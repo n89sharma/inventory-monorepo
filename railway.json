@@ -1,9 +1,10 @@
 {
   "build": {
-    "rootDirectory": "apps/backend"
+    "rootDirectory": "apps/backend",
+    "buildCommand": "npm install && npm run build -w apps/backend"
   },
   "deploy": {
-    "startCommand": "node /dist/src/index.js",
+    "startCommand": "node apps/backend/dist/src/index.js",
     "watchPaths": [
       "apps/backend/**"
     ]
