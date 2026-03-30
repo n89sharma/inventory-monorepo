@@ -10,7 +10,7 @@ import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import type { NavigationSection } from 'shared-types'
+import type { NavigationSection } from '@/ui-types/navigation-context'
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 

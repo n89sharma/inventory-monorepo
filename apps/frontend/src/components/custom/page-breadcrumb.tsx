@@ -8,7 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/shadcn/breadcrumb'
-import { isCollection, type NavigationSection } from 'shared-types'
+import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
 import { formatSentenceCase } from '@/lib/formatters'
 
 interface BreadcrumbSegment {

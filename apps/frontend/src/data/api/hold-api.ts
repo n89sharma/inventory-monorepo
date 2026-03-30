@@ -1,6 +1,7 @@
 import { api } from '@/data/api/axios-client'
+import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
 import type { User } from 'shared-types'
-import { getIdOrNullFromSelection, getSelectedOrNull, type Hold, HoldSchema, type SelectOption } from 'shared-types'
+import { HoldSchema, type Hold } from 'shared-types'
 import { z } from 'zod'
 
 export async function getHolds(

@@ -7,7 +7,7 @@ export const AssetSummarySchema = z.object({
   model: z.string(),
   asset_type: z.string(),
   serial_number: z.string(),
-  meter_total: z.string(),
+  meter_total: z.bigint().nullable(),
   availability_status: z.string(),
   tracking_status: z.string(),
   technical_status: z.string(),

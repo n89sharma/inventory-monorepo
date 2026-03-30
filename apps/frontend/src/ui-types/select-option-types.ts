@@ -1,5 +1,5 @@
-import type { Status, Warehouse } from './reference-data-types';
-import type { User } from './user-types';
+import type { Status, User, Warehouse } from 'shared-types';
+import { StatusSchema, WarehouseSchema } from 'shared-types';
 import { z } from 'zod';
 
 export type SelectOption<T> =
@@ -41,3 +41,6 @@ export function getSelectOption<T>(v: T): SelectOption<T> {
     selected: v
   }
 }
+
+export const StatusSelectOptionSchema = SelectOptionSchema(StatusSchema)
+export const WarehouseSelectOptionSchema = SelectOptionSchema(WarehouseSchema)

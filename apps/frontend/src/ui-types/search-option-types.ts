@@ -1,5 +1,4 @@
-import type { Warehouse } from './reference-data-types'
-import type { User } from './user-types'
+import type { User, Warehouse } from 'shared-types'
 import type { SelectOption } from './select-option-types'
 
 export type SearchOptions = {

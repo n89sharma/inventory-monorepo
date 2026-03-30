@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
+import { CreateArrival, CreateAsset } from 'shared-types'
 import { prisma } from "../prisma.js"
-import { Arrival, Asset } from "../types/arrivalTypes.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
 const sequenceAssetEntity = 'ASSET'
@@ -9,7 +9,7 @@ const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
 
-export async function createArrival(newArrival: Arrival) {
+export async function createArrival(newArrival: CreateArrival) {
   const warehouseCode = newArrival.warehouse.city_code
   const currentDateTime = new Date()
   const barcodes = await generateBarcodes(newArrival.assets, warehouseCode, currentDateTime)
@@ -17,11 +17,11 @@ export async function createArrival(newArrival: Arrival) {
   const arrival = await prisma.arrival.create({
     data: {
       arrival_number: await getNewArrivalNumber(warehouseCode, currentDateTime),
+      origin: { connect: { id: newArrival.vendor.id } },
+      destination: { connect: { id: newArrival.warehouse.id } },
+      transporter: { connect: { id: newArrival.transporter.id } },
       notes: newArrival.comment,
       created_at: currentDateTime,
-      destination: { connect: { id: newArrival.warehouse.id } },
-      origin: { connect: { id: newArrival.vendor.id } },
-      transporter: { connect: { id: newArrival.transporter.id } },
       assets: {
         create: newArrival.assets.map(a => mapAsset(
           a,
@@ -36,7 +36,7 @@ export async function createArrival(newArrival: Arrival) {
 }
 
 function mapAsset(
-  asset: Asset,
+  asset: CreateAsset,
   barcodes: Record<string, string>,
   warehouseId: number,
   currentDateTime: Date) {
@@ -68,7 +68,7 @@ function mapAsset(
 }
 
 
-async function generateBarcodes(assets: Asset[], warehouseCode: string, date: Date) {
+async function generateBarcodes(assets: CreateAsset[], warehouseCode: string, date: Date) {
   const barcodes: Record<string, string> = {}
   for (const asset of assets) {
     barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode, date)
@@ -93,7 +93,7 @@ async function getNextSequence(entityType: string, warehouseCode: string, date: 
   const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
   return result[0].get_next_sequence
 }
-export async function updateArrival(arrival: Arrival) {
+export async function updateArrival(arrival: CreateArrival) {
   const existingAssetIds = (await prisma.asset.findMany({
     where: { arrival_id: arrival.id },
     select: { id: true }

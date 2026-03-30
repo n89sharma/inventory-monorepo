@@ -1,5 +1,6 @@
 import { api } from '@/data/api/axios-client'
-import { getSelectedOrNull, type Invoice, InvoiceSchema, type SelectOption } from 'shared-types'
+import { getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
+import { type Invoice, InvoiceSchema } from 'shared-types'
 import { z } from 'zod'
 
 export async function getInvoices(

@@ -1,9 +1,9 @@
 import { Badge } from "@/components/shadcn/badge"
 import { Button } from "@/components/shadcn/button"
-import type { AssetForm } from 'shared-types'
-import type { CoreFunction } from 'shared-types'
+import type { AssetForm } from "@/ui-types/arrival-form-types"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
+import type { CoreFunction } from 'shared-types'
 
 interface GetNewAssetTableColumnProps {
   onDelete: (index: number) => void

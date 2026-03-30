@@ -1,8 +1,7 @@
 import { useConstantsStore } from '@/data/store/constants-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { flattenFieldErrors } from '@/lib/utils'
-import { ArrivalFormSchema, type ArrivalForm } from 'shared-types'
-import { UNSELECTED } from 'shared-types'
+import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon, PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -18,6 +17,7 @@ import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
 import { getNewAssetTableColumns } from '../column-defs/new-assets-columns'
+import { UNSELECTED } from '@/ui-types/select-option-types'
 
 interface ArrivalFormPageProps {
   defaultValues?: ArrivalForm

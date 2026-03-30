@@ -1,4 +1,4 @@
-import type { NavigationSection } from 'shared-types'
+import type { NavigationSection } from '@/ui-types/navigation-context'
 import { create } from 'zustand'
 
 interface NavigationStore {

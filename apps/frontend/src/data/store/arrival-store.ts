@@ -1,5 +1,5 @@
-import type { ArrivalSummary, SelectOption, Warehouse } from 'shared-types'
-import { ANY_OPTION, UNSELECTED } from 'shared-types'
+import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
+import type { ArrivalSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface ArrivalStore {

@@ -1,10 +1,10 @@
 import { getInvoices } from "@/data/api/invoice-api"
 import { useInvoiceStore } from "@/data/store/invoice-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
-import type { SearchOptions } from 'shared-types'
 import { SearchBar } from "../custom/search-bar"
 import { CollectionPage } from "./collection-page"
 import { invoiceTableColumns } from "./column-defs/invoice-columns"
+import type { SearchOptions } from "@/ui-types/search-option-types"
 
 export function InvoicesSummaryPage(): React.JSX.Element {
   const invoices = useInvoiceStore(state => state.invoices)

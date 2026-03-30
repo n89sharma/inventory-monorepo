@@ -1,5 +1,5 @@
 import express from 'express'
-import { createArrival, getArrivals, getArrival, getArrivalForEdit, updateArrival } from '../controllers/arrivalController.js'
+import { createArrival, getArrival, getArrivalForEdit, getArrivals, updateArrival } from '../controllers/arrivalController.js'
 import { DateRangeWithWarehouseSchema, validateQuery } from '../middleware/validation.js'
 
 const router = express.Router()

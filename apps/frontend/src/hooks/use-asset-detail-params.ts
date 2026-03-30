@@ -1,5 +1,5 @@
+import type { NavigationSection } from '@/ui-types/navigation-context'
 import { useParams } from "react-router-dom"
-import type { NavigationSection } from 'shared-types'
 
 interface AssetDetailsParams {
   section: NavigationSection

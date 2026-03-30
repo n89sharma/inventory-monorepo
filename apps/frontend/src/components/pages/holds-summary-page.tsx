@@ -2,10 +2,10 @@ import { getHolds } from "@/data/api/hold-api"
 import { useHoldStore } from "@/data/store/hold-store"
 import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
-import type { SearchOptions } from 'shared-types'
-import { ANY_OPTION } from 'shared-types'
-import { SelectOptions } from "../custom/select-options"
+import type { SearchOptions } from "@/ui-types/search-option-types"
+import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { SearchBar } from "../custom/search-bar"
+import { SelectOptions } from "../custom/select-options"
 import { CollectionPage } from "./collection-page"
 import { holdTableColumns } from "./column-defs/hold-columns"
 

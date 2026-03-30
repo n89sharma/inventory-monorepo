@@ -83,8 +83,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             <CardTitle>Warehouse</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">{detail.warehouse.city_code}</span>
-            <span className="text-muted-foreground">{detail.warehouse.street}</span>
+            <span className="font-medium">{detail.warehouse?.city_code}</span>
+            <span className="text-muted-foreground">{detail.warehouse?.street}</span>
           </CardContent>
         </Card>
       </div>

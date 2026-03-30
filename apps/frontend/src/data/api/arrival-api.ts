@@ -1,8 +1,10 @@
 import { api } from '@/data/api/axios-client'
 import { apiErrorHandler } from '@/lib/error-handler'
+import type { ArrivalForm } from '@/ui-types/arrival-form-types'
+import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, EditArrivalSchema, getIdOrNullFromSelection, getSelectedOrNull, type ArrivalDetail, type ArrivalForm, type ArrivalSummary, type EditArrival, type SelectOption } from 'shared-types'
+import type { ApiResponse, ArrivalDetail, ArrivalSummary, EditArrival, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, EditArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 
 interface CreateArrivalResponse {

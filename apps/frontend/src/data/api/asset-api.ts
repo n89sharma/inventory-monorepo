@@ -1,7 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import { formatThousandsK, formatUSD, getFormattedDate, getInitials, getPartNames } from '@/lib/formatters'
+import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
 import type { AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Model, Part, Status, Warehouse } from 'shared-types'
-import { AssetSummarySchema, getIdOrNullFromSelection, type SelectOption } from 'shared-types'
+import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
 interface AssetDetailResponse {

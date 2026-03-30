@@ -1,7 +1,8 @@
+import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-types'
+import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
 import { subDays } from 'date-fns'
 import { useEffect, useRef } from 'react'
-import type { SearchOptions, SetSearchOptions } from 'shared-types'
-import { ANY_OPTION, getSelectOption } from 'shared-types'
+
 
 export function useAutoSearch(
   hasSearched: boolean,

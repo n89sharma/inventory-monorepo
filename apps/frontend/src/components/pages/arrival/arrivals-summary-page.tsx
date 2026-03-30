@@ -2,8 +2,6 @@ import { getArrivals } from "@/data/api/arrival-api"
 import { useArrivalStore } from "@/data/store/arrival-store"
 import { useConstantsStore } from "@/data/store/constants-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
-import type { SearchOptions } from 'shared-types'
-import { ANY_OPTION } from 'shared-types'
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
@@ -12,6 +10,8 @@ import { Button } from "../../shadcn/button"
 import { SelectOptions } from "../../custom/select-options"
 import { CollectionPage } from "../collection-page"
 import { arrivalTableColumns } from "../column-defs/arrival-columns"
+import type { SearchOptions } from "@/ui-types/search-option-types"
+import { ANY_OPTION } from "@/ui-types/select-option-types"
 
 export function ArrivalsSummaryPage(): React.JSX.Element {
   const arrivals = useArrivalStore(state => state.arrivals)

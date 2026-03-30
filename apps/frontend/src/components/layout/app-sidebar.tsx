@@ -14,7 +14,7 @@ import { ChartLineUpIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, Magnifyin
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { isNavigationSection, type NavigationSection } from 'shared-types'
+import { isNavigationSection, type NavigationSection } from "@/ui-types/navigation-context"
 
 const sidebarItems = [
   {

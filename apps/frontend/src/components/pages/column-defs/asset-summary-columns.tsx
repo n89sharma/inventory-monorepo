@@ -1,10 +1,10 @@
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
+import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
-import type { AssetSummary, NavigationSection } from 'shared-types'
-import { isCollection } from 'shared-types'
+import type { AssetSummary } from 'shared-types'
 
 export function createAssetSummaryColumns(
   navigationSection: NavigationSection,

@@ -1,4 +1,3 @@
-import type React from "react"
 import {
   Field,
   FieldLabel
@@ -11,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/select"
-import { type SelectOption, ANY_OPTION, getSelectOption, isSelected, UNSELECTED } from 'shared-types'
+import { type SelectOption, ANY_OPTION, getSelectOption, isSelected, UNSELECTED } from "@/ui-types/select-option-types"
+import type React from "react"
 
 type SelectOptionsProps<T> = {
   selection: SelectOption<T>
@@ -52,7 +52,7 @@ export function SelectOptions<T>({
     if (key === 'ANY')
       return ANY_OPTION
     const found = options.find(o => getKeyFromEntity(o) === key)
-    if (found) 
+    if (found)
       return getSelectOption(found)
     return UNSELECTED
   }

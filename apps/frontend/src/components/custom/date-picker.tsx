@@ -1,3 +1,4 @@
+import { Button } from "@/components/shadcn/button"
 import { Calendar } from "@/components/shadcn/calendar"
 import { Field, FieldLabel } from "@/components/shadcn/field"
 import {
@@ -5,9 +6,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/shadcn/popover"
-import { Button } from "@/components/shadcn/button"
+import { getSelectedOrNull, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
 import { format } from "date-fns"
-import { getSelectedOrNull, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "shared-types"
 
 interface DatePickerFieldProps {
   label: string

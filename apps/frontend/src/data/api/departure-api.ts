@@ -1,6 +1,7 @@
 import { api } from '@/data/api/axios-client'
+import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { Warehouse } from 'shared-types'
-import { type Departure, DepartureSchema, getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from 'shared-types'
+import { type Departure, DepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
 export async function getDepartures(

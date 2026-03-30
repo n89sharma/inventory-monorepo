@@ -2,11 +2,11 @@ import { getDepartures } from "@/data/api/departure-api"
 import { useConstantsStore } from "@/data/store/constants-store"
 import { useDepartureStore } from "@/data/store/departure-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
-import type { SearchOptions } from 'shared-types'
-import { ANY_OPTION } from 'shared-types'
+import type { SearchOptions } from "@/ui-types/search-option-types"
+import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { useMemo } from "react"
-import { SelectOptions } from "../custom/select-options"
 import { SearchBar } from "../custom/search-bar"
+import { SelectOptions } from "../custom/select-options"
 import { CollectionPage } from "./collection-page"
 import { departureTableColumns } from "./column-defs/departure-columns"
 

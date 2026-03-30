@@ -4,5 +4,12 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "bbuild": "npm run build -w apps/backend",
+    "fbuild": "npm run build -w packages/shared-types && npm run build -w apps/frontend",
+    "bdev": "npm run dev -w apps/backend",
+    "fdev": "npm run dev -w apps/frontend",
+    "bstart": "npm run start -w apps/backend"
+  }
 }

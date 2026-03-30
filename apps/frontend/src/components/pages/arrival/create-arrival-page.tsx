@@ -1,5 +1,5 @@
 import { createArrival } from '@/data/api/arrival-api'
-import type { ArrivalForm } from 'shared-types'
+import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ArrivalFormPage } from './arrival-form-page'

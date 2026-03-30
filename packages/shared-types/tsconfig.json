@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
     "outDir": "dist",
+    "declaration": true,
     "strict": true,
     "lib": ["esnext"],
     "esModuleInterop": true,
     "module": "nodenext",
     "target": "ESNext",
     "moduleResolution": "nodenext",
-    "types": ["node"]
+    "composite": true,
+    "types": []
   },
-  "references": [
-    { "path": "../../packages/shared-types" }
-  ]
+  "include": ["./**/*.ts"],
+  "exclude": ["dist"]
 }

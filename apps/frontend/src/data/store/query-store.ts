@@ -1,5 +1,5 @@
+import { ANY_OPTION, type SelectOption } from '@/ui-types/select-option-types'
 import type { AssetSummary, Model, Status, Warehouse } from 'shared-types'
-import { ANY_OPTION, type SelectOption } from 'shared-types'
 import { create } from 'zustand'
 
 interface QueryStore {

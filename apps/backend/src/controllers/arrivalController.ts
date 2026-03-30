@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from 'express'
+import { ArrivalDetail, ArrivalSummary, CreateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb, getAssetsForArrival as getAssetsForArrivalDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import { createArrival as createArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
-import { Arrival, ArrivalSchema } from "../types/arrivalTypes.js"
 
-export async function getArrivals(req: Request, res: Response) {
+export async function getArrivals(
+  req: Request,
+  res: Response<ArrivalSummary[] | { error: string }>) {
   try {
     const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
     const arrivals = await prisma.$queryRawTyped(getArrivalsDb(fromDate, toDate, warehouse ?? 0))
@@ -16,7 +18,10 @@ export async function getArrivals(req: Request, res: Response) {
   }
 }
 
-export async function getArrival(req: Request, res: Response) {
+export async function getArrival(
+  req: Request,
+  res: Response<ArrivalDetail | { error: string }>) {
+
   const { arrivalNumber } = req.params
   try {
     const [arrival, assets] = await Promise.all([
@@ -37,9 +42,9 @@ export async function getArrival(req: Request, res: Response) {
       vendor: arrival.origin,
       transporter: arrival.transporter,
       warehouse: arrival.destination,
-      comment: arrival.notes ?? null,
+      comment: arrival.notes,
       created_at: arrival.created_at,
-      created_by: arrival.created_by?.email ?? null,
+      created_by: arrival.created_by?.email,
       assets,
     })
   } catch (error) {
@@ -47,9 +52,13 @@ export async function getArrival(req: Request, res: Response) {
   }
 }
 
-export async function createArrival(req: Request, res: Response, next: NextFunction) {
+export async function createArrival(
+  req: Request,
+  res: Response<{ arrivalNumber: string }>,
+  next: NextFunction) {
+
   try {
-    const validatedArrival: Arrival = ArrivalSchema.parse(req.body)
+    const validatedArrival = CreateArrivalSchema.parse(req.body)
     const arrivalNumber = await createArrivalSer(validatedArrival)
     res.status(201).json({ arrivalNumber: arrivalNumber })
   } catch (error) {
@@ -105,10 +114,14 @@ export async function getArrivalForEdit(req: Request, res: Response) {
   }
 }
 
-export async function updateArrival(req: Request, res: Response, next: NextFunction) {
+export async function updateArrival(
+  req: Request,
+  res: Response<{ arrivalNumber: string }>,
+  next: NextFunction) {
+
   const { arrivalNumber } = req.params
   try {
-    const validated = ArrivalSchema.parse(req.body)
+    const validated = CreateArrivalSchema.parse(req.body)
     await updateArrivalSer(validated)
     res.json({ arrivalNumber })
   } catch (error) {

@@ -1,5 +1,5 @@
+import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { Invoice } from 'shared-types'
-import { ANY_OPTION, UNSELECTED, type SelectOption } from 'shared-types'
 import { create } from 'zustand'
 
 interface InvoiceStore {
