@@ -1664,6 +1664,11 @@ export type AssetErrorFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` AssetErrors.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of AssetErrors.
+   */
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

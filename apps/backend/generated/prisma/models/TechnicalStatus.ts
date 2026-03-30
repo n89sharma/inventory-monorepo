@@ -1035,6 +1035,11 @@ export type TechnicalStatusFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` TechnicalStatuses.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TechnicalStatuses.
+   */
   distinct?: Prisma.TechnicalStatusScalarFieldEnum | Prisma.TechnicalStatusScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

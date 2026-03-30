@@ -43,9 +43,9 @@ export type TechnicalSpecificationSumAggregateOutputType = {
   id: number | null
   asset_id: number | null
   cassettes: number | null
-  meter_black: bigint | null
-  meter_colour: bigint | null
-  meter_total: bigint | null
+  meter_black: number | null
+  meter_colour: number | null
+  meter_total: number | null
   drum_life_c: number | null
   drum_life_m: number | null
   drum_life_y: number | null
@@ -57,9 +57,9 @@ export type TechnicalSpecificationMinAggregateOutputType = {
   asset_id: number | null
   cassettes: number | null
   internal_finisher: string | null
-  meter_black: bigint | null
-  meter_colour: bigint | null
-  meter_total: bigint | null
+  meter_black: number | null
+  meter_colour: number | null
+  meter_total: number | null
   drum_life_c: number | null
   drum_life_m: number | null
   drum_life_y: number | null
@@ -71,9 +71,9 @@ export type TechnicalSpecificationMaxAggregateOutputType = {
   asset_id: number | null
   cassettes: number | null
   internal_finisher: string | null
-  meter_black: bigint | null
-  meter_colour: bigint | null
-  meter_total: bigint | null
+  meter_black: number | null
+  meter_colour: number | null
+  meter_total: number | null
   drum_life_c: number | null
   drum_life_m: number | null
   drum_life_y: number | null
@@ -256,9 +256,9 @@ export type TechnicalSpecificationGroupByOutputType = {
   asset_id: number
   cassettes: number | null
   internal_finisher: string | null
-  meter_black: bigint | null
-  meter_colour: bigint | null
-  meter_total: bigint | null
+  meter_black: number | null
+  meter_colour: number | null
+  meter_total: number | null
   drum_life_c: number | null
   drum_life_m: number | null
   drum_life_y: number | null
@@ -293,9 +293,9 @@ export type TechnicalSpecificationWhereInput = {
   asset_id?: Prisma.IntFilter<"TechnicalSpecification"> | number
   cassettes?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   internal_finisher?: Prisma.StringNullableFilter<"TechnicalSpecification"> | string | null
-  meter_black?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_colour?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_total?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
+  meter_black?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_colour?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_total?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
@@ -326,9 +326,9 @@ export type TechnicalSpecificationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TechnicalSpecificationWhereInput | Prisma.TechnicalSpecificationWhereInput[]
   cassettes?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   internal_finisher?: Prisma.StringNullableFilter<"TechnicalSpecification"> | string | null
-  meter_black?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_colour?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_total?: Prisma.BigIntNullableFilter<"TechnicalSpecification"> | bigint | number | null
+  meter_black?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_colour?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_total?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
@@ -363,9 +363,9 @@ export type TechnicalSpecificationScalarWhereWithAggregatesInput = {
   asset_id?: Prisma.IntWithAggregatesFilter<"TechnicalSpecification"> | number
   cassettes?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   internal_finisher?: Prisma.StringNullableWithAggregatesFilter<"TechnicalSpecification"> | string | null
-  meter_black?: Prisma.BigIntNullableWithAggregatesFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_colour?: Prisma.BigIntNullableWithAggregatesFilter<"TechnicalSpecification"> | bigint | number | null
-  meter_total?: Prisma.BigIntNullableWithAggregatesFilter<"TechnicalSpecification"> | bigint | number | null
+  meter_black?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  meter_colour?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  meter_total?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   drum_life_c?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   drum_life_m?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
@@ -375,9 +375,9 @@ export type TechnicalSpecificationScalarWhereWithAggregatesInput = {
 export type TechnicalSpecificationCreateInput = {
   cassettes?: number | null
   internal_finisher?: string | null
-  meter_black?: bigint | number | null
-  meter_colour?: bigint | number | null
-  meter_total?: bigint | number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
   drum_life_c?: number | null
   drum_life_m?: number | null
   drum_life_y?: number | null
@@ -390,9 +390,9 @@ export type TechnicalSpecificationUncheckedCreateInput = {
   asset_id: number
   cassettes?: number | null
   internal_finisher?: string | null
-  meter_black?: bigint | number | null
-  meter_colour?: bigint | number | null
-  meter_total?: bigint | number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
   drum_life_c?: number | null
   drum_life_m?: number | null
   drum_life_y?: number | null
@@ -402,9 +402,9 @@ export type TechnicalSpecificationUncheckedCreateInput = {
 export type TechnicalSpecificationUpdateInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -417,9 +417,9 @@ export type TechnicalSpecificationUncheckedUpdateInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -431,9 +431,9 @@ export type TechnicalSpecificationCreateManyInput = {
   asset_id: number
   cassettes?: number | null
   internal_finisher?: string | null
-  meter_black?: bigint | number | null
-  meter_colour?: bigint | number | null
-  meter_total?: bigint | number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
   drum_life_c?: number | null
   drum_life_m?: number | null
   drum_life_y?: number | null
@@ -443,9 +443,9 @@ export type TechnicalSpecificationCreateManyInput = {
 export type TechnicalSpecificationUpdateManyMutationInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -457,9 +457,9 @@ export type TechnicalSpecificationUncheckedUpdateManyInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -575,20 +575,12 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type NullableBigIntFieldUpdateOperationsInput = {
-  set?: bigint | number | null
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
-}
-
 export type TechnicalSpecificationCreateWithoutAssetInput = {
   cassettes?: number | null
   internal_finisher?: string | null
-  meter_black?: bigint | number | null
-  meter_colour?: bigint | number | null
-  meter_total?: bigint | number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
   drum_life_c?: number | null
   drum_life_m?: number | null
   drum_life_y?: number | null
@@ -599,9 +591,9 @@ export type TechnicalSpecificationUncheckedCreateWithoutAssetInput = {
   id?: number
   cassettes?: number | null
   internal_finisher?: string | null
-  meter_black?: bigint | number | null
-  meter_colour?: bigint | number | null
-  meter_total?: bigint | number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
   drum_life_c?: number | null
   drum_life_m?: number | null
   drum_life_y?: number | null
@@ -627,9 +619,9 @@ export type TechnicalSpecificationUpdateToOneWithWhereWithoutAssetInput = {
 export type TechnicalSpecificationUpdateWithoutAssetInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -640,9 +632,9 @@ export type TechnicalSpecificationUncheckedUpdateWithoutAssetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  meter_black?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_colour?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  meter_total?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -731,9 +723,9 @@ export type $TechnicalSpecificationPayload<ExtArgs extends runtime.Types.Extensi
     asset_id: number
     cassettes: number | null
     internal_finisher: string | null
-    meter_black: bigint | null
-    meter_colour: bigint | null
-    meter_total: bigint | null
+    meter_black: number | null
+    meter_colour: number | null
+    meter_total: number | null
     drum_life_c: number | null
     drum_life_m: number | null
     drum_life_y: number | null
@@ -1166,9 +1158,9 @@ export interface TechnicalSpecificationFieldRefs {
   readonly asset_id: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly cassettes: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly internal_finisher: Prisma.FieldRef<"TechnicalSpecification", 'String'>
-  readonly meter_black: Prisma.FieldRef<"TechnicalSpecification", 'BigInt'>
-  readonly meter_colour: Prisma.FieldRef<"TechnicalSpecification", 'BigInt'>
-  readonly meter_total: Prisma.FieldRef<"TechnicalSpecification", 'BigInt'>
+  readonly meter_black: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly meter_colour: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly meter_total: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly drum_life_c: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly drum_life_m: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly drum_life_y: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
@@ -1373,6 +1365,11 @@ export type TechnicalSpecificationFindManyArgs<ExtArgs extends runtime.Types.Ext
    * Skip the first `n` TechnicalSpecifications.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TechnicalSpecifications.
+   */
   distinct?: Prisma.TechnicalSpecificationScalarFieldEnum | Prisma.TechnicalSpecificationScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

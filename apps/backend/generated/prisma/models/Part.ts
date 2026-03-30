@@ -1191,6 +1191,11 @@ export type PartFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Parts.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Parts.
+   */
   distinct?: Prisma.PartScalarFieldEnum | Prisma.PartScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

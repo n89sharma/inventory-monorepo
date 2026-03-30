@@ -981,6 +981,11 @@ export type SequenceFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Sequences.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Sequences.
+   */
   distinct?: Prisma.SequenceScalarFieldEnum | Prisma.SequenceScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

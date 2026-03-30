@@ -35,8 +35,8 @@ export namespace getAssetDetails {
     sale_price: $runtime.Decimal | null
     ts_cassettes: number | null
     internal_finisher: string | null
-    meter_black: bigint | null
-    meter_colour: bigint | null
+    meter_black: number | null
+    meter_colour: number | null
     drum_life_c: number | null
     drum_life_m: number | null
     drum_life_y: number | null

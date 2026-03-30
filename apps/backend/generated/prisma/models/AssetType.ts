@@ -1035,6 +1035,11 @@ export type AssetTypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` AssetTypes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of AssetTypes.
+   */
   distinct?: Prisma.AssetTypeScalarFieldEnum | Prisma.AssetTypeScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

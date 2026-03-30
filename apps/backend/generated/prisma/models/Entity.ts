@@ -1035,6 +1035,11 @@ export type EntityFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Skip the first `n` Entities.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Entities.
+   */
   distinct?: Prisma.EntityScalarFieldEnum | Prisma.EntityScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

@@ -64,9 +64,9 @@ model TechnicalSpecification {
   asset_id          Int     @unique
   cassettes         Int?
   internal_finisher String?
-  meter_black       BigInt?
-  meter_colour      BigInt?
-  meter_total       BigInt?
+  meter_black       Int?
+  meter_colour      Int?
+  meter_total       Int?
   drum_life_c       Int?
   drum_life_m       Int?
   drum_life_y       Int?

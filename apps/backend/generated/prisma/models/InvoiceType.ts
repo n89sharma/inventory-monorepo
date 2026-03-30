@@ -1035,6 +1035,11 @@ export type InvoiceTypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` InvoiceTypes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of InvoiceTypes.
+   */
   distinct?: Prisma.InvoiceTypeScalarFieldEnum | Prisma.InvoiceTypeScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

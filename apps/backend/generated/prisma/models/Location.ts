@@ -1212,6 +1212,11 @@ export type LocationFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Locations.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Locations.
+   */
   distinct?: Prisma.LocationScalarFieldEnum | Prisma.LocationScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

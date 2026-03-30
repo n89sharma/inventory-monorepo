@@ -56,9 +56,9 @@ function mapAsset(
     },
     technical_specification: {
       create: {
-        meter_black: BigInt(asset.meterBlack),
-        meter_colour: BigInt(asset.meterColour),
-        meter_total: BigInt(asset.meterBlack + asset.meterColour),
+        meter_black: asset.meterBlack,
+        meter_colour: asset.meterColour,
+        meter_total: asset.meterBlack + asset.meterColour,
         internal_finisher: asset.internalFinisher,
         cassettes: asset.cassettes
       }
@@ -127,9 +127,9 @@ export async function updateArrival(arrival: CreateArrival) {
         technical_status_id: asset.technicalStatus.id,
         technical_specification: {
           update: {
-            meter_black: BigInt(asset.meterBlack),
-            meter_colour: BigInt(asset.meterColour),
-            meter_total: BigInt(asset.meterBlack + asset.meterColour),
+            meter_black: asset.meterBlack,
+            meter_colour: asset.meterColour,
+            meter_total: asset.meterBlack + asset.meterColour,
             cassettes: asset.cassettes,
             internal_finisher: asset.internalFinisher
           }

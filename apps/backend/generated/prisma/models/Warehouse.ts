@@ -1496,6 +1496,11 @@ export type WarehouseFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` Warehouses.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Warehouses.
+   */
   distinct?: Prisma.WarehouseScalarFieldEnum | Prisma.WarehouseScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

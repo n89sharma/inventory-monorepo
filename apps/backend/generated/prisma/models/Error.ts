@@ -1288,6 +1288,11 @@ export type ErrorFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` Errors.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Errors.
+   */
   distinct?: Prisma.ErrorScalarFieldEnum | Prisma.ErrorScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

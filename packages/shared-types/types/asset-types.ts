@@ -7,7 +7,7 @@ export const AssetSummarySchema = z.object({
   model: z.string(),
   asset_type: z.string(),
   serial_number: z.string(),
-  meter_total: z.bigint().nullable(),
+  meter_total: z.number().nullable(),
   availability_status: z.string(),
   tracking_status: z.string(),
   technical_status: z.string(),
@@ -41,9 +41,9 @@ export type AssetDetails = {
   specs: {
     cassettes: number
     internal_finisher: string
-    meter_black: string
-    meter_colour: string
-    meter_total: string
+    meter_black: number
+    meter_colour: number
+    meter_total: number
     drum_life_c: number
     drum_life_m: number
     drum_life_y: number

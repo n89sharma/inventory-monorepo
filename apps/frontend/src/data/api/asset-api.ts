@@ -1,5 +1,5 @@
 import { api } from '@/data/api/axios-client'
-import { formatThousandsK, formatUSD, getFormattedDate, getInitials, getPartNames } from '@/lib/formatters'
+import { formatUSD, getFormattedDate, getInitials, getPartNames } from '@/lib/formatters'
 import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
 import type { AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Model, Part, Status, Warehouse } from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
@@ -28,8 +28,8 @@ interface AssetDetailResponse {
   sale_price: number
   ts_cassettes: number,
   internal_finisher: string,
-  meter_black: string,
-  meter_colour: string,
+  meter_black: number,
+  meter_colour: number,
   drum_life_c: number,
   drum_life_m: number,
   drum_life_y: number,
@@ -107,9 +107,9 @@ function mapAssetDetail(r: AssetDetailResponse): AssetDetails {
     specs: {
       cassettes: r.ts_cassettes,
       internal_finisher: r.internal_finisher,
-      meter_black: formatThousandsK(parseInt(r.meter_black)),
-      meter_colour: formatThousandsK(parseInt(r.meter_colour)),
-      meter_total: formatThousandsK(parseInt(r.meter_black) + parseInt(r.meter_colour)),
+      meter_black: r.meter_black,
+      meter_colour: r.meter_colour,
+      meter_total: r.meter_black + r.meter_colour,
       drum_life_c: r.drum_life_c,
       drum_life_m: r.drum_life_m,
       drum_life_y: r.drum_life_y,

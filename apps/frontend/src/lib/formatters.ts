@@ -1,9 +1,8 @@
 import { format } from 'date-fns'
 
-export function formatThousandsK(value: number | string): string {
-  const numValue = typeof value != 'number' ? parseInt(value) : value
-  if (numValue < 1000) return value.toString()
-  return (numValue / 1000).toFixed(0) + " K"
+export function formatThousandsK(value: number): string {
+  if (value < 1000) return value.toString()
+  return (value / 1000).toFixed(0) + " K"
 }
 
 export function formatUSD(value: number) {

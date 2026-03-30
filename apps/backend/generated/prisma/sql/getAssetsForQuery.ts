@@ -13,17 +13,17 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param warehouse
  * @param meter
  */
-export const getAssetsForQuery = $runtime.makeTypedQueryFactory("select\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\ntr.status as tracking_status,\nav.status as availability_status,\nte.status as technical_status\nfrom \"Asset\" a\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"TrackingStatus\" tr on tr.id = a.tracking_status_id\njoin \"AvailabilityStatus\" av on av.id = a.availability_status_id\njoin \"TechnicalStatus\" te on te.id = a.technical_status_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere m.\"name\"\n~* $1\nAND\n($2 = 0 or tr.id = $2)\nAND\n($3 = 0 or av.id = $3)\nAND\n($4 = 0 or te.id = $4)\nAND\n($5 = 0 or w.id = $5)\nAND\n($6 = -1 or t.meter_total <= $6)") as (modelPattern: string, trackingStatus: number, availabilityStatus: number, technicalStatus: number, warehouse: number, meter: number | bigint) => $runtime.TypedSql<getAssetsForQuery.Parameters, getAssetsForQuery.Result>
+export const getAssetsForQuery = $runtime.makeTypedQueryFactory("select\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\ntr.status as tracking_status,\nav.status as availability_status,\nte.status as technical_status\nfrom \"Asset\" a\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"TrackingStatus\" tr on tr.id = a.tracking_status_id\njoin \"AvailabilityStatus\" av on av.id = a.availability_status_id\njoin \"TechnicalStatus\" te on te.id = a.technical_status_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere m.\"name\"\n~* $1\nAND\n($2 = 0 or tr.id = $2)\nAND\n($3 = 0 or av.id = $3)\nAND\n($4 = 0 or te.id = $4)\nAND\n($5 = 0 or w.id = $5)\nAND\n($6 = -1 or t.meter_total <= $6)") as (modelPattern: string, trackingStatus: number, availabilityStatus: number, technicalStatus: number, warehouse: number, meter: number) => $runtime.TypedSql<getAssetsForQuery.Parameters, getAssetsForQuery.Result>
 
 export namespace getAssetsForQuery {
-  export type Parameters = [modelPattern: string, trackingStatus: number, availabilityStatus: number, technicalStatus: number, warehouse: number, meter: number | bigint]
+  export type Parameters = [modelPattern: string, trackingStatus: number, availabilityStatus: number, technicalStatus: number, warehouse: number, meter: number]
   export type Result = {
     brand: string
     model: string
     asset_type: string
     barcode: string
     serial_number: string
-    meter_total: bigint | null
+    meter_total: number | null
     warehouse_city_code: string
     warehouse_street: string
     tracking_status: string

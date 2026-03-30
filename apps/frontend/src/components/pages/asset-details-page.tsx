@@ -7,10 +7,11 @@ import { getAllAssetDetails } from '@/data/api/asset-api'
 import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
+import { formatThousandsK } from '@/lib/formatters'
+import type { NavigationSection } from '@/ui-types/navigation-context'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import type { NavigationSection } from '@/ui-types/navigation-context'
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 
@@ -88,7 +89,7 @@ export const AssetDetailsPage = () => {
             <DataRowContainer>
               <DataRow label="Asset Type" value={ad?.asset_type} />
               <DataRow label="Serial #" value={ad?.serial_number} />
-              <DataRow label="Meter" value={ad?.specs?.meter_total} />
+              <DataRow label="Meter" value={ad && ad.specs ? formatThousandsK(ad.specs.meter_total) : '0K'} />
               <DataRow label="Tracking Status" value={ad?.tracking_status} />
               <DataRow label="Availability" value={ad?.availability_status} />
               <DataRow label="Technical Status" value={ad?.technical_status} />

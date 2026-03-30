@@ -1839,6 +1839,11 @@ export type ArrivalFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` Arrivals.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Arrivals.
+   */
   distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

@@ -1,22 +1,18 @@
-import express from 'express'
 import cors from 'cors'
+import express from 'express'
 import morgan from 'morgan'
-import assetRoutes from './routes/assets.js'
 import arrivalRoutes from './routes/arrivals.js'
+import assetRoutes from './routes/assets.js'
+import constantRoutes from './routes/constants.js'
 import departureRoutes from './routes/depatures.js'
-import transferRoutes from './routes/transfers.js'
 import holdRoutes from './routes/holds.js'
 import invoiceRoutes from './routes/invoices.js'
-import constantRoutes from './routes/constants.js'
 import modelRoutes from './routes/models.js'
 import organizationRoutes from './routes/organizations.js'
+import transferRoutes from './routes/transfers.js'
 import userRoutes from './routes/users.js'
 
 const app = express();
-
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
 
 app.use(express.json());
 app.use(cors({ origin: ["http://localhost:5173", "https://shiva-inv.vercel.app"] }))

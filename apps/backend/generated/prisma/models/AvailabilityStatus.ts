@@ -1035,6 +1035,11 @@ export type AvailabilityStatusFindManyArgs<ExtArgs extends runtime.Types.Extensi
    * Skip the first `n` AvailabilityStatuses.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of AvailabilityStatuses.
+   */
   distinct?: Prisma.AvailabilityStatusScalarFieldEnum | Prisma.AvailabilityStatusScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

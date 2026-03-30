@@ -1299,6 +1299,11 @@ export type CostFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Costs.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Costs.
+   */
   distinct?: Prisma.CostScalarFieldEnum | Prisma.CostScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

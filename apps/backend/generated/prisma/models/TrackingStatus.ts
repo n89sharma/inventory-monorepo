@@ -1035,6 +1035,11 @@ export type TrackingStatusFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` TrackingStatuses.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of TrackingStatuses.
+   */
   distinct?: Prisma.TrackingStatusScalarFieldEnum | Prisma.TrackingStatusScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }

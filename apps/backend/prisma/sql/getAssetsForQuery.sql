@@ -3,7 +3,7 @@
 -- @param {Int} $3:availabilityStatus
 -- @param {Int} $4:technicalStatus
 -- @param {Int} $5:warehouse
--- @param {BigInt} $6:meter
+-- @param {Int} $6:meter
 select
   b."name" as brand,
   m."name" as model,

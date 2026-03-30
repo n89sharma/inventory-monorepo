@@ -18,7 +18,7 @@ export namespace getAssetsForInvoice {
     asset_type: string
     barcode: string
     serial_number: string
-    meter_total: bigint | null
+    meter_total: number | null
     warehouse_city_code: string
     warehouse_street: string
     tracking_status: string

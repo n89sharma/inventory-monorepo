@@ -1837,6 +1837,11 @@ export type TransferFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Transfers.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Transfers.
+   */
   distinct?: Prisma.TransferScalarFieldEnum | Prisma.TransferScalarFieldEnum[]
   relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
