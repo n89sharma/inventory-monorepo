@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "btypes": "npm run build -w packages/shared-types",
     "bbuild": "npm run build -w apps/backend",
     "fbuild": "npm run build -w packages/shared-types && npm run build -w apps/frontend",
     "bdev": "npm run dev -w apps/backend",

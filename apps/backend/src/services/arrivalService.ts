@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { CreateArrival, CreateAsset } from 'shared-types'
+import { CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -93,7 +93,8 @@ async function getNextSequence(entityType: string, warehouseCode: string, date: 
   const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
   return result[0].get_next_sequence
 }
-export async function updateArrival(arrival: CreateArrival) {
+
+export async function updateArrival(arrival: UpdateArrival) {
   const existingAssetIds = (await prisma.asset.findMany({
     where: { arrival_id: arrival.id },
     select: { id: true }

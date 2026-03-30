@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AssetSummarySchema } from './asset-types.js';
 import { ModelSchema } from './model-types.js';
-import { OrgDetailSchema } from './organization-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
 import { CoreFunctionsSchema, StatusSchema, WarehouseSchema } from './reference-data-types.js';
 
 // GET /arrivals?fromDate...&toDate...&warehouse...
@@ -29,9 +29,8 @@ export const ArrivalDetailSchema = z.object({
 })
 export type ArrivalDetail = z.infer<typeof ArrivalDetailSchema>
 
-// POST PUT /arrivals
+// POST /arrivals
 export const CreateAssetSchema = z.object({
-  id: z.number().optional(),
   model: ModelSchema.refine(val => !!val, "Model is required"),
   serialNumber: z.string().refine(val => val.length > 0, "Serial number is required"),
   meterBlack: z.number().min(0, "Meter must be positive"),
@@ -43,19 +42,29 @@ export const CreateAssetSchema = z.object({
 })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 
-// POST PUT /arrivals
 export const CreateArrivalSchema = z.object({
-  id: z.number().optional(),
-  vendor: OrgDetailSchema.refine(val => !!val, "Vendor required"),
-  transporter: OrgDetailSchema.refine(val => !!val, "Transporter required"),
+  vendor: OrgSummarySchema.refine(val => !!val, "Vendor required"),
+  transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
   warehouse: WarehouseSchema.refine(val => !!val, "Warehouse required"),
   comment: z.string(),
   assets: z.array(CreateAssetSchema).nonempty("No assets in the arrival")
 })
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
+// PUT /arrivals
+export const UpdateAssetSchema = CreateAssetSchema.extend({
+  id: z.number().optional()
+})
+export type UpdateAsset = z.infer<typeof UpdateAssetSchema>
+
+export const UpdateArrivalSchema = CreateArrivalSchema.extend({
+  id: z.number(),
+  assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival")
+})
+export type UpdateArrival = z.infer<typeof UpdateArrivalSchema>
+
 // GET /arrivals/1100034/edit
-export const EditAssetSchema = z.object({
+export const AssetFormDataSchema = z.object({
   id: z.number(),
   barcode: z.string(),
   modelId: z.number(),
@@ -67,16 +76,16 @@ export const EditAssetSchema = z.object({
   internalFinisher: z.string(),
   coreFunctionIds: z.array(z.number())
 })
-export type EditAsset = z.infer<typeof EditAssetSchema>
+export type AssetFormData = z.infer<typeof AssetFormDataSchema>
 
 // GET /arrivals/1100034/edit
-export const EditArrivalSchema = z.object({
+export const ArrivalFormDataSchema = z.object({
   id: z.number(),
   arrivalNumber: z.string(),
   vendorId: z.number(),
   transporterId: z.number(),
-  warehouseId: z.number(),
+  warehouseId: z.number().nullable(),
   comment: z.string(),
-  assets: z.array(EditAssetSchema)
+  assets: z.array(AssetFormDataSchema)
 })
-export type EditArrival = z.infer<typeof EditArrivalSchema>
+export type ArrivalFormData = z.infer<typeof ArrivalFormDataSchema>

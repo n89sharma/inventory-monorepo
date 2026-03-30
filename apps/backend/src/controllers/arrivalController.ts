@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ArrivalDetail, ArrivalSummary, CreateArrivalSchema } from 'shared-types'
+import { ArrivalDetail, ArrivalFormData, ArrivalSummary, CreateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb, getAssetsForArrival as getAssetsForArrivalDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -66,7 +66,10 @@ export async function createArrival(
   }
 }
 
-export async function getArrivalForEdit(req: Request, res: Response) {
+export async function getArrivalForEdit(
+  req: Request,
+  res: Response<ArrivalFormData | { error: string }>) {
+
   const { arrivalNumber } = req.params
   try {
     const arrival = await prisma.arrival.findUnique({
@@ -121,7 +124,7 @@ export async function updateArrival(
 
   const { arrivalNumber } = req.params
   try {
-    const validated = CreateArrivalSchema.parse(req.body)
+    const validated = UpdateArrivalSchema.parse(req.body)
     await updateArrivalSer(validated)
     res.json({ arrivalNumber })
   } catch (error) {

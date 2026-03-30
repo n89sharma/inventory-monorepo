@@ -3,8 +3,8 @@ import { apiErrorHandler } from '@/lib/error-handler'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, ArrivalDetail, ArrivalSummary, EditArrival, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, EditArrivalSchema } from 'shared-types'
+import type { ApiResponse, ArrivalDetail, ArrivalFormData, ArrivalSummary, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalFormDataSchema, ArrivalSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
 interface CreateArrivalResponse {
@@ -32,9 +32,9 @@ export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDe
   return ArrivalDetailSchema.parse(res.data)
 }
 
-export async function getArrivalForEdit(arrivalNumber: string): Promise<EditArrival> {
+export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalFormData> {
   const res = await api.get(`/arrivals/${arrivalNumber}/edit`)
-  return EditArrivalSchema.parse(res.data)
+  return ArrivalFormDataSchema.parse(res.data)
 }
 
 export async function updateArrival(
