@@ -32,6 +32,21 @@ npm run preview  # Preview production build
 
 No tests are configured yet.
 
+### Root-level build commands
+```bash
+npm run bbuild   # Build backend only (from repo root)
+npm run fbuild   # Build shared-types then frontend (from repo root)
+```
+
+## Development Workflow
+
+**After every code change, run both build commands from the repo root:**
+```bash
+npm run bbuild
+npm run fbuild
+```
+Then summarize any errors and fix them before considering the task complete.
+
 ## Architecture
 
 ### Data Flow
