@@ -1,10 +1,9 @@
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { getArrivalDetail } from '@/data/api/arrival-api'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import type { ArrivalDetail } from 'shared-types'
-import type { OrgDetail } from 'shared-types'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
+import type { ArrivalDetail, OrgDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { Card, CardContent, CardHeader, CardTitle } from '../../shadcn/card'
@@ -38,6 +37,7 @@ function OrgCard({ title, org }: { title: string, org: OrgDetail }) {
 export function ArrivalDetailsPage(): React.JSX.Element {
   const [detail, setDetail] = useState<ArrivalDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -57,6 +57,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       setLoading(true)
       try {
         setDetail(await getArrivalDetail(collectionId!))
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load arrival')
       } finally {
         setLoading(false)
       }
@@ -66,6 +68,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   }, [collectionId])
 
   if (loading) return <div>Loading...</div>
+  if (error) return <div>{error}</div>
   if (!detail) return <div>Arrival not found</div>
 
   return (

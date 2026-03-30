@@ -28,8 +28,9 @@ export async function getArrivals(
 }
 
 export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDetail> {
-  const res = await api.get(`/arrivals/${arrivalNumber}`)
-  return ArrivalDetailSchema.parse(res.data)
+  const { data } = await api.get<ApiResponse<ArrivalDetail>>(`/arrivals/${arrivalNumber}`)
+  if (data.success) return ArrivalDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalFormData> {

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { ArrivalDetail, ArrivalFormData, ArrivalSummary, CreateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
+import { ApiResponse, ArrivalDetail, ArrivalFormData, ArrivalSummary, CreateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
-import { getArrivals as getArrivalsDb, getAssetsForArrival as getAssetsForArrivalDb } from '../../generated/prisma/sql.js'
+import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
-import { createArrival as createArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
+import { createArrival as createArrivalSer, getArrival as getArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
 
 export async function getArrivals(
   req: Request,
@@ -20,35 +20,18 @@ export async function getArrivals(
 
 export async function getArrival(
   req: Request,
-  res: Response<ArrivalDetail | { error: string }>) {
+  res: Response<ApiResponse<ArrivalDetail>>) {
 
   const { arrivalNumber } = req.params
-  try {
-    const [arrival, assets] = await Promise.all([
-      prisma.arrival.findUnique({
-        where: { arrival_number: arrivalNumber },
-        include: { origin: true, destination: true, transporter: true, created_by: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForArrivalDb(arrivalNumber))
-    ])
-
-    if (!arrival) {
-      res.status(404).json({ error: `Arrival ${arrivalNumber} not found` })
-      return
+  const response = await getArrivalSer(arrivalNumber)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    if (response.error.status === 400) {
+      return res.status(404).json(response)
+    } else {
+      return res.status(500).json(response)
     }
-
-    res.json({
-      arrival_number: arrival.arrival_number,
-      vendor: arrival.origin,
-      transporter: arrival.transporter,
-      warehouse: arrival.destination,
-      comment: arrival.notes,
-      created_at: arrival.created_at,
-      created_by: arrival.created_by?.email,
-      assets,
-    })
-  } catch (error) {
-    res.status(500).json({ error: `Failed to fetch arrival ${arrivalNumber}` })
   }
 }
 

@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
-import { CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
+import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -8,6 +9,33 @@ const sequenceAssetEntity = 'ASSET'
 const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
+
+export async function getArrival(arrivalNumber: string): Promise<ApiResponse<ArrivalDetail>> {
+  try {
+    const [arrival, assets] = await Promise.all([
+      prisma.arrival.findUnique({
+        where: { arrival_number: arrivalNumber },
+        include: { origin: true, destination: true, transporter: true, created_by: true }
+      }),
+      prisma.$queryRawTyped(getAssetsForArrival(arrivalNumber))
+    ])
+    if (!arrival) {
+      return response400(`Arrival ${arrivalNumber} not found`)
+    }
+    return successResponse({
+      arrival_number: arrival.arrival_number,
+      vendor: arrival.origin,
+      transporter: arrival.transporter,
+      warehouse: arrival.destination,
+      comment: arrival.notes,
+      created_at: arrival.created_at,
+      created_by: arrival.created_by?.email,
+      assets
+    })
+  } catch (error) {
+    return response500(`Failed to fetch arrival ${arrivalNumber}`)
+  }
+}
 
 export async function createArrival(newArrival: CreateArrival) {
   const warehouseCode = newArrival.warehouse.city_code
@@ -23,7 +51,7 @@ export async function createArrival(newArrival: CreateArrival) {
       notes: newArrival.comment,
       created_at: currentDateTime,
       assets: {
-        create: newArrival.assets.map(a => mapAsset(
+        create: newArrival.assets.map(a => mapAssetForArrivalCreation(
           a,
           barcodes,
           newArrival.warehouse.id,
@@ -35,7 +63,7 @@ export async function createArrival(newArrival: CreateArrival) {
   return arrival.arrival_number
 }
 
-function mapAsset(
+function mapAssetForArrivalCreation(
   asset: CreateAsset,
   barcodes: Record<string, string>,
   warehouseId: number,
@@ -113,7 +141,7 @@ export async function updateArrival(arrival: UpdateArrival) {
     const barcodes = await generateBarcodes(assetsToCreate, warehouseCode, currentDateTime)
     assetCreates = assetsToCreate.map(asset => prisma.asset.create({
       data: {
-        ...mapAsset(asset, barcodes, arrival.warehouse.id, currentDateTime),
+        ...mapAssetForArrivalCreation(asset, barcodes, arrival.warehouse.id, currentDateTime),
         arrival: { connect: { id: arrival.id } }
       }
     }))

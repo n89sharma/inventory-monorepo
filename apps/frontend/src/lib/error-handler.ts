@@ -36,6 +36,10 @@ export function apiErrorHandler<T>(error: Error | AxiosError<ApiError>): ApiResp
 
   return {
     success: false,
-    error: error
+    error: {
+      type: 'OTHER',
+      summary: error.name,
+      details: error.message
+    }
   }
 }
