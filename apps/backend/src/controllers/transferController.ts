@@ -1,8 +1,10 @@
-import { Request, Response } from 'express'
-import { getTransfers as getTransfersDb, getAssetsForTransfers as getAssetsForTransfersDb } from '../../generated/prisma/sql.js'
-import { prisma } from '../prisma.js'
-import { z } from 'zod'
 import { isAfter } from 'date-fns'
+import { Request, Response } from 'express'
+import { ApiResponse, TransferDetail } from 'shared-types'
+import { z } from 'zod'
+import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
+import { prisma } from '../prisma.js'
+import { getTransfer as getTransferSer } from '../services/transferService.js'
 
 export const TransferQuerySchema = z.object({
   fromDate: z.string(),
@@ -28,12 +30,16 @@ export async function getTransfers(req: Request, res: Response) {
   }
 }
 
-export async function getAssetsForTransfer(req: Request, res: Response) {
+export async function getTransferDetail(req: Request, res: Response<ApiResponse<TransferDetail>>) {
   const { transferNumber } = req.params
-  try {
-    const assets = await prisma.$queryRawTyped(getAssetsForTransfersDb(transferNumber))
-    res.json(assets)
-  } catch (error) {
-    res.status(500).json({ error: `Failed to fetch assets for transfer ${transferNumber}` })
+  const response = await getTransferSer(transferNumber)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    if (response.error.status === 400) {
+      return res.status(404).json(response)
+    } else {
+      return res.status(500).json(response)
+    }
   }
 }

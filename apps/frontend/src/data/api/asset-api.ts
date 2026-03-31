@@ -254,11 +254,6 @@ export async function getAssetsForInvoices(invoiceNumber: string): Promise<Asset
   return z.array(AssetSummarySchema).parse(res.data)
 }
 
-export async function getAssetsForTransfers(transferNumber: string): Promise<AssetSummary[]> {
-  const res = await api.get(`/transfers/${transferNumber}`)
-  return z.array(AssetSummarySchema).parse(res.data)
-}
-
 export async function getAssetsForHolds(holdNumber: string): Promise<AssetSummary[]> {
   const res = await api.get(`/holds/${holdNumber}`)
   return z.array(AssetSummarySchema).parse(res.data)
