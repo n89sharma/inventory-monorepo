@@ -12,7 +12,7 @@ import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
-  const [detail, setDetail] = useState<ArrivalDetail | null>(null)
+  const [arrival, setArrival] = useState<ArrivalDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const setLastPath = useNavigationStore(state => state.setLastPath)
@@ -33,7 +33,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     async function load() {
       setLoading(true)
       try {
-        setDetail(await getArrivalDetail(collectionId!))
+        setArrival(await getArrivalDetail(collectionId!))
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load arrival')
       } finally {
@@ -46,7 +46,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
-  if (!detail) return <div>Arrival not found</div>
+  if (!arrival) return <div>Arrival not found</div>
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,11 +56,11 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="arrivals" collectionId={collectionId} />
       </div>
       <div className="flex gap-4">
-        <OrgCard title="Vendor" org={detail.vendor} />
-        <OrgCard title="Transporter" org={detail.transporter} />
-        <WarehouseCard title="Warehouse" warehouse={detail.warehouse} />
+        <OrgCard title="Vendor" org={arrival.vendor} />
+        <OrgCard title="Transporter" org={arrival.transporter} />
+        <WarehouseCard title="Warehouse" warehouse={arrival.warehouse} />
       </div>
-      <DataTable columns={columns} data={detail.assets} />
+      <DataTable columns={columns} data={arrival.assets} />
     </div>
   )
 }

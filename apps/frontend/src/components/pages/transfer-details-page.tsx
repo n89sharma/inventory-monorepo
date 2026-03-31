@@ -12,7 +12,7 @@ import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function TransferDetailsPage(): React.JSX.Element {
-  const [detail, setDetail] = useState<TransferDetail | null>(null)
+  const [transfer, setTransfer] = useState<TransferDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const setLastPath = useNavigationStore(state => state.setLastPath)
@@ -33,7 +33,7 @@ export function TransferDetailsPage(): React.JSX.Element {
     async function load() {
       setLoading(true)
       try {
-        setDetail(await getTransferDetail(collectionId!))
+        setTransfer(await getTransferDetail(collectionId!))
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load transfer')
       } finally {
@@ -46,7 +46,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
-  if (!detail) return <div>Transfer not found</div>
+  if (!transfer) return <div>Transfer not found</div>
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,11 +56,11 @@ export function TransferDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="transfers" collectionId={collectionId} />
       </div>
       <div className="flex gap-4">
-        <WarehouseCard title="Origin" warehouse={detail.origin} />
-        <WarehouseCard title="Destination" warehouse={detail.destination} />
-        <OrgCard title="Transporter" org={detail.transporter} />
+        <WarehouseCard title="Origin" warehouse={transfer.origin} />
+        <WarehouseCard title="Destination" warehouse={transfer.destination} />
+        <OrgCard title="Transporter" org={transfer.transporter} />
       </div>
-      <DataTable columns={columns} data={detail.assets} />
+      <DataTable columns={columns} data={transfer.assets} />
     </div>
   )
 }

@@ -12,7 +12,7 @@ import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
-  const [detail, setDetail] = useState<InvoiceDetail | null>(null)
+  const [invoice, setInvoice] = useState<InvoiceDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const setLastPath = useNavigationStore(state => state.setLastPath)
@@ -33,7 +33,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     async function load() {
       setLoading(true)
       try {
-        setDetail(await getInvoiceDetail(collectionId!))
+        setInvoice(await getInvoiceDetail(collectionId!))
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load invoice')
       } finally {
@@ -46,7 +46,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
-  if (!detail) return <div>Invoice not found</div>
+  if (!invoice) return <div>Invoice not found</div>
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,10 +56,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="invoices" collectionId={collectionId} />
       </div>
       <div className="flex gap-4">
-        <UserCard title="Created By" user={detail.created_by} />
-        <OrgCard title="Customer" org={detail.customer} />
+        <UserCard title="Created By" user={invoice.created_by} />
+        <OrgCard title="Customer" org={invoice.customer} />
       </div>
-      <DataTable columns={columns} data={detail.assets} />
+      <DataTable columns={columns} data={invoice.assets} />
     </div>
   )
 }

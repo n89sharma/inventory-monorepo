@@ -12,7 +12,7 @@ import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
-  const [detail, setDetail] = useState<HoldDetail | null>(null)
+  const [hold, setHold] = useState<HoldDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const setLastPath = useNavigationStore(state => state.setLastPath)
@@ -33,7 +33,7 @@ export function HoldDetailsPage(): React.JSX.Element {
     async function load() {
       setLoading(true)
       try {
-        setDetail(await getHoldDetail(collectionId!))
+        setHold(await getHoldDetail(collectionId!))
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load hold')
       } finally {
@@ -46,7 +46,7 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
-  if (!detail) return <div>Hold not found</div>
+  if (!hold) return <div>Hold not found</div>
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,11 +56,11 @@ export function HoldDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="holds" collectionId={collectionId} />
       </div>
       <div className="flex gap-4">
-        <UserCard title="Created By" user={detail.created_by} />
-        <UserCard title="Created For" user={detail.created_for} />
-        <OrgCard title="Customer" org={detail.customer} />
+        <UserCard title="Created By" user={hold.created_by} />
+        <UserCard title="Created For" user={hold.created_for} />
+        <OrgCard title="Customer" org={hold.customer} />
       </div>
-      <DataTable columns={columns} data={detail.assets} />
+      <DataTable columns={columns} data={hold.assets} />
     </div>
   )
 }

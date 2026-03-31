@@ -1,9 +1,9 @@
-import { PencilSimpleIcon, DotsThreeVerticalIcon, TrashIcon } from "@phosphor-icons/react";
-import { Link } from "react-router-dom";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../shadcn/dropdown-menu";
-import { Button } from "../shadcn/button";
-import { AlertDialogDestructive } from "./delete-collection-dialog";
+import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "../shadcn/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu";
+import { AlertDialogDestructive } from "./delete-collection-dialog";
 
 type CollectionEditBarProps = {
   section: string,
@@ -17,11 +17,9 @@ export function CollectionEditBar({
 
   return (
     <div className="flex gap-2">
-      {section === 'arrivals' && (
-        <Button asChild>
-          <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
-        </Button>
-      )}
+      <Button asChild>
+        <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
+      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" aria-label="More options">
