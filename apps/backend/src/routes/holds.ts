@@ -1,10 +1,10 @@
 import express from 'express'
-import { getAssetsForHold, getHolds, HoldQuerySchema } from '../controllers/holdController.js'
+import { getHoldDetail, getHolds, HoldQuerySchema } from '../controllers/holdController.js'
 import { validateQuery } from '../middleware/validation.js'
 
 const router = express.Router()
 
 router.get('/', validateQuery(HoldQuerySchema), getHolds)
-router.get('/:holdNumber', getAssetsForHold)
+router.get('/:holdNumber', getHoldDetail)
 
 export default router

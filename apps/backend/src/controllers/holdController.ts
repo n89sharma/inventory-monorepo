@@ -1,8 +1,10 @@
-import { Request, Response } from 'express'
-import { getHolds as getHoldsDb, getAssetsForHold as getAssetsForHoldDb} from '../../generated/prisma/sql.js'
-import { prisma } from '../prisma.js'
-import { z } from 'zod'
 import { isAfter } from 'date-fns'
+import { Request, Response } from 'express'
+import { ApiResponse, HoldDetail } from 'shared-types'
+import { z } from 'zod'
+import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
+import { prisma } from '../prisma.js'
+import { getHold as getHoldSer } from '../services/holdService.js'
 
 export const HoldQuerySchema = z.object({
   fromDate: z.string(),
@@ -28,12 +30,16 @@ export async function getHolds(req: Request, res: Response) {
   }
 }
 
-export async function getAssetsForHold(req: Request, res: Response) {
+export async function getHoldDetail(req: Request, res: Response<ApiResponse<HoldDetail>>) {
   const { holdNumber } = req.params
-  try {
-    const assets = await prisma.$queryRawTyped(getAssetsForHoldDb(holdNumber))
-    res.json(assets)
-  } catch (error) {
-    res.status(500).json({ error:  `Failed to fetch assets for hold ${holdNumber}` })
+  const response = await getHoldSer(holdNumber)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    if (response.error.status === 400) {
+      return res.status(404).json(response)
+    } else {
+      return res.status(500).json(response)
+    }
   }
 }
