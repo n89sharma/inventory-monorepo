@@ -1,11 +1,11 @@
 import { Button } from "@/components/shadcn/button"
-import type { Invoice } from 'shared-types'
+import type { InvoiceSummary } from 'shared-types'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
 
-export const invoiceTableColumns: ColumnDef<Invoice>[] = [
+export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   {
     accessorKey: "invoice_number",
     header: ({ column }) => {

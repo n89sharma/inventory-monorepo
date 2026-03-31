@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
-import { ApiResponse, Departure, DepartureDetail, response500, successResponse } from 'shared-types'
+import { ApiResponse, DepartureDetail, DepartureSummary, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import { getDeparture as getDepartureSer } from '../services/departureService.js'
 
-export async function getDepartures(req: Request, res: Response<ApiResponse<Departure[]>>) {
+export async function getDepartures(req: Request, res: Response<ApiResponse<DepartureSummary[]>>) {
   try {
     const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
     const departures = await prisma.$queryRawTyped(getDeparturesDb(fromDate, toDate, warehouse ?? 0))

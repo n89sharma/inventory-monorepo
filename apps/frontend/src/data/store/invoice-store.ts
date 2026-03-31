@@ -1,15 +1,15 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { Invoice } from 'shared-types'
+import type { InvoiceSummary } from 'shared-types'
 import { create } from 'zustand'
 
 interface InvoiceStore {
-  invoices: Invoice[]
+  invoices: InvoiceSummary[]
   loading: boolean
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   hasSearched: boolean
 
-  setInvoices: (invoices: Invoice[]) => void
+  setInvoices: (invoices: InvoiceSummary[]) => void
   setLoading: (loading: boolean) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void

@@ -1,16 +1,16 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { Departure, Warehouse } from 'shared-types'
+import type { DepartureSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface DepartureStore {
-  departures: Departure[]
+  departures: DepartureSummary[]
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   origin: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
 
-  setDepartures: (departures: Departure[]) => void
+  setDepartures: (departures: DepartureSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setOrigin: (warehouse: SelectOption<Warehouse>) => void

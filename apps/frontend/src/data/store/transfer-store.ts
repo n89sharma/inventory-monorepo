@@ -1,9 +1,9 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { Transfer, Warehouse } from 'shared-types'
+import type { TransferSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface TransferStore {
-  transfers: Transfer[]
+  transfers: TransferSummary[]
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   origin: SelectOption<Warehouse>
@@ -11,7 +11,7 @@ interface TransferStore {
   loading: boolean
   hasSearched: boolean
 
-  setTransfers: (t: Transfer[]) => void
+  setTransfers: (t: TransferSummary[]) => void
   setFromDate: (d: SelectOption<Date>) => void
   setToDate: (d: SelectOption<Date>) => void
   setOrigin: (o: SelectOption<Warehouse>) => void

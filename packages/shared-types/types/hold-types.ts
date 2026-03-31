@@ -3,7 +3,7 @@ import { AssetSummarySchema } from './asset-types.js';
 import { OrgDetailSchema } from './organization-types.js';
 import { UserSchema } from './user-types.js';
 
-export const HoldSchema = z.object({
+export const HoldSummarySchema = z.object({
   hold_number: z.string(),
   created_by: z.string(),
   created_for: z.string(),
@@ -14,7 +14,7 @@ export const HoldSchema = z.object({
   to_dt: z.coerce.date().nullable()
 });
 
-export type Hold = z.infer<typeof HoldSchema>;
+export type HoldSummary = z.infer<typeof HoldSummarySchema>;
 
 // GET /holds/:holdNumber
 export const HoldDetailSchema = z.object({

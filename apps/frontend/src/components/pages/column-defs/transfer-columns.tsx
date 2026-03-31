@@ -1,11 +1,11 @@
 import { Button } from "@/components/shadcn/button"
-import type { Transfer } from 'shared-types'
+import type { TransferSummary } from 'shared-types'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
 
-export const transferTableColumns: ColumnDef<Transfer>[] = [
+export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
     accessorKey: "transfer_number",
     header: ({ column }) => {

@@ -3,7 +3,7 @@ import { AssetSummarySchema } from './asset-types.js';
 import { OrgDetailSchema } from './organization-types.js';
 import { UserSchema } from './user-types.js';
 
-export const InvoiceSchema = z.object({
+export const InvoiceSummarySchema = z.object({
   invoice_number: z.string(),
   organization: z.string(),
   created_by: z.string(),
@@ -12,7 +12,7 @@ export const InvoiceSchema = z.object({
   invoice_type: z.string()
 });
 
-export type Invoice = z.infer<typeof InvoiceSchema>;
+export type InvoiceSummary = z.infer<typeof InvoiceSummarySchema>;
 
 // GET /invoices/:invoiceNumber
 export const InvoiceDetailSchema = z.object({

@@ -1,9 +1,9 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { Hold, User } from 'shared-types'
+import type { HoldSummary, User } from 'shared-types'
 import { create } from 'zustand'
 
 interface HoldStore {
-  holds: Hold[]
+  holds: HoldSummary[]
   loading: boolean
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
@@ -11,7 +11,7 @@ interface HoldStore {
   holdFor: SelectOption<User>
   hasSearched: boolean
 
-  setHolds: (holds: Hold[]) => void
+  setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void

@@ -1,11 +1,11 @@
 import { Button } from "@/components/shadcn/button"
-import type { Hold } from 'shared-types'
+import type { HoldSummary } from 'shared-types'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
 
-export const holdTableColumns: ColumnDef<Hold>[] = [
+export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   {
     accessorKey: "hold_number",
     header: ({ column }) => {

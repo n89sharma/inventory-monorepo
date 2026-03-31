@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, Transfer, TransferDetail, response500, successResponse } from 'shared-types'
+import { ApiResponse, TransferDetail, TransferSummary, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -20,7 +20,7 @@ export const TransferQuerySchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
-export async function getTransfers(req: Request, res: Response<ApiResponse<Transfer[]>>) {
+export async function getTransfers(req: Request, res: Response<ApiResponse<TransferSummary[]>>) {
   try {
     const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<typeof TransferQuerySchema>
     const transfers = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0))

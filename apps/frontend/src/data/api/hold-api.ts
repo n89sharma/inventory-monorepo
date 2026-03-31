@@ -1,7 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
 import type { ApiResponse, HoldDetail, User } from 'shared-types'
-import { HoldDetailSchema, HoldSchema, type Hold } from 'shared-types'
+import { HoldDetailSchema, HoldSummarySchema, type HoldSummary } from 'shared-types'
 import { z } from 'zod'
 
 export async function getHolds(
@@ -9,8 +9,8 @@ export async function getHolds(
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>
-): Promise<Hold[]> {
-  const { data } = await api.get<ApiResponse<Hold[]>>(`/holds`, {
+): Promise<HoldSummary[]> {
+  const { data } = await api.get<ApiResponse<HoldSummary[]>>(`/holds`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
@@ -18,7 +18,7 @@ export async function getHolds(
       holdFor: getIdOrNullFromSelection(holdFor)
     }
   })
-  if (data.success) return z.array(HoldSchema).parse(data.data)
+  if (data.success) return z.array(HoldSummarySchema).parse(data.data)
   throw new Error(data.error.summary)
 }
 

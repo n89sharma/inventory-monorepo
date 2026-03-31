@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
-import { ApiResponse, Invoice, InvoiceDetail, response500, successResponse } from 'shared-types'
+import { ApiResponse, InvoiceDetail, InvoiceSummary, response500, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import { getInvoice as getInvoiceSer } from '../services/invoiceService.js'
 
-export async function getInvoices(req: Request, res: Response<ApiResponse<Invoice[]>>) {
+export async function getInvoices(req: Request, res: Response<ApiResponse<InvoiceSummary[]>>) {
   try {
     const { fromDate, toDate } = res.locals.parsedDates
     const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))

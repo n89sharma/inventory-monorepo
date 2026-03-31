@@ -1,11 +1,11 @@
 import { Button } from "@/components/shadcn/button"
-import type { Departure } from 'shared-types'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
+import type { DepartureSummary } from 'shared-types'
 
-export const departureTableColumns: ColumnDef<Departure>[] = [
+export const departureTableColumns: ColumnDef<DepartureSummary>[] = [
   {
     accessorKey: "departure_number",
     header: ({ column }) => {

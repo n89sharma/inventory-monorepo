@@ -3,7 +3,7 @@ import { AssetSummarySchema } from './asset-types.js';
 import { OrgDetailSchema } from './organization-types.js';
 import { WarehouseSchema } from './reference-data-types.js';
 
-export const TransferSchema = z.object({
+export const TransferSummarySchema = z.object({
   transfer_number: z.string(),
   origin_code: z.string(),
   origin_street: z.string(),
@@ -14,7 +14,7 @@ export const TransferSchema = z.object({
   created_by: z.string()
 });
 
-export type Transfer = z.infer<typeof TransferSchema>;
+export type TransferSummary = z.infer<typeof TransferSummarySchema>;
 
 // GET /transfers/:transferNumber
 export const TransferDetailSchema = z.object({
