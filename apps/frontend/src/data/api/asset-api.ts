@@ -244,10 +244,6 @@ export async function getAllAssetDetails(barcode: string) {
 }
 
 
-export async function getAssetsForDeparture(departureNumber: string): Promise<AssetSummary[]> {
-  const res = await api.get(`/departures/${departureNumber}`)
-  return z.array(AssetSummarySchema).parse(res.data)
-}
 
 export async function getAssetsForInvoices(invoiceNumber: string): Promise<AssetSummary[]> {
   const res = await api.get(`/invoices/${invoiceNumber}`)

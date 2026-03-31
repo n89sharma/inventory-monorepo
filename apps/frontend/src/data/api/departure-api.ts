@@ -1,7 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { Warehouse } from 'shared-types'
-import { type Departure, DepartureSchema } from 'shared-types'
+import type { ApiResponse, DepartureDetail, Warehouse } from 'shared-types'
+import { type Departure, DepartureDetailSchema, DepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
 export async function getDepartures(
@@ -18,4 +18,10 @@ export async function getDepartures(
     }
   })
   return z.array(DepartureSchema).parse(res.data)
+}
+
+export async function getDepartureDetail(departureNumber: string): Promise<DepartureDetail> {
+  const { data } = await api.get<ApiResponse<DepartureDetail>>(`/departures/${departureNumber}`)
+  if (data.success) return DepartureDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
 }

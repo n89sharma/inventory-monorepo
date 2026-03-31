@@ -1,8 +1,10 @@
 import { Request, Response } from 'express'
-import { getDepartures as getDeparturesDb, getAssetsForDepartures as getAssetsForDeparturesDb} from '../../generated/prisma/sql.js'
-import { prisma } from '../prisma.js'
+import { ApiResponse, DepartureDetail } from 'shared-types'
 import { z } from 'zod'
+import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
+import { prisma } from '../prisma.js'
+import { getDeparture as getDepartureSer } from '../services/departureService.js'
 
 export async function getDepartures(req: Request, res: Response) {
   try {
@@ -14,12 +16,16 @@ export async function getDepartures(req: Request, res: Response) {
   }
 }
 
-export async function getAssetsForDeparture(req: Request, res: Response) {
+export async function getDepartureDetail(req: Request, res: Response<ApiResponse<DepartureDetail>>) {
   const { departureNumber } = req.params
-  try {
-    const assets = await prisma.$queryRawTyped(getAssetsForDeparturesDb(departureNumber))
-    res.json(assets)
-  } catch (error) {
-    res.status(500).json({ error: `Failed to fetch assets for departure ${departureNumber}` })
+  const response = await getDepartureSer(departureNumber)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    if (response.error.status === 400) {
+      return res.status(404).json(response)
+    } else {
+      return res.status(500).json(response)
+    }
   }
 }
