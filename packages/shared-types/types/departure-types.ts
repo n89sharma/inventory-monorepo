@@ -9,7 +9,7 @@ export const DepartureSchema = z.object({
   origin_street: z.string(),
   destination: z.string(),
   transporter: z.string(),
-  created_at: z.iso.datetime(),
+  created_at: z.coerce.date(),
   created_by: z.string()
 });
 

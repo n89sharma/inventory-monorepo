@@ -10,14 +10,15 @@ export async function getDepartures(
   origin: SelectOption<Warehouse>
 ): Promise<Departure[]> {
 
-  const res = await api.get(`/departures`, {
+  const { data } = await api.get<ApiResponse<Departure[]>>(`/departures`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(origin),
     }
   })
-  return z.array(DepartureSchema).parse(res.data)
+  if (data.success) return z.array(DepartureSchema).parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getDepartureDetail(departureNumber: string): Promise<DepartureDetail> {

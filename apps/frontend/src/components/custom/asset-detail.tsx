@@ -22,10 +22,10 @@ type TitleProps = {
 
 type CMYKDataProps = {
   label: string,
-  c_value: number | undefined,
-  m_value: number | undefined,
-  y_value: number | undefined,
-  k_value: number | undefined,
+  c_value: number | undefined | null,
+  m_value: number | undefined | null,
+  y_value: number | undefined | null,
+  k_value: number | undefined | null,
   className?: string
 }
 

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find E:/00-home/development/inventory-monorepo/apps/backend/generated/prisma/sql -name *.ts)"
     ]
-  }
+  },
+  "outputStyle": "default"
 }

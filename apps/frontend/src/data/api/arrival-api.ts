@@ -17,14 +17,15 @@ export async function getArrivals(
   destination: SelectOption<Warehouse>
 ): Promise<ArrivalSummary[]> {
 
-  const res = await api.get(`/arrivals`, {
+  const { data } = await api.get<ApiResponse<ArrivalSummary[]>>(`/arrivals`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(destination)
     }
   })
-  return z.array(ArrivalSummarySchema).parse(res.data)
+  if (data.success) return z.array(ArrivalSummarySchema).parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDetail> {
@@ -34,8 +35,9 @@ export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDe
 }
 
 export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalFormData> {
-  const res = await api.get(`/arrivals/${arrivalNumber}/edit`)
-  return ArrivalFormDataSchema.parse(res.data)
+  const { data } = await api.get<ApiResponse<ArrivalFormData>>(`/arrivals/${arrivalNumber}/edit`)
+  if (data.success) return ArrivalFormDataSchema.parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function updateArrival(

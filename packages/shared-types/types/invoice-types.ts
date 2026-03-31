@@ -7,7 +7,7 @@ export const InvoiceSchema = z.object({
   invoice_number: z.string(),
   organization: z.string(),
   created_by: z.string(),
-  created_at: z.iso.datetime(),
+  created_at: z.coerce.date(),
   is_cleared: z.boolean(),
   invoice_type: z.string()
 });

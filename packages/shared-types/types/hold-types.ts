@@ -8,10 +8,10 @@ export const HoldSchema = z.object({
   created_by: z.string(),
   created_for: z.string(),
   customer: z.string(),
-  notes: z.string(),
-  created_at: z.iso.datetime(),
-  from_dt: z.iso.datetime().nullable(),
-  to_dt: z.iso.datetime().nullable()
+  notes: z.string().nullable(),
+  created_at: z.coerce.date(),
+  from_dt: z.coerce.date().nullable(),
+  to_dt: z.coerce.date().nullable()
 });
 
 export type Hold = z.infer<typeof HoldSchema>;

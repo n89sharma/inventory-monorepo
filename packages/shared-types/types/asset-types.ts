@@ -30,36 +30,36 @@ export type AssetDetails = {
   warehouse_code: string
   warehouse_street: string
   cost: {
-    purchase_cost: string
-    transport_cost: string
-    processing_cost: string
-    other_cost: string
-    parts_cost: string
-    total_cost: string
-    sale_price: string
+    purchase_cost: number | null
+    transport_cost: number | null
+    processing_cost: number | null
+    other_cost: number | null
+    parts_cost: number | null
+    total_cost: number | null
+    sale_price: number | null
   }
   specs: {
-    cassettes: number
-    internal_finisher: string
-    meter_black: number
-    meter_colour: number
-    meter_total: number
-    drum_life_c: number
-    drum_life_m: number
-    drum_life_y: number
-    drum_life_k: number
+    cassettes: number | null
+    internal_finisher: string | null
+    meter_black: number | null
+    meter_colour: number | null
+    meter_total: number | null
+    drum_life_c: number | null
+    drum_life_m: number | null
+    drum_life_y: number | null
+    drum_life_k: number | null
   }
   hold: {
     created_by: string
     created_for: string
-    created_at: string | null
+    created_at: Date | null
     customer: string
-    from_dt: string
-    to_dt: string
-    notes: string
+    from_dt: Date | null
+    to_dt: Date | null
+    notes: string | null
     hold_number: string
   }
-  created_at: string
+  created_at: Date
   is_held: boolean
   arrival: {
     arrival_number: string
@@ -68,8 +68,8 @@ export type AssetDetails = {
     destination_street: string
     transporter: string
     created_by: string
-    notes: string
-    created_at: string
+    notes: string | null
+    created_at: Date
   }
   departure: {
     departure_number: string
@@ -78,8 +78,8 @@ export type AssetDetails = {
     destination: string
     transporter: string
     created_by: string
-    notes: string
-    created_at: string
+    notes: string | null
+    created_at: Date
   }
   purchase_invoice: {
     invoice_number: string
@@ -89,25 +89,25 @@ export type AssetDetails = {
 
 export type Error = {
   code: string
-  description: string
+  description: string | null
   category: string
   is_fixed: boolean
-  added_at: string
+  added_at: Date | null
   added_by: string
-  fixed_at: string
+  fixed_at: Date | null
   fixed_by: string
 }
 
 export type Comment = {
   comment: string
   username: string
-  created_at: string
-  updated_at: string
+  created_at: Date
+  updated_at: Date
   initials: string
 }
 
 export type AssetTransfer = {
-  created_at: string
+  created_at: Date
   source_code: string
   source_stree: string
   destination_code: string
@@ -120,7 +120,10 @@ export type Part = {
   recipient: string
   donor: string
   store_part_number: string
+  updated_at: Date
+  username: string
+  notes: string
   type: string
-  part: string
+  partName: string
 }
 

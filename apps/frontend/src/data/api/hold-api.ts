@@ -10,7 +10,7 @@ export async function getHolds(
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>
 ): Promise<Hold[]> {
-  const res = await api.get(`/holds`, {
+  const { data } = await api.get<ApiResponse<Hold[]>>(`/holds`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
@@ -18,7 +18,8 @@ export async function getHolds(
       holdFor: getIdOrNullFromSelection(holdFor)
     }
   })
-  return z.array(HoldSchema).parse(res.data)
+  if (data.success) return z.array(HoldSchema).parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {

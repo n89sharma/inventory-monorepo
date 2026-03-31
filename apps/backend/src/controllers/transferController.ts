@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, TransferDetail } from 'shared-types'
+import { ApiResponse, Transfer, TransferDetail, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -20,13 +20,13 @@ export const TransferQuerySchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
-export async function getTransfers(req: Request, res: Response) {
+export async function getTransfers(req: Request, res: Response<ApiResponse<Transfer[]>>) {
   try {
     const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<typeof TransferQuerySchema>
     const transfers = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0))
-    res.json(transfers)
+    res.json(successResponse(transfers))
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch transfers' })
+    res.status(500).json(response500('Failed to fetch transfers'))
   }
 }
 

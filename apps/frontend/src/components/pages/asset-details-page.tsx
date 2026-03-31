@@ -7,7 +7,7 @@ import { getAllAssetDetails } from '@/data/api/asset-api'
 import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
-import { formatThousandsK } from '@/lib/formatters'
+import { formatDate, formatDateWithTime, formatThousandsK, formatUSD } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
@@ -89,33 +89,33 @@ export const AssetDetailsPage = () => {
             <DataRowContainer>
               <DataRow label="Asset Type" value={ad?.asset_type} />
               <DataRow label="Serial #" value={ad?.serial_number} />
-              <DataRow label="Meter" value={ad && ad.specs ? formatThousandsK(ad.specs.meter_total) : '0K'} />
+              <DataRow label="Meter" value={ad ? formatThousandsK(ad.specs.meter_total) : '0K'} />
               <DataRow label="Tracking Status" value={ad?.tracking_status} />
               <DataRow label="Availability" value={ad?.availability_status} />
               <DataRow label="Technical Status" value={ad?.technical_status} />
               <DataRow label="Warehouse" value={ad?.warehouse_code} />
               <DataRow label="Location" value={ad?.location} />
-              <DataRow label="Created At" value={ad?.created_at} />
+              <DataRow label="Created At" value={ad ? formatDate(ad.created_at) : ''} />
             </DataRowContainer>
           </Section>
 
           <Section>
             <Header title="Pricing"></Header>
             <DataRowContainer>
-              <DataRow label="Purchase Cost" value={ad?.cost.purchase_cost} curr={true} />
-              <DataRow label="Transport Cost" value={ad?.cost.transport_cost} curr={true} />
-              <DataRow label="Processing Cost" value={ad?.cost.processing_cost} curr={true} />
-              <DataRow label="Other Cost" value={ad?.cost.other_cost} curr={true} />
-              <DataRow label="Parts Cost" value={ad?.cost.parts_cost} curr={true} />
-              <DataRow label="Total Cost" value={ad?.cost.total_cost} curr={true} />
-              <DataRow label="Sale Price" value={ad?.cost.sale_price} curr={true} />
+              <DataRow label="Purchase Cost" value={ad ? formatUSD(ad.cost.purchase_cost) : '$0'} curr={true} />
+              <DataRow label="Transport Cost" value={ad ? formatUSD(ad.cost.transport_cost) : '$0'} curr={true} />
+              <DataRow label="Processing Cost" value={ad ? formatUSD(ad.cost.processing_cost) : '$0'} curr={true} />
+              <DataRow label="Other Cost" value={ad ? formatUSD(ad.cost.other_cost) : '$0'} curr={true} />
+              <DataRow label="Parts Cost" value={ad ? formatUSD(ad.cost.parts_cost) : '$0'} curr={true} />
+              <DataRow label="Total Cost" value={ad ? formatUSD(ad.cost.total_cost) : '$0'} curr={true} />
+              <DataRow label="Sale Price" value={ad ? formatUSD(ad.cost.sale_price) : '$0'} curr={true} />
             </DataRowContainer>
           </Section>
 
           <Section>
             <Header title="Hold"></Header>
             <DataRowContainer>
-              <DataRow label="Date" value={ad?.hold.created_at}></DataRow>
+              <DataRow label="Date" value={ad?.hold?.created_at ? formatDate(ad.hold.created_at) : ''}></DataRow>
               <DataRow label="Customer" value={ad?.hold.customer}></DataRow>
               <DataRow label="For" value={ad?.hold.created_for}></DataRow>
               <DataRow label="By" value={ad?.hold.created_by}></DataRow>
@@ -149,7 +149,7 @@ export const AssetDetailsPage = () => {
           <Section>
             <Header title="Installed Parts" />
             <PartsHeader />
-            {ap?.map(p => <DataRow key={p.store_part_number} label={p.part} value={p.donor} />)}
+            {ap?.map(p => <DataRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
           </Section>
 
         </SectionRow>
@@ -159,7 +159,7 @@ export const AssetDetailsPage = () => {
           <Section>
             <Header title="Arrival"></Header>
             <DataRowContainer>
-              <DataRow label="Arrived On" value={ad?.arrival.created_at}></DataRow>
+              <DataRow label="Arrived On" value={ad ? formatDate(ad.arrival.created_at) : ''}></DataRow>
               <DataRow label="Vendor" value={ad?.arrival.origin}></DataRow>
               <DataRow label="Warehouse" value={ad?.arrival.destination_code}></DataRow>
               <DataRow label="Arrival #" value={ad?.arrival.arrival_number}></DataRow>
@@ -185,7 +185,7 @@ export const AssetDetailsPage = () => {
               </div>
             </div>
             <DataRowContainer>
-              <DataRow label="Transferred On" value={currTransfer ? currTransfer.created_at : '-'}></DataRow>
+              <DataRow label="Transferred On" value={currTransfer ? formatDate(currTransfer.created_at) : '-'}></DataRow>
               <DataRow label="Source" value={currTransfer ? currTransfer.source_code : '-'}></DataRow>
               <DataRow label="Destination" value={currTransfer ? currTransfer.destination_code : '-'}></DataRow>
               <DataRow label="Transfer #" value={currTransfer ? currTransfer.transfer_number : '-'}></DataRow>
@@ -196,7 +196,7 @@ export const AssetDetailsPage = () => {
           <Section>
             <Header title="Departure"></Header>
             <DataRowContainer>
-              <DataRow label="Departed On" value={ad?.departure?.created_at}></DataRow>
+              <DataRow label="Departed On" value={ad?.departure?.created_at ? formatDate(ad.departure.created_at) : ''}></DataRow>
               <DataRow label="Warehouse" value={ad?.departure?.origin_code}></DataRow>
               <DataRow label="Customer" value={ad?.departure?.destination}></DataRow>
               <DataRow label="Departure #" value={ad?.departure?.departure_number}></DataRow>
@@ -215,7 +215,7 @@ export const AssetDetailsPage = () => {
             {ac?.map(c => (<Comment
               key={`${c.username}-${c.created_at}`}
               user={c.username}
-              date={c.created_at}
+              date={formatDateWithTime(c.created_at)}
               avatarFallback={c.initials}
               comment={c.comment}
               tags={EMPTY_TAGS}

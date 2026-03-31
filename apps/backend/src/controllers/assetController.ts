@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Part, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -20,7 +21,7 @@ export const AssetQuerySchema = z.object({
   meter: z.string().optional().transform(Number)
 })
 
-export async function getAssets(req: Request, res: Response) {
+export async function getAssets(req: Request, res: Response<ApiResponse<AssetSummary[]>>) {
   try {
     const {
       model,
@@ -38,13 +39,13 @@ export async function getAssets(req: Request, res: Response) {
       isNaN(warehouseId) ? 0 : warehouseId,
       isNaN(meter) ? -1 : meter
     ))
-    res.json(assets)
+    res.json(successResponse(assets))
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch assets' })
+    res.status(500).json(response500('Failed to fetch assets'))
   }
 }
 
-export async function getAssetDetail(req: Request, res: Response) {
+export async function getAssetDetail(req: Request, res: Response<ApiResponse<AssetDetails>>) {
   const { barcode } = req.params
   const response = await getAssetDetailSer(barcode)
   if (response.success) {
@@ -58,7 +59,7 @@ export async function getAssetDetail(req: Request, res: Response) {
   }
 }
 
-export async function getAssetAccessories(req: Request, res: Response) {
+export async function getAssetAccessories(req: Request, res: Response<ApiResponse<string[]>>) {
   const { barcode } = req.params
   const response = await getAssetAccessoriesSer(barcode)
   if (response.success) {
@@ -68,7 +69,7 @@ export async function getAssetAccessories(req: Request, res: Response) {
   }
 }
 
-export async function getAssetErrors(req: Request, res: Response) {
+export async function getAssetErrors(req: Request, res: Response<ApiResponse<Error[]>>) {
   const { barcode } = req.params
   const response = await getAssetErrorsSer(barcode)
   if (response.success) {
@@ -78,7 +79,7 @@ export async function getAssetErrors(req: Request, res: Response) {
   }
 }
 
-export async function getAssetComments(req: Request, res: Response) {
+export async function getAssetComments(req: Request, res: Response<ApiResponse<Comment[]>>) {
   const { barcode } = req.params
   const response = await getAssetCommentsSer(barcode)
   if (response.success) {
@@ -88,7 +89,7 @@ export async function getAssetComments(req: Request, res: Response) {
   }
 }
 
-export async function getAssetParts(req: Request, res: Response) {
+export async function getAssetParts(req: Request, res: Response<ApiResponse<Part[]>>) {
   const { barcode } = req.params
   const response = await getAssetPartsSer(barcode)
   if (response.success) {
@@ -98,7 +99,7 @@ export async function getAssetParts(req: Request, res: Response) {
   }
 }
 
-export async function getAssetTransfers(req: Request, res: Response) {
+export async function getAssetTransfers(req: Request, res: Response<ApiResponse<AssetTransfer[]>>) {
   const { barcode } = req.params
   const response = await getAssetTransfersSer(barcode)
   if (response.success) {

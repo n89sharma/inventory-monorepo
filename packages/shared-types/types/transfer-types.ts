@@ -10,7 +10,7 @@ export const TransferSchema = z.object({
   destination_code: z.string(),
   destination_street: z.string(),
   transporter: z.string(),
-  created_at: z.iso.datetime(),
+  created_at: z.coerce.date(),
   created_by: z.string()
 });
 

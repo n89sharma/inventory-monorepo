@@ -1,16 +1,16 @@
 import { Request, Response } from 'express'
-import { ApiResponse, InvoiceDetail } from 'shared-types'
+import { ApiResponse, Invoice, InvoiceDetail, response500, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import { getInvoice as getInvoiceSer } from '../services/invoiceService.js'
 
-export async function getInvoices(req: Request, res: Response) {
+export async function getInvoices(req: Request, res: Response<ApiResponse<Invoice[]>>) {
   try {
     const { fromDate, toDate } = res.locals.parsedDates
-    const transfers = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
-    res.json(transfers)
+    const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
+    res.json(successResponse(invoices))
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch invoices' })
+    res.status(500).json(response500('Failed to fetch invoices'))
   }
 }
 

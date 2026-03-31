@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { ApiResponse, ArrivalDetail, ArrivalFormData, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { prisma } from "../prisma.js"
 
@@ -34,6 +34,50 @@ export async function getArrival(arrivalNumber: string): Promise<ApiResponse<Arr
     })
   } catch (error) {
     return response500(`Failed to fetch arrival ${arrivalNumber}`)
+  }
+}
+
+export async function getArrivalForEdit(arrivalNumber: string): Promise<ApiResponse<ArrivalFormData>> {
+  try {
+    const arrival = await prisma.arrival.findUnique({
+      where: { arrival_number: arrivalNumber },
+      include: {
+        origin: true,
+        destination: true,
+        transporter: true,
+        assets: {
+          include: {
+            technical_specification: true,
+            asset_accessories: true
+          }
+        }
+      }
+    })
+    if (!arrival) {
+      return response400(`Arrival ${arrivalNumber} not found`)
+    }
+    return successResponse({
+      id: arrival.id,
+      arrivalNumber: arrival.arrival_number,
+      vendorId: arrival.origin_id,
+      transporterId: arrival.transporter_id,
+      warehouseId: arrival.destination_id,
+      comment: arrival.notes ?? '',
+      assets: arrival.assets.map(asset => ({
+        id: asset.id,
+        barcode: asset.barcode,
+        modelId: asset.model_id,
+        serialNumber: asset.serial_number,
+        meterBlack: Number(asset.technical_specification?.meter_black ?? 0),
+        meterColour: Number(asset.technical_specification?.meter_colour ?? 0),
+        cassettes: asset.technical_specification?.cassettes ?? null,
+        technicalStatusId: asset.technical_status_id,
+        internalFinisher: asset.technical_specification?.internal_finisher ?? '',
+        coreFunctionIds: asset.asset_accessories.map(aa => aa.accessory_id)
+      }))
+    })
+  } catch (error) {
+    return response500(`Failed to fetch arrival ${arrivalNumber} for edit`)
   }
 }
 

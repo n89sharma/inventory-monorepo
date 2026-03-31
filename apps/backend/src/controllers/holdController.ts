@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, HoldDetail } from 'shared-types'
+import { ApiResponse, Hold, HoldDetail, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -20,13 +20,13 @@ export const HoldQuerySchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
-export async function getHolds(req: Request, res: Response) {
+export async function getHolds(req: Request, res: Response<ApiResponse<Hold[]>>) {
   try {
     const { fromDate, toDate, holdBy, holdFor } = res.locals.query as z.infer<typeof HoldQuerySchema>
     const holds = await prisma.$queryRawTyped(getHoldsDb(fromDate, toDate, holdBy ?? 0, holdFor ?? 0))
-    res.json(holds)
+    res.json(successResponse(holds))
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch holds' })
+    res.status(500).json(response500('Failed to fetch holds'))
   }
 }
 

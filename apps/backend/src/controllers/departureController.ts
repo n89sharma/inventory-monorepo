@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
-import { ApiResponse, DepartureDetail } from 'shared-types'
+import { ApiResponse, Departure, DepartureDetail, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import { getDeparture as getDepartureSer } from '../services/departureService.js'
 
-export async function getDepartures(req: Request, res: Response) {
+export async function getDepartures(req: Request, res: Response<ApiResponse<Departure[]>>) {
   try {
     const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
     const departures = await prisma.$queryRawTyped(getDeparturesDb(fromDate, toDate, warehouse ?? 0))
-    res.json(departures)
+    res.json(successResponse(departures))
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch departures' })
+    res.status(500).json(response500('Failed to fetch departures'))
   }
 }
 

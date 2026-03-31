@@ -9,13 +9,14 @@ export async function getInvoices(
   toDate: SelectOption<Date>
 ): Promise<Invoice[]> {
 
-  const res = await api.get(`/invoices`, {
+  const { data } = await api.get<ApiResponse<Invoice[]>>(`/invoices`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate)
     }
   })
-  return z.array(InvoiceSchema).parse(res.data)
+  if (data.success) return z.array(InvoiceSchema).parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getInvoiceDetail(invoiceNumber: string): Promise<InvoiceDetail> {

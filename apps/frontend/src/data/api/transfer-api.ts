@@ -11,7 +11,7 @@ export async function getTransfers(
   destination: SelectOption<Warehouse>
 ): Promise<Transfer[]> {
 
-  const res = await api.get(`/transfers`, {
+  const { data } = await api.get<ApiResponse<Transfer[]>>(`/transfers`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
@@ -19,7 +19,8 @@ export async function getTransfers(
       destination: getIdOrNullFromSelection(destination),
     }
   })
-  return z.array(TransferSchema).parse(res.data)
+  if (data.success) return z.array(TransferSchema).parse(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getTransferDetail(transferNumber: string): Promise<TransferDetail> {
