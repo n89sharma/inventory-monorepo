@@ -1,7 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import { formatUSD, getFormattedDate, getInitials, getPartNames } from '@/lib/formatters'
 import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Model, Part, Status, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Model, Part, Status, Warehouse } from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -187,33 +187,39 @@ function mapAssetParts(p: PartResponse): Part {
 }
 
 export async function getAssetDetail(params: { barcode: string }): Promise<AssetDetails> {
-  const res = await api.get<AssetDetailResponse>(`/assets/${params.barcode}`)
-  return mapAssetDetail(res.data)
+  const { data } = await api.get<ApiResponse<AssetDetailResponse>>(`/assets/${params.barcode}`)
+  if (data.success) return mapAssetDetail(data.data)
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
-  const res = await api.get<string[]>(`/assets/${params.barcode}/accessories`)
-  return res.data
+  const { data } = await api.get<ApiResponse<string[]>>(`/assets/${params.barcode}/accessories`)
+  if (data.success) return data.data
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetErrors(params: { barcode: string }): Promise<Error[]> {
-  const res = await api.get<Error[]>(`/assets/${params.barcode}/errors`)
-  return res.data
+  const { data } = await api.get<ApiResponse<Error[]>>(`/assets/${params.barcode}/errors`)
+  if (data.success) return data.data
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetComments(params: { barcode: string }): Promise<Comment[]> {
-  const res = await api.get<CommentResponse[]>(`/assets/${params.barcode}/comments`)
-  return res.data.map(mapAssetComments)
+  const { data } = await api.get<ApiResponse<CommentResponse[]>>(`/assets/${params.barcode}/comments`)
+  if (data.success) return data.data.map(mapAssetComments)
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetTransfers(params: { barcode: string }): Promise<AssetTransfer[]> {
-  const res = await api.get<AssetTransfer[]>(`/assets/${params.barcode}/transfers`)
-  return res.data.map(mapAssetTransfers)
+  const { data } = await api.get<ApiResponse<AssetTransfer[]>>(`/assets/${params.barcode}/transfers`)
+  if (data.success) return data.data.map(mapAssetTransfers)
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetParts(params: { barcode: string }): Promise<Part[]> {
-  const res = await api.get<PartResponse[]>(`/assets/${params.barcode}/parts`)
-  return res.data.map(mapAssetParts)
+  const { data } = await api.get<ApiResponse<PartResponse[]>>(`/assets/${params.barcode}/parts`)
+  if (data.success) return data.data.map(mapAssetParts)
+  throw new Error(data.error.summary)
 }
 
 function getPromiseResult<T>(result: PromiseSettledResult<T>) {
