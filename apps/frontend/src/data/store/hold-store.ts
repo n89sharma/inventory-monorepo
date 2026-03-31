@@ -1,5 +1,6 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { HoldSummary, User } from 'shared-types'
+import { getHoldDetail } from '@/data/api/hold-api'
+import type { HoldDetail, HoldSummary, User } from 'shared-types'
 import { create } from 'zustand'
 
 interface HoldStore {
@@ -10,6 +11,9 @@ interface HoldStore {
   holdBy: SelectOption<User>
   holdFor: SelectOption<User>
   hasSearched: boolean
+  holdDetail: HoldDetail | null
+  detailLoading: boolean
+  detailError: string | null
 
   setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -18,11 +22,13 @@ interface HoldStore {
   setHoldBy: (v: SelectOption<User>) => void
   setHoldFor: (v: SelectOption<User>) => void
   setHasSearched: (hasSearched: boolean) => void
+  setHoldDetail: (holdDetail: HoldDetail) => void
+  loadHoldDetail: (holdNumber: string) => Promise<void>
 
   clearHolds: () => void
 }
 
-export const useHoldStore = create<HoldStore>((set) => ({
+export const useHoldStore = create<HoldStore>((set, get) => ({
   holds: [],
   loading: false,
   fromDate: UNSELECTED,
@@ -30,6 +36,9 @@ export const useHoldStore = create<HoldStore>((set) => ({
   holdBy: ANY_OPTION,
   holdFor: ANY_OPTION,
   hasSearched: false,
+  holdDetail: null,
+  detailLoading: false,
+  detailError: null,
 
   setHolds: (holds) => set({ holds }),
   setLoading: (loading) => set({ loading }),
@@ -38,5 +47,17 @@ export const useHoldStore = create<HoldStore>((set) => ({
   setHoldBy: (holdBy) => set({ holdBy }),
   setHoldFor: (holdFor) => set({ holdFor }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
+  setHoldDetail: (holdDetail) => set({ holdDetail }),
+  loadHoldDetail: async (holdNumber) => {
+    if (get().holdDetail?.hold_number === holdNumber) return
+    set({ detailLoading: true, detailError: null })
+    try {
+      set({ holdDetail: await getHoldDetail(holdNumber) })
+    } catch (e) {
+      set({ detailError: e instanceof Error ? e.message : 'Failed to load hold' })
+    } finally {
+      set({ detailLoading: false })
+    }
+  },
   clearHolds: () => set({ holds: [] })
 }))

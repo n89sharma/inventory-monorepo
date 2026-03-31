@@ -1,20 +1,20 @@
 import { OrgCard } from '@/components/custom/org-card'
 import { UserCard } from '@/components/custom/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { getInvoiceDetail } from '@/data/api/invoice-api'
+import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import type { InvoiceDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../custom/collection-edit-bar'
 import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
-  const [invoice, setInvoice] = useState<InvoiceDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const invoice = useInvoiceStore(state => state.invoiceDetail)
+  const detailLoading = useInvoiceStore(state => state.detailLoading)
+  const detailError = useInvoiceStore(state => state.detailError)
+  const loadInvoiceDetail = useInvoiceStore(state => state.loadInvoiceDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,23 +29,11 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('invoices', pathname)
-
-    async function load() {
-      setLoading(true)
-      try {
-        setInvoice(await getInvoiceDetail(collectionId!))
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load invoice')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+    loadInvoiceDetail(collectionId)
   }, [collectionId])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div>Loading...</div>
+  if (detailError) return <div>{detailError}</div>
   if (!invoice) return <div>Invoice not found</div>
 
   return (

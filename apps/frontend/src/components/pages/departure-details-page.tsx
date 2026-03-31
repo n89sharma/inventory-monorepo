@@ -1,20 +1,20 @@
 import { OrgCard } from '@/components/custom/org-card'
 import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { getDepartureDetail } from '@/data/api/departure-api'
+import { useDepartureStore } from '@/data/store/departure-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import type { DepartureDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../custom/collection-edit-bar'
 import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function DepartureDetailsPage(): React.JSX.Element {
-  const [departure, setDeparture] = useState<DepartureDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const departure = useDepartureStore(state => state.departureDetail)
+  const detailLoading = useDepartureStore(state => state.detailLoading)
+  const detailError = useDepartureStore(state => state.detailError)
+  const loadDepartureDetail = useDepartureStore(state => state.loadDepartureDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,23 +29,11 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('departures', pathname)
-
-    async function load() {
-      setLoading(true)
-      try {
-        setDeparture(await getDepartureDetail(collectionId!))
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load departure')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+    loadDepartureDetail(collectionId)
   }, [collectionId])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div>Loading...</div>
+  if (detailError) return <div>{detailError}</div>
   if (!departure) return <div>Departure not found</div>
 
   return (

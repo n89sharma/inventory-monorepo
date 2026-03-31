@@ -1,20 +1,20 @@
 import { OrgCard } from '@/components/custom/org-card'
 import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { getTransferDetail } from '@/data/api/transfer-api'
+import { useTransferStore } from '@/data/store/transfer-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import type { TransferDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../custom/collection-edit-bar'
 import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function TransferDetailsPage(): React.JSX.Element {
-  const [transfer, setTransfer] = useState<TransferDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const transfer = useTransferStore(state => state.transferDetail)
+  const detailLoading = useTransferStore(state => state.detailLoading)
+  const detailError = useTransferStore(state => state.detailError)
+  const loadTransferDetail = useTransferStore(state => state.loadTransferDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,23 +29,11 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('transfers', pathname)
-
-    async function load() {
-      setLoading(true)
-      try {
-        setTransfer(await getTransferDetail(collectionId!))
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load transfer')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+    loadTransferDetail(collectionId)
   }, [collectionId])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div>Loading...</div>
+  if (detailError) return <div>{detailError}</div>
   if (!transfer) return <div>Transfer not found</div>
 
   return (

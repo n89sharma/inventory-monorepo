@@ -1,5 +1,6 @@
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { TransferSummary, Warehouse } from 'shared-types'
+import { getTransferDetail } from '@/data/api/transfer-api'
+import type { TransferDetail, TransferSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface TransferStore {
@@ -10,6 +11,9 @@ interface TransferStore {
   destination: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
+  transferDetail: TransferDetail | null
+  detailLoading: boolean
+  detailError: string | null
 
   setTransfers: (t: TransferSummary[]) => void
   setFromDate: (d: SelectOption<Date>) => void
@@ -18,11 +22,13 @@ interface TransferStore {
   setDestination: (d: SelectOption<Warehouse>) => void
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
+  setTransferDetail: (transferDetail: TransferDetail) => void
+  loadTransferDetail: (transferNumber: string) => Promise<void>
 
   clearTransfers: () => void
 }
 
-export const useTransferStore = create<TransferStore>((set) => ({
+export const useTransferStore = create<TransferStore>((set, get) => ({
   transfers: [],
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
@@ -30,6 +36,9 @@ export const useTransferStore = create<TransferStore>((set) => ({
   destination: ANY_OPTION,
   loading: false,
   hasSearched: false,
+  transferDetail: null,
+  detailLoading: false,
+  detailError: null,
 
   setTransfers: (transfers) => set({ transfers }),
   setFromDate: (fromDate) => set({ fromDate }),
@@ -38,6 +47,17 @@ export const useTransferStore = create<TransferStore>((set) => ({
   setDestination: (destination) => set({ destination }),
   setLoading: (loading) => set({ loading }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-
+  setTransferDetail: (transferDetail) => set({ transferDetail }),
+  loadTransferDetail: async (transferNumber) => {
+    if (get().transferDetail?.transfer_number === transferNumber) return
+    set({ detailLoading: true, detailError: null })
+    try {
+      set({ transferDetail: await getTransferDetail(transferNumber) })
+    } catch (e) {
+      set({ detailError: e instanceof Error ? e.message : 'Failed to load transfer' })
+    } finally {
+      set({ detailLoading: false })
+    }
+  },
   clearTransfers: () => set({ transfers: [] })
 }))

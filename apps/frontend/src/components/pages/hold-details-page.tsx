@@ -1,20 +1,20 @@
 import { OrgCard } from '@/components/custom/org-card'
 import { UserCard } from '@/components/custom/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { getHoldDetail } from '@/data/api/hold-api'
+import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import type { HoldDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../custom/collection-edit-bar'
 import { DataTable } from '../shadcn/data-table'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
-  const [hold, setHold] = useState<HoldDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const hold = useHoldStore(state => state.holdDetail)
+  const detailLoading = useHoldStore(state => state.detailLoading)
+  const detailError = useHoldStore(state => state.detailError)
+  const loadHoldDetail = useHoldStore(state => state.loadHoldDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,23 +29,11 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('holds', pathname)
-
-    async function load() {
-      setLoading(true)
-      try {
-        setHold(await getHoldDetail(collectionId!))
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load hold')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
+    loadHoldDetail(collectionId)
   }, [collectionId])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div>Loading...</div>
+  if (detailError) return <div>{detailError}</div>
   if (!hold) return <div>Hold not found</div>
 
   return (

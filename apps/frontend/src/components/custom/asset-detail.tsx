@@ -186,7 +186,7 @@ export function ErrorRow({ error, className }: ErrorRowProps): React.JSX.Element
 export function InvoiceClearedRow({ isCleared, className }: InvoiceClearedRowProps): React.JSX.Element {
   return (
     <div className={cn("flex items-center gap-4 py-1.5 border-b first:border-t-2", className)}>
-      <dt className={cn("text-left text-sm font-medium text-muted-foreground min-w-[110px]", className)}>
+      <dt className={cn("text-left text-sm font-medium text-muted-foreground min-w-28", className)}>
         Cleared?
       </dt>
       <dd className={cn("flex items-center gap-1 text-sm", className)}>
@@ -217,7 +217,7 @@ export function AccessoryRow({
 export function PartsHeader({ className }: { className?: string }): React.JSX.Element {
   return (
     <div className={cn("flex border-b border-t-2 items-center py-0.5", className)}>
-      <dt className={cn("text-sm font-semibold text-muted-foreground min-w-[110px]", className)}>Part</dt>
+      <dt className={cn("text-sm font-semibold text-muted-foreground min-w-28", className)}>Part</dt>
       <dd className={cn("text-sm font-semibold text-muted-foreground", className)}>Source</dd>
     </div>
   )
@@ -225,7 +225,7 @@ export function PartsHeader({ className }: { className?: string }): React.JSX.El
 
 export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
   return (
-    <dt className={cn("text-left text-sm font-medium text-muted-foreground min-w-[110px]", className)}>
+    <dt className={cn("text-left text-sm font-medium text-muted-foreground min-w-28", className)}>
       {label}
     </dt>
   )
@@ -237,7 +237,7 @@ export function DataValue({ value, curr = false, className }: ValueProps): React
     return (
       <dd className={cn("flex items-center gap-1 text-sm font-semibold", className)}>
         {value && <span>$</span>}
-        <span className="tabular-nums text-right w-[80px]">{formattedValue}</span>
+        <span className="tabular-nums text-right w-20">{formattedValue}</span>
       </dd>
     )
   }

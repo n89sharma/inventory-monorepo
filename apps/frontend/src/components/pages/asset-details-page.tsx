@@ -3,7 +3,6 @@ import { Comment } from '@/components/custom/comment'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
-import { getAllAssetDetails } from '@/data/api/asset-api'
 import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
@@ -31,31 +30,15 @@ export const AssetDetailsPage = () => {
   const at = useAssetStore((state) => state.transfers)
   const ap = useAssetStore((state) => state.parts)
 
-  const setAssetDetails = useAssetStore((state) => state.setAssetDetails)
-  const setAssetAccessories = useAssetStore((state) => state.setAssetAccessories)
-  const setAssetErrors = useAssetStore((state) => state.setAssetErrors)
-  const setAssetComments = useAssetStore((state) => state.setAssetComments)
-  const setAssetTransfers = useAssetStore((state) => state.setAssetTransfers)
-  const setAssetParts = useAssetStore((state) => state.setAssetParts)
-  const clearAssetStore = useAssetStore((state) => state.clearAssetStore)
+  const loading = useAssetStore((state) => state.loading)
+  const error = useAssetStore((state) => state.error)
+  const loadAssetDetails = useAssetStore((state) => state.loadAssetDetails)
 
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
-
-    async function loadAssetDetails() {
-      if (!assetId) return
-      clearAssetStore()
-      const r = await getAllAssetDetails(assetId)
-      if (r.assetDetails.status === 'fulfilled') setAssetDetails(r.assetDetails.result)
-      if (r.assetAccessories.status === 'fulfilled') setAssetAccessories(r.assetAccessories.result)
-      if (r.assetErrors.status === 'fulfilled') setAssetErrors(r.assetErrors.result)
-      if (r.assetComments.status === 'fulfilled') setAssetComments(r.assetComments.result)
-      if (r.assetTransfers.status === 'fulfilled') setAssetTransfers(r.assetTransfers.result)
-      if (r.assetParts.status == 'fulfilled') setAssetParts(r.assetParts.result)
-    }
-
+    if (!assetId) return
     setCurrentTransferIndex(0)
-    loadAssetDetails()
+    loadAssetDetails(assetId)
   }, [assetId])
 
   function handleNextTransfer() {
@@ -69,6 +52,9 @@ export const AssetDetailsPage = () => {
   }
 
   const currTransfer = at[currentIndex] || null
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>{error}</div>
 
   return (
     <div className="flex flex-col gap-2">

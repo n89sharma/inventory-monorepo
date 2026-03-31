@@ -49,7 +49,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
       cell: ({ row }) => {
         const functions: CoreFunction[] = row.original.coreFunctions
         return (
-          <div className="flex flex-wrap gap-1 max-w-[250px]">
+          <div className="flex flex-wrap gap-1 max-w-60">
             {functions.map(f => (<Badge key={f.accessory} variant="outline">{f.accessory}</Badge>))}
           </div>
         )

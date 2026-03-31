@@ -1,27 +1,27 @@
 import { OrgCard } from '@/components/custom/org-card'
-import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { getArrivalDetail } from '@/data/api/arrival-api'
+import { WarehouseCard } from '@/components/custom/warehouse-card'
+import { useArrivalStore } from '@/data/store/arrival-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import type { ArrivalDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
-  const [arrival, setArrival] = useState<ArrivalDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const arrival = useArrivalStore(state => state.arrivalDetail)
+  const detailLoading = useArrivalStore(state => state.detailLoading)
+  const detailError = useArrivalStore(state => state.detailError)
+  const loadArrivalDetail = useArrivalStore(state => state.loadArrivalDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId } = useParams<{ collectionId: string }>()
+  const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (collectionId === undefined) throw new Error('Missing collectionId parameter')
+  if (arrivalNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('arrivals', collectionId), [collectionId])
+  const columns = useMemo(() => createAssetSummaryColumns('arrivals', arrivalNumber), [arrivalNumber])
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -29,31 +29,19 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('arrivals', pathname)
+    loadArrivalDetail(arrivalNumber)
+  }, [arrivalNumber])
 
-    async function load() {
-      setLoading(true)
-      try {
-        setArrival(await getArrivalDetail(collectionId!))
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load arrival')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
-  }, [collectionId])
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div>Loading...</div>
+  if (detailError) return <div>{detailError}</div>
   if (!arrival) return <div>Arrival not found</div>
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('arrivals', collectionId)} />
+      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('arrivals', arrivalNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Arrival {collectionId}</h1>
-        <CollectionEditBar section="arrivals" collectionId={collectionId} />
+        <h1 className="text-3xl font-bold p-2">Arrival {arrivalNumber}</h1>
+        <CollectionEditBar section="arrivals" collectionId={arrivalNumber} />
       </div>
       <div className="flex gap-4">
         <OrgCard title="Vendor" org={arrival.vendor} />

@@ -1,3 +1,4 @@
+import { getAllAssetDetails } from '@/data/api/asset-api'
 import type { AssetDetails, AssetTransfer, Comment, Error, Part } from 'shared-types'
 import { create } from 'zustand'
 
@@ -9,6 +10,8 @@ interface AssetStore {
   comments: Comment[]
   transfers: AssetTransfer[]
   parts: Part[]
+  loading: boolean
+  error: string | null
 
   //actions
   setAssetDetails: (assetDetails: AssetDetails) => void
@@ -17,6 +20,7 @@ interface AssetStore {
   setAssetComments: (comments: Comment[]) => void
   setAssetTransfers: (transfers: AssetTransfer[]) => void
   setAssetParts: (parts: Part[]) => void
+  loadAssetDetails: (barcode: string) => Promise<void>
 
   //clear state
   clearAssetStore: () => void
@@ -29,6 +33,8 @@ export const useAssetStore = create<AssetStore>((set) => ({
   comments: [],
   transfers: [],
   parts: [],
+  loading: false,
+  error: null,
 
   setAssetDetails: (assetDetails) => set({ assetDetails }),
   setAssetAccessories: (accessories) => set({ accessories }),
@@ -36,6 +42,22 @@ export const useAssetStore = create<AssetStore>((set) => ({
   setAssetComments: (comments) => set({ comments }),
   setAssetTransfers: (transfers) => set({ transfers }),
   setAssetParts: (parts) => set({ parts }),
+  loadAssetDetails: async (barcode) => {
+    set({ loading: true, error: null, assetDetails: null, accessories: [], errors: [], comments: [], transfers: [], parts: [] })
+    try {
+      const r = await getAllAssetDetails(barcode)
+      if (r.assetDetails.status === 'fulfilled') set({ assetDetails: r.assetDetails.result })
+      if (r.assetAccessories.status === 'fulfilled') set({ accessories: r.assetAccessories.result })
+      if (r.assetErrors.status === 'fulfilled') set({ errors: r.assetErrors.result })
+      if (r.assetComments.status === 'fulfilled') set({ comments: r.assetComments.result })
+      if (r.assetTransfers.status === 'fulfilled') set({ transfers: r.assetTransfers.result })
+      if (r.assetParts.status === 'fulfilled') set({ parts: r.assetParts.result })
+    } catch (e) {
+      set({ error: e instanceof Error ? e.message : 'Failed to load asset details' })
+    } finally {
+      set({ loading: false })
+    }
+  },
 
   clearAssetStore: () => set({
     assetDetails: null,
