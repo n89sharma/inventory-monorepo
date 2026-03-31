@@ -243,14 +243,6 @@ export async function getAllAssetDetails(barcode: string) {
   }
 }
 
-
-
-export async function getAssetsForInvoices(invoiceNumber: string): Promise<AssetSummary[]> {
-  const res = await api.get(`/invoices/${invoiceNumber}`)
-  return z.array(AssetSummarySchema).parse(res.data)
-}
-
-
 export async function getAssetsForQuery(
   model: Model,
   meter: number | null,

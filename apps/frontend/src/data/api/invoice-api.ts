@@ -1,6 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import { getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import { type Invoice, InvoiceSchema } from 'shared-types'
+import type { ApiResponse, InvoiceDetail } from 'shared-types'
+import { type Invoice, InvoiceDetailSchema, InvoiceSchema } from 'shared-types'
 import { z } from 'zod'
 
 export async function getInvoices(
@@ -15,4 +16,10 @@ export async function getInvoices(
     }
   })
   return z.array(InvoiceSchema).parse(res.data)
+}
+
+export async function getInvoiceDetail(invoiceNumber: string): Promise<InvoiceDetail> {
+  const { data } = await api.get<ApiResponse<InvoiceDetail>>(`/invoices/${invoiceNumber}`)
+  if (data.success) return InvoiceDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
 }
