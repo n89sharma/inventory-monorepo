@@ -5,7 +5,7 @@ import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { Controller, useForm, type UseFieldArrayAppend, type UseFieldArrayUpdate } from 'react-hook-form'
-import type { CoreFunction, Model } from 'shared-types'
+import type { CoreFunction, ModelSummary } from 'shared-types'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
 import { SelectOptions } from '../custom/select-options'
@@ -101,7 +101,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
               name='model'
               options={models}
               searchKey='model_name'
-              getLabel={(m: Model) => `${m.brand_name} ${m.model_name}`}
+              getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
               fieldLabel='Model'
               fieldRequired={true}
             />

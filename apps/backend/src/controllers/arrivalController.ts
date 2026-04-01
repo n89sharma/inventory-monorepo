@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, ArrivalDetail, ArrivalFormData, ArrivalSummary, CreateArrivalSchema, UpdateArrivalSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, ArrivalDetail, ArrivalSummary, CreateArrivalSchema, UpdateArrival, UpdateArrivalSchema, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
-import { createArrival as createArrivalSer, getArrival as getArrivalSer, getArrivalForEdit as getArrivalForEditSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
+import { createArrival as createArrivalSer, getArrivalForUpdate as getArrivalForEditSer, getArrival as getArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
 
 export async function getArrivals(
   req: Request,
@@ -49,9 +49,9 @@ export async function createArrival(
   }
 }
 
-export async function getArrivalForEdit(
+export async function getArrivalForUpdate(
   req: Request,
-  res: Response<ApiResponse<ArrivalFormData>>) {
+  res: Response<ApiResponse<UpdateArrival>>) {
 
   const { arrivalNumber } = req.params
   const response = await getArrivalForEditSer(arrivalNumber)

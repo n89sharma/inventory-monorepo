@@ -1,6 +1,9 @@
 import { format } from 'date-fns'
-import { ApiResponse, ArrivalDetail, ArrivalFormData, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
+import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
+import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -9,6 +12,30 @@ const sequenceAssetEntity = 'ASSET'
 const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
+
+const assetIncludeArgs = {
+  include: {
+    model: true,
+    TechnicalStatus: true,
+    technical_specification: true,
+    asset_accessories: {
+      include: {
+        Accessory: true
+      }
+    }
+  }
+} satisfies AssetDefaultArgs
+
+const arrivalIncludeArgs = {
+  include: {
+    origin: true,
+    destination: true,
+    transporter: true,
+    assets: assetIncludeArgs
+  }
+} satisfies ArrivalDefaultArgs
+
+type UpdateArrivalDb = ArrivalGetPayload<typeof arrivalIncludeArgs>
 
 export async function getArrival(arrivalNumber: string): Promise<ApiResponse<ArrivalDetail>> {
   try {
@@ -37,47 +64,43 @@ export async function getArrival(arrivalNumber: string): Promise<ApiResponse<Arr
   }
 }
 
-export async function getArrivalForEdit(arrivalNumber: string): Promise<ApiResponse<ArrivalFormData>> {
+
+export async function getArrivalForUpdate(arrivalNumber: string): Promise<ApiResponse<UpdateArrival>> {
   try {
-    const arrival = await prisma.arrival.findUnique({
+    const dbArrival = await prisma.arrival.findUnique({
       where: { arrival_number: arrivalNumber },
-      include: {
-        origin: true,
-        destination: true,
-        transporter: true,
-        assets: {
-          include: {
-            technical_specification: true,
-            asset_accessories: true
-          }
-        }
-      }
+      ...arrivalIncludeArgs
     })
-    if (!arrival) {
+    if (!dbArrival) {
       return response400(`Arrival ${arrivalNumber} not found`)
     }
-    return successResponse({
-      id: arrival.id,
-      arrivalNumber: arrival.arrival_number,
-      vendorId: arrival.origin_id,
-      transporterId: arrival.transporter_id,
-      warehouseId: arrival.destination_id,
-      comment: arrival.notes ?? '',
-      assets: arrival.assets.map(asset => ({
-        id: asset.id,
-        barcode: asset.barcode,
-        modelId: asset.model_id,
-        serialNumber: asset.serial_number,
-        meterBlack: Number(asset.technical_specification?.meter_black ?? 0),
-        meterColour: Number(asset.technical_specification?.meter_colour ?? 0),
-        cassettes: asset.technical_specification?.cassettes ?? null,
-        technicalStatusId: asset.technical_status_id,
-        internalFinisher: asset.technical_specification?.internal_finisher ?? '',
-        coreFunctionIds: asset.asset_accessories.map(aa => aa.accessory_id)
-      }))
-    })
+    return successResponse(await mapDbToGetUpdateArrival(dbArrival))
   } catch (error) {
     return response500(`Failed to fetch arrival ${arrivalNumber} for edit`)
+  }
+}
+
+async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<UpdateArrival> {
+  const { origin, destination, transporter, notes, assets } = dbArrival
+  const models = await Promise.all(assets.map(a => mapDbModelToSummaryModel(a.model_id)))
+
+  return {
+    id: dbArrival.id,
+    vendor: origin,
+    warehouse: destination,
+    transporter: transporter,
+    comment: notes,
+    assets: assets.map((a, i) => ({
+      id: a.id,
+      model: models[i],
+      serialNumber: a.serial_number,
+      meterBlack: a.technical_specification?.meter_black ?? 0,
+      meterColour: a.technical_specification?.meter_colour ?? 0,
+      cassettes: a.technical_specification?.cassettes ?? 0,
+      technicalStatus: a.TechnicalStatus,
+      internalFinisher: a.technical_specification?.internal_finisher ?? '',
+      coreFunctions: a.asset_accessories.map(ac => ac.Accessory)
+    }))
   }
 }
 
@@ -95,7 +118,7 @@ export async function createArrival(newArrival: CreateArrival) {
       notes: newArrival.comment,
       created_at: currentDateTime,
       assets: {
-        create: newArrival.assets.map(a => mapAssetForArrivalCreation(
+        create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(
           a,
           barcodes,
           newArrival.warehouse.id,
@@ -107,11 +130,11 @@ export async function createArrival(newArrival: CreateArrival) {
   return arrival.arrival_number
 }
 
-function mapAssetForArrivalCreation(
+function mapInputAssetToPrismaCreateAsset(
   asset: CreateAsset,
   barcodes: Record<string, string>,
   warehouseId: number,
-  currentDateTime: Date) {
+  currentDateTime: Date): AssetCreateWithoutArrivalInput {
 
   return {
     barcode: barcodes[asset.serialNumber],
@@ -140,32 +163,6 @@ function mapAssetForArrivalCreation(
 }
 
 
-async function generateBarcodes(assets: CreateAsset[], warehouseCode: string, date: Date) {
-  const barcodes: Record<string, string> = {}
-  for (const asset of assets) {
-    barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode, date)
-  }
-  return barcodes
-}
-
-async function getNewArrivalNumber(warehouseCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceArrivalEntity, warehouseCode, date)
-  return `A${warehouseCode}-${formattedDate}-${String(sequence).padStart(3, '0')}`
-}
-
-async function getNewAssetBarcode(warehouseCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceAssetEntity, warehouseCode, date)
-  return `${warehouseCode}-${formattedDate}-${String(sequence).padStart(4, '0')}`
-}
-
-async function getNextSequence(entityType: string, warehouseCode: string, date: Date): Promise<number> {
-  const formattedDate = format(date, 'yyyy-MM-dd')
-  const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
-  return result[0].get_next_sequence
-}
-
 export async function updateArrival(arrival: UpdateArrival) {
   const existingAssetIds = (await prisma.asset.findMany({
     where: { arrival_id: arrival.id },
@@ -185,7 +182,7 @@ export async function updateArrival(arrival: UpdateArrival) {
     const barcodes = await generateBarcodes(assetsToCreate, warehouseCode, currentDateTime)
     assetCreates = assetsToCreate.map(asset => prisma.asset.create({
       data: {
-        ...mapAssetForArrivalCreation(asset, barcodes, arrival.warehouse.id, currentDateTime),
+        ...mapInputAssetToPrismaCreateAsset(asset, barcodes, arrival.warehouse.id, currentDateTime),
         arrival: { connect: { id: arrival.id } }
       }
     }))
@@ -244,4 +241,30 @@ export async function updateArrival(arrival: UpdateArrival) {
     ...accessoryCreates,
     ...assetCreates
   ])
+}
+
+async function generateBarcodes(assets: CreateAsset[], warehouseCode: string, date: Date) {
+  const barcodes: Record<string, string> = {}
+  for (const asset of assets) {
+    barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode, date)
+  }
+  return barcodes
+}
+
+async function getNewArrivalNumber(warehouseCode: string, date: Date): Promise<string> {
+  const formattedDate = format(date, 'yyMMdd')
+  const sequence = await getNextSequence(sequenceArrivalEntity, warehouseCode, date)
+  return `A${warehouseCode}-${formattedDate}-${String(sequence).padStart(3, '0')}`
+}
+
+async function getNewAssetBarcode(warehouseCode: string, date: Date): Promise<string> {
+  const formattedDate = format(date, 'yyMMdd')
+  const sequence = await getNextSequence(sequenceAssetEntity, warehouseCode, date)
+  return `${warehouseCode}-${formattedDate}-${String(sequence).padStart(4, '0')}`
+}
+
+async function getNextSequence(entityType: string, warehouseCode: string, date: Date): Promise<number> {
+  const formattedDate = format(date, 'yyyy-MM-dd')
+  const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
+  return result[0].get_next_sequence
 }

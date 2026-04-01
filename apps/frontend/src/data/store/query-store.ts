@@ -1,10 +1,10 @@
 import { ANY_OPTION, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetSummary, Model, Status, Warehouse } from 'shared-types'
+import type { AssetSummary, ModelSummary, Status, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface QueryStore {
   assets: AssetSummary[]
-  model: Model | null
+  model: ModelSummary | null
   meter: number | null
   availabilityStatus: SelectOption<Status>
   technicalStatus: SelectOption<Status>
@@ -12,7 +12,7 @@ interface QueryStore {
   hasSearched: boolean
 
   setAssets: (assets: AssetSummary[]) => void
-  setModel: (model: Model | null) => void
+  setModel: (model: ModelSummary | null) => void
   setMeter: (meter: number | null) => void
   setAvailabilityStatus: (status: SelectOption<Status>) => void
   setTechnicalStatus: (status: SelectOption<Status>) => void

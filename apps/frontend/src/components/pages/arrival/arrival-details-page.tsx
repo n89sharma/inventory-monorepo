@@ -19,7 +19,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (arrivalNumber === undefined) throw new Error('Missing collectionId parameter')
+  if (arrivalNumber === undefined) throw new Error('Missing collectionId/arrivalNumber parameter')
 
   const columns = useMemo(() => createAssetSummaryColumns('arrivals', arrivalNumber), [arrivalNumber])
 

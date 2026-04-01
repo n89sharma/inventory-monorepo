@@ -1,11 +1,12 @@
-import { CoreFunctionsSchema, ModelSchema, OrgSummarySchema, type CoreFunction, type Model, type OrgSummary, type Status, type Warehouse } from "shared-types"
+import type { CoreFunction, ModelSummary, OrgSummary, Status, Warehouse } from "shared-types"
+import { CoreFunctionsSchema, ModelSummarySchema, OrgSummarySchema } from "shared-types"
 import z from "zod"
 import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type SelectOption } from "./select-option-types"
 
 // Asset Modal within Edit or Create Asset
 export const AssetFormSchema = z.object({
   id: z.number().optional(),
-  model: ModelSchema.nullable().refine(val => !!val, "Model is required"),
+  model: ModelSummarySchema.nullable().refine(val => !!val, "Model is required"),
   serialNumber: z.string().refine(val => val.length > 0, "Serial number is required"),
   meterBlack: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Black meter is required"),
   meterColour: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Colour meter is required"),
@@ -27,7 +28,7 @@ export const ArrivalFormSchema = z.object({
 
 export type AssetForm = {
   id?: number | undefined,
-  model: Model | null,
+  model: ModelSummary | null,
   serialNumber: string,
   meterBlack: number | null,
   meterColour: number | null,

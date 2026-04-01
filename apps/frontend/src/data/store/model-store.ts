@@ -1,11 +1,11 @@
-import type { Model } from 'shared-types'
+import type { ModelSummary } from 'shared-types'
 import { create } from 'zustand'
 
 interface ModelStore {
-  models: Model[]
+  models: ModelSummary[]
   loading: boolean
 
-  setModels: (models: Model[]) => void
+  setModels: (models: ModelSummary[]) => void
   setLoading: (loading: boolean) => void
 
   clearModels: () => void

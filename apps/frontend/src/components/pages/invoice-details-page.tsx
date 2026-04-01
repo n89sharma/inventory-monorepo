@@ -16,12 +16,12 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const detailError = useInvoiceStore(state => state.detailError)
   const loadInvoiceDetail = useInvoiceStore(state => state.loadInvoiceDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId } = useParams<{ collectionId: string }>()
+  const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (collectionId === undefined) throw new Error('Missing collectionId parameter')
+  if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('invoices', collectionId), [collectionId])
+  const columns = useMemo(() => createAssetSummaryColumns('invoices', invoiceNumber), [invoiceNumber])
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -29,8 +29,8 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('invoices', pathname)
-    loadInvoiceDetail(collectionId)
-  }, [collectionId])
+    loadInvoiceDetail(invoiceNumber)
+  }, [invoiceNumber])
 
   if (detailLoading) return <div>Loading...</div>
   if (detailError) return <div>{detailError}</div>
@@ -38,10 +38,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', collectionId)} />
+      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Invoice {collectionId}</h1>
-        <CollectionEditBar section="invoices" collectionId={collectionId} />
+        <h1 className="text-3xl font-bold p-2">Invoice {invoiceNumber}</h1>
+        <CollectionEditBar section="invoices" collectionId={invoiceNumber} />
       </div>
       <div className="flex gap-4">
         <UserCard title="Created By" user={invoice.created_by} />

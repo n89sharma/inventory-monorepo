@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 
-export const ModelSchema = z.object({
+export const ModelSummarySchema = z.object({
   id: z.number(),
   brand_name: z.string(),
   model_name: z.string(),
@@ -10,4 +10,4 @@ export const ModelSchema = z.object({
   size: z.number()
 });
 
-export type Model = z.infer<typeof ModelSchema>;
+export type ModelSummary = z.infer<typeof ModelSummarySchema>;

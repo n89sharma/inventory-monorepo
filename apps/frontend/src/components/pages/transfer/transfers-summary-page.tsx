@@ -5,10 +5,10 @@ import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { useMemo } from "react"
-import { SearchBar } from "../custom/search-bar"
-import { SelectOptions } from "../custom/select-options"
-import { CollectionPage } from "./collection-page"
-import { transferTableColumns } from "./column-defs/transfer-columns"
+import { SearchBar } from "../../custom/search-bar"
+import { SelectOptions } from "../../custom/select-options"
+import { CollectionPage } from "../collection-page"
+import { transferTableColumns } from "../column-defs/transfer-columns"
 
 export function TransferSummaryPage(): React.JSX.Element {
   const transfers = useTransferStore(state => state.transfers)

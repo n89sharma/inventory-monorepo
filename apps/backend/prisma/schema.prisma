@@ -198,13 +198,13 @@ model Arrival {
   id             Int          @id @default(autoincrement())
   arrival_number String       @unique @db.VarChar(50)
   origin_id      Int
-  destination_id Int?
+  destination_id Int
   transporter_id Int
   created_by_id  Int?
   notes          String?
   created_at     DateTime
   created_by     User?        @relation(fields: [created_by_id], references: [id])
-  destination    Warehouse?   @relation(fields: [destination_id], references: [id])
+  destination    Warehouse    @relation(fields: [destination_id], references: [id])
   origin         Organization @relation("ArrivalOrigin", fields: [origin_id], references: [id])
   transporter    Organization @relation("ArrivalTransporter", fields: [transporter_id], references: [id])
   assets         Asset[]

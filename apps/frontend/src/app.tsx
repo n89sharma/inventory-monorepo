@@ -4,7 +4,7 @@ import { AssetDetailsPage } from '@/components/pages/asset-details-page'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ArrivalDetailsPage } from './components/pages/arrival/arrival-details-page'
 import { CreateArrivalPage } from './components/pages/arrival/create-arrival-page'
-import { ArrivalEditPage } from './components/pages/arrival/edit-arrival-page'
+import { UpdateArrivalPage } from './components/pages/arrival/update-arrival-page'
 import { DepartureDetailsPage } from './components/pages/departure-details-page'
 import { DepartureSummaryPage } from './components/pages/departures-summary-page'
 import { HoldDetailsPage } from './components/pages/hold-details-page'
@@ -12,8 +12,8 @@ import { HoldSummaryPage } from './components/pages/holds-summary-page'
 import { InvoiceDetailsPage } from './components/pages/invoice-details-page'
 import { InvoicesSummaryPage } from './components/pages/invoices-summary-page'
 import { QueryPage } from './components/pages/query'
-import { TransferDetailsPage } from './components/pages/transfer-details-page'
-import { TransferSummaryPage } from './components/pages/transfers-summary-page'
+import { TransferDetailsPage } from './components/pages/transfer/transfer-details-page'
+import { TransferSummaryPage } from './components/pages/transfer/transfers-summary-page'
 import { useGlobalData } from './hooks/use-global-data'
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
 
           <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
           <Route path="/arrivals/new" element={<CreateArrivalPage />} />
-          <Route path="/arrivals/:collectionId/edit" element={<ArrivalEditPage />} />
+          <Route path="/arrivals/:collectionId/edit" element={<UpdateArrivalPage />} />
           <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
 
           <Route path="/transfers" element={<TransferSummaryPage />} />

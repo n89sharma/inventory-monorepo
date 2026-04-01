@@ -1,10 +1,10 @@
 import { api } from '@/data/api/axios-client'
 import { apiErrorHandler } from '@/lib/error-handler'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
+import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, ArrivalDetail, ArrivalFormData, ArrivalSummary, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalFormDataSchema, ArrivalSummarySchema } from 'shared-types'
+import type { ApiResponse, ArrivalDetail, ArrivalSummary, UpdateArrival, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 
 interface CreateArrivalResponse {
@@ -34,10 +34,31 @@ export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDe
   throw new Error(data.error.summary)
 }
 
-export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalFormData> {
-  const { data } = await api.get<ApiResponse<ArrivalFormData>>(`/arrivals/${arrivalNumber}/edit`)
-  if (data.success) return ArrivalFormDataSchema.parse(data.data)
+export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalForm> {
+  const { data } = await api.get<ApiResponse<UpdateArrival>>(`/arrivals/${arrivalNumber}/edit`)
+  if (data.success) return mapUpdateArrivalToUiArrivalForm(UpdateArrivalSchema.parse(data.data))
   throw new Error(data.error.summary)
+}
+
+export function mapUpdateArrivalToUiArrivalForm(arrival: UpdateArrival): ArrivalForm {
+  return {
+    id: arrival.id,
+    vendor: arrival.vendor,
+    transporter: arrival.transporter,
+    warehouse: getSelectOption(arrival.warehouse),
+    comment: arrival.comment ?? '',
+    assets: arrival.assets.map(asset => ({
+      id: asset.id,
+      model: asset.model,
+      serialNumber: asset.serialNumber,
+      meterBlack: asset.meterBlack,
+      meterColour: asset.meterColour,
+      cassettes: asset.cassettes,
+      technicalStatus: getSelectOption(asset.technicalStatus),
+      internalFinisher: asset.internalFinisher,
+      coreFunctions: asset.coreFunctions
+    }))
+  }
 }
 
 export async function updateArrival(

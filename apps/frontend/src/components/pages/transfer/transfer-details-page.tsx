@@ -1,14 +1,14 @@
 import { OrgCard } from '@/components/custom/org-card'
-import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useTransferStore } from '@/data/store/transfer-store'
+import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { useNavigationStore } from '@/data/store/navigation-store'
+import { useTransferStore } from '@/data/store/transfer-store'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { CollectionEditBar } from '../custom/collection-edit-bar'
-import { DataTable } from '../shadcn/data-table'
-import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
+import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { DataTable } from '../../shadcn/data-table'
+import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function TransferDetailsPage(): React.JSX.Element {
   const transfer = useTransferStore(state => state.transferDetail)
@@ -16,12 +16,12 @@ export function TransferDetailsPage(): React.JSX.Element {
   const detailError = useTransferStore(state => state.detailError)
   const loadTransferDetail = useTransferStore(state => state.loadTransferDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId } = useParams<{ collectionId: string }>()
+  const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (collectionId === undefined) throw new Error('Missing collectionId parameter')
+  if (transferNumber === undefined) throw new Error('Missing collectionId/transferNumber parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('transfers', collectionId), [collectionId])
+  const columns = useMemo(() => createAssetSummaryColumns('transfers', transferNumber), [transferNumber])
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -29,8 +29,8 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('transfers', pathname)
-    loadTransferDetail(collectionId)
-  }, [collectionId])
+    loadTransferDetail(transferNumber)
+  }, [transferNumber])
 
   if (detailLoading) return <div>Loading...</div>
   if (detailError) return <div>{detailError}</div>
@@ -38,10 +38,10 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('transfers', collectionId)} />
+      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('transfers', transferNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Transfer {collectionId}</h1>
-        <CollectionEditBar section="transfers" collectionId={collectionId} />
+        <h1 className="text-3xl font-bold p-2">Transfer {transferNumber}</h1>
+        <CollectionEditBar section="transfers" collectionId={transferNumber} />
       </div>
       <div className="flex gap-4">
         <WarehouseCard title="Origin" warehouse={transfer.origin} />

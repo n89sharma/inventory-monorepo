@@ -336,11 +336,6 @@ export type WarehouseScalarRelationFilter = {
   isNot?: Prisma.WarehouseWhereInput
 }
 
-export type WarehouseNullableScalarRelationFilter = {
-  is?: Prisma.WarehouseWhereInput | null
-  isNot?: Prisma.WarehouseWhereInput | null
-}
-
 export type WarehouseCity_codeStreetCompoundUniqueInput = {
   city_code: string
   street: string
@@ -409,12 +404,10 @@ export type WarehouseCreateNestedOneWithoutArrivalsInput = {
   connect?: Prisma.WarehouseWhereUniqueInput
 }
 
-export type WarehouseUpdateOneWithoutArrivalsNestedInput = {
+export type WarehouseUpdateOneRequiredWithoutArrivalsNestedInput = {
   create?: Prisma.XOR<Prisma.WarehouseCreateWithoutArrivalsInput, Prisma.WarehouseUncheckedCreateWithoutArrivalsInput>
   connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutArrivalsInput
   upsert?: Prisma.WarehouseUpsertWithoutArrivalsInput
-  disconnect?: Prisma.WarehouseWhereInput | boolean
-  delete?: Prisma.WarehouseWhereInput | boolean
   connect?: Prisma.WarehouseWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutArrivalsInput, Prisma.WarehouseUpdateWithoutArrivalsInput>, Prisma.WarehouseUncheckedUpdateWithoutArrivalsInput>
 }

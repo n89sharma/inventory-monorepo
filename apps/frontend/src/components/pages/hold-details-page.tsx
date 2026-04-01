@@ -16,12 +16,12 @@ export function HoldDetailsPage(): React.JSX.Element {
   const detailError = useHoldStore(state => state.detailError)
   const loadHoldDetail = useHoldStore(state => state.loadHoldDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId } = useParams<{ collectionId: string }>()
+  const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (collectionId === undefined) throw new Error('Missing collectionId parameter')
+  if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('holds', collectionId), [collectionId])
+  const columns = useMemo(() => createAssetSummaryColumns('holds', holdNumber), [holdNumber])
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -29,8 +29,8 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('holds', pathname)
-    loadHoldDetail(collectionId)
-  }, [collectionId])
+    loadHoldDetail(holdNumber)
+  }, [holdNumber])
 
   if (detailLoading) return <div>Loading...</div>
   if (detailError) return <div>{detailError}</div>
@@ -38,10 +38,10 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('holds', collectionId)} />
+      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('holds', holdNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Hold {collectionId}</h1>
-        <CollectionEditBar section="holds" collectionId={collectionId} />
+        <h1 className="text-3xl font-bold p-2">Hold {holdNumber}</h1>
+        <CollectionEditBar section="holds" collectionId={holdNumber} />
       </div>
       <div className="flex gap-4">
         <UserCard title="Created By" user={hold.created_by} />

@@ -16,12 +16,12 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const detailError = useDepartureStore(state => state.detailError)
   const loadDepartureDetail = useDepartureStore(state => state.loadDepartureDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId } = useParams<{ collectionId: string }>()
+  const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
-  if (collectionId === undefined) throw new Error('Missing collectionId parameter')
+  if (departureNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('departures', collectionId), [collectionId])
+  const columns = useMemo(() => createAssetSummaryColumns('departures', departureNumber), [departureNumber])
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -29,8 +29,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('departures', pathname)
-    loadDepartureDetail(collectionId)
-  }, [collectionId])
+    loadDepartureDetail(departureNumber)
+  }, [departureNumber])
 
   if (detailLoading) return <div>Loading...</div>
   if (detailError) return <div>{detailError}</div>
@@ -38,10 +38,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('departures', collectionId)} />
+      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('departures', departureNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Departure {collectionId}</h1>
-        <CollectionEditBar section="departures" collectionId={collectionId} />
+        <h1 className="text-3xl font-bold p-2">Departure {departureNumber}</h1>
+        <CollectionEditBar section="departures" collectionId={departureNumber} />
       </div>
       <div className="flex gap-4">
         <WarehouseCard title="Origin" warehouse={departure.origin} />

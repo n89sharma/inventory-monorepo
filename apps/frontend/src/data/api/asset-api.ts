@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
-import type { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Model, Part, Status, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, ModelSummary, Part, Status, Warehouse } from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -68,7 +68,7 @@ export async function getAllAssetDetails(barcode: string) {
 }
 
 export async function getAssetsForQuery(
-  model: Model,
+  model: ModelSummary,
   meter: number | null,
   availabilityStatus: SelectOption<Status>,
   technicalStatus: SelectOption<Status>,
