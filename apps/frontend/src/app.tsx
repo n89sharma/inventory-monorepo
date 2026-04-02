@@ -6,6 +6,8 @@ import { ArrivalDetailsPage } from './components/pages/arrival/arrival-details-p
 import { CreateArrivalPage } from './components/pages/arrival/create-arrival-page'
 import { UpdateArrivalPage } from './components/pages/arrival/update-arrival-page'
 import { DepartureDetailsPage } from './components/pages/departure-details-page'
+import { CreateDeparturePage } from './components/pages/departure/create-departure-page'
+import { UpdateDeparturePage } from './components/pages/departure/update-departure-page'
 import { DepartureSummaryPage } from './components/pages/departures-summary-page'
 import { HoldDetailsPage } from './components/pages/hold-details-page'
 import { HoldSummaryPage } from './components/pages/holds-summary-page'
@@ -38,6 +40,8 @@ function App() {
           <Route path="/transfers/:collectionId" element={<TransferDetailsPage />} />
 
           <Route path="/departures" element={<DepartureSummaryPage />} />
+          <Route path="/departures/new" element={<CreateDeparturePage />} />
+          <Route path="/departures/:collectionId/edit" element={<UpdateDeparturePage />} />
           <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
 
           <Route path="/holds" element={<HoldSummaryPage />} />

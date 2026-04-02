@@ -3,9 +3,12 @@ import { useDepartureStore } from "@/data/store/departure-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
+import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
+import { Link } from "react-router-dom"
 import { SearchBar } from "../custom/search-bar"
 import { SelectOptions } from "../custom/select-options"
+import { Button } from "../shadcn/button"
 import { CollectionPage } from "./collection-page"
 import { departureTableColumns } from "./column-defs/departure-columns"
 
@@ -49,6 +52,11 @@ export function DepartureSummaryPage(): React.JSX.Element {
             className="max-w-40"
           />
         </SearchBar>
+      }
+      actions={
+        <Button asChild>
+          <Link to="/departures/new"><PlusIcon />Create Departure</Link>
+        </Button>
       }
     />
   )
