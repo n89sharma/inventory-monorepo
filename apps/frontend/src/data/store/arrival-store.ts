@@ -54,6 +54,7 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   setDestination: (warehouse) => set({ destination: warehouse }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
   setArrivalDetail: (arrivalDetail) => set({ arrivalDetail }),
+
   getArrivals: async (fromDate, toDate, destination) => {
     set({ hasSearched: true, arrivals: await getArrivals(fromDate, toDate, destination) })
   },
@@ -61,8 +62,6 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     set({ arrivalFormData: null })
     set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
   },
-  submitCreateArrival: (data) => createArrival(data),
-  submitUpdateArrival: (arrivalNumber, data) => updateArrival(arrivalNumber, data),
   getArrivalDetail: async (arrivalNumber) => {
     if (get().arrivalDetail?.arrival_number === arrivalNumber) return
     set({ detailLoading: true, detailError: null })
@@ -74,5 +73,12 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
+
+  submitCreateArrival: (data: ArrivalForm) => createArrival(data),
+  submitUpdateArrival: (arrivalNumber, data) => {
+    set({ arrivalDetail: null })
+    return updateArrival(arrivalNumber, data)
+  },
+
   clearArrivals: () => set({ arrivals: [] })
 }))

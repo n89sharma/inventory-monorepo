@@ -5,8 +5,8 @@ import {
   getTransfers as getTransfersApi,
   updateTransfer
 } from '@/data/api/transfer-api'
-import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
+import type { TransferForm } from '@/ui-types/transfer-form-types'
 import type { ApiResponse, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
@@ -58,7 +58,10 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
   getTransfers: async (fromDate, toDate, origin, destination) => {
     set({ hasSearched: true, transfers: await getTransfersApi(fromDate, toDate, origin, destination) })
   },
-
+  getTransferForUpdate: async (transferNumber) => {
+    set({ transferFormData: null })
+    set({ transferFormData: await getTransferForUpdate(transferNumber) })
+  },
   getTransferDetails: async (transferNumber) => {
     if (get().transferDetail?.transfer_number === transferNumber) return
     set({ detailLoading: true, detailError: null })
@@ -71,14 +74,11 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     }
   },
 
-  getTransferForUpdate: async (transferNumber) => {
-    set({ transferFormData: null })
-    set({ transferFormData: await getTransferForUpdate(transferNumber) })
-  },
-
   submitCreateTransfer: (data) => createTransfer(data),
-
-  submitUpdateTransfer: (transferNumber, data) => updateTransfer(transferNumber, data),
+  submitUpdateTransfer: (transferNumber, data) => {
+    set({ transferDetail: null })
+    return updateTransfer(transferNumber, data)
+  },
 
   clearTransfers: () => set({ transfers: [] })
 }))

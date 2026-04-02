@@ -1,9 +1,12 @@
+import { Button } from "@/components/shadcn/button"
 import { useConstantsStore } from "@/data/store/constants-store"
 import { useTransferStore } from "@/data/store/transfer-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
+import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
+import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptions } from "../../custom/select-options"
 import { CollectionPage } from "../collection-page"
@@ -60,6 +63,11 @@ export function TransferSummaryPage(): React.JSX.Element {
             className="max-w-40"
           />
         </SearchBar>
+      }
+      actions={
+        <Button asChild>
+          <Link to="/transfers/new"><PlusIcon />Create Transfer</Link>
+        </Button>
       }
     />
   )
