@@ -1,5 +1,5 @@
 import { Button } from "@/components/shadcn/button"
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
@@ -60,5 +60,15 @@ export const departureTableColumns: ColumnDef<DepartureSummary>[] = [
   {
     accessorKey: "destination",
     header: "Customer"
+  },
+  {
+    header: "Edit",
+    cell: ({ row }) => (
+      <Link to={`/departures/${row.original.departure_number}/edit`}>
+        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+          <PencilSimpleIcon />
+        </Button>
+      </Link>
+    )
   }
 ]
