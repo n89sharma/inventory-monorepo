@@ -6,6 +6,7 @@ import {
   getAssetDetail,
   getAssetErrors,
   getAssetParts,
+  getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets
 } from '../controllers/assetController.js'
@@ -14,6 +15,7 @@ import { validateQuery } from '../middleware/validation.js'
 const router = express.Router()
 
 router.get('/', validateQuery(AssetQuerySchema), getAssets)
+router.get('/:barcode/summary', getAssetSummaryByBarcode)
 router.get('/:barcode', getAssetDetail)
 router.get('/:barcode/accessories', getAssetAccessories)
 router.get('/:barcode/errors', getAssetErrors)

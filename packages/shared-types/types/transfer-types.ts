@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema } from './organization-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
 import { WarehouseSchema } from './reference-data-types.js';
 
 // GET /transfers?fromDate...&toDate...&origin...&destination...
@@ -28,3 +28,31 @@ export const TransferDetailSchema = z.object({
   assets: z.array(AssetSummarySchema)
 })
 export type TransferDetail = z.infer<typeof TransferDetailSchema>
+
+// POST /transfers
+export const CreateTransferSchema = z.object({
+  origin: WarehouseSchema.refine(val => !!val, "Origin required"),
+  destination: WarehouseSchema.refine(val => !!val, "Destination required"),
+  transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
+  comment: z.string().nullable(),
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer")
+}).refine(data => data.origin.id !== data.destination.id, {
+  message: "Origin and destination cannot be the same",
+  path: ["destination"]
+})
+export type CreateTransfer = z.infer<typeof CreateTransferSchema>
+
+// GET /transfers/:transferNumber/edit
+// PUT /transfers/:transferNumber
+export const UpdateTransferSchema = z.object({
+  id: z.number(),
+  origin: WarehouseSchema.refine(val => !!val, "Origin required"),
+  destination: WarehouseSchema.refine(val => !!val, "Destination required"),
+  transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
+  comment: z.string().nullable(),
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer")
+}).refine(data => data.origin.id !== data.destination.id, {
+  message: "Origin and destination cannot be the same",
+  path: ["destination"]
+})
+export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>

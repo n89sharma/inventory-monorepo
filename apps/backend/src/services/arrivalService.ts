@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { getNextSequence } from '../lib/db-utils.js'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
@@ -263,8 +264,3 @@ async function getNewAssetBarcode(warehouseCode: string, date: Date): Promise<st
   return `${warehouseCode}-${formattedDate}-${String(sequence).padStart(4, '0')}`
 }
 
-async function getNextSequence(entityType: string, warehouseCode: string, date: Date): Promise<number> {
-  const formattedDate = format(date, 'yyyy-MM-dd')
-  const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
-  return result[0].get_next_sequence
-}

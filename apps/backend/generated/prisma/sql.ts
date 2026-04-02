@@ -7,6 +7,8 @@ export * from "./sql/getArrivals.js"
 
 export * from "./sql/getAssetAccessories.js"
 
+export * from "./sql/getAssetByBarcode.js"
+
 export * from "./sql/getAssetComments.js"
 
 export * from "./sql/getAssetDetails.js"

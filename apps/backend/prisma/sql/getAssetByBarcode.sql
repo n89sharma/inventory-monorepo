@@ -11,8 +11,7 @@ select
   tr.status as tracking_status,
   av.status as availability_status,
   te.status as technical_status
-from "Invoice" i
-  join "Asset" a on i.id = a.purchase_invoice_id
+from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
@@ -22,4 +21,4 @@ from "Invoice" i
   join "TechnicalStatus" te on te.id = a.technical_status_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
-where i.invoice_number  = $1
+where a.barcode = $1

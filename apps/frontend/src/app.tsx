@@ -12,8 +12,10 @@ import { HoldSummaryPage } from './components/pages/holds-summary-page'
 import { InvoiceDetailsPage } from './components/pages/invoice-details-page'
 import { InvoicesSummaryPage } from './components/pages/invoices-summary-page'
 import { QueryPage } from './components/pages/query'
+import { CreateTransferPage } from './components/pages/transfer/create-transfer-page'
 import { TransferDetailsPage } from './components/pages/transfer/transfer-details-page'
 import { TransferSummaryPage } from './components/pages/transfer/transfers-summary-page'
+import { UpdateTransferPage } from './components/pages/transfer/update-transfer-page'
 import { useGlobalData } from './hooks/use-global-data'
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
           <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
 
           <Route path="/transfers" element={<TransferSummaryPage />} />
+          <Route path="/transfers/new" element={<CreateTransferPage />} />
+          <Route path="/transfers/:collectionId/edit" element={<UpdateTransferPage />} />
           <Route path="/transfers/:collectionId" element={<TransferDetailsPage />} />
 
           <Route path="/departures" element={<DepartureSummaryPage />} />

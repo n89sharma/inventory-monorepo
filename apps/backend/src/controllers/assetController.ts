@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Part, response500, successResponse } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Part, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
-import { getAssetsForQuery } from '../../generated/prisma/sql.js'
+import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import {
   getAssetAccessories as getAssetAccessoriesSer,
@@ -106,5 +106,18 @@ export async function getAssetTransfers(req: Request, res: Response<ApiResponse<
     return res.json(response)
   } else {
     return res.status(500).json(response)
+  }
+}
+
+export async function getAssetSummaryByBarcode(req: Request, res: Response<ApiResponse<AssetSummary>>) {
+  try {
+    const { barcode } = req.params
+    const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
+    if (results.length === 0) {
+      return res.status(404).json(response400(`Asset ${barcode} not found`))
+    }
+    return res.json(successResponse(results[0]))
+  } catch (error) {
+    return res.status(500).json(response500('Failed to fetch asset'))
   }
 }

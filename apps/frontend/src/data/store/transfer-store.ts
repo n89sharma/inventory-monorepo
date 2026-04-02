@@ -1,6 +1,13 @@
-import { getTransferDetail, getTransfers } from '@/data/api/transfer-api'
+import {
+  createTransfer,
+  getTransferDetail,
+  getTransferForUpdate,
+  getTransfers as getTransfersApi,
+  updateTransfer
+} from '@/data/api/transfer-api'
+import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { TransferDetail, TransferSummary, Warehouse } from 'shared-types'
+import type { ApiResponse, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface TransferStore {
@@ -9,27 +16,25 @@ interface TransferStore {
   toDate: SelectOption<Date>
   origin: SelectOption<Warehouse>
   destination: SelectOption<Warehouse>
-  loading: boolean
   hasSearched: boolean
   transferDetail: TransferDetail | null
   detailLoading: boolean
   detailError: string | null
+  transferFormData: TransferForm | null
 
-  setTransfers: (t: TransferSummary[]) => void
   setFromDate: (d: SelectOption<Date>) => void
   setToDate: (d: SelectOption<Date>) => void
   setOrigin: (o: SelectOption<Warehouse>) => void
   setDestination: (d: SelectOption<Warehouse>) => void
-  setLoading: (loading: boolean) => void
-  setHasSearched: (hasSearched: boolean) => void
-  setTransferDetail: (transferDetail: TransferDetail) => void
-  getTransferDetails: (transferNumber: string) => Promise<void>
   getTransfers: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
     origin: SelectOption<Warehouse>,
     destination: SelectOption<Warehouse>) => Promise<void>
-
+  getTransferDetails: (transferNumber: string) => Promise<void>
+  getTransferForUpdate: (transferNumber: string) => Promise<void>
+  submitCreateTransfer: (data: TransferForm) => Promise<ApiResponse<{ transferNumber: string }>>
+  submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<ApiResponse<void>>
   clearTransfers: () => void
 }
 
@@ -39,23 +44,21 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
   toDate: ANY_OPTION,
   origin: ANY_OPTION,
   destination: ANY_OPTION,
-  loading: false,
   hasSearched: false,
   transferDetail: null,
   detailLoading: false,
   detailError: null,
+  transferFormData: null,
 
-  setTransfers: (transfers) => set({ transfers }),
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
   setOrigin: (origin) => set({ origin }),
   setDestination: (destination) => set({ destination }),
-  setLoading: (loading) => set({ loading }),
-  setHasSearched: (hasSearched) => set({ hasSearched }),
-  setTransferDetail: (transferDetail) => set({ transferDetail }),
+
   getTransfers: async (fromDate, toDate, origin, destination) => {
-    set({ hasSearched: true, transfers: await getTransfers(fromDate, toDate, origin, destination) })
+    set({ hasSearched: true, transfers: await getTransfersApi(fromDate, toDate, origin, destination) })
   },
+
   getTransferDetails: async (transferNumber) => {
     if (get().transferDetail?.transfer_number === transferNumber) return
     set({ detailLoading: true, detailError: null })
@@ -67,5 +70,15 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
+
+  getTransferForUpdate: async (transferNumber) => {
+    set({ transferFormData: null })
+    set({ transferFormData: await getTransferForUpdate(transferNumber) })
+  },
+
+  submitCreateTransfer: (data) => createTransfer(data),
+
+  submitUpdateTransfer: (transferNumber, data) => updateTransfer(transferNumber, data),
+
   clearTransfers: () => set({ transfers: [] })
 }))

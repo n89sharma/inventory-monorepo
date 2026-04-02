@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 
 export const AssetSummarySchema = z.object({
+  id: z.number(),
   barcode: z.string(),
   brand: z.string(),
   model: z.string(),
