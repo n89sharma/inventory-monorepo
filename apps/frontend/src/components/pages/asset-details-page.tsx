@@ -32,13 +32,13 @@ export const AssetDetailsPage = () => {
 
   const loading = useAssetStore((state) => state.loading)
   const error = useAssetStore((state) => state.error)
-  const loadAssetDetails = useAssetStore((state) => state.loadAssetDetails)
+  const getAssetDetails = useAssetStore((state) => state.getAssetDetails)
 
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
     if (!assetId) return
     setCurrentTransferIndex(0)
-    loadAssetDetails(assetId)
+    getAssetDetails(assetId)
   }, [assetId])
 
   function handleNextTransfer() {

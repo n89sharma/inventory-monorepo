@@ -1,6 +1,6 @@
 import { OrgCard } from '@/components/custom/org-card'
-import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { useDepartureStore } from '@/data/store/departure-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -14,7 +14,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const departure = useDepartureStore(state => state.departureDetail)
   const detailLoading = useDepartureStore(state => state.detailLoading)
   const detailError = useDepartureStore(state => state.detailError)
-  const loadDepartureDetail = useDepartureStore(state => state.loadDepartureDetail)
+  const getDepartureDetails = useDepartureStore(state => state.getDepartureDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,7 +29,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('departures', pathname)
-    loadDepartureDetail(departureNumber)
+    getDepartureDetails(departureNumber)
   }, [departureNumber])
 
   if (detailLoading) return <div>Loading...</div>

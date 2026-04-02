@@ -1,4 +1,3 @@
-import { getDepartures } from "@/data/api/departure-api"
 import { useConstantsStore } from "@/data/store/constants-store"
 import { useDepartureStore } from "@/data/store/departure-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
@@ -12,7 +11,7 @@ import { departureTableColumns } from "./column-defs/departure-columns"
 
 export function DepartureSummaryPage(): React.JSX.Element {
   const departures = useDepartureStore(state => state.departures)
-  const setDepartures = useDepartureStore(state => state.setDepartures)
+  const getDepartures = useDepartureStore(state => state.getDepartures)
   const fromDate = useDepartureStore(state => state.fromDate)
   const setFromDate = useDepartureStore(state => state.setFromDate)
   const toDate = useDepartureStore(state => state.toDate)
@@ -20,16 +19,14 @@ export function DepartureSummaryPage(): React.JSX.Element {
   const origin = useDepartureStore(state => state.origin)
   const setOrigin = useDepartureStore(state => state.setOrigin)
   const hasSearched = useDepartureStore(state => state.hasSearched)
-  const setHasSearched = useDepartureStore(state => state.setHasSearched)
   const warehouses = useConstantsStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
-  async function onSearchSetData({ fromDate, toDate, origin }: SearchOptions) {
-    setHasSearched(true)
-    setDepartures(await getDepartures(fromDate, toDate, origin ?? ANY_OPTION))
+  async function onDepartureSearch({ fromDate, toDate, origin }: SearchOptions) {
+    await getDepartures(fromDate, toDate, origin ?? ANY_OPTION)
   }
 
-  useAutoSearch(hasSearched, onSearchSetData, { setFromDate, setToDate, setOrigin })
+  useAutoSearch(hasSearched, onDepartureSearch, { setFromDate, setToDate, setOrigin })
 
   return (
     <CollectionPage
@@ -40,7 +37,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate, origin }}
           setSearchOptions={{ setFromDate, setToDate, setOrigin }}
-          onSearch={onSearchSetData}
+          onSearch={onDepartureSearch}
         >
           <SelectOptions
             selection={origin!}

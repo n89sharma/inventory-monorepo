@@ -1,5 +1,5 @@
+import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import { getInvoiceDetail } from '@/data/api/invoice-api'
 import type { InvoiceDetail, InvoiceSummary } from 'shared-types'
 import { create } from 'zustand'
 
@@ -19,7 +19,8 @@ interface InvoiceStore {
   setToDate: (date: SelectOption<Date>) => void
   setHasSearched: (hasSearched: boolean) => void
   setInvoiceDetail: (invoiceDetail: InvoiceDetail) => void
-  loadInvoiceDetail: (invoiceNumber: string) => Promise<void>
+  getInvoiceDetails: (invoiceNumber: string) => Promise<void>
+  getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
 
   clearInvoices: () => void
 }
@@ -40,7 +41,10 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   setToDate: (toDate) => set({ toDate }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
   setInvoiceDetail: (invoiceDetail) => set({ invoiceDetail }),
-  loadInvoiceDetail: async (invoiceNumber) => {
+  getInvoices: async (fromDate, toDate) => {
+    set({ hasSearched: true, invoices: await getInvoices(fromDate, toDate) })
+  },
+  getInvoiceDetails: async (invoiceNumber) => {
     if (get().invoiceDetail?.invoice_number === invoiceNumber) return
     set({ detailLoading: true, detailError: null })
     try {

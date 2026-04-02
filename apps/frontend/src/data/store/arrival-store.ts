@@ -1,6 +1,7 @@
+import { createArrival, getArrivalDetail, getArrivalForUpdate, getArrivals, updateArrival } from '@/data/api/arrival-api'
+import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import { getArrivalDetail } from '@/data/api/arrival-api'
-import type { ArrivalDetail, ArrivalSummary, Warehouse } from 'shared-types'
+import type { ApiResponse, ArrivalDetail, ArrivalSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface ArrivalStore {
@@ -13,6 +14,7 @@ interface ArrivalStore {
   arrivalDetail: ArrivalDetail | null
   detailLoading: boolean
   detailError: string | null
+  arrivalFormData: ArrivalForm | null
 
   setArrivals: (arrivals: ArrivalSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
@@ -21,7 +23,14 @@ interface ArrivalStore {
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
   setArrivalDetail: (arrivalDetail: ArrivalDetail) => void
-  loadArrivalDetail: (arrivalNumber: string) => Promise<void>
+  getArrivalDetail: (arrivalNumber: string) => Promise<void>
+  getArrivals: (
+    fromDate: SelectOption<Date>,
+    toDate: SelectOption<Date>,
+    destination: SelectOption<Warehouse>) => Promise<void>
+  getArrivalForUpdate: (arrivalNumber: string) => Promise<void>
+  submitCreateArrival: (data: ArrivalForm) => Promise<ApiResponse<{ arrivalNumber: string }>>
+  submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<ApiResponse<void>>
 
   clearArrivals: () => void
 }
@@ -36,6 +45,7 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   arrivalDetail: null,
   detailLoading: false,
   detailError: null,
+  arrivalFormData: null,
 
   setArrivals: (arrivals) => set({ arrivals }),
   setLoading: (loading) => set({ loading }),
@@ -44,7 +54,16 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   setDestination: (warehouse) => set({ destination: warehouse }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
   setArrivalDetail: (arrivalDetail) => set({ arrivalDetail }),
-  loadArrivalDetail: async (arrivalNumber) => {
+  getArrivals: async (fromDate, toDate, destination) => {
+    set({ hasSearched: true, arrivals: await getArrivals(fromDate, toDate, destination) })
+  },
+  getArrivalForUpdate: async (arrivalNumber) => {
+    set({ arrivalFormData: null })
+    set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
+  },
+  submitCreateArrival: (data) => createArrival(data),
+  submitUpdateArrival: (arrivalNumber, data) => updateArrival(arrivalNumber, data),
+  getArrivalDetail: async (arrivalNumber) => {
     if (get().arrivalDetail?.arrival_number === arrivalNumber) return
     set({ detailLoading: true, detailError: null })
     try {

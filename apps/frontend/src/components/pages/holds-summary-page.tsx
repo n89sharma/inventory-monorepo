@@ -1,4 +1,3 @@
-import { getHolds } from "@/data/api/hold-api"
 import { useHoldStore } from "@/data/store/hold-store"
 import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
@@ -11,7 +10,7 @@ import { holdTableColumns } from "./column-defs/hold-columns"
 
 export function HoldSummaryPage(): React.JSX.Element {
   const holds = useHoldStore(state => state.holds)
-  const setHolds = useHoldStore(state => state.setHolds)
+  const getHolds = useHoldStore(state => state.getHolds)
   const fromDate = useHoldStore(state => state.fromDate)
   const toDate = useHoldStore(state => state.toDate)
   const setFromDate = useHoldStore(state => state.setFromDate)
@@ -21,15 +20,13 @@ export function HoldSummaryPage(): React.JSX.Element {
   const setHoldBy = useHoldStore(state => state.setHoldBy)
   const setHoldFor = useHoldStore(state => state.setHoldFor)
   const hasSearched = useHoldStore(state => state.hasSearched)
-  const setHasSearched = useHoldStore(state => state.setHasSearched)
   const activeUsers = useUserStore(state => state.users)
 
-  async function onSearchSetData({ fromDate, toDate, holdBy, holdFor }: SearchOptions) {
-    setHasSearched(true)
-    setHolds(await getHolds(fromDate, toDate, holdBy ?? ANY_OPTION, holdFor ?? ANY_OPTION))
+  async function onHoldSearch({ fromDate, toDate, holdBy, holdFor }: SearchOptions) {
+    await getHolds(fromDate, toDate, holdBy ?? ANY_OPTION, holdFor ?? ANY_OPTION)
   }
 
-  useAutoSearch(hasSearched, onSearchSetData, { setFromDate, setToDate, setHoldBy, setHoldFor })
+  useAutoSearch(hasSearched, onHoldSearch, { setFromDate, setToDate, setHoldBy, setHoldFor })
 
   return (
     <CollectionPage
@@ -40,7 +37,7 @@ export function HoldSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate, holdBy, holdFor }}
           setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
-          onSearch={onSearchSetData}
+          onSearch={onHoldSearch}
         >
           <SelectOptions
             selection={holdBy!}

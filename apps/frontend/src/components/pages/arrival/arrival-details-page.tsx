@@ -14,7 +14,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const arrival = useArrivalStore(state => state.arrivalDetail)
   const detailLoading = useArrivalStore(state => state.detailLoading)
   const detailError = useArrivalStore(state => state.detailError)
-  const loadArrivalDetail = useArrivalStore(state => state.loadArrivalDetail)
+  const getArrivalDetail = useArrivalStore(state => state.getArrivalDetail)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,7 +29,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('arrivals', pathname)
-    loadArrivalDetail(arrivalNumber)
+    getArrivalDetail(arrivalNumber)
   }, [arrivalNumber])
 
   if (detailLoading) return <div>Loading...</div>

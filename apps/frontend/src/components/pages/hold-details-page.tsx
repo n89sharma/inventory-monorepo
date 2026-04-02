@@ -1,6 +1,6 @@
 import { OrgCard } from '@/components/custom/org-card'
-import { UserCard } from '@/components/custom/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { UserCard } from '@/components/custom/user-card'
 import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -14,7 +14,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   const hold = useHoldStore(state => state.holdDetail)
   const detailLoading = useHoldStore(state => state.detailLoading)
   const detailError = useHoldStore(state => state.detailError)
-  const loadHoldDetail = useHoldStore(state => state.loadHoldDetail)
+  const getHoldDetails = useHoldStore(state => state.getHoldDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,7 +29,7 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('holds', pathname)
-    loadHoldDetail(holdNumber)
+    getHoldDetails(holdNumber)
   }, [holdNumber])
 
   if (detailLoading) return <div>Loading...</div>

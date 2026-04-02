@@ -1,5 +1,5 @@
+import { getDepartureDetail, getDepartures } from '@/data/api/departure-api'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import { getDepartureDetail } from '@/data/api/departure-api'
 import type { DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
@@ -21,7 +21,11 @@ interface DepartureStore {
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
   setDepartureDetail: (departureDetail: DepartureDetail) => void
-  loadDepartureDetail: (departureNumber: string) => Promise<void>
+  getDepartureDetails: (departureNumber: string) => Promise<void>
+  getDepartures: (
+    fromDate: SelectOption<Date>,
+    toDate: SelectOption<Date>,
+    origin: SelectOption<Warehouse>) => Promise<void>
 
   clearDepartures: () => void
 }
@@ -44,7 +48,10 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
   setDepartureDetail: (departureDetail) => set({ departureDetail }),
-  loadDepartureDetail: async (departureNumber) => {
+  getDepartures: async (fromDate, toDate, origin) => {
+    set({ hasSearched: true, departures: await getDepartures(fromDate, toDate, origin) })
+  },
+  getDepartureDetails: async (departureNumber) => {
     if (get().departureDetail?.departure_number === departureNumber) return
     set({ detailLoading: true, detailError: null })
     try {

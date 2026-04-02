@@ -1,17 +1,20 @@
-import { getArrivalForEdit, updateArrival } from '@/data/api/arrival-api'
+import { useArrivalStore } from '@/data/store/arrival-store'
 import { useConstantsStore } from '@/data/store/constants-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ArrivalFormPage } from './arrival-form-page'
 
 export function UpdateArrivalPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
-  const [arrivalForm, setArrivalForm] = useState<ArrivalForm | null>(null)
   const navigate = useNavigate()
+
+  const arrivalFormData = useArrivalStore(state => state.arrivalFormData)
+  const getArrivalForUpdate = useArrivalStore(state => state.getArrivalForUpdate)
+  const submitUpdateArrival = useArrivalStore(state => state.submitUpdateArrival)
 
   const orgs = useOrgStore(state => state.organizations)
   const warehouses = useConstantsStore(state => state.warehouses)
@@ -22,11 +25,7 @@ export function UpdateArrivalPage(): React.JSX.Element {
   useEffect(() => {
     if (!arrivalNumber) return
     if (!orgs.length || !warehouses.length || !models.length || !technicalStatuses.length || !coreFunctions.length) return
-
-    async function load() {
-      setArrivalForm(await getArrivalForEdit(arrivalNumber!))
-    }
-    load()
+    getArrivalForUpdate(arrivalNumber)
   }, [arrivalNumber, orgs.length, warehouses.length, models.length, technicalStatuses.length, coreFunctions.length])
 
   const pageConfig = {
@@ -42,9 +41,9 @@ export function UpdateArrivalPage(): React.JSX.Element {
     { label: 'Edit' },
   ]
 
-  async function onValidSubmit(arrivalForm: ArrivalForm) {
+  async function onValidArrivalUpdateSubmit(arrivalForm: ArrivalForm) {
     try {
-      const res = await updateArrival(arrivalNumber!, arrivalForm)
+      const res = await submitUpdateArrival(arrivalNumber!, arrivalForm)
       if (res.success) {
         navigate(`/arrivals/${arrivalNumber}`, {
           state: { successMessage: `Arrival ${arrivalNumber} updated!` }
@@ -55,6 +54,11 @@ export function UpdateArrivalPage(): React.JSX.Element {
     }
   }
 
-  if (!arrivalForm) return <div>Loading…</div>
-  return <ArrivalFormPage defaultValues={arrivalForm} pageConfig={pageConfig} breadcrumbs={breadcrumbs} onValidSubmit={onValidSubmit} />
+  if (!arrivalFormData) return <div>Loading…</div>
+  return <ArrivalFormPage
+    defaultValues={arrivalFormData}
+    pageConfig={pageConfig}
+    breadcrumbs={breadcrumbs}
+    onValidSubmit={onValidArrivalUpdateSubmit}
+  />
 }

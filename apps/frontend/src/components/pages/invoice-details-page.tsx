@@ -1,6 +1,6 @@
 import { OrgCard } from '@/components/custom/org-card'
-import { UserCard } from '@/components/custom/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { UserCard } from '@/components/custom/user-card'
 import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -14,7 +14,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const invoice = useInvoiceStore(state => state.invoiceDetail)
   const detailLoading = useInvoiceStore(state => state.detailLoading)
   const detailError = useInvoiceStore(state => state.detailError)
-  const loadInvoiceDetail = useInvoiceStore(state => state.loadInvoiceDetail)
+  const getInvoiceDetails = useInvoiceStore(state => state.getInvoiceDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,7 +29,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('invoices', pathname)
-    loadInvoiceDetail(invoiceNumber)
+    getInvoiceDetails(invoiceNumber)
   }, [invoiceNumber])
 
   if (detailLoading) return <div>Loading...</div>

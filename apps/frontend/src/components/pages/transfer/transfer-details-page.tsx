@@ -14,7 +14,7 @@ export function TransferDetailsPage(): React.JSX.Element {
   const transfer = useTransferStore(state => state.transferDetail)
   const detailLoading = useTransferStore(state => state.detailLoading)
   const detailError = useTransferStore(state => state.detailError)
-  const loadTransferDetail = useTransferStore(state => state.loadTransferDetail)
+  const getTransferDetails = useTransferStore(state => state.getTransferDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -29,7 +29,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('transfers', pathname)
-    loadTransferDetail(transferNumber)
+    getTransferDetails(transferNumber)
   }, [transferNumber])
 
   if (detailLoading) return <div>Loading...</div>

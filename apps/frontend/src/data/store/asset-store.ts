@@ -20,7 +20,7 @@ interface AssetStore {
   setAssetComments: (comments: Comment[]) => void
   setAssetTransfers: (transfers: AssetTransfer[]) => void
   setAssetParts: (parts: Part[]) => void
-  loadAssetDetails: (barcode: string) => Promise<void>
+  getAssetDetails: (barcode: string) => Promise<void>
 
   //clear state
   clearAssetStore: () => void
@@ -42,7 +42,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
   setAssetComments: (comments) => set({ comments }),
   setAssetTransfers: (transfers) => set({ transfers }),
   setAssetParts: (parts) => set({ parts }),
-  loadAssetDetails: async (barcode) => {
+  getAssetDetails: async (barcode) => {
     set({ loading: true, error: null, assetDetails: null, accessories: [], errors: [], comments: [], transfers: [], parts: [] })
     try {
       const r = await getAllAssetDetails(barcode)

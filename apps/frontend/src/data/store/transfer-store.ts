@@ -1,5 +1,5 @@
+import { getTransferDetail, getTransfers } from '@/data/api/transfer-api'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import { getTransferDetail } from '@/data/api/transfer-api'
 import type { TransferDetail, TransferSummary, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
@@ -23,7 +23,12 @@ interface TransferStore {
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
   setTransferDetail: (transferDetail: TransferDetail) => void
-  loadTransferDetail: (transferNumber: string) => Promise<void>
+  getTransferDetails: (transferNumber: string) => Promise<void>
+  getTransfers: (
+    fromDate: SelectOption<Date>,
+    toDate: SelectOption<Date>,
+    origin: SelectOption<Warehouse>,
+    destination: SelectOption<Warehouse>) => Promise<void>
 
   clearTransfers: () => void
 }
@@ -48,7 +53,10 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
   setTransferDetail: (transferDetail) => set({ transferDetail }),
-  loadTransferDetail: async (transferNumber) => {
+  getTransfers: async (fromDate, toDate, origin, destination) => {
+    set({ hasSearched: true, transfers: await getTransfers(fromDate, toDate, origin, destination) })
+  },
+  getTransferDetails: async (transferNumber) => {
     if (get().transferDetail?.transfer_number === transferNumber) return
     set({ detailLoading: true, detailError: null })
     try {

@@ -1,4 +1,3 @@
-import { getTransfers } from "@/data/api/transfer-api"
 import { useConstantsStore } from "@/data/store/constants-store"
 import { useTransferStore } from "@/data/store/transfer-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
@@ -12,7 +11,7 @@ import { transferTableColumns } from "../column-defs/transfer-columns"
 
 export function TransferSummaryPage(): React.JSX.Element {
   const transfers = useTransferStore(state => state.transfers)
-  const setTransfers = useTransferStore(state => state.setTransfers)
+  const getTransfers = useTransferStore(state => state.getTransfers)
   const fromDate = useTransferStore(state => state.fromDate)
   const toDate = useTransferStore(state => state.toDate)
   const origin = useTransferStore(state => state.origin)
@@ -22,16 +21,14 @@ export function TransferSummaryPage(): React.JSX.Element {
   const setOrigin = useTransferStore(state => state.setOrigin)
   const setDestination = useTransferStore(state => state.setDestination)
   const hasSearched = useTransferStore(state => state.hasSearched)
-  const setHasSearched = useTransferStore(state => state.setHasSearched)
   const warehouses = useConstantsStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
-  async function onSearchSetData({ fromDate, toDate, origin, destination }: SearchOptions) {
-    setHasSearched(true)
-    setTransfers(await getTransfers(fromDate, toDate, origin ?? ANY_OPTION, destination ?? ANY_OPTION))
+  async function onTransferSearch({ fromDate, toDate, origin, destination }: SearchOptions) {
+    await getTransfers(fromDate, toDate, origin ?? ANY_OPTION, destination ?? ANY_OPTION)
   }
 
-  useAutoSearch(hasSearched, onSearchSetData, { setFromDate, setToDate, setOrigin, setDestination })
+  useAutoSearch(hasSearched, onTransferSearch, { setFromDate, setToDate, setOrigin, setDestination })
 
   return (
     <CollectionPage
@@ -42,7 +39,7 @@ export function TransferSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, destination }}
           setSearchOptions={{ setFromDate, setToDate, setOrigin, setDestination }}
-          onSearch={onSearchSetData}
+          onSearch={onTransferSearch}
         >
           <SelectOptions
             selection={origin!}

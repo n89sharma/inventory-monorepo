@@ -34,7 +34,7 @@ export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDe
   throw new Error(data.error.summary)
 }
 
-export async function getArrivalForEdit(arrivalNumber: string): Promise<ArrivalForm> {
+export async function getArrivalForUpdate(arrivalNumber: string): Promise<ArrivalForm> {
   const { data } = await api.get<ApiResponse<UpdateArrival>>(`/arrivals/${arrivalNumber}/edit`)
   if (data.success) return mapUpdateArrivalToUiArrivalForm(UpdateArrivalSchema.parse(data.data))
   throw new Error(data.error.summary)
