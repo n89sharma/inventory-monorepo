@@ -14,7 +14,7 @@ export function CopyButton({ value, className }: CopyButtonProps): React.JSX.Ele
     if (!value) return
     navigator.clipboard.writeText(value)
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setTimeout(() => setCopied(false), 1000)
   }
 
   return (

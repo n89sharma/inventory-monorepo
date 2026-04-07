@@ -181,10 +181,11 @@ export function DataCurrencyRow({ label, value, className }: DataCurrencyRowProp
 export function DataLinkRow({ label, value, to, className }: DataLinkRowProps): React.JSX.Element {
   return (
     <DataRow label={label} className={className}>
-      <dd className="text-sm">
+      <dd className="group flex items-center gap-2 text-sm">
         {value
           ? <Link to={to} className="text-primary hover:underline">{value}</Link>
           : '-'}
+        {value && <CopyButton value={value} />}
       </dd>
     </DataRow>
   )
