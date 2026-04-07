@@ -1,4 +1,4 @@
-import { AccessoryRow, AssetTitle, CMYKRow, DataRow, DataRowContainer, DetailsContainer, ErrorHeader, ErrorRow, Header, InvoiceClearedRow, PartsHeader, Section, SectionRow } from '@/components/custom/asset-detail'
+import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRowContainer, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-detail'
 import { Comment } from '@/components/custom/comment'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { Button } from '@/components/shadcn/button'
@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/ta
 import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
-import { formatDate, formatDateWithTime, formatThousandsK, formatUSD } from '@/lib/formatters'
+import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
@@ -71,42 +71,42 @@ export const AssetDetailsPage = () => {
         <SectionRow>
 
           <Section>
-            <Header title="Summary"></Header>
+            <SectionHeader title="Summary"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Asset Type" value={ad?.asset_type} />
-              <DataRow label="Serial #" value={ad?.serial_number} />
-              <DataRow label="Meter" value={ad ? formatThousandsK(ad.specs.meter_total) : '0K'} />
-              <DataRow label="Tracking Status" value={ad?.tracking_status} />
-              <DataRow label="Availability" value={ad?.availability_status} />
-              <DataRow label="Technical Status" value={ad?.technical_status} />
-              <DataRow label="Warehouse" value={ad?.warehouse_code} />
-              <DataRow label="Location" value={ad?.location} />
-              <DataRow label="Created At" value={ad ? formatDate(ad.created_at) : ''} />
+              <DataValueRow label="Asset Type" value={ad?.asset_type} />
+              <DataValueRow label="Serial #" value={ad?.serial_number} />
+              <DataValueRow label="Meter" value={ad ? formatThousandsK(ad.specs.meter_total) : '0K'} />
+              <DataValueRow label="Tracking Status" value={ad?.tracking_status} />
+              <DataValueRow label="Availability" value={ad?.availability_status} />
+              <DataValueRow label="Technical Status" value={ad?.technical_status} />
+              <DataValueRow label="Warehouse" value={ad?.warehouse_code} />
+              <DataValueRow label="Location" value={ad?.location} />
+              <DataDateRow label="Created At" value={ad?.created_at} />
             </DataRowContainer>
           </Section>
 
           <Section>
-            <Header title="Pricing"></Header>
+            <SectionHeader title="Pricing"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Purchase Cost" value={ad ? formatUSD(ad.cost.purchase_cost) : '$0'} curr={true} />
-              <DataRow label="Transport Cost" value={ad ? formatUSD(ad.cost.transport_cost) : '$0'} curr={true} />
-              <DataRow label="Processing Cost" value={ad ? formatUSD(ad.cost.processing_cost) : '$0'} curr={true} />
-              <DataRow label="Other Cost" value={ad ? formatUSD(ad.cost.other_cost) : '$0'} curr={true} />
-              <DataRow label="Parts Cost" value={ad ? formatUSD(ad.cost.parts_cost) : '$0'} curr={true} />
-              <DataRow label="Total Cost" value={ad ? formatUSD(ad.cost.total_cost) : '$0'} curr={true} />
-              <DataRow label="Sale Price" value={ad ? formatUSD(ad.cost.sale_price) : '$0'} curr={true} />
+              <DataCurrencyRow label="Purchase Cost" value={ad?.cost.purchase_cost} />
+              <DataCurrencyRow label="Transport Cost" value={ad?.cost.transport_cost} />
+              <DataCurrencyRow label="Processing Cost" value={ad?.cost.processing_cost} />
+              <DataCurrencyRow label="Other Cost" value={ad?.cost.other_cost} />
+              <DataCurrencyRow label="Parts Cost" value={ad?.cost.parts_cost} />
+              <DataCurrencyRow label="Total Cost" value={ad?.cost.total_cost} />
+              <DataCurrencyRow label="Sale Price" value={ad?.cost.sale_price} />
             </DataRowContainer>
           </Section>
 
           <Section>
-            <Header title="Hold"></Header>
+            <SectionHeader title="Hold"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Date" value={ad?.hold?.created_at ? formatDate(ad.hold.created_at) : ''}></DataRow>
-              <DataRow label="Customer" value={ad?.hold.customer}></DataRow>
-              <DataRow label="For" value={ad?.hold.created_for}></DataRow>
-              <DataRow label="By" value={ad?.hold.created_by}></DataRow>
-              <DataRow label="Notes" value={ad?.hold.notes}></DataRow>
-              <DataRow label="Hold#" value={ad?.hold.hold_number}></DataRow>
+              <DataDateRow label="Date" value={ad?.hold?.created_at} />
+              <DataValueRow label="Customer" value={ad?.hold.customer} />
+              <DataValueRow label="For" value={ad?.hold.created_for} />
+              <DataValueRow label="By" value={ad?.hold.created_by} />
+              <DataValueRow label="Notes" value={ad?.hold.notes} />
+              <DataLinkRow label="Hold #" value={ad?.hold.hold_number} to={`/holds/${ad?.hold.hold_number}`} />
             </DataRowContainer>
           </Section>
 
@@ -115,17 +115,17 @@ export const AssetDetailsPage = () => {
         <SectionRow>
 
           <Section>
-            <Header title="Specifications"></Header>
+            <SectionHeader title="Specifications"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Cassettes" value={ad?.specs.cassettes} />
-              <DataRow label="Internal Finisher" value={ad?.specs.internal_finisher} />
+              <DataValueRow label="Cassettes" value={ad?.specs.cassettes} />
+              <DataValueRow label="Internal Finisher" value={ad?.specs.internal_finisher} />
               <CMYKRow label="Drum Life" c_value={ad?.specs.drum_life_c} m_value={ad?.specs.drum_life_m} y_value={ad?.specs.drum_life_y} k_value={ad?.specs.drum_life_k} />
               <AccessoryRow label="Core Functions" accessories={aa ?? []}></AccessoryRow>
             </DataRowContainer>
           </Section>
 
           <Section>
-            <Header title="Errors"></Header>
+            <SectionHeader title="Errors"></SectionHeader>
             <ErrorHeader />
             <DataRowContainer>
               {ae?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
@@ -133,9 +133,9 @@ export const AssetDetailsPage = () => {
           </Section>
 
           <Section>
-            <Header title="Installed Parts" />
+            <SectionHeader title="Installed Parts" />
             <PartsHeader />
-            {ap?.map(p => <DataRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
+            {ap?.map(p => <DataValueRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
           </Section>
 
         </SectionRow>
@@ -143,21 +143,21 @@ export const AssetDetailsPage = () => {
         <SectionRow>
 
           <Section>
-            <Header title="Arrival"></Header>
+            <SectionHeader title="Arrival"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Arrived On" value={ad ? formatDate(ad.arrival.created_at) : ''}></DataRow>
-              <DataRow label="Vendor" value={ad?.arrival.origin}></DataRow>
-              <DataRow label="Warehouse" value={ad?.arrival.destination_code}></DataRow>
-              <DataRow label="Arrival #" value={ad?.arrival.arrival_number}></DataRow>
-              <DataRow label="Transporter" value={ad?.arrival.transporter}></DataRow>
-              <DataRow label="Invoice #" value={ad?.purchase_invoice.invoice_number}></DataRow>
+              <DataDateRow label="Arrived On" value={ad?.arrival.created_at} />
+              <DataValueRow label="Vendor" value={ad?.arrival.origin} />
+              <DataValueRow label="Warehouse" value={ad?.arrival.destination_code} />
+              <DataLinkRow label="Arrival #" value={ad?.arrival.arrival_number} to={`/arrivals/${ad?.arrival.arrival_number}`} />
+              <DataValueRow label="Transporter" value={ad?.arrival.transporter} />
+              <DataLinkRow label="Invoice #" value={ad?.purchase_invoice.invoice_number} to={`/invoices/${ad?.purchase_invoice.invoice_number}`} />
               <InvoiceClearedRow isCleared={!!ad?.purchase_invoice.is_cleared} />
             </DataRowContainer>
           </Section>
 
           <Section>
             <div className="flex items-center">
-              <Header title="Transfer" />
+              <SectionHeader title="Transfer" />
               <div className={`flex items-center justify-between w-full ml-10 ${!at.length && "hidden"}`}>
                 <span className="text-sm font-medium text-muted-foreground">{`${currentIndex + 1}/${at.length}`}</span>
                 <div>
@@ -171,22 +171,22 @@ export const AssetDetailsPage = () => {
               </div>
             </div>
             <DataRowContainer>
-              <DataRow label="Transferred On" value={currTransfer ? formatDate(currTransfer.created_at) : '-'}></DataRow>
-              <DataRow label="Source" value={currTransfer ? currTransfer.source_code : '-'}></DataRow>
-              <DataRow label="Destination" value={currTransfer ? currTransfer.destination_code : '-'}></DataRow>
-              <DataRow label="Transfer #" value={currTransfer ? currTransfer.transfer_number : '-'}></DataRow>
-              <DataRow label="Transporter" value={currTransfer ? currTransfer.transporter : '-'}></DataRow>
+              <DataDateRow label="Transferred On" value={currTransfer?.created_at} />
+              <DataValueRow label="Source" value={currTransfer?.source_code} />
+              <DataValueRow label="Destination" value={currTransfer?.destination_code} />
+              <DataLinkRow label="Transfer #" value={currTransfer?.transfer_number} to={`/transfers/${currTransfer?.transfer_number}`} />
+              <DataValueRow label="Transporter" value={currTransfer?.transporter} />
             </DataRowContainer>
           </Section>
 
           <Section>
-            <Header title="Departure"></Header>
+            <SectionHeader title="Departure"></SectionHeader>
             <DataRowContainer>
-              <DataRow label="Departed On" value={ad?.departure?.created_at ? formatDate(ad.departure.created_at) : ''}></DataRow>
-              <DataRow label="Warehouse" value={ad?.departure?.origin_code}></DataRow>
-              <DataRow label="Customer" value={ad?.departure?.destination}></DataRow>
-              <DataRow label="Departure #" value={ad?.departure?.departure_number}></DataRow>
-              <DataRow label="Transporter" value={ad?.departure?.transporter}></DataRow>
+              <DataDateRow label="Departed On" value={ad?.departure?.created_at} />
+              <DataValueRow label="Warehouse" value={ad?.departure?.origin_code} />
+              <DataValueRow label="Customer" value={ad?.departure?.destination} />
+              <DataLinkRow label="Departure #" value={ad?.departure?.departure_number} to={`/departures/${ad?.departure?.departure_number}`} />
+              <DataValueRow label="Transporter" value={ad?.departure?.transporter} />
             </DataRowContainer>
           </Section>
 
@@ -194,8 +194,8 @@ export const AssetDetailsPage = () => {
 
         <Tabs defaultValue="comments">
           <TabsList variant="line">
-            <TabsTrigger value="comments"><Header title="Comments" /></TabsTrigger>
-            <TabsTrigger value="history"><Header title="History" /></TabsTrigger>
+            <TabsTrigger value="comments"><SectionHeader title="Comments" /></TabsTrigger>
+            <TabsTrigger value="history"><SectionHeader title="History" /></TabsTrigger>
           </TabsList>
           <TabsContent value="comments" className="flex flex-col gap-3">
             {ac?.map(c => (<Comment

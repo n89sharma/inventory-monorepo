@@ -40,6 +40,10 @@ npm run fbuild   # Build shared-types then frontend (from repo root)
 
 ## Development Workflow
 
+**Before making any changes to project files, always load these two skills:**
+1. `/vercel-react-best-practices`
+2. `/vercel-composition-patterns`
+
 **After every code change, run both build commands from the repo root:**
 ```bash
 npm run bbuild
