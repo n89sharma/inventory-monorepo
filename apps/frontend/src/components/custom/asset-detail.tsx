@@ -1,8 +1,9 @@
+import { CopyButton } from "@/components/custom/copy-button"
 import { Badge } from "@/components/shadcn/badge"
 import { Checkbox } from "@/components/shadcn/checkbox"
-import { CopyButton } from "@/components/custom/copy-button"
 import { formatDate, formatUSD } from "@/lib/formatters"
 import { cn } from "@/lib/utils"
+import { CurrencyDollarIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 import { type Error } from "shared-types"
 
@@ -168,7 +169,7 @@ export function DataCurrencyRow({ label, value, className }: DataCurrencyRowProp
   return (
     <DataRow label={label} className={className}>
       <dd className="flex items-center gap-1 text-sm">
-        {value != null && <span>$</span>}
+        {value != null && <span><CurrencyDollarIcon /></span>}
         <span className="tabular-nums text-right w-20">
           {value != null ? formatUSD(value) : '-'}
         </span>
