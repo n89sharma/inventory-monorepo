@@ -1,4 +1,5 @@
 import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/asset-detail'
+import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { Comment } from '@/components/custom/comment'
@@ -47,7 +48,10 @@ export const AssetDetailsPage = () => {
     <div className="flex flex-col gap-2">
       <PageBreadcrumb segments={getBreadcrumForAssetDetails(section, collectionId, assetId)} />
       <DetailsContainer>
-      <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode}></AssetTitle>
+        <div className="flex items-start justify-between">
+          <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode} />
+          <AssetEditBar />
+        </div>
         <SectionRow>
           <Section>
             <SectionHeader title="Summary"></SectionHeader>

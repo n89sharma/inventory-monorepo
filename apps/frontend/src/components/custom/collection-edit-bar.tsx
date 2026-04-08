@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu";
 import { AlertDialogDestructive } from "./delete-collection-dialog";
+import { ShareButton } from "./share-button";
 
 type CollectionEditBarProps = {
   section: string,
@@ -17,6 +18,7 @@ export function CollectionEditBar({
 
   return (
     <div className="flex gap-2">
+      <ShareButton />
       <Button asChild>
         <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
       </Button>
