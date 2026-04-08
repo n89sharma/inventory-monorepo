@@ -1,3 +1,4 @@
+import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
@@ -25,16 +26,19 @@ export function createAssetSummaryColumns(
         )
       },
       cell: ({ row }) => (
-        <Link
-          to={
-            isCollection(navigationSection)
-              ? `/${navigationSection}/${collectionId}/${row.original.barcode}`
-              : `/search/${row.original.barcode}`
-          }
-          className="text-primary hover:underline font-medium"
-        >
-          {row.getValue('barcode')}
-        </Link>
+        <div className="group flex items-center gap-2">
+          <Link
+            to={
+              isCollection(navigationSection)
+                ? `/${navigationSection}/${collectionId}/${row.original.barcode}`
+                : `/search/${row.original.barcode}`
+            }
+            className="text-primary hover:underline font-medium"
+          >
+            {row.getValue('barcode')}
+          </Link>
+          <CopyButton value={row.original.barcode} />
+        </div>
       )
     },
     {

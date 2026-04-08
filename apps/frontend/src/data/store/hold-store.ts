@@ -59,12 +59,11 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   getHoldDetails: async (holdNumber) => {
     if (get().holdDetail?.hold_number === holdNumber) return
     set({ detailLoading: true, detailError: null })
-    try {
-      set({ holdDetail: await getHoldDetail(holdNumber) })
-    } catch (e) {
-      set({ detailError: e instanceof Error ? e.message : 'Failed to load hold' })
-    } finally {
-      set({ detailLoading: false })
+    const res = await getHoldDetail(holdNumber)
+    if (res.success) {
+      set({ holdDetail: res.data, detailLoading: false })
+    } else {
+      set({ detailError: res.error.summary, detailLoading: false })
     }
   },
   clearHolds: () => set({ holds: [] })

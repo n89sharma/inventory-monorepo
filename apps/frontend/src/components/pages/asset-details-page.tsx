@@ -1,4 +1,5 @@
-import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRowContainer, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-detail'
+import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-detail'
+import { CopyButton } from '@/components/custom/copy-button'
 import { Comment } from '@/components/custom/comment'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { Button } from '@/components/shadcn/button'
@@ -74,7 +75,12 @@ export const AssetDetailsPage = () => {
             <SectionHeader title="Summary"></SectionHeader>
             <DataRowContainer>
               <DataValueRow label="Asset Type" value={ad?.asset_type} />
-              <DataValueRow label="Serial #" value={ad?.serial_number} />
+              <DataRow label="Serial #">
+                <div className="group flex items-center gap-2">
+                  <DataValue value={ad?.serial_number} />
+                  <CopyButton value={ad?.serial_number} />
+                </div>
+              </DataRow>
               <DataValueRow label="Meter" value={ad ? formatThousandsK(ad.specs.meter_total) : '0K'} />
               <DataValueRow label="Tracking Status" value={ad?.tracking_status} />
               <DataValueRow label="Availability" value={ad?.availability_status} />

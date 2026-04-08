@@ -1,7 +1,9 @@
 import { api } from '@/data/api/axios-client'
+import { apiErrorHandler } from '@/lib/error-handler'
 import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
 import type { ApiResponse, HoldDetail, User } from 'shared-types'
 import { HoldDetailSchema, HoldSummarySchema, type HoldSummary } from 'shared-types'
+import type { AxiosResponse } from 'axios'
 import { z } from 'zod'
 
 export async function getHolds(
@@ -22,8 +24,11 @@ export async function getHolds(
   throw new Error(data.error.summary)
 }
 
-export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
-  const { data } = await api.get<ApiResponse<HoldDetail>>(`/holds/${holdNumber}`)
-  if (data.success) return HoldDetailSchema.parse(data.data)
-  throw new Error(data.error.summary)
+export async function getHoldDetail(holdNumber: string): Promise<ApiResponse<HoldDetail>> {
+  return api.get<ApiResponse<HoldDetail>>(`/holds/${holdNumber}`)
+    .then(({ data }: AxiosResponse<ApiResponse<HoldDetail>>) => {
+      if (data.success) return { success: true as const, data: HoldDetailSchema.parse(data.data) }
+      return data
+    })
+    .catch(apiErrorHandler<HoldDetail>)
 }

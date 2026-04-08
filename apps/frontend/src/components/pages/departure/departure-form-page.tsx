@@ -1,22 +1,21 @@
-import { getAssetByBarcode } from '@/data/api/transfer-api'
 import { useConstantsStore } from '@/data/store/constants-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { DepartureFormSchema, type DepartureForm } from '@/ui-types/departure-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleNotchIcon, PlusIcon } from '@phosphor-icons/react'
-import { useMemo, useRef, useState } from 'react'
+import { CircleNotchIcon } from '@phosphor-icons/react'
+import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { AddAssetsToCreateForm } from '../../custom/add-assets-to-create-form'
 import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
 import { PageBreadcrumb } from '../../custom/page-breadcrumb'
 import { SelectOptions } from '../../custom/select-options'
 import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
-import { Input } from '../../shadcn/input'
 import { Textarea } from '../../shadcn/textarea'
 import { getDepartureFormAssetColumns } from '../column-defs/departure-form-asset-columns'
 
@@ -44,10 +43,6 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting } = form.formState
 
-  const barcodeInputRef = useRef<HTMLInputElement>(null)
-  const [barcodeError, setBarcodeError] = useState<string | null>(null)
-  const [isLookingUp, setIsLookingUp] = useState(false)
-
   const assetTableColumns = useMemo(() => getDepartureFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getDefaultDeparture(): DepartureForm {
@@ -73,36 +68,6 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
 
   function onInvalidDeparture(errors: FieldErrors<DepartureForm>) {
     toast.error(`Form has errors: ${flattenFieldErrors(errors, ['id'])}`, { position: 'top-center' })
-  }
-
-  async function handleAddAsset() {
-    const barcode = barcodeInputRef.current?.value.trim()
-    if (!barcode) return
-
-    const currentAssets = form.getValues('assets')
-    if (currentAssets.some(a => a.barcode === barcode)) {
-      setBarcodeError(`Asset ${barcode} is already in this departure.`)
-      return
-    }
-
-    setBarcodeError(null)
-    setIsLookingUp(true)
-    try {
-      const asset = await getAssetByBarcode(barcode)
-      addAsset(asset)
-      if (barcodeInputRef.current) barcodeInputRef.current.value = ''
-    } catch {
-      setBarcodeError('Asset not found.')
-    } finally {
-      setIsLookingUp(false)
-    }
-  }
-
-  function onBarcodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleAddAsset()
-    }
   }
 
   return (
@@ -185,32 +150,11 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
             />
           </FieldSet>
 
-          <div className='flex items-end gap-2 max-w-xl'>
-            <Field className='flex-1'>
-              <FieldLabel>Barcode</FieldLabel>
-              <Input
-                ref={barcodeInputRef}
-                placeholder='Scan or enter barcode'
-                onKeyDown={onBarcodeKeyDown}
-                onChange={() => setBarcodeError(null)}
-              />
-              {barcodeError && (
-                <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
-              )}
-            </Field>
-            <Button
-              variant='secondary'
-              type='button'
-              onClick={handleAddAsset}
-              disabled={isLookingUp}
-              className='mb-0.5'
-            >
-              {isLookingUp
-                ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up...</>
-                : <><PlusIcon />Add Asset</>
-              }
-            </Button>
-          </div>
+          <AddAssetsToCreateForm
+            getAssets={() => form.getValues('assets')}
+            onAddAsset={addAsset}
+            entityName='departure'
+          />
 
           <div className='flex gap-4'>
             <Button className='rounded-md' onClick={submitDeparture} type='submit'>
