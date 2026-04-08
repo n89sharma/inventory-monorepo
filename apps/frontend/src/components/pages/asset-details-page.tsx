@@ -1,16 +1,16 @@
-import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-detail'
+import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/asset-detail'
+import { OptionalSection } from '@/components/custom/asset-details/optional-section'
+import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
-import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
@@ -18,16 +18,12 @@ const EMPTY_TAGS: { display: string; id: string }[] = []
 export const AssetDetailsPage = () => {
 
   const { section, collectionId, assetId } = useAssetDetailsParams()
-
   const { pathname } = useLocation()
-  const [currentIndex, setCurrentTransferIndex] = useState(0)
-
   const setLastPath = useNavigationStore(state => state.setLastPath)
-
-  const ad = useAssetStore((state) => state.assetDetails)
-  const aa = useAssetStore((state) => state.accessories)
-  const ae = useAssetStore((state) => state.errors)
-  const ac = useAssetStore((state) => state.comments)
+  const assetDetails = useAssetStore((state) => state.assetDetails)
+  const accessories = useAssetStore((state) => state.accessories)
+  const errors = useAssetStore((state) => state.errors)
+  const comments = useAssetStore((state) => state.comments)
   const at = useAssetStore((state) => state.transfers)
   const ap = useAssetStore((state) => state.parts)
 
@@ -38,82 +34,68 @@ export const AssetDetailsPage = () => {
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
     if (!assetId) return
-    setCurrentTransferIndex(0)
     getAssetDetails(assetId)
   }, [assetId])
 
-  function handleNextTransfer() {
-    if (at.length === 0) return
-    setCurrentTransferIndex((prev) => (prev + 1) % at.length)
-  }
-
-  function handlePreviousTransfer() {
-    if (at.length === 0) return
-    setCurrentTransferIndex((prev) => (prev - 1 + at.length) % at.length)
-  }
-
-  const currTransfer = at[currentIndex] || null
-
   if (loading) return <div>Loading...</div>
   if (error) return <div>{error}</div>
+  if (!assetDetails) return null
+
+  const { cost, hold, arrival, departure, specs, purchase_invoice } = assetDetails
 
   return (
     <div className="flex flex-col gap-2">
       <PageBreadcrumb segments={getBreadcrumForAssetDetails(section, collectionId, assetId)} />
-      {!!ad && <DetailsContainer>
-
-        <SectionRow className="flex-col">
-          <Section>
-            <AssetTitle brand={ad?.brand} model={ad?.model} barcode={ad?.barcode}></AssetTitle>
-          </Section>
-        </SectionRow>
-
+      <DetailsContainer>
+        <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode}></AssetTitle>
 
         <SectionRow>
 
           <Section>
             <SectionHeader title="Summary"></SectionHeader>
             <DataRowContainer>
-              <DataValueRow label="Asset Type" value={ad?.asset_type} />
+              <DataValueRow label="Asset Type" value={assetDetails.asset_type} />
               <DataRow label="Serial #">
                 <div className="group flex items-center gap-2">
-                  <DataValue value={ad?.serial_number} />
-                  <CopyButton value={ad?.serial_number} />
+                  <DataValue value={assetDetails.serial_number} />
+                  <CopyButton value={assetDetails.serial_number} />
                 </div>
               </DataRow>
-              <DataValueRow label="Meter" value={ad ? formatThousandsK(ad.specs.meter_total) : '0K'} />
-              <DataValueRow label="Tracking Status" value={ad?.tracking_status} />
-              <DataValueRow label="Availability" value={ad?.availability_status} />
-              <DataValueRow label="Technical Status" value={ad?.technical_status} />
-              <DataValueRow label="Warehouse" value={ad?.warehouse_code} />
-              <DataValueRow label="Location" value={ad?.location} />
-              <DataDateRow label="Created At" value={ad?.created_at} />
+              <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
+              <DataValueRow label="Tracking Status" value={assetDetails.tracking_status} />
+              <DataValueRow label="Availability" value={assetDetails.availability_status} />
+              <DataValueRow label="Technical Status" value={assetDetails.technical_status} />
+              <DataValueRow label="Warehouse" value={assetDetails.warehouse_code} />
+              <DataValueRow label="Location" value={assetDetails.location} />
+              <DataDateRow label="Created At" value={assetDetails.created_at} />
             </DataRowContainer>
           </Section>
 
           <Section>
             <SectionHeader title="Pricing"></SectionHeader>
             <DataRowContainer>
-              <DataCurrencyRow label="Purchase Cost" value={ad?.cost.purchase_cost} />
-              <DataCurrencyRow label="Transport Cost" value={ad?.cost.transport_cost} />
-              <DataCurrencyRow label="Processing Cost" value={ad?.cost.processing_cost} />
-              <DataCurrencyRow label="Other Cost" value={ad?.cost.other_cost} />
-              <DataCurrencyRow label="Parts Cost" value={ad?.cost.parts_cost} />
-              <DataCurrencyRow label="Total Cost" value={ad?.cost.total_cost} />
-              <DataCurrencyRow label="Sale Price" value={ad?.cost.sale_price} />
+              <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} />
+              <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} />
+              <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} />
+              <DataCurrencyRow label="Other Cost" value={cost.other_cost} />
+              <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} />
+              <DataCurrencyRow label="Total Cost" value={cost.total_cost} />
+              <DataCurrencyRow label="Sale Price" value={cost.sale_price} />
             </DataRowContainer>
           </Section>
 
           <Section>
             <SectionHeader title="Hold"></SectionHeader>
-            <DataRowContainer>
-              <DataLinkRow label="Hold #" value={ad?.hold.hold_number} to={`/holds/${ad?.hold.hold_number}`} />
-              <DataDateRow label="Date" value={ad?.hold?.created_at} />
-              <DataValueRow label="Customer" value={ad?.hold.customer} />
-              <DataValueRow label="For" value={ad?.hold.created_for} />
-              <DataValueRow label="By" value={ad?.hold.created_by} />
-              <DataValueRow label="Notes" value={ad?.hold.notes} />
-            </DataRowContainer>
+            <OptionalSection condition={!!hold} fallback="No hold on record">
+              <DataRowContainer>
+                <DataLinkRow label="Hold #" value={hold?.hold_number} to={`/holds/${hold?.hold_number}`} />
+                <DataDateRow label="Date" value={hold?.created_at} />
+                <DataValueRow label="Customer" value={hold?.customer} />
+                <DataValueRow label="For" value={hold?.created_for} />
+                <DataValueRow label="By" value={hold?.created_by} />
+                <DataValueRow label="Notes" value={hold?.notes} />
+              </DataRowContainer>
+            </OptionalSection>
           </Section>
 
         </SectionRow>
@@ -123,25 +105,35 @@ export const AssetDetailsPage = () => {
           <Section>
             <SectionHeader title="Specifications"></SectionHeader>
             <DataRowContainer>
-              <DataValueRow label="Cassettes" value={ad?.specs.cassettes} />
-              <DataValueRow label="Internal Finisher" value={ad?.specs.internal_finisher} />
-              <CMYKRow label="Drum Life" c_value={ad?.specs.drum_life_c} m_value={ad?.specs.drum_life_m} y_value={ad?.specs.drum_life_y} k_value={ad?.specs.drum_life_k} />
-              <AccessoryRow label="Core Functions" accessories={aa ?? []}></AccessoryRow>
+              <DataValueRow label="Cassettes" value={specs.cassettes} />
+              <DataValueRow label="Internal Finisher" value={specs.internal_finisher} />
+              <CMYKRow
+                label="Drum Life"
+                c_value={specs.drum_life_c}
+                m_value={specs.drum_life_m}
+                y_value={specs.drum_life_y}
+                k_value={specs.drum_life_k}
+              />
+              <AccessoryRow label="Core Functions" accessories={accessories ?? []}></AccessoryRow>
             </DataRowContainer>
           </Section>
 
           <Section>
             <SectionHeader title="Errors"></SectionHeader>
-            <ErrorHeader />
-            <DataRowContainer>
-              {ae?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
-            </DataRowContainer>
+            <OptionalSection condition={!!errors?.length} fallback="No errors on record">
+              <ErrorHeader />
+              <DataRowContainer>
+                {errors?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
+              </DataRowContainer>
+            </OptionalSection>
           </Section>
 
           <Section>
             <SectionHeader title="Installed Parts" />
-            <PartsHeader />
-            {ap?.map(p => <DataValueRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
+            <OptionalSection condition={!!ap?.length} fallback="No parts installed">
+              <PartsHeader />
+              {ap?.map(p => <DataValueRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
+            </OptionalSection>
           </Section>
 
         </SectionRow>
@@ -150,61 +142,46 @@ export const AssetDetailsPage = () => {
 
           <Section>
             <SectionHeader title="Arrival"></SectionHeader>
-            <DataRowContainer>
-              <DataLinkRow label="Arrival #" value={ad?.arrival.arrival_number} to={`/arrivals/${ad?.arrival.arrival_number}`} />
-              <DataDateRow label="Arrived On" value={ad?.arrival.created_at} />
-              <DataValueRow label="Vendor" value={ad?.arrival.origin} />
-              <DataValueRow label="Warehouse" value={ad?.arrival.destination_code} />
-              <DataLinkRow label="Invoice #" value={ad?.purchase_invoice.invoice_number} to={`/invoices/${ad?.purchase_invoice.invoice_number}`} />
-              <DataValueRow label="Transporter" value={ad?.arrival.transporter} />
-              <InvoiceClearedRow isCleared={!!ad?.purchase_invoice.is_cleared} />
-            </DataRowContainer>
+            <OptionalSection condition={!!arrival} fallback="No arrival on record">
+              <DataRowContainer>
+                <DataLinkRow label="Arrival #" value={arrival?.arrival_number} to={`/arrivals/${arrival?.arrival_number}`} />
+                <DataDateRow label="Arrived On" value={arrival?.created_at} />
+                <DataValueRow label="Vendor" value={arrival?.origin} />
+                <DataValueRow label="Warehouse" value={arrival?.destination_code} />
+                <DataValueRow label="Transporter" value={arrival?.transporter} />
+                {purchase_invoice
+                  ? <DataLinkRow label="Invoice #" value={purchase_invoice.invoice_number} to={`/invoices/${purchase_invoice.invoice_number}`} />
+                  : <DataValueRow label="Invoice #" value="-" />
+                }
+                <InvoiceClearedRow isCleared={!!purchase_invoice?.is_cleared} />
+              </DataRowContainer>
+            </OptionalSection>
           </Section>
 
-          <Section>
-            <div className="flex items-center">
-              <SectionHeader title="Transfer" />
-              <div className={`flex items-center justify-between w-full ml-10 ${!at.length && "hidden"}`}>
-                <span className="text-sm font-medium text-muted-foreground">{`${currentIndex + 1}/${at.length}`}</span>
-                <div>
-                  <Button variant="outline" size="xs" onClick={handlePreviousTransfer} aria-label="Previous transfer">
-                    <CaretLeftIcon weight="fill" aria-hidden="true" />
-                  </Button>
-                  <Button variant="outline" size="xs" onClick={handleNextTransfer} aria-label="Next transfer">
-                    <CaretRightIcon weight="fill" aria-hidden="true" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <DataRowContainer>
-              <DataLinkRow label="Transfer #" value={currTransfer?.transfer_number} to={`/transfers/${currTransfer?.transfer_number}`} />
-              <DataDateRow label="Transferred On" value={currTransfer?.created_at} />
-              <DataValueRow label="Source" value={currTransfer?.source_code} />
-              <DataValueRow label="Destination" value={currTransfer?.destination_code} />
-              <DataValueRow label="Transporter" value={currTransfer?.transporter} />
-            </DataRowContainer>
-          </Section>
+          <TransferSection transfers={at} />
 
           <Section>
             <SectionHeader title="Departure"></SectionHeader>
-            <DataRowContainer>
-              <DataLinkRow label="Departure #" value={ad?.departure?.departure_number} to={`/departures/${ad?.departure?.departure_number}`} />
-              <DataDateRow label="Departed On" value={ad?.departure?.created_at} />
-              <DataValueRow label="Warehouse" value={ad?.departure?.origin_code} />
-              <DataValueRow label="Customer" value={ad?.departure?.destination} />
-              <DataValueRow label="Transporter" value={ad?.departure?.transporter} />
-            </DataRowContainer>
+            <OptionalSection condition={!!departure} fallback="No departure on record">
+              <DataRowContainer>
+                <DataLinkRow label="Departure #" value={departure?.departure_number} to={`/departures/${departure?.departure_number}`} />
+                <DataDateRow label="Departed On" value={departure?.created_at} />
+                <DataValueRow label="Warehouse" value={departure?.origin_code} />
+                <DataValueRow label="Customer" value={departure?.destination} />
+                <DataValueRow label="Transporter" value={departure?.transporter} />
+              </DataRowContainer>
+            </OptionalSection>
           </Section>
 
         </SectionRow>
 
         <Tabs defaultValue="comments">
           <TabsList variant="line">
-            <TabsTrigger value="comments"><SectionHeader title="Comments" /></TabsTrigger>
-            <TabsTrigger value="history"><SectionHeader title="History" /></TabsTrigger>
+            <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2" /></TabsTrigger>
+            <TabsTrigger value="history"><SectionHeader title="History" className="px-2" /></TabsTrigger>
           </TabsList>
           <TabsContent value="comments" className="flex flex-col gap-3">
-            {ac?.map(c => (<Comment
+            {comments?.map(c => (<Comment
               key={`${c.username}-${c.created_at}`}
               user={c.username}
               date={formatDateWithTime(c.created_at)}
@@ -215,7 +192,7 @@ export const AssetDetailsPage = () => {
           </TabsContent>
         </Tabs>
 
-      </DetailsContainer>}
+      </DetailsContainer>
     </div>
   )
 }

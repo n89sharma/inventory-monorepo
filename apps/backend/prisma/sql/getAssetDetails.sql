@@ -67,11 +67,11 @@ from "Asset" a
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
-  left join "Cost" c on c.asset_id = a.id
-  join "TechnicalSpecification" ts on ts.asset_id = a.id
   join "TrackingStatus" tr on tr.id = a.tracking_status_id
   join "AvailabilityStatus" av on av.id = a.availability_status_id
   join "TechnicalStatus" te on te.id = a.technical_status_id
+  left join "Cost" c on c.asset_id = a.id
+  left join "TechnicalSpecification" ts on ts.asset_id = a.id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Hold" h on h.id = a.hold_id

@@ -27,9 +27,9 @@ export type AssetDetails = {
   availability_status: string
   tracking_status: string
   technical_status: string
-  location: string
-  warehouse_code: string
-  warehouse_street: string
+  location: string | null
+  warehouse_code: string | null
+  warehouse_street: string | null
   cost: {
     purchase_cost: number | null
     transport_cost: number | null
@@ -59,7 +59,7 @@ export type AssetDetails = {
     to_dt: Date | null
     notes: string | null
     hold_number: string
-  }
+  } | null
   created_at: Date
   is_held: boolean
   arrival: {
@@ -71,7 +71,7 @@ export type AssetDetails = {
     created_by: string
     notes: string | null
     created_at: Date
-  }
+  } | null
   departure: {
     departure_number: string
     origin_code: string
@@ -81,11 +81,11 @@ export type AssetDetails = {
     created_by: string
     notes: string | null
     created_at: Date
-  }
+  } | null
   purchase_invoice: {
     invoice_number: string
     is_cleared: boolean
-  }
+  } | null
 }
 
 export type Error = {

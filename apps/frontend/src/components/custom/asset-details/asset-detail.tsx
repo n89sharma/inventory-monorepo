@@ -100,7 +100,7 @@ export function DetailsContainer({ children, className }: ChildrenProps): React.
 
 export function SectionRow({ children, className }: ChildrenProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-row flex-wrap gap-20", className)}>
+    <div className={cn("flex flex-row flex-wrap gap-16", className)}>
       {children}
     </div>
   )
@@ -214,20 +214,20 @@ export function CMYKRow({
   return (
     <DataRow label={label} className={className}>
       <dd className="flex items-center gap-2 text-sm">
-        <span className="flex items-center gap-1">
-          <span className="text-cyan-500">C</span>
+        <span className="flex items-center">
+          <span className="text-cyan-500 text-xs">C</span>
           <span className="tabular-nums">{c_value ?? 0}</span>
         </span>
-        <span className="flex items-center gap-1">
-          <span className="text-fuchsia-500">M</span>
+        <span className="flex items-center">
+          <span className="text-fuchsia-500 text-xs">M</span>
           <span className="tabular-nums">{m_value ?? 0}</span>
         </span>
-        <span className="flex items-center gap-1">
-          <span className="text-yellow-500">Y</span>
+        <span className="flex items-center">
+          <span className="text-yellow-500 text-xs">Y</span>
           <span className="tabular-nums">{y_value ?? 0}</span>
         </span>
-        <span className="flex items-center gap-1">
-          <span className="text-foreground">K</span>
+        <span className="flex items-center">
+          <span className="text-foreground text-xs">K</span>
           <span className="tabular-nums">{k_value ?? 0}</span>
         </span>
       </dd>

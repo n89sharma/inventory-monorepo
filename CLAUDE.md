@@ -44,6 +44,15 @@ npm run fbuild   # Build shared-types then frontend (from repo root)
 1. `/vercel-react-best-practices`
 2. `/vercel-composition-patterns`
 
+### Guard Component Pattern
+When the same conditional render shape — show children or show a fallback — appears more than once, extract it into a **Guard Component** rather than repeating inline ternaries. A Guard Component takes a `condition: boolean`, a `fallback: string` (or `ReactNode`), and `children: ReactNode`. It renders children when the condition is met, and the fallback otherwise.
+
+This pattern mirrors how React's `Suspense` works and is the idiomatic alternative to repeating `{condition ? <content /> : <p>No data</p>}` across a page.
+
+**Important JSX caveat:** children props are evaluated eagerly before the component renders. Use `?.` optional chaining inside children (not `!` non-null assertions) to avoid runtime errors when the guarded value is null.
+
+Reference implementation: `apps/frontend/src/components/custom/asset-details/optional-section.tsx`
+
 **After every code change, run both build commands from the repo root:**
 ```bash
 npm run bbuild

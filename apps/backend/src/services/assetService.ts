@@ -134,39 +134,59 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
     },
     created_at: r.created_at,
     is_held: r.is_held,
-    hold: {
-      created_by: r.hold_by_name,
-      created_for: r.hold_for_name,
-      created_at: r.hold_created_at,
-      customer: r.hold_customer,
-      from_dt: r.hold_from,
-      to_dt: r.hold_to,
-      notes: r.hold_notes,
-      hold_number: r.hold_number
-    },
-    arrival: {
-      arrival_number: r.arrival_number,
-      origin: r.arrival_origin,
-      destination_code: r.arrival_destination_city_code,
-      destination_street: r.arrival_destination_street,
-      transporter: r.arrival_transporter,
-      created_by: r.arrival_created_by_name,
-      notes: r.arrival_notes,
-      created_at: r.arrival_created_at
-    },
-    departure: {
-      departure_number: r.departure_number,
-      origin_code: r.departure_origin_city_code,
-      origin_street: r.departure_origin_city_code,
-      destination: r.departure_destination,
-      transporter: r.departure_transporter,
-      created_by: r.departure_created_by_name,
-      notes: r.departure_notes,
-      created_at: r.departure_created_at
-    },
-    purchase_invoice: {
-      invoice_number: r.purchase_invoice_number,
-      is_cleared: r.purchase_invoice_is_cleared
-    }
+    hold: mapHold(r),
+    arrival: mapArrival(r),
+    departure: mapDeparture(r),
+    purchase_invoice: mapInvoice(r)
+  }
+}
+
+function mapHold(r: getAssetDetailsQuery.Result) {
+  if (!r.hold_number) return null
+  return {
+    created_by: r.hold_by_name,
+    created_for: r.hold_for_name,
+    created_at: r.hold_created_at,
+    customer: r.hold_customer,
+    from_dt: r.hold_from,
+    to_dt: r.hold_to,
+    notes: r.hold_notes,
+    hold_number: r.hold_number
+  }
+}
+
+function mapArrival(r: getAssetDetailsQuery.Result) {
+  if (!r.arrival_number) return null
+  return {
+    arrival_number: r.arrival_number,
+    origin: r.arrival_origin,
+    destination_code: r.arrival_destination_city_code,
+    destination_street: r.arrival_destination_street,
+    transporter: r.arrival_transporter,
+    created_by: r.arrival_created_by_name,
+    notes: r.arrival_notes,
+    created_at: r.arrival_created_at
+  }
+}
+
+function mapDeparture(r: getAssetDetailsQuery.Result) {
+  if (!r.departure_number) return null
+  return {
+    departure_number: r.departure_number,
+    origin_code: r.departure_origin_city_code,
+    origin_street: r.departure_origin_city_code,
+    destination: r.departure_destination,
+    transporter: r.departure_transporter,
+    created_by: r.departure_created_by_name,
+    notes: r.departure_notes,
+    created_at: r.departure_created_at
+  }
+}
+
+function mapInvoice(r: getAssetDetailsQuery.Result) {
+  if (!r.purchase_invoice_number) return null
+  return {
+    invoice_number: r.purchase_invoice_number,
+    is_cleared: r.purchase_invoice_is_cleared
   }
 }
