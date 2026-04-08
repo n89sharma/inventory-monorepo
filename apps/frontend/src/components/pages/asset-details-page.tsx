@@ -47,10 +47,8 @@ export const AssetDetailsPage = () => {
     <div className="flex flex-col gap-2">
       <PageBreadcrumb segments={getBreadcrumForAssetDetails(section, collectionId, assetId)} />
       <DetailsContainer>
-        <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode}></AssetTitle>
-
+      <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode}></AssetTitle>
         <SectionRow>
-
           <Section>
             <SectionHeader title="Summary"></SectionHeader>
             <DataRowContainer>
