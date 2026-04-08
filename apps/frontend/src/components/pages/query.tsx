@@ -48,7 +48,7 @@ export function QueryPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-3xl font-bold p-2">
+      <h1 className="text-2xl font-semibold p-2">
         Search
       </h1>
       <form

@@ -73,7 +73,7 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
       <PageBreadcrumb segments={breadcrumbs} />
-      <h1 className='text-3xl font-bold p-2'>{pageConfig.pageHeading}</h1>
+      <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>

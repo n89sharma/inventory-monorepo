@@ -40,7 +40,7 @@ export function HoldDetailsPage(): React.JSX.Element {
     <div className="flex flex-col gap-4">
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('holds', holdNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Hold {holdNumber}</h1>
+        <h1 className="text-2xl font-semibold p-2">Hold {holdNumber}</h1>
         <CollectionEditBar section="holds" collectionId={holdNumber} />
       </div>
       <div className="flex gap-4">

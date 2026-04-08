@@ -40,7 +40,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     <div className="flex flex-col gap-4">
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold p-2">Invoice {invoiceNumber}</h1>
+        <h1 className="text-2xl font-semibold p-2">Invoice {invoiceNumber}</h1>
         <CollectionEditBar section="invoices" collectionId={invoiceNumber} />
       </div>
       <div className="flex gap-4">

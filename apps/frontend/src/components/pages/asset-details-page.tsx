@@ -1,6 +1,6 @@
 import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-detail'
-import { CopyButton } from '@/components/custom/copy-button'
 import { Comment } from '@/components/custom/comment'
+import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
@@ -107,12 +107,12 @@ export const AssetDetailsPage = () => {
           <Section>
             <SectionHeader title="Hold"></SectionHeader>
             <DataRowContainer>
+              <DataLinkRow label="Hold #" value={ad?.hold.hold_number} to={`/holds/${ad?.hold.hold_number}`} />
               <DataDateRow label="Date" value={ad?.hold?.created_at} />
               <DataValueRow label="Customer" value={ad?.hold.customer} />
               <DataValueRow label="For" value={ad?.hold.created_for} />
               <DataValueRow label="By" value={ad?.hold.created_by} />
               <DataValueRow label="Notes" value={ad?.hold.notes} />
-              <DataLinkRow label="Hold #" value={ad?.hold.hold_number} to={`/holds/${ad?.hold.hold_number}`} />
             </DataRowContainer>
           </Section>
 
@@ -151,12 +151,12 @@ export const AssetDetailsPage = () => {
           <Section>
             <SectionHeader title="Arrival"></SectionHeader>
             <DataRowContainer>
+              <DataLinkRow label="Arrival #" value={ad?.arrival.arrival_number} to={`/arrivals/${ad?.arrival.arrival_number}`} />
               <DataDateRow label="Arrived On" value={ad?.arrival.created_at} />
               <DataValueRow label="Vendor" value={ad?.arrival.origin} />
               <DataValueRow label="Warehouse" value={ad?.arrival.destination_code} />
-              <DataLinkRow label="Arrival #" value={ad?.arrival.arrival_number} to={`/arrivals/${ad?.arrival.arrival_number}`} />
-              <DataValueRow label="Transporter" value={ad?.arrival.transporter} />
               <DataLinkRow label="Invoice #" value={ad?.purchase_invoice.invoice_number} to={`/invoices/${ad?.purchase_invoice.invoice_number}`} />
+              <DataValueRow label="Transporter" value={ad?.arrival.transporter} />
               <InvoiceClearedRow isCleared={!!ad?.purchase_invoice.is_cleared} />
             </DataRowContainer>
           </Section>
@@ -177,10 +177,10 @@ export const AssetDetailsPage = () => {
               </div>
             </div>
             <DataRowContainer>
+              <DataLinkRow label="Transfer #" value={currTransfer?.transfer_number} to={`/transfers/${currTransfer?.transfer_number}`} />
               <DataDateRow label="Transferred On" value={currTransfer?.created_at} />
               <DataValueRow label="Source" value={currTransfer?.source_code} />
               <DataValueRow label="Destination" value={currTransfer?.destination_code} />
-              <DataLinkRow label="Transfer #" value={currTransfer?.transfer_number} to={`/transfers/${currTransfer?.transfer_number}`} />
               <DataValueRow label="Transporter" value={currTransfer?.transporter} />
             </DataRowContainer>
           </Section>
@@ -188,10 +188,10 @@ export const AssetDetailsPage = () => {
           <Section>
             <SectionHeader title="Departure"></SectionHeader>
             <DataRowContainer>
+              <DataLinkRow label="Departure #" value={ad?.departure?.departure_number} to={`/departures/${ad?.departure?.departure_number}`} />
               <DataDateRow label="Departed On" value={ad?.departure?.created_at} />
               <DataValueRow label="Warehouse" value={ad?.departure?.origin_code} />
               <DataValueRow label="Customer" value={ad?.departure?.destination} />
-              <DataLinkRow label="Departure #" value={ad?.departure?.departure_number} to={`/departures/${ad?.departure?.departure_number}`} />
               <DataValueRow label="Transporter" value={ad?.departure?.transporter} />
             </DataRowContainer>
           </Section>
