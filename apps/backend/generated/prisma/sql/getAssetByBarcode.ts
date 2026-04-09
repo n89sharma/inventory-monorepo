@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetByBarcode = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\ntr.status as tracking_status,\nav.status as availability_status,\nte.status as technical_status\nfrom \"Asset\" a\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"TrackingStatus\" tr on tr.id = a.tracking_status_id\njoin \"AvailabilityStatus\" av on av.id = a.availability_status_id\njoin \"TechnicalStatus\" te on te.id = a.technical_status_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere a.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetByBarcode.Parameters, getAssetByBarcode.Result>
+export const getAssetByBarcode = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\ntr.status as tracking_status,\nav.status as availability_status,\nte.status as technical_status,\na.is_held as is_held\nfrom \"Asset\" a\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"TrackingStatus\" tr on tr.id = a.tracking_status_id\njoin \"AvailabilityStatus\" av on av.id = a.availability_status_id\njoin \"TechnicalStatus\" te on te.id = a.technical_status_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere a.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetByBarcode.Parameters, getAssetByBarcode.Result>
 
 export namespace getAssetByBarcode {
   export type Parameters = [text: string]
@@ -25,5 +25,6 @@ export namespace getAssetByBarcode {
     tracking_status: string
     availability_status: string
     technical_status: string
+    is_held: boolean
   }
 }

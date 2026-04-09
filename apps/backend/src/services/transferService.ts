@@ -5,7 +5,7 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from '../prisma.js'
 
 const sequenceTransferEntity = 'TRANSFER'
-const DEFAULT_CREATED_BY_ID = 177
+const DEFAULT_CREATED_BY_ID = 178
 
 export async function getTransfer(transferNumber: string): Promise<ApiResponse<TransferDetail>> {
   try {

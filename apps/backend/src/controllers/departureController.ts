@@ -4,7 +4,12 @@ import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
-import { createDeparture, getDeparture as getDepartureSer, getDepartureForUpdate as getDepartureForUpdateSer, updateDeparture } from '../services/departureService.js'
+import {
+  createDeparture as createDepartureSer,
+  getDepartureForUpdate as getDepartureForUpdateSer,
+  getDeparture as getDepartureSer,
+  updateDeparture as updateDepartureSer
+} from '../services/departureService.js'
 
 export async function getDepartures(req: Request, res: Response<ApiResponse<DepartureSummary[]>>) {
   try {
@@ -44,20 +49,20 @@ export async function getDepartureForUpdate(req: Request, res: Response, next: N
   }
 }
 
-export async function createDepartureHandler(req: Request, res: Response, next: NextFunction) {
+export async function createDeparture(req: Request, res: Response, next: NextFunction) {
   try {
     const departure = CreateDepartureSchema.parse(req.body)
-    const departureNumber = await createDeparture(departure)
+    const departureNumber = await createDepartureSer(departure)
     res.status(201).json({ departureNumber })
   } catch (error) {
     next(error)
   }
 }
 
-export async function updateDepartureHandler(req: Request, res: Response, next: NextFunction) {
+export async function updateDeparture(req: Request, res: Response, next: NextFunction) {
   try {
     const departure = UpdateDepartureSchema.parse(req.body)
-    await updateDeparture(departure)
+    await updateDepartureSer(departure)
     res.json({ departureNumber: req.params.departureNumber })
   } catch (error) {
     next(error)

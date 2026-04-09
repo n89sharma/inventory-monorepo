@@ -7,20 +7,17 @@ import { Button } from '../shadcn/button'
 import { Field, FieldLabel } from '../shadcn/field'
 import { Input } from '../shadcn/input'
 
-interface AddAssetsToCreateFormProps {
+interface AddAssetByBarcodeProps {
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
   entityName: string
+  validateAsset?: (asset: AssetSummary) => string | null
 }
 
-export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: AddAssetsToCreateFormProps): React.JSX.Element {
+export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateAsset }: AddAssetByBarcodeProps): React.JSX.Element {
   const barcodeInputRef = useRef<HTMLInputElement>(null)
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
-
-  const holdInputRef = useRef<HTMLInputElement>(null)
-  const [holdError, setHoldError] = useState<string | null>(null)
-  const [isLookingUpHold, setIsLookingUpHold] = useState(false)
 
   async function handleAddAsset() {
     const barcode = barcodeInputRef.current?.value.trim()
@@ -36,6 +33,13 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
     setIsLookingUp(true)
     try {
       const asset = await getAssetByBarcode(barcode)
+      if (validateAsset) {
+        const validationError = validateAsset(asset)
+        if (validationError) {
+          setBarcodeError(validationError)
+          return
+        }
+      }
       onAddAsset(asset)
       if (barcodeInputRef.current) barcodeInputRef.current.value = ''
     } catch {
@@ -51,6 +55,47 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
       handleAddAsset()
     }
   }
+
+  return (
+    <div className='flex items-end gap-2 max-w-xl'>
+      <Field className='flex-1'>
+        <FieldLabel>Barcode</FieldLabel>
+        <Input
+          ref={barcodeInputRef}
+          placeholder='Scan or enter barcode'
+          onKeyDown={onBarcodeKeyDown}
+          onChange={() => setBarcodeError(null)}
+        />
+        {barcodeError && (
+          <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
+        )}
+      </Field>
+      <Button
+        variant='secondary'
+        type='button'
+        onClick={handleAddAsset}
+        disabled={isLookingUp}
+        className='mb-0.5'
+      >
+        {isLookingUp
+          ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up...</>
+          : <><PlusIcon />Add Asset</>
+        }
+      </Button>
+    </div>
+  )
+}
+
+interface AddAssetsToCreateFormProps {
+  getAssets: () => AssetSummary[]
+  onAddAsset: (asset: AssetSummary) => void
+  entityName: string
+}
+
+export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: AddAssetsToCreateFormProps): React.JSX.Element {
+  const holdInputRef = useRef<HTMLInputElement>(null)
+  const [holdError, setHoldError] = useState<string | null>(null)
+  const [isLookingUpHold, setIsLookingUpHold] = useState(false)
 
   async function handleAddAssetsFromHold() {
     const holdNumber = holdInputRef.current?.value.trim()
@@ -86,32 +131,7 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
 
   return (
     <>
-      <div className='flex items-end gap-2 max-w-xl'>
-        <Field className='flex-1'>
-          <FieldLabel>Barcode</FieldLabel>
-          <Input
-            ref={barcodeInputRef}
-            placeholder='Scan or enter barcode'
-            onKeyDown={onBarcodeKeyDown}
-            onChange={() => setBarcodeError(null)}
-          />
-          {barcodeError && (
-            <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
-          )}
-        </Field>
-        <Button
-          variant='secondary'
-          type='button'
-          onClick={handleAddAsset}
-          disabled={isLookingUp}
-          className='mb-0.5'
-        >
-          {isLookingUp
-            ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up...</>
-            : <><PlusIcon />Add Asset</>
-          }
-        </Button>
-      </div>
+      <AddAssetByBarcode getAssets={getAssets} onAddAsset={onAddAsset} entityName={entityName} />
 
       <div className='flex items-end gap-2 max-w-xl'>
         <Field className='flex-1'>

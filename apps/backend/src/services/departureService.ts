@@ -5,7 +5,7 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from '../prisma.js'
 
 const sequenceDepartureEntity = 'DEPARTURE'
-const DEFAULT_CREATED_BY_ID = 177
+const DEFAULT_CREATED_BY_ID = 178
 
 export async function getDeparture(departureNumber: string): Promise<ApiResponse<DepartureDetail>> {
   try {

@@ -13,7 +13,8 @@ export const AssetSummarySchema = z.object({
   tracking_status: z.string(),
   technical_status: z.string(),
   warehouse_city_code: z.string().nullable(),
-  warehouse_street: z.string().nullable()
+  warehouse_street: z.string().nullable(),
+  is_held: z.boolean().optional()
 })
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>

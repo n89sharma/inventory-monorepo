@@ -3,8 +3,11 @@ import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
+import { PlusIcon } from "@phosphor-icons/react"
+import { Link } from "react-router-dom"
 import { SearchBar } from "../custom/search-bar"
 import { SelectOptions } from "../custom/select-options"
+import { Button } from "../shadcn/button"
 import { CollectionPage } from "./collection-page"
 import { holdTableColumns } from "./column-defs/hold-columns"
 
@@ -60,6 +63,11 @@ export function HoldSummaryPage(): React.JSX.Element {
             className="max-w-40"
           />
         </SearchBar>
+      }
+      actions={
+        <Button asChild>
+          <Link to="/holds/new"><PlusIcon />Create Hold</Link>
+        </Button>
       }
     />
   )

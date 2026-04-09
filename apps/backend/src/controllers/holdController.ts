@@ -1,10 +1,10 @@
 import { isAfter } from 'date-fns'
-import { Request, Response } from 'express'
-import { ApiResponse, HoldDetail, HoldSummary, response500, successResponse } from 'shared-types'
+import { NextFunction, Request, Response } from 'express'
+import { ApiResponse, CreateHoldSchema, HoldDetail, HoldSummary, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
-import { getHold as getHoldSer } from '../services/holdService.js'
+import { createHold as createHoldSer, getHold as getHoldSer } from '../services/holdService.js'
 
 export const HoldQuerySchema = z.object({
   fromDate: z.string(),
@@ -27,6 +27,22 @@ export async function getHolds(req: Request, res: Response<ApiResponse<HoldSumma
     res.json(successResponse(holds))
   } catch (error) {
     res.status(500).json(response500('Failed to fetch holds'))
+  }
+}
+
+export async function createHold(req: Request, res: Response, next: NextFunction) {
+  try {
+    const validated = CreateHoldSchema.parse(req.body)
+    const response = await createHoldSer(validated)
+    if (response.success) {
+      return res.status(201).json({ holdNumber: response.data })
+    }
+    if (response.error.status === 400) {
+      return res.status(400).json(response)
+    }
+    return res.status(500).json(response)
+  } catch (error) {
+    next(error)
   }
 }
 

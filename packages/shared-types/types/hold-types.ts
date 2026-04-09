@@ -29,3 +29,12 @@ export const HoldDetailSchema = z.object({
   assets: z.array(AssetSummarySchema)
 })
 export type HoldDetail = z.infer<typeof HoldDetailSchema>
+
+// POST /holds
+export const CreateHoldSchema = z.object({
+  created_for_id: z.number().int(),
+  customer_id: z.number().int(),
+  notes: z.string().nullable(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
+})
+export type CreateHold = z.infer<typeof CreateHoldSchema>

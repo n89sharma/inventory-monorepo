@@ -10,7 +10,8 @@ select
   w.street as warehouse_street,
   tr.status as tracking_status,
   av.status as availability_status,
-  te.status as technical_status
+  te.status as technical_status,
+  a.is_held as is_held
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
   join "Model" m on m.id = a.model_id
