@@ -1,5 +1,5 @@
-import { createInvoice, getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
-import type { InvoiceForm } from '@/ui-types/invoice-form-types'
+import { createInvoice, getInvoiceDetail, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
+import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ApiResponse, InvoiceDetail, InvoiceSummary } from 'shared-types'
 import { create } from 'zustand'
@@ -13,6 +13,7 @@ interface InvoiceStore {
   invoiceDetail: InvoiceDetail | null
   detailLoading: boolean
   detailError: string | null
+  invoiceEditFormData: InvoiceEditForm | null
 
   setInvoices: (invoices: InvoiceSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -23,6 +24,8 @@ interface InvoiceStore {
   getInvoiceDetails: (invoiceNumber: string) => Promise<void>
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
   submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
+  getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
+  submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
 
   clearInvoices: () => void
 }
@@ -36,6 +39,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   invoiceDetail: null,
   detailLoading: false,
   detailError: null,
+  invoiceEditFormData: null,
 
   setInvoices: (invoices) => set({ invoices }),
   setLoading: (loading) => set({ loading }),
@@ -58,5 +62,13 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     }
   },
   submitCreateInvoice: (data) => createInvoice(data),
+  getInvoiceForUpdate: async (invoiceNumber) => {
+    set({ invoiceEditFormData: null })
+    set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
+  },
+  submitUpdateInvoice: (invoiceNumber, data) => {
+    set({ invoiceDetail: null })
+    return updateInvoice(invoiceNumber, data)
+  },
   clearInvoices: () => set({ invoices: [] })
 }))

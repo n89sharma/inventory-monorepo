@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema } from './organization-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
 import { UserSchema } from './user-types.js';
 
 export const CreateInvoiceSchema = z.object({
@@ -34,3 +34,14 @@ export const InvoiceDetailSchema = z.object({
   assets: z.array(AssetSummarySchema)
 })
 export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>
+
+// GET /invoices/:invoiceNumber/edit and PUT /invoices/:invoiceNumber
+export const UpdateInvoiceSchema = z.object({
+  id: z.number().int(),
+  invoice_number: z.string(),
+  organization: OrgSummarySchema,
+  invoice_type: z.object({ id: z.number().int(), type: z.string() }),
+  is_cleared: z.boolean(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+})
+export type UpdateInvoice = z.infer<typeof UpdateInvoiceSchema>

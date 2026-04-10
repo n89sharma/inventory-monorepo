@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, UpdateInvoice, UpdateInvoiceSchema, response400, response500, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
-import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer } from '../services/invoiceService.js'
+import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer, getInvoiceForUpdate as getInvoiceForUpdateSer, updateInvoice as updateInvoiceSer } from '../services/invoiceService.js'
 
 export async function createInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
   try {
@@ -23,6 +23,27 @@ export async function getInvoices(req: Request, res: Response<ApiResponse<Invoic
     res.json(successResponse(invoices))
   } catch (error) {
     res.status(500).json(response500('Failed to fetch invoices'))
+  }
+}
+
+export async function getInvoiceForUpdate(req: Request, res: Response<ApiResponse<UpdateInvoice>>) {
+  const { invoiceNumber } = req.params
+  const response = await getInvoiceForUpdateSer(invoiceNumber)
+  if (response.success) return res.json(response)
+  if (response.error.status === 400) return res.status(404).json(response)
+  return res.status(500).json(response)
+}
+
+export async function updateInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
+  try {
+    const { invoiceNumber } = req.params
+    const data = UpdateInvoiceSchema.parse(req.body)
+    const response = await updateInvoiceSer(invoiceNumber, data)
+    if (response.success) return res.json(response)
+    if (response.error.status === 400) return res.status(400).json(response)
+    return res.status(500).json(response)
+  } catch {
+    res.status(500).json(response500('Failed to update invoice'))
   }
 }
 

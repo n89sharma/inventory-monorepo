@@ -21,3 +21,14 @@ export type InvoiceForm = {
   is_cleared: boolean
   assets: AssetSummary[]
 }
+
+export const InvoiceEditFormSchema = z.object({
+  id: z.number(),
+  invoice_number: z.string(),
+  organization: OrgSummarySchema,
+  invoice_type: z.object({ id: z.number(), type: z.string() }),
+  is_cleared: z.boolean(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+})
+
+export type InvoiceEditForm = z.infer<typeof InvoiceEditFormSchema>
