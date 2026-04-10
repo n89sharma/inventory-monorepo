@@ -31,7 +31,7 @@ No tests are configured yet.
 
 ## Development Workflow
 
-**Before making any changes to project files, always load these two skills:**
+**Before making any changes to frontend project files (apps/frontend/*), always load these two skills:**
 1. `/vercel-react-best-practices`
 2. `/vercel-composition-patterns`
 
