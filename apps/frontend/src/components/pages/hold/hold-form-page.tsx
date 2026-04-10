@@ -18,7 +18,7 @@ import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { AssetSummary } from 'shared-types'
-import { getDepartureFormAssetColumns } from '../column-defs/departure-form-asset-columns'
+import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
 interface HoldFormPageProps {
   defaultValues?: HoldForm
@@ -53,7 +53,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting } = form.formState
 
-  const assetTableColumns = useMemo(() => getDepartureFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getSubmitButtonContent() {
     if (isSubmitting) {

@@ -17,7 +17,7 @@ import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
-import { getTransferFormAssetColumns } from '../column-defs/transfer-form-asset-columns'
+import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
 interface TransferFormPageProps {
   defaultValues?: TransferForm
@@ -43,7 +43,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting } = form.formState
 
-  const assetTableColumns = useMemo(() => getTransferFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getDefaultTransfer(): TransferForm {
     return {

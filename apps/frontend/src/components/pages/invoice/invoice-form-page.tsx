@@ -19,7 +19,7 @@ import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { getDepartureFormAssetColumns } from '../column-defs/departure-form-asset-columns'
+import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
 interface InvoiceFormPageProps {
   pageConfig: {
@@ -53,7 +53,7 @@ export function InvoiceFormPage({ pageConfig, breadcrumbs, onValidSubmit }: Invo
   const invoiceTypes = useConstantsStore(state => state.invoiceTypes)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting } = form.formState
-  const assetTableColumns = useMemo(() => getDepartureFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getSubmitButtonContent() {
     if (isSubmitting) {

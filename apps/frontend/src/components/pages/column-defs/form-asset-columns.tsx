@@ -4,7 +4,7 @@ import { TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { AssetSummary } from 'shared-types'
 
-export function getDepartureFormAssetColumns(onDelete: (index: number) => void): ColumnDef<AssetSummary>[] {
+export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDef<AssetSummary>[] {
   return [
     {
       accessorKey: "barcode",

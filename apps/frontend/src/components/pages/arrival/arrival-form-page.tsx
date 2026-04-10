@@ -16,7 +16,7 @@ import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
-import { getNewAssetTableColumns } from '../column-defs/new-assets-columns'
+import { getNewAssetTableColumns } from '../column-defs/form-new-asset-columns'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 
 interface ArrivalFormPageProps {
