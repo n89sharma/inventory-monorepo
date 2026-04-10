@@ -20,11 +20,9 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
       )
     },
     cell: ({ row }) => (
-      <Button asChild variant="link" className="h-0">
-        <Link to={`/arrivals/${row.original.arrival_number}`}>
-          {row.getValue('arrival_number')}
-        </Link>
-      </Button>
+      <Link to={`/arrivals/${row.original.arrival_number}`} className="text-primary hover:underline font-medium">
+        {row.getValue('arrival_number')}
+      </Link>
     )
   },
   {
@@ -63,21 +61,12 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   },
   {
     header: "Edit",
-    cell: ({ row }) => {
-      return (
-
+    cell: ({ row }) => (
+      <Button asChild variant="outline" size="icon">
         <Link to={`/arrivals/${row.original.arrival_number}/edit`}>
-          <Button
-            variant="outline"
-            size="icon"
-            asChild={false}
-            className="cursor-pointer"
-          >
-            <PencilSimpleIcon />
-          </Button >
-        </Link >
-
-      )
-    }
+          <PencilSimpleIcon />
+        </Link>
+      </Button>
+    )
   }
 ]

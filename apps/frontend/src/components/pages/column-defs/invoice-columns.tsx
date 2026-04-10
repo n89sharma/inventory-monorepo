@@ -20,11 +20,9 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
       )
     },
     cell: ({ row }) => (
-      <Button asChild variant="link" className="h-0">
-        <Link to={`/invoices/${row.original.invoice_number}`}>
-          {row.getValue('invoice_number')}
-        </Link>
-      </Button>
+      <Link to={`/invoices/${row.original.invoice_number}`} className="text-primary hover:underline font-medium">
+        {row.getValue('invoice_number')}
+      </Link>
     )
   },
   {
@@ -64,11 +62,11 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Link to={`/invoices/${row.original.invoice_number}/edit`}>
-        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+      <Button asChild variant="outline" size="icon">
+        <Link to={`/invoices/${row.original.invoice_number}/edit`}>
           <PencilSimpleIcon />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     )
   }
 ]

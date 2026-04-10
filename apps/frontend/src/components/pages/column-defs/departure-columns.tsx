@@ -20,11 +20,9 @@ export const departureTableColumns: ColumnDef<DepartureSummary>[] = [
       )
     },
     cell: ({ row }) => (
-      <Button asChild variant="link" className="h-0">
-        <Link to={`/departures/${row.original.departure_number}`}>
-          {row.getValue('departure_number')}
-        </Link>
-      </Button>
+      <Link to={`/departures/${row.original.departure_number}`} className="text-primary hover:underline font-medium">
+        {row.getValue('departure_number')}
+      </Link>
     )
   },
   {
@@ -64,11 +62,11 @@ export const departureTableColumns: ColumnDef<DepartureSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Link to={`/departures/${row.original.departure_number}/edit`}>
-        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+      <Button asChild variant="outline" size="icon">
+        <Link to={`/departures/${row.original.departure_number}/edit`}>
           <PencilSimpleIcon />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     )
   }
 ]

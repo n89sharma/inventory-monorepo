@@ -20,11 +20,9 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
       )
     },
     cell: ({ row }) => (
-      <Button asChild variant="link" className="h-0">
-        <Link to={`/holds/${row.original.hold_number}`}>
-          {row.getValue('hold_number')}
-        </Link>
-      </Button>
+      <Link to={`/holds/${row.original.hold_number}`} className="text-primary hover:underline font-medium">
+        {row.getValue('hold_number')}
+      </Link>
     )
   },
   {
@@ -60,11 +58,11 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Link to={`/holds/${row.original.hold_number}/edit`}>
-        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+      <Button asChild variant="outline" size="icon">
+        <Link to={`/holds/${row.original.hold_number}/edit`}>
           <PencilSimpleIcon />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     )
   }
 ]

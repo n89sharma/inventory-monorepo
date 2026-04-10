@@ -20,11 +20,9 @@ export const transferTableColumns: ColumnDef<TransferSummary>[] = [
       )
     },
     cell: ({ row }) => (
-      <Button asChild variant="link" className="h-0">
-        <Link to={`/transfers/${row.original.transfer_number}`}>
-          {row.getValue('transfer_number')}
-        </Link>
-      </Button>
+      <Link to={`/transfers/${row.original.transfer_number}`} className="text-primary hover:underline font-medium">
+        {row.getValue('transfer_number')}
+      </Link>
     )
   },
   {
@@ -64,11 +62,11 @@ export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Link to={`/transfers/${row.original.transfer_number}/edit`}>
-        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+      <Button asChild variant="outline" size="icon">
+        <Link to={`/transfers/${row.original.transfer_number}/edit`}>
           <PencilSimpleIcon />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     )
   }
 ]
