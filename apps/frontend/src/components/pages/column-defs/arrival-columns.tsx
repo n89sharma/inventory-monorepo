@@ -60,6 +60,10 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
     header: "Vendor"
   },
   {
+    accessorKey: "asset_count",
+    header: "Assets"
+  },
+  {
     header: "Edit",
     cell: ({ row }) => (
       <Button asChild variant="outline" size="icon" aria-label="Edit arrival">

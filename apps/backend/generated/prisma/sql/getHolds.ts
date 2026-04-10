@@ -11,11 +11,12 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param int4
  * @param int4
  */
-export const getHolds = $runtime.makeTypedQueryFactory("select\nh.hold_number as hold_number,\nub.\"name\" as created_by,\nuf.\"name\" as created_for,\nc.\"name\" as customer,\nh.notes as notes,\nh.created_at as created_at,\nh.from_dt as from_dt,\nh.to_dt as to_dt\nfrom \"Hold\" h\njoin \"User\" ub on ub.id = h.created_by_id\njoin \"User\" uf on uf.id = h.created_for_id\njoin \"Organization\" c on c.id = h.customer_id\nwhere h.created_at between $1 and $2\nand ($3 = 0 or ub.id = $3)\nand ($4 = 0 or uf.id = $4)") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getHolds.Parameters, getHolds.Result>
+export const getHolds = $runtime.makeTypedQueryFactory("select\nh.id as id,\nh.hold_number as hold_number,\nub.\"name\" as created_by,\nuf.\"name\" as created_for,\nc.\"name\" as customer,\nh.notes as notes,\nh.created_at as created_at,\nh.from_dt as from_dt,\nh.to_dt as to_dt,\n(select count(*)::int from \"Asset\" ast where ast.hold_id = h.id) as asset_count\nfrom \"Hold\" h\njoin \"User\" ub on ub.id = h.created_by_id\njoin \"User\" uf on uf.id = h.created_for_id\njoin \"Organization\" c on c.id = h.customer_id\nwhere h.created_at between $1 and $2\nand ($3 = 0 or ub.id = $3)\nand ($4 = 0 or uf.id = $4)") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getHolds.Parameters, getHolds.Result>
 
 export namespace getHolds {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number, int4: number]
   export type Result = {
+    id: number
     hold_number: string
     created_by: string
     created_for: string
@@ -24,5 +25,6 @@ export namespace getHolds {
     created_at: Date
     from_dt: Date | null
     to_dt: Date | null
+    asset_count: number | null
   }
 }

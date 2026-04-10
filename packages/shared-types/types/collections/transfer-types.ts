@@ -1,18 +1,17 @@
 import { z } from 'zod';
-import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
-import { WarehouseSchema } from './reference-data-types.js';
+import { AssetSummarySchema } from '../asset-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
+import { WarehouseSchema } from '../reference-data-types.js';
+import { CollectionSummarySchema } from './collection-types.js';
 
 // GET /transfers?fromDate...&toDate...&origin...&destination...
-export const TransferSummarySchema = z.object({
+export const TransferSummarySchema = CollectionSummarySchema.extend({
   transfer_number: z.string(),
   origin_code: z.string(),
   origin_street: z.string(),
   destination_code: z.string(),
   destination_street: z.string(),
-  transporter: z.string(),
-  created_at: z.coerce.date(),
-  created_by: z.string()
+  transporter: z.string()
 })
 export type TransferSummary = z.infer<typeof TransferSummarySchema>;
 

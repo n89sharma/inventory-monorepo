@@ -1,9 +1,9 @@
 import { Button } from "@/components/shadcn/button"
-import type { HoldSummary } from 'shared-types'
 import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
+import type { HoldSummary } from 'shared-types'
 
 export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   {
@@ -54,6 +54,10 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
         </Button>
       )
     },
+  },
+  {
+    accessorKey: "asset_count",
+    header: "Assets"
   },
   {
     header: "Edit",

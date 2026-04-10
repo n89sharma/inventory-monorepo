@@ -10,11 +10,12 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param timestamp
  * @param int4
  */
-export const getDepartures = $runtime.makeTypedQueryFactory("select\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nwo.street as origin_street,\nod.\"name\" as destination,\nt.\"name\" as transporter,\nd.created_at as created_at,\nu.\"name\"  as created_by\nfrom \"Departure\" d\njoin \"User\" u on u.id = d.created_by_id\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\njoin \"Organization\" t on t.id = d.transporter_id\nwhere d.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\norder by d.created_at desc") as (timestamp: Date, timestamp: Date, int4: number) => $runtime.TypedSql<getDepartures.Parameters, getDepartures.Result>
+export const getDepartures = $runtime.makeTypedQueryFactory("select\nd.id as id,\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nwo.street as origin_street,\nod.\"name\" as destination,\nt.\"name\" as transporter,\nd.created_at as created_at,\nu.\"name\"  as created_by,\n(select count(*)::int from \"Asset\" ast where ast.departure_id = d.id) as asset_count\nfrom \"Departure\" d\njoin \"User\" u on u.id = d.created_by_id\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\njoin \"Organization\" t on t.id = d.transporter_id\nwhere d.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\norder by d.created_at desc") as (timestamp: Date, timestamp: Date, int4: number) => $runtime.TypedSql<getDepartures.Parameters, getDepartures.Result>
 
 export namespace getDepartures {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number]
   export type Result = {
+    id: number
     departure_number: string
     origin_code: string
     origin_street: string
@@ -22,5 +23,6 @@ export namespace getDepartures {
     transporter: string
     created_at: Date
     created_by: string
+    asset_count: number | null
   }
 }

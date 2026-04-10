@@ -1,4 +1,5 @@
 select
+  t.id as id,
 	t.transfer_number as transfer_number,
 	t.created_at as created_at,
 	wo.city_code as origin_code,
@@ -6,7 +7,8 @@ select
 	wd.city_code as destination_code,
 	wd.street as destination_street,
 	tr."name" as transporter,
-    u."name"  as created_by
+  u."name"  as created_by,
+  (select count(*)::int from "AssetTransfer" at where at.transfer_id = t.id) as asset_count
 from "Transfer" t
 join "User" u on u.id = t.created_by_id 
 join "Warehouse" wo on wo.id = t.origin_id  

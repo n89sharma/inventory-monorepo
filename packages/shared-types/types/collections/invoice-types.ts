@@ -1,13 +1,12 @@
 import { z } from 'zod';
-import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
-import { UserSchema } from './user-types.js';
+import { AssetSummarySchema } from '../asset-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
+import { UserSchema } from '../user-types.js';
+import { CollectionSummarySchema } from './collection-types.js';
 
-export const InvoiceSummarySchema = z.object({
+export const InvoiceSummarySchema = CollectionSummarySchema.extend({
   invoice_number: z.string(),
   organization: z.string(),
-  created_by: z.string(),
-  created_at: z.coerce.date(),
   is_cleared: z.boolean(),
   invoice_type: z.string()
 })

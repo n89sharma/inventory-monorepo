@@ -11,11 +11,12 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param int4
  * @param int4
  */
-export const getTransfers = $runtime.makeTypedQueryFactory("select\nt.transfer_number as transfer_number,\nt.created_at as created_at,\nwo.city_code as origin_code,\nwo.street as origin_street,\nwd.city_code as destination_code,\nwd.street as destination_street,\ntr.\"name\" as transporter,\nu.\"name\"  as created_by\nfrom \"Transfer\" t\njoin \"User\" u on u.id = t.created_by_id\njoin \"Warehouse\" wo on wo.id = t.origin_id\njoin \"Warehouse\" wd on wd.id = t.destination_id\njoin \"Organization\" tr on tr.id = t.transporter_id\nwhere t.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or wd.id = $4)\norder by t.created_at desc") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getTransfers.Parameters, getTransfers.Result>
+export const getTransfers = $runtime.makeTypedQueryFactory("select\nt.id as id,\nt.transfer_number as transfer_number,\nt.created_at as created_at,\nwo.city_code as origin_code,\nwo.street as origin_street,\nwd.city_code as destination_code,\nwd.street as destination_street,\ntr.\"name\" as transporter,\nu.\"name\"  as created_by,\n(select count(*)::int from \"AssetTransfer\" at where at.transfer_id = t.id) as asset_count\nfrom \"Transfer\" t\njoin \"User\" u on u.id = t.created_by_id\njoin \"Warehouse\" wo on wo.id = t.origin_id\njoin \"Warehouse\" wd on wd.id = t.destination_id\njoin \"Organization\" tr on tr.id = t.transporter_id\nwhere t.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or wd.id = $4)\norder by t.created_at desc") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getTransfers.Parameters, getTransfers.Result>
 
 export namespace getTransfers {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number, int4: number]
   export type Result = {
+    id: number
     transfer_number: string
     created_at: Date
     origin_code: string
@@ -24,5 +25,6 @@ export namespace getTransfers {
     destination_street: string
     transporter: string
     created_by: string
+    asset_count: number | null
   }
 }

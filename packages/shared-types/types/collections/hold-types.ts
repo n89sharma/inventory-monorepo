@@ -1,15 +1,14 @@
 import { z } from 'zod';
-import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
-import { UserSchema } from './user-types.js';
+import { AssetSummarySchema } from '../asset-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
+import { UserSchema } from '../user-types.js';
+import { CollectionSummarySchema } from './collection-types.js';
 
-export const HoldSummarySchema = z.object({
+export const HoldSummarySchema = CollectionSummarySchema.extend({
   hold_number: z.string(),
-  created_by: z.string(),
   created_for: z.string(),
   customer: z.string(),
   notes: z.string().nullable(),
-  created_at: z.coerce.date(),
   from_dt: z.coerce.date().nullable(),
   to_dt: z.coerce.date().nullable()
 })

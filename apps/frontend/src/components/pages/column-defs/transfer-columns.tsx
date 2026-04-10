@@ -1,9 +1,9 @@
 import { Button } from "@/components/shadcn/button"
-import type { TransferSummary } from 'shared-types'
 import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
+import type { TransferSummary } from 'shared-types'
 
 export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
@@ -58,6 +58,10 @@ export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
     accessorKey: "created_by",
     header: "Created By"
+  },
+  {
+    accessorKey: "asset_count",
+    header: "Assets"
   },
   {
     header: "Edit",

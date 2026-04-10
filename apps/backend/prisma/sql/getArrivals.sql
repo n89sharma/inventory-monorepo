@@ -1,11 +1,13 @@
 select
+  a.id as id,
 	a.arrival_number as arrival_number,
 	a.created_at as created_at,
 	w.city_code as destination_code,
 	w.street as destination_street,
 	o."name" as vendor,
 	t."name" as transporter,
-	u."name"  as created_by
+	u."name"  as created_by,
+  (select count(*)::int from "Asset" ast where ast.arrival_id = a.id) as asset_count
 from "Arrival" a
 left join "User" u on u.id = a.created_by_id 
 join "Warehouse" w on w.id = a.destination_id 

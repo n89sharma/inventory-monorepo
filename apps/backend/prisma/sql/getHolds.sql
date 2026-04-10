@@ -1,4 +1,5 @@
 select
+  h.id as id,
 	h.hold_number as hold_number,
 	ub."name" as created_by,
 	uf."name" as created_for,
@@ -6,7 +7,8 @@ select
 	h.notes as notes,
 	h.created_at as created_at,
 	h.from_dt as from_dt,
-	h.to_dt as to_dt
+	h.to_dt as to_dt,
+  (select count(*)::int from "Asset" ast where ast.hold_id = h.id) as asset_count
 from "Hold" h
 join "User" ub on ub.id = h.created_by_id 
 join "User" uf on uf.id = h.created_for_id 

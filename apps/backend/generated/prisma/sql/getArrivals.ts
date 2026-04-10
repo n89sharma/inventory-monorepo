@@ -10,11 +10,12 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param timestamp
  * @param int4
  */
-export const getArrivals = $runtime.makeTypedQueryFactory("select\na.arrival_number as arrival_number,\na.created_at as created_at,\nw.city_code as destination_code,\nw.street as destination_street,\no.\"name\" as vendor,\nt.\"name\" as transporter,\nu.\"name\"  as created_by\nfrom \"Arrival\" a\nleft join \"User\" u on u.id = a.created_by_id\njoin \"Warehouse\" w on w.id = a.destination_id\njoin \"Organization\" o on o.id = a.origin_id\njoin \"Organization\" t on t.id = a.transporter_id\nwhere a.created_at between $1 and $2\nand ($3 = 0 or w.id = $3)\norder by a.created_at desc") as (timestamp: Date, timestamp: Date, int4: number) => $runtime.TypedSql<getArrivals.Parameters, getArrivals.Result>
+export const getArrivals = $runtime.makeTypedQueryFactory("select\na.id as id,\na.arrival_number as arrival_number,\na.created_at as created_at,\nw.city_code as destination_code,\nw.street as destination_street,\no.\"name\" as vendor,\nt.\"name\" as transporter,\nu.\"name\"  as created_by,\n(select count(*)::int from \"Asset\" ast where ast.arrival_id = a.id) as asset_count\nfrom \"Arrival\" a\nleft join \"User\" u on u.id = a.created_by_id\njoin \"Warehouse\" w on w.id = a.destination_id\njoin \"Organization\" o on o.id = a.origin_id\njoin \"Organization\" t on t.id = a.transporter_id\nwhere a.created_at between $1 and $2\nand ($3 = 0 or w.id = $3)\norder by a.created_at desc") as (timestamp: Date, timestamp: Date, int4: number) => $runtime.TypedSql<getArrivals.Parameters, getArrivals.Result>
 
 export namespace getArrivals {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number]
   export type Result = {
+    id: number
     arrival_number: string
     created_at: Date
     destination_code: string
@@ -22,5 +23,6 @@ export namespace getArrivals {
     vendor: string
     transporter: string
     created_by: string
+    asset_count: number | null
   }
 }

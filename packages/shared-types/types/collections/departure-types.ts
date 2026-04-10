@@ -1,16 +1,15 @@
 import { z } from 'zod';
-import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
-import { WarehouseSchema } from './reference-data-types.js';
+import { AssetSummarySchema } from '../asset-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
+import { WarehouseSchema } from '../reference-data-types.js';
+import { CollectionSummarySchema } from './collection-types.js';
 
-export const DepartureSummarySchema = z.object({
+export const DepartureSummarySchema = CollectionSummarySchema.extend({
   departure_number: z.string(),
   origin_code: z.string(),
   origin_street: z.string(),
   destination: z.string(),
-  transporter: z.string(),
-  created_at: z.coerce.date(),
-  created_by: z.string()
+  transporter: z.string()
 })
 export type DepartureSummary = z.infer<typeof DepartureSummarySchema>;
 
