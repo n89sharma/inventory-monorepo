@@ -7,23 +7,6 @@ import { CurrencyDollarIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 import { type Error } from "shared-types"
 
-type ChildrenProps = {
-  children: React.ReactNode
-  className?: string
-}
-
-type SectionHeaderProps = {
-  title: string,
-  className?: string
-}
-
-type TitleProps = {
-  brand: string | undefined,
-  model: string | undefined,
-  barcode: string | undefined,
-  className?: string
-}
-
 type CMYKDataProps = {
   label: string,
   c_value: number | undefined | null,
@@ -90,58 +73,23 @@ type ValueProps = {
   className?: string
 }
 
-export function DetailsContainer({ children, className }: ChildrenProps): React.JSX.Element {
+export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col rounded-sm bg-card p-2 gap-8", className)}>
-      {children}
-    </div>
+    <dt className={cn("text-left text-muted-foreground min-w-28", className)}>
+      {label}
+    </dt>
   )
 }
 
-export function SectionRow({ children, className }: ChildrenProps): React.JSX.Element {
-  return (
-    <div className={cn("flex flex-row flex-wrap gap-8", className)}>
-      {children}
-    </div>
-  )
-}
+export function DataValue({ value, className }: ValueProps): React.JSX.Element {
+  const valuePresent =
+    (typeof value === 'string' && value.length > 0) ||
+    (value)
 
-export function Section({ children, className }: ChildrenProps): React.JSX.Element {
   return (
-    <section className={cn("w-64", className)}>
-      {children}
-    </section>
-  )
-}
-
-export function AssetTitle({ brand, model, barcode, className }: TitleProps): React.JSX.Element {
-  return (
-    <h1 className={cn("text-2xl font-semibold flex flex-col gap-1", className)}>
-      <span className="group flex items-center gap-2">
-        {barcode}
-        <CopyButton value={barcode} />
-      </span>
-      <span className="group flex items-center gap-2">
-        {`${brand} ${model}`}
-        <CopyButton value={model} />
-      </span>
-    </h1>
-  )
-}
-
-export function SectionHeader({ title, className }: SectionHeaderProps): React.JSX.Element {
-  return (
-    <h2 className={cn("text-xl font-semibold tracking-tight text-left", className)}>
-      {title}
-    </h2>
-  )
-}
-
-export function DataRowContainer({ children, className }: ChildrenProps): React.JSX.Element {
-  return (
-    <div className={cn("flex flex-col", className)}>
-      {children}
-    </div>
+    <dd className={cn("min-w-0 wrap-break-words", className)}>
+      {valuePresent ? value : '-'}
+    </dd>
   )
 }
 
@@ -184,7 +132,7 @@ export function DataLinkRow({ label, value, to, className }: DataLinkRowProps): 
     <DataRow label={label} className={className}>
       <dd className="group flex min-w-0 items-center gap-2">
         {value
-          ? <Link to={to} className="text-primary hover:underline break-words min-w-0">{value}</Link>
+          ? <Link to={to} className="text-primary hover:underline wrap-break-words min-w-0">{value}</Link>
           : '-'}
         {value && <CopyButton value={value} />}
       </dd>
@@ -235,6 +183,32 @@ export function CMYKRow({
   )
 }
 
+export function AccessoryRow({
+  label,
+  accessories,
+  className
+}: AccessoryDataProps): React.JSX.Element {
+  return (
+    <DataRow label={label} className={className}>
+      <div className="grid grid-cols-2">
+        {accessories.map(a => (
+          <Badge variant="outline" key={a}>{a}</Badge>
+        ))}
+      </div>
+    </DataRow>
+  )
+}
+
+export function InvoiceClearedRow({ isCleared, className }: InvoiceClearedRowProps): React.JSX.Element {
+  return (
+    <DataRow label="Cleared?" className={className}>
+      <dd className="flex min-w-0 items-center gap-1">
+        <Checkbox checked={isCleared} />
+      </dd>
+    </DataRow>
+  )
+}
+
 export function ErrorHeader({ className }: { className?: string }): React.JSX.Element {
   return (
     <div className={cn("flex border-b border-t-2 items-center py-0.5 text-sm", className)}>
@@ -257,53 +231,11 @@ export function ErrorRow({ error, className }: ErrorRowProps): React.JSX.Element
   )
 }
 
-export function InvoiceClearedRow({ isCleared, className }: InvoiceClearedRowProps): React.JSX.Element {
-  return (
-    <DataRow label="Cleared?" className={className}>
-      <dd className="flex min-w-0 items-center gap-1">
-        <Checkbox checked={isCleared} />
-      </dd>
-    </DataRow>
-  )
-}
-
-export function AccessoryRow({
-  label,
-  accessories,
-  className
-}: AccessoryDataProps): React.JSX.Element {
-  return (
-    <DataRow label={label} className={className}>
-      <div className="grid grid-cols-2">
-        {accessories.map(a => (
-          <Badge variant="outline" key={a}>{a}</Badge>
-        ))}
-      </div>
-    </DataRow>
-  )
-}
-
 export function PartsHeader({ className }: { className?: string }): React.JSX.Element {
   return (
     <div className={cn("flex items-center py-0.5 text-sm", className)}>
       <dt className={cn("text-muted-foreground min-w-28", className)}>Part</dt>
       <dd className={cn("text-muted-foreground", className)}>Source</dd>
     </div>
-  )
-}
-
-export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
-  return (
-    <dt className={cn("text-left text-muted-foreground min-w-28", className)}>
-      {label}
-    </dt>
-  )
-}
-
-export function DataValue({ value, className }: ValueProps): React.JSX.Element {
-  return (
-    <dd className={cn("min-w-0 break-words", className)}>
-      {value ?? '-'}
-    </dd>
   )
 }

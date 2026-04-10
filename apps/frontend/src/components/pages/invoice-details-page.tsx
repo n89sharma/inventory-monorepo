@@ -1,6 +1,6 @@
-import { OrgCard } from '@/components/custom/org-card'
+import { Organization } from '@/components/custom/cards/organization-card'
+import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { UserCard } from '@/components/custom/user-card'
 import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -45,7 +45,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       </div>
       <div className="flex gap-4">
         <UserCard title="Created By" user={invoice.created_by} />
-        <OrgCard title="Customer" org={invoice.customer} />
+        <Organization title="Customer" org={invoice.customer} />
       </div>
       <DataTable columns={columns} data={invoice.assets} />
     </div>

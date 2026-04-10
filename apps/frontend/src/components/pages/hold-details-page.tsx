@@ -1,6 +1,6 @@
-import { OrgCard } from '@/components/custom/org-card'
+import { Organization } from '@/components/custom/cards/organization-card'
+import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { UserCard } from '@/components/custom/user-card'
 import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -46,7 +46,7 @@ export function HoldDetailsPage(): React.JSX.Element {
       <div className="flex gap-4">
         <UserCard title="Created By" user={hold.created_by} />
         <UserCard title="Created For" user={hold.created_for} />
-        <OrgCard title="Customer" org={hold.customer} />
+        <Organization title="Customer" org={hold.customer} />
       </div>
       <DataTable columns={columns} data={hold.assets} />
     </div>

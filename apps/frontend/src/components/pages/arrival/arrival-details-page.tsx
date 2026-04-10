@@ -1,6 +1,6 @@
-import { OrgCard } from '@/components/custom/org-card'
+import { Organization } from '@/components/custom/cards/organization-card'
+import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { useArrivalStore } from '@/data/store/arrival-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -44,8 +44,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="arrivals" collectionId={arrivalNumber} />
       </div>
       <div className="flex gap-4">
-        <OrgCard title="Vendor" org={arrival.vendor} />
-        <OrgCard title="Transporter" org={arrival.transporter} />
+        <Organization title="Vendor" org={arrival.vendor} />
+        <Organization title="Transporter" org={arrival.transporter} />
         <WarehouseCard title="Warehouse" warehouse={arrival.warehouse} />
       </div>
       <DataTable columns={columns} data={arrival.assets} />

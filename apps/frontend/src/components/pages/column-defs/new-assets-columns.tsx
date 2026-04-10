@@ -1,5 +1,6 @@
 import { Badge } from "@/components/shadcn/badge"
 import { Button } from "@/components/shadcn/button"
+import { formatThousandsK } from "@/lib/formatters"
 import type { AssetForm } from "@/ui-types/arrival-form-types"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -25,11 +26,13 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
     },
     {
       accessorKey: "meterBlack",
-      header: "Meter Black"
+      header: "Meter Black",
+      cell: ({ row }) => formatThousandsK(row.getValue('meterBlack'))
     },
     {
       accessorKey: "meterColour",
-      header: "Meter Colour"
+      header: "Meter Colour",
+      cell: ({ row }) => formatThousandsK(row.getValue('meterColour'))
     },
     {
       accessorKey: "internalFinisher",

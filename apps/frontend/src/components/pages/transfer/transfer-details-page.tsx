@@ -1,6 +1,6 @@
-import { OrgCard } from '@/components/custom/org-card'
+import { Organization } from '@/components/custom/cards/organization-card'
+import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { WarehouseCard } from '@/components/custom/warehouse-card'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useTransferStore } from '@/data/store/transfer-store'
 import { useEffect, useMemo } from 'react'
@@ -45,8 +45,8 @@ export function TransferDetailsPage(): React.JSX.Element {
       </div>
       <div className="flex gap-4">
         <WarehouseCard title="Origin" warehouse={transfer.origin} />
+        <Organization title="Transporter" org={transfer.transporter} />
         <WarehouseCard title="Destination" warehouse={transfer.destination} />
-        <OrgCard title="Transporter" org={transfer.transporter} />
       </div>
       <DataTable columns={columns} data={transfer.assets} />
     </div>

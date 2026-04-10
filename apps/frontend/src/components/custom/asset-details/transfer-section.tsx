@@ -2,7 +2,8 @@ import { Button } from '@/components/shadcn/button'
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import type { AssetTransfer } from 'shared-types'
-import { DataDateRow, DataLinkRow, DataRowContainer, DataValueRow, Section, SectionHeader } from './asset-detail'
+import { DataRowContainer, Section, SectionHeader } from './detail-layout'
+import { DataDateRow, DataLinkRow, DataValueRow } from './detail-row'
 import { OptionalSection } from './optional-section'
 
 interface TransferSectionProps {

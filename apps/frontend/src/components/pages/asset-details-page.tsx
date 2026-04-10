@@ -1,4 +1,5 @@
-import { AccessoryRow, AssetTitle, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataRowContainer, DataValue, DataValueRow, DetailsContainer, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/asset-detail'
+import { AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
+import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader } from '@/components/custom/asset-details/detail-row'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
