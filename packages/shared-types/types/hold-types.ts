@@ -12,8 +12,7 @@ export const HoldSummarySchema = z.object({
   created_at: z.coerce.date(),
   from_dt: z.coerce.date().nullable(),
   to_dt: z.coerce.date().nullable()
-});
-
+})
 export type HoldSummary = z.infer<typeof HoldSummarySchema>;
 
 // GET /holds/:holdNumber
@@ -30,6 +29,15 @@ export const HoldDetailSchema = z.object({
 })
 export type HoldDetail = z.infer<typeof HoldDetailSchema>
 
+// POST /holds
+export const CreateHoldSchema = z.object({
+  created_for_id: z.number().int(),
+  customer_id: z.number().int(),
+  notes: z.string().nullable(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
+})
+export type CreateHold = z.infer<typeof CreateHoldSchema>
+
 // GET /holds/:holdNumber/edit + PUT /holds/:holdNumber
 export const UpdateHoldSchema = z.object({
   id: z.number().int(),
@@ -39,12 +47,3 @@ export const UpdateHoldSchema = z.object({
   assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
 })
 export type UpdateHold = z.infer<typeof UpdateHoldSchema>
-
-// POST /holds
-export const CreateHoldSchema = z.object({
-  created_for_id: z.number().int(),
-  customer_id: z.number().int(),
-  notes: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
-})
-export type CreateHold = z.infer<typeof CreateHoldSchema>

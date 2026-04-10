@@ -11,8 +11,7 @@ export const DepartureSummarySchema = z.object({
   transporter: z.string(),
   created_at: z.coerce.date(),
   created_by: z.string()
-});
-
+})
 export type DepartureSummary = z.infer<typeof DepartureSummarySchema>;
 
 // GET /departures/:departureNumber
