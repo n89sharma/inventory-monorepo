@@ -6,6 +6,7 @@ import { SelectOptionSchema, isSelected, type SelectOption } from './select-opti
 const UserSelectOptionSchema = SelectOptionSchema(UserSchema)
 
 export const HoldFormSchema = z.object({
+  id: z.number().optional(),
   created_for: UserSelectOptionSchema.refine(val => isSelected(val), 'Created For is required'),
   customer: OrgSummarySchema.nullable().refine(val => !!val, 'Customer is required'),
   notes: z.string(),
@@ -13,6 +14,7 @@ export const HoldFormSchema = z.object({
 })
 
 export type HoldForm = {
+  id?: number
   created_for: SelectOption<User>
   customer: OrgSummary | null
   notes: string

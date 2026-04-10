@@ -21,6 +21,7 @@ import type { AssetSummary } from 'shared-types'
 import { getDepartureFormAssetColumns } from '../column-defs/departure-form-asset-columns'
 
 interface HoldFormPageProps {
+  defaultValues?: HoldForm
   pageConfig: {
     pageHeading: string
     saveButtonText: string
@@ -36,11 +37,11 @@ function validateHoldAsset(asset: AssetSummary): string | null {
   return null
 }
 
-export function HoldFormPage({ pageConfig, breadcrumbs, onValidSubmit }: HoldFormPageProps): React.JSX.Element {
+export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: HoldFormPageProps): React.JSX.Element {
   const navigate = useNavigate()
   const form = useForm<HoldForm>({
     resolver: zodResolver(HoldFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       created_for: UNSELECTED,
       customer: null,
       notes: '',

@@ -1,4 +1,4 @@
-import { createHold, getHoldDetail, getHolds } from '@/data/api/hold-api'
+import { createHold, getHoldDetail, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ApiResponse, HoldDetail, HoldSummary, User } from 'shared-types'
@@ -15,6 +15,7 @@ interface HoldStore {
   holdDetail: HoldDetail | null
   detailLoading: boolean
   detailError: string | null
+  holdFormData: HoldForm | null
 
   setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -31,7 +32,9 @@ interface HoldStore {
     holdBy: SelectOption<User>,
     holdFor: SelectOption<User>) => Promise<void>
 
+  getHoldForUpdate: (holdNumber: string) => Promise<void>
   submitCreateHold: (data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
+  submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
   clearHolds: () => void
 }
 
@@ -46,6 +49,7 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   holdDetail: null,
   detailLoading: false,
   detailError: null,
+  holdFormData: null,
 
   setHolds: (holds) => set({ holds }),
   setLoading: (loading) => set({ loading }),
@@ -68,6 +72,14 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
       set({ detailError: res.error.summary, detailLoading: false })
     }
   },
+  getHoldForUpdate: async (holdNumber) => {
+    set({ holdFormData: null })
+    set({ holdFormData: await getHoldForUpdate(holdNumber) })
+  },
   submitCreateHold: (data) => createHold(data),
+  submitUpdateHold: (holdNumber, data) => {
+    set({ holdDetail: null })
+    return updateHold(holdNumber, data)
+  },
   clearHolds: () => set({ holds: [] })
 }))

@@ -1,6 +1,6 @@
 import { Button } from "@/components/shadcn/button"
 import type { HoldSummary } from 'shared-types'
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
@@ -56,5 +56,15 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
         </Button>
       )
     },
+  },
+  {
+    header: "Edit",
+    cell: ({ row }) => (
+      <Link to={`/holds/${row.original.hold_number}/edit`}>
+        <Button variant="outline" size="icon" asChild={false} className="cursor-pointer">
+          <PencilSimpleIcon />
+        </Button>
+      </Link>
+    )
   }
 ]

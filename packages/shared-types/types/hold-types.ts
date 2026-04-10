@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AssetSummarySchema } from './asset-types.js';
-import { OrgDetailSchema } from './organization-types.js';
+import { OrgDetailSchema, OrgSummarySchema } from './organization-types.js';
 import { UserSchema } from './user-types.js';
 
 export const HoldSummarySchema = z.object({
@@ -29,6 +29,16 @@ export const HoldDetailSchema = z.object({
   assets: z.array(AssetSummarySchema)
 })
 export type HoldDetail = z.infer<typeof HoldDetailSchema>
+
+// GET /holds/:holdNumber/edit + PUT /holds/:holdNumber
+export const UpdateHoldSchema = z.object({
+  id: z.number().int(),
+  created_for: UserSchema,
+  customer: OrgSummarySchema,
+  notes: z.string().nullable(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
+})
+export type UpdateHold = z.infer<typeof UpdateHoldSchema>
 
 // POST /holds
 export const CreateHoldSchema = z.object({
