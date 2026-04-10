@@ -113,8 +113,8 @@ export function QueryPage(): React.JSX.Element {
           Search
         </Button>
       </form>
-      <div hidden={!loading}>
-        <span>Loading...</span>
+      <div hidden={!loading} role="status" aria-live="polite">
+        <span>Loading…</span>
       </div>
       <DataTable columns={createAssetSummaryColumns('search')} data={assets} />
     </div>

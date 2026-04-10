@@ -119,7 +119,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                 <Field className='max-w-xl'>
                   <FieldLabel>Notes</FieldLabel>
                   <Textarea
-                    placeholder='Hold notes'
+                    placeholder='Hold notes…'
                     className='resize-none'
                     {...field}
                   />

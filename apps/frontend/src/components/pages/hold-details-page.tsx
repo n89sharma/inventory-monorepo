@@ -32,7 +32,7 @@ export function HoldDetailsPage(): React.JSX.Element {
     getHoldDetails(holdNumber)
   }, [holdNumber])
 
-  if (detailLoading) return <div>Loading...</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError}</div>
   if (!hold) return <div>Hold not found</div>
 

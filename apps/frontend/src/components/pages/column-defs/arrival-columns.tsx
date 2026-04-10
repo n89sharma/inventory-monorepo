@@ -62,7 +62,7 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon">
+      <Button asChild variant="outline" size="icon" aria-label="Edit arrival">
         <Link to={`/arrivals/${row.original.arrival_number}/edit`}>
           <PencilSimpleIcon />
         </Link>

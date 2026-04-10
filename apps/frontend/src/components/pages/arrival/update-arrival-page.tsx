@@ -31,7 +31,7 @@ export function UpdateArrivalPage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: `Edit Arrival ${arrivalNumber}`,
     saveButtonText: 'Save Changes',
-    submittingText: 'Saving...',
+    submittingText: 'Saving…',
     cancelNavUrl: `/arrivals/${arrivalNumber}`,
   }
 

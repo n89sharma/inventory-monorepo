@@ -62,7 +62,7 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon">
+      <Button asChild variant="outline" size="icon" aria-label="Edit invoice">
         <Link to={`/invoices/${row.original.invoice_number}/edit`}>
           <PencilSimpleIcon />
         </Link>

@@ -62,7 +62,7 @@ export const departureTableColumns: ColumnDef<DepartureSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon">
+      <Button asChild variant="outline" size="icon" aria-label="Edit departure">
         <Link to={`/departures/${row.original.departure_number}/edit`}>
           <PencilSimpleIcon />
         </Link>

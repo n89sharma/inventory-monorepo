@@ -32,7 +32,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
     getDepartureDetails(departureNumber)
   }, [departureNumber])
 
-  if (detailLoading) return <div>Loading...</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError}</div>
   if (!departure) return <div>Departure not found</div>
 

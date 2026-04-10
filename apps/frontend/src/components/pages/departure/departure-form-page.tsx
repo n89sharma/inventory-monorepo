@@ -129,7 +129,7 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
                 <Field className='max-w-xl'>
                   <FieldLabel>Comments</FieldLabel>
                   <Textarea
-                    placeholder='Departure notes'
+                    placeholder='Departure notes…'
                     className='resize-none'
                     {...field}
                   />

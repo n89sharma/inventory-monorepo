@@ -11,7 +11,7 @@ export function CreateDeparturePage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: 'Create Departure',
     saveButtonText: 'Create Departure',
-    submittingText: 'Creating...',
+    submittingText: 'Creating…',
     cancelNavUrl: '/departures',
   }
 

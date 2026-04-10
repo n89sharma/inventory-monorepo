@@ -55,6 +55,7 @@ export function InputWithClear({
         <InputGroupAddon align="inline-end">
           <InputGroupButton
             size="icon-sm"
+            aria-label="Clear"
             onClick={() => onValueChange(null)}
             hidden={!isValuePresent()}
           >

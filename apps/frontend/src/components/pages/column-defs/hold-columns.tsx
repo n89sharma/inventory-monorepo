@@ -58,7 +58,7 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon">
+      <Button asChild variant="outline" size="icon" aria-label="Edit hold">
         <Link to={`/holds/${row.original.hold_number}/edit`}>
           <PencilSimpleIcon />
         </Link>

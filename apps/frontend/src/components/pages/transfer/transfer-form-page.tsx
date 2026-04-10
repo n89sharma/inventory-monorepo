@@ -136,7 +136,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
                 <Field className='max-w-xl'>
                   <FieldLabel>Comments</FieldLabel>
                   <Textarea
-                    placeholder='Transfer notes'
+                    placeholder='Transfer notes…'
                     className='resize-none'
                     {...field}
                   />

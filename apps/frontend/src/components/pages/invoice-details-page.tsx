@@ -32,7 +32,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     getInvoiceDetails(invoiceNumber)
   }, [invoiceNumber])
 
-  if (detailLoading) return <div>Loading...</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError}</div>
   if (!invoice) return <div>Invoice not found</div>
 

@@ -62,6 +62,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
           variant="outline"
           size="icon"
           type="button"
+          aria-label="Edit asset"
           onClick={() => onEdit(row.index)}
         >
           <PencilSimpleIcon />
@@ -74,6 +75,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
         <Button
           variant="outline"
           type="button"
+          aria-label="Remove asset"
           onClick={() => onDelete(row.index)}
         >
           <TrashIcon />

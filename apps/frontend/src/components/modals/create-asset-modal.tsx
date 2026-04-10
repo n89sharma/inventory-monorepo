@@ -169,7 +169,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
                 render={({ field: { onChange, value } }) => (
                   <MultipleSelector
                     options={getCoreFunctionOptions(coreFunctions)}
-                    placeholder='Select functions'
+                    placeholder='Select functions…'
                     emptyIndicator={<p>No results found.</p>}
                     value={getCoreFunctionOptions(value)}
                     onChange={options => onChange(coreFunctions.filter(c => options.map(o => o.id).includes(c.id)))}

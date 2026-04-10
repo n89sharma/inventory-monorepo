@@ -27,7 +27,7 @@ export function UpdateHoldPage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: `Edit Hold ${holdNumber}`,
     saveButtonText: 'Save Changes',
-    submittingText: 'Saving...',
+    submittingText: 'Saving…',
     cancelNavUrl: `/holds/${holdNumber}`,
   }
 

@@ -62,7 +62,7 @@ export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
     header: "Edit",
     cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon">
+      <Button asChild variant="outline" size="icon" aria-label="Edit transfer">
         <Link to={`/transfers/${row.original.transfer_number}/edit`}>
           <PencilSimpleIcon />
         </Link>

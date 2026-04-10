@@ -50,6 +50,7 @@ export function getDepartureFormAssetColumns(onDelete: (index: number) => void):
           variant="ghost"
           size="icon"
           type="button"
+          aria-label="Remove asset"
           onClick={() => onDelete(row.index)}
         >
           <TrashIcon />

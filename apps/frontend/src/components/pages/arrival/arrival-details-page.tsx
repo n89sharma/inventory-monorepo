@@ -32,7 +32,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     getArrivalDetail(arrivalNumber)
   }, [arrivalNumber])
 
-  if (detailLoading) return <div>Loading...</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError}</div>
   if (!arrival) return <div>Arrival not found</div>
 

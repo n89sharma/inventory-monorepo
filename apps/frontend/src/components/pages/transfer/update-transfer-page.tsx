@@ -27,7 +27,7 @@ export function UpdateTransferPage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: `Edit Transfer ${transferNumber}`,
     saveButtonText: 'Save Changes',
-    submittingText: 'Saving...',
+    submittingText: 'Saving…',
     cancelNavUrl: `/transfers/${transferNumber}`,
   }
 

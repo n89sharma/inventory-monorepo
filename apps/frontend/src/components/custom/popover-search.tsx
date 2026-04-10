@@ -133,7 +133,7 @@ export function PopoverSearch<T>({
                 onChange={e => updateSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
                 ref={inputRef}
-                placeholder='Start typing to see suggestions...'
+                placeholder='Start typing to see suggestions…'
                 required={fieldRequired}
                 autoComplete="off"
                 role="combobox"

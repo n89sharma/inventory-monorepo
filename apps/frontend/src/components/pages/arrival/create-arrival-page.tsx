@@ -11,7 +11,7 @@ export function CreateArrivalPage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: 'Create Arrival',
     saveButtonText: 'Create Arrival',
-    submittingText: 'Creating...',
+    submittingText: 'Creating…',
     cancelNavUrl: '/arrivals',
   }
 

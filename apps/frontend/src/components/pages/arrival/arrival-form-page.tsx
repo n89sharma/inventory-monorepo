@@ -135,7 +135,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
                     Comments
                   </FieldLabel>
                   <Textarea
-                    placeholder='Arrival notes'
+                    placeholder='Arrival notes…'
                     className='resize-none'
                     {...field}
                   />

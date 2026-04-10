@@ -32,7 +32,7 @@ export function TransferDetailsPage(): React.JSX.Element {
     getTransferDetails(transferNumber)
   }, [transferNumber])
 
-  if (detailLoading) return <div>Loading...</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError}</div>
   if (!transfer) return <div>Transfer not found</div>
 

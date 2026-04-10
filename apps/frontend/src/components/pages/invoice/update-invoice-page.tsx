@@ -21,7 +21,7 @@ export function UpdateInvoicePage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: `Edit Invoice ${invoiceNumber}`,
     saveButtonText: 'Save Changes',
-    submittingText: 'Saving...',
+    submittingText: 'Saving…',
     cancelNavUrl: `/invoices/${invoiceNumber}`,
   }
 

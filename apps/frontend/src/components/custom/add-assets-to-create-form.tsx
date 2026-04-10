@@ -62,7 +62,7 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
         <FieldLabel>Barcode</FieldLabel>
         <Input
           ref={barcodeInputRef}
-          placeholder='Scan or enter barcode'
+          placeholder='Scan or enter barcode…'
           onKeyDown={onBarcodeKeyDown}
           onChange={() => setBarcodeError(null)}
         />
@@ -78,7 +78,7 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
         className='mb-0.5'
       >
         {isLookingUp
-          ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up...</>
+          ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up…</>
           : <><PlusIcon />Add Asset</>
         }
       </Button>
@@ -138,7 +138,7 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
           <FieldLabel>Hold Number</FieldLabel>
           <Input
             ref={holdInputRef}
-            placeholder='Enter hold number'
+            placeholder='Enter hold number…'
             onKeyDown={onHoldKeyDown}
             onChange={() => setHoldError(null)}
           />
@@ -154,7 +154,7 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
           className='mb-0.5'
         >
           {isLookingUpHold
-            ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up...</>
+            ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up…</>
             : <><PlusIcon />Add Assets from Hold</>
           }
         </Button>

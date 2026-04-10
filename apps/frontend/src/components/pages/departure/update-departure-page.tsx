@@ -27,7 +27,7 @@ export function UpdateDeparturePage(): React.JSX.Element {
   const pageConfig = {
     pageHeading: `Edit Departure ${departureNumber}`,
     saveButtonText: 'Save Changes',
-    submittingText: 'Saving...',
+    submittingText: 'Saving…',
     cancelNavUrl: `/departures/${departureNumber}`,
   }
 
