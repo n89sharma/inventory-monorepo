@@ -1,4 +1,4 @@
-import type { Status, User, Warehouse } from 'shared-types';
+import type { InvoiceType, Status, User, Warehouse } from 'shared-types';
 import { StatusSchema, WarehouseSchema } from 'shared-types';
 import { z } from 'zod';
 
@@ -17,7 +17,7 @@ export const SelectOptionSchema = <T extends z.ZodTypeAny>(selectedSchema: T) =>
 export const ANY_OPTION: SelectOption<never> = { state: 'ANY' }
 export const UNSELECTED: SelectOption<never> = { state: 'UNSELECTED' }
 
-export function getIdOrNullFromSelection(selection: SelectOption<Warehouse | User | Status>) {
+export function getIdOrNullFromSelection(selection: SelectOption<Warehouse | User | Status | InvoiceType>) {
   if (selection.state === 'SELECTED') {
     return selection.selected.id
   }

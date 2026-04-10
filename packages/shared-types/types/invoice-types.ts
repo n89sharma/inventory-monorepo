@@ -3,6 +3,15 @@ import { AssetSummarySchema } from './asset-types.js';
 import { OrgDetailSchema } from './organization-types.js';
 import { UserSchema } from './user-types.js';
 
+export const CreateInvoiceSchema = z.object({
+  invoice_number: z.string().min(1),
+  organization_id: z.number().int(),
+  invoice_type_id: z.number().int(),
+  is_cleared: z.boolean(),
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+})
+export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
+
 export const InvoiceSummarySchema = z.object({
   invoice_number: z.string(),
   organization: z.string(),

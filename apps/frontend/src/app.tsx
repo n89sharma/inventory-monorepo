@@ -12,6 +12,7 @@ import { DepartureSummaryPage } from './components/pages/departures-summary-page
 import { CreateHoldPage } from './components/pages/hold/create-hold-page'
 import { HoldDetailsPage } from './components/pages/hold-details-page'
 import { HoldSummaryPage } from './components/pages/holds-summary-page'
+import { CreateInvoicePage } from './components/pages/invoice/create-invoice-page'
 import { InvoiceDetailsPage } from './components/pages/invoice-details-page'
 import { InvoicesSummaryPage } from './components/pages/invoices-summary-page'
 import { QueryPage } from './components/pages/query'
@@ -50,6 +51,7 @@ function App() {
           <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
 
           <Route path="/invoices" element={<InvoicesSummaryPage />} />
+          <Route path="/invoices/new" element={<CreateInvoicePage />} />
           <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
 
           <Route path="/reports" element={<ArrivalsSummaryPage />} />

@@ -1,8 +1,20 @@
 import { Request, Response } from 'express'
-import { ApiResponse, InvoiceDetail, InvoiceSummary, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, response500, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
-import { getInvoice as getInvoiceSer } from '../services/invoiceService.js'
+import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer } from '../services/invoiceService.js'
+
+export async function createInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
+  try {
+    const data = CreateInvoiceSchema.parse(req.body)
+    const response = await createInvoiceSer(data)
+    if (response.success) return res.status(201).json(response)
+    if (response.error.status === 400) return res.status(400).json(response)
+    return res.status(500).json(response)
+  } catch (error) {
+    res.status(500).json(response500('Failed to create invoice'))
+  }
+}
 
 export async function getInvoices(req: Request, res: Response<ApiResponse<InvoiceSummary[]>>) {
   try {

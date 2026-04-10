@@ -1,6 +1,7 @@
-import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
+import { createInvoice, getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
+import type { InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { InvoiceDetail, InvoiceSummary } from 'shared-types'
+import type { ApiResponse, InvoiceDetail, InvoiceSummary } from 'shared-types'
 import { create } from 'zustand'
 
 interface InvoiceStore {
@@ -21,6 +22,7 @@ interface InvoiceStore {
   setInvoiceDetail: (invoiceDetail: InvoiceDetail) => void
   getInvoiceDetails: (invoiceNumber: string) => Promise<void>
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
+  submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
 
   clearInvoices: () => void
 }
@@ -55,5 +57,6 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
+  submitCreateInvoice: (data) => createInvoice(data),
   clearInvoices: () => set({ invoices: [] })
 }))

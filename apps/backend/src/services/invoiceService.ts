@@ -1,6 +1,35 @@
-import { ApiResponse, InvoiceDetail, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateInvoice, InvoiceDetail, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
+
+export async function createInvoice(data: CreateInvoice): Promise<ApiResponse<{ invoiceNumber: string }>> {
+  try {
+    const existing = await prisma.invoice.findFirst({
+      where: { organization_id: data.organization_id, invoice_number: data.invoice_number }
+    })
+    if (existing) {
+      return response400(`Invoice number ${data.invoice_number} already exists for this organization`)
+    }
+    const assetIds = data.assets.map(a => a.id)
+    const invoice = await prisma.invoice.create({
+      data: {
+        invoice_number: data.invoice_number,
+        organization_id: data.organization_id,
+        updated_by_id: 178,
+        is_cleared: data.is_cleared,
+        invoice_type_id: data.invoice_type_id,
+        created_at: new Date()
+      }
+    })
+    await prisma.asset.updateMany({
+      where: { id: { in: assetIds } },
+      data: { purchase_invoice_id: invoice.id }
+    })
+    return successResponse({ invoiceNumber: invoice.invoice_number })
+  } catch (error) {
+    return response500('Failed to create invoice')
+  }
+}
 
 export async function getInvoice(invoiceNumber: string): Promise<ApiResponse<InvoiceDetail>> {
   try {

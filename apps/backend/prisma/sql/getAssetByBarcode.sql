@@ -11,7 +11,8 @@ select
   tr.status as tracking_status,
   av.status as availability_status,
   te.status as technical_status,
-  a.is_held as is_held
+  a.is_held as is_held,
+  a.purchase_invoice_id as purchase_invoice_id
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
   join "Model" m on m.id = a.model_id
