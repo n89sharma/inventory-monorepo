@@ -8,46 +8,55 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
   return [
     {
       accessorKey: "barcode",
-      header: "Barcode"
+      header: "Barcode",
+      size: 160
     },
     {
       accessorKey: "brand",
-      header: "Brand"
+      header: "Brand",
+      size: 80
     },
     {
       accessorKey: "model",
-      header: "Model"
+      header: "Model",
+      size: 110
     },
     {
       accessorKey: "serial_number",
-      header: "Serial Number"
+      header: "Serial Number",
+      size: 100
     },
     {
       accessorKey: "meter_total",
       header: "Total Meter",
-      cell: ({ row }) => formatThousandsK(row.getValue('meter_total'))
+      cell: ({ row }) => formatThousandsK(row.getValue('meter_total')),
+      size: 60
     },
     {
       accessorKey: "availability_status",
-      header: "Availability Status"
+      header: "Availability Status",
+      size: 80
     },
     {
       accessorKey: "tracking_status",
-      header: "Tracking Status"
+      header: "Tracking Status",
+      size: 80
     },
     {
       accessorKey: "technical_status",
-      header: "Technical Status"
+      header: "Technical Status",
+      size: 80
     },
     {
       accessorKey: "warehouse_city_code",
-      header: "Warehouse"
+      header: "Warehouse",
+      size: 60
     },
     {
       id: "delete",
       cell: ({ row }) => (
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           type="button"
           aria-label="Remove asset"
@@ -55,7 +64,8 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
         >
           <TrashIcon />
         </Button>
-      )
+      ),
+      size: 50
     }
   ]
 }

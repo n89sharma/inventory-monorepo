@@ -1,76 +1,34 @@
 import { Button } from "@/components/shadcn/button"
-import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import { Link } from "react-router-dom"
 import type { ArrivalSummary } from 'shared-types'
+import { assetCountColumn, createdAtColumn, createdByColumn, makeEditColumn } from './shared-columns'
 
 export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   {
     accessorKey: "arrival_number",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Arrival Number
-          <ArrowsDownUpIcon />
-        </Button>
-      )
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Arrival Number
+        <ArrowsDownUpIcon />
+      </Button>
+    ),
     cell: ({ row }) => (
       <Link to={`/arrivals/${row.original.arrival_number}`} className="text-primary hover:underline font-medium">
         {row.getValue('arrival_number')}
       </Link>
-    )
+    ),
+    size: 140
   },
-  {
-    accessorKey: "created_at",
-    cell: ({ getValue }) => {
-      const date = getValue<Date>()
-      return date ? format(date, "PPP") : "-"
-    },
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date
-          <ArrowsDownUpIcon />
-        </Button>
-      )
-    },
-  },
-  {
-    accessorKey: "created_by",
-    header: "Created By"
-  },
-  {
-    accessorKey: "destination_code",
-    header: "Warehouse"
-  },
-  {
-    accessorKey: "transporter",
-    header: "Transporter"
-  },
-  {
-    accessorKey: "vendor",
-    header: "Vendor"
-  },
-  {
-    accessorKey: "asset_count",
-    header: "Assets"
-  },
-  {
-    header: "Edit",
-    cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon" aria-label="Edit arrival">
-        <Link to={`/arrivals/${row.original.arrival_number}/edit`}>
-          <PencilSimpleIcon />
-        </Link>
-      </Button>
-    )
-  }
+  createdAtColumn as ColumnDef<ArrivalSummary>,
+  createdByColumn as ColumnDef<ArrivalSummary>,
+  { accessorKey: "destination_code", header: "Warehouse", size: 80 },
+  { accessorKey: "transporter", header: "Transporter" },
+  { accessorKey: "vendor", header: "Vendor" },
+  assetCountColumn as ColumnDef<ArrivalSummary>,
+  makeEditColumn<ArrivalSummary>(row => `/arrivals/${row.arrival_number}/edit`),
 ]

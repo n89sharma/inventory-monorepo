@@ -26,7 +26,7 @@ export function createAssetSummaryColumns(
         )
       },
       cell: ({ row }) => (
-        <div className="group flex items-center gap-2">
+        <div className="group flex items-center justify-center gap-2">
           <Link
             to={
               isCollection(navigationSection)
@@ -39,42 +39,51 @@ export function createAssetSummaryColumns(
           </Link>
           <CopyButton value={row.original.barcode} />
         </div>
-      )
+      ),
+      size: 160
     },
     {
       accessorKey: "brand",
-      header: "Brand"
+      header: "Brand",
+      size: 80
     },
     {
       accessorKey: "model",
-      header: "Model"
+      header: "Model",
+      size: 120
     },
     {
       accessorKey: "serial_number",
-      header: "Serial Number"
+      header: "Serial Number",
+      size: 100
     },
     {
       accessorKey: "meter_total",
       cell: ({ row }) => {
         return formatThousandsK(row.getValue('meter_total'))
       },
-      header: "Total Meter"
+      header: "Total Meter",
+      size: 70
     },
     {
       accessorKey: "availability_status",
-      header: "Availability Status"
+      header: "Availability Status",
+      size: 80
     },
     {
       accessorKey: "tracking_status",
-      header: "Tracking Status"
+      header: "Tracking Status",
+      size: 80
     },
     {
       accessorKey: "technical_status",
-      header: "Technical Status"
+      header: "Technical Status",
+      size: 80
     },
     {
       accessorKey: "warehouse_city_code",
-      header: "Warehouse"
+      header: "Warehouse",
+      size: 80
     }
   ]
 }

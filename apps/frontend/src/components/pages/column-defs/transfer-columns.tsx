@@ -1,76 +1,34 @@
 import { Button } from "@/components/shadcn/button"
-import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import { Link } from "react-router-dom"
 import type { TransferSummary } from 'shared-types'
+import { assetCountColumn, createdAtColumn, createdByColumn, makeEditColumn } from './shared-columns'
 
 export const transferTableColumns: ColumnDef<TransferSummary>[] = [
   {
     accessorKey: "transfer_number",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Transfer Number
-          <ArrowsDownUpIcon />
-        </Button>
-      )
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Transfer Number
+        <ArrowsDownUpIcon />
+      </Button>
+    ),
     cell: ({ row }) => (
       <Link to={`/transfers/${row.original.transfer_number}`} className="text-primary hover:underline font-medium">
         {row.getValue('transfer_number')}
       </Link>
-    )
+    ),
+    size: 140
   },
-  {
-    accessorKey: "created_at",
-    cell: ({ getValue }) => {
-      const date = getValue<Date>()
-      return date ? format(date, "PPP") : "-"
-    },
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date
-          <ArrowsDownUpIcon />
-        </Button>
-      )
-    },
-  },
-  {
-    accessorKey: "origin_code",
-    header: "Origin"
-  },
-  {
-    accessorKey: "destination_code",
-    header: "Destination"
-  },
-  {
-    accessorKey: "transporter",
-    header: "Transporter"
-  },
-  {
-    accessorKey: "created_by",
-    header: "Created By"
-  },
-  {
-    accessorKey: "asset_count",
-    header: "Assets"
-  },
-  {
-    header: "Edit",
-    cell: ({ row }) => (
-      <Button asChild variant="outline" size="icon" aria-label="Edit transfer">
-        <Link to={`/transfers/${row.original.transfer_number}/edit`}>
-          <PencilSimpleIcon />
-        </Link>
-      </Button>
-    )
-  }
+  createdAtColumn as ColumnDef<TransferSummary>,
+  { accessorKey: "origin_code", header: "Origin", size: 90 },
+  { accessorKey: "destination_code", header: "Destination", size: 90 },
+  { accessorKey: "transporter", header: "Transporter" },
+  createdByColumn as ColumnDef<TransferSummary>,
+  assetCountColumn as ColumnDef<TransferSummary>,
+  makeEditColumn<TransferSummary>(row => `/transfers/${row.transfer_number}/edit`),
 ]

@@ -1,5 +1,6 @@
 export * from './types/api-response-types.js'
 export * from './types/asset-types.js'
+export * from './types/collections/collection-types.js'
 export * from './types/collections/arrival-types.js'
 export * from './types/collections/departure-types.js'
 export * from './types/collections/hold-types.js'

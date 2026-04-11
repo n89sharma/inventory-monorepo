@@ -14,37 +14,45 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
   return [
     {
       accessorKey: "model.brand_name",
-      header: "Brand"
+      header: "Brand",
+      size: 80
     },
     {
       accessorKey: "model.model_name",
-      header: "Model"
+      header: "Model",
+      size: 120
     },
     {
       accessorKey: "serialNumber",
-      header: "Serial Number"
+      header: "Serial Number",
+      size: 100
     },
     {
       accessorKey: "meterBlack",
       header: "Meter Black",
-      cell: ({ row }) => formatThousandsK(row.getValue('meterBlack'))
+      cell: ({ row }) => formatThousandsK(row.getValue('meterBlack')),
+      size: 70
     },
     {
       accessorKey: "meterColour",
       header: "Meter Colour",
-      cell: ({ row }) => formatThousandsK(row.getValue('meterColour'))
+      cell: ({ row }) => formatThousandsK(row.getValue('meterColour')),
+      size: 70
     },
     {
       accessorKey: "internalFinisher",
-      header: "Internal Finisher"
+      header: "Internal Finisher",
+      size: 70
     },
     {
       accessorKey: "cassettes",
-      header: "Cassettes"
+      header: "Cassettes",
+      size: 70
     },
     {
       accessorKey: "technicalStatus.selected.status",
-      header: "Technical Status"
+      header: "Technical Status",
+      size: 100
     },
     {
       accessorKey: "coreFunctions",
@@ -56,7 +64,8 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
             {functions.map(f => (<Badge key={f.accessory} variant="outline">{f.accessory}</Badge>))}
           </div>
         )
-      }
+      },
+      size: 140
     },
     {
       header: "Edit",
@@ -70,7 +79,8 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
         >
           <PencilSimpleIcon />
         </Button>
-      )
+      ),
+      size: 50
     },
     {
       header: "Remove",
@@ -83,7 +93,8 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
         >
           <TrashIcon />
         </Button>
-      )
+      ),
+      size: 50
     }
   ]
 }
