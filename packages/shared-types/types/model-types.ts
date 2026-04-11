@@ -11,3 +11,13 @@ export const ModelSummarySchema = z.object({
 });
 
 export type ModelSummary = z.infer<typeof ModelSummarySchema>;
+
+export const CreateModelSchema = z.object({
+  name: z.string().min(1),
+  weight: z.number().min(0),
+  size: z.number().min(0),
+  brand_id: z.number(),
+  asset_type_id: z.number()
+});
+
+export type CreateModel = z.infer<typeof CreateModelSchema>;

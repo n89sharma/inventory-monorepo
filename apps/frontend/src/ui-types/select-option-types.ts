@@ -1,5 +1,5 @@
 import type { InvoiceType, Status, User, Warehouse } from 'shared-types';
-import { StatusSchema, WarehouseSchema } from 'shared-types';
+import { AssetTypeSchema, StatusSchema, WarehouseSchema } from 'shared-types';
 import { z } from 'zod';
 
 export type SelectOption<T> =
@@ -44,3 +44,4 @@ export function getSelectOption<T>(v: T): SelectOption<T> {
 
 export const StatusSelectOptionSchema = SelectOptionSchema(StatusSchema)
 export const WarehouseSelectOptionSchema = SelectOptionSchema(WarehouseSchema)
+export const AssetTypeSelectOptionSchema = SelectOptionSchema(AssetTypeSchema)

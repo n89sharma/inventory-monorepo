@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import type { AssetType, CoreFunction, InvoiceType, ReferenceData, Role, Status, Warehouse } from 'shared-types'
+import type { AssetType, Brand, CoreFunction, InvoiceType, ReferenceData, Role, Status, Warehouse } from 'shared-types'
 
 interface ConstantsStore {
   coreFunctions: CoreFunction[]
   assetTypes: AssetType[]
+  brands: Brand[]
   trackingStatuses: Status[]
   availabilityStatuses: Status[]
   technicalStatuses: Status[]
@@ -21,6 +22,7 @@ interface ConstantsStore {
 export const useConstantsStore = create<ConstantsStore>((set) => ({
   coreFunctions: [],
   assetTypes: [],
+  brands: [],
   trackingStatuses: [],
   availabilityStatuses: [],
   technicalStatuses: [],
@@ -32,6 +34,7 @@ export const useConstantsStore = create<ConstantsStore>((set) => ({
   setConstants: (constants) => set({
     coreFunctions: constants.coreFunctions,
     assetTypes: constants.assetTypes,
+    brands: constants.brands,
     trackingStatuses: constants.trackingStatuses,
     availabilityStatuses: constants.availabilityStatuses,
     technicalStatuses: constants.technicalStatuses,
@@ -43,6 +46,7 @@ export const useConstantsStore = create<ConstantsStore>((set) => ({
   clearConstants: () => set({
     coreFunctions: [],
     assetTypes: [],
+    brands: [],
     trackingStatuses: [],
     availabilityStatuses: [],
     technicalStatuses: [],

@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarRail
 } from "@/components/shadcn/sidebar"
-import { ChartLineUpIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, MagnifyingGlassIcon, StackIcon, TruckTrailerIcon, UserIcon, WarehouseIcon } from "@phosphor-icons/react"
+import { ChartLineUpIcon, GearIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, MagnifyingGlassIcon, StackIcon, TruckTrailerIcon, UserIcon, WarehouseIcon } from "@phosphor-icons/react"
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useNavigationStore } from '@/data/store/navigation-store'
@@ -51,6 +51,11 @@ const sidebarItems = [
     title: "Reports",
     url: "/reports",
     icon: <ChartLineUpIcon aria-hidden="true" />
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: <GearIcon aria-hidden="true" />
   }
 
 ]

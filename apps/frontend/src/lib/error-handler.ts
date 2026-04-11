@@ -1,15 +1,19 @@
 import { isAxiosError, type AxiosError } from "axios"
-import type { ApiError, ApiResponse } from "shared-types"
+import type { ApiResponse } from "shared-types"
 
-export function apiErrorHandler<T>(error: Error | AxiosError<ApiError>): ApiResponse<T> {
+export function apiErrorHandler<T>(error: Error | AxiosError<ApiResponse<T>>): ApiResponse<T> {
 
   if (isAxiosError(error)) {
     //AxiosError
     if (error.response) {
       //status code > 2xx
+      const body = error.response.data
+      if (body && !body.success) {
+        return { success: false, error: body.error }
+      }
       return {
         success: false,
-        error: error.response.data
+        error: { type: 'API_ERROR', summary: 'Request failed' }
       }
     } else if (error.request) {
       //no response

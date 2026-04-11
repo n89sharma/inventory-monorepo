@@ -22,6 +22,7 @@ import { CreateTransferPage } from './components/pages/transfer/create-transfer-
 import { TransferDetailsPage } from './components/pages/transfer/transfer-details-page'
 import { TransferSummaryPage } from './components/pages/transfer/transfers-summary-page'
 import { UpdateTransferPage } from './components/pages/transfer/update-transfer-page'
+import { SettingsPage } from './components/pages/settings/settings-page'
 import { useGlobalData } from './hooks/use-global-data'
 
 function App() {
@@ -64,6 +65,8 @@ function App() {
 
           <Route path="/search" element={<QueryPage />} />
           <Route path="/search/:assetId" element={<AssetDetailsPage />} />
+
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>

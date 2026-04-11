@@ -6,6 +6,7 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
     const [
       accessories,
       assetTypes,
+      brands,
       trackingStatuses,
       availabilityStatuses,
       technicalStatuses,
@@ -15,6 +16,7 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
     ] = await Promise.all([
       prisma.accessory.findMany(),
       prisma.assetType.findMany(),
+      prisma.brand.findMany(),
       prisma.trackingStatus.findMany(),
       prisma.availabilityStatus.findMany(),
       prisma.technicalStatus.findMany(),
@@ -26,6 +28,7 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
     return successResponse({
       coreFunctions: accessories,
       assetTypes,
+      brands,
       trackingStatuses,
       availabilityStatuses,
       technicalStatuses,
