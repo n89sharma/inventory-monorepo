@@ -1,6 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 import morgan from 'morgan'
+import brandRoutes from './routes/brandRoutes.js'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
 import constantRoutes from './routes/referenceRoutes.js'
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/constants', constantRoutes);
+app.use('/brands', brandRoutes);
 app.use('/assets', assetRoutes);
 app.use('/arrivals', arrivalRoutes);
 app.use('/departures', departureRoutes);

@@ -14,6 +14,7 @@ interface ConstantsStore {
   loading: boolean
 
   setConstants: (constants: ReferenceData) => void
+  setBrands: (brands: Brand[]) => void
   setLoading: (loading: boolean) => void
 
   clearConstants: () => void
@@ -42,6 +43,7 @@ export const useConstantsStore = create<ConstantsStore>((set) => ({
     invoiceTypes: constants.invoiceTypes,
     warehouses: constants.warehouses,
   }),
+  setBrands: (brands) => set({ brands }),
   setLoading: (loading) => set({ loading }),
   clearConstants: () => set({
     coreFunctions: [],

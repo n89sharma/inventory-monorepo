@@ -45,6 +45,11 @@ export const ReferenceDataSchema = z.object({
   warehouses: z.array(WarehouseSchema)
 });
 
+export const CreateBrandSchema = z.object({
+  name: z.string().min(1)
+})
+
+export type CreateBrand = z.infer<typeof CreateBrandSchema>
 export type ReferenceData = z.infer<typeof ReferenceDataSchema>;
 export type CoreFunction = z.infer<typeof CoreFunctionsSchema>;
 export type AssetType = z.infer<typeof AssetTypeSchema>;
