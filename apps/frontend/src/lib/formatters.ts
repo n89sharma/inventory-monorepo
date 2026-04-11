@@ -17,7 +17,10 @@ export function formatUSD(value: number | null): string {
 }
 
 export function formatSentenceCase(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+  return str
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
 }
 
 export function formatDateWithTime(rawDate: Date): string {
