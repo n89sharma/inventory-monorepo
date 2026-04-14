@@ -1,18 +1,18 @@
-import { getReferenceData as getConstantsApi } from '@/data/api/reference-data-api'
+import { getReferenceData as getReferenceDataApi } from '@/data/api/reference-data-api'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useEffect, useState } from 'react'
 
-export function useConstantsData() {
+export function useReferenceData() {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
-  const setConstants = useReferenceDataStore((state) => state.setReferenceData)
+  const setReferenceData = useReferenceDataStore((state) => state.setReferenceData)
 
   useEffect(() => {
     const controller = new AbortController()
-    async function getConstants() {
+    async function getReferenceData() {
       try {
         setLoading(true)
-        setConstants(await getConstantsApi())
+        setReferenceData(await getReferenceDataApi())
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
           setError(err)
@@ -22,7 +22,7 @@ export function useConstantsData() {
       }
     }
 
-    getConstants()
+    getReferenceData()
     return () => controller.abort()
   }, [])
 

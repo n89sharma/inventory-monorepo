@@ -14,15 +14,15 @@ export function useGlobalData() {
 
   const setModels = useModelStore(state => state.setModels)
   const setOrganizations = useOrgStore(state => state.setOrganizations)
-  const setConstants = useReferenceDataStore(state => state.setReferenceData)
+  const setReferenceData = useReferenceDataStore(state => state.setReferenceData)
   const setUsers = useUserStore(state => state.setUsers)
 
   useEffect(() => {
     Promise.all([getModels(), getOrgs(), getReferenceData(), getUsers()])
-      .then(([models, orgs, constants, users]) => {
+      .then(([models, orgs, referenceData, users]) => {
         setModels(models)
         setOrganizations(orgs)
-        setConstants(constants)
+        setReferenceData(referenceData)
         setUsers(users)
         setIsReady(true)
       })

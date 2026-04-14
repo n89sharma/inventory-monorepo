@@ -1,15 +1,15 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, Part, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, Part, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import {
-  getAssetAccessories as getAssetAccessoriesSer,
-  getAssetComments as getAssetCommentsSer,
+  getAccessories as getAssetAccessoriesSer,
+  getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
-  getAssetErrors as getAssetErrorsSer,
+  getErrors as getAssetErrorsSer,
   getAssetParts as getAssetPartsSer,
-  getAssetTransfers as getAssetTransfersSer
+  getTransfers as getAssetTransfersSer
 } from '../services/assetService.js'
 
 export const AssetQuerySchema = z.object({
@@ -69,7 +69,7 @@ export async function getAssetAccessories(req: Request, res: Response<ApiRespons
   }
 }
 
-export async function getAssetErrors(req: Request, res: Response<ApiResponse<Error[]>>) {
+export async function getAssetErrors(req: Request, res: Response<ApiResponse<AssetError[]>>) {
   const { barcode } = req.params
   const response = await getAssetErrorsSer(barcode)
   if (response.success) {

@@ -1,12 +1,12 @@
 import { getAllAssetDetails } from '@/data/api/asset-api'
-import type { AssetDetails, AssetTransfer, Comment, Error, Part } from 'shared-types'
+import type { AssetDetails, AssetError, AssetTransfer, Comment, Part } from 'shared-types'
 import { create } from 'zustand'
 
 interface AssetStore {
   //entities
   assetDetails: AssetDetails | null
   accessories: string[]
-  errors: Error[]
+  errors: AssetError[]
   comments: Comment[]
   transfers: AssetTransfer[]
   parts: Part[]
@@ -16,7 +16,7 @@ interface AssetStore {
   //actions
   setAssetDetails: (assetDetails: AssetDetails) => void
   setAssetAccessories: (accessories: string[]) => void
-  setAssetErrors: (errors: Error[]) => void
+  setAssetErrors: (errors: AssetError[]) => void
   setAssetComments: (comments: Comment[]) => void
   setAssetTransfers: (transfers: AssetTransfer[]) => void
   setAssetParts: (parts: Part[]) => void

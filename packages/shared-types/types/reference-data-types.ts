@@ -32,7 +32,16 @@ export const WarehouseSchema = z.object({
   city_code: z.string(),
   street: z.string(),
   is_active: z.boolean()
-});
+})
+
+export const ErrorSchema = z.object({
+  id: z.number(),
+  brand_id: z.number(),
+  code: z.string(),
+  description: z.string().nullable(),
+  category: z.string()
+})
+
 export const ReferenceDataSchema = z.object({
   coreFunctions: z.array(CoreFunctionsSchema),
   assetTypes: z.array(AssetTypeSchema),
@@ -42,7 +51,8 @@ export const ReferenceDataSchema = z.object({
   technicalStatuses: z.array(StatusSchema),
   roles: z.array(RoleSchema),
   invoiceTypes: z.array(InvoiceTypeSchema),
-  warehouses: z.array(WarehouseSchema)
+  warehouses: z.array(WarehouseSchema),
+  errors: z.array(ErrorSchema)
 });
 
 export const CreateBrandSchema = z.object({
@@ -58,3 +68,4 @@ export type Status = z.infer<typeof StatusSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type InvoiceType = z.infer<typeof InvoiceTypeSchema>;
 export type Warehouse = z.infer<typeof WarehouseSchema>;
+export type Error = z.infer<typeof ErrorSchema>;

@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
   res.send('Inventory API');
 })
 
-app.use('/constants', constantRoutes);
+app.use('/reference', constantRoutes);
 app.use('/brands', brandRoutes);
 app.use('/assets', assetRoutes);
 app.use('/arrivals', arrivalRoutes);

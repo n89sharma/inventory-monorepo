@@ -12,7 +12,8 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
       technicalStatuses,
       roles,
       invoiceTypes,
-      warehouses
+      warehouses,
+      errors
     ] = await Promise.all([
       prisma.accessory.findMany(),
       prisma.assetType.findMany(),
@@ -22,7 +23,8 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
       prisma.technicalStatus.findMany(),
       prisma.role.findMany(),
       prisma.invoiceType.findMany(),
-      prisma.warehouse.findMany()
+      prisma.warehouse.findMany(),
+      prisma.error.findMany()
     ])
 
     return successResponse({
@@ -34,7 +36,8 @@ export async function getReferenceData(): Promise<ApiResponse<ReferenceData>> {
       technicalStatuses,
       roles,
       invoiceTypes,
-      warehouses
+      warehouses,
+      errors
     })
   } catch (error) {
     return response500('Failed to fetch reference data')

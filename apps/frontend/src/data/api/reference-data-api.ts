@@ -3,7 +3,7 @@ import type { ApiResponse } from 'shared-types'
 import { type ReferenceData, ReferenceDataSchema } from 'shared-types'
 
 export async function getReferenceData(): Promise<ReferenceData> {
-  const { data } = await api.get<ApiResponse<ReferenceData>>('/constants')
+  const { data } = await api.get<ApiResponse<ReferenceData>>('/reference')
   if (data.success) return ReferenceDataSchema.parse(data.data)
   throw new Error(data.error.summary)
 }

@@ -8,11 +8,13 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetErrors = $runtime.makeTypedQueryFactory("SELECT\ne.code as code,\ne.description as description,\ne.category as category,\nae.is_fixed as is_fixed,\nae.added_at as added_at,\nub.\"name\" as added_by,\nae.fixed_at as fixed_at,\nux.\"name\" as fixed_by\nfrom \"AssetError\" ae\njoin \"Asset\" a ON a.id = ae.asset_id\njoin \"Error\" e on e.id = ae.error_id\nleft join \"User\" ub on ub.id = ae.added_by\nleft join \"User\" ux on ux.id = ae.fixed_by\nwhere a.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetErrors.Parameters, getAssetErrors.Result>
+export const getAssetErrors = $runtime.makeTypedQueryFactory("SELECT\ne.id as id,\ne.brand_id as brand_id,\ne.code as code,\ne.description as description,\ne.category as category,\nae.is_fixed as is_fixed,\nae.added_at as added_at,\nub.\"name\" as added_by,\nae.fixed_at as fixed_at,\nux.\"name\" as fixed_by\nfrom \"AssetError\" ae\njoin \"Asset\" a ON a.id = ae.asset_id\njoin \"Error\" e on e.id = ae.error_id\nleft join \"User\" ub on ub.id = ae.added_by\nleft join \"User\" ux on ux.id = ae.fixed_by\nwhere a.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetErrors.Parameters, getAssetErrors.Result>
 
 export namespace getAssetErrors {
   export type Parameters = [text: string]
   export type Result = {
+    id: number
+    brand_id: number
     code: string
     description: string | null
     category: string

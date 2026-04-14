@@ -1,4 +1,6 @@
 SELECT
+    e.id as id,
+    e.brand_id as brand_id,
     e.code as code,
     e.description as description,
     e.category as category,

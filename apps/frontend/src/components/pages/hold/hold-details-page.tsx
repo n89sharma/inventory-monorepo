@@ -6,9 +6,9 @@ import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { CollectionEditBar } from '../custom/collection-edit-bar'
-import { DataTable } from '../shadcn/data-table'
-import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
+import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { DataTable } from '../../shadcn/data-table'
+import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
   const hold = useHoldStore(state => state.holdDetail)

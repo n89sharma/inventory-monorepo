@@ -5,7 +5,7 @@ import { formatDate, formatUSD } from "@/lib/formatters"
 import { cn } from "@/lib/utils"
 import { CurrencyDollarIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
-import { type Error } from "shared-types"
+import { type AssetError } from "shared-types"
 
 type CMYKDataProps = {
   label: string,
@@ -17,7 +17,7 @@ type CMYKDataProps = {
 }
 
 type ErrorRowProps = {
-  error: Error,
+  error: AssetError,
   className?: string
 }
 

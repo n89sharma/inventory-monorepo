@@ -6,11 +6,11 @@ import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
-import { SearchBar } from "../custom/search-bar"
-import { SelectOptions } from "../custom/select-options"
-import { Button } from "../shadcn/button"
-import { CollectionPage } from "./collection-page"
-import { departureTableColumns } from "./column-defs/departure-columns"
+import { SearchBar } from "../../custom/search-bar"
+import { SelectOptions } from "../../custom/select-options"
+import { Button } from "../../shadcn/button"
+import { CollectionPage } from "../collection-page"
+import { departureTableColumns } from "../column-defs/departure-columns"
 
 export function DepartureSummaryPage(): React.JSX.Element {
   const departures = useDepartureStore(state => state.departures)

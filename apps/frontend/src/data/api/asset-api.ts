@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
-import type { ApiResponse, AssetDetails, AssetSummary, AssetTransfer, Comment, Error, ModelSummary, Part, Status, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, ModelSummary, Part, Status, Warehouse } from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -16,8 +16,8 @@ export async function getAssetAccessories(params: { barcode: string }): Promise<
   throw new Error(data.error.summary)
 }
 
-export async function getAssetErrors(params: { barcode: string }): Promise<Error[]> {
-  const { data } = await api.get<ApiResponse<Error[]>>(`/assets/${params.barcode}/errors`)
+export async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
+  const { data } = await api.get<ApiResponse<AssetError[]>>(`/assets/${params.barcode}/errors`)
   if (data.success) return data.data
   throw new Error(data.error.summary)
 }

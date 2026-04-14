@@ -90,7 +90,9 @@ export type AssetDetails = {
   } | null
 }
 
-export type Error = {
+export type AssetError = {
+  id: number
+  brand_id: number
   code: string
   description: string | null
   category: string

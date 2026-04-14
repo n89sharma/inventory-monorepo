@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetTransfer, Comment, Error, Part, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, Part, response400, response500, successResponse } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -8,6 +8,8 @@ import {
   getAssetTransfers as getAssetTransfersQuery
 } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
+
+const DEFAULT_CREATED_BY_ID = 178
 
 export async function getAssetDetail(barcode: string): Promise<ApiResponse<AssetDetails>> {
   try {
@@ -21,7 +23,7 @@ export async function getAssetDetail(barcode: string): Promise<ApiResponse<Asset
   }
 }
 
-export async function getAssetAccessories(barcode: string): Promise<ApiResponse<string[]>> {
+export async function getAccessories(barcode: string): Promise<ApiResponse<string[]>> {
   try {
     const accessories = await prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
     return successResponse(accessories.map(a => a.accessory))
@@ -30,7 +32,7 @@ export async function getAssetAccessories(barcode: string): Promise<ApiResponse<
   }
 }
 
-export async function getAssetErrors(barcode: string): Promise<ApiResponse<Error[]>> {
+export async function getErrors(barcode: string): Promise<ApiResponse<AssetError[]>> {
   try {
     const errors = await prisma.$queryRawTyped(getAssetErrorsQuery(barcode))
     return successResponse(errors)
@@ -55,7 +57,7 @@ export function getInitials(name: string): string {
     .toUpperCase()
 }
 
-export async function getAssetComments(barcode: string): Promise<ApiResponse<Comment[]>> {
+export async function getComments(barcode: string): Promise<ApiResponse<Comment[]>> {
   try {
     const comments = await prisma.$queryRawTyped(getAssetCommentsQuery(barcode))
     const commentsWithInitials = comments.map(c => ({ ...c, initials: getInitials(c.username) }))
@@ -90,7 +92,7 @@ export async function getAssetParts(barcode: string): Promise<ApiResponse<Part[]
   }
 }
 
-export async function getAssetTransfers(barcode: string): Promise<ApiResponse<AssetTransfer[]>> {
+export async function getTransfers(barcode: string): Promise<ApiResponse<AssetTransfer[]>> {
   try {
     const transfers = await prisma.$queryRawTyped(getAssetTransfersQuery(barcode))
     return successResponse(transfers)

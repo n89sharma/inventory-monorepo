@@ -162,7 +162,7 @@ Path alias `@/` maps to `src/`.
 - Asset field errors are shown inline using a `<Controller name='assets'>` that renders `<FieldError>` when `fieldState.invalid`
 
 **Hooks:**
-- `useGlobalData` — fetches users, organizations, models, and all reference data once at app start; called in `App.tsx`; results available anywhere via `useUserStore` (users), `useOrgStore` (orgs), `useModelStore` (models), `useConstantsStore` (warehouses, invoice types, asset types, statuses, roles) — no need to fetch these in a form or page
+- `useGlobalData` — fetches users, organizations, models, and all reference data once at app start; called in `App.tsx`; results available anywhere via `useUserStore` (users), `useOrgStore` (orgs), `useModelStore` (models), `useReferenceDataStore` (warehouses, invoice types, asset types, statuses, roles) — no need to fetch these in a form or page
 - `useAutoSearch` — triggers a search on page load if the entity has not been searched yet in the current session; used on every summary/list page to pre-populate results on first visit
 - `useLocalStorage` — persists a value to `localStorage` with a versioned key; used for lightweight client-side preferences
 
