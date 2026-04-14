@@ -74,7 +74,11 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     }
   },
 
-  submitCreateArrival: (data: ArrivalForm) => createArrival(data),
+  submitCreateArrival: async (data: ArrivalForm) => {
+    const response = await createArrival(data)
+    get().getArrivals(get().fromDate, get().toDate, get().destination)
+    return response
+  },
   submitUpdateArrival: (arrivalNumber, data) => {
     set({ arrivalDetail: null })
     return updateArrival(arrivalNumber, data)

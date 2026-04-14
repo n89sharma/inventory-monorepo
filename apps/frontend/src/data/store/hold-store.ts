@@ -76,7 +76,11 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     set({ holdFormData: null })
     set({ holdFormData: await getHoldForUpdate(holdNumber) })
   },
-  submitCreateHold: (data) => createHold(data),
+  submitCreateHold: async (data) => {
+    const response = await createHold(data)
+    get().getHolds(get().fromDate, get().toDate, get().holdBy, get().holdFor)
+    return response
+  },
   submitUpdateHold: (holdNumber, data) => {
     set({ holdDetail: null })
     return updateHold(holdNumber, data)

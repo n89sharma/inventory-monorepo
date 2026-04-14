@@ -61,7 +61,11 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
-  submitCreateInvoice: (data) => createInvoice(data),
+  submitCreateInvoice: async (data) => {
+    const response = await createInvoice(data)
+    get().getInvoices(get().fromDate, get().toDate)
+    return response
+  },
   getInvoiceForUpdate: async (invoiceNumber) => {
     set({ invoiceEditFormData: null })
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
