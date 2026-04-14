@@ -78,7 +78,7 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   },
   submitCreateHold: async (data) => {
     const response = await createHold(data)
-    get().getHolds(get().fromDate, get().toDate, get().holdBy, get().holdFor)
+    set({ hasSearched: false })
     return response
   },
   submitUpdateHold: (holdNumber, data) => {

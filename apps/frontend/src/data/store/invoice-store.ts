@@ -63,7 +63,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   },
   submitCreateInvoice: async (data) => {
     const response = await createInvoice(data)
-    get().getInvoices(get().fromDate, get().toDate)
+    set({ hasSearched: false })
     return response
   },
   getInvoiceForUpdate: async (invoiceNumber) => {

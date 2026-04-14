@@ -76,7 +76,7 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
 
   submitCreateTransfer: async (data) => {
     const response = await createTransfer(data)
-    get().getTransfers(get().fromDate, get().toDate, get().origin, get().destination)
+    set({ hasSearched: false })
     return response
   },
   submitUpdateTransfer: (transferNumber, data) => {

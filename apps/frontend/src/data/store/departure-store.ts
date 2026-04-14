@@ -77,7 +77,7 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
 
   submitCreateDeparture: async (data) => {
     const response = await createDeparture(data)
-    get().getDepartures(get().fromDate, get().toDate, get().origin)
+    set({ hasSearched: false })
     return response
   },
   submitUpdateDeparture: (departureNumber, data) => {
