@@ -1,10 +1,10 @@
 import { format } from 'date-fns'
 import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
-import { getNextSequence } from '../lib/db-utils.js'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
+import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -13,6 +13,8 @@ const sequenceAssetEntity = 'ASSET'
 const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
+
+const DEFAULT_CREATED_BY_ID = 178
 
 const assetIncludeArgs = {
   include: {
@@ -57,7 +59,7 @@ export async function getArrival(arrivalNumber: string): Promise<ApiResponse<Arr
       warehouse: arrival.destination,
       comment: arrival.notes,
       created_at: arrival.created_at,
-      created_by: arrival.created_by?.email,
+      created_by: arrival.created_by.email,
       assets
     })
   } catch (error) {
@@ -118,6 +120,7 @@ export async function createArrival(newArrival: CreateArrival) {
       transporter: { connect: { id: newArrival.transporter.id } },
       notes: newArrival.comment,
       created_at: currentDateTime,
+      created_by: { connect: { id: DEFAULT_CREATED_BY_ID } },
       assets: {
         create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(
           a,

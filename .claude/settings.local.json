@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "Bash(find E:/00-home/development/inventory-monorepo/apps/backend/generated/prisma/sql -name *.ts)"
+      "Bash(find E:/00-home/development/inventory-monorepo/apps/backend/generated/prisma/sql -name *.ts)",
+      "WebSearch"
     ]
   },
   "outputStyle": "default"

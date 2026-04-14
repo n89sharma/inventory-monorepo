@@ -12,7 +12,7 @@ export const ArrivalSummarySchema = CollectionSummarySchema.extend({
   transporter: z.string(),
   destination_code: z.string(),
   destination_street: z.string(),
-  created_by: z.string().nullable()
+  created_by: z.string()
 })
 export type ArrivalSummary = z.infer<typeof ArrivalSummarySchema>
 
@@ -24,7 +24,7 @@ export const ArrivalDetailSchema = z.object({
   warehouse: WarehouseSchema.nullable(),
   comment: z.string().nullable(),
   created_at: z.coerce.date(),
-  created_by: z.string().optional(),
+  created_by: z.string(),
   assets: z.array(AssetSummarySchema)
 })
 export type ArrivalDetail = z.infer<typeof ArrivalDetailSchema>
