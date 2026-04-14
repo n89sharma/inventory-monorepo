@@ -1,7 +1,8 @@
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useOrgStore } from '@/data/store/org-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
+import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon, PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -17,7 +18,6 @@ import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
 import { getNewAssetTableColumns } from '../column-defs/form-new-asset-columns'
-import { UNSELECTED } from '@/ui-types/select-option-types'
 
 interface ArrivalFormPageProps {
   defaultValues?: ArrivalForm
@@ -37,7 +37,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
     resolver: zodResolver(ArrivalFormSchema),
     defaultValues: defaultValues ?? getDefaultArrival()
   })
-  const warehouses = useConstantsStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset, update: updateAsset } = useFieldArray({ control: form.control, name: 'assets' })

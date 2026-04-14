@@ -1,5 +1,5 @@
 import { createBrand, getBrands } from '@/data/api/brand-api'
-import { useConstantsStore } from '@/data/store/constants-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { BrandFormSchema, type BrandForm } from '@/ui-types/brand-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,7 +17,7 @@ interface CreateBrandModalProps {
 }
 
 export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps): React.JSX.Element {
-  const setBrands = useConstantsStore(state => state.setBrands)
+  const setBrands = useReferenceDataStore(state => state.setBrands)
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(BrandFormSchema),

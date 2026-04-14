@@ -1,6 +1,6 @@
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useDepartureStore } from '@/data/store/departure-store'
 import { useOrgStore } from '@/data/store/org-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -16,7 +16,7 @@ export function UpdateDeparturePage(): React.JSX.Element {
   const submitUpdateDeparture = useDepartureStore(state => state.submitUpdateDeparture)
 
   const orgs = useOrgStore(state => state.organizations)
-  const warehouses = useConstantsStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
 
   useEffect(() => {
     if (!departureNumber) return

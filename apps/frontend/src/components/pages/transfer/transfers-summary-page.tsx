@@ -1,5 +1,5 @@
 import { Button } from "@/components/shadcn/button"
-import { useConstantsStore } from "@/data/store/constants-store"
+import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useTransferStore } from "@/data/store/transfer-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
@@ -24,7 +24,7 @@ export function TransferSummaryPage(): React.JSX.Element {
   const setOrigin = useTransferStore(state => state.setOrigin)
   const setDestination = useTransferStore(state => state.setDestination)
   const hasSearched = useTransferStore(state => state.hasSearched)
-  const warehouses = useConstantsStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
   async function onTransferSearch({ fromDate, toDate, origin, destination }: SearchOptions) {

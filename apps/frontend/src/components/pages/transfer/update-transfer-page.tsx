@@ -1,5 +1,5 @@
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useOrgStore } from '@/data/store/org-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useTransferStore } from '@/data/store/transfer-store'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useEffect } from 'react'
@@ -16,7 +16,7 @@ export function UpdateTransferPage(): React.JSX.Element {
   const submitUpdateTransfer = useTransferStore(state => state.submitUpdateTransfer)
 
   const orgs = useOrgStore(state => state.organizations)
-  const warehouses = useConstantsStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
 
   useEffect(() => {
     if (!transferNumber) return

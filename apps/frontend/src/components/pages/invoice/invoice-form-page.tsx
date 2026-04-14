@@ -7,17 +7,17 @@ import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useOrgStore } from '@/data/store/org-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceFormSchema, type InvoiceForm } from '@/ui-types/invoice-form-types'
-import type { AssetSummary } from 'shared-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
@@ -50,7 +50,7 @@ export function InvoiceFormPage({ pageConfig, breadcrumbs, onValidSubmit }: Invo
     }
   })
   const orgs = useOrgStore(state => state.organizations)
-  const invoiceTypes = useConstantsStore(state => state.invoiceTypes)
+  const invoiceTypes = useReferenceDataStore(state => state.invoiceTypes)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting } = form.formState
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])

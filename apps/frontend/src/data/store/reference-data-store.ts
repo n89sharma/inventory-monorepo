@@ -1,7 +1,7 @@
-import { create } from 'zustand'
 import type { AssetType, Brand, CoreFunction, InvoiceType, ReferenceData, Role, Status, Warehouse } from 'shared-types'
+import { create } from 'zustand'
 
-interface ConstantsStore {
+interface ReferenceDataStore {
   coreFunctions: CoreFunction[]
   assetTypes: AssetType[]
   brands: Brand[]
@@ -13,14 +13,14 @@ interface ConstantsStore {
   warehouses: Warehouse[]
   loading: boolean
 
-  setConstants: (constants: ReferenceData) => void
+  setReferenceData: (refData: ReferenceData) => void
   setBrands: (brands: Brand[]) => void
   setLoading: (loading: boolean) => void
 
-  clearConstants: () => void
+  clearReferenceData: () => void
 }
 
-export const useConstantsStore = create<ConstantsStore>((set) => ({
+export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   coreFunctions: [],
   assetTypes: [],
   brands: [],
@@ -32,20 +32,20 @@ export const useConstantsStore = create<ConstantsStore>((set) => ({
   warehouses: [],
   loading: false,
 
-  setConstants: (constants) => set({
-    coreFunctions: constants.coreFunctions,
-    assetTypes: constants.assetTypes,
-    brands: constants.brands,
-    trackingStatuses: constants.trackingStatuses,
-    availabilityStatuses: constants.availabilityStatuses,
-    technicalStatuses: constants.technicalStatuses,
-    roles: constants.roles,
-    invoiceTypes: constants.invoiceTypes,
-    warehouses: constants.warehouses,
+  setReferenceData: (referenceData) => set({
+    coreFunctions: referenceData.coreFunctions,
+    assetTypes: referenceData.assetTypes,
+    brands: referenceData.brands,
+    trackingStatuses: referenceData.trackingStatuses,
+    availabilityStatuses: referenceData.availabilityStatuses,
+    technicalStatuses: referenceData.technicalStatuses,
+    roles: referenceData.roles,
+    invoiceTypes: referenceData.invoiceTypes,
+    warehouses: referenceData.warehouses,
   }),
   setBrands: (brands) => set({ brands }),
   setLoading: (loading) => set({ loading }),
-  clearConstants: () => set({
+  clearReferenceData: () => set({
     coreFunctions: [],
     assetTypes: [],
     brands: [],

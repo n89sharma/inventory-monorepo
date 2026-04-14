@@ -1,6 +1,6 @@
 import { createModel, getModels } from '@/data/api/model-api'
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useModelStore } from '@/data/store/model-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ModelFormSchema, type ModelForm } from '@/ui-types/model-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
@@ -22,8 +22,8 @@ interface CreateModelModalProps {
 }
 
 export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps): React.JSX.Element {
-  const brands = useConstantsStore(state => state.brands)
-  const assetTypes = useConstantsStore(state => state.assetTypes)
+  const brands = useReferenceDataStore(state => state.brands)
+  const assetTypes = useReferenceDataStore(state => state.assetTypes)
   const setModels = useModelStore(state => state.setModels)
 
   const form = useForm<ModelForm>({

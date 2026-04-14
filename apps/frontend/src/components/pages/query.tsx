@@ -1,22 +1,22 @@
-import { useState } from 'react'
 import { Button } from "@/components/shadcn/button"
 import { getAssetsForQuery } from "@/data/api/asset-api"
-import { DataTable } from "../shadcn/data-table"
-import { useConstantsStore } from '@/data/store/constants-store'
+import { useModelStore } from '@/data/store/model-store'
+import { useQueryStore } from '@/data/store/query-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useState } from 'react'
 import { InputWithClear } from '../custom/input-with-clear'
 import { PopoverSearch } from '../custom/popover-search'
-import { useModelStore } from '@/data/store/model-store'
-import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 import { SelectOptions } from '../custom/select-options'
-import { useQueryStore } from '@/data/store/query-store'
+import { DataTable } from "../shadcn/data-table"
+import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 export function QueryPage(): React.JSX.Element {
   const [loading, setLoading] = useState(false)
 
   const models = useModelStore((state) => state.models)
-  const availabilityStatuses = useConstantsStore((state) => state.availabilityStatuses)
-  const technicalStatuses = useConstantsStore((state) => state.technicalStatuses)
-  const warehouses = useConstantsStore((state) => state.warehouses)
+  const availabilityStatuses = useReferenceDataStore((state) => state.availabilityStatuses)
+  const technicalStatuses = useReferenceDataStore((state) => state.technicalStatuses)
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
   const activeWarehouses = warehouses.filter(w => w.is_active)
 
   const assets = useQueryStore(state => state.assets)

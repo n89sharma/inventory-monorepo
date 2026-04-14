@@ -1,5 +1,5 @@
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useModelStore } from '@/data/store/model-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,8 +36,8 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
     resolver: zodResolver(AssetFormSchema),
     defaultValues: getDefaultNewAsset()
   })
-  const technicalStatuses = useConstantsStore(state => state.technicalStatuses)
-  const coreFunctions = useConstantsStore(state => state.coreFunctions)
+  const technicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
+  const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const models = useModelStore(state => state.models)
 
   useEffect(() => {

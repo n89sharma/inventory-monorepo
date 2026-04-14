@@ -1,5 +1,5 @@
 import { useArrivalStore } from "@/data/store/arrival-store"
-import { useConstantsStore } from "@/data/store/constants-store"
+import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
@@ -22,7 +22,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
   const destination = useArrivalStore(state => state.destination)
   const setDestination = useArrivalStore(state => state.setDestination)
   const hasSearched = useArrivalStore(state => state.hasSearched)
-  const warehouses = useConstantsStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
   async function onArrivalSearch({ fromDate, toDate, destination }: SearchOptions) {

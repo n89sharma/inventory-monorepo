@@ -1,7 +1,7 @@
 import { useArrivalStore } from '@/data/store/arrival-store'
-import { useConstantsStore } from '@/data/store/constants-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -17,9 +17,9 @@ export function UpdateArrivalPage(): React.JSX.Element {
   const submitUpdateArrival = useArrivalStore(state => state.submitUpdateArrival)
 
   const orgs = useOrgStore(state => state.organizations)
-  const warehouses = useConstantsStore(state => state.warehouses)
-  const technicalStatuses = useConstantsStore(state => state.technicalStatuses)
-  const coreFunctions = useConstantsStore(state => state.coreFunctions)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
+  const technicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
+  const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const models = useModelStore(state => state.models)
 
   useEffect(() => {
