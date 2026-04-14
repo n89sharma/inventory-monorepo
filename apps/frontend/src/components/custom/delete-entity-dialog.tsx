@@ -3,26 +3,28 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
   AlertDialogTitle
 } from "@/components/shadcn/alert-dialog"
 import { TrashIcon } from "@phosphor-icons/react"
+import type { ReactNode } from "react"
 
-type AlertDialogDestructiveProps = {
-  section: string,
-  collectionId: string,
+type DeleteEntityDialogProps = {
+  entity: string,
+  entityId: string,
+  children?: ReactNode,
   open?: boolean,
   onOpenChange?: (open: boolean) => void
 }
 
-export function AlertDialogDestructive({
-  section,
-  collectionId,
+export function DeleteEntityDialog({
+  entity,
+  entityId,
+  children,
   open,
-  onOpenChange }: AlertDialogDestructiveProps) {
+  onOpenChange }: DeleteEntityDialogProps) {
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -31,11 +33,9 @@ export function AlertDialogDestructive({
           <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
             <TrashIcon />
           </AlertDialogMedia>
-          <AlertDialogTitle>Delete {`${section} ${collectionId}`}?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This does not delete the underlying assets present in the collection.
-          </AlertDialogDescription>
+          <AlertDialogTitle>Delete {`${entity} ${entityId}`}?</AlertDialogTitle>
         </AlertDialogHeader>
+        {children}
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
           <AlertDialogAction variant="destructive">Delete</AlertDialogAction>

@@ -1,9 +1,10 @@
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { AlertDialogDescription } from "../shadcn/alert-dialog";
 import { Button } from "../shadcn/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu";
-import { AlertDialogDestructive } from "./delete-collection-dialog";
+import { DeleteEntityDialog } from "./delete-entity-dialog";
 import { ShareButton } from "./share-button";
 
 type CollectionEditBarProps = {
@@ -34,12 +35,16 @@ export function CollectionEditBar({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialogDestructive
+      <DeleteEntityDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        section={section}
-        collectionId={collectionId}
-      />
+        entity={section}
+        entityId={collectionId}
+      >
+        <AlertDialogDescription>
+          This does not delete the underlying assets present in the collection.
+        </AlertDialogDescription>
+      </DeleteEntityDialog>
     </div>
   )
 

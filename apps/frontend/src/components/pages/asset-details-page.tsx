@@ -1,8 +1,8 @@
 import { AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
 import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader } from '@/components/custom/asset-details/detail-row'
-import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
+import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
@@ -51,7 +51,7 @@ export const AssetDetailsPage = () => {
       <DetailsContainer>
         <div className="flex items-start justify-between">
           <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode} />
-          <AssetEditBar />
+          <AssetEditBar barcode={assetDetails.barcode} />
         </div>
         <SectionRow>
           <Section>
