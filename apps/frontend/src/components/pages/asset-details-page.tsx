@@ -51,7 +51,7 @@ export const AssetDetailsPage = () => {
       <DetailsContainer>
         <div className="flex items-start justify-between">
           <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode} />
-          <AssetEditBar barcode={assetDetails.barcode} />
+          <AssetEditBar />
         </div>
         <SectionRow>
           <Section>

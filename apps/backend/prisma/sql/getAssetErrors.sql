@@ -1,5 +1,5 @@
 SELECT
-    e.id as id,
+    e.id as error_id,
     e.brand_id as brand_id,
     e.code as code,
     e.description as description,

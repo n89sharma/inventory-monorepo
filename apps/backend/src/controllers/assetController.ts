@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, Part, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, Part, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -9,7 +9,8 @@ import {
   getAssetDetail as getAssetDetailSer,
   getErrors as getAssetErrorsSer,
   getAssetParts as getAssetPartsSer,
-  getTransfers as getAssetTransfersSer
+  getTransfers as getAssetTransfersSer,
+  updateAssetErrors as updateAssetErrorsSer
 } from '../services/assetService.js'
 
 export const AssetQuerySchema = z.object({
@@ -119,5 +120,17 @@ export async function getAssetSummaryByBarcode(req: Request, res: Response<ApiRe
     return res.json(successResponse(results[0]))
   } catch (error) {
     return res.status(500).json(response500('Failed to fetch asset'))
+  }
+}
+
+export async function updateAssetErrors(req: Request, res: Response<ApiResponse<void>>) {
+  const { barcode } = req.params
+  const validated = UpdateAssetErrorsSchema.parse(req.body)
+  const response = await updateAssetErrorsSer(barcode, validated)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    const status = response.error.type === 'API_ERROR' ? 404 : 500
+    return res.status(status).json(response)
   }
 }

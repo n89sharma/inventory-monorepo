@@ -48,6 +48,7 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   }),
   setBrands: (brands) => set({ brands }),
   setLoading: (loading) => set({ loading }),
+
   clearReferenceData: () => set({
     coreFunctions: [],
     assetTypes: [],

@@ -91,7 +91,7 @@ export type AssetDetails = {
 }
 
 export type AssetError = {
-  id: number
+  error_id: number
   brand_id: number
   code: string
   description: string | null
@@ -131,4 +131,16 @@ export type Part = {
   type: string
   partName: string
 }
+
+export const UpdateErrorSchema = z.object({
+  code: z.string(),
+  is_fixed: z.boolean()
+})
+
+export const UpdateAssetErrorsSchema = z.object({
+  errors: z.array(UpdateErrorSchema)
+})
+
+export type UpdateError = z.infer<typeof UpdateErrorSchema>
+export type UpdateAssetErrors = z.infer<typeof UpdateAssetErrorsSchema>
 

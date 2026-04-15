@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, Part, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, Part, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -190,5 +190,74 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
   return {
     invoice_number: r.purchase_invoice_number,
     is_cleared: r.purchase_invoice_is_cleared
+  }
+}
+
+export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors): Promise<ApiResponse<void>> {
+  try {
+    const asset = await prisma.asset.findUnique({
+      where: { barcode },
+      select: { id: true, model: { select: { brand_id: true } } }
+    })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const assetId = asset.id
+    const brandId = asset.model.brand_id
+
+    const errorRecords = await prisma.error.findMany({
+      where: { brand_id: brandId, code: { in: data.errors.map(e => e.code) } },
+      select: { id: true, code: true }
+    })
+    const codeToId = new Map(errorRecords.map(e => [e.code, e.id]))
+
+    const currentRows = await prisma.assetError.findMany({
+      where: { asset_id: assetId },
+      select: { error_id: true, is_fixed: true }
+    })
+    const currentIdMap = new Map(currentRows.map(ae => [ae.error_id, ae.is_fixed]))
+
+    const inputIdMap = new Map(
+      data.errors
+        .filter(e => codeToId.has(e.code))
+        .map(e => [codeToId.get(e.code)!, e.is_fixed])
+    )
+
+    const now = new Date()
+
+    const deletes = currentRows
+      .filter(ae => !inputIdMap.has(ae.error_id))
+      .map(ae => prisma.assetError.delete({
+        where: { asset_id_error_id: { asset_id: assetId, error_id: ae.error_id } }
+      }))
+
+    const inserts = [...inputIdMap.entries()]
+      .filter(([errorId]) => !currentIdMap.has(errorId))
+      .map(([errorId, is_fixed]) => prisma.assetError.create({
+        data: {
+          asset_id: assetId,
+          error_id: errorId,
+          is_fixed,
+          added_by: DEFAULT_CREATED_BY_ID,
+          added_at: now,
+          fixed_at: is_fixed ? now : null,
+          fixed_by: is_fixed ? DEFAULT_CREATED_BY_ID : null
+        }
+      }))
+
+    const updates = [...inputIdMap.entries()]
+      .filter(([errorId, is_fixed]) => currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed)
+      .map(([errorId, is_fixed]) => prisma.assetError.update({
+        where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
+        data: {
+          is_fixed,
+          fixed_at: is_fixed ? now : null,
+          fixed_by: is_fixed ? DEFAULT_CREATED_BY_ID : null
+        }
+      }))
+
+    await prisma.$transaction([...deletes, ...inserts, ...updates])
+    return successResponse(undefined)
+  } catch (error) {
+    return response500(`Failed to update errors for asset ${barcode}`)
   }
 }

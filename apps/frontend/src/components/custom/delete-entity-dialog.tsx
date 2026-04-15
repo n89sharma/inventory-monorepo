@@ -13,7 +13,7 @@ import type { ReactNode } from "react"
 
 type DeleteEntityDialogProps = {
   entity: string,
-  entityId: string,
+  entityId: string | undefined,
   children?: ReactNode,
   open?: boolean,
   onOpenChange?: (open: boolean) => void
