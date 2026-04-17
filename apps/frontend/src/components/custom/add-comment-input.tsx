@@ -36,16 +36,11 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
           placeholder="Add a comment..."
           value={text}
           onChange={e => setText(e.target.value)}
-          className="min-h-[4.5rem] resize-none"
+          className="min-h-18 resize-none"
           maxLength={2000}
           disabled={isSubmitting}
         />
-        <div className="flex flex-row justify-end gap-2">
-          {text.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSubmitting}>
-              Cancel
-            </Button>
-          )}
+        <div className="flex flex-row gap-2">
           <Button
             size="sm"
             disabled={!text.trim() || isSubmitting}
@@ -54,6 +49,11 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
             {isSubmitting && <CircleNotchIcon className="animate-spin" size={16} />}
             Comment
           </Button>
+          {text.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={handleCancel} disabled={isSubmitting}>
+              Cancel
+            </Button>
+          )}
         </div>
       </div>
     </div>

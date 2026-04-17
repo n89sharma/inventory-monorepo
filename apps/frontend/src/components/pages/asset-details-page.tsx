@@ -180,17 +180,17 @@ export const AssetDetailsPage = () => {
             <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2" /></TabsTrigger>
             <TabsTrigger value="history"><SectionHeader title="History" className="px-2" /></TabsTrigger>
           </TabsList>
-          <TabsContent value="comments" className="flex flex-col gap-3">
+          <TabsContent value="comments" className="flex flex-col gap-3 py-3">
             <AddCommentInput barcode={assetDetails.barcode} />
             {sortedComments.length
               ? sortedComments.map(c => (<Comment
-                  key={`${c.username}-${c.created_at}`}
-                  user={c.username}
-                  date={formatDateWithTime(c.created_at)}
-                  avatarFallback={c.initials}
-                  comment={c.comment}
-                  tags={EMPTY_TAGS}
-                />))
+                key={`${c.username}-${c.created_at}`}
+                user={c.username}
+                date={formatDateWithTime(c.created_at)}
+                avatarFallback={c.initials}
+                comment={c.comment}
+                tags={EMPTY_TAGS}
+              />))
               : <p className="text-sm text-muted-foreground">No comments on record</p>
             }
           </TabsContent>
