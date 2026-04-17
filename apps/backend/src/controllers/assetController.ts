@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -10,6 +10,8 @@ import {
   getErrors as getAssetErrorsSer,
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
+  createComment as createCommentSer,
+  createPartTransfer as createPartTransferSer,
   updateAssetErrors as updateAssetErrorsSer
 } from '../services/assetService.js'
 
@@ -120,6 +122,30 @@ export async function getAssetSummaryByBarcode(req: Request, res: Response<ApiRe
     return res.json(successResponse(results[0]))
   } catch (error) {
     return res.status(500).json(response500('Failed to fetch asset'))
+  }
+}
+
+export async function createAssetComment(req: Request, res: Response<ApiResponse<void>>) {
+  const { barcode } = req.params
+  const validated = CreateCommentSchema.parse(req.body)
+  const response = await createCommentSer(barcode, validated)
+  if (response.success) {
+    return res.status(201).json(response)
+  } else {
+    const status = response.error.type === 'API_ERROR' ? 400 : 500
+    return res.status(status).json(response)
+  }
+}
+
+export async function createPartTransfer(req: Request, res: Response<ApiResponse<void>>) {
+  const { barcode } = req.params
+  const validated = CreatePartTransferSchema.parse(req.body)
+  const response = await createPartTransferSer(barcode, validated)
+  if (response.success) {
+    return res.status(201).json(response)
+  } else {
+    const status = response.error.type === 'API_ERROR' ? 400 : 500
+    return res.status(status).json(response)
   }
 }
 

@@ -1,5 +1,5 @@
-import { getAllAssetDetails, getAssetErrors, updateAssetErrors as updateAssetErrorsApi } from '@/data/api/asset-api'
-import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, PartTransfer, UpdateError } from 'shared-types'
+import { createPartTransfer as createPartTransferApi, getAllAssetDetails, getAssetComments, getAssetErrors, getAssetPartTransfers, postComment as postCommentApi, updateAssetErrors as updateAssetErrorsApi } from '@/data/api/asset-api'
+import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, UpdateError } from 'shared-types'
 import { create } from 'zustand'
 
 interface AssetStore {
@@ -22,6 +22,8 @@ interface AssetStore {
   setAssetPartTransfers: (partTransfers: PartTransfer[]) => void
   getAssetDetails: (barcode: string) => Promise<void>
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<ApiResponse<void>>
+  createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<ApiResponse<void>>
+  createComment: (barcode: string, data: CreateComment) => Promise<ApiResponse<void>>
 
   //clear state
   clearAssetStore: () => void
@@ -65,6 +67,24 @@ export const useAssetStore = create<AssetStore>((set) => ({
     if (response.success) {
       const updated = await getAssetErrors({ barcode })
       set({ errors: updated })
+    }
+    return response
+  },
+
+  createPartTransfer: async (barcode, data) => {
+    const response = await createPartTransferApi(barcode, data)
+    if (response.success) {
+      const updated = await getAssetPartTransfers({ barcode })
+      set({ partTransfers: updated })
+    }
+    return response
+  },
+
+  createComment: async (barcode, data) => {
+    const response = await postCommentApi(barcode, data)
+    if (response.success) {
+      const updated = await getAssetComments({ barcode })
+      set({ comments: updated })
     }
     return response
   },

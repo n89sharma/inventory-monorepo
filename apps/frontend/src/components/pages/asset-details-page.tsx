@@ -14,6 +14,7 @@ import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
@@ -45,6 +46,7 @@ export const AssetDetailsPage = () => {
   if (!assetDetails) return null
 
   const { cost, hold, arrival, departure, specs, purchase_invoice } = assetDetails
+  const sortedComments = [...(comments ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
     <div className="flex flex-col gap-2">
@@ -179,14 +181,21 @@ export const AssetDetailsPage = () => {
             <TabsTrigger value="history"><SectionHeader title="History" className="px-2" /></TabsTrigger>
           </TabsList>
           <TabsContent value="comments" className="flex flex-col gap-3">
-            {comments?.map(c => (<Comment
-              key={`${c.username}-${c.created_at}`}
-              user={c.username}
-              date={formatDateWithTime(c.created_at)}
-              avatarFallback={c.initials}
-              comment={c.comment}
-              tags={EMPTY_TAGS}
-            />))}
+            <AddCommentInput barcode={assetDetails.barcode} />
+            {sortedComments.length
+              ? sortedComments.map(c => (<Comment
+                  key={`${c.username}-${c.created_at}`}
+                  user={c.username}
+                  date={formatDateWithTime(c.created_at)}
+                  avatarFallback={c.initials}
+                  comment={c.comment}
+                  tags={EMPTY_TAGS}
+                />))
+              : <p className="text-sm text-muted-foreground">No comments on record</p>
+            }
+          </TabsContent>
+          <TabsContent value="history">
+            <p className="text-sm text-muted-foreground">No history on record</p>
           </TabsContent>
         </Tabs>
 

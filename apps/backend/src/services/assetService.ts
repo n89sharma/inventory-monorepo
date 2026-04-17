@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, PartTransfer, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -174,6 +174,61 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
   return {
     invoice_number: r.purchase_invoice_number,
     is_cleared: r.purchase_invoice_is_cleared
+  }
+}
+
+export async function createComment(barcode: string, data: CreateComment): Promise<ApiResponse<void>> {
+  try {
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+    const now = new Date()
+    await prisma.comment.create({
+      data: {
+        asset_id: asset.id,
+        created_by_id: DEFAULT_CREATED_BY_ID,
+        comment: data.comment,
+        created_at: now,
+        updated_at: now
+      }
+    })
+    return successResponse(undefined)
+  } catch {
+    return response500(`Failed to create comment for ${barcode}`)
+  }
+}
+
+export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<ApiResponse<void>> {
+  if (data.donor_barcode === recipientBarcode) {
+    return response400('Donor and recipient cannot be the same asset')
+  }
+
+  try {
+    const recipient = await prisma.asset.findUnique({
+      where: { barcode: recipientBarcode },
+      select: { id: true }
+    })
+    if (!recipient) return response400(`Asset ${recipientBarcode} not found`)
+
+    const donor = await prisma.asset.findUnique({
+      where: { barcode: data.donor_barcode },
+      select: { id: true }
+    })
+    if (!donor) return response400(`Donor asset ${data.donor_barcode} not found`)
+
+    await prisma.partTransfer.create({
+      data: {
+        recipient_asset_id: recipient.id,
+        donor_asset_id: donor.id,
+        part: data.part,
+        is_exchange: data.is_exchange,
+        notes: data.notes,
+        fixed_at: new Date(),
+        fixed_by: DEFAULT_CREATED_BY_ID
+      }
+    })
+    return successResponse(undefined)
+  } catch (error) {
+    return response500(`Failed to create part transfer for ${recipientBarcode}`)
   }
 }
 

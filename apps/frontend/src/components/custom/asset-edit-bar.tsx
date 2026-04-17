@@ -1,6 +1,7 @@
 import { useAssetStore } from "@/data/store/asset-store"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
+import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
 import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
@@ -12,6 +13,7 @@ export function AssetEditBar(): React.JSX.Element {
   const errors = useAssetStore(state => state.errors)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
+  const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
 
   return (
     <div className="flex gap-2">
@@ -28,7 +30,9 @@ export function AssetEditBar(): React.JSX.Element {
           <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>
             Errors
           </DropdownMenuItem>
-          <DropdownMenuItem disabled>Parts</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setAddPartTransferOpen(true)}>
+            Parts
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -37,6 +41,12 @@ export function AssetEditBar(): React.JSX.Element {
         onOpenChange={setEditErrorsOpen}
         assetDetails={assetDetails}
         errors={errors}
+      />
+
+      <AddPartTransferModal
+        open={addPartTransferOpen}
+        onOpenChange={setAddPartTransferOpen}
+        recipientBarcode={assetDetails?.barcode ?? null}
       />
 
 

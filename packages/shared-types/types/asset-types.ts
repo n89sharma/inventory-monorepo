@@ -143,3 +143,18 @@ export const UpdateAssetErrorsSchema = z.object({
 export type UpdateError = z.infer<typeof UpdateErrorSchema>
 export type UpdateAssetErrors = z.infer<typeof UpdateAssetErrorsSchema>
 
+export const CreatePartTransferSchema = z.object({
+  donor_barcode: z.string().min(1, "Donor is required"),
+  part: z.string().min(1, "Part is required"),
+  is_exchange: z.boolean(),
+  notes: z.string().optional()
+})
+
+export type CreatePartTransfer = z.infer<typeof CreatePartTransferSchema>
+
+export const CreateCommentSchema = z.object({
+  comment: z.string().min(1).max(2000)
+})
+
+export type CreateComment = z.infer<typeof CreateCommentSchema>
+

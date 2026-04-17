@@ -8,6 +8,8 @@ import type {
   AssetSummary,
   AssetTransfer,
   Comment,
+  CreateComment,
+  CreatePartTransfer,
   ModelSummary,
   PartTransfer,
   Status,
@@ -55,6 +57,18 @@ export async function getAssetPartTransfers(params: { barcode: string }): Promis
 
 export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<ApiResponse<void>> {
   return api.put(`/assets/${barcode}/errors`, { errors })
+    .then(() => ({ success: true as const, data: undefined }))
+    .catch(apiErrorHandler<void>)
+}
+
+export async function postComment(barcode: string, data: CreateComment): Promise<ApiResponse<void>> {
+  return api.post(`/assets/${barcode}/comments`, data)
+    .then(() => ({ success: true as const, data: undefined }))
+    .catch(apiErrorHandler<void>)
+}
+
+export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<ApiResponse<void>> {
+  return api.post(`/assets/${recipientBarcode}/parts`, data)
     .then(() => ({ success: true as const, data: undefined }))
     .catch(apiErrorHandler<void>)
 }

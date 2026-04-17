@@ -1,6 +1,8 @@
 import express from 'express'
 import {
   AssetQuerySchema,
+  createAssetComment,
+  createPartTransfer,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
@@ -22,7 +24,9 @@ router.get('/:barcode/accessories', getAssetAccessories)
 router.get('/:barcode/errors', getAssetErrors)
 router.put('/:barcode/errors', updateAssetErrors)
 router.get('/:barcode/comments', getAssetComments)
+router.post('/:barcode/comments', createAssetComment)
 router.get('/:barcode/parts', getAssetPartTransfer)
+router.post('/:barcode/parts', createPartTransfer)
 router.get('/:barcode/transfers', getAssetTransfers)
 
 export default router

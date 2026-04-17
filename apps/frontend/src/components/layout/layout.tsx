@@ -16,7 +16,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <Toaster />
       <div className="flex flex-col w-full">
         <Header className="sticky top-0 z-10 bg-background" />
-        <main id="main-content" className="p-4 w-full max-w-7xl mx-auto">
+        <main id="main-content" className="p-4 w-full max-w-5xl mx-auto">
           {children}
         </main>
       </div>
