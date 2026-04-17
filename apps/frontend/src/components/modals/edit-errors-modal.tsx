@@ -60,10 +60,6 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
 
   async function handleSave() {
     if (!assetDetails) return
-    if (localErrors.length === 0) {
-      toast.error('Asset must have at least one error.')
-      return
-    }
     setSaving(true)
     const response = await updateAssetErrors(assetDetails.barcode, localErrors)
     setSaving(false)
