@@ -235,7 +235,7 @@ export function PartsHeader({ className }: { className?: string }): React.JSX.El
   return (
     <div className={cn("flex items-center py-0.5 text-sm", className)}>
       <dt className={cn("text-muted-foreground min-w-28", className)}>Part</dt>
-      <dd className={cn("text-muted-foreground", className)}>Source</dd>
+      <dd className={cn("text-muted-foreground", className)}>Donor</dd>
     </div>
   )
 }

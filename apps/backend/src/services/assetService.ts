@@ -1,10 +1,10 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, Part, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, PartTransfer, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
   getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
-  getAssetParts as getAssetPartsQuery,
+  getAssetPartTransfer as getAssetPartTransferQuery,
   getAssetTransfers as getAssetTransfersQuery
 } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -67,28 +67,12 @@ export async function getComments(barcode: string): Promise<ApiResponse<Comment[
   }
 }
 
-export function getPartNames(notes: string): string {
-  const sqrBracketRegex = /\[(.*?)\]/g
-  const goodBadRegex = /Exchanged(.*?)\(GOOD\)/g
-
-  const sqrBracketResults = Array.from(notes.matchAll(sqrBracketRegex)).map(m => m[1])
-  const goodBadResults = Array.from(notes.matchAll(goodBadRegex)).map(m => m[1])
-
-  if (sqrBracketResults[0]) return sqrBracketResults[0]
-  return goodBadResults[0]
-}
-
-export async function getAssetParts(barcode: string): Promise<ApiResponse<Part[]>> {
+export async function getAssetPartTransfer(barcode: string): Promise<ApiResponse<PartTransfer[]>> {
   try {
-    const parts = await prisma.$queryRawTyped(getAssetPartsQuery(barcode))
-    const partsWithType = parts.map(p => ({
-      ...p,
-      type: p.store_part_number ? 'STORE' : 'MACHINE',
-      partName: getPartNames(p.notes)
-    }))
-    return successResponse(partsWithType)
+    const parts = await prisma.$queryRawTyped(getAssetPartTransferQuery(barcode))
+    return successResponse(parts)
   } catch (error) {
-    return response500(`Failed to fetch parts for ${barcode}`)
+    return response500(`Failed to fetch part transfers for ${barcode}`)
   }
 }
 

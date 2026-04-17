@@ -48,16 +48,6 @@ export type Error = Prisma.ErrorModel
  */
 export type AssetError = Prisma.AssetErrorModel
 /**
- * Model Part
- * 
- */
-export type Part = Prisma.PartModel
-/**
- * Model AssetPart
- * 
- */
-export type AssetPart = Prisma.AssetPartModel
-/**
  * Model Transfer
  * 
  */
@@ -187,3 +177,13 @@ export type TrackingStatus = Prisma.TrackingStatusModel
  * 
  */
 export type Sequence = Prisma.SequenceModel
+/**
+ * Model StorePart
+ * 
+ */
+export type StorePart = Prisma.StorePartModel
+/**
+ * Model PartTransfer
+ * 
+ */
+export type PartTransfer = Prisma.PartTransferModel

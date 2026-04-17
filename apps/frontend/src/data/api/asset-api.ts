@@ -1,7 +1,19 @@
 import { api } from '@/data/api/axios-client'
 import { apiErrorHandler } from '@/lib/error-handler'
 import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
-import type { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, ModelSummary, Part, Status, UpdateError, Warehouse } from 'shared-types'
+import type {
+  ApiResponse,
+  AssetDetails,
+  AssetError,
+  AssetSummary,
+  AssetTransfer,
+  Comment,
+  ModelSummary,
+  PartTransfer,
+  Status,
+  UpdateError,
+  Warehouse
+} from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -35,8 +47,8 @@ export async function getAssetTransfers(params: { barcode: string }): Promise<As
   throw new Error(data.error.summary)
 }
 
-export async function getAssetParts(params: { barcode: string }): Promise<Part[]> {
-  const { data } = await api.get<ApiResponse<Part[]>>(`/assets/${params.barcode}/parts`)
+export async function getAssetPartTransfers(params: { barcode: string }): Promise<PartTransfer[]> {
+  const { data } = await api.get<ApiResponse<PartTransfer[]>>(`/assets/${params.barcode}/parts`)
   if (data.success) return data.data
   throw new Error(data.error.summary)
 }
@@ -61,7 +73,7 @@ export async function getAllAssetDetails(barcode: string) {
     getAssetErrors({ barcode }),
     getAssetComments({ barcode }),
     getAssetTransfers({ barcode }),
-    getAssetParts({ barcode })
+    getAssetPartTransfers({ barcode })
   ])
 
   return {
@@ -70,7 +82,7 @@ export async function getAllAssetDetails(barcode: string) {
     assetErrors: getPromiseResult(results[2]),
     assetComments: getPromiseResult(results[3]),
     assetTransfers: getPromiseResult(results[4]),
-    assetParts: getPromiseResult(results[5])
+    assetPartTransfers: getPromiseResult(results[5])
   }
 }
 

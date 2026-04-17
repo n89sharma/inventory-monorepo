@@ -57,8 +57,6 @@ export const ModelName = {
   AssetAccessory: 'AssetAccessory',
   Error: 'Error',
   AssetError: 'AssetError',
-  Part: 'Part',
-  AssetPart: 'AssetPart',
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
   Arrival: 'Arrival',
@@ -84,7 +82,9 @@ export const ModelName = {
   Role: 'Role',
   TechnicalStatus: 'TechnicalStatus',
   TrackingStatus: 'TrackingStatus',
-  Sequence: 'Sequence'
+  Sequence: 'Sequence',
+  StorePart: 'StorePart',
+  PartTransfer: 'PartTransfer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -194,31 +194,6 @@ export const AssetErrorScalarFieldEnum = {
 } as const
 
 export type AssetErrorScalarFieldEnum = (typeof AssetErrorScalarFieldEnum)[keyof typeof AssetErrorScalarFieldEnum]
-
-
-export const PartScalarFieldEnum = {
-  id: 'id',
-  description: 'description',
-  part_number: 'part_number',
-  dealer_price: 'dealer_price',
-  sale_price: 'sale_price',
-  cost: 'cost'
-} as const
-
-export type PartScalarFieldEnum = (typeof PartScalarFieldEnum)[keyof typeof PartScalarFieldEnum]
-
-
-export const AssetPartScalarFieldEnum = {
-  id: 'id',
-  recipient_asset_id: 'recipient_asset_id',
-  donor_asset_id: 'donor_asset_id',
-  store_part_id: 'store_part_id',
-  updated_at: 'updated_at',
-  updated_by: 'updated_by',
-  notes: 'notes'
-} as const
-
-export type AssetPartScalarFieldEnum = (typeof AssetPartScalarFieldEnum)[keyof typeof AssetPartScalarFieldEnum]
 
 
 export const TransferScalarFieldEnum = {
@@ -500,6 +475,32 @@ export const SequenceScalarFieldEnum = {
 } as const
 
 export type SequenceScalarFieldEnum = (typeof SequenceScalarFieldEnum)[keyof typeof SequenceScalarFieldEnum]
+
+
+export const StorePartScalarFieldEnum = {
+  id: 'id',
+  part_number: 'part_number',
+  description: 'description',
+  dealer_price: 'dealer_price',
+  sale_price: 'sale_price',
+  cost: 'cost'
+} as const
+
+export type StorePartScalarFieldEnum = (typeof StorePartScalarFieldEnum)[keyof typeof StorePartScalarFieldEnum]
+
+
+export const PartTransferScalarFieldEnum = {
+  id: 'id',
+  recipient_asset_id: 'recipient_asset_id',
+  donor_asset_id: 'donor_asset_id',
+  fixed_at: 'fixed_at',
+  fixed_by: 'fixed_by',
+  part: 'part',
+  notes: 'notes',
+  is_exchange: 'is_exchange'
+} as const
+
+export type PartTransferScalarFieldEnum = (typeof PartTransferScalarFieldEnum)[keyof typeof PartTransferScalarFieldEnum]
 
 
 export const SortOrder = {

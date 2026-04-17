@@ -121,15 +121,14 @@ export type AssetTransfer = {
   transporter: string
 }
 
-export type Part = {
+export type PartTransfer = {
   recipient: string
   donor: string
-  store_part_number: string
-  updated_at: Date
-  username: string
-  notes: string
-  type: string
-  partName: string
+  fixed_at: Date
+  fixed_by: string
+  notes: string | null
+  part: string
+  is_exchange: boolean
 }
 
 export const UpdateErrorSchema = z.object({

@@ -1,5 +1,5 @@
 import { AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
-import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow, PartsHeader } from '@/components/custom/asset-details/detail-row'
+import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow } from '@/components/custom/asset-details/detail-row'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
@@ -14,6 +14,7 @@ import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { PartsSection } from '../custom/parts-section'
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 
@@ -26,8 +27,8 @@ export const AssetDetailsPage = () => {
   const accessories = useAssetStore((state) => state.accessories)
   const errors = useAssetStore((state) => state.errors)
   const comments = useAssetStore((state) => state.comments)
-  const at = useAssetStore((state) => state.transfers)
-  const ap = useAssetStore((state) => state.parts)
+  const transfers = useAssetStore((state) => state.transfers)
+  const partTransfers = useAssetStore((state) => state.partTransfers)
 
   const loading = useAssetStore((state) => state.loading)
   const error = useAssetStore((state) => state.error)
@@ -131,13 +132,7 @@ export const AssetDetailsPage = () => {
             </OptionalSection>
           </Section>
 
-          <Section>
-            <SectionHeader title="Installed Parts" />
-            <OptionalSection condition={!!ap?.length} fallback="No parts installed">
-              <PartsHeader />
-              {ap?.map(p => <DataValueRow key={p.store_part_number} label={p.partName} value={p.donor} />)}
-            </OptionalSection>
-          </Section>
+          <PartsSection asset={assetDetails} partTransfers={partTransfers} />
 
         </SectionRow>
 
@@ -161,7 +156,7 @@ export const AssetDetailsPage = () => {
             </OptionalSection>
           </Section>
 
-          <TransferSection transfers={at} />
+          <TransferSection transfers={transfers} />
 
           <Section>
             <SectionHeader title="Departure"></SectionHeader>

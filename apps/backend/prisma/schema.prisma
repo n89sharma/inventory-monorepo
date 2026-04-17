@@ -9,41 +9,41 @@ datasource db {
 }
 
 model Asset {
-  id                                            Int                     @id @default(autoincrement())
-  barcode                                       String                  @unique @db.VarChar(50)
-  serial_number                                 String                  @db.VarChar(50)
-  model_id                                      Int
-  tracking_status_id                            Int
-  availability_status_id                        Int
-  technical_status_id                           Int
-  purchase_invoice_id                           Int?
-  sales_invoice_id                              Int?
-  arrival_id                                    Int?
-  departure_id                                  Int?
-  hold_id                                       Int?
-  created_at                                    DateTime
-  is_held                                       Boolean
-  location_id                                   Int?
-  arrival                                       Arrival?                @relation(fields: [arrival_id], references: [id])
-  AvailabilityStatus                            AvailabilityStatus      @relation(fields: [availability_status_id], references: [id])
-  departure                                     Departure?              @relation(fields: [departure_id], references: [id])
-  hold                                          Hold?                   @relation(fields: [hold_id], references: [id])
-  Location                                      Location?               @relation(fields: [location_id], references: [id])
-  model                                         Model                   @relation(fields: [model_id], references: [id])
-  purchase_invoice                              Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
-  sales_invoice                                 Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
-  TechnicalStatus                               TechnicalStatus         @relation(fields: [technical_status_id], references: [id])
-  TrackingStatus                                TrackingStatus          @relation(fields: [tracking_status_id], references: [id])
-  asset_accessories                             AssetAccessory[]
-  asset_errors                                  AssetError[]
-  asset_history                                 AssetHistory[]
-  AssetPart_AssetPart_donor_asset_idToAsset     AssetPart[]             @relation("AssetPart_donor_asset_idToAsset")
-  AssetPart_AssetPart_recipient_asset_idToAsset AssetPart[]             @relation("AssetPart_recipient_asset_idToAsset")
-  asset_transfers                               AssetTransfer[]
-  comments                                      Comment[]
-  cost                                          Cost?
-  files                                         File[]
-  technical_specification                       TechnicalSpecification?
+  id                                                  Int                     @id @default(autoincrement())
+  barcode                                             String                  @unique @db.VarChar(50)
+  serial_number                                       String                  @db.VarChar(50)
+  model_id                                            Int
+  tracking_status_id                                  Int
+  availability_status_id                              Int
+  technical_status_id                                 Int
+  purchase_invoice_id                                 Int?
+  sales_invoice_id                                    Int?
+  arrival_id                                          Int?
+  departure_id                                        Int?
+  hold_id                                             Int?
+  created_at                                          DateTime
+  is_held                                             Boolean
+  location_id                                         Int?
+  arrival                                             Arrival?                @relation(fields: [arrival_id], references: [id])
+  AvailabilityStatus                                  AvailabilityStatus      @relation(fields: [availability_status_id], references: [id])
+  departure                                           Departure?              @relation(fields: [departure_id], references: [id])
+  hold                                                Hold?                   @relation(fields: [hold_id], references: [id])
+  Location                                            Location?               @relation(fields: [location_id], references: [id])
+  model                                               Model                   @relation(fields: [model_id], references: [id])
+  purchase_invoice                                    Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
+  sales_invoice                                       Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
+  TechnicalStatus                                     TechnicalStatus         @relation(fields: [technical_status_id], references: [id])
+  TrackingStatus                                      TrackingStatus          @relation(fields: [tracking_status_id], references: [id])
+  asset_accessories                                   AssetAccessory[]
+  asset_errors                                        AssetError[]
+  asset_history                                       AssetHistory[]
+  asset_transfers                                     AssetTransfer[]
+  comments                                            Comment[]
+  cost                                                Cost?
+  files                                               File[]
+  PartTransfer_PartTransfer_donor_asset_idToAsset     PartTransfer[]          @relation("PartTransfer_donor_asset_idToAsset")
+  PartTransfer_PartTransfer_recipient_asset_idToAsset PartTransfer[]          @relation("PartTransfer_recipient_asset_idToAsset")
+  technical_specification                             TechnicalSpecification?
 
   @@index([serial_number])
   @@index([model_id])
@@ -136,32 +136,6 @@ model AssetError {
   fixedBy  User?     @relation("ErrorFixedBy", fields: [fixed_by], references: [id])
 
   @@id([asset_id, error_id])
-}
-
-model Part {
-  id           Int         @id @default(autoincrement())
-  description  String
-  part_number  String      @unique @db.VarChar(50)
-  dealer_price Decimal     @db.Decimal(12, 2)
-  sale_price   Decimal     @db.Decimal(12, 2)
-  cost         Decimal     @db.Decimal(12, 2)
-  AssetPart    AssetPart[]
-}
-
-model AssetPart {
-  id                                        Int      @id @default(autoincrement())
-  recipient_asset_id                        Int
-  donor_asset_id                            Int?
-  store_part_id                             Int?
-  updated_at                                DateTime
-  updated_by                                Int
-  notes                                     String
-  Asset_AssetPart_donor_asset_idToAsset     Asset?   @relation("AssetPart_donor_asset_idToAsset", fields: [donor_asset_id], references: [id])
-  Asset_AssetPart_recipient_asset_idToAsset Asset    @relation("AssetPart_recipient_asset_idToAsset", fields: [recipient_asset_id], references: [id])
-  Part                                      Part?    @relation(fields: [store_part_id], references: [id])
-  updatedBy                                 User     @relation(fields: [updated_by], references: [id])
-
-  @@unique([recipient_asset_id, donor_asset_id, store_part_id])
 }
 
 model Transfer {
@@ -374,7 +348,6 @@ model User {
   asset_errors_added   AssetError[]   @relation("ErrorAddedBy")
   asset_errors_fixed   AssetError[]   @relation("ErrorFixedBy")
   asset_history        AssetHistory[]
-  asset_parts          AssetPart[]
   comments             Comment[]
   departures           Departure[]
   departure_sales_reps Departure[]    @relation("SalesRep")
@@ -382,6 +355,7 @@ model User {
   holds_created        Hold[]         @relation("HoldCreatedBy")
   holds_for            Hold[]         @relation("HoldCreatedFor")
   invoices_updated     Invoice[]
+  PartTransfer         PartTransfer[]
   transfers            Transfer[]
   Role                 Role           @relation(fields: [role_id], references: [id])
 }
@@ -495,4 +469,30 @@ model Sequence {
   last_number    Int      @default(0)
 
   @@id([entity_type, warehouse_code, sequence_date])
+}
+
+model StorePart {
+  id           Int     @id @default(autoincrement())
+  part_number  String  @unique @db.VarChar(50)
+  description  String
+  dealer_price Decimal @db.Decimal(12, 2)
+  sale_price   Decimal @db.Decimal(12, 2)
+  cost         Decimal @db.Decimal(12, 2)
+}
+
+model PartTransfer {
+  id                                           Int      @id @default(autoincrement())
+  recipient_asset_id                           Int
+  donor_asset_id                               Int
+  fixed_at                                     DateTime
+  fixed_by                                     Int
+  part                                         String
+  notes                                        String?
+  is_exchange                                  Boolean
+  Asset_PartTransfer_donor_asset_idToAsset     Asset    @relation("PartTransfer_donor_asset_idToAsset", fields: [donor_asset_id], references: [id])
+  User                                         User     @relation(fields: [fixed_by], references: [id])
+  Asset_PartTransfer_recipient_asset_idToAsset Asset    @relation("PartTransfer_recipient_asset_idToAsset", fields: [recipient_asset_id], references: [id])
+
+  @@index([donor_asset_id])
+  @@index([recipient_asset_id])
 }

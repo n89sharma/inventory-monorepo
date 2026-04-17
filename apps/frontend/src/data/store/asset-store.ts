@@ -1,5 +1,5 @@
-import { getAssetErrors, getAllAssetDetails, updateAssetErrors as updateAssetErrorsApi } from '@/data/api/asset-api'
-import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, Part, UpdateError } from 'shared-types'
+import { getAllAssetDetails, getAssetErrors, updateAssetErrors as updateAssetErrorsApi } from '@/data/api/asset-api'
+import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, PartTransfer, UpdateError } from 'shared-types'
 import { create } from 'zustand'
 
 interface AssetStore {
@@ -9,7 +9,7 @@ interface AssetStore {
   errors: AssetError[]
   comments: Comment[]
   transfers: AssetTransfer[]
-  parts: Part[]
+  partTransfers: PartTransfer[]
   loading: boolean
   error: string | null
 
@@ -19,7 +19,7 @@ interface AssetStore {
   setAssetErrors: (errors: AssetError[]) => void
   setAssetComments: (comments: Comment[]) => void
   setAssetTransfers: (transfers: AssetTransfer[]) => void
-  setAssetParts: (parts: Part[]) => void
+  setAssetPartTransfers: (partTransfers: PartTransfer[]) => void
   getAssetDetails: (barcode: string) => Promise<void>
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<ApiResponse<void>>
 
@@ -33,7 +33,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
   errors: [],
   comments: [],
   transfers: [],
-  parts: [],
+  partTransfers: [],
   loading: false,
   error: null,
 
@@ -42,9 +42,9 @@ export const useAssetStore = create<AssetStore>((set) => ({
   setAssetErrors: (errors) => set({ errors }),
   setAssetComments: (comments) => set({ comments }),
   setAssetTransfers: (transfers) => set({ transfers }),
-  setAssetParts: (parts) => set({ parts }),
+  setAssetPartTransfers: (parts) => set({ partTransfers: parts }),
   getAssetDetails: async (barcode) => {
-    set({ loading: true, error: null, assetDetails: null, accessories: [], errors: [], comments: [], transfers: [], parts: [] })
+    set({ loading: true, error: null, assetDetails: null, accessories: [], errors: [], comments: [], transfers: [], partTransfers: [] })
     try {
       const r = await getAllAssetDetails(barcode)
       if (r.assetDetails.status === 'fulfilled') set({ assetDetails: r.assetDetails.result })
@@ -52,7 +52,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
       if (r.assetErrors.status === 'fulfilled') set({ errors: r.assetErrors.result })
       if (r.assetComments.status === 'fulfilled') set({ comments: r.assetComments.result })
       if (r.assetTransfers.status === 'fulfilled') set({ transfers: r.assetTransfers.result })
-      if (r.assetParts.status === 'fulfilled') set({ parts: r.assetParts.result })
+      if (r.assetPartTransfers.status === 'fulfilled') set({ partTransfers: r.assetPartTransfers.result })
     } catch (e) {
       set({ error: e instanceof Error ? e.message : 'Failed to load asset details' })
     } finally {
@@ -75,6 +75,6 @@ export const useAssetStore = create<AssetStore>((set) => ({
     errors: [],
     comments: [],
     transfers: [],
-    parts: []
+    partTransfers: []
   })
 }))

@@ -12,16 +12,16 @@ export function AssetEditBar(): React.JSX.Element {
   const errors = useAssetStore(state => state.errors)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
-  
+
   return (
     <div className="flex gap-2">
       <ShareButton />
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button>
+        <Button asChild>
+          <DropdownMenuTrigger>
             <PencilSimpleIcon />Edit
-          </Button>
-        </DropdownMenuTrigger>
+          </DropdownMenuTrigger>
+        </Button>
         <DropdownMenuContent>
           <DropdownMenuItem disabled>Pricing</DropdownMenuItem>
           <DropdownMenuItem disabled>Technical Specs</DropdownMenuItem>

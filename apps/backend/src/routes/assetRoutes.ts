@@ -5,7 +5,7 @@ import {
   getAssetComments,
   getAssetDetail,
   getAssetErrors,
-  getAssetParts,
+  getAssetPartTransfer,
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
@@ -22,7 +22,7 @@ router.get('/:barcode/accessories', getAssetAccessories)
 router.get('/:barcode/errors', getAssetErrors)
 router.put('/:barcode/errors', updateAssetErrors)
 router.get('/:barcode/comments', getAssetComments)
-router.get('/:barcode/parts', getAssetParts)
+router.get('/:barcode/parts', getAssetPartTransfer)
 router.get('/:barcode/transfers', getAssetTransfers)
 
 export default router

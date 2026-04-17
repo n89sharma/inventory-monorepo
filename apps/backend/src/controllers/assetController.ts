@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, Part, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -8,7 +8,7 @@ import {
   getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
   getErrors as getAssetErrorsSer,
-  getAssetParts as getAssetPartsSer,
+  getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
   updateAssetErrors as updateAssetErrorsSer
 } from '../services/assetService.js'
@@ -90,9 +90,9 @@ export async function getAssetComments(req: Request, res: Response<ApiResponse<C
   }
 }
 
-export async function getAssetParts(req: Request, res: Response<ApiResponse<Part[]>>) {
+export async function getAssetPartTransfer(req: Request, res: Response<ApiResponse<PartTransfer[]>>) {
   const { barcode } = req.params
-  const response = await getAssetPartsSer(barcode)
+  const response = await getAssetPartTransferSer(barcode)
   if (response.success) {
     return res.json(response)
   } else {
