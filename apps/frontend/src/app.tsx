@@ -1,4 +1,5 @@
 import { MainLayout } from '@/components/layout/layout'
+import { PageTitleUpdater } from '@/components/layout/page-title-updater'
 import { ArrivalsSummaryPage } from '@/components/pages/arrival/arrivals-summary-page'
 import { AssetDetailsPage } from '@/components/pages/asset-details-page'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
@@ -30,6 +31,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <PageTitleUpdater />
       <MainLayout>
         <Routes>
           <Route path="/" element={<Navigate to="/arrivals" replace />} />
