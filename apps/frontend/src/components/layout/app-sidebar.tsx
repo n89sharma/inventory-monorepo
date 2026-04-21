@@ -12,10 +12,10 @@ import {
 } from "@/components/shadcn/sidebar"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { isNavigationSection, type NavigationSection } from "@/ui-types/navigation-context"
-import { UserButton } from "@clerk/react"
 import { ChartLineUpIcon, GearIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, MagnifyingGlassIcon, StackIcon, TruckTrailerIcon, WarehouseIcon } from "@phosphor-icons/react"
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { UserMenuButton } from '@/components/custom/user-menu-button'
 
 const sidebarItems = [
   {
@@ -122,9 +122,7 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <UserButton />
-            </SidebarMenuButton>
+            <UserMenuButton />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
