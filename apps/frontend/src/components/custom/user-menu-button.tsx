@@ -1,7 +1,8 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/shadcn/dropdown-menu'
 import { SidebarMenuButton } from '@/components/shadcn/sidebar'
 import { useClerk, useUser } from '@clerk/react'
-import { SignOutIcon, UserIcon } from '@phosphor-icons/react'
+import { EnvelopeIcon, SignOutIcon, UserIcon } from '@phosphor-icons/react'
+import microsoftLogo from '@/assets/microsoft.svg'
 
 export function UserMenuButton() {
   const { user } = useUser()
@@ -9,8 +10,7 @@ export function UserMenuButton() {
 
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'User'
   const email = user?.primaryEmailAddress?.emailAddress ?? ''
-  const microsoftAccount = user?.externalAccounts.find(a => a.provider === 'microsoft')
-  const signInMethod = microsoftAccount ? 'Microsoft' : 'Email'
+  const isMicrosoft = user?.externalAccounts.some(a => a.provider === 'microsoft')
 
   return (
     <DropdownMenu>
@@ -25,7 +25,13 @@ export function UserMenuButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align="start" className="w-56">
         <DropdownMenuLabel className="flex flex-col leading-tight">
-          <span className="text-xs text-muted-foreground">Signed in via {signInMethod}</span>
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            {isMicrosoft ? (
+              <>Signed in via Microsoft <img src={microsoftLogo} alt="Microsoft" className="size-3" /></>
+            ) : (
+              <>Signed in via Email <EnvelopeIcon aria-hidden="true" className="size-3" /></>
+            )}
+          </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/login' })}>
