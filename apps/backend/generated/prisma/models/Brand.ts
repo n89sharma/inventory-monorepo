@@ -171,7 +171,7 @@ export type BrandGroupByOutputType = {
   _max: BrandMaxAggregateOutputType | null
 }
 
-type GetBrandGroupByPayload<T extends BrandGroupByArgs> = Prisma.PrismaPromise<
+export type GetBrandGroupByPayload<T extends BrandGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BrandGroupByOutputType, T['by']> &
       {

@@ -41,9 +41,9 @@ export type UserMinAggregateOutputType = {
   username: string | null
   email: string | null
   name: string | null
-  googleId: string | null
   role_id: number | null
   is_active: boolean | null
+  clerk_id: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -51,9 +51,9 @@ export type UserMaxAggregateOutputType = {
   username: string | null
   email: string | null
   name: string | null
-  googleId: string | null
   role_id: number | null
   is_active: boolean | null
+  clerk_id: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -61,9 +61,9 @@ export type UserCountAggregateOutputType = {
   username: number
   email: number
   name: number
-  googleId: number
   role_id: number
   is_active: number
+  clerk_id: number
   _all: number
 }
 
@@ -83,9 +83,9 @@ export type UserMinAggregateInputType = {
   username?: true
   email?: true
   name?: true
-  googleId?: true
   role_id?: true
   is_active?: true
+  clerk_id?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -93,9 +93,9 @@ export type UserMaxAggregateInputType = {
   username?: true
   email?: true
   name?: true
-  googleId?: true
   role_id?: true
   is_active?: true
+  clerk_id?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -103,9 +103,9 @@ export type UserCountAggregateInputType = {
   username?: true
   email?: true
   name?: true
-  googleId?: true
   role_id?: true
   is_active?: true
+  clerk_id?: true
   _all?: true
 }
 
@@ -200,9 +200,9 @@ export type UserGroupByOutputType = {
   username: string
   email: string
   name: string
-  googleId: string | null
   role_id: number
   is_active: boolean
+  clerk_id: string | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -210,7 +210,7 @@ export type UserGroupByOutputType = {
   _max: UserMaxAggregateOutputType | null
 }
 
-type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserGroupByOutputType, T['by']> &
       {
@@ -233,9 +233,9 @@ export type UserWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
-  googleId?: Prisma.StringNullableFilter<"User"> | string | null
   role_id?: Prisma.IntFilter<"User"> | number
   is_active?: Prisma.BoolFilter<"User"> | boolean
+  clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
   arrivals?: Prisma.ArrivalListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
   asset_errors_fixed?: Prisma.AssetErrorListRelationFilter
@@ -257,9 +257,9 @@ export type UserOrderByWithRelationInput = {
   username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   role_id?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   arrivals?: Prisma.ArrivalOrderByRelationAggregateInput
   asset_errors_added?: Prisma.AssetErrorOrderByRelationAggregateInput
   asset_errors_fixed?: Prisma.AssetErrorOrderByRelationAggregateInput
@@ -279,7 +279,7 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   username?: string
-  googleId?: string
+  clerk_id?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -301,16 +301,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   PartTransfer?: Prisma.PartTransferListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
   Role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
-}, "id" | "username" | "googleId">
+}, "id" | "username" | "clerk_id">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   role_id?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -326,17 +326,17 @@ export type UserScalarWhereWithAggregatesInput = {
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  googleId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role_id?: Prisma.IntWithAggregatesFilter<"User"> | number
   is_active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  clerk_id?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -358,9 +358,9 @@ export type UserUncheckedCreateInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -380,8 +380,8 @@ export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -403,9 +403,9 @@ export type UserUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -426,17 +426,17 @@ export type UserCreateManyInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -444,9 +444,9 @@ export type UserUncheckedUpdateManyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -464,9 +464,9 @@ export type UserCountOrderByAggregateInput = {
   username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  googleId?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  clerk_id?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -479,9 +479,9 @@ export type UserMaxOrderByAggregateInput = {
   username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  googleId?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  clerk_id?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -489,9 +489,9 @@ export type UserMinOrderByAggregateInput = {
   username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  googleId?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  clerk_id?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -745,8 +745,8 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutUserInput
@@ -767,9 +767,9 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -793,8 +793,8 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutUserInput
@@ -815,9 +815,9 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -852,8 +852,8 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   asset_history?: Prisma.AssetHistoryUpdateManyWithoutUserNestedInput
@@ -874,9 +874,9 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -906,8 +906,8 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_history?: Prisma.AssetHistoryUpdateManyWithoutUserNestedInput
@@ -928,9 +928,9 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -949,8 +949,8 @@ export type UserCreateWithoutTransfersInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -971,9 +971,9 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1008,8 +1008,8 @@ export type UserUpdateWithoutTransfersInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1030,9 +1030,9 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1051,8 +1051,8 @@ export type UserCreateWithoutArrivalsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutUserInput
@@ -1073,9 +1073,9 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -1110,8 +1110,8 @@ export type UserUpdateWithoutArrivalsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   asset_history?: Prisma.AssetHistoryUpdateManyWithoutUserNestedInput
@@ -1132,9 +1132,9 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -1153,8 +1153,8 @@ export type UserCreateWithoutDeparturesInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1175,9 +1175,9 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1201,8 +1201,8 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1223,9 +1223,9 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1260,8 +1260,8 @@ export type UserUpdateWithoutDeparturesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1282,9 +1282,9 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1314,8 +1314,8 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1336,9 +1336,9 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1357,8 +1357,8 @@ export type UserCreateWithoutHolds_createdInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1379,9 +1379,9 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1405,8 +1405,8 @@ export type UserCreateWithoutHolds_forInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1427,9 +1427,9 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1464,8 +1464,8 @@ export type UserUpdateWithoutHolds_createdInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1486,9 +1486,9 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1518,8 +1518,8 @@ export type UserUpdateWithoutHolds_forInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1540,9 +1540,9 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1561,8 +1561,8 @@ export type UserCreateWithoutInvoices_updatedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1583,9 +1583,9 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1620,8 +1620,8 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1642,9 +1642,9 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1663,8 +1663,8 @@ export type UserCreateWithoutFilesInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1685,9 +1685,9 @@ export type UserUncheckedCreateWithoutFilesInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1722,8 +1722,8 @@ export type UserUpdateWithoutFilesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1744,9 +1744,9 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1765,8 +1765,8 @@ export type UserCreateWithoutCommentsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1787,9 +1787,9 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1824,8 +1824,8 @@ export type UserUpdateWithoutCommentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1846,9 +1846,9 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1867,8 +1867,8 @@ export type UserCreateWithoutAsset_historyInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1889,9 +1889,9 @@ export type UserUncheckedCreateWithoutAsset_historyInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -1926,8 +1926,8 @@ export type UserUpdateWithoutAsset_historyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -1948,9 +1948,9 @@ export type UserUncheckedUpdateWithoutAsset_historyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -1969,8 +1969,8 @@ export type UserCreateWithoutRoleInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -1991,8 +1991,8 @@ export type UserUncheckedCreateWithoutRoleInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -2042,17 +2042,17 @@ export type UserScalarWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
-  googleId?: Prisma.StringNullableFilter<"User"> | string | null
   role_id?: Prisma.IntFilter<"User"> | number
   is_active?: Prisma.BoolFilter<"User"> | boolean
+  clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateWithoutPartTransferInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
@@ -2073,9 +2073,9 @@ export type UserUncheckedCreateWithoutPartTransferInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   role_id: number
   is_active?: boolean
+  clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
@@ -2110,8 +2110,8 @@ export type UserUpdateWithoutPartTransferInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -2132,9 +2132,9 @@ export type UserUncheckedUpdateWithoutPartTransferInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -2154,16 +2154,16 @@ export type UserCreateManyRoleInput = {
   username: string
   email: string
   name: string
-  googleId?: string | null
   is_active?: boolean
+  clerk_id?: string | null
 }
 
 export type UserUpdateWithoutRoleInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
@@ -2184,8 +2184,8 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
@@ -2206,8 +2206,8 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -2354,9 +2354,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   username?: boolean
   email?: boolean
   name?: boolean
-  googleId?: boolean
   role_id?: boolean
   is_active?: boolean
+  clerk_id?: boolean
   arrivals?: boolean | Prisma.User$arrivalsArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
   asset_errors_fixed?: boolean | Prisma.User$asset_errors_fixedArgs<ExtArgs>
@@ -2379,9 +2379,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   email?: boolean
   name?: boolean
-  googleId?: boolean
   role_id?: boolean
   is_active?: boolean
+  clerk_id?: boolean
   Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2390,9 +2390,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   email?: boolean
   name?: boolean
-  googleId?: boolean
   role_id?: boolean
   is_active?: boolean
+  clerk_id?: boolean
   Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2401,12 +2401,12 @@ export type UserSelectScalar = {
   username?: boolean
   email?: boolean
   name?: boolean
-  googleId?: boolean
   role_id?: boolean
   is_active?: boolean
+  clerk_id?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "name" | "googleId" | "role_id" | "is_active", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "name" | "role_id" | "is_active" | "clerk_id", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrivals?: boolean | Prisma.User$arrivalsArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
@@ -2454,9 +2454,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     username: string
     email: string
     name: string
-    googleId: string | null
     role_id: number
     is_active: boolean
+    clerk_id: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2898,9 +2898,9 @@ export interface UserFieldRefs {
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
-  readonly googleId: Prisma.FieldRef<"User", 'String'>
   readonly role_id: Prisma.FieldRef<"User", 'Int'>
   readonly is_active: Prisma.FieldRef<"User", 'Boolean'>
+  readonly clerk_id: Prisma.FieldRef<"User", 'String'>
 }
     
 

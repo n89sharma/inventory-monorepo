@@ -185,7 +185,7 @@ export type SequenceGroupByOutputType = {
   _max: SequenceMaxAggregateOutputType | null
 }
 
-type GetSequenceGroupByPayload<T extends SequenceGroupByArgs> = Prisma.PrismaPromise<
+export type GetSequenceGroupByPayload<T extends SequenceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SequenceGroupByOutputType, T['by']> &
       {

@@ -229,7 +229,7 @@ export type TransferGroupByOutputType = {
   _max: TransferMaxAggregateOutputType | null
 }
 
-type GetTransferGroupByPayload<T extends TransferGroupByArgs> = Prisma.PrismaPromise<
+export type GetTransferGroupByPayload<T extends TransferGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TransferGroupByOutputType, T['by']> &
       {

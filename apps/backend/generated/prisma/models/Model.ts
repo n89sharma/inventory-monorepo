@@ -215,7 +215,7 @@ export type ModelGroupByOutputType = {
   _max: ModelMaxAggregateOutputType | null
 }
 
-type GetModelGroupByPayload<T extends ModelGroupByArgs> = Prisma.PrismaPromise<
+export type GetModelGroupByPayload<T extends ModelGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ModelGroupByOutputType, T['by']> &
       {

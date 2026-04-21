@@ -4,9 +4,8 @@ import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from '../prisma.js'
 
-const DEFAULT_CREATED_BY_ID = 178
 
-export async function createHold(data: CreateHold): Promise<ApiResponse<string>> {
+export async function createHold(data: CreateHold, userId: number): Promise<ApiResponse<string>> {
   try {
     const assetIds = data.assets.map(a => a.id)
 
@@ -26,7 +25,7 @@ export async function createHold(data: CreateHold): Promise<ApiResponse<string>>
       prisma.hold.create({
         data: {
           hold_number: holdNumber,
-          created_by: { connect: { id: DEFAULT_CREATED_BY_ID } },
+          created_by: { connect: { id: userId } },
           created_for: { connect: { id: data.created_for_id } },
           customer: { connect: { id: data.customer_id } },
           notes: data.notes ?? null,

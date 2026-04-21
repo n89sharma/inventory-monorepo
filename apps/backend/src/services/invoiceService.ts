@@ -2,7 +2,7 @@ import { ApiResponse, CreateInvoice, InvoiceDetail, UpdateInvoice, response400, 
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 
-export async function createInvoice(data: CreateInvoice): Promise<ApiResponse<{ invoiceNumber: string }>> {
+export async function createInvoice(data: CreateInvoice, userId: number): Promise<ApiResponse<{ invoiceNumber: string }>> {
   try {
     const existing = await prisma.invoice.findFirst({
       where: { organization_id: data.organization_id, invoice_number: data.invoice_number }
@@ -15,7 +15,7 @@ export async function createInvoice(data: CreateInvoice): Promise<ApiResponse<{ 
       data: {
         invoice_number: data.invoice_number,
         organization_id: data.organization_id,
-        updated_by_id: 178,
+        updated_by_id: userId,
         is_cleared: data.is_cleared,
         invoice_type_id: data.invoice_type_id,
         created_at: new Date()

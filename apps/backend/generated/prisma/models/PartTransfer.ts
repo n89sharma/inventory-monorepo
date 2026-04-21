@@ -225,7 +225,7 @@ export type PartTransferGroupByOutputType = {
   _max: PartTransferMaxAggregateOutputType | null
 }
 
-type GetPartTransferGroupByPayload<T extends PartTransferGroupByArgs> = Prisma.PrismaPromise<
+export type GetPartTransferGroupByPayload<T extends PartTransferGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<PartTransferGroupByOutputType, T['by']> &
       {

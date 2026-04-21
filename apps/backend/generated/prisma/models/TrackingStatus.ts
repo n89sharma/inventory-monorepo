@@ -171,7 +171,7 @@ export type TrackingStatusGroupByOutputType = {
   _max: TrackingStatusMaxAggregateOutputType | null
 }
 
-type GetTrackingStatusGroupByPayload<T extends TrackingStatusGroupByArgs> = Prisma.PrismaPromise<
+export type GetTrackingStatusGroupByPayload<T extends TrackingStatusGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TrackingStatusGroupByOutputType, T['by']> &
       {

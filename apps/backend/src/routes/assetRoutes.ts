@@ -13,9 +13,12 @@ import {
   getAssets,
   updateAssetErrors
 } from '../controllers/assetController.js'
+import { requireAuth } from '../middleware/requireAuth.js'
 import { validateQuery } from '../middleware/validation.js'
 
 const router = express.Router()
+
+router.use(requireAuth)
 
 router.get('/', validateQuery(AssetQuerySchema), getAssets)
 router.get('/:barcode/summary', getAssetSummaryByBarcode)

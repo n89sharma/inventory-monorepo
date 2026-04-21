@@ -7,7 +7,7 @@ import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer, getInvo
 export async function createInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
   try {
     const data = CreateInvoiceSchema.parse(req.body)
-    const response = await createInvoiceSer(data)
+    const response = await createInvoiceSer(data, res.locals.dbUserId)
     if (response.success) return res.status(201).json(response)
     if (response.error.status === 400) return res.status(400).json(response)
     return res.status(500).json(response)

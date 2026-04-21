@@ -3,18 +3,19 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
-  SidebarGroupContent,
   SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail
 } from "@/components/shadcn/sidebar"
-import { ChartLineUpIcon, GearIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, MagnifyingGlassIcon, StackIcon, TruckTrailerIcon, UserIcon, WarehouseIcon } from "@phosphor-icons/react"
-import { useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { isNavigationSection, type NavigationSection } from "@/ui-types/navigation-context"
+import { UserButton } from "@clerk/react"
+import { ChartLineUpIcon, GearIcon, InvoiceIcon, LineSegmentsIcon, LockOpenIcon, MagnifyingGlassIcon, StackIcon, TruckTrailerIcon, WarehouseIcon } from "@phosphor-icons/react"
+import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const sidebarItems = [
   {
@@ -81,9 +82,8 @@ export function AppSidebar(): React.JSX.Element {
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <StackIcon aria-hidden="true" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="flex items-center text-sm">
                 <span className="truncate font-medium">Shiva Exports Ltd</span>
-                <span className="truncate text-xs">Inventory</span>
               </div>
             </div>
           </SidebarMenuItem>
@@ -123,7 +123,7 @@ export function AppSidebar(): React.JSX.Element {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <UserIcon aria-hidden="true" /> Username
+              <UserButton />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

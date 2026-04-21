@@ -232,7 +232,7 @@ export type HoldGroupByOutputType = {
   _max: HoldMaxAggregateOutputType | null
 }
 
-type GetHoldGroupByPayload<T extends HoldGroupByArgs> = Prisma.PrismaPromise<
+export type GetHoldGroupByPayload<T extends HoldGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<HoldGroupByOutputType, T['by']> &
       {

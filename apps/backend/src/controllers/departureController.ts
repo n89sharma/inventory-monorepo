@@ -52,7 +52,7 @@ export async function getDepartureForUpdate(req: Request, res: Response, next: N
 export async function createDeparture(req: Request, res: Response, next: NextFunction) {
   try {
     const departure = CreateDepartureSchema.parse(req.body)
-    const departureNumber = await createDepartureSer(departure)
+    const departureNumber = await createDepartureSer(departure, res.locals.dbUserId)
     res.status(201).json({ departureNumber })
   } catch (error) {
     next(error)

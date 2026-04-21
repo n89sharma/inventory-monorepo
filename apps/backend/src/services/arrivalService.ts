@@ -14,7 +14,6 @@ const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
 
-const DEFAULT_CREATED_BY_ID = 178
 
 const assetIncludeArgs = {
   include: {
@@ -107,7 +106,7 @@ async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<Upda
   }
 }
 
-export async function createArrival(newArrival: CreateArrival) {
+export async function createArrival(newArrival: CreateArrival, userId: number) {
   const warehouseCode = newArrival.warehouse.city_code
   const currentDateTime = new Date()
   const barcodes = await generateBarcodes(newArrival.assets, warehouseCode, currentDateTime)
@@ -120,7 +119,7 @@ export async function createArrival(newArrival: CreateArrival) {
       transporter: { connect: { id: newArrival.transporter.id } },
       notes: newArrival.comment,
       created_at: currentDateTime,
-      created_by: { connect: { id: DEFAULT_CREATED_BY_ID } },
+      created_by: { connect: { id: userId } },
       assets: {
         create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(
           a,

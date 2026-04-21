@@ -5,7 +5,6 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from '../prisma.js'
 
 const sequenceDepartureEntity = 'DEPARTURE'
-const DEFAULT_CREATED_BY_ID = 178
 
 export async function getDeparture(departureNumber: string): Promise<ApiResponse<DepartureDetail>> {
   try {
@@ -67,7 +66,7 @@ export async function getDepartureForUpdate(departureNumber: string): Promise<Ap
   }
 }
 
-export async function createDeparture(departure: CreateDeparture): Promise<string> {
+export async function createDeparture(departure: CreateDeparture, userId: number): Promise<string> {
   const originCode = departure.origin.city_code
   const currentDateTime = new Date()
   const departureNumber = await getNewDepartureNumber(originCode, currentDateTime)
@@ -89,7 +88,7 @@ export async function createDeparture(departure: CreateDeparture): Promise<strin
       origin: { connect: { id: departure.origin.id } },
       destination: { connect: { id: departure.customer.id } },
       transporter: { connect: { id: departure.transporter.id } },
-      created_by: { connect: { id: DEFAULT_CREATED_BY_ID } },
+      created_by: { connect: { id: userId } },
       notes: departure.comment,
       created_at: currentDateTime
     }

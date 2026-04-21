@@ -1,6 +1,8 @@
 import { MainLayout } from '@/components/layout/layout'
 import { PageTitleUpdater } from '@/components/layout/page-title-updater'
 import { ArrivalsSummaryPage } from '@/components/pages/arrival/arrivals-summary-page'
+import { LoginPage } from '@/components/pages/login-page'
+import { ProtectedRoute } from '@/components/custom/protected-route'
 import { AssetDetailsPage } from '@/components/pages/asset-details-page'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ArrivalDetailsPage } from './components/pages/arrival/arrival-details-page'
@@ -24,53 +26,64 @@ import { CreateTransferPage } from './components/pages/transfer/create-transfer-
 import { TransferDetailsPage } from './components/pages/transfer/transfer-details-page'
 import { TransferSummaryPage } from './components/pages/transfer/transfers-summary-page'
 import { UpdateTransferPage } from './components/pages/transfer/update-transfer-page'
+import { useAxiosAuth } from './hooks/use-axios-auth'
+import { useAuth } from '@clerk/react'
 import { useGlobalData } from './hooks/use-global-data'
 
 function App() {
-  useGlobalData()
+  useAxiosAuth()
+  const { isSignedIn, isLoaded } = useAuth()
+  useGlobalData(isLoaded && !!isSignedIn)
 
   return (
     <BrowserRouter>
       <PageTitleUpdater />
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/arrivals" replace />} />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={
+          <ProtectedRoute>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/arrivals" replace />} />
 
-          <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
-          <Route path="/arrivals/new" element={<CreateArrivalPage />} />
-          <Route path="/arrivals/:collectionId/edit" element={<UpdateArrivalPage />} />
-          <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
+              <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
+              <Route path="/arrivals/new" element={<CreateArrivalPage />} />
+              <Route path="/arrivals/:collectionId/edit" element={<UpdateArrivalPage />} />
+              <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
 
-          <Route path="/transfers" element={<TransferSummaryPage />} />
-          <Route path="/transfers/new" element={<CreateTransferPage />} />
-          <Route path="/transfers/:collectionId/edit" element={<UpdateTransferPage />} />
-          <Route path="/transfers/:collectionId" element={<TransferDetailsPage />} />
+              <Route path="/transfers" element={<TransferSummaryPage />} />
+              <Route path="/transfers/new" element={<CreateTransferPage />} />
+              <Route path="/transfers/:collectionId/edit" element={<UpdateTransferPage />} />
+              <Route path="/transfers/:collectionId" element={<TransferDetailsPage />} />
 
-          <Route path="/departures" element={<DepartureSummaryPage />} />
-          <Route path="/departures/new" element={<CreateDeparturePage />} />
-          <Route path="/departures/:collectionId/edit" element={<UpdateDeparturePage />} />
-          <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
+              <Route path="/departures" element={<DepartureSummaryPage />} />
+              <Route path="/departures/new" element={<CreateDeparturePage />} />
+              <Route path="/departures/:collectionId/edit" element={<UpdateDeparturePage />} />
+              <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
 
-          <Route path="/holds" element={<HoldSummaryPage />} />
-          <Route path="/holds/new" element={<CreateHoldPage />} />
-          <Route path="/holds/:collectionId/edit" element={<UpdateHoldPage />} />
-          <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
+              <Route path="/holds" element={<HoldSummaryPage />} />
+              <Route path="/holds/new" element={<CreateHoldPage />} />
+              <Route path="/holds/:collectionId/edit" element={<UpdateHoldPage />} />
+              <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
 
-          <Route path="/invoices" element={<InvoicesSummaryPage />} />
-          <Route path="/invoices/new" element={<CreateInvoicePage />} />
-          <Route path="/invoices/:collectionId/edit" element={<UpdateInvoicePage />} />
-          <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
+              <Route path="/invoices" element={<InvoicesSummaryPage />} />
+              <Route path="/invoices/new" element={<CreateInvoicePage />} />
+              <Route path="/invoices/:collectionId/edit" element={<UpdateInvoicePage />} />
+              <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
 
-          <Route path="/reports" element={<ArrivalsSummaryPage />} />
+              <Route path="/reports" element={<ArrivalsSummaryPage />} />
 
-          <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
+              <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 
-          <Route path="/search" element={<QueryPage />} />
-          <Route path="/search/:assetId" element={<AssetDetailsPage />} />
+              <Route path="/search" element={<QueryPage />} />
+              <Route path="/search/:assetId" element={<AssetDetailsPage />} />
 
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </MainLayout>
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </MainLayout>
+          </ProtectedRoute>
+        } />
+      </Routes>
     </BrowserRouter>
   )
 }

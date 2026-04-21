@@ -7,9 +7,12 @@ import {
   getTransfers,
   updateTransfer
 } from '../controllers/transferController.js'
+import { requireAuth } from '../middleware/requireAuth.js'
 import { validateQuery } from '../middleware/validation.js'
 
 const router = express.Router()
+
+router.use(requireAuth)
 
 router.get('/', validateQuery(TransferQuerySchema), getTransfers)
 router.post('/', createTransfer)

@@ -196,7 +196,7 @@ export type ErrorGroupByOutputType = {
   _max: ErrorMaxAggregateOutputType | null
 }
 
-type GetErrorGroupByPayload<T extends ErrorGroupByArgs> = Prisma.PrismaPromise<
+export type GetErrorGroupByPayload<T extends ErrorGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ErrorGroupByOutputType, T['by']> &
       {

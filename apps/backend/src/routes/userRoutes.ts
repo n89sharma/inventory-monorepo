@@ -1,8 +1,11 @@
 import express from 'express'
 import { UserQuerySchema, getUsers } from '../controllers/userController.js'
+import { requireAuth } from '../middleware/requireAuth.js'
 import { validateQuery } from '../middleware/validation.js'
 
 const router = express.Router()
+
+router.use(requireAuth)
 
 router.get('/', validateQuery(UserQuerySchema), getUsers)
 

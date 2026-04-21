@@ -5,7 +5,6 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { prisma } from '../prisma.js'
 
 const sequenceTransferEntity = 'TRANSFER'
-const DEFAULT_CREATED_BY_ID = 178
 
 export async function getTransfer(transferNumber: string): Promise<ApiResponse<TransferDetail>> {
   try {
@@ -63,7 +62,7 @@ export async function getTransferForUpdate(transferNumber: string): Promise<ApiR
   }
 }
 
-export async function createTransfer(transfer: CreateTransfer): Promise<string> {
+export async function createTransfer(transfer: CreateTransfer, userId: number): Promise<string> {
   const originCode = transfer.origin.city_code
   const currentDateTime = new Date()
   const transferNumber = await getNewTransferNumber(originCode, currentDateTime)
@@ -74,7 +73,7 @@ export async function createTransfer(transfer: CreateTransfer): Promise<string> 
       origin: { connect: { id: transfer.origin.id } },
       destination: { connect: { id: transfer.destination.id } },
       transporter: { connect: { id: transfer.transporter.id } },
-      created_by: { connect: { id: DEFAULT_CREATED_BY_ID } },
+      created_by: { connect: { id: userId } },
       notes: transfer.comment,
       created_at: currentDateTime,
       asset_transfers: {

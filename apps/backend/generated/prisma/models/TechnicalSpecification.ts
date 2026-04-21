@@ -270,7 +270,7 @@ export type TechnicalSpecificationGroupByOutputType = {
   _max: TechnicalSpecificationMaxAggregateOutputType | null
 }
 
-type GetTechnicalSpecificationGroupByPayload<T extends TechnicalSpecificationGroupByArgs> = Prisma.PrismaPromise<
+export type GetTechnicalSpecificationGroupByPayload<T extends TechnicalSpecificationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TechnicalSpecificationGroupByOutputType, T['by']> &
       {

@@ -9,7 +9,6 @@ import {
 } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 
-const DEFAULT_CREATED_BY_ID = 178
 
 export async function getAssetDetail(barcode: string): Promise<ApiResponse<AssetDetails>> {
   try {
@@ -177,7 +176,7 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
   }
 }
 
-export async function createComment(barcode: string, data: CreateComment): Promise<ApiResponse<void>> {
+export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<ApiResponse<void>> {
   try {
     const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
     if (!asset) return response400(`Asset ${barcode} not found`)
@@ -185,7 +184,7 @@ export async function createComment(barcode: string, data: CreateComment): Promi
     await prisma.comment.create({
       data: {
         asset_id: asset.id,
-        created_by_id: DEFAULT_CREATED_BY_ID,
+        created_by_id: userId,
         comment: data.comment,
         created_at: now,
         updated_at: now
@@ -197,7 +196,7 @@ export async function createComment(barcode: string, data: CreateComment): Promi
   }
 }
 
-export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<ApiResponse<void>> {
+export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer, userId: number): Promise<ApiResponse<void>> {
   if (data.donor_barcode === recipientBarcode) {
     return response400('Donor and recipient cannot be the same asset')
   }
@@ -223,7 +222,7 @@ export async function createPartTransfer(recipientBarcode: string, data: CreateP
         is_exchange: data.is_exchange,
         notes: data.notes,
         fixed_at: new Date(),
-        fixed_by: DEFAULT_CREATED_BY_ID
+        fixed_by: userId
       }
     })
     return successResponse(undefined)
@@ -232,7 +231,7 @@ export async function createPartTransfer(recipientBarcode: string, data: CreateP
   }
 }
 
-export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors): Promise<ApiResponse<void>> {
+export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors, userId: number): Promise<ApiResponse<void>> {
   try {
     const asset = await prisma.asset.findUnique({
       where: { barcode },
@@ -276,10 +275,10 @@ export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors
           asset_id: assetId,
           error_id: errorId,
           is_fixed,
-          added_by: DEFAULT_CREATED_BY_ID,
+          added_by: userId,
           added_at: now,
           fixed_at: is_fixed ? now : null,
-          fixed_by: is_fixed ? DEFAULT_CREATED_BY_ID : null
+          fixed_by: is_fixed ? userId : null
         }
       }))
 
@@ -290,7 +289,7 @@ export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors
         data: {
           is_fixed,
           fixed_at: is_fixed ? now : null,
-          fixed_by: is_fixed ? DEFAULT_CREATED_BY_ID : null
+          fixed_by: is_fixed ? userId : null
         }
       }))
 

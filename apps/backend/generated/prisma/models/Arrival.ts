@@ -229,7 +229,7 @@ export type ArrivalGroupByOutputType = {
   _max: ArrivalMaxAggregateOutputType | null
 }
 
-type GetArrivalGroupByPayload<T extends ArrivalGroupByArgs> = Prisma.PrismaPromise<
+export type GetArrivalGroupByPayload<T extends ArrivalGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ArrivalGroupByOutputType, T['by']> &
       {

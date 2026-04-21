@@ -128,7 +128,7 @@ export async function getAssetSummaryByBarcode(req: Request, res: Response<ApiRe
 export async function createAssetComment(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = CreateCommentSchema.parse(req.body)
-  const response = await createCommentSer(barcode, validated)
+  const response = await createCommentSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.status(201).json(response)
   } else {
@@ -140,7 +140,7 @@ export async function createAssetComment(req: Request, res: Response<ApiResponse
 export async function createPartTransfer(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = CreatePartTransferSchema.parse(req.body)
-  const response = await createPartTransferSer(barcode, validated)
+  const response = await createPartTransferSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.status(201).json(response)
   } else {
@@ -152,7 +152,7 @@ export async function createPartTransfer(req: Request, res: Response<ApiResponse
 export async function updateAssetErrors(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = UpdateAssetErrorsSchema.parse(req.body)
-  const response = await updateAssetErrorsSer(barcode, validated)
+  const response = await updateAssetErrorsSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.json(response)
   } else {

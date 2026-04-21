@@ -218,7 +218,7 @@ export type AssetErrorGroupByOutputType = {
   _max: AssetErrorMaxAggregateOutputType | null
 }
 
-type GetAssetErrorGroupByPayload<T extends AssetErrorGroupByArgs> = Prisma.PrismaPromise<
+export type GetAssetErrorGroupByPayload<T extends AssetErrorGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AssetErrorGroupByOutputType, T['by']> &
       {

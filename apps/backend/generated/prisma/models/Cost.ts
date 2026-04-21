@@ -252,7 +252,7 @@ export type CostGroupByOutputType = {
   _max: CostMaxAggregateOutputType | null
 }
 
-type GetCostGroupByPayload<T extends CostGroupByArgs> = Prisma.PrismaPromise<
+export type GetCostGroupByPayload<T extends CostGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CostGroupByOutputType, T['by']> &
       {

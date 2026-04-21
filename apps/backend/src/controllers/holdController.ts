@@ -33,7 +33,7 @@ export async function getHolds(req: Request, res: Response<ApiResponse<HoldSumma
 export async function createHold(req: Request, res: Response, next: NextFunction) {
   try {
     const validated = CreateHoldSchema.parse(req.body)
-    const response = await createHoldSer(validated)
+    const response = await createHoldSer(validated, res.locals.dbUserId)
     if (response.success) {
       return res.status(201).json({ holdNumber: response.data })
     }

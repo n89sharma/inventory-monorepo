@@ -171,7 +171,7 @@ export type EntityGroupByOutputType = {
   _max: EntityMaxAggregateOutputType | null
 }
 
-type GetEntityGroupByPayload<T extends EntityGroupByArgs> = Prisma.PrismaPromise<
+export type GetEntityGroupByPayload<T extends EntityGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<EntityGroupByOutputType, T['by']> &
       {

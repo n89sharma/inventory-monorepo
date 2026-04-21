@@ -218,7 +218,7 @@ export type AssetHistoryGroupByOutputType = {
   _max: AssetHistoryMaxAggregateOutputType | null
 }
 
-type GetAssetHistoryGroupByPayload<T extends AssetHistoryGroupByArgs> = Prisma.PrismaPromise<
+export type GetAssetHistoryGroupByPayload<T extends AssetHistoryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AssetHistoryGroupByOutputType, T['by']> &
       {

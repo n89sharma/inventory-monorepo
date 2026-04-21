@@ -42,7 +42,7 @@ export async function createArrival(
 
   try {
     const validatedArrival = CreateArrivalSchema.parse(req.body)
-    const arrivalNumber = await createArrivalSer(validatedArrival)
+    const arrivalNumber = await createArrivalSer(validatedArrival, res.locals.dbUserId)
     res.status(201).json({ arrivalNumber: arrivalNumber })
   } catch (error) {
     next(error)

@@ -66,7 +66,7 @@ export async function getTransferForUpdate(req: Request, res: Response<ApiRespon
 export async function createTransfer(req: Request, res: Response<{ transferNumber: string }>, next: NextFunction) {
   try {
     const validated = CreateTransferSchema.parse(req.body)
-    const transferNumber = await createTransferSer(validated)
+    const transferNumber = await createTransferSer(validated, res.locals.dbUserId)
     res.status(201).json({ transferNumber })
   } catch (error) {
     next(error)
