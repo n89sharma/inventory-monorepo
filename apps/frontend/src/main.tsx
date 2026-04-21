@@ -9,7 +9,10 @@ import '@/global.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TooltipProvider>
-      <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+      <ClerkProvider
+        publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+        localization={{ signIn: { start: { subtitle: '' } } }}
+      >
         <App />
       </ClerkProvider>
     </TooltipProvider>
