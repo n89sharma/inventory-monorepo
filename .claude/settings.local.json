@@ -5,7 +5,8 @@
       "Bash(find E:/00-home/development/inventory-monorepo/apps/backend/generated/prisma/sql -name *.ts)",
       "WebSearch",
       "WebFetch(domain:clerk.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:ui.shadcn.com)"
     ]
   },
   "outputStyle": "default"
