@@ -9,7 +9,10 @@
       "WebFetch(domain:ui.shadcn.com)",
       "Bash(ls -la *.js)",
       "Bash(sort -k5 -rn)",
-      "Bash(awk '{printf \"%s KB\\\\t%s\\\\n\", int\\($5/1024\\), $9}')"
+      "Bash(awk '{printf \"%s KB\\\\t%s\\\\n\", int\\($5/1024\\), $9}')",
+      "Bash(npm install *)",
+      "Bash(grep -v \"//\")",
+      "Bash(grep *)"
     ]
   },
   "outputStyle": "default"

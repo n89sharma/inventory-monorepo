@@ -1,4 +1,5 @@
 import { createInvoice, getInvoiceDetail, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
+import { produce } from 'immer'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ApiResponse, InvoiceDetail, InvoiceSummary } from 'shared-types'
@@ -72,7 +73,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     if (get().detailCache[invoiceNumber]) return
     try {
       const detail = await getInvoiceDetail(invoiceNumber)
-      set(s => ({ detailCache: { ...s.detailCache, [invoiceNumber]: detail } }))
+      set(produce(draft => { draft.detailCache[invoiceNumber] = detail }))
     } catch {
       // silently swallow — detail page will fetch normally on navigation
     }
@@ -87,10 +88,10 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
   },
   submitUpdateInvoice: (invoiceNumber, data) => {
-    set(s => {
-      const { [invoiceNumber]: _, ...rest } = s.detailCache
-      return { invoiceDetail: null, detailCache: rest }
-    })
+    set(produce(draft => {
+      delete draft.detailCache[invoiceNumber]
+      draft.invoiceDetail = null
+    }))
     return updateInvoice(invoiceNumber, data)
   },
   clearInvoices: () => set({ invoices: [] })

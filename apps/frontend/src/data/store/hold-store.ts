@@ -1,4 +1,5 @@
 import { createHold, getHoldDetail, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
+import { produce } from 'immer'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ApiResponse, HoldDetail, HoldSummary, User } from 'shared-types'
@@ -84,7 +85,7 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     try {
       const res = await getHoldDetail(holdNumber)
       if (res.success) {
-        set(s => ({ detailCache: { ...s.detailCache, [holdNumber]: res.data } }))
+        set(produce(draft => { draft.detailCache[holdNumber] = res.data }))
       }
     } catch {
       // silently swallow — detail page will fetch normally on navigation
@@ -100,10 +101,10 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     return response
   },
   submitUpdateHold: (holdNumber, data) => {
-    set(s => {
-      const { [holdNumber]: _, ...rest } = s.detailCache
-      return { holdDetail: null, detailCache: rest }
-    })
+    set(produce(draft => {
+      delete draft.detailCache[holdNumber]
+      draft.holdDetail = null
+    }))
     return updateHold(holdNumber, data)
   },
   clearHolds: () => set({ holds: [] })

@@ -1,4 +1,5 @@
 import { createPartTransfer as createPartTransferApi, getAllAssetDetails, getAssetComments, getAssetErrors, getAssetPartTransfers, postComment as postCommentApi, updateAssetErrors as updateAssetErrorsApi } from '@/data/api/asset-api'
+import { produce } from 'immer'
 import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, UpdateError } from 'shared-types'
 import { create } from 'zustand'
 
@@ -90,7 +91,7 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
         transfers: r.assetTransfers.status === 'fulfilled' ? r.assetTransfers.result : [],
         partTransfers: r.assetPartTransfers.status === 'fulfilled' ? r.assetPartTransfers.result : [],
       }
-      set(s => ({ assetCache: { ...s.assetCache, [barcode]: entry } }))
+      set(produce(draft => { draft.assetCache[barcode] = entry }))
     } catch {
       // silently swallow — asset page will fetch normally on navigation
     }

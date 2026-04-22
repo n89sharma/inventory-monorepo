@@ -5,6 +5,7 @@ import {
   getTransfers as getTransfersApi,
   updateTransfer
 } from '@/data/api/transfer-api'
+import { produce } from 'immer'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import type { ApiResponse, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
@@ -84,7 +85,7 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     if (get().detailCache[transferNumber]) return
     try {
       const detail = await getTransferDetail(transferNumber)
-      set(s => ({ detailCache: { ...s.detailCache, [transferNumber]: detail } }))
+      set(produce(draft => { draft.detailCache[transferNumber] = detail }))
     } catch {
       // silently swallow — detail page will fetch normally on navigation
     }
@@ -96,10 +97,10 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     return response
   },
   submitUpdateTransfer: (transferNumber, data) => {
-    set(s => {
-      const { [transferNumber]: _, ...rest } = s.detailCache
-      return { transferDetail: null, detailCache: rest }
-    })
+    set(produce(draft => {
+      delete draft.detailCache[transferNumber]
+      draft.transferDetail = null
+    }))
     return updateTransfer(transferNumber, data)
   },
 

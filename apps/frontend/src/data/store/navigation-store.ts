@@ -1,3 +1,4 @@
+import { produce } from 'immer'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { create } from 'zustand'
 
@@ -18,7 +19,7 @@ export const useNavigationStore = create<NavigationStore>((set) => ({
     home: null
   },
   setLastPath: (section, path) =>
-    set(state => ({ lastPaths: { ...state.lastPaths, [section]: path } })),
+    set(produce(draft => { draft.lastPaths[section] = path })),
   clearLastPath: (section) =>
-    set(state => ({ lastPaths: { ...state.lastPaths, [section]: null } }))
+    set(produce(draft => { draft.lastPaths[section] = null }))
 }))

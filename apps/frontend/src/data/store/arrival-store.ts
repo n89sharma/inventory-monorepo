@@ -1,4 +1,5 @@
 import { createArrival, getArrivalDetail, getArrivalForUpdate, getArrivals, updateArrival } from '@/data/api/arrival-api'
+import { produce } from 'immer'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ApiResponse, ArrivalDetail, ArrivalSummary, Warehouse } from 'shared-types'
@@ -84,7 +85,7 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     if (get().detailCache[arrivalNumber]) return
     try {
       const detail = await getArrivalDetail(arrivalNumber)
-      set(s => ({ detailCache: { ...s.detailCache, [arrivalNumber]: detail } }))
+      set(produce(draft => { draft.detailCache[arrivalNumber] = detail }))
     } catch {
       // silently swallow — detail page will fetch normally on navigation
     }
@@ -96,10 +97,10 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     return response
   },
   submitUpdateArrival: (arrivalNumber, data) => {
-    set(s => {
-      const { [arrivalNumber]: _, ...rest } = s.detailCache
-      return { arrivalDetail: null, detailCache: rest }
-    })
+    set(produce(draft => {
+      delete draft.detailCache[arrivalNumber]
+      draft.arrivalDetail = null
+    }))
     return updateArrival(arrivalNumber, data)
   },
 

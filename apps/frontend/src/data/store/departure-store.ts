@@ -5,6 +5,7 @@ import {
   getDepartures,
   updateDeparture
 } from '@/data/api/departure-api'
+import { produce } from 'immer'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import type { ApiResponse, DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
@@ -81,7 +82,7 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     if (get().detailCache[departureNumber]) return
     try {
       const detail = await getDepartureDetail(departureNumber)
-      set(s => ({ detailCache: { ...s.detailCache, [departureNumber]: detail } }))
+      set(produce(draft => { draft.detailCache[departureNumber] = detail }))
     } catch {
       // silently swallow — detail page will fetch normally on navigation
     }
@@ -97,10 +98,10 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     return response
   },
   submitUpdateDeparture: (departureNumber, data) => {
-    set(s => {
-      const { [departureNumber]: _, ...rest } = s.detailCache
-      return { departureDetail: null, detailCache: rest }
-    })
+    set(produce(draft => {
+      delete draft.detailCache[departureNumber]
+      draft.departureDetail = null
+    }))
     return updateDeparture(departureNumber, data)
   },
 
