@@ -21,7 +21,7 @@ export async function handleClerkWebhook(req: Request, res: Response) {
       if (existingUser) {
         await prisma.user.update({
           where: { email },
-          data: { clerk_id: id }
+          data: { clerk_id: id, is_active: true }
         })
       } else {
         await prisma.user.create({
