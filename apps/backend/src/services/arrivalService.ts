@@ -58,7 +58,7 @@ export async function getArrival(arrivalNumber: string): Promise<ApiResponse<Arr
       warehouse: arrival.destination,
       comment: arrival.notes,
       created_at: arrival.created_at,
-      created_by: arrival.created_by.email,
+      created_by: arrival.created_by.name,
       assets
     })
   } catch (error) {

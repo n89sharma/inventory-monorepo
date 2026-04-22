@@ -25,7 +25,7 @@ export async function getTransfer(transferNumber: string): Promise<ApiResponse<T
       transporter: transfer.transporter,
       notes: transfer.notes,
       created_at: transfer.created_at,
-      created_by: transfer.created_by?.email,
+      created_by: transfer.created_by?.name,
       assets
     })
   } catch (error) {

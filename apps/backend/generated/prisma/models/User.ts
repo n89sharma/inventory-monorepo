@@ -38,7 +38,6 @@ export type UserSumAggregateOutputType = {
 
 export type UserMinAggregateOutputType = {
   id: number | null
-  username: string | null
   email: string | null
   name: string | null
   role_id: number | null
@@ -48,7 +47,6 @@ export type UserMinAggregateOutputType = {
 
 export type UserMaxAggregateOutputType = {
   id: number | null
-  username: string | null
   email: string | null
   name: string | null
   role_id: number | null
@@ -58,7 +56,6 @@ export type UserMaxAggregateOutputType = {
 
 export type UserCountAggregateOutputType = {
   id: number
-  username: number
   email: number
   name: number
   role_id: number
@@ -80,7 +77,6 @@ export type UserSumAggregateInputType = {
 
 export type UserMinAggregateInputType = {
   id?: true
-  username?: true
   email?: true
   name?: true
   role_id?: true
@@ -90,7 +86,6 @@ export type UserMinAggregateInputType = {
 
 export type UserMaxAggregateInputType = {
   id?: true
-  username?: true
   email?: true
   name?: true
   role_id?: true
@@ -100,7 +95,6 @@ export type UserMaxAggregateInputType = {
 
 export type UserCountAggregateInputType = {
   id?: true
-  username?: true
   email?: true
   name?: true
   role_id?: true
@@ -197,10 +191,9 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type UserGroupByOutputType = {
   id: number
-  username: string
-  email: string
+  email: string | null
   name: string
-  role_id: number
+  role_id: number | null
   is_active: boolean
   clerk_id: string | null
   _count: UserCountAggregateOutputType | null
@@ -230,10 +223,9 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
-  username?: Prisma.StringFilter<"User"> | string
-  email?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
-  role_id?: Prisma.IntFilter<"User"> | number
+  role_id?: Prisma.IntNullableFilter<"User"> | number | null
   is_active?: Prisma.BoolFilter<"User"> | boolean
   clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
   arrivals?: Prisma.ArrivalListRelationFilter
@@ -249,15 +241,14 @@ export type UserWhereInput = {
   invoices_updated?: Prisma.InvoiceListRelationFilter
   PartTransfer?: Prisma.PartTransferListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
-  Role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
+  Role?: Prisma.XOR<Prisma.RoleNullableScalarRelationFilter, Prisma.RoleWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  username?: Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
-  role_id?: Prisma.SortOrder
+  role_id?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   arrivals?: Prisma.ArrivalOrderByRelationAggregateInput
@@ -278,14 +269,13 @@ export type UserOrderByWithRelationInput = {
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  username?: string
+  email?: string
+  name?: string
   clerk_id?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
-  email?: Prisma.StringFilter<"User"> | string
-  name?: Prisma.StringFilter<"User"> | string
-  role_id?: Prisma.IntFilter<"User"> | number
+  role_id?: Prisma.IntNullableFilter<"User"> | number | null
   is_active?: Prisma.BoolFilter<"User"> | boolean
   arrivals?: Prisma.ArrivalListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
@@ -300,15 +290,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   invoices_updated?: Prisma.InvoiceListRelationFilter
   PartTransfer?: Prisma.PartTransferListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
-  Role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
-}, "id" | "username" | "clerk_id">
+  Role?: Prisma.XOR<Prisma.RoleNullableScalarRelationFilter, Prisma.RoleWhereInput> | null
+}, "id" | "email" | "name" | "clerk_id">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  username?: Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
-  role_id?: Prisma.SortOrder
+  role_id?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -323,17 +312,15 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"User"> | number
-  username?: Prisma.StringWithAggregatesFilter<"User"> | string
-  email?: Prisma.StringWithAggregatesFilter<"User"> | string
+  email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  role_id?: Prisma.IntWithAggregatesFilter<"User"> | number
+  role_id?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   is_active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   clerk_id?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -350,15 +337,14 @@ export type UserCreateInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -377,8 +363,7 @@ export type UserUncheckedCreateInput = {
 }
 
 export type UserUpdateInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -395,15 +380,14 @@ export type UserUpdateInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -423,17 +407,15 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -441,10 +423,9 @@ export type UserUpdateManyMutationInput = {
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -461,7 +442,6 @@ export type UserScalarRelationFilter = {
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
@@ -476,7 +456,6 @@ export type UserAvgOrderByAggregateInput = {
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
@@ -486,7 +465,6 @@ export type UserMaxOrderByAggregateInput = {
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  username?: Prisma.SortOrder
   email?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role_id?: Prisma.SortOrder
@@ -742,8 +720,7 @@ export type UserUpdateOneRequiredWithoutPartTransferNestedInput = {
 }
 
 export type UserCreateWithoutAsset_errors_addedInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -759,15 +736,14 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -790,8 +766,7 @@ export type UserCreateOrConnectWithoutAsset_errors_addedInput = {
 }
 
 export type UserCreateWithoutAsset_errors_fixedInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -807,15 +782,14 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -849,8 +823,7 @@ export type UserUpdateToOneWithWhereWithoutAsset_errors_addedInput = {
 }
 
 export type UserUpdateWithoutAsset_errors_addedInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -866,15 +839,14 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -903,8 +875,7 @@ export type UserUpdateToOneWithWhereWithoutAsset_errors_fixedInput = {
 }
 
 export type UserUpdateWithoutAsset_errors_fixedInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -920,15 +891,14 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -946,8 +916,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
 }
 
 export type UserCreateWithoutTransfersInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -963,15 +932,14 @@ export type UserCreateWithoutTransfersInput = {
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTransfersInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1005,8 +973,7 @@ export type UserUpdateToOneWithWhereWithoutTransfersInput = {
 }
 
 export type UserUpdateWithoutTransfersInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1022,15 +989,14 @@ export type UserUpdateWithoutTransfersInput = {
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransfersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1048,8 +1014,7 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
 }
 
 export type UserCreateWithoutArrivalsInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1065,15 +1030,14 @@ export type UserCreateWithoutArrivalsInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutArrivalsInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
@@ -1107,8 +1071,7 @@ export type UserUpdateToOneWithWhereWithoutArrivalsInput = {
 }
 
 export type UserUpdateWithoutArrivalsInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1124,15 +1087,14 @@ export type UserUpdateWithoutArrivalsInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArrivalsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
@@ -1150,8 +1112,7 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
 }
 
 export type UserCreateWithoutDeparturesInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1167,15 +1128,14 @@ export type UserCreateWithoutDeparturesInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDeparturesInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1198,8 +1158,7 @@ export type UserCreateOrConnectWithoutDeparturesInput = {
 }
 
 export type UserCreateWithoutDeparture_sales_repsInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1215,15 +1174,14 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1257,8 +1215,7 @@ export type UserUpdateToOneWithWhereWithoutDeparturesInput = {
 }
 
 export type UserUpdateWithoutDeparturesInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1274,15 +1231,14 @@ export type UserUpdateWithoutDeparturesInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparturesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1311,8 +1267,7 @@ export type UserUpdateToOneWithWhereWithoutDeparture_sales_repsInput = {
 }
 
 export type UserUpdateWithoutDeparture_sales_repsInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1328,15 +1283,14 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1354,8 +1308,7 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
 }
 
 export type UserCreateWithoutHolds_createdInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1371,15 +1324,14 @@ export type UserCreateWithoutHolds_createdInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHolds_createdInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1402,8 +1354,7 @@ export type UserCreateOrConnectWithoutHolds_createdInput = {
 }
 
 export type UserCreateWithoutHolds_forInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1419,15 +1370,14 @@ export type UserCreateWithoutHolds_forInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHolds_forInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1461,8 +1411,7 @@ export type UserUpdateToOneWithWhereWithoutHolds_createdInput = {
 }
 
 export type UserUpdateWithoutHolds_createdInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1478,15 +1427,14 @@ export type UserUpdateWithoutHolds_createdInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1515,8 +1463,7 @@ export type UserUpdateToOneWithWhereWithoutHolds_forInput = {
 }
 
 export type UserUpdateWithoutHolds_forInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1532,15 +1479,14 @@ export type UserUpdateWithoutHolds_forInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_forInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1558,8 +1504,7 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
 }
 
 export type UserCreateWithoutInvoices_updatedInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1575,15 +1520,14 @@ export type UserCreateWithoutInvoices_updatedInput = {
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1617,8 +1561,7 @@ export type UserUpdateToOneWithWhereWithoutInvoices_updatedInput = {
 }
 
 export type UserUpdateWithoutInvoices_updatedInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1634,15 +1577,14 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1660,8 +1602,7 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
 }
 
 export type UserCreateWithoutFilesInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1677,15 +1618,14 @@ export type UserCreateWithoutFilesInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFilesInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1719,8 +1659,7 @@ export type UserUpdateToOneWithWhereWithoutFilesInput = {
 }
 
 export type UserUpdateWithoutFilesInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1736,15 +1675,14 @@ export type UserUpdateWithoutFilesInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFilesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1762,8 +1700,7 @@ export type UserUncheckedUpdateWithoutFilesInput = {
 }
 
 export type UserCreateWithoutCommentsInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1779,15 +1716,14 @@ export type UserCreateWithoutCommentsInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1821,8 +1757,7 @@ export type UserUpdateToOneWithWhereWithoutCommentsInput = {
 }
 
 export type UserUpdateWithoutCommentsInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1838,15 +1773,14 @@ export type UserUpdateWithoutCommentsInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1864,8 +1798,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
 }
 
 export type UserCreateWithoutAsset_historyInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1881,15 +1814,14 @@ export type UserCreateWithoutAsset_historyInput = {
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsset_historyInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1923,8 +1855,7 @@ export type UserUpdateToOneWithWhereWithoutAsset_historyInput = {
 }
 
 export type UserUpdateWithoutAsset_historyInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1940,15 +1871,14 @@ export type UserUpdateWithoutAsset_historyInput = {
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_historyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1966,8 +1896,7 @@ export type UserUncheckedUpdateWithoutAsset_historyInput = {
 }
 
 export type UserCreateWithoutRoleInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -1988,8 +1917,7 @@ export type UserCreateWithoutRoleInput = {
 
 export type UserUncheckedCreateWithoutRoleInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -2039,17 +1967,15 @@ export type UserScalarWhereInput = {
   OR?: Prisma.UserScalarWhereInput[]
   NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
-  username?: Prisma.StringFilter<"User"> | string
-  email?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
-  role_id?: Prisma.IntFilter<"User"> | number
+  role_id?: Prisma.IntNullableFilter<"User"> | number | null
   is_active?: Prisma.BoolFilter<"User"> | boolean
   clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateWithoutPartTransferInput = {
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
@@ -2065,15 +1991,14 @@ export type UserCreateWithoutPartTransferInput = {
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-  Role: Prisma.RoleCreateNestedOneWithoutUserInput
+  Role?: Prisma.RoleCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPartTransferInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
-  role_id: number
+  role_id?: number | null
   is_active?: boolean
   clerk_id?: string | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2107,8 +2032,7 @@ export type UserUpdateToOneWithWhereWithoutPartTransferInput = {
 }
 
 export type UserUpdateWithoutPartTransferInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2124,15 +2048,14 @@ export type UserUpdateWithoutPartTransferInput = {
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-  Role?: Prisma.RoleUpdateOneRequiredWithoutUserNestedInput
+  Role?: Prisma.RoleUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPartTransferInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  role_id?: Prisma.IntFieldUpdateOperationsInput | number
+  role_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2151,16 +2074,14 @@ export type UserUncheckedUpdateWithoutPartTransferInput = {
 
 export type UserCreateManyRoleInput = {
   id?: number
-  username: string
-  email: string
+  email?: string | null
   name: string
   is_active?: boolean
   clerk_id?: string | null
 }
 
 export type UserUpdateWithoutRoleInput = {
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2181,8 +2102,7 @@ export type UserUpdateWithoutRoleInput = {
 
 export type UserUncheckedUpdateWithoutRoleInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2203,8 +2123,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
 
 export type UserUncheckedUpdateManyWithoutRoleInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  username?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2351,7 +2270,6 @@ export type UserCountOutputTypeCountTransfersArgs<ExtArgs extends runtime.Types.
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  username?: boolean
   email?: boolean
   name?: boolean
   role_id?: boolean
@@ -2370,35 +2288,32 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
   PartTransfer?: boolean | Prisma.User$PartTransferArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  username?: boolean
   email?: boolean
   name?: boolean
   role_id?: boolean
   is_active?: boolean
   clerk_id?: boolean
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  username?: boolean
   email?: boolean
   name?: boolean
   role_id?: boolean
   is_active?: boolean
   clerk_id?: boolean
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   id?: boolean
-  username?: boolean
   email?: boolean
   name?: boolean
   role_id?: boolean
@@ -2406,7 +2321,7 @@ export type UserSelectScalar = {
   clerk_id?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "username" | "email" | "name" | "role_id" | "is_active" | "clerk_id", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "role_id" | "is_active" | "clerk_id", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrivals?: boolean | Prisma.User$arrivalsArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
@@ -2421,14 +2336,14 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
   PartTransfer?: boolean | Prisma.User$PartTransferArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
+  Role?: boolean | Prisma.User$RoleArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2447,14 +2362,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     invoices_updated: Prisma.$InvoicePayload<ExtArgs>[]
     PartTransfer: Prisma.$PartTransferPayload<ExtArgs>[]
     transfers: Prisma.$TransferPayload<ExtArgs>[]
-    Role: Prisma.$RolePayload<ExtArgs>
+    Role: Prisma.$RolePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    username: string
-    email: string
+    email: string | null
     name: string
-    role_id: number
+    role_id: number | null
     is_active: boolean
     clerk_id: string | null
   }, ExtArgs["result"]["user"]>
@@ -2864,7 +2778,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   invoices_updated<T extends Prisma.User$invoices_updatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invoices_updatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   PartTransfer<T extends Prisma.User$PartTransferArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$PartTransferArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfers<T extends Prisma.User$transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  Role<T extends Prisma.RoleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RoleDefaultArgs<ExtArgs>>): Prisma.Prisma__RoleClient<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  Role<T extends Prisma.User$RoleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$RoleArgs<ExtArgs>>): Prisma.Prisma__RoleClient<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2895,7 +2809,6 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'Int'>
-  readonly username: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly role_id: Prisma.FieldRef<"User", 'Int'>
@@ -3620,6 +3533,25 @@ export type User$transfersArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.TransferScalarFieldEnum | Prisma.TransferScalarFieldEnum[]
+}
+
+/**
+ * User.Role
+ */
+export type User$RoleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Role
+   */
+  select?: Prisma.RoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Role
+   */
+  omit?: Prisma.RoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoleInclude<ExtArgs> | null
+  where?: Prisma.RoleWhereInput
 }
 
 /**

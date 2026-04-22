@@ -72,11 +72,10 @@ export async function getHoldForUpdate(holdNumber: string): Promise<ApiResponse<
       id: hold.id,
       created_for: {
         id: hold.created_for.id,
-        username: hold.created_for.username,
         name: hold.created_for.name,
-        email: hold.created_for.email,
-        role_id: hold.created_for.role_id,
-        role: hold.created_for.Role.role
+        email: hold.created_for.email ?? '',
+        role_id: hold.created_for.role_id ?? 0,
+        role: hold.created_for.Role?.role ?? ''
       },
       customer: {
         id: hold.customer.id,
@@ -166,19 +165,17 @@ export async function getHold(holdNumber: string): Promise<ApiResponse<HoldDetai
       hold_number: hold.hold_number,
       created_by: {
         id: hold.created_by.id,
-        username: hold.created_by.username,
         name: hold.created_by.name,
-        email: hold.created_by.email,
-        role_id: hold.created_by.role_id,
-        role: hold.created_by.Role.role
+        email: hold.created_by.email ?? '',
+        role_id: hold.created_by.role_id ?? 0,
+        role: hold.created_by.Role?.role ?? ''
       },
       created_for: {
         id: hold.created_for.id,
-        username: hold.created_for.username,
         name: hold.created_for.name,
-        email: hold.created_for.email,
-        role_id: hold.created_for.role_id,
-        role: hold.created_for.Role.role
+        email: hold.created_for.email ?? '',
+        role_id: hold.created_for.role_id ?? 0,
+        role: hold.created_for.Role?.role ?? ''
       },
       customer: hold.customer,
       notes: hold.notes,

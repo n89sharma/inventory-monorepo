@@ -115,11 +115,10 @@ export async function getInvoice(invoiceNumber: string): Promise<ApiResponse<Inv
       created_at: invoice.created_at,
       created_by: {
         id: invoice.updated_by.id,
-        username: invoice.updated_by.username,
         name: invoice.updated_by.name,
-        email: invoice.updated_by.email,
-        role_id: invoice.updated_by.role_id,
-        role: invoice.updated_by.Role.role
+        email: invoice.updated_by.email ?? '',
+        role_id: invoice.updated_by.role_id ?? 0,
+        role: invoice.updated_by.Role?.role ?? ''
       },
       customer: invoice.organization,
       assets

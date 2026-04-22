@@ -25,7 +25,7 @@ export async function getDeparture(departureNumber: string): Promise<ApiResponse
       transporter: departure.transporter,
       notes: departure.notes,
       created_at: departure.created_at,
-      created_by: departure.created_by?.email,
+      created_by: departure.created_by?.name,
       assets
     })
   } catch (error) {

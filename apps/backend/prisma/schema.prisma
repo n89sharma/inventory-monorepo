@@ -338,10 +338,9 @@ model Comment {
 
 model User {
   id                   Int            @id @default(autoincrement())
-  username             String         @unique
-  email                String
-  name                 String
-  role_id              Int
+  email                String?        @unique
+  name                 String         @unique
+  role_id              Int?
   is_active            Boolean        @default(false)
   clerk_id             String?        @unique
   arrivals             Arrival[]
@@ -357,7 +356,7 @@ model User {
   invoices_updated     Invoice[]
   PartTransfer         PartTransfer[]
   transfers            Transfer[]
-  Role                 Role           @relation(fields: [role_id], references: [id])
+  Role                 Role?          @relation(fields: [role_id], references: [id])
 }
 
 model Organization {

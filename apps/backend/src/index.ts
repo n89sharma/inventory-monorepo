@@ -4,6 +4,7 @@ import 'dotenv/config'
 import express from 'express'
 import morgan from 'morgan'
 import arrivalRoutes from './routes/arrivalRoutes.js'
+import webhookRoutes from './routes/webhookRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
 import brandRoutes from './routes/brandRoutes.js'
 import departureRoutes from './routes/depatureRoutes.js'
@@ -18,6 +19,7 @@ import userRoutes from './routes/userRoutes.js'
 const app = express();
 
 app.use(clerkMiddleware())
+app.use('/webhooks', webhookRoutes)
 app.use(express.json());
 app.use(cors({ origin: ["http://localhost:5173", "https://shiva-inv.vercel.app"] }))
 app.use(morgan('dev'));
