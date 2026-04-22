@@ -1,5 +1,8 @@
 {
   "buildCommand": "npm run build -w packages/shared-types && npm run build -w apps/frontend",
   "installCommand": "npm install",
-  "outputDirectory": "apps/frontend/dist"
+  "outputDirectory": "apps/frontend/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
