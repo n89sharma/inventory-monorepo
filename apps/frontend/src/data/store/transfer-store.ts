@@ -21,6 +21,7 @@ interface TransferStore {
   detailLoading: boolean
   detailError: string | null
   transferFormData: TransferForm | null
+  detailCache: Record<string, TransferDetail>
 
   setFromDate: (d: SelectOption<Date>) => void
   setToDate: (d: SelectOption<Date>) => void
@@ -32,6 +33,7 @@ interface TransferStore {
     origin: SelectOption<Warehouse>,
     destination: SelectOption<Warehouse>) => Promise<void>
   getTransferDetails: (transferNumber: string) => Promise<void>
+  prefetchTransferDetail: (transferNumber: string) => Promise<void>
   getTransferForUpdate: (transferNumber: string) => Promise<void>
   submitCreateTransfer: (data: TransferForm) => Promise<ApiResponse<{ transferNumber: string }>>
   submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<ApiResponse<void>>
@@ -49,6 +51,7 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
   detailLoading: false,
   detailError: null,
   transferFormData: null,
+  detailCache: {},
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -63,7 +66,11 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     set({ transferFormData: await getTransferForUpdate(transferNumber) })
   },
   getTransferDetails: async (transferNumber) => {
-    if (get().transferDetail?.transfer_number === transferNumber) return
+    const cached = get().detailCache[transferNumber]
+    if (cached) {
+      set({ transferDetail: cached })
+      return
+    }
     set({ detailLoading: true, detailError: null })
     try {
       set({ transferDetail: await getTransferDetail(transferNumber) })
@@ -73,6 +80,15 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
+  prefetchTransferDetail: async (transferNumber) => {
+    if (get().detailCache[transferNumber]) return
+    try {
+      const detail = await getTransferDetail(transferNumber)
+      set(s => ({ detailCache: { ...s.detailCache, [transferNumber]: detail } }))
+    } catch {
+      // silently swallow — detail page will fetch normally on navigation
+    }
+  },
 
   submitCreateTransfer: async (data) => {
     const response = await createTransfer(data)
@@ -80,7 +96,10 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     return response
   },
   submitUpdateTransfer: (transferNumber, data) => {
-    set({ transferDetail: null })
+    set(s => {
+      const { [transferNumber]: _, ...rest } = s.detailCache
+      return { transferDetail: null, detailCache: rest }
+    })
     return updateTransfer(transferNumber, data)
   },
 

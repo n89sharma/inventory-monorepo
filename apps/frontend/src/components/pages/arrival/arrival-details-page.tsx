@@ -2,6 +2,7 @@ import { Organization } from '@/components/custom/cards/organization-card'
 import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useArrivalStore } from '@/data/store/arrival-store'
+import { useAssetStore } from '@/data/store/asset-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -15,6 +16,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const detailLoading = useArrivalStore(state => state.detailLoading)
   const detailError = useArrivalStore(state => state.detailError)
   const getArrivalDetail = useArrivalStore(state => state.getArrivalDetail)
+  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -48,7 +50,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={arrival.transporter} />
         <WarehouseCard title="Warehouse" warehouse={arrival.warehouse} />
       </div>
-      <DataTable columns={columns} data={arrival.assets} />
+      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
     </div>
   )
 }

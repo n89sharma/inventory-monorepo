@@ -16,6 +16,7 @@ interface HoldStore {
   detailLoading: boolean
   detailError: string | null
   holdFormData: HoldForm | null
+  detailCache: Record<string, HoldDetail>
 
   setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -26,6 +27,7 @@ interface HoldStore {
   setHasSearched: (hasSearched: boolean) => void
   setHoldDetail: (holdDetail: HoldDetail) => void
   getHoldDetails: (holdNumber: string) => Promise<void>
+  prefetchHoldDetail: (holdNumber: string) => Promise<void>
   getHolds: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -50,6 +52,7 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   detailLoading: false,
   detailError: null,
   holdFormData: null,
+  detailCache: {},
 
   setHolds: (holds) => set({ holds }),
   setLoading: (loading) => set({ loading }),
@@ -63,13 +66,28 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     set({ hasSearched: true, holds: await getHolds(fromDate, toDate, holdBy, holdFor) })
   },
   getHoldDetails: async (holdNumber) => {
-    if (get().holdDetail?.hold_number === holdNumber) return
+    const cached = get().detailCache[holdNumber]
+    if (cached) {
+      set({ holdDetail: cached })
+      return
+    }
     set({ detailLoading: true, detailError: null })
     const res = await getHoldDetail(holdNumber)
     if (res.success) {
       set({ holdDetail: res.data, detailLoading: false })
     } else {
       set({ detailError: res.error.summary, detailLoading: false })
+    }
+  },
+  prefetchHoldDetail: async (holdNumber) => {
+    if (get().detailCache[holdNumber]) return
+    try {
+      const res = await getHoldDetail(holdNumber)
+      if (res.success) {
+        set(s => ({ detailCache: { ...s.detailCache, [holdNumber]: res.data } }))
+      }
+    } catch {
+      // silently swallow — detail page will fetch normally on navigation
     }
   },
   getHoldForUpdate: async (holdNumber) => {
@@ -82,7 +100,10 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     return response
   },
   submitUpdateHold: (holdNumber, data) => {
-    set({ holdDetail: null })
+    set(s => {
+      const { [holdNumber]: _, ...rest } = s.detailCache
+      return { holdDetail: null, detailCache: rest }
+    })
     return updateHold(holdNumber, data)
   },
   clearHolds: () => set({ holds: [] })

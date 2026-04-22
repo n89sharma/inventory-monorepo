@@ -15,6 +15,7 @@ import { transferTableColumns } from "../column-defs/transfer-columns"
 export function TransferSummaryPage(): React.JSX.Element {
   const transfers = useTransferStore(state => state.transfers)
   const getTransfers = useTransferStore(state => state.getTransfers)
+  const prefetchTransferDetail = useTransferStore(state => state.prefetchTransferDetail)
   const fromDate = useTransferStore(state => state.fromDate)
   const toDate = useTransferStore(state => state.toDate)
   const origin = useTransferStore(state => state.origin)
@@ -38,6 +39,7 @@ export function TransferSummaryPage(): React.JSX.Element {
       title="Transfers"
       columns={transferTableColumns}
       data={transfers}
+      onRowMouseEnter={(transfer) => prefetchTransferDetail(transfer.transfer_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, destination }}

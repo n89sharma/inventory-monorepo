@@ -1,6 +1,7 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { useAssetStore } from '@/data/store/asset-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useTransferStore } from '@/data/store/transfer-store'
 import { useEffect, useMemo } from 'react'
@@ -15,6 +16,7 @@ export function TransferDetailsPage(): React.JSX.Element {
   const detailLoading = useTransferStore(state => state.detailLoading)
   const detailError = useTransferStore(state => state.detailError)
   const getTransferDetails = useTransferStore(state => state.getTransferDetails)
+  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -48,7 +50,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={transfer.transporter} />
         <WarehouseCard title="Destination" warehouse={transfer.destination} />
       </div>
-      <DataTable columns={columns} data={transfer.assets} />
+      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
     </div>
   )
 }

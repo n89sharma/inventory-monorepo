@@ -24,11 +24,13 @@ import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onRowMouseEnter?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onRowMouseEnter,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -97,6 +99,7 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    onMouseEnter={() => onRowMouseEnter?.(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell

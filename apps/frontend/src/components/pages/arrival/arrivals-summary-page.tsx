@@ -15,6 +15,7 @@ import { arrivalTableColumns } from "../column-defs/arrival-columns"
 export function ArrivalsSummaryPage(): React.JSX.Element {
   const arrivals = useArrivalStore(state => state.arrivals)
   const getArrivals = useArrivalStore(state => state.getArrivals)
+  const prefetchArrivalDetail = useArrivalStore(state => state.prefetchArrivalDetail)
   const fromDate = useArrivalStore(state => state.fromDate)
   const setFromDate = useArrivalStore(state => state.setFromDate)
   const toDate = useArrivalStore(state => state.toDate)
@@ -36,6 +37,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
       title="Arrivals"
       columns={arrivalTableColumns}
       data={arrivals}
+      onRowMouseEnter={(arrival) => prefetchArrivalDetail(arrival.arrival_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, destination }}

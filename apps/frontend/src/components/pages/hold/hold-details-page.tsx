@@ -1,6 +1,7 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { useAssetStore } from '@/data/store/asset-store'
 import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -15,6 +16,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   const detailLoading = useHoldStore(state => state.detailLoading)
   const detailError = useHoldStore(state => state.detailError)
   const getHoldDetails = useHoldStore(state => state.getHoldDetails)
+  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -48,7 +50,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         <UserCard title="Created For" user={hold.created_for} />
         <Organization title="Customer" org={hold.customer} />
       </div>
-      <DataTable columns={columns} data={hold.assets} />
+      <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
     </div>
   )
 }

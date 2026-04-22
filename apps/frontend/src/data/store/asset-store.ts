@@ -2,6 +2,15 @@ import { createPartTransfer as createPartTransferApi, getAllAssetDetails, getAss
 import type { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, UpdateError } from 'shared-types'
 import { create } from 'zustand'
 
+type AssetCacheEntry = {
+  assetDetails: AssetDetails | null
+  accessories: string[]
+  errors: AssetError[]
+  comments: Comment[]
+  transfers: AssetTransfer[]
+  partTransfers: PartTransfer[]
+}
+
 interface AssetStore {
   //entities
   assetDetails: AssetDetails | null
@@ -12,6 +21,7 @@ interface AssetStore {
   partTransfers: PartTransfer[]
   loading: boolean
   error: string | null
+  assetCache: Record<string, AssetCacheEntry>
 
   //actions
   setAssetDetails: (assetDetails: AssetDetails) => void
@@ -21,6 +31,7 @@ interface AssetStore {
   setAssetTransfers: (transfers: AssetTransfer[]) => void
   setAssetPartTransfers: (partTransfers: PartTransfer[]) => void
   getAssetDetails: (barcode: string) => Promise<void>
+  prefetchAssetDetails: (barcode: string) => Promise<void>
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<ApiResponse<void>>
   createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<ApiResponse<void>>
   createComment: (barcode: string, data: CreateComment) => Promise<ApiResponse<void>>
@@ -29,7 +40,7 @@ interface AssetStore {
   clearAssetStore: () => void
 }
 
-export const useAssetStore = create<AssetStore>((set) => ({
+export const useAssetStore = create<AssetStore>((set, get) => ({
   assetDetails: null,
   accessories: [],
   errors: [],
@@ -38,6 +49,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
   partTransfers: [],
   loading: false,
   error: null,
+  assetCache: {},
 
   setAssetDetails: (assetDetails) => set({ assetDetails }),
   setAssetAccessories: (accessories) => set({ accessories }),
@@ -46,6 +58,11 @@ export const useAssetStore = create<AssetStore>((set) => ({
   setAssetTransfers: (transfers) => set({ transfers }),
   setAssetPartTransfers: (parts) => set({ partTransfers: parts }),
   getAssetDetails: async (barcode) => {
+    const cached = get().assetCache[barcode]
+    if (cached) {
+      set({ assetDetails: cached.assetDetails, accessories: cached.accessories, errors: cached.errors, comments: cached.comments, transfers: cached.transfers, partTransfers: cached.partTransfers })
+      return
+    }
     set({ loading: true, error: null, assetDetails: null, accessories: [], errors: [], comments: [], transfers: [], partTransfers: [] })
     try {
       const r = await getAllAssetDetails(barcode)
@@ -59,6 +76,23 @@ export const useAssetStore = create<AssetStore>((set) => ({
       set({ error: e instanceof Error ? e.message : 'Failed to load asset details' })
     } finally {
       set({ loading: false })
+    }
+  },
+  prefetchAssetDetails: async (barcode) => {
+    if (get().assetCache[barcode]) return
+    try {
+      const r = await getAllAssetDetails(barcode)
+      const entry: AssetCacheEntry = {
+        assetDetails: r.assetDetails.status === 'fulfilled' ? r.assetDetails.result : null,
+        accessories: r.assetAccessories.status === 'fulfilled' ? r.assetAccessories.result : [],
+        errors: r.assetErrors.status === 'fulfilled' ? r.assetErrors.result : [],
+        comments: r.assetComments.status === 'fulfilled' ? r.assetComments.result : [],
+        transfers: r.assetTransfers.status === 'fulfilled' ? r.assetTransfers.result : [],
+        partTransfers: r.assetPartTransfers.status === 'fulfilled' ? r.assetPartTransfers.result : [],
+      }
+      set(s => ({ assetCache: { ...s.assetCache, [barcode]: entry } }))
+    } catch {
+      // silently swallow — asset page will fetch normally on navigation
     }
   },
 

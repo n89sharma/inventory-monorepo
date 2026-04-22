@@ -7,9 +7,10 @@ interface CollectionPageProps<TData, TValue> {
   data: TData[]
   searchBar: React.ReactNode
   actions?: React.ReactNode
+  onRowMouseEnter?: (row: TData) => void
 }
 
-export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions }: CollectionPageProps<TData, TValue>) {
+export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions, onRowMouseEnter }: CollectionPageProps<TData, TValue>) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -17,7 +18,7 @@ export function CollectionPage<TData, TValue>({ title, columns, data, searchBar,
         {actions}
       </div>
       {searchBar}
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} onRowMouseEnter={onRowMouseEnter} />
     </div>
   )
 }

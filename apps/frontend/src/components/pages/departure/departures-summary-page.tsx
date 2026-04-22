@@ -15,6 +15,7 @@ import { departureTableColumns } from "../column-defs/departure-columns"
 export function DepartureSummaryPage(): React.JSX.Element {
   const departures = useDepartureStore(state => state.departures)
   const getDepartures = useDepartureStore(state => state.getDepartures)
+  const prefetchDepartureDetail = useDepartureStore(state => state.prefetchDepartureDetail)
   const fromDate = useDepartureStore(state => state.fromDate)
   const setFromDate = useDepartureStore(state => state.setFromDate)
   const toDate = useDepartureStore(state => state.toDate)
@@ -36,6 +37,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
       title="Departures"
       columns={departureTableColumns}
       data={departures}
+      onRowMouseEnter={(departure) => prefetchDepartureDetail(departure.departure_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin }}

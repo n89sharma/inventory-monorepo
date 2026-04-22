@@ -1,6 +1,7 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { useAssetStore } from '@/data/store/asset-store'
 import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -15,6 +16,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const detailLoading = useInvoiceStore(state => state.detailLoading)
   const detailError = useInvoiceStore(state => state.detailError)
   const getInvoiceDetails = useInvoiceStore(state => state.getInvoiceDetails)
+  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -47,7 +49,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <UserCard title="Created By" user={invoice.created_by} />
         <Organization title="Customer" org={invoice.customer} />
       </div>
-      <DataTable columns={columns} data={invoice.assets} />
+      <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
     </div>
   )
 }

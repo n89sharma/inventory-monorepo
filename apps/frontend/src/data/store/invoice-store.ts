@@ -14,6 +14,7 @@ interface InvoiceStore {
   detailLoading: boolean
   detailError: string | null
   invoiceEditFormData: InvoiceEditForm | null
+  detailCache: Record<string, InvoiceDetail>
 
   setInvoices: (invoices: InvoiceSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -22,6 +23,7 @@ interface InvoiceStore {
   setHasSearched: (hasSearched: boolean) => void
   setInvoiceDetail: (invoiceDetail: InvoiceDetail) => void
   getInvoiceDetails: (invoiceNumber: string) => Promise<void>
+  prefetchInvoiceDetail: (invoiceNumber: string) => Promise<void>
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
   submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
   getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
@@ -40,6 +42,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   detailLoading: false,
   detailError: null,
   invoiceEditFormData: null,
+  detailCache: {},
 
   setInvoices: (invoices) => set({ invoices }),
   setLoading: (loading) => set({ loading }),
@@ -51,7 +54,11 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set({ hasSearched: true, invoices: await getInvoices(fromDate, toDate) })
   },
   getInvoiceDetails: async (invoiceNumber) => {
-    if (get().invoiceDetail?.invoice_number === invoiceNumber) return
+    const cached = get().detailCache[invoiceNumber]
+    if (cached) {
+      set({ invoiceDetail: cached })
+      return
+    }
     set({ detailLoading: true, detailError: null })
     try {
       set({ invoiceDetail: await getInvoiceDetail(invoiceNumber) })
@@ -59,6 +66,15 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
       set({ detailError: e instanceof Error ? e.message : 'Failed to load invoice' })
     } finally {
       set({ detailLoading: false })
+    }
+  },
+  prefetchInvoiceDetail: async (invoiceNumber) => {
+    if (get().detailCache[invoiceNumber]) return
+    try {
+      const detail = await getInvoiceDetail(invoiceNumber)
+      set(s => ({ detailCache: { ...s.detailCache, [invoiceNumber]: detail } }))
+    } catch {
+      // silently swallow — detail page will fetch normally on navigation
     }
   },
   submitCreateInvoice: async (data) => {
@@ -71,7 +87,10 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
   },
   submitUpdateInvoice: (invoiceNumber, data) => {
-    set({ invoiceDetail: null })
+    set(s => {
+      const { [invoiceNumber]: _, ...rest } = s.detailCache
+      return { invoiceDetail: null, detailCache: rest }
+    })
     return updateInvoice(invoiceNumber, data)
   },
   clearInvoices: () => set({ invoices: [] })

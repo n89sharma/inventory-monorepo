@@ -1,6 +1,7 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { useAssetStore } from '@/data/store/asset-store'
 import { useDepartureStore } from '@/data/store/departure-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
@@ -15,6 +16,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const detailLoading = useDepartureStore(state => state.detailLoading)
   const detailError = useDepartureStore(state => state.detailError)
   const getDepartureDetails = useDepartureStore(state => state.getDepartureDetails)
+  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
@@ -48,7 +50,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={departure.transporter} />
         <Organization title="Customer" org={departure.customer} />
       </div>
-      <DataTable columns={columns} data={departure.assets} />
+      <DataTable columns={columns} data={departure.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
     </div>
   )
 }

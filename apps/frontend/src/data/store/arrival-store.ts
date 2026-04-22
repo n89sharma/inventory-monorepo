@@ -15,6 +15,7 @@ interface ArrivalStore {
   detailLoading: boolean
   detailError: string | null
   arrivalFormData: ArrivalForm | null
+  detailCache: Record<string, ArrivalDetail>
 
   setArrivals: (arrivals: ArrivalSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
@@ -24,6 +25,7 @@ interface ArrivalStore {
   setHasSearched: (hasSearched: boolean) => void
   setArrivalDetail: (arrivalDetail: ArrivalDetail) => void
   getArrivalDetail: (arrivalNumber: string) => Promise<void>
+  prefetchArrivalDetail: (arrivalNumber: string) => Promise<void>
   getArrivals: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -46,6 +48,7 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   detailLoading: false,
   detailError: null,
   arrivalFormData: null,
+  detailCache: {},
 
   setArrivals: (arrivals) => set({ arrivals }),
   setLoading: (loading) => set({ loading }),
@@ -63,7 +66,11 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
   },
   getArrivalDetail: async (arrivalNumber) => {
-    if (get().arrivalDetail?.arrival_number === arrivalNumber) return
+    const cached = get().detailCache[arrivalNumber]
+    if (cached) {
+      set({ arrivalDetail: cached })
+      return
+    }
     set({ detailLoading: true, detailError: null })
     try {
       set({ arrivalDetail: await getArrivalDetail(arrivalNumber) })
@@ -73,6 +80,15 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
       set({ detailLoading: false })
     }
   },
+  prefetchArrivalDetail: async (arrivalNumber) => {
+    if (get().detailCache[arrivalNumber]) return
+    try {
+      const detail = await getArrivalDetail(arrivalNumber)
+      set(s => ({ detailCache: { ...s.detailCache, [arrivalNumber]: detail } }))
+    } catch {
+      // silently swallow — detail page will fetch normally on navigation
+    }
+  },
 
   submitCreateArrival: async (data: ArrivalForm) => {
     const response = await createArrival(data)
@@ -80,7 +96,10 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     return response
   },
   submitUpdateArrival: (arrivalNumber, data) => {
-    set({ arrivalDetail: null })
+    set(s => {
+      const { [arrivalNumber]: _, ...rest } = s.detailCache
+      return { arrivalDetail: null, detailCache: rest }
+    })
     return updateArrival(arrivalNumber, data)
   },
 

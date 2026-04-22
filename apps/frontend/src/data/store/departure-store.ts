@@ -21,6 +21,7 @@ interface DepartureStore {
   detailLoading: boolean
   detailError: string | null
   departureFormData: DepartureForm | null
+  detailCache: Record<string, DepartureDetail>
 
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
@@ -28,6 +29,7 @@ interface DepartureStore {
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
   getDepartureDetails: (departureNumber: string) => Promise<void>
+  prefetchDepartureDetail: (departureNumber: string) => Promise<void>
   getDepartures: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -49,6 +51,7 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
   detailLoading: false,
   detailError: null,
   departureFormData: null,
+  detailCache: {},
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -60,7 +63,11 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     set({ hasSearched: true, departures: await getDepartures(fromDate, toDate, origin) })
   },
   getDepartureDetails: async (departureNumber) => {
-    if (get().departureDetail?.departure_number === departureNumber) return
+    const cached = get().detailCache[departureNumber]
+    if (cached) {
+      set({ departureDetail: cached })
+      return
+    }
     set({ detailLoading: true, detailError: null })
     try {
       set({ departureDetail: await getDepartureDetail(departureNumber) })
@@ -68,6 +75,15 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
       set({ detailError: e instanceof Error ? e.message : 'Failed to load departure' })
     } finally {
       set({ detailLoading: false })
+    }
+  },
+  prefetchDepartureDetail: async (departureNumber) => {
+    if (get().detailCache[departureNumber]) return
+    try {
+      const detail = await getDepartureDetail(departureNumber)
+      set(s => ({ detailCache: { ...s.detailCache, [departureNumber]: detail } }))
+    } catch {
+      // silently swallow — detail page will fetch normally on navigation
     }
   },
   getDepartureForUpdate: async (departureNumber) => {
@@ -81,7 +97,10 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     return response
   },
   submitUpdateDeparture: (departureNumber, data) => {
-    set({ departureDetail: null })
+    set(s => {
+      const { [departureNumber]: _, ...rest } = s.detailCache
+      return { departureDetail: null, detailCache: rest }
+    })
     return updateDeparture(departureNumber, data)
   },
 
