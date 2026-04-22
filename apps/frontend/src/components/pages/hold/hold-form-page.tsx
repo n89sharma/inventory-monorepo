@@ -89,7 +89,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                     onSelectionChange={onChange}
                     options={users}
                     getLabel={u => u.name}
-                    getKey={u => u.email}
+                    getKey={u => u.name}
                     fieldLabel='Created For'
                     anyAllowed={false}
                     fieldRequired={true}

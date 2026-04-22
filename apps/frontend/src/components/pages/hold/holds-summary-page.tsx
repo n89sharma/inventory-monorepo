@@ -47,7 +47,7 @@ export function HoldSummaryPage(): React.JSX.Element {
             onSelectionChange={setHoldBy!}
             options={activeUsers}
             getLabel={u => u.name}
-            getKey={u => u.email}
+            getKey={u => u.name}
             fieldLabel="Hold By"
             anyAllowed={true}
             className="max-w-40"
@@ -57,7 +57,7 @@ export function HoldSummaryPage(): React.JSX.Element {
             onSelectionChange={setHoldFor!}
             options={activeUsers}
             getLabel={u => u.name}
-            getKey={u => u.email}
+            getKey={u => u.name}
             fieldLabel="Hold For"
             anyAllowed={true}
             className="max-w-40"

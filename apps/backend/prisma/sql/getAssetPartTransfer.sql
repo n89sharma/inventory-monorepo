@@ -3,7 +3,7 @@ select
 	d.barcode as donor,
 	pt.part as part,
   pt.fixed_at as fixed_at,
-  u.username as fixed_by,
+  u.name as fixed_by,
   pt.notes as notes,
   is_exchange as is_exchange
 from "PartTransfer" pt

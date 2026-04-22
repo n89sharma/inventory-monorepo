@@ -41,9 +41,9 @@ export namespace getAssetDetails {
     drum_life_m: number | null
     drum_life_y: number | null
     drum_life_k: number | null
-    hold_by_email: string
+    hold_by_email: string | null
     hold_by_name: string
-    hold_for_email: string
+    hold_for_email: string | null
     hold_for_name: string
     hold_created_at: Date
     hold_customer: string
@@ -56,7 +56,7 @@ export namespace getAssetDetails {
     arrival_destination_city_code: string
     arrival_destination_street: string
     arrival_transporter: string
-    arrival_created_by_email: string
+    arrival_created_by_email: string | null
     arrival_created_by_name: string
     arrival_notes: string | null
     arrival_created_at: Date
@@ -65,7 +65,7 @@ export namespace getAssetDetails {
     departure_origin_street: string
     departure_destination: string
     departure_transporter: string
-    departure_created_by_email: string
+    departure_created_by_email: string | null
     departure_created_by_name: string
     departure_notes: string | null
     departure_created_at: Date

@@ -1,6 +1,5 @@
 select
 	u.id,
-	u.username,
 	u.name,
 	u.email,
 	u.role_id,

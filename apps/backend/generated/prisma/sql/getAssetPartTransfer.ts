@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetPartTransfer = $runtime.makeTypedQueryFactory("select\nr.barcode as recipient,\nd.barcode as donor,\npt.part as part,\npt.fixed_at as fixed_at,\nu.username as fixed_by,\npt.notes as notes,\nis_exchange as is_exchange\nfrom \"PartTransfer\" pt\njoin \"Asset\" r on r.id = pt.recipient_asset_id\njoin \"Asset\" d on d.id = pt.donor_asset_id\njoin \"User\" u on u.id = pt.fixed_by\nwhere r.barcode = $1 OR d.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetPartTransfer.Parameters, getAssetPartTransfer.Result>
+export const getAssetPartTransfer = $runtime.makeTypedQueryFactory("select\nr.barcode as recipient,\nd.barcode as donor,\npt.part as part,\npt.fixed_at as fixed_at,\nu.name as fixed_by,\npt.notes as notes,\nis_exchange as is_exchange\nfrom \"PartTransfer\" pt\njoin \"Asset\" r on r.id = pt.recipient_asset_id\njoin \"Asset\" d on d.id = pt.donor_asset_id\njoin \"User\" u on u.id = pt.fixed_by\nwhere r.barcode = $1 OR d.barcode = $1") as (text: string) => $runtime.TypedSql<getAssetPartTransfer.Parameters, getAssetPartTransfer.Result>
 
 export namespace getAssetPartTransfer {
   export type Parameters = [text: string]
