@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
 import { z } from 'zod'
-import { getAssetByBarcode, getAssetsForQuery } from '../../generated/prisma/sql.js'
+import { getAssetByBarcode, getAssetsForQuery, searchBarcodes } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import {
   getAccessories as getAssetAccessoriesSer,
@@ -14,6 +14,10 @@ import {
   createPartTransfer as createPartTransferSer,
   updateAssetErrors as updateAssetErrorsSer
 } from '../services/assetService.js'
+
+export const BarcodeSuggestionsQuerySchema = z.object({
+  q: z.string().min(1)
+})
 
 export const AssetQuerySchema = z.object({
   model: z.string(),
@@ -158,5 +162,15 @@ export async function updateAssetErrors(req: Request, res: Response<ApiResponse<
   } else {
     const status = response.error.type === 'API_ERROR' ? 404 : 500
     return res.status(status).json(response)
+  }
+}
+
+export async function getBarcodeSuggestions(req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) {
+  try {
+    const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
+    const results = await prisma.$queryRawTyped(searchBarcodes(q.toUpperCase()))
+    res.json(successResponse(results))
+  } catch {
+    res.status(500).json(response500('Failed to fetch suggestions'))
   }
 }

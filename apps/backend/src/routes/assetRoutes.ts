@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   AssetQuerySchema,
+  BarcodeSuggestionsQuerySchema,
   createAssetComment,
   createPartTransfer,
   getAssetAccessories,
@@ -11,6 +12,7 @@ import {
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
+  getBarcodeSuggestions,
   updateAssetErrors
 } from '../controllers/assetController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -21,6 +23,7 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', validateQuery(AssetQuerySchema), getAssets)
+router.get('/suggestions', validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
 router.get('/:barcode/summary', getAssetSummaryByBarcode)
 router.get('/:barcode', getAssetDetail)
 router.get('/:barcode/accessories', getAssetAccessories)

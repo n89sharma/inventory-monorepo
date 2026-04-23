@@ -131,6 +131,14 @@ export type PartTransfer = {
   is_exchange: boolean
 }
 
+export const BarcodeSuggestionSchema = z.object({
+  barcode: z.string(),
+  asset_type: z.string(),
+  model: z.string(),
+})
+
+export type BarcodeSuggestion = z.infer<typeof BarcodeSuggestionSchema>
+
 export const UpdateErrorSchema = z.object({
   code: z.string(),
   is_fixed: z.boolean()

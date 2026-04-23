@@ -7,6 +7,7 @@ import type {
   AssetError,
   AssetSummary,
   AssetTransfer,
+  BarcodeSuggestion,
   Comment,
   CreateComment,
   CreatePartTransfer,
@@ -18,6 +19,23 @@ import type {
 } from 'shared-types'
 import { AssetSummarySchema } from 'shared-types'
 import { z } from 'zod'
+
+export async function getBarcodeSuggestions(q: string): Promise<BarcodeSuggestion[]> {
+  try {
+    const { data } = await api.get<ApiResponse<BarcodeSuggestion[]>>('/assets/suggestions', { params: { q } })
+    return data.success ? data.data : []
+  } catch {
+    return []
+  }
+}
+
+export async function verifyAssetExists(barcode: string): Promise<ApiResponse<void>> {
+  return api.get<ApiResponse<AssetSummary>>(`/assets/${barcode}/summary`)
+    .then(({ data }) => data.success
+      ? { success: true as const, data: undefined }
+      : { success: false as const, error: data.error })
+    .catch(apiErrorHandler<void>)
+}
 
 export async function getAssetDetail(params: { barcode: string }): Promise<AssetDetails> {
   const { data } = await api.get<ApiResponse<AssetDetails>>(`/assets/${params.barcode}`)
