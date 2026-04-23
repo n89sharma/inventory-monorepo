@@ -6,14 +6,15 @@
 import * as $runtime from "@prisma/client/runtime/client"
 
 /**
- * @param prefix
+ * @param q
  */
-export const searchBarcodes = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\nat.asset_type as asset_type,\nm.name as model\nfrom \"Asset\" a\njoin \"Model\" m on m.id = a.model_id\njoin \"AssetType\" at on at.id = m.asset_type_id\nwhere a.barcode like $1 || '%'\norder by a.barcode\nlimit 5") as (prefix: string) => $runtime.TypedSql<searchBarcodes.Parameters, searchBarcodes.Result>
+export const searchBarcodes = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\na.serial_number as serial_number,\nat.asset_type as asset_type,\nm.name as model\nfrom \"Asset\" a\njoin \"Model\" m on m.id = a.model_id\njoin \"AssetType\" at on at.id = m.asset_type_id\nwhere a.barcode like $1 || '%'\nor a.serial_number like '%' || $1 || '%'\norder by a.barcode\nlimit 5") as (q: string) => $runtime.TypedSql<searchBarcodes.Parameters, searchBarcodes.Result>
 
 export namespace searchBarcodes {
-  export type Parameters = [prefix: string]
+  export type Parameters = [q: string]
   export type Result = {
     barcode: string
+    serial_number: string
     asset_type: string
     model: string
   }

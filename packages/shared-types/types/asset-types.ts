@@ -133,6 +133,7 @@ export type PartTransfer = {
 
 export const BarcodeSuggestionSchema = z.object({
   barcode: z.string(),
+  serial_number: z.string(),
   asset_type: z.string(),
   model: z.string(),
 })

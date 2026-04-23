@@ -1,7 +1,7 @@
 import { Button } from "@/components/shadcn/button"
+import { formatDate } from "@/lib/formatters"
 import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import { Link } from "react-router-dom"
 import type { CollectionSummarySchema } from 'shared-types'
 
@@ -9,7 +9,7 @@ export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
   accessorKey: "created_at",
   cell: ({ getValue }) => {
     const date = getValue<Date>()
-    return date ? format(date, "PPP") : "-"
+    return date ? formatDate(date) : "-"
   },
   header: ({ column }) => (
     <Button
