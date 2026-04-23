@@ -12,7 +12,8 @@
       "Bash(awk '{printf \"%s KB\\\\t%s\\\\n\", int\\($5/1024\\), $9}')",
       "Bash(npm install *)",
       "Bash(grep -v \"//\")",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "WebFetch(domain:web.dev)"
     ]
   },
   "outputStyle": "default"
