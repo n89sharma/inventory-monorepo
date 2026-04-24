@@ -1,4 +1,5 @@
 import { useArrivalStore } from "@/data/store/arrival-store"
+import { preloadArrivalDetail } from "@/hooks/use-arrival-detail"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
@@ -15,7 +16,6 @@ import { arrivalTableColumns } from "../column-defs/arrival-columns"
 export function ArrivalsSummaryPage(): React.JSX.Element {
   const arrivals = useArrivalStore(state => state.arrivals)
   const getArrivals = useArrivalStore(state => state.getArrivals)
-  const getArrivalDetail = useArrivalStore(state => state.getArrivalDetail)
   const fromDate = useArrivalStore(state => state.fromDate)
   const setFromDate = useArrivalStore(state => state.setFromDate)
   const toDate = useArrivalStore(state => state.toDate)
@@ -37,7 +37,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
       title="Arrivals"
       columns={arrivalTableColumns}
       data={arrivals}
-      onRowMouseEnter={(arrival) => getArrivalDetail(arrival.arrival_number)}
+      onRowMouseEnter={(arrival) => preloadArrivalDetail(arrival.arrival_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, destination }}

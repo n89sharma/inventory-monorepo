@@ -1,4 +1,5 @@
 import { useDepartureStore } from "@/data/store/departure-store"
+import { preloadDepartureDetail } from "@/hooks/use-departure-detail"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
@@ -15,7 +16,6 @@ import { departureTableColumns } from "../column-defs/departure-columns"
 export function DepartureSummaryPage(): React.JSX.Element {
   const departures = useDepartureStore(state => state.departures)
   const getDepartures = useDepartureStore(state => state.getDepartures)
-  const getDepartureDetails = useDepartureStore(state => state.getDepartureDetails)
   const fromDate = useDepartureStore(state => state.fromDate)
   const setFromDate = useDepartureStore(state => state.setFromDate)
   const toDate = useDepartureStore(state => state.toDate)
@@ -37,7 +37,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
       title="Departures"
       columns={departureTableColumns}
       data={departures}
-      onRowMouseEnter={(departure) => getDepartureDetails(departure.departure_number)}
+      onRowMouseEnter={(departure) => preloadDepartureDetail(departure.departure_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin }}

@@ -1,4 +1,5 @@
 import { useHoldStore } from "@/data/store/hold-store"
+import { preloadHoldDetail } from "@/hooks/use-hold-detail"
 import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
@@ -14,7 +15,6 @@ import { holdTableColumns } from "../column-defs/hold-columns"
 export function HoldSummaryPage(): React.JSX.Element {
   const holds = useHoldStore(state => state.holds)
   const getHolds = useHoldStore(state => state.getHolds)
-  const getHoldDetails = useHoldStore(state => state.getHoldDetails)
   const fromDate = useHoldStore(state => state.fromDate)
   const toDate = useHoldStore(state => state.toDate)
   const setFromDate = useHoldStore(state => state.setFromDate)
@@ -37,7 +37,7 @@ export function HoldSummaryPage(): React.JSX.Element {
       title="Holds"
       columns={holdTableColumns}
       data={holds}
-      onRowMouseEnter={(hold) => getHoldDetails(hold.hold_number)}
+      onRowMouseEnter={(hold) => preloadHoldDetail(hold.hold_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, holdBy, holdFor }}

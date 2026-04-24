@@ -1,8 +1,9 @@
-import { createHold, getHoldDetail, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
-import { produce } from 'immer'
+import { createHold, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
+import { holdDetailKey } from '@/hooks/use-hold-detail'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, HoldDetail, HoldSummary, User } from 'shared-types'
+import type { ApiResponse, HoldSummary, User } from 'shared-types'
+import { mutate } from 'swr'
 import { create } from 'zustand'
 
 interface HoldStore {
@@ -13,10 +14,7 @@ interface HoldStore {
   holdBy: SelectOption<User>
   holdFor: SelectOption<User>
   hasSearched: boolean
-  detailLoading: boolean
-  detailError: string | null
   holdFormData: HoldForm | null
-  holdDetailCache: Record<string, HoldDetail>
 
   setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -25,7 +23,6 @@ interface HoldStore {
   setHoldBy: (v: SelectOption<User>) => void
   setHoldFor: (v: SelectOption<User>) => void
   setHasSearched: (hasSearched: boolean) => void
-  getHoldDetails: (holdNumber: string) => Promise<void>
   getHolds: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -37,7 +34,7 @@ interface HoldStore {
   clearHolds: () => void
 }
 
-export const useHoldStore = create<HoldStore>((set, get) => ({
+export const useHoldStore = create<HoldStore>((set) => ({
   holds: [],
   loading: false,
   fromDate: UNSELECTED,
@@ -45,10 +42,7 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   holdBy: ANY_OPTION,
   holdFor: ANY_OPTION,
   hasSearched: false,
-  detailLoading: false,
-  detailError: null,
   holdFormData: null,
-  holdDetailCache: {},
 
   setHolds: (holds) => set({ holds }),
   setLoading: (loading) => set({ loading }),
@@ -60,17 +54,6 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
   getHolds: async (fromDate, toDate, holdBy, holdFor) => {
     set({ hasSearched: true, holds: await getHolds(fromDate, toDate, holdBy, holdFor) })
   },
-  getHoldDetails: async (holdNumber) => {
-    if (get().holdDetailCache[holdNumber]) return
-    set({ detailLoading: true, detailError: null })
-    const res = await getHoldDetail(holdNumber)
-    if (res.success) {
-      set(produce(draft => { draft.holdDetailCache[holdNumber] = res.data }))
-      set({ detailLoading: false })
-    } else {
-      set({ detailError: res.error.summary, detailLoading: false })
-    }
-  },
   getHoldForUpdate: async (holdNumber) => {
     set({ holdFormData: null })
     set({ holdFormData: await getHoldForUpdate(holdNumber) })
@@ -80,9 +63,10 @@ export const useHoldStore = create<HoldStore>((set, get) => ({
     set({ hasSearched: false })
     return response
   },
-  submitUpdateHold: (holdNumber, data) => {
-    set(produce(draft => { delete draft.holdDetailCache[holdNumber] }))
-    return updateHold(holdNumber, data)
+  submitUpdateHold: async (holdNumber, data) => {
+    const response = await updateHold(holdNumber, data)
+    if (response.success) mutate(holdDetailKey(holdNumber))
+    return response
   },
   clearHolds: () => set({ holds: [] })
 }))

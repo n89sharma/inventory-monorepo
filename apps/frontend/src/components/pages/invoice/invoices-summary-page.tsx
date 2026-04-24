@@ -3,6 +3,7 @@ import { CollectionPage } from "@/components/pages/collection-page"
 import { invoiceTableColumns } from "@/components/pages/column-defs/invoice-columns"
 import { Button } from "@/components/shadcn/button"
 import { useInvoiceStore } from "@/data/store/invoice-store"
+import { preloadInvoiceDetail } from "@/hooks/use-invoice-detail"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
@@ -12,7 +13,6 @@ import { Link } from "react-router-dom"
 export function InvoicesSummaryPage(): React.JSX.Element {
   const invoices = useInvoiceStore(state => state.invoices)
   const getInvoices = useInvoiceStore(state => state.getInvoices)
-  const getInvoiceDetails = useInvoiceStore(state => state.getInvoiceDetails)
   const fromDate = useInvoiceStore(state => state.fromDate)
   const toDate = useInvoiceStore(state => state.toDate)
   const setFromDate = useInvoiceStore(state => state.setFromDate)
@@ -30,7 +30,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       title="Invoices"
       columns={invoiceTableColumns}
       data={invoices}
-      onRowMouseEnter={(invoice) => getInvoiceDetails(invoice.invoice_number)}
+      onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate }}

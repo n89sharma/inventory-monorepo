@@ -85,11 +85,8 @@ export async function updateHold(
     .catch(apiErrorHandler<{ holdNumber: string }>)
 }
 
-export async function getHoldDetail(holdNumber: string): Promise<ApiResponse<HoldDetail>> {
-  return api.get<ApiResponse<HoldDetail>>(`/holds/${holdNumber}`)
-    .then(({ data }: AxiosResponse<ApiResponse<HoldDetail>>) => {
-      if (data.success) return { success: true as const, data: HoldDetailSchema.parse(data.data) }
-      return data
-    })
-    .catch(apiErrorHandler<HoldDetail>)
+export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
+  const { data } = await api.get<ApiResponse<HoldDetail>>(`/holds/${holdNumber}`)
+  if (data.success) return HoldDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
 }

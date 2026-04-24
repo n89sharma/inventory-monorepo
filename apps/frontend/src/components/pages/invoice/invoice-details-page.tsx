@@ -1,9 +1,9 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useAssetStore } from '@/data/store/asset-store'
-import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
+import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { useInvoiceDetail } from '@/hooks/use-invoice-detail'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -14,17 +14,13 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 export function InvoiceDetailsPage(): React.JSX.Element {
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
 
-  const invoice = useInvoiceStore(state => invoiceNumber ? state.invoiceDetailCache[invoiceNumber] : null)
-  const detailLoading = useInvoiceStore(state => state.detailLoading)
-  const detailError = useInvoiceStore(state => state.detailError)
-  const getInvoiceDetails = useInvoiceStore(state => state.getInvoiceDetails)
-  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { pathname, state } = useLocation()
 
   if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
 
   const columns = useMemo(() => createAssetSummaryColumns('invoices', invoiceNumber), [invoiceNumber])
+  const { data: invoice, error: detailError, isLoading: detailLoading } = useInvoiceDetail(invoiceNumber)
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -32,11 +28,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('invoices', pathname)
-    getInvoiceDetails(invoiceNumber)
   }, [invoiceNumber])
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError}</div>
+  if (detailError) return <div>{detailError.message}</div>
   if (!invoice) return <div>Invoice not found</div>
 
   return (
@@ -50,7 +45,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <UserCard title="Created By" user={invoice.created_by} />
         <Organization title="Customer" org={invoice.customer} />
       </div>
-      <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )
 }

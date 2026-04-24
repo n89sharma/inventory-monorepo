@@ -3,7 +3,7 @@ import { Input } from '@/components/shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import { ScrollArea } from '@/components/shadcn/scroll-area'
 import { getGlobalSearchResults } from '@/data/api/search-api'
-import { useAssetStore } from '@/data/store/asset-store'
+import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { formatDate } from '@/lib/formatters'
 import { cn } from "@/lib/utils"
 import { CircleNotchIcon } from '@phosphor-icons/react'
@@ -31,7 +31,6 @@ export const AssetSearch = ({ className }: { className?: string }) => {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const hoverPrefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const navigate = useNavigate()
 
   const flat = flattenResults(results)
@@ -59,7 +58,7 @@ export const AssetSearch = ({ className }: { className?: string }) => {
     const item = flat[highlightedIndex]
     if (item.kind !== 'asset') return
     const t = setTimeout(() => {
-      getAssetDetails(item.data.barcode)
+      preloadAssetDetail(item.data.barcode)
     }, 100)
     return () => clearTimeout(t)
   }, [highlightedIndex])
@@ -67,7 +66,7 @@ export const AssetSearch = ({ className }: { className?: string }) => {
   function handleHoverPrefetch(barcode: string) {
     if (hoverPrefetchTimer.current) clearTimeout(hoverPrefetchTimer.current)
     hoverPrefetchTimer.current = setTimeout(() => {
-      getAssetDetails(barcode)
+      preloadAssetDetail(barcode)
     }, 100)
   }
 

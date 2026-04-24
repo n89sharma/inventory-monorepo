@@ -7,9 +7,9 @@ import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
-import { useAssetStore } from "@/data/store/asset-store"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
+import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { useEffect } from 'react'
@@ -24,26 +24,21 @@ export const AssetDetailsPage = () => {
   const { section, collectionId, assetId } = useAssetDetailsParams()
   const { pathname } = useLocation()
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const detailLoading = useAssetStore((state) => state.detailLoading)
-  const detailError = useAssetStore((state) => state.detailError)
-  const getAssetDetails = useAssetStore((state) => state.getAssetDetails)
-  const cached = useAssetStore((state) => state.assetDetailCache[assetId])
+  const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
 
-  const assetDetails = cached?.assetDetails ?? null
-  const accessories = cached?.accessories ?? []
-  const errors = cached?.errors ?? []
-  const comments = cached?.comments ?? []
-  const transfers = cached?.transfers ?? []
-  const partTransfers = cached?.partTransfers ?? []
+  const assetDetails = data?.assetDetails ?? null
+  const accessories = data?.accessories ?? []
+  const errors = data?.errors ?? []
+  const comments = data?.comments ?? []
+  const transfers = data?.transfers ?? []
+  const partTransfers = data?.partTransfers ?? []
 
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
-    if (!assetId) return
-    getAssetDetails(assetId)
   }, [assetId])
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError}</div>
+  if (detailError) return <div>{detailError.message}</div>
   if (!assetDetails) return null
 
   const { cost, hold, arrival, departure, specs, purchase_invoice } = assetDetails

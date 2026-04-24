@@ -1,8 +1,9 @@
-import { createInvoice, getInvoiceDetail, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
-import { produce } from 'immer'
+import { createInvoice, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
+import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, InvoiceDetail, InvoiceSummary } from 'shared-types'
+import type { ApiResponse, InvoiceSummary } from 'shared-types'
+import { mutate } from 'swr'
 import { create } from 'zustand'
 
 interface InvoiceStore {
@@ -11,17 +12,13 @@ interface InvoiceStore {
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   hasSearched: boolean
-  detailLoading: boolean
-  detailError: string | null
   invoiceEditFormData: InvoiceEditForm | null
-  invoiceDetailCache: Record<string, InvoiceDetail>
 
   setInvoices: (invoices: InvoiceSummary[]) => void
   setLoading: (loading: boolean) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setHasSearched: (hasSearched: boolean) => void
-  getInvoiceDetails: (invoiceNumber: string) => Promise<void>
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
   submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
   getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
@@ -29,16 +26,13 @@ interface InvoiceStore {
   clearInvoices: () => void
 }
 
-export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
+export const useInvoiceStore = create<InvoiceStore>((set) => ({
   invoices: [],
   loading: false,
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   hasSearched: false,
-  detailLoading: false,
-  detailError: null,
   invoiceEditFormData: null,
-  invoiceDetailCache: {},
 
   setInvoices: (invoices) => set({ invoices }),
   setLoading: (loading) => set({ loading }),
@@ -47,18 +41,6 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
   setHasSearched: (hasSearched) => set({ hasSearched }),
   getInvoices: async (fromDate, toDate) => {
     set({ hasSearched: true, invoices: await getInvoices(fromDate, toDate) })
-  },
-  getInvoiceDetails: async (invoiceNumber) => {
-    if (get().invoiceDetailCache[invoiceNumber]) return
-    set({ detailLoading: true, detailError: null })
-    try {
-      const detail = await getInvoiceDetail(invoiceNumber)
-      set(produce(draft => { draft.invoiceDetailCache[invoiceNumber] = detail }))
-    } catch (e) {
-      set({ detailError: e instanceof Error ? e.message : 'Failed to load invoice' })
-    } finally {
-      set({ detailLoading: false })
-    }
   },
   submitCreateInvoice: async (data) => {
     const response = await createInvoice(data)
@@ -69,9 +51,10 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => ({
     set({ invoiceEditFormData: null })
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
   },
-  submitUpdateInvoice: (invoiceNumber, data) => {
-    set(produce(draft => { delete draft.invoiceDetailCache[invoiceNumber] }))
-    return updateInvoice(invoiceNumber, data)
+  submitUpdateInvoice: async (invoiceNumber, data) => {
+    const response = await updateInvoice(invoiceNumber, data)
+    if (response.success) mutate(invoiceDetailKey(invoiceNumber))
+    return response
   },
   clearInvoices: () => set({ invoices: [] })
 }))

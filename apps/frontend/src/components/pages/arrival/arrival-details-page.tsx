@@ -1,8 +1,8 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useArrivalStore } from '@/data/store/arrival-store'
-import { useAssetStore } from '@/data/store/asset-store'
+import { useArrivalDetail } from '@/hooks/use-arrival-detail'
+import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -14,11 +14,6 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
 
-  const arrival = useArrivalStore(state => arrivalNumber ? state.arrivalDetailCache[arrivalNumber] : null)
-  const detailLoading = useArrivalStore(state => state.detailLoading)
-  const detailError = useArrivalStore(state => state.detailError)
-  const getArrivalDetail = useArrivalStore(state => state.getArrivalDetail)
-  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { pathname, state } = useLocation()
 
@@ -26,17 +21,18 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const columns = useMemo(() => createAssetSummaryColumns('arrivals', arrivalNumber), [arrivalNumber])
 
+  const { data: arrival, error: detailError, isLoading: detailLoading } = useArrivalDetail(arrivalNumber)
+
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
   }, [])
 
   useEffect(() => {
     setLastPath('arrivals', pathname)
-    getArrivalDetail(arrivalNumber)
   }, [arrivalNumber])
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError}</div>
+  if (detailError) return <div>{detailError.message}</div>
   if (!arrival) return <div>Arrival not found</div>
 
   return (
@@ -51,7 +47,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={arrival.transporter} />
         <WarehouseCard title="Warehouse" warehouse={arrival.warehouse} />
       </div>
-      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )
 }

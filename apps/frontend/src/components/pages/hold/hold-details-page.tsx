@@ -1,9 +1,9 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { UserCard } from '@/components/custom/cards/user-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useAssetStore } from '@/data/store/asset-store'
-import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
+import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { useHoldDetail } from '@/hooks/use-hold-detail'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -14,17 +14,13 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 export function HoldDetailsPage(): React.JSX.Element {
   const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
 
-  const hold = useHoldStore(state => holdNumber ? state.holdDetailCache[holdNumber] : null)
-  const detailLoading = useHoldStore(state => state.detailLoading)
-  const detailError = useHoldStore(state => state.detailError)
-  const getHoldDetails = useHoldStore(state => state.getHoldDetails)
-  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { pathname, state } = useLocation()
 
   if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
 
   const columns = useMemo(() => createAssetSummaryColumns('holds', holdNumber), [holdNumber])
+  const { data: hold, error: detailError, isLoading: detailLoading } = useHoldDetail(holdNumber)
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -32,11 +28,10 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('holds', pathname)
-    getHoldDetails(holdNumber)
   }, [holdNumber])
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError}</div>
+  if (detailError) return <div>{detailError.message}</div>
   if (!hold) return <div>Hold not found</div>
 
   return (
@@ -51,7 +46,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         <UserCard title="Created For" user={hold.created_for} />
         <Organization title="Customer" org={hold.customer} />
       </div>
-      <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )
 }

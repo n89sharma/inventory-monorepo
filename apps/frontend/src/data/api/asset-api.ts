@@ -91,15 +91,17 @@ export async function createPartTransfer(recipientBarcode: string, data: CreateP
     .catch(apiErrorHandler<void>)
 }
 
-function getPromiseResult<T>(result: PromiseSettledResult<T>) {
-  return {
-    status: result.status,
-    result: result.status === 'fulfilled' ? result.value : result.reason
-  }
+export type AssetAllDetails = {
+  assetDetails: AssetDetails | null
+  accessories: string[]
+  errors: AssetError[]
+  comments: Comment[]
+  transfers: AssetTransfer[]
+  partTransfers: PartTransfer[]
 }
 
-export async function getAllAssetDetails(barcode: string) {
-  const results = await Promise.allSettled([
+export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetails> {
+  const [assetDetails, accessories, errors, comments, transfers, partTransfers] = await Promise.allSettled([
     getAssetDetail({ barcode }),
     getAssetAccessories({ barcode }),
     getAssetErrors({ barcode }),
@@ -109,12 +111,12 @@ export async function getAllAssetDetails(barcode: string) {
   ])
 
   return {
-    assetDetails: getPromiseResult(results[0]),
-    assetAccessories: getPromiseResult(results[1]),
-    assetErrors: getPromiseResult(results[2]),
-    assetComments: getPromiseResult(results[3]),
-    assetTransfers: getPromiseResult(results[4]),
-    assetPartTransfers: getPromiseResult(results[5])
+    assetDetails: assetDetails.status === 'fulfilled' ? assetDetails.value : null,
+    accessories: accessories.status === 'fulfilled' ? accessories.value : [],
+    errors: errors.status === 'fulfilled' ? errors.value : [],
+    comments: comments.status === 'fulfilled' ? comments.value : [],
+    transfers: transfers.status === 'fulfilled' ? transfers.value : [],
+    partTransfers: partTransfers.status === 'fulfilled' ? partTransfers.value : [],
   }
 }
 

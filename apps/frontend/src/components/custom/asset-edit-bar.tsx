@@ -1,4 +1,4 @@
-import { useAssetStore } from "@/data/store/asset-store"
+import { useAssetDetail } from "@/hooks/use-asset-detail"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
@@ -9,8 +9,9 @@ import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
 export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Element {
-  const assetDetails = useAssetStore(state => state.assetDetailCache[barcode]?.assetDetails ?? null)
-  const errors = useAssetStore(state => state.assetDetailCache[barcode]?.errors ?? [])
+  const { data } = useAssetDetail(barcode)
+  const assetDetails = data?.assetDetails ?? null
+  const errors = data?.errors ?? []
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)

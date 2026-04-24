@@ -1,9 +1,9 @@
 import { Organization } from '@/components/custom/cards/organization-card'
 import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useAssetStore } from '@/data/store/asset-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useTransferStore } from '@/data/store/transfer-store'
+import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { useTransferDetail } from '@/hooks/use-transfer-detail'
 import { useEffect, useMemo } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -14,17 +14,13 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 export function TransferDetailsPage(): React.JSX.Element {
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
 
-  const transfer = useTransferStore(state => transferNumber ? state.transferDetailCache[transferNumber] : null)
-  const detailLoading = useTransferStore(state => state.detailLoading)
-  const detailError = useTransferStore(state => state.detailError)
-  const getTransferDetails = useTransferStore(state => state.getTransferDetails)
-  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { pathname, state } = useLocation()
 
   if (transferNumber === undefined) throw new Error('Missing collectionId/transferNumber parameter')
 
   const columns = useMemo(() => createAssetSummaryColumns('transfers', transferNumber), [transferNumber])
+  const { data: transfer, error: detailError, isLoading: detailLoading } = useTransferDetail(transferNumber)
 
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
@@ -32,11 +28,10 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   useEffect(() => {
     setLastPath('transfers', pathname)
-    getTransferDetails(transferNumber)
   }, [transferNumber])
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError}</div>
+  if (detailError) return <div>{detailError.message}</div>
   if (!transfer) return <div>Transfer not found</div>
 
   return (
@@ -51,7 +46,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={transfer.transporter} />
         <WarehouseCard title="Destination" warehouse={transfer.destination} />
       </div>
-      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )
 }

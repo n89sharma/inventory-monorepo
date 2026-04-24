@@ -1,8 +1,9 @@
-import { createArrival, getArrivalDetail, getArrivalForUpdate, getArrivals, updateArrival } from '@/data/api/arrival-api'
-import { produce } from 'immer'
+import { createArrival, getArrivalForUpdate, getArrivals, updateArrival } from '@/data/api/arrival-api'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, ArrivalDetail, ArrivalSummary, Warehouse } from 'shared-types'
+import type { ApiResponse, ArrivalSummary, Warehouse } from 'shared-types'
+import { arrivalDetailKey } from '@/hooks/use-arrival-detail'
+import { mutate } from 'swr'
 import { create } from 'zustand'
 
 interface ArrivalStore {
@@ -12,10 +13,7 @@ interface ArrivalStore {
   destination: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
-  detailLoading: boolean
-  detailError: string | null
   arrivalFormData: ArrivalForm | null
-  arrivalDetailCache: Record<string, ArrivalDetail>
 
   setArrivals: (arrivals: ArrivalSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
@@ -23,8 +21,6 @@ interface ArrivalStore {
   setDestination: (warehouse: SelectOption<Warehouse>) => void
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
-  getArrivalDetail: (arrivalNumber: string) => Promise<void>
-
   getArrivals: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -32,21 +28,17 @@ interface ArrivalStore {
   getArrivalForUpdate: (arrivalNumber: string) => Promise<void>
   submitCreateArrival: (data: ArrivalForm) => Promise<ApiResponse<{ arrivalNumber: string }>>
   submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<ApiResponse<void>>
-
   clearArrivals: () => void
 }
 
-export const useArrivalStore = create<ArrivalStore>((set, get) => ({
+export const useArrivalStore = create<ArrivalStore>((set) => ({
   arrivals: [],
   loading: false,
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   destination: ANY_OPTION,
   hasSearched: false,
-  detailLoading: false,
-  detailError: null,
   arrivalFormData: null,
-  arrivalDetailCache: {},
 
   setArrivals: (arrivals) => set({ arrivals }),
   setLoading: (loading) => set({ loading }),
@@ -62,26 +54,15 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     set({ arrivalFormData: null })
     set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
   },
-  getArrivalDetail: async (arrivalNumber) => {
-    if (get().arrivalDetailCache[arrivalNumber]) return
-    set({ detailLoading: true, detailError: null })
-    try {
-      const detail = await getArrivalDetail(arrivalNumber)
-      set(produce(draft => { draft.arrivalDetailCache[arrivalNumber] = detail }))
-    } catch (e) {
-      set({ detailError: e instanceof Error ? e.message : 'Failed to load arrival' })
-    } finally {
-      set({ detailLoading: false })
-    }
-  },
   submitCreateArrival: async (data: ArrivalForm) => {
     const response = await createArrival(data)
     set({ hasSearched: false })
     return response
   },
-  submitUpdateArrival: (arrivalNumber, data) => {
-    set(produce(draft => { delete draft.arrivalDetailCache[arrivalNumber] }))
-    return updateArrival(arrivalNumber, data)
+  submitUpdateArrival: async (arrivalNumber, data) => {
+    const response = await updateArrival(arrivalNumber, data)
+    if (response.success) mutate(arrivalDetailKey(arrivalNumber))
+    return response
   },
 
   clearArrivals: () => set({ arrivals: [] })

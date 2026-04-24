@@ -103,23 +103,21 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
 
     setHoldError(null)
     setIsLookingUpHold(true)
-    const res = await getHoldDetail(holdNumber)
-    setIsLookingUpHold(false)
-
-    if (!res.success) {
-      setHoldError(res.error.status === 404 ? `Hold ${holdNumber} not found.` : res.error.summary)
-      return
+    try {
+      const hold = await getHoldDetail(holdNumber)
+      const currentIds = new Set(getAssets().map(a => a.id))
+      const hasConflict = hold.assets.some(a => currentIds.has(a.id))
+      if (hasConflict) {
+        setHoldError(`One or more assets from hold ${holdNumber} are already in this ${entityName}. No assets were added.`)
+        return
+      }
+      hold.assets.forEach(asset => onAddAsset(asset))
+      if (holdInputRef.current) holdInputRef.current.value = ''
+    } catch (e) {
+      setHoldError(e instanceof Error ? e.message : `Failed to load hold ${holdNumber}`)
+    } finally {
+      setIsLookingUpHold(false)
     }
-
-    const currentIds = new Set(getAssets().map(a => a.id))
-    const hasConflict = res.data.assets.some(a => currentIds.has(a.id))
-    if (hasConflict) {
-      setHoldError(`One or more assets from hold ${holdNumber} are already in this ${entityName}. No assets were added.`)
-      return
-    }
-
-    res.data.assets.forEach(asset => onAddAsset(asset))
-    if (holdInputRef.current) holdInputRef.current.value = ''
   }
 
   function onHoldKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {

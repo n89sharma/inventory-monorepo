@@ -1,6 +1,7 @@
 import { Button } from "@/components/shadcn/button"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useTransferStore } from "@/data/store/transfer-store"
+import { preloadTransferDetail } from "@/hooks/use-transfer-detail"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
@@ -15,7 +16,6 @@ import { transferTableColumns } from "../column-defs/transfer-columns"
 export function TransferSummaryPage(): React.JSX.Element {
   const transfers = useTransferStore(state => state.transfers)
   const getTransfers = useTransferStore(state => state.getTransfers)
-  const getTransferDetails = useTransferStore(state => state.getTransferDetails)
   const fromDate = useTransferStore(state => state.fromDate)
   const toDate = useTransferStore(state => state.toDate)
   const origin = useTransferStore(state => state.origin)
@@ -39,7 +39,7 @@ export function TransferSummaryPage(): React.JSX.Element {
       title="Transfers"
       columns={transferTableColumns}
       data={transfers}
-      onRowMouseEnter={(transfer) => getTransferDetails(transfer.transfer_number)}
+      onRowMouseEnter={(transfer) => preloadTransferDetail(transfer.transfer_number)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, destination }}
