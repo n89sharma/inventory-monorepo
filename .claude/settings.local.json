@@ -13,7 +13,8 @@
       "Bash(npm install *)",
       "Bash(grep -v \"//\")",
       "Bash(grep *)",
-      "WebFetch(domain:web.dev)"
+      "WebFetch(domain:web.dev)",
+      "mcp__context7__query-docs"
     ]
   },
   "outputStyle": "default"
