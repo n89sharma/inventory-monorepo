@@ -18,11 +18,10 @@ interface DepartureStore {
   origin: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
-  departureDetail: DepartureDetail | null
   detailLoading: boolean
   detailError: string | null
   departureFormData: DepartureForm | null
-  detailCache: Record<string, DepartureDetail>
+  departureDetailCache: Record<string, DepartureDetail>
 
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
@@ -30,7 +29,6 @@ interface DepartureStore {
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
   getDepartureDetails: (departureNumber: string) => Promise<void>
-  prefetchDepartureDetail: (departureNumber: string) => Promise<void>
   getDepartures: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -48,11 +46,10 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
   origin: ANY_OPTION,
   loading: false,
   hasSearched: false,
-  departureDetail: null,
   detailLoading: false,
   detailError: null,
   departureFormData: null,
-  detailCache: {},
+  departureDetailCache: {},
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -64,27 +61,15 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     set({ hasSearched: true, departures: await getDepartures(fromDate, toDate, origin) })
   },
   getDepartureDetails: async (departureNumber) => {
-    const cached = get().detailCache[departureNumber]
-    if (cached) {
-      set({ departureDetail: cached })
-      return
-    }
+    if (get().departureDetailCache[departureNumber]) return
     set({ detailLoading: true, detailError: null })
     try {
-      set({ departureDetail: await getDepartureDetail(departureNumber) })
+      const detail = await getDepartureDetail(departureNumber)
+      set(produce(draft => { draft.departureDetailCache[departureNumber] = detail }))
     } catch (e) {
       set({ detailError: e instanceof Error ? e.message : 'Failed to load departure' })
     } finally {
       set({ detailLoading: false })
-    }
-  },
-  prefetchDepartureDetail: async (departureNumber) => {
-    if (get().detailCache[departureNumber]) return
-    try {
-      const detail = await getDepartureDetail(departureNumber)
-      set(produce(draft => { draft.detailCache[departureNumber] = detail }))
-    } catch {
-      // silently swallow — detail page will fetch normally on navigation
     }
   },
   getDepartureForUpdate: async (departureNumber) => {
@@ -98,10 +83,7 @@ export const useDepartureStore = create<DepartureStore>((set, get) => ({
     return response
   },
   submitUpdateDeparture: (departureNumber, data) => {
-    set(produce(draft => {
-      delete draft.detailCache[departureNumber]
-      draft.departureDetail = null
-    }))
+    set(produce(draft => { delete draft.departureDetailCache[departureNumber] }))
     return updateDeparture(departureNumber, data)
   },
 

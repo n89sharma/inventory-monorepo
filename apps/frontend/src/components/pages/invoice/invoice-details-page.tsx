@@ -12,13 +12,14 @@ import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
-  const invoice = useInvoiceStore(state => state.invoiceDetail)
+  const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
+
+  const invoice = useInvoiceStore(state => invoiceNumber ? state.invoiceDetailCache[invoiceNumber] : null)
   const detailLoading = useInvoiceStore(state => state.detailLoading)
   const detailError = useInvoiceStore(state => state.detailError)
   const getInvoiceDetails = useInvoiceStore(state => state.getInvoiceDetails)
-  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
+  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
   if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
@@ -49,7 +50,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <UserCard title="Created By" user={invoice.created_by} />
         <Organization title="Customer" org={invoice.customer} />
       </div>
-      <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
     </div>
   )
 }

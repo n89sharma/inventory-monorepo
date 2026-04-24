@@ -8,9 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
-export function AssetEditBar(): React.JSX.Element {
-  const assetDetails = useAssetStore(state => state.assetDetails)
-  const errors = useAssetStore(state => state.errors)
+export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Element {
+  const assetDetails = useAssetStore(state => state.assetDetailCache[barcode]?.assetDetails ?? null)
+  const errors = useAssetStore(state => state.assetDetailCache[barcode]?.errors ?? [])
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)

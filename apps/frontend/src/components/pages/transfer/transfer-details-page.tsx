@@ -12,13 +12,14 @@ import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function TransferDetailsPage(): React.JSX.Element {
-  const transfer = useTransferStore(state => state.transferDetail)
+  const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
+
+  const transfer = useTransferStore(state => transferNumber ? state.transferDetailCache[transferNumber] : null)
   const detailLoading = useTransferStore(state => state.detailLoading)
   const detailError = useTransferStore(state => state.detailError)
   const getTransferDetails = useTransferStore(state => state.getTransferDetails)
-  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
+  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
   if (transferNumber === undefined) throw new Error('Missing collectionId/transferNumber parameter')
@@ -50,7 +51,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={transfer.transporter} />
         <WarehouseCard title="Destination" warehouse={transfer.destination} />
       </div>
-      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
     </div>
   )
 }

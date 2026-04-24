@@ -12,13 +12,14 @@ import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
-  const hold = useHoldStore(state => state.holdDetail)
+  const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
+
+  const hold = useHoldStore(state => holdNumber ? state.holdDetailCache[holdNumber] : null)
   const detailLoading = useHoldStore(state => state.detailLoading)
   const detailError = useHoldStore(state => state.detailError)
   const getHoldDetails = useHoldStore(state => state.getHoldDetails)
-  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
+  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
   if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
@@ -50,7 +51,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         <UserCard title="Created For" user={hold.created_for} />
         <Organization title="Customer" org={hold.customer} />
       </div>
-      <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
     </div>
   )
 }

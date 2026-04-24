@@ -12,13 +12,14 @@ import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
-  const arrival = useArrivalStore(state => state.arrivalDetail)
+  const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
+
+  const arrival = useArrivalStore(state => arrivalNumber ? state.arrivalDetailCache[arrivalNumber] : null)
   const detailLoading = useArrivalStore(state => state.detailLoading)
   const detailError = useArrivalStore(state => state.detailError)
   const getArrivalDetail = useArrivalStore(state => state.getArrivalDetail)
-  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
+  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
   const { pathname, state } = useLocation()
 
   if (arrivalNumber === undefined) throw new Error('Missing collectionId/arrivalNumber parameter')
@@ -50,7 +51,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <Organization title="Transporter" org={arrival.transporter} />
         <WarehouseCard title="Warehouse" warehouse={arrival.warehouse} />
       </div>
-      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => prefetchAssetDetails(asset.barcode)} />
+      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => getAssetDetails(asset.barcode)} />
     </div>
   )
 }

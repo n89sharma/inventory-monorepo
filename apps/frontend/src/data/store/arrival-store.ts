@@ -12,11 +12,10 @@ interface ArrivalStore {
   destination: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
-  arrivalDetail: ArrivalDetail | null
   detailLoading: boolean
   detailError: string | null
   arrivalFormData: ArrivalForm | null
-  detailCache: Record<string, ArrivalDetail>
+  arrivalDetailCache: Record<string, ArrivalDetail>
 
   setArrivals: (arrivals: ArrivalSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
@@ -24,9 +23,8 @@ interface ArrivalStore {
   setDestination: (warehouse: SelectOption<Warehouse>) => void
   setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
-  setArrivalDetail: (arrivalDetail: ArrivalDetail) => void
   getArrivalDetail: (arrivalNumber: string) => Promise<void>
-  prefetchArrivalDetail: (arrivalNumber: string) => Promise<void>
+
   getArrivals: (
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
@@ -45,11 +43,10 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   toDate: ANY_OPTION,
   destination: ANY_OPTION,
   hasSearched: false,
-  arrivalDetail: null,
   detailLoading: false,
   detailError: null,
   arrivalFormData: null,
-  detailCache: {},
+  arrivalDetailCache: {},
 
   setArrivals: (arrivals) => set({ arrivals }),
   setLoading: (loading) => set({ loading }),
@@ -57,7 +54,6 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
   setToDate: (toDate) => set({ toDate }),
   setDestination: (warehouse) => set({ destination: warehouse }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-  setArrivalDetail: (arrivalDetail) => set({ arrivalDetail }),
 
   getArrivals: async (fromDate, toDate, destination) => {
     set({ hasSearched: true, arrivals: await getArrivals(fromDate, toDate, destination) })
@@ -67,40 +63,24 @@ export const useArrivalStore = create<ArrivalStore>((set, get) => ({
     set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
   },
   getArrivalDetail: async (arrivalNumber) => {
-    const cached = get().detailCache[arrivalNumber]
-    if (cached) {
-      set({ arrivalDetail: cached })
-      return
-    }
+    if (get().arrivalDetailCache[arrivalNumber]) return
     set({ detailLoading: true, detailError: null })
     try {
-      set({ arrivalDetail: await getArrivalDetail(arrivalNumber) })
+      const detail = await getArrivalDetail(arrivalNumber)
+      set(produce(draft => { draft.arrivalDetailCache[arrivalNumber] = detail }))
     } catch (e) {
       set({ detailError: e instanceof Error ? e.message : 'Failed to load arrival' })
     } finally {
       set({ detailLoading: false })
     }
   },
-  prefetchArrivalDetail: async (arrivalNumber) => {
-    if (get().detailCache[arrivalNumber]) return
-    try {
-      const detail = await getArrivalDetail(arrivalNumber)
-      set(produce(draft => { draft.detailCache[arrivalNumber] = detail }))
-    } catch {
-      // silently swallow — detail page will fetch normally on navigation
-    }
-  },
-
   submitCreateArrival: async (data: ArrivalForm) => {
     const response = await createArrival(data)
     set({ hasSearched: false })
     return response
   },
   submitUpdateArrival: (arrivalNumber, data) => {
-    set(produce(draft => {
-      delete draft.detailCache[arrivalNumber]
-      draft.arrivalDetail = null
-    }))
+    set(produce(draft => { delete draft.arrivalDetailCache[arrivalNumber] }))
     return updateArrival(arrivalNumber, data)
   },
 

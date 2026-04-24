@@ -18,11 +18,10 @@ interface TransferStore {
   origin: SelectOption<Warehouse>
   destination: SelectOption<Warehouse>
   hasSearched: boolean
-  transferDetail: TransferDetail | null
   detailLoading: boolean
   detailError: string | null
   transferFormData: TransferForm | null
-  detailCache: Record<string, TransferDetail>
+  transferDetailCache: Record<string, TransferDetail>
 
   setFromDate: (d: SelectOption<Date>) => void
   setToDate: (d: SelectOption<Date>) => void
@@ -34,7 +33,6 @@ interface TransferStore {
     origin: SelectOption<Warehouse>,
     destination: SelectOption<Warehouse>) => Promise<void>
   getTransferDetails: (transferNumber: string) => Promise<void>
-  prefetchTransferDetail: (transferNumber: string) => Promise<void>
   getTransferForUpdate: (transferNumber: string) => Promise<void>
   submitCreateTransfer: (data: TransferForm) => Promise<ApiResponse<{ transferNumber: string }>>
   submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<ApiResponse<void>>
@@ -48,11 +46,10 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
   origin: ANY_OPTION,
   destination: ANY_OPTION,
   hasSearched: false,
-  transferDetail: null,
   detailLoading: false,
   detailError: null,
   transferFormData: null,
-  detailCache: {},
+  transferDetailCache: {},
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -67,40 +64,24 @@ export const useTransferStore = create<TransferStore>((set, get) => ({
     set({ transferFormData: await getTransferForUpdate(transferNumber) })
   },
   getTransferDetails: async (transferNumber) => {
-    const cached = get().detailCache[transferNumber]
-    if (cached) {
-      set({ transferDetail: cached })
-      return
-    }
+    if (get().transferDetailCache[transferNumber]) return
     set({ detailLoading: true, detailError: null })
     try {
-      set({ transferDetail: await getTransferDetail(transferNumber) })
+      const detail = await getTransferDetail(transferNumber)
+      set(produce(draft => { draft.transferDetailCache[transferNumber] = detail }))
     } catch (e) {
       set({ detailError: e instanceof Error ? e.message : 'Failed to load transfer' })
     } finally {
       set({ detailLoading: false })
     }
   },
-  prefetchTransferDetail: async (transferNumber) => {
-    if (get().detailCache[transferNumber]) return
-    try {
-      const detail = await getTransferDetail(transferNumber)
-      set(produce(draft => { draft.detailCache[transferNumber] = detail }))
-    } catch {
-      // silently swallow — detail page will fetch normally on navigation
-    }
-  },
-
   submitCreateTransfer: async (data) => {
     const response = await createTransfer(data)
     set({ hasSearched: false })
     return response
   },
   submitUpdateTransfer: (transferNumber, data) => {
-    set(produce(draft => {
-      delete draft.detailCache[transferNumber]
-      draft.transferDetail = null
-    }))
+    set(produce(draft => { delete draft.transferDetailCache[transferNumber] }))
     return updateTransfer(transferNumber, data)
   },
 

@@ -24,16 +24,17 @@ export const AssetDetailsPage = () => {
   const { section, collectionId, assetId } = useAssetDetailsParams()
   const { pathname } = useLocation()
   const setLastPath = useNavigationStore(state => state.setLastPath)
-  const assetDetails = useAssetStore((state) => state.assetDetails)
-  const accessories = useAssetStore((state) => state.accessories)
-  const errors = useAssetStore((state) => state.errors)
-  const comments = useAssetStore((state) => state.comments)
-  const transfers = useAssetStore((state) => state.transfers)
-  const partTransfers = useAssetStore((state) => state.partTransfers)
-
-  const loading = useAssetStore((state) => state.loading)
-  const error = useAssetStore((state) => state.error)
+  const detailLoading = useAssetStore((state) => state.detailLoading)
+  const detailError = useAssetStore((state) => state.detailError)
   const getAssetDetails = useAssetStore((state) => state.getAssetDetails)
+  const cached = useAssetStore((state) => state.assetDetailCache[assetId])
+
+  const assetDetails = cached?.assetDetails ?? null
+  const accessories = cached?.accessories ?? []
+  const errors = cached?.errors ?? []
+  const comments = cached?.comments ?? []
+  const transfers = cached?.transfers ?? []
+  const partTransfers = cached?.partTransfers ?? []
 
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
@@ -41,8 +42,8 @@ export const AssetDetailsPage = () => {
     getAssetDetails(assetId)
   }, [assetId])
 
-  if (loading) return <div role="status" aria-live="polite">Loading…</div>
-  if (error) return <div>{error}</div>
+  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
+  if (detailError) return <div>{detailError}</div>
   if (!assetDetails) return null
 
   const { cost, hold, arrival, departure, specs, purchase_invoice } = assetDetails
@@ -54,7 +55,7 @@ export const AssetDetailsPage = () => {
       <DetailsContainer>
         <div className="flex items-start justify-between">
           <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode} />
-          <AssetEditBar />
+          <AssetEditBar barcode={assetId} />
         </div>
         <SectionRow>
           <Section>

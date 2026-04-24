@@ -31,7 +31,7 @@ export const AssetSearch = ({ className }: { className?: string }) => {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const hoverPrefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const prefetchAssetDetails = useAssetStore(state => state.prefetchAssetDetails)
+  const getAssetDetails = useAssetStore(state => state.getAssetDetails)
   const navigate = useNavigate()
 
   const flat = flattenResults(results)
@@ -59,7 +59,7 @@ export const AssetSearch = ({ className }: { className?: string }) => {
     const item = flat[highlightedIndex]
     if (item.kind !== 'asset') return
     const t = setTimeout(() => {
-      prefetchAssetDetails(item.data.barcode)
+      getAssetDetails(item.data.barcode)
     }, 100)
     return () => clearTimeout(t)
   }, [highlightedIndex])
@@ -67,7 +67,7 @@ export const AssetSearch = ({ className }: { className?: string }) => {
   function handleHoverPrefetch(barcode: string) {
     if (hoverPrefetchTimer.current) clearTimeout(hoverPrefetchTimer.current)
     hoverPrefetchTimer.current = setTimeout(() => {
-      prefetchAssetDetails(barcode)
+      getAssetDetails(barcode)
     }, 100)
   }
 
