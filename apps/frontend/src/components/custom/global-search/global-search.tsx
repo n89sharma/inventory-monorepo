@@ -8,18 +8,21 @@ import { useNavigate } from 'react-router-dom'
 import type { GlobalSearchResult } from 'shared-types'
 import { SearchPopoverContent, type FlatResult } from './search-popover-content'
 
-const emptyResults: GlobalSearchResult = { assets: [], arrivals: [], departures: [] }
+const emptyResults: GlobalSearchResult = { assets: [], arrivals: [], departures: [], transfers: [], holds: [], invoices: [] }
+
+const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoices'] as const
+type Tab = typeof tabs[number]
 
 export const GlobalSearch = ({ className }: { className?: string }) => {
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<GlobalSearchResult>(emptyResults)
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('assets')
+  const [activeTab, setActiveTab] = useState<Tab>('assets')
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const navigate = useNavigate()
 
-  const hasResults = results.assets.length > 0 || results.arrivals.length > 0 || results.departures.length > 0
+  const hasResults = tabs.some(tab => results[tab].length > 0)
 
   useEffect(() => {
     if (!query) return
@@ -27,11 +30,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
       const res = await getGlobalSearchResults(query)
       setResults(res)
       setIsLoading(false)
-      const firstWithResults = (['assets', 'arrivals', 'departures'] as const).find(tab =>
-        tab === 'assets' ? res.assets.length > 0
-        : tab === 'arrivals' ? res.arrivals.length > 0
-        : res.departures.length > 0
-      )
+      const firstWithResults = tabs.find(tab => res[tab].length > 0)
       if (firstWithResults) setActiveTab(firstWithResults)
     }, 150)
     return () => clearTimeout(t)
@@ -57,8 +56,14 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
       navigate(`/search/${item.data.barcode}`)
     } else if (item.kind === 'arrival') {
       navigate(`/arrivals/${item.data.arrival_number}`)
-    } else {
+    } else if (item.kind === 'departure') {
       navigate(`/departures/${item.data.departure_number}`)
+    } else if (item.kind === 'transfer') {
+      navigate(`/transfers/${item.data.transfer_number}`)
+    } else if (item.kind === 'hold') {
+      navigate(`/holds/${item.data.hold_number}`)
+    } else {
+      navigate(`/invoices/${item.data.invoice_number}`)
     }
   }
 
@@ -92,7 +97,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
             hasResults={hasResults}
             results={results}
             activeTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={tab => setActiveTab(tab as Tab)}
             onSelect={navigateTo}
             onHover={handlePrefetch}
           />

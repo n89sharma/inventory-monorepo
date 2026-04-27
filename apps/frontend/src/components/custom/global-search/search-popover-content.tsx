@@ -1,13 +1,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { formatDate } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import type { ArrivalSuggestion, BarcodeSuggestion, DepartureSuggestion, GlobalSearchResult } from 'shared-types'
+import type { ArrivalSuggestion, BarcodeSuggestion, DepartureSuggestion, GlobalSearchResult, HoldSuggestion, InvoiceSuggestion, TransferSuggestion } from 'shared-types'
 import { CommandResultList } from './command-result-list'
 
 export type FlatResult =
   | { kind: 'asset'; data: BarcodeSuggestion }
   | { kind: 'arrival'; data: ArrivalSuggestion }
   | { kind: 'departure'; data: DepartureSuggestion }
+  | { kind: 'transfer'; data: TransferSuggestion }
+  | { kind: 'hold'; data: HoldSuggestion }
+  | { kind: 'invoice'; data: InvoiceSuggestion }
 
 type Props = {
   isLoading: boolean
@@ -33,12 +36,12 @@ export function SearchPopoverContent({ isLoading, hasResults, results, activeTab
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
       <TabsList className="w-full" variant="line">
-        <TabsTrigger value="assets" disabled={results.assets.length === 0}>Assets</TabsTrigger>
-        <TabsTrigger value="arrivals" disabled={results.arrivals.length === 0}>Arrivals</TabsTrigger>
-        <TabsTrigger value="departures" disabled={results.departures.length === 0}>Departures</TabsTrigger>
-        <TabsTrigger value="transfers" disabled>Transfers</TabsTrigger>
-        <TabsTrigger value="holds" disabled>Holds</TabsTrigger>
-        <TabsTrigger value="invoices" disabled>Invoices</TabsTrigger>
+        <TabsTrigger value="assets" disabled={results.assets.length === 0} className="cursor-pointer">Assets</TabsTrigger>
+        <TabsTrigger value="arrivals" disabled={results.arrivals.length === 0} className="cursor-pointer">Arrivals</TabsTrigger>
+        <TabsTrigger value="departures" disabled={results.departures.length === 0} className="cursor-pointer">Departures</TabsTrigger>
+        <TabsTrigger value="transfers" disabled={results.transfers.length === 0} className="cursor-pointer">Transfers</TabsTrigger>
+        <TabsTrigger value="holds" disabled={results.holds.length === 0} className="cursor-pointer">Holds</TabsTrigger>
+        <TabsTrigger value="invoices" disabled={results.invoices.length === 0} className="cursor-pointer">Invoices</TabsTrigger>
       </TabsList>
       <TabsContent value="assets">
         <CommandResultList
@@ -68,9 +71,33 @@ export function SearchPopoverContent({ isLoading, hasResults, results, activeTab
           onSelect={s => onSelect({ kind: 'departure', data: s })}
         />
       </TabsContent>
-      <TabsContent value="transfers" />
-      <TabsContent value="holds" />
-      <TabsContent value="invoices" />
+      <TabsContent value="transfers">
+        <CommandResultList
+          items={results.transfers}
+          getKey={s => String(s.id)}
+          getValue={s => s.transfer_number}
+          getColumns={s => [s.transfer_number, formatDate(s.created_at), s.origin_code, s.destination_code]}
+          onSelect={s => onSelect({ kind: 'transfer', data: s })}
+        />
+      </TabsContent>
+      <TabsContent value="holds">
+        <CommandResultList
+          items={results.holds}
+          getKey={s => String(s.id)}
+          getValue={s => s.hold_number}
+          getColumns={s => [s.hold_number, formatDate(s.created_at), s.customer, s.created_for]}
+          onSelect={s => onSelect({ kind: 'hold', data: s })}
+        />
+      </TabsContent>
+      <TabsContent value="invoices">
+        <CommandResultList
+          items={results.invoices}
+          getKey={s => String(s.id)}
+          getValue={s => s.invoice_number}
+          getColumns={s => [s.invoice_number, formatDate(s.created_at), s.organization, s.invoice_type]}
+          onSelect={s => onSelect({ kind: 'invoice', data: s })}
+        />
+      </TabsContent>
     </Tabs>
   )
 }
