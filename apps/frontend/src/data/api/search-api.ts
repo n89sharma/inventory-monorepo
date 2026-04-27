@@ -4,8 +4,8 @@ import type { ApiResponse, GlobalSearchResult } from 'shared-types'
 export async function getGlobalSearchResults(q: string): Promise<GlobalSearchResult> {
   try {
     const { data } = await api.get<ApiResponse<GlobalSearchResult>>('/search', { params: { q } })
-    return data.success ? data.data : { assets: [], arrivals: [] }
+    return data.success ? data.data : { assets: [], arrivals: [], departures: [] }
   } catch {
-    return { assets: [], arrivals: [] }
+    return { assets: [], arrivals: [], departures: [] }
   }
 }

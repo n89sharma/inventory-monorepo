@@ -35,11 +35,24 @@ No tests are configured yet.
 1. `/vercel-react-best-practices`
 2. `/vercel-composition-patterns`
 
-### Guard Component Pattern
-Extract repeated `condition ? <content /> : <fallback />` shapes into a Guard Component (`condition: boolean`, `fallback: ReactNode`, `children: ReactNode`). Reference: `apps/frontend/src/components/custom/asset-details/optional-section.tsx`.
+### Conditional Rendering Rules
 
+**Binary condition (show or fallback):** Use a Guard Component (`condition: boolean`, `fallback: ReactNode`, `children: ReactNode`). Reference: `apps/frontend/src/components/custom/asset-details/optional-section.tsx`.
 - Use `?.` optional chaining inside children (not `!`) — children props are evaluated eagerly before the component renders
 - Always use ternary over `&&` for conditional JSX — `&&` can render `0` or `false` to the DOM
+
+**Three or more states (e.g. loading / empty / content):** Extract a dedicated component and use early returns — never nest ternaries.
+```tsx
+// WRONG — nested ternary
+{isLoading ? <Spinner /> : !hasResults ? <Empty /> : <Content />}
+
+// RIGHT — extracted component with early returns
+function SearchPopoverContent({ isLoading, hasResults, ... }) {
+  if (isLoading) return <Spinner />
+  if (!hasResults) return <Empty />
+  return <Content />
+}
+```
 
 **After every code change, run both build commands from the repo root:**
 ```bash

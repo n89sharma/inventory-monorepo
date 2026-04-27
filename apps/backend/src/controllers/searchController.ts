@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { ApiResponse, GlobalSearchResult, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
-import { searchArrivals, searchBarcodes } from '../../generated/prisma/sql.js'
+import { searchArrivals, searchBarcodes, searchDepartures } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 
 export const GlobalSearchQuerySchema = z.object({
@@ -12,11 +12,12 @@ export async function globalSearch(req: Request, res: Response<ApiResponse<Globa
   try {
     const { q } = res.locals.query as z.infer<typeof GlobalSearchQuerySchema>
     const upper = q.toUpperCase()
-    const [assets, arrivals] = await Promise.all([
+    const [assets, arrivals, departures] = await Promise.all([
       prisma.$queryRawTyped(searchBarcodes(upper)),
       prisma.$queryRawTyped(searchArrivals(upper)),
+      prisma.$queryRawTyped(searchDepartures(upper)),
     ])
-    res.json(successResponse({ assets, arrivals }))
+    res.json(successResponse({ assets, arrivals, departures }))
   } catch {
     res.status(500).json(response500('Search failed'))
   }

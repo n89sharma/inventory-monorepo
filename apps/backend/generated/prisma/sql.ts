@@ -48,3 +48,5 @@ export * from "./sql/getUsers.js"
 export * from "./sql/searchArrivals.js"
 
 export * from "./sql/searchBarcodes.js"
+
+export * from "./sql/searchDepartures.js"

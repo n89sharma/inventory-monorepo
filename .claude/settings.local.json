@@ -17,5 +17,10 @@
       "mcp__context7__query-docs"
     ]
   },
-  "outputStyle": "default"
+  "outputStyle": "default",
+  "enabledMcpjsonServers": [
+    "clerk",
+    "context7",
+    "vercel"
+  ]
 }
