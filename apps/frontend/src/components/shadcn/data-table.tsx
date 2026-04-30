@@ -1,4 +1,4 @@
-import type { ColumnDef, SortingState } from "@tanstack/react-table"
+import type { ColumnDef, OnChangeFn, RowSelectionState, SortingState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
@@ -25,15 +25,25 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onRowMouseEnter?: (row: TData) => void
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
+  getRowId?: (originalRow: TData, index: number) => string
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   onRowMouseEnter,
+  rowSelection: controlledRowSelection,
+  onRowSelectionChange: onControlledRowSelectionChange,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>([])
+  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
+
+  const rowSelection = controlledRowSelection ?? internalRowSelection
+  const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
 
   const table = useReactTable({
     data,
@@ -42,8 +52,12 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    enableRowSelection: true,
+    onRowSelectionChange,
+    getRowId,
     state: {
       sorting,
+      rowSelection,
     },
     initialState: {
       pagination: {
@@ -99,7 +113,11 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className="cursor-pointer"
                     onMouseEnter={() => onRowMouseEnter?.(row.original)}
+                    onClick={(e) => {
+                      if (!(e.target as HTMLElement).closest('a, button')) row.toggleSelected()
+                    }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell

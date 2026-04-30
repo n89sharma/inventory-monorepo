@@ -3,6 +3,7 @@ import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
 import { TrackingStatusBadge } from "@/components/custom/tracking-status-badge"
 import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
+import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
@@ -15,6 +16,32 @@ export function createAssetSummaryColumns(
   collectionId?: string): ColumnDef<AssetSummary>[] {
 
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected()
+              ? true
+              : table.getIsSomePageRowsSelected()
+                ? 'indeterminate'
+                : false
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all on this page"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      size: 40,
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: "barcode",
       header: ({ column }) => {

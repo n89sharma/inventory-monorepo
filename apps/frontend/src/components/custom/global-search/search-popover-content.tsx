@@ -35,7 +35,7 @@ export function SearchPopoverContent({ isLoading, hasResults, results, activeTab
 
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
-      <TabsList className="w-full" variant="line">
+      <TabsList className="w-full">
         <TabsTrigger value="assets" disabled={results.assets.length === 0} className="cursor-pointer">Assets</TabsTrigger>
         <TabsTrigger value="arrivals" disabled={results.arrivals.length === 0} className="cursor-pointer">Arrivals</TabsTrigger>
         <TabsTrigger value="departures" disabled={results.departures.length === 0} className="cursor-pointer">Departures</TabsTrigger>

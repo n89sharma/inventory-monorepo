@@ -14,7 +14,8 @@
       "Bash(grep -v \"//\")",
       "Bash(grep *)",
       "WebFetch(domain:web.dev)",
-      "mcp__context7__query-docs"
+      "mcp__context7__query-docs",
+      "mcp__context7__resolve-library-id"
     ]
   },
   "enabledMcpjsonServers": [

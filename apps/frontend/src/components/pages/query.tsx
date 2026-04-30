@@ -3,12 +3,52 @@ import { getAssetsForQuery } from "@/data/api/asset-api"
 import { useModelStore } from '@/data/store/model-store'
 import { useQueryStore } from '@/data/store/query-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
+import type { AssetSummary } from 'shared-types'
 import { InputWithClear } from '../custom/input-with-clear'
 import { PopoverSearch } from '../custom/popover-search'
 import { SelectOptions } from '../custom/select-options'
 import { DataTable } from "../shadcn/data-table"
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
+
+const searchColumns = createAssetSummaryColumns('search')
+const getAssetRowId = (row: AssetSummary) => row.barcode
+
+function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [prevAssets, setPrevAssets] = useState(assets)
+
+  if (assets !== prevAssets) {
+    setPrevAssets(assets)
+    setRowSelection({})
+  }
+
+  const selectedCount = Object.keys(rowSelection).length
+
+  return (
+    <div className="flex flex-col gap-2">
+      {selectedCount > 0 ? (
+        <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-1 text-sm text-muted-foreground">
+          {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
+          <Button variant="ghost" size="sm" onClick={() => setRowSelection({})}>
+            Clear
+          </Button>
+          <Button size="sm" variant="secondary">
+            Add to
+          </Button>
+        </div>
+      ) : null}
+      <DataTable
+        columns={searchColumns}
+        data={assets}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={getAssetRowId}
+      />
+    </div>
+  )
+}
 
 export function QueryPage(): React.JSX.Element {
   const [loading, setLoading] = useState(false)
@@ -116,7 +156,7 @@ export function QueryPage(): React.JSX.Element {
       <div hidden={!loading} role="status" aria-live="polite">
         <span>Loading…</span>
       </div>
-      <DataTable columns={createAssetSummaryColumns('search')} data={assets} />
+      <QueryResultsTable assets={assets} />
     </div>
   )
 }
