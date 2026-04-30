@@ -6,6 +6,7 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
 import type { AssetSummary } from 'shared-types'
+import { AddToCollectionModal } from '../modals/add-to-collection-modal'
 import { InputWithClear } from '../custom/input-with-clear'
 import { PopoverSearch } from '../custom/popover-search'
 import { SelectOptions } from '../custom/select-options'
@@ -18,6 +19,8 @@ const getAssetRowId = (row: AssetSummary) => row.barcode
 function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [prevAssets, setPrevAssets] = useState(assets)
+  const [addToOpen, setAddToOpen] = useState(false)
+  const [frozenAssets, setFrozenAssets] = useState<AssetSummary[]>([])
 
   if (assets !== prevAssets) {
     setPrevAssets(assets)
@@ -25,6 +28,11 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
   }
 
   const selectedCount = Object.keys(rowSelection).length
+
+  function openAddTo() {
+    setFrozenAssets(assets.filter(a => rowSelection[a.barcode]))
+    setAddToOpen(true)
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -34,7 +42,7 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
           <Button variant="ghost" size="sm" onClick={() => setRowSelection({})}>
             Clear
           </Button>
-          <Button size="sm" variant="secondary">
+          <Button size="sm" variant="secondary" onClick={openAddTo}>
             Add to
           </Button>
         </div>
@@ -45,6 +53,12 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         getRowId={getAssetRowId}
+      />
+      <AddToCollectionModal
+        open={addToOpen}
+        onOpenChange={setAddToOpen}
+        selectedAssets={frozenAssets}
+        onConfirmSuccess={() => setRowSelection({})}
       />
     </div>
   )
