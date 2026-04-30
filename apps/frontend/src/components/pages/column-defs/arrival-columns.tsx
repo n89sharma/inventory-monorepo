@@ -1,3 +1,4 @@
+import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -18,9 +19,12 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <Link to={`/arrivals/${row.original.arrival_number}`} className="text-primary hover:underline font-medium">
-        {row.getValue('arrival_number')}
-      </Link>
+      <div className="group flex items-center justify-center gap-2">
+        <Link to={`/arrivals/${row.original.arrival_number}`} className="text-primary hover:underline font-medium">
+          {row.getValue('arrival_number')}
+        </Link>
+        <CopyButton value={row.original.arrival_number} />
+      </div>
     ),
     size: 140
   },

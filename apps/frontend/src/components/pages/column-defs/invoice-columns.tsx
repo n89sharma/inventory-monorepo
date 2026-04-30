@@ -1,3 +1,4 @@
+import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -18,9 +19,12 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <Link to={`/invoices/${row.original.invoice_number}`} className="text-primary hover:underline font-medium">
-        {row.getValue('invoice_number')}
-      </Link>
+      <div className="group flex items-center justify-center gap-2">
+        <Link to={`/invoices/${row.original.invoice_number}`} className="text-primary hover:underline font-medium">
+          {row.getValue('invoice_number')}
+        </Link>
+        <CopyButton value={row.original.invoice_number} />
+      </div>
     ),
     size: 140
   },
