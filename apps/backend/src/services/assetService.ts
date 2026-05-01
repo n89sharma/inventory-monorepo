@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetPricing } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -316,5 +316,33 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
     return successResponse(undefined)
   } catch (error) {
     return response500(`Failed to update pricing for asset ${barcode}`)
+  }
+}
+
+export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<ApiResponse<void>> {
+  try {
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
+
+    const accessories = await prisma.accessory.findMany({
+      where: { accessory: { in: data.accessory_names } },
+      select: { id: true },
+    })
+
+    await prisma.$transaction([
+      prisma.technicalSpecification.upsert({
+        where: { asset_id: asset.id },
+        update: { cassettes: data.cassettes, internal_finisher: data.internal_finisher, meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total, drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m, drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k },
+        create: { asset_id: asset.id, cassettes: data.cassettes, internal_finisher: data.internal_finisher, meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total, drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m, drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k },
+      }),
+      prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
+      ...accessories.map(a => prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: a.id } })),
+    ])
+
+    return successResponse(undefined)
+  } catch (error) {
+    return response500(`Failed to update specs for asset ${barcode}`)
   }
 }

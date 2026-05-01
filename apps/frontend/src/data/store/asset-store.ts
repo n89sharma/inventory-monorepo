@@ -1,6 +1,6 @@
-import { createPartTransfer as createPartTransferApi, postComment as postCommentApi, updateAssetErrors as updateAssetErrorsApi, updateAssetPricing as updateAssetPricingApi } from '@/data/api/asset-api'
+import { createPartTransfer as createPartTransferApi, postComment as postCommentApi, updateAssetErrors as updateAssetErrorsApi, updateAssetPricing as updateAssetPricingApi, updateAssetSpecs as updateAssetSpecsApi } from '@/data/api/asset-api'
 import { assetDetailKey } from '@/hooks/use-asset-detail'
-import type { ApiResponse, CreateComment, CreatePartTransfer, UpdateAssetPricing, UpdateError } from 'shared-types'
+import type { ApiResponse, CreateComment, CreatePartTransfer, UpdateAssetPricing, UpdateAssetSpecs, UpdateError } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -9,6 +9,7 @@ interface AssetStore {
   createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<ApiResponse<void>>
   createComment: (barcode: string, data: CreateComment) => Promise<ApiResponse<void>>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<ApiResponse<void>>
+  updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<ApiResponse<void>>
 }
 
 export const useAssetStore = create<AssetStore>(() => ({
@@ -32,6 +33,12 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   updateAssetPricing: async (barcode, data) => {
     const response = await updateAssetPricingApi(barcode, data)
+    if (response.success) mutate(assetDetailKey(barcode))
+    return response
+  },
+
+  updateAssetSpecs: async (barcode, data) => {
+    const response = await updateAssetSpecsApi(barcode, data)
     if (response.success) mutate(assetDetailKey(barcode))
     return response
   },

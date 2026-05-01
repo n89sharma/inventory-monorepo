@@ -6,6 +6,7 @@ import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
 import { EditPricingModal } from "../modals/edit-pricing-modal"
+import { EditSpecsModal } from "../modals/edit-specs-modal"
 import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
@@ -15,9 +16,11 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const { data } = useAssetDetail(barcode)
   const assetDetails = data?.assetDetails ?? null
   const errors = data?.errors ?? []
+  const accessories = data?.accessories ?? []
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
+  const [editSpecsOpen, setEditSpecsOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
@@ -34,7 +37,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         </Button>
         <DropdownMenuContent>
           <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>
-          <DropdownMenuItem disabled>Specifications</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setEditSpecsOpen(true)}>Specifications</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>
             Errors
           </DropdownMenuItem>
@@ -59,6 +62,13 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         open={editPricingOpen}
         onOpenChange={setEditPricingOpen}
         assetDetails={assetDetails}
+      />
+
+      <EditSpecsModal
+        open={editSpecsOpen}
+        onOpenChange={setEditSpecsOpen}
+        assetDetails={assetDetails}
+        accessories={accessories}
       />
 
       <AddPartTransferModal

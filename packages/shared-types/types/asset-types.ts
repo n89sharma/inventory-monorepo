@@ -179,3 +179,17 @@ export const UpdateAssetPricingSchema = z.object({
 
 export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
 
+export const UpdateAssetSpecsSchema = z.object({
+  cassettes: z.number().int().nonnegative().nullable(),
+  internal_finisher: z.string().nullable(),
+  meter_black: z.number().int().nonnegative().nullable(),
+  meter_colour: z.number().int().nonnegative().nullable(),
+  drum_life_c: z.number().int().nonnegative().nullable(),
+  drum_life_m: z.number().int().nonnegative().nullable(),
+  drum_life_y: z.number().int().nonnegative().nullable(),
+  drum_life_k: z.number().int().nonnegative().nullable(),
+  accessory_names: z.array(z.string()),
+})
+
+export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>
+
