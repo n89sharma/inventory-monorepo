@@ -1,7 +1,7 @@
 import { useAssetDetail } from "@/hooks/use-asset-detail"
-import { assetDetailsToSummary } from "shared-types"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
+import { assetDetailsToSummary } from "shared-types"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
@@ -34,12 +34,16 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         </Button>
         <DropdownMenuContent>
           <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>
-          <DropdownMenuItem disabled>Technical Specs</DropdownMenuItem>
+          <DropdownMenuItem disabled>Specifications</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>
             Errors
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setAddPartTransferOpen(true)}>
             Parts
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>
+            Add to Collection
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -72,10 +76,6 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>
-            Add to Collection
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
             <TrashIcon />Delete
           </DropdownMenuItem>
@@ -85,7 +85,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         open={addToCollectionOpen}
         onOpenChange={setAddToCollectionOpen}
         selectedAssets={assetAsSummary ? [assetAsSummary] : []}
-        onConfirmSuccess={() => {}}
+        onConfirmSuccess={() => { }}
       />
       <DeleteEntityDialog
         open={deleteOpen}
