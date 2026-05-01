@@ -86,6 +86,7 @@ export async function getTransfers(barcode: string): Promise<ApiResponse<AssetTr
 
 function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
   return {
+    id: r.id,
     barcode: r.barcode,
     serial_number: r.serial_number,
     model: r.model,

@@ -1,4 +1,5 @@
 select
+  a.id as id,
   a.barcode as barcode,
   a.serial_number as serial_number,
   m."name" as model,

@@ -21,6 +21,7 @@ export const AssetSummarySchema = z.object({
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
 
 export type AssetDetails = {
+  id: number
   barcode: string
   model: string
   brand: string

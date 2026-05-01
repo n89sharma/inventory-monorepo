@@ -1,10 +1,12 @@
 import { useAssetDetail } from "@/hooks/use-asset-detail"
+import { assetDetailsToSummary } from "shared-types"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
+import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
 import { Button } from "../shadcn/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
@@ -15,6 +17,9 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
+  const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
+
+  const assetAsSummary = assetDetails ? assetDetailsToSummary(assetDetails) : null
 
   return (
     <div className="flex gap-2">
@@ -59,11 +64,21 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>
+            Add to Collection
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
             <TrashIcon />Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <AddToCollectionModal
+        open={addToCollectionOpen}
+        onOpenChange={setAddToCollectionOpen}
+        selectedAssets={assetAsSummary ? [assetAsSummary] : []}
+        onConfirmSuccess={() => {}}
+      />
       <DeleteEntityDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
