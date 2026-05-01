@@ -14,6 +14,7 @@ import type {
   ModelSummary,
   PartTransfer,
   Status,
+  UpdateAssetPricing,
   UpdateError,
   Warehouse
 } from 'shared-types'
@@ -75,6 +76,12 @@ export async function getAssetPartTransfers(params: { barcode: string }): Promis
 
 export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<ApiResponse<void>> {
   return api.put(`/assets/${barcode}/errors`, { errors })
+    .then(() => ({ success: true as const, data: undefined }))
+    .catch(apiErrorHandler<void>)
+}
+
+export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<ApiResponse<void>> {
+  return api.put(`/assets/${barcode}/pricing`, data)
     .then(() => ({ success: true as const, data: undefined }))
     .catch(apiErrorHandler<void>)
 }

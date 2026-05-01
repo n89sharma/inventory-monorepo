@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetPricingSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery, searchBarcodes } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -12,7 +12,8 @@ import {
   getTransfers as getAssetTransfersSer,
   createComment as createCommentSer,
   createPartTransfer as createPartTransferSer,
-  updateAssetErrors as updateAssetErrorsSer
+  updateAssetErrors as updateAssetErrorsSer,
+  updateAssetPricing as updateAssetPricingSer
 } from '../services/assetService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
@@ -157,6 +158,18 @@ export async function updateAssetErrors(req: Request, res: Response<ApiResponse<
   const { barcode } = req.params
   const validated = UpdateAssetErrorsSchema.parse(req.body)
   const response = await updateAssetErrorsSer(barcode, validated, res.locals.dbUserId)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    const status = response.error.type === 'API_ERROR' ? 404 : 500
+    return res.status(status).json(response)
+  }
+}
+
+export async function updateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
+  const { barcode } = req.params
+  const validated = UpdateAssetPricingSchema.parse(req.body)
+  const response = await updateAssetPricingSer(barcode, validated)
   if (response.success) {
     return res.json(response)
   } else {

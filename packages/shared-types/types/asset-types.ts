@@ -168,3 +168,14 @@ export const CreateCommentSchema = z.object({
 
 export type CreateComment = z.infer<typeof CreateCommentSchema>
 
+export const UpdateAssetPricingSchema = z.object({
+  purchase_cost: z.number().nonnegative(),
+  transport_cost: z.number().nonnegative(),
+  processing_cost: z.number().nonnegative(),
+  other_cost: z.number().nonnegative(),
+  parts_cost: z.number().nonnegative(),
+  sale_price: z.number().nonnegative(),
+})
+
+export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
+

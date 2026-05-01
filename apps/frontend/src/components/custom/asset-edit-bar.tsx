@@ -5,6 +5,7 @@ import { useState } from "react"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
+import { EditPricingModal } from "../modals/edit-pricing-modal"
 import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
@@ -16,6 +17,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const errors = data?.errors ?? []
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
+  const [editPricingOpen, setEditPricingOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
@@ -31,7 +33,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           </DropdownMenuTrigger>
         </Button>
         <DropdownMenuContent>
-          <DropdownMenuItem disabled>Pricing</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>
           <DropdownMenuItem disabled>Technical Specs</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>
             Errors
@@ -47,6 +49,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         onOpenChange={setEditErrorsOpen}
         assetDetails={assetDetails}
         errors={errors}
+      />
+
+      <EditPricingModal
+        open={editPricingOpen}
+        onOpenChange={setEditPricingOpen}
+        assetDetails={assetDetails}
       />
 
       <AddPartTransferModal

@@ -13,7 +13,8 @@ import {
   getAssetTransfers,
   getAssets,
   getBarcodeSuggestions,
-  updateAssetErrors
+  updateAssetErrors,
+  updateAssetPricing
 } from '../controllers/assetController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { validateQuery } from '../middleware/validation.js'
@@ -29,6 +30,7 @@ router.get('/:barcode', getAssetDetail)
 router.get('/:barcode/accessories', getAssetAccessories)
 router.get('/:barcode/errors', getAssetErrors)
 router.put('/:barcode/errors', updateAssetErrors)
+router.put('/:barcode/pricing', updateAssetPricing)
 router.get('/:barcode/comments', getAssetComments)
 router.post('/:barcode/comments', createAssetComment)
 router.get('/:barcode/parts', getAssetPartTransfer)

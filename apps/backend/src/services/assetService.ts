@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetPricing } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -298,5 +298,23 @@ export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors
     return successResponse(undefined)
   } catch (error) {
     return response500(`Failed to update errors for asset ${barcode}`)
+  }
+}
+
+export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<ApiResponse<void>> {
+  try {
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const total_cost = data.purchase_cost + data.transport_cost + data.processing_cost + data.other_cost + data.parts_cost
+
+    await prisma.cost.upsert({
+      where: { asset_id: asset.id },
+      update: { purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
+      create: { asset_id: asset.id, purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
+    })
+    return successResponse(undefined)
+  } catch (error) {
+    return response500(`Failed to update pricing for asset ${barcode}`)
   }
 }
