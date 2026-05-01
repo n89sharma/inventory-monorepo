@@ -1,6 +1,8 @@
+import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import type { AssetDetails, PartTransfer } from "shared-types";
 import { Badge } from "../shadcn/badge";
+import { Button } from "../shadcn/button";
 import { Section, SectionHeader } from "./asset-details/detail-layout";
 import { DataRow } from "./asset-details/detail-row";
 import { OptionalSection } from "./asset-details/optional-section";
@@ -26,12 +28,18 @@ export function PartsSection({ asset, partTransfers }: PartSectionProps): React.
 function getPartBadge(transfer: PartTransfer, currentAsset: string) {
 
   const badge = transfer.donor === currentAsset
-    ? <Badge variant="destructive">
-      <Link to={`/search/${transfer.recipient}`}>{transfer.is_exchange ? 'Exchange Donor' : 'Removed'}</Link>
-    </Badge>
-    : <Badge className="bg-lime-300 text-secondary-foreground">
-      <Link to={`/search/${transfer.donor}`}>{transfer.is_exchange ? 'Exchange Recipient' : 'Added'}</Link>
-    </Badge>
+    ? <div className="flex items-center gap-0.5">
+      <Badge variant="destructive">{transfer.is_exchange ? 'Exchange Donor' : 'Removed'}</Badge>
+      <Button asChild variant="link" size="xs" className="p-0">
+        <Link to={`/search/${transfer.recipient}`}><ArrowUpRightIcon /></Link>
+      </Button>
+    </div>
+    : <div className="flex items-center gap-0.5">
+      <Badge className="bg-lime-300 text-secondary-foreground">{transfer.is_exchange ? 'Exchange Recipient' : 'Added'}</Badge>
+      <Button asChild variant="link" size="xs" className="p-0">
+        <Link to={`/search/${transfer.donor}`}><ArrowUpRightIcon /></Link>
+      </Button>
+    </div>
 
   return (
     <DataRow
