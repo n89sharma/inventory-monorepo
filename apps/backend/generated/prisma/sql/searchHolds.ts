@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param q
  */
-export const searchHolds = $runtime.makeTypedQueryFactory("select\nh.id as id,\nh.hold_number as hold_number,\nc.name as customer,\nuf.name as created_for,\nh.created_at as created_at\nfrom \"Hold\" h\njoin \"Organization\" c on c.id = h.customer_id\njoin \"User\" uf on uf.id = h.created_for_id\nwhere h.hold_number like $1 || '%'\norder by h.created_at desc\nlimit 3") as (q: string) => $runtime.TypedSql<searchHolds.Parameters, searchHolds.Result>
+export const searchHolds = $runtime.makeTypedQueryFactory("select\nh.id as id,\nh.hold_number as hold_number,\nc.name as customer,\nuf.name as created_for,\nub.name as created_by,\nh.created_at as created_at\nfrom \"Hold\" h\njoin \"Organization\" c on c.id = h.customer_id\njoin \"User\" uf on uf.id = h.created_for_id\njoin \"User\" ub on ub.id = h.created_by_id\nwhere h.hold_number like $1 || '%'\norder by h.created_at desc\nlimit 3") as (q: string) => $runtime.TypedSql<searchHolds.Parameters, searchHolds.Result>
 
 export namespace searchHolds {
   export type Parameters = [q: string]
@@ -17,6 +17,7 @@ export namespace searchHolds {
     hold_number: string
     customer: string
     created_for: string
+    created_by: string
     created_at: Date
   }
 }

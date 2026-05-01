@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import type { AssetSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { emptyResults, SearchView, type CollectionResults, type SelectedCollection } from './collection-search'
+import { DetailGrid, emptyResults, SearchView, type CollectionResults, type SelectedCollection } from './collection-search'
 
 function toCollectionTarget(s: SelectedCollection): CollectionTarget {
   switch (s.kind) {
@@ -85,24 +85,6 @@ function InformationSection({ assetCount, selected, duplicateCount, isLoadingDet
   )
 }
 
-function DetailGrid({ selected, onClear }: { selected: SelectedCollection; onClear: () => void }) {
-  return (
-    <div className="flex flex-col gap-3 rounded-md border p-2">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium px-1">{collectionLabel(selected)}</p>
-        <Button variant="secondary" size="sm" onClick={onClear}>Change</Button>
-      </div>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-1 text-sm">
-        {getDetailFields(selected).map(({ label, value }) => (
-          <div key={label}>
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="font-medium">{value ?? '—'}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 interface AddToCollectionModalProps {
   open: boolean
@@ -207,7 +189,7 @@ export function AddToCollectionModal({ open, onOpenChange, selectedAssets, onCon
         <InformationSection assetCount={assetCount} selected={selected} duplicateCount={duplicateCount} isLoadingDetail={isLoadingDetail} />
 
         {selected !== null
-          ? <DetailGrid selected={selected} onClear={handleClearSelection} />
+          ? <DetailGrid title={collectionLabel(selected)} fields={getDetailFields(selected)} onClear={handleClearSelection} />
           : <SearchView query={query} onQueryChange={handleQueryChange} isLoading={isLoading} results={results} onSelect={handleSelect} />
         }
 

@@ -36,6 +36,7 @@ export const HoldSuggestionSchema = z.object({
   hold_number: z.string(),
   customer: z.string(),
   created_for: z.string(),
+  created_by: z.string(),
   created_at: z.coerce.date(),
 })
 

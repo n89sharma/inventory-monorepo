@@ -3,8 +3,9 @@ import type {
   HoldSuggestion,
   InvoiceSuggestion,
   TransferSuggestion,
-} from 'shared-types'
-import { Input } from '../shadcn/input'
+} from 'shared-types';
+import { Button } from '../shadcn/button';
+import { Input } from '../shadcn/input';
 
 export type SelectedCollection =
   | { kind: 'departure'; data: DepartureSuggestion }
@@ -70,23 +71,24 @@ function SearchContent({ query, isLoading, results, onSelect }: {
   results: CollectionResults
   onSelect: (c: SelectedCollection) => void
 }) {
-  if (!query) return <p className="px-3 py-2 text-sm text-muted-foreground">Start typing to search…</p>
+  if (!query) return <p className="px-3 py-2 text-sm text-muted-foreground">Start typing above to see suggestions…</p>
   if (isLoading) return <p className="px-3 py-2 text-sm text-muted-foreground">Searching…</p>
   if (!hasAnyResults(results)) return <p className="px-3 py-2 text-sm text-muted-foreground">No results.</p>
   return <ResultsList results={results} onSelect={onSelect} />
 }
 
-export function SearchView({ query, onQueryChange, isLoading, results, onSelect }: {
+export function SearchView({ query, onQueryChange, isLoading, results, onSelect, label = 'Collection' }: {
   query: string
   onQueryChange: (v: string) => void
   isLoading: boolean
   results: CollectionResults
   onSelect: (c: SelectedCollection) => void
+  label?: string
 }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">Collection</label>
+        <label className="text-sm font-medium">{label}</label>
         <Input
           autoFocus
           placeholder="Search by ID…"
@@ -96,6 +98,29 @@ export function SearchView({ query, onQueryChange, isLoading, results, onSelect 
       </div>
       <div className="h-80 overflow-y-auto rounded-md border">
         <SearchContent query={query} isLoading={isLoading} results={results} onSelect={onSelect} />
+      </div>
+    </div>
+  )
+}
+
+export function DetailGrid({ title, fields, onClear }: {
+  title: string
+  fields: { label: string; value: string | null }[]
+  onClear: () => void
+}) {
+  return (
+    <div className="flex flex-col gap-3 rounded-md border p-2">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium px-1">{title}</p>
+        <Button variant="secondary" size="sm" onClick={onClear}>Change</Button>
+      </div>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-1 text-sm">
+        {fields.map(({ label, value }) => (
+          <div key={label}>
+            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="font-medium">{value ?? '—'}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
