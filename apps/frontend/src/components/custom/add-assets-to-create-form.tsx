@@ -4,7 +4,7 @@ import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
-import { Field, FieldLabel } from '../shadcn/field'
+import { Field, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
 import { Input } from '../shadcn/input'
 
 interface AddAssetByBarcodeProps {
@@ -57,25 +57,27 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
   }
 
   return (
-    <div className='flex items-end gap-2 w-90'>
-      <Field className='flex-1'>
-        <FieldLabel>Barcode</FieldLabel>
-        <Input
-          ref={barcodeInputRef}
-          placeholder='Scan or enter barcode…'
-          onKeyDown={onBarcodeKeyDown}
-          onChange={() => setBarcodeError(null)}
-        />
-        {barcodeError && (
-          <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
-        )}
-      </Field>
+    <div className='flex flex-col'>
+      <div className='flex-1 flex flex-col justify-center'>
+        <Field>
+          <FieldLabel>Barcode</FieldLabel>
+          <Input
+            ref={barcodeInputRef}
+            placeholder='Scan or enter barcode…'
+            onKeyDown={onBarcodeKeyDown}
+            onChange={() => setBarcodeError(null)}
+          />
+          {barcodeError && (
+            <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
+          )}
+        </Field>
+      </div>
       <Button
         variant='secondary'
         type='button'
         onClick={handleAddAsset}
         disabled={isLookingUp}
-        className='mb-0.5'
+        className='mt-3'
       >
         {isLookingUp
           ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up…</>
@@ -97,16 +99,34 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
 
   return (
     <>
-      <AddAssetByBarcode getAssets={getAssets} onAddAsset={onAddAsset} entityName={entityName} />
+      <FieldSet className='border rounded-md p-4'>
+        <FieldLegend>Add assets by:</FieldLegend>
+        <div className='grid grid-cols-[1fr_auto_1fr] gap-6 items-stretch'>
 
-      <Button
-        variant='secondary'
-        type='button'
-        onClick={() => setIsHoldModalOpen(true)}
-        className='w-35'
-      >
-        Add from Hold
-      </Button>
+          <AddAssetByBarcode getAssets={getAssets} onAddAsset={onAddAsset} entityName={entityName} />
+
+          <div className='relative flex flex-col items-center'>
+            <div className='flex-1 w-px bg-border' />
+            <span className='absolute top-1/2 -translate-y-1/2 bg-background px-1.5 text-xs text-muted-foreground'>or</span>
+          </div>
+
+          <div className='flex flex-col'>
+            <div className='flex-1 flex flex-col justify-center gap-1'>
+              <p className='text-sm font-medium'>Hold</p>
+              <p className='text-sm text-muted-foreground'>Adds all assets from the selected hold</p>
+            </div>
+            <Button
+              variant='secondary'
+              type='button'
+              onClick={() => setIsHoldModalOpen(true)}
+              className='mt-3'
+            >
+              Add from Hold
+            </Button>
+          </div>
+
+        </div>
+      </FieldSet>
 
       <AddFromHoldModal
         open={isHoldModalOpen}
