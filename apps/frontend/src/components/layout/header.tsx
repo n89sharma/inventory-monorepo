@@ -7,7 +7,7 @@ interface HeaderProps {
 
 export function Header({ className }: HeaderProps): React.JSX.Element {
   return (
-    <header className={cn("flex flex-row items-center px-4 py-2 gap-4 border-b", className)}>
+    <header className={cn("flex flex-row items-center justify-center px-4 py-2 gap-4 border-b", className)}>
       <GlobalSearch />
     </header>
   )

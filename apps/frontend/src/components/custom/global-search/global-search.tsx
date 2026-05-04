@@ -3,6 +3,7 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/compon
 import { getGlobalSearchResults } from '@/data/api/search-api'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { cn } from '@/lib/utils'
+import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { GlobalSearchResult } from 'shared-types'
@@ -20,9 +21,22 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('assets')
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
   const hasResults = tabs.some(tab => results[tab].length > 0)
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   useEffect(() => {
     if (!query) return
@@ -67,6 +81,18 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     }
   }
 
+  function clearSearch() {
+    setQuery("")
+    setPopoverOpen(false)
+    setIsLoading(false)
+    setResults(emptyResults)
+    inputRef.current?.blur()
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Escape') clearSearch()
+  }
+
   function handlePrefetch(barcode: string) {
     if (prefetchTimer.current) clearTimeout(prefetchTimer.current)
     prefetchTimer.current = setTimeout(() => preloadAssetDetail(barcode), 100)
@@ -77,14 +103,35 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverTrigger asChild><div /></PopoverTrigger>
         <PopoverAnchor asChild>
-          <Input
-            type="text"
-            name="search"
-            autoComplete="off"
-            placeholder="Global search…"
-            value={query}
-            onChange={handleInputChange}
-          />
+          <div className="relative w-96">
+            <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
+            <Input
+              ref={inputRef}
+              type="text"
+              name="search"
+              autoComplete="off"
+              placeholder="Global search…"
+              value={query}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              className="pl-8 pr-20"
+            />
+            {query ? (
+              <button
+                onClick={clearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                tabIndex={-1}
+                aria-label="Clear search"
+              >
+                <XIcon className="size-4" />
+              </button>
+            ) : (
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
+                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">Ctrl</kbd>
+                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">K</kbd>
+              </div>
+            )}
+          </div>
         </PopoverAnchor>
         <PopoverContent
           align="start"
