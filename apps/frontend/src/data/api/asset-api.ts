@@ -5,6 +5,7 @@ import type {
   ApiResponse,
   AssetDetails,
   AssetError,
+  AssetLocation,
   AssetSummary,
   AssetTransfer,
   BarcodeSuggestion,
@@ -14,6 +15,7 @@ import type {
   ModelSummary,
   PartTransfer,
   Status,
+  UpdateAssetLocation,
   UpdateAssetPricing,
   UpdateAssetSpecs,
   UpdateError,
@@ -89,6 +91,18 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
 
 export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<ApiResponse<void>> {
   return api.put(`/assets/${barcode}/specs`, data)
+    .then(() => ({ success: true as const, data: undefined }))
+    .catch(apiErrorHandler<void>)
+}
+
+export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiResponse<AssetLocation[]>> {
+  return api.get<ApiResponse<AssetLocation[]>>('/assets/locations', { params: { warehouseId } })
+    .then(({ data }) => data)
+    .catch(apiErrorHandler<AssetLocation[]>)
+}
+
+export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<ApiResponse<void>> {
+  return api.put(`/assets/${barcode}/location`, data)
     .then(() => ({ success: true as const, data: undefined }))
     .catch(apiErrorHandler<void>)
 }

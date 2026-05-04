@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, getAssetsForQuery, searchBarcodes } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -13,12 +13,18 @@ import {
   createComment as createCommentSer,
   createPartTransfer as createPartTransferSer,
   updateAssetErrors as updateAssetErrorsSer,
+  updateAssetLocation as updateAssetLocationSer,
   updateAssetPricing as updateAssetPricingSer,
-  updateAssetSpecs as updateAssetSpecsSer
+  updateAssetSpecs as updateAssetSpecsSer,
+  getLocationsByWarehouse as getLocationsByWarehouseSer
 } from '../services/assetService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
   q: z.string().min(1)
+})
+
+export const LocationsByWarehouseQuerySchema = z.object({
+  warehouseId: z.string().transform(Number)
 })
 
 export const AssetQuerySchema = z.object({
@@ -187,6 +193,28 @@ export async function updateAssetSpecs(req: Request, res: Response<ApiResponse<v
     return res.json(response)
   } else {
     const status = response.error.type === 'API_ERROR' ? 404 : 500
+    return res.status(status).json(response)
+  }
+}
+
+export async function getLocationsByWarehouse(req: Request, res: Response<ApiResponse<AssetLocation[]>>) {
+  const { warehouseId } = res.locals.query as z.infer<typeof LocationsByWarehouseQuerySchema>
+  const response = await getLocationsByWarehouseSer(warehouseId)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    return res.status(500).json(response)
+  }
+}
+
+export async function updateAssetLocation(req: Request, res: Response<ApiResponse<void>>) {
+  const { barcode } = req.params
+  const validated = UpdateAssetLocationSchema.parse(req.body)
+  const response = await updateAssetLocationSer(barcode, validated)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    const status = response.error.type === 'API_ERROR' ? 400 : 500
     return res.status(status).json(response)
   }
 }

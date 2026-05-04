@@ -18,6 +18,7 @@ export type PopoverSearchProps<T> = {
   fieldRequired: boolean
   error?: boolean
   className?: string
+  filterInput?: (val: string) => string
 }
 
 export function PopoverSearch<T>({
@@ -30,7 +31,8 @@ export function PopoverSearch<T>({
   fieldLabel,
   fieldRequired,
   error,
-  className }: PopoverSearchProps<T>): React.JSX.Element {
+  className,
+  filterInput }: PopoverSearchProps<T>): React.JSX.Element {
 
   const [matches, setMatches] = useState<T[]>([])
   const [userInput, setUserInput] = useState(selection ? getLabel(selection) : '')
@@ -53,7 +55,8 @@ export function PopoverSearch<T>({
       })
   }, [options])
 
-  function updateSearch(inputVal: string) {
+  function updateSearch(rawInput: string) {
+    const inputVal = filterInput ? filterInput(rawInput) : rawInput
     setUserInput(inputVal)
 
     if (!inputVal.trim()) {

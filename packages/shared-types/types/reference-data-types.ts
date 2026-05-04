@@ -34,6 +34,12 @@ export const WarehouseSchema = z.object({
   is_active: z.boolean()
 })
 
+export const AssetLocationSchema = z.object({
+  id: z.number(),
+  location: z.string(),
+  warehouse_id: z.number(),
+})
+
 export const ErrorSchema = z.object({
   id: z.number(),
   brand_id: z.number(),
@@ -68,4 +74,5 @@ export type Status = z.infer<typeof StatusSchema>;
 export type Role = z.infer<typeof RoleSchema>;
 export type InvoiceType = z.infer<typeof InvoiceTypeSchema>;
 export type Warehouse = z.infer<typeof WarehouseSchema>;
+export type AssetLocation = z.infer<typeof AssetLocationSchema>;
 export type Error = z.infer<typeof ErrorSchema>;

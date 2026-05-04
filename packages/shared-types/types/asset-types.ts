@@ -193,3 +193,9 @@ export const UpdateAssetSpecsSchema = z.object({
 
 export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>
 
+export const UpdateAssetLocationSchema = z.object({
+  location_id: z.number().int().positive(),
+})
+
+export type UpdateAssetLocation = z.infer<typeof UpdateAssetLocationSchema>
+

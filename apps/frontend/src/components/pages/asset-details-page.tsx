@@ -6,13 +6,16 @@ import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { EditLocationModal } from '@/components/modals/edit-location-modal'
+import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
-import { useEffect } from 'react'
+import { PencilSimpleIcon } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
@@ -25,6 +28,7 @@ export const AssetDetailsPage = () => {
   const { pathname } = useLocation()
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
+  const [editLocationOpen, setEditLocationOpen] = useState(false)
 
   const assetDetails = data?.assetDetails ?? null
   const accessories = data?.accessories ?? []
@@ -68,7 +72,21 @@ export const AssetDetailsPage = () => {
               <DataValueRow label="Availability" value={assetDetails.availability_status} />
               <DataValueRow label="Technical Status" value={assetDetails.technical_status} />
               <DataValueRow label="Warehouse" value={assetDetails.warehouse_code} />
-              <DataValueRow label="Location" value={assetDetails.location} />
+              <DataRow label="Location">
+                <div className="group flex items-center gap-2">
+                  <DataValue value={assetDetails.location} />
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    type="button"
+                    aria-label="Edit location"
+                    onClick={() => setEditLocationOpen(true)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <PencilSimpleIcon aria-hidden="true" />
+                  </Button>
+                </div>
+              </DataRow>
               <DataDateRow label="Created At" value={assetDetails.created_at} />
             </DataRowContainer>
           </Section>
@@ -196,6 +214,12 @@ export const AssetDetailsPage = () => {
         </Tabs>
 
       </DetailsContainer>
+
+      <EditLocationModal
+        open={editLocationOpen}
+        onOpenChange={setEditLocationOpen}
+        assetDetails={assetDetails}
+      />
     </div>
   )
 }

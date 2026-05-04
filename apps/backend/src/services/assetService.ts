@@ -1,11 +1,12 @@
-import { ApiResponse, AssetDetails, AssetError, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
   getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
   getAssetPartTransfer as getAssetPartTransferQuery,
-  getAssetTransfers as getAssetTransfersQuery
+  getAssetTransfers as getAssetTransfersQuery,
+  getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 
@@ -316,6 +317,30 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
     return successResponse(undefined)
   } catch (error) {
     return response500(`Failed to update pricing for asset ${barcode}`)
+  }
+}
+
+export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiResponse<AssetLocation[]>> {
+  try {
+    const locations = await prisma.$queryRawTyped(getLocationsByWarehouseQuery(warehouseId))
+    return successResponse(locations)
+  } catch {
+    return response500('Failed to fetch locations')
+  }
+}
+
+export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<ApiResponse<void>> {
+  try {
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const location = await prisma.location.findUnique({ where: { id: data.location_id } })
+    if (!location) return response400('Location not found')
+
+    await prisma.asset.update({ where: { barcode }, data: { location_id: data.location_id } })
+    return successResponse(undefined)
+  } catch {
+    return response500(`Failed to update location for asset ${barcode}`)
   }
 }
 
