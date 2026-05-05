@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -504,6 +504,15 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
   } catch (error) {
     return response500(`Failed to update pricing for asset ${barcode}`)
   }
+}
+
+export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<ApiResponse<void>> {
+  const results = await Promise.allSettled(
+    items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing))
+  )
+  const failCount = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)).length
+  if (failCount > 0) return response500(`Failed to update pricing for ${failCount} asset(s)`)
+  return successResponse(undefined)
 }
 
 export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiResponse<AssetLocation[]>> {

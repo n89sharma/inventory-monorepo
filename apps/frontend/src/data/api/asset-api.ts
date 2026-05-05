@@ -8,6 +8,7 @@ import type {
   AssetSummary,
   AssetTransfer,
   BarcodeSuggestion,
+  BulkUpdateAssetPricing,
   Comment,
   CreateComment,
   CreatePartTransfer,
@@ -84,6 +85,12 @@ export async function updateAssetErrors(barcode: string, errors: UpdateError[]):
 
 export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<ApiResponse<void>> {
   return api.put(`/assets/${barcode}/pricing`, data)
+    .then(() => ({ success: true as const, data: undefined }))
+    .catch(apiErrorHandler<void>)
+}
+
+export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<ApiResponse<void>> {
+  return api.put('/assets/bulk/pricing', { items })
     .then(() => ({ success: true as const, data: undefined }))
     .catch(apiErrorHandler<void>)
 }

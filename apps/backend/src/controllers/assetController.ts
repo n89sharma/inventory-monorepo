@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, BulkUpdateAssetPricingSchema, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -17,6 +17,7 @@ import {
   updateAssetErrors as updateAssetErrorsSer,
   updateAssetLocation as updateAssetLocationSer,
   updateAssetPricing as updateAssetPricingSer,
+  bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   updateAssetSpecs as updateAssetSpecsSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer
 } from '../services/assetService.js'
@@ -187,6 +188,16 @@ export async function updateAssetPricing(req: Request, res: Response<ApiResponse
   } else {
     const status = response.error.type === 'API_ERROR' ? 404 : 500
     return res.status(status).json(response)
+  }
+}
+
+export async function bulkUpdateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
+  const { items } = BulkUpdateAssetPricingSchema.parse(req.body)
+  const response = await bulkUpdateAssetPricingSer(items)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    return res.status(500).json(response)
   }
 }
 

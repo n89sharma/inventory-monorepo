@@ -179,6 +179,12 @@ export const UpdateAssetPricingSchema = z.object({
 
 export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
 
+export const BulkUpdateAssetPricingSchema = z.object({
+  items: z.array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema))
+})
+
+export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
+
 export const UpdateAssetSpecsSchema = z.object({
   cassettes: z.number().int().nonnegative().nullable(),
   internal_finisher: z.string().nullable(),

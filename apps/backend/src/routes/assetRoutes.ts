@@ -16,6 +16,7 @@ import {
   getAssets,
   getBarcodeSuggestions,
   getLocationsByWarehouse,
+  bulkUpdateAssetPricing,
   updateAssetErrors,
   updateAssetLocation,
   updateAssetPricing,
@@ -38,6 +39,7 @@ router.get('/:barcode/accessories', getAssetAccessories)
 router.get('/:barcode/errors', getAssetErrors)
 router.put('/:barcode/errors', updateAssetErrors)
 router.put('/:barcode/location', updateAssetLocation)
+router.put('/bulk/pricing', bulkUpdateAssetPricing)
 router.put('/:barcode/pricing', updateAssetPricing)
 router.put('/:barcode/specs', updateAssetSpecs)
 router.get('/:barcode/comments', getAssetComments)
