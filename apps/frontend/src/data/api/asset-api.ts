@@ -1,6 +1,5 @@
 import { api } from '@/data/api/axios-client'
 import { apiErrorHandler } from '@/lib/error-handler'
-import { getIdOrNullFromSelection, type SelectOption } from '@/ui-types/select-option-types'
 import type {
   ApiResponse,
   AssetDetails,
@@ -151,17 +150,17 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
 export async function getAssetsForQuery(
   model: ModelSummary,
   meter: number | null,
-  availabilityStatus: SelectOption<Status>,
-  technicalStatus: SelectOption<Status>,
-  warehouse: SelectOption<Warehouse>): Promise<AssetSummary[]> {
+  availabilityStatuses: Status[],
+  technicalStatuses: Status[],
+  warehouses: Warehouse[]): Promise<AssetSummary[]> {
 
   const { data } = await api.get<ApiResponse<AssetSummary[]>>(`/assets`, {
     params: {
       model: model.model_name,
-      meter: meter,
-      availabilityStatusId: getIdOrNullFromSelection(availabilityStatus),
-      technicalStatusId: getIdOrNullFromSelection(technicalStatus),
-      warehouseId: getIdOrNullFromSelection(warehouse)
+      meter: meter ?? undefined,
+      availabilityStatusIds: availabilityStatuses.map(s => s.id),
+      technicalStatusIds: technicalStatuses.map(s => s.id),
+      warehouseIds: warehouses.map(w => w.id),
     }
   })
   if (data.success) return z.array(AssetSummarySchema).parse(data.data)

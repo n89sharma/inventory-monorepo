@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
 import { z } from 'zod'
-import { getAssetByBarcode, getAssetsForQuery, searchBarcodes } from '../../generated/prisma/sql.js'
+import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
+import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../prisma.js'
 import {
   getAccessories as getAssetAccessoriesSer,
@@ -27,33 +28,60 @@ export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number)
 })
 
+const toNumberArray = (val: unknown) =>
+  val === undefined ? [] : Array.isArray(val) ? val : [val]
+
 export const AssetQuerySchema = z.object({
   model: z.string(),
   trackingStatusId: z.string().optional().transform(Number),
-  availabilityStatusId: z.string().optional().transform(Number),
-  technicalStatusId: z.string().optional().transform(Number),
-  warehouseId: z.string().optional().transform(Number),
+  availabilityStatusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  technicalStatusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   meter: z.string().optional().transform(Number)
 })
+
+function inFilter(col: string, ids: number[]) {
+  if (ids.length === 0) return Prisma.sql`TRUE`
+  return Prisma.sql`${Prisma.raw(col)} IN (${Prisma.join(ids)})`
+}
 
 export async function getAssets(req: Request, res: Response<ApiResponse<AssetSummary[]>>) {
   try {
     const {
       model,
       trackingStatusId,
-      availabilityStatusId,
-      technicalStatusId,
-      warehouseId,
+      availabilityStatusIds,
+      technicalStatusIds,
+      warehouseIds,
       meter } = res.locals.query as z.infer<typeof AssetQuerySchema>
 
-    const assets = await prisma.$queryRawTyped(getAssetsForQuery(
-      model,
-      isNaN(trackingStatusId) ? 0 : trackingStatusId,
-      isNaN(availabilityStatusId) ? 0 : availabilityStatusId,
-      isNaN(technicalStatusId) ? 0 : technicalStatusId,
-      isNaN(warehouseId) ? 0 : warehouseId,
-      isNaN(meter) ? -1 : meter
-    ))
+    const trackingId = isNaN(trackingStatusId) ? 0 : trackingStatusId
+    const meterParam = isNaN(meter) ? -1 : meter
+
+    const assets = await prisma.$queryRaw<AssetSummary[]>`
+      SELECT a.id, b."name" AS brand, m."name" AS model,
+             at.asset_type, a.barcode, a.serial_number, t.meter_total,
+             w.city_code AS warehouse_city_code, w.street AS warehouse_street,
+             tr.status AS tracking_status,
+             av.status AS availability_status,
+             te.status AS technical_status
+      FROM "Asset" a
+        JOIN "TechnicalSpecification" t ON t.asset_id = a.id
+        JOIN "Model" m ON m.id = a.model_id
+        JOIN "Brand" b ON b.id = m.brand_id
+        JOIN "AssetType" at ON at.id = m.asset_type_id
+        JOIN "TrackingStatus" tr ON tr.id = a.tracking_status_id
+        JOIN "AvailabilityStatus" av ON av.id = a.availability_status_id
+        JOIN "TechnicalStatus" te ON te.id = a.technical_status_id
+        LEFT JOIN "Location" l ON l.id = a.location_id
+        LEFT JOIN "Warehouse" w ON w.id = l.warehouse_id
+      WHERE m."name" ~* ${model}
+        AND (${trackingId} = 0 OR tr.id = ${trackingId})
+        AND ${inFilter('av.id', availabilityStatusIds)}
+        AND ${inFilter('te.id', technicalStatusIds)}
+        AND ${inFilter('w.id', warehouseIds)}
+        AND (${meterParam} = -1 OR t.meter_total <= ${meterParam})
+    `
     res.json(successResponse(assets))
   } catch (error) {
     res.status(500).json(response500('Failed to fetch assets'))

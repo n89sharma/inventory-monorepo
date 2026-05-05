@@ -8,8 +8,8 @@ import { useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { AddToCollectionModal } from '../modals/add-to-collection-modal'
 import { InputWithClear } from '../custom/input-with-clear'
+import { MultiSelectOptions } from '../custom/multi-select-options'
 import { PopoverSearch } from '../custom/popover-search'
-import { SelectOptions } from '../custom/select-options'
 import { DataTable } from "../shadcn/data-table"
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
@@ -68,31 +68,31 @@ export function QueryPage(): React.JSX.Element {
   const [loading, setLoading] = useState(false)
 
   const models = useModelStore((state) => state.models)
-  const availabilityStatuses = useReferenceDataStore((state) => state.availabilityStatuses)
-  const technicalStatuses = useReferenceDataStore((state) => state.technicalStatuses)
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
-  const activeWarehouses = warehouses.filter(w => w.is_active)
+  const allAvailabilityStatuses = useReferenceDataStore((state) => state.availabilityStatuses)
+  const allTechnicalStatuses = useReferenceDataStore((state) => state.technicalStatuses)
+  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
+  const activeWarehouses = allWarehouses.filter(w => w.is_active)
 
   const assets = useQueryStore(state => state.assets)
   const model = useQueryStore(state => state.model)
   const meter = useQueryStore(state => state.meter)
-  const availabilityStatus = useQueryStore(state => state.availabilityStatus)
-  const technicalStatus = useQueryStore(state => state.technicalStatus)
-  const warehouse = useQueryStore(state => state.warehouse)
+  const availabilityStatuses = useQueryStore(state => state.availabilityStatuses)
+  const technicalStatuses = useQueryStore(state => state.technicalStatuses)
+  const selectedWarehouses = useQueryStore(state => state.selectedWarehouses)
 
   const setAssets = useQueryStore(state => state.setAssets)
   const setModel = useQueryStore(state => state.setModel)
   const setMeter = useQueryStore(state => state.setMeter)
-  const setAvailabilityStatus = useQueryStore(state => state.setAvailabilityStatus)
-  const setTechnicalStatus = useQueryStore(state => state.setTechnicalStatus)
-  const setWarehouse = useQueryStore(state => state.setWarehouse)
+  const setAvailabilityStatuses = useQueryStore(state => state.setAvailabilityStatuses)
+  const setTechnicalStatuses = useQueryStore(state => state.setTechnicalStatuses)
+  const setSelectedWarehouses = useQueryStore(state => state.setSelectedWarehouses)
   const setHasSearched = useQueryStore(state => state.setHasSearched)
 
   async function submitQuery() {
     setLoading(true)
     try {
       if (model) {
-        setAssets(await getAssetsForQuery(model, meter, availabilityStatus, technicalStatus, warehouse))
+        setAssets(await getAssetsForQuery(model, meter, availabilityStatuses, technicalStatuses, selectedWarehouses))
         setHasSearched(true)
       }
     } finally {
@@ -121,33 +121,30 @@ export function QueryPage(): React.JSX.Element {
           fieldRequired={true}
         />
 
-        <SelectOptions
-          selection={availabilityStatus}
-          onSelectionChange={setAvailabilityStatus}
-          options={availabilityStatuses}
+        <MultiSelectOptions
+          selection={availabilityStatuses}
+          onSelectionChange={setAvailabilityStatuses}
+          options={allAvailabilityStatuses}
           getLabel={s => s.status}
           fieldLabel='Availability'
-          anyAllowed={true}
           className='max-w-36'
         />
 
-        <SelectOptions
-          selection={technicalStatus}
-          onSelectionChange={setTechnicalStatus}
-          options={technicalStatuses}
+        <MultiSelectOptions
+          selection={technicalStatuses}
+          onSelectionChange={setTechnicalStatuses}
+          options={allTechnicalStatuses}
           getLabel={s => s.status}
           fieldLabel='Testing Status'
-          anyAllowed={true}
           className='max-w-36'
         />
 
-        <SelectOptions
-          selection={warehouse}
-          onSelectionChange={setWarehouse}
+        <MultiSelectOptions
+          selection={selectedWarehouses}
+          onSelectionChange={setSelectedWarehouses}
           options={activeWarehouses}
           getLabel={w => w.city_code}
           fieldLabel='Warehouse'
-          anyAllowed={true}
           className='max-w-36'
         />
 
