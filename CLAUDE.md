@@ -56,12 +56,7 @@ function SearchPopoverContent({ isLoading, hasResults, ... }) {
 }
 ```
 
-**After every code change, run both build commands from the repo root:**
-```bash
-npm run bbuild
-npm run fbuild
-```
-Summarize any errors and fix them before considering the task complete.
+**After every code change, run `npm run bbuild && npm run fbuild` from the repo root. Summarize any errors and fix them before considering the task complete.**
 
 ---
 
@@ -192,6 +187,8 @@ Path alias `@/` maps to `src/`.
 - `SelectOptions` component — for small, fixed lists (warehouses, users, invoice types)
 - `ControlledPopoverSearch` — for large, searchable lists (organizations); stores value as `T | null` directly
 - `getIdOrNullFromSelection()` extracts `.selected.id`; extend its union type when adding a new selectable entity type
+
+**`MultiSelectOptions` pattern** — for small fixed lists where multiple values can be selected simultaneously (e.g. availability statuses, technical statuses, warehouses on the Query page). Implemented as a `DropdownMenu` + `DropdownMenuCheckboxItem`. Keep the menu open on select via `onSelect={e => e.preventDefault()}`. Include a "Select all" item at the top. Component at `components/custom/multi-select-options.tsx`.
 
 **Page routing** (`app.tsx`): specific routes must be declared before param routes:
 ```tsx
