@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -8,7 +8,52 @@ import {
   getAssetTransfers as getAssetTransfersQuery,
   getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
+import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../prisma.js'
+
+function inFilter(col: string, ids: number[]) {
+  if (ids.length === 0) return Prisma.sql`TRUE`
+  return Prisma.sql`${Prisma.raw(col)} IN (${Prisma.join(ids)})`
+}
+
+export async function getAssets(
+  model: string,
+  trackingId: number,
+  availabilityStatusIds: number[],
+  technicalStatusIds: number[],
+  warehouseIds: number[],
+  meterParam: number
+): Promise<ApiResponse<AssetSummary[]>> {
+  try {
+    const assets = await prisma.$queryRaw<AssetSummary[]>`
+      SELECT a.id, b."name" AS brand, m."name" AS model,
+             at.asset_type, a.barcode, a.serial_number, t.meter_total,
+             w.city_code AS warehouse_city_code, w.street AS warehouse_street,
+             tr.status AS tracking_status,
+             av.status AS availability_status,
+             te.status AS technical_status
+      FROM "Asset" a
+        JOIN "TechnicalSpecification" t ON t.asset_id = a.id
+        JOIN "Model" m ON m.id = a.model_id
+        JOIN "Brand" b ON b.id = m.brand_id
+        JOIN "AssetType" at ON at.id = m.asset_type_id
+        JOIN "TrackingStatus" tr ON tr.id = a.tracking_status_id
+        JOIN "AvailabilityStatus" av ON av.id = a.availability_status_id
+        JOIN "TechnicalStatus" te ON te.id = a.technical_status_id
+        LEFT JOIN "Location" l ON l.id = a.location_id
+        LEFT JOIN "Warehouse" w ON w.id = l.warehouse_id
+      WHERE m."name" ~* ${model}
+        AND (${trackingId} = 0 OR tr.id = ${trackingId})
+        AND ${inFilter('av.id', availabilityStatusIds)}
+        AND ${inFilter('te.id', technicalStatusIds)}
+        AND ${inFilter('w.id', warehouseIds)}
+        AND (${meterParam} = -1 OR t.meter_total <= ${meterParam})
+    `
+    return successResponse(assets)
+  } catch {
+    return response500('Failed to fetch assets')
+  }
+}
 
 
 export async function getAssetDetail(barcode: string): Promise<ApiResponse<AssetDetails>> {

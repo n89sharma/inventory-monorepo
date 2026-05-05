@@ -116,6 +116,10 @@ In practice: every create/update form gets a `XyzFormSchema` + `XyzForm` type in
 | **Controller** | `src/controllers/xyzController.ts` | `entityController.ts` | HTTP layer — parse body with `XyzSchema.parse(req.body)`, call service, return 200/201/400/500 |
 | **Route** | `src/routes/xyzRoutes.ts` | `entityRoutes.ts` | Wire URL paths to controller functions; registered in `src/index.ts` |
 
+**Controller vs service separation:** Controllers own HTTP concerns only — parse query/body params, call a service, return the right status code. All DB logic (Prisma calls, raw SQL, business rules) belongs in the service. Never call `prisma` directly from a controller.
+
+**After removing a feature or query:** Delete any `.sql` files in `prisma/sql/` that are no longer used, then run `npm run prisma` to regenerate `generated/prisma/sql/`. Also check for orphaned imports across the controller, service, and API layers.
+
 **Key backend utilities:**
 - `response400`, `response500`, `successResponse` from `shared-types` — standard response wrappers
 - `getNextSequence(entityType, warehouseCode, date)` in `src/lib/db-utils.ts` — generates a sequential number for an entity on a given date; combine with date formatting to produce numbers like `H-260409-001`

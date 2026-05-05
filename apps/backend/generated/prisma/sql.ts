@@ -25,8 +25,6 @@ export * from "./sql/getAssetsForHold.js"
 
 export * from "./sql/getAssetsForInvoice.js"
 
-export * from "./sql/getAssetsForQuery.js"
-
 export * from "./sql/getAssetsForTransfers.js"
 
 export * from "./sql/getAssetTransfers.js"
