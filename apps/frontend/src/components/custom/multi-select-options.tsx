@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/shadcn/dropdown-menu"
 import { Field, FieldLabel } from "@/components/shadcn/field"
@@ -27,10 +28,15 @@ export function MultiSelectOptions<T extends { id: number }>({
   className,
 }: MultiSelectOptionsProps<T>): React.JSX.Element {
   const label = selection.length === 0 ? 'Any' : `${selection.length} selected`
+  const allSelected = options.length > 0 && selection.length === options.length
 
   function toggle(option: T, checked: boolean) {
     if (checked) onSelectionChange([...selection, option])
     else onSelectionChange(selection.filter(s => s.id !== option.id))
+  }
+
+  function toggleAll(checked: boolean) {
+    onSelectionChange(checked ? options : [])
   }
 
   return (
@@ -44,6 +50,14 @@ export function MultiSelectOptions<T extends { id: number }>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuCheckboxItem
+            checked={allSelected}
+            onCheckedChange={toggleAll}
+            onSelect={e => e.preventDefault()}
+          >
+            Select all
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
           {options.map(option => (
             <DropdownMenuCheckboxItem
               key={option.id}
