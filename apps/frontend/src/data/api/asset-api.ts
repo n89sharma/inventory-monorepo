@@ -147,6 +147,22 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
   }
 }
 
+export async function exportAssets(barcodes: string[], filename?: string): Promise<void> {
+  const response = await api.post('/assets/export', { barcodes }, { responseType: 'blob' })
+  const disposition = response.headers['content-disposition'] as string | undefined
+  const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
+  const blob = new Blob([response.data], { type: 'text/csv' })
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = resolvedFilename
+  document.body.append(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 export async function getAssetsForQuery(
   model: ModelSummary,
   meter: number | null,

@@ -1,30 +1,39 @@
 import { Button } from "@/components/shadcn/button"
-import { getAssetsForQuery } from "@/data/api/asset-api"
+import { exportAssets, getAssetsForQuery } from "@/data/api/asset-api"
 import { useModelStore } from '@/data/store/model-store'
 import { useQueryStore } from '@/data/store/query-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import type { RowSelectionState } from '@tanstack/react-table'
+import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
 import type { AssetSummary } from 'shared-types'
-import { AddToCollectionModal } from '../modals/add-to-collection-modal'
+import { toast } from 'sonner'
 import { InputWithClear } from '../custom/input-with-clear'
 import { MultiSelectOptions } from '../custom/multi-select-options'
 import { PopoverSearch } from '../custom/popover-search'
+import { AddToCollectionModal } from '../modals/add-to-collection-modal'
 import { DataTable } from "../shadcn/data-table"
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 const searchColumns = createAssetSummaryColumns('search')
 const getAssetRowId = (row: AssetSummary) => row.barcode
 
-function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+function QueryResultsTable({
+  assets,
+  rowSelection,
+  onRowSelectionChange,
+}: {
+  assets: AssetSummary[]
+  rowSelection: RowSelectionState
+  onRowSelectionChange: OnChangeFn<RowSelectionState>
+}) {
   const [prevAssets, setPrevAssets] = useState(assets)
   const [addToOpen, setAddToOpen] = useState(false)
   const [frozenAssets, setFrozenAssets] = useState<AssetSummary[]>([])
 
   if (assets !== prevAssets) {
     setPrevAssets(assets)
-    setRowSelection({})
+    onRowSelectionChange({})
   }
 
   const selectedCount = Object.keys(rowSelection).length
@@ -39,7 +48,7 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
       {selectedCount > 0 ? (
         <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-1 text-sm text-muted-foreground">
           {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
-          <Button variant="ghost" size="sm" onClick={() => setRowSelection({})}>
+          <Button variant="ghost" size="sm" onClick={() => onRowSelectionChange({})}>
             Clear
           </Button>
           <Button size="sm" variant="secondary" onClick={openAddTo}>
@@ -51,14 +60,14 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
         columns={searchColumns}
         data={assets}
         rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
+        onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
       />
       <AddToCollectionModal
         open={addToOpen}
         onOpenChange={setAddToOpen}
         selectedAssets={frozenAssets}
-        onConfirmSuccess={() => setRowSelection({})}
+        onConfirmSuccess={() => onRowSelectionChange({})}
       />
     </div>
   )
@@ -66,6 +75,8 @@ function QueryResultsTable({ assets }: { assets: AssetSummary[] }) {
 
 export function QueryPage(): React.JSX.Element {
   const [loading, setLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const models = useModelStore((state) => state.models)
   const allAvailabilityStatuses = useReferenceDataStore((state) => state.availabilityStatuses)
@@ -100,74 +111,115 @@ export function QueryPage(): React.JSX.Element {
     }
   }
 
+  async function handleExport() {
+    const selectedBarcodes = Object.keys(rowSelection)
+    const barcodesToExport = selectedBarcodes.length > 0
+      ? selectedBarcodes
+      : assets.map(a => a.barcode)
+
+    if (barcodesToExport.length > 2000) {
+      toast.error('Please select 2000 assets or less', { position: 'top-center' })
+      return
+    }
+
+    setExportLoading(true)
+    try {
+      await exportAssets(barcodesToExport)
+    } catch {
+      toast.error('Failed to export assets', { position: 'top-center' })
+    } finally {
+      setExportLoading(false)
+    }
+  }
+
+  const exportDisabled = assets.length === 0 || exportLoading
+
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-2xl font-semibold p-2">
-        Search
-      </h1>
+      <div className="flex items-center justify-between p-2">
+        <h1 className="text-2xl font-semibold">
+          Search
+        </h1>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleExport}
+          disabled={exportDisabled}
+          aria-label="Export to CSV"
+        >
+          {exportLoading
+            ? <SpinnerGapIcon className="animate-spin" />
+            : <DownloadSimpleIcon />}
+        </Button>
+      </div>
       <form
         className="flex flex-row gap-2 border rounded-md p-2 items-end"
         onSubmit={e => e.preventDefault()}
       >
+        <fieldset disabled={exportLoading} className="contents">
+          <PopoverSearch
+            selection={model}
+            onSelectionChange={setModel}
+            onClear={() => setModel(null)}
+            options={models}
+            searchKey='model_name'
+            getLabel={m => `${m.brand_name} ${m.model_name}`}
+            fieldLabel='Model'
+            fieldRequired={true}
+          />
 
-        <PopoverSearch
-          selection={model}
-          onSelectionChange={setModel}
-          onClear={() => setModel(null)}
-          options={models}
-          searchKey='model_name'
-          getLabel={m => `${m.brand_name} ${m.model_name}`}
-          fieldLabel='Model'
-          fieldRequired={true}
-        />
+          <MultiSelectOptions
+            selection={availabilityStatuses}
+            onSelectionChange={setAvailabilityStatuses}
+            options={allAvailabilityStatuses}
+            getLabel={s => s.status}
+            fieldLabel='Availability'
+            className='max-w-36'
+          />
 
-        <MultiSelectOptions
-          selection={availabilityStatuses}
-          onSelectionChange={setAvailabilityStatuses}
-          options={allAvailabilityStatuses}
-          getLabel={s => s.status}
-          fieldLabel='Availability'
-          className='max-w-36'
-        />
+          <MultiSelectOptions
+            selection={technicalStatuses}
+            onSelectionChange={setTechnicalStatuses}
+            options={allTechnicalStatuses}
+            getLabel={s => s.status}
+            fieldLabel='Testing Status'
+            className='max-w-36'
+          />
 
-        <MultiSelectOptions
-          selection={technicalStatuses}
-          onSelectionChange={setTechnicalStatuses}
-          options={allTechnicalStatuses}
-          getLabel={s => s.status}
-          fieldLabel='Testing Status'
-          className='max-w-36'
-        />
+          <MultiSelectOptions
+            selection={selectedWarehouses}
+            onSelectionChange={setSelectedWarehouses}
+            options={activeWarehouses}
+            getLabel={w => w.city_code}
+            fieldLabel='Warehouse'
+            className='max-w-36'
+          />
 
-        <MultiSelectOptions
-          selection={selectedWarehouses}
-          onSelectionChange={setSelectedWarehouses}
-          options={activeWarehouses}
-          getLabel={w => w.city_code}
-          fieldLabel='Warehouse'
-          className='max-w-36'
-        />
+          <InputWithClear
+            value={meter}
+            onValueChange={val => setMeter(typeof val === 'string' ? null : val)}
+            fieldLabel='Meter'
+            inputType='number'
+            className='max-w-36'
+          />
 
-        <InputWithClear
-          value={meter}
-          onValueChange={val => setMeter(typeof val === 'string' ? null : val)}
-          fieldLabel='Meter'
-          inputType='number'
-          className='max-w-36'
-        />
-
-        <Button
-          className="rounded-md"
-          onClick={submitQuery}
-          type="submit"
-        >
-          Search
-        </Button>
+          <Button
+            className="rounded-md"
+            onClick={submitQuery}
+            type="submit"
+          >
+            Search
+          </Button>
+        </fieldset>
       </form>
       <div hidden={!loading} role="status" aria-live="polite">
         <span>Loading…</span>
       </div>
-      <QueryResultsTable assets={assets} />
+      <QueryResultsTable
+        assets={assets}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+      />
     </div>
   )
 }

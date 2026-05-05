@@ -147,6 +147,8 @@ Path alias `@/` maps to `src/`.
 | **Components** | `components/custom/` | `descriptive-name.tsx` | Reusable UI not tied to a specific entity — `add-assets-to-create-form.tsx`, `collection-edit-bar.tsx`, `controlled-popover-search.tsx`, etc. |
 | **Hooks** | `hooks/use-kebab-case.ts` | `use-kebab-case.ts` | Custom React hooks — see descriptions below |
 
+**Toast position:** Always pass `{ position: 'top-center' }` to every `toast.error()`, `toast.success()`, and `toast.warning()` call — e.g. `toast.error('Something went wrong', { position: 'top-center' })`.
+
 **Form page anatomy** — all form pages follow this JSX structure:
 ```tsx
 <FieldSet>

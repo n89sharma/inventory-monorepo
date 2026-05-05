@@ -13,6 +13,7 @@ import {
   getTransfers as getAssetTransfersSer,
   createComment as createCommentSer,
   createPartTransfer as createPartTransferSer,
+  exportAssets as exportAssetsSer,
   updateAssetErrors as updateAssetErrorsSer,
   updateAssetLocation as updateAssetLocationSer,
   updateAssetPricing as updateAssetPricingSer,
@@ -221,6 +222,23 @@ export async function updateAssetLocation(req: Request, res: Response<ApiRespons
     const status = response.error.type === 'API_ERROR' ? 400 : 500
     return res.status(status).json(response)
   }
+}
+
+export const ExportAssetsSchema = z.object({
+  barcodes: z.array(z.string()).min(1).max(2000)
+})
+
+export async function exportAssets(req: Request, res: Response) {
+  const { barcodes } = ExportAssetsSchema.parse(req.body)
+  const response = await exportAssetsSer(barcodes)
+  if (response.success) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    res.setHeader('Content-Type', 'text/csv')
+    res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
+    return res.send(response.data)
+  }
+  const status = response.error.type === 'API_ERROR' ? 400 : 500
+  return res.status(status).json(response)
 }
 
 export async function getBarcodeSuggestions(req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) {

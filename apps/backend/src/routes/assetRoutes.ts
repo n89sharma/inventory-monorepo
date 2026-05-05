@@ -5,6 +5,7 @@ import {
   LocationsByWarehouseQuerySchema,
   createAssetComment,
   createPartTransfer,
+  exportAssets,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
@@ -28,6 +29,7 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', validateQuery(AssetQuerySchema), getAssets)
+router.post('/export', exportAssets)
 router.get('/suggestions', validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
 router.get('/locations', validateQuery(LocationsByWarehouseQuerySchema), getLocationsByWarehouse)
 router.get('/:barcode/summary', getAssetSummaryByBarcode)

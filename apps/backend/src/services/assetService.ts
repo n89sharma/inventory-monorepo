@@ -3,6 +3,7 @@ import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
   getAssetDetails as getAssetDetailsQuery,
+  getAssetDetailsBatch as getAssetDetailsBatchQuery,
   getAssetErrors as getAssetErrorsQuery,
   getAssetPartTransfer as getAssetPartTransferQuery,
   getAssetTransfers as getAssetTransfersQuery,
@@ -221,6 +222,146 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
     invoice_number: r.purchase_invoice_number,
     is_cleared: r.purchase_invoice_is_cleared
   }
+}
+
+export async function exportAssets(barcodes: string[]): Promise<ApiResponse<string>> {
+  if (barcodes.length > 2000) return response400('Cannot export more than 2000 assets')
+  try {
+    const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
+    const details = results.map(r => mapAssetDetail(r as unknown as getAssetDetailsQuery.Result))
+    return successResponse(generateCsv(details))
+  } catch {
+    return response500('Failed to export assets')
+  }
+}
+
+function escapeCSV(val: unknown): string {
+  if (val === null || val === undefined) return ''
+  const str = val instanceof Date ? val.toISOString() : String(val)
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`
+  }
+  return str
+}
+
+const CSV_HEADERS = [
+  'barcode',
+  'serial_number',
+  'model',
+  'brand',
+  'asset_type',
+  'tracking_status',
+  'availability_status',
+  'technical_status',
+  'location',
+  'warehouse_code',
+  'warehouse_street',
+  'created_at',
+  'is_held',
+  'cost_purchase_cost',
+  'cost_transport_cost',
+  'cost_processing_cost',
+  'cost_other_cost',
+  'cost_parts_cost',
+  'cost_total_cost',
+  'cost_sale_price',
+  'specs_cassettes',
+  'specs_internal_finisher',
+  'specs_meter_black',
+  'specs_meter_colour',
+  'specs_meter_total',
+  'specs_drum_life_c',
+  'specs_drum_life_m',
+  'specs_drum_life_y',
+  'specs_drum_life_k',
+  'hold_created_by',
+  'hold_created_for',
+  'hold_created_at',
+  'hold_customer',
+  'hold_from_dt',
+  'hold_to_dt',
+  'hold_notes',
+  'hold_hold_number',
+  'arrival_arrival_number',
+  'arrival_origin',
+  'arrival_destination_code',
+  'arrival_destination_street',
+  'arrival_transporter',
+  'arrival_created_by',
+  'arrival_notes',
+  'arrival_created_at',
+  'departure_departure_number',
+  'departure_origin_code',
+  'departure_origin_street',
+  'departure_destination',
+  'departure_transporter',
+  'departure_created_by',
+  'departure_notes',
+  'departure_created_at',
+  'purchase_invoice_invoice_number',
+  'purchase_invoice_is_cleared',
+]
+
+function generateCsv(assets: AssetDetails[]): string {
+  const rows = assets.map(a => [
+    a.barcode,
+    a.serial_number,
+    a.model,
+    a.brand,
+    a.asset_type,
+    a.tracking_status,
+    a.availability_status,
+    a.technical_status,
+    a.location,
+    a.warehouse_code,
+    a.warehouse_street,
+    a.created_at,
+    a.is_held,
+    a.cost.purchase_cost,
+    a.cost.transport_cost,
+    a.cost.processing_cost,
+    a.cost.other_cost,
+    a.cost.parts_cost,
+    a.cost.total_cost,
+    a.cost.sale_price,
+    a.specs.cassettes,
+    a.specs.internal_finisher,
+    a.specs.meter_black,
+    a.specs.meter_colour,
+    a.specs.meter_total,
+    a.specs.drum_life_c,
+    a.specs.drum_life_m,
+    a.specs.drum_life_y,
+    a.specs.drum_life_k,
+    a.hold?.created_by,
+    a.hold?.created_for,
+    a.hold?.created_at,
+    a.hold?.customer,
+    a.hold?.from_dt,
+    a.hold?.to_dt,
+    a.hold?.notes,
+    a.hold?.hold_number,
+    a.arrival?.arrival_number,
+    a.arrival?.origin,
+    a.arrival?.destination_code,
+    a.arrival?.destination_street,
+    a.arrival?.transporter,
+    a.arrival?.created_by,
+    a.arrival?.notes,
+    a.arrival?.created_at,
+    a.departure?.departure_number,
+    a.departure?.origin_code,
+    a.departure?.origin_street,
+    a.departure?.destination,
+    a.departure?.transporter,
+    a.departure?.created_by,
+    a.departure?.notes,
+    a.departure?.created_at,
+    a.purchase_invoice?.invoice_number,
+    a.purchase_invoice?.is_cleared,
+  ].map(escapeCSV))
+
+  return [CSV_HEADERS.join(','), ...rows.map(r => r.join(','))].join('\n')
 }
 
 export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<ApiResponse<void>> {
