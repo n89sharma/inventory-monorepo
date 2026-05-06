@@ -1,5 +1,6 @@
 import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
+import { Checkbox } from "@/components/shadcn/checkbox"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
@@ -31,7 +32,16 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   createdAtColumn as ColumnDef<InvoiceSummary>,
   createdByColumn as ColumnDef<InvoiceSummary>,
   { accessorKey: "organization", header: "Organization" },
-  { accessorKey: "is_cleared", header: "Cleared", size: 50 },
+  {
+    accessorKey: "is_cleared",
+    header: "Cleared",
+    size: 50,
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <Checkbox checked={row.original.is_cleared} />
+      </div>
+    ),
+  },
   { accessorKey: "invoice_type", header: "Invoice Type" },
   assetCountColumn as ColumnDef<InvoiceSummary>,
   makeEditColumn<InvoiceSummary>(row => `/invoices/${row.invoice_number}/edit`),
