@@ -2,27 +2,32 @@ import { exportAssets } from '@/data/api/asset-api'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import type { AssetSummary } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
 import { Button } from "../shadcn/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
+import { BulkEditPricingModal } from "../modals/bulk-edit-pricing-modal"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
 type CollectionEditBarProps = {
   section: string
   collectionId: string
-  barcodes?: string[]
+  assets?: AssetSummary[]
 }
 
 export function CollectionEditBar({
   section,
   collectionId,
-  barcodes,
+  assets,
 }: CollectionEditBarProps): React.JSX.Element {
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
+  const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
+
+  const barcodes = assets?.map(a => a.barcode)
 
   async function handleExport() {
     if (!barcodes || barcodes.length === 0) return
@@ -47,7 +52,7 @@ export function CollectionEditBar({
   return (
     <div className="flex gap-2">
       <ShareButton />
-      {barcodes !== undefined && (
+      {assets !== undefined && (
         <Button
           variant="outline"
           size="icon"
@@ -70,6 +75,10 @@ export function CollectionEditBar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem onSelect={() => setBulkPricingOpen(true)}>
+            Bulk edit pricing
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
             <TrashIcon />Delete
           </DropdownMenuItem>
@@ -85,6 +94,12 @@ export function CollectionEditBar({
           This does not delete the underlying assets present in the collection.
         </AlertDialogDescription>
       </DeleteEntityDialog>
+      <BulkEditPricingModal
+        open={bulkPricingOpen}
+        onOpenChange={setBulkPricingOpen}
+        selectedAssets={assets ?? []}
+        onSaveSuccess={() => setBulkPricingOpen(false)}
+      />
     </div>
   )
 }

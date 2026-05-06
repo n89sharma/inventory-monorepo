@@ -39,7 +39,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('transfers', transferNumber)} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold p-2">Transfer {transferNumber}</h1>
-        <CollectionEditBar section="transfers" collectionId={transferNumber} barcodes={transfer.assets.map(a => a.barcode)} />
+        <CollectionEditBar section="transfers" collectionId={transferNumber} assets={transfer.assets} />
       </div>
       <div className="flex gap-4">
         <WarehouseCard title="Origin" warehouse={transfer.origin} />

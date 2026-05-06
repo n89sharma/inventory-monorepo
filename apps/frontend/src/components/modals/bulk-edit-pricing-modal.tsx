@@ -93,7 +93,7 @@ const columns: ColumnDef<PricingRow>[] = [
   {
     accessorKey: 'model',
     header: () => <div className="text-center">Model</div>,
-    cell: ({ getValue }) => <div className="text-center">{getValue() as string}</div>,
+    cell: ({ getValue }) => <div className="text-center ">{getValue() as string}</div>,
     size: 90,
   },
   {
@@ -249,7 +249,11 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
                   {table.getRowModel().rows.map(row => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map(cell => (
-                        <TableCell key={cell.id} style={{ width: cell.column.getSize() }}>
+                        <TableCell
+                          key={cell.id}
+                          style={{ width: cell.column.getSize() }}
+                          className={cell.column.id === 'model' ? 'whitespace-normal' : ''}
+                        >
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}

@@ -39,7 +39,7 @@ export function HoldDetailsPage(): React.JSX.Element {
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('holds', holdNumber)} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold p-2">Hold {holdNumber}</h1>
-        <CollectionEditBar section="holds" collectionId={holdNumber} barcodes={hold.assets.map(a => a.barcode)} />
+        <CollectionEditBar section="holds" collectionId={holdNumber} assets={hold.assets} />
       </div>
       <div className="flex gap-4">
         <UserCard title="Created By" user={hold.created_by} />

@@ -39,7 +39,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold p-2">Invoice {invoiceNumber}</h1>
-        <CollectionEditBar section="invoices" collectionId={invoiceNumber} barcodes={invoice.assets.map(a => a.barcode)} />
+        <CollectionEditBar section="invoices" collectionId={invoiceNumber} assets={invoice.assets} />
       </div>
       <div className="flex gap-4">
         <UserCard title="Created By" user={invoice.created_by} />
