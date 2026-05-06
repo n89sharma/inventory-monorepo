@@ -182,7 +182,7 @@ export async function updateAssetErrors(req: Request, res: Response<ApiResponse<
 export async function updateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = UpdateAssetPricingSchema.parse(req.body)
-  const response = await updateAssetPricingSer(barcode, validated)
+  const response = await updateAssetPricingSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.json(response)
   } else {
@@ -193,7 +193,7 @@ export async function updateAssetPricing(req: Request, res: Response<ApiResponse
 
 export async function bulkUpdateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
   const { items } = BulkUpdateAssetPricingSchema.parse(req.body)
-  const response = await bulkUpdateAssetPricingSer(items)
+  const response = await bulkUpdateAssetPricingSer(items, res.locals.dbUserId)
   if (response.success) {
     return res.json(response)
   } else {
@@ -204,7 +204,7 @@ export async function bulkUpdateAssetPricing(req: Request, res: Response<ApiResp
 export async function updateAssetSpecs(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = UpdateAssetSpecsSchema.parse(req.body)
-  const response = await updateAssetSpecsSer(barcode, validated)
+  const response = await updateAssetSpecsSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.json(response)
   } else {
@@ -226,7 +226,7 @@ export async function getLocationsByWarehouse(req: Request, res: Response<ApiRes
 export async function updateAssetLocation(req: Request, res: Response<ApiResponse<void>>) {
   const { barcode } = req.params
   const validated = UpdateAssetLocationSchema.parse(req.body)
-  const response = await updateAssetLocationSer(barcode, validated)
+  const response = await updateAssetLocationSer(barcode, validated, res.locals.dbUserId)
   if (response.success) {
     return res.json(response)
   } else {

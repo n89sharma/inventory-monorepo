@@ -74,7 +74,7 @@ export async function updateArrival(
   const { arrivalNumber } = req.params
   try {
     const validated = UpdateArrivalSchema.parse(req.body)
-    await updateArrivalSer(validated)
+    await updateArrivalSer(validated, res.locals.dbUserId)
     res.json({ arrivalNumber })
   } catch (error) {
     next(error)

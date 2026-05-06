@@ -118,20 +118,10 @@ export type User = Prisma.UserModel
  */
 export type Organization = Prisma.OrganizationModel
 /**
- * Model AssetHistory
- * 
- */
-export type AssetHistory = Prisma.AssetHistoryModel
-/**
  * Model Accessory
  * 
  */
 export type Accessory = Prisma.AccessoryModel
-/**
- * Model Action
- * 
- */
-export type Action = Prisma.ActionModel
 /**
  * Model AssetType
  * 
@@ -142,11 +132,6 @@ export type AssetType = Prisma.AssetTypeModel
  * 
  */
 export type AvailabilityStatus = Prisma.AvailabilityStatusModel
-/**
- * Model Entity
- * 
- */
-export type Entity = Prisma.EntityModel
 /**
  * Model FileType
  * 
@@ -187,3 +172,8 @@ export type StorePart = Prisma.StorePartModel
  * 
  */
 export type PartTransfer = Prisma.PartTransferModel
+/**
+ * Model History
+ * 
+ */
+export type History = Prisma.HistoryModel

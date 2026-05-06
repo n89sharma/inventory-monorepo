@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateHold, HoldDetail, UpdateHold, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { recordAssetUpdate, recordHoldCreate, recordHoldUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 
@@ -17,6 +18,12 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
       const barcodes = conflicting.map(a => a.barcode).join(', ')
       return response400(`The following assets already have an active hold: ${barcodes}`)
     }
+
+    const currentAssets = await prisma.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, hold_id: true, is_held: true }
+    })
+    const assetStateMap = new Map(currentAssets.map(a => [a.id, { hold_id: a.hold_id, is_held: a.is_held }]))
 
     const now = new Date()
     const holdNumber = await getNewHoldNumber(now)
@@ -35,11 +42,32 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
           assets: { connect: assetIds.map(id => ({ id })) }
         }
       }),
-      prisma.asset.updateMany({
-        where: { id: { in: assetIds } },
-        data: { is_held: true }
-      })
+      prisma.asset.updateMany({ where: { id: { in: assetIds } }, data: { is_held: true } })
     ])
+
+    const hold = await prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true } })
+    if (hold) {
+      await recordHoldCreate(hold.id, {
+        hold_number: holdNumber,
+        created_by_id: userId,
+        created_for_id: data.created_for_id,
+        customer_id: data.customer_id,
+        notes: data.notes ?? null,
+        from_dt: now,
+        to_dt: null
+      }, userId)
+
+      for (const assetId of assetIds) {
+        const prev = assetStateMap.get(assetId)
+        await recordAssetUpdate(assetId, {
+          hold_id: prev?.hold_id ?? null,
+          is_held: prev?.is_held ?? false
+        }, {
+          hold_id: hold.id,
+          is_held: true
+        }, userId)
+      }
+    }
 
     return successResponse(holdNumber)
   } catch (error) {
@@ -90,7 +118,7 @@ export async function getHoldForUpdate(holdNumber: string): Promise<ApiResponse<
   }
 }
 
-export async function updateHold(data: UpdateHold): Promise<ApiResponse<void>> {
+export async function updateHold(data: UpdateHold, userId: number): Promise<ApiResponse<void>> {
   try {
     const holdRecord = await prisma.hold.findUnique({
       where: { id: data.id },
@@ -129,15 +157,26 @@ export async function updateHold(data: UpdateHold): Promise<ApiResponse<void>> {
           }
         }
       }),
-      prisma.asset.updateMany({
-        where: { id: { in: assetIdsToRemove } },
-        data: { is_held: false }
-      }),
-      prisma.asset.updateMany({
-        where: { id: { in: assetIdsToAdd } },
-        data: { is_held: true }
-      })
+      prisma.asset.updateMany({ where: { id: { in: assetIdsToRemove } }, data: { is_held: false } }),
+      prisma.asset.updateMany({ where: { id: { in: assetIdsToAdd } }, data: { is_held: true } })
     ])
+
+    await recordHoldUpdate(data.id, {
+      created_for_id: holdRecord.created_for_id,
+      customer_id: holdRecord.customer_id,
+      notes: holdRecord.notes
+    }, {
+      created_for_id: data.created_for.id,
+      customer_id: data.customer.id,
+      notes: data.notes ?? null
+    }, userId)
+
+    for (const assetId of assetIdsToRemove) {
+      await recordAssetUpdate(assetId, { hold_id: data.id, is_held: true }, { is_held: false }, userId)
+    }
+    for (const assetId of assetIdsToAdd) {
+      await recordAssetUpdate(assetId, { is_held: false }, { hold_id: data.id, is_held: true }, userId)
+    }
 
     return successResponse(undefined)
   } catch (error) {

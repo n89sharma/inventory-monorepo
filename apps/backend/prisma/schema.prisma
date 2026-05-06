@@ -36,7 +36,6 @@ model Asset {
   TrackingStatus                                      TrackingStatus          @relation(fields: [tracking_status_id], references: [id])
   asset_accessories                                   AssetAccessory[]
   asset_errors                                        AssetError[]
-  asset_history                                       AssetHistory[]
   asset_transfers                                     AssetTransfer[]
   comments                                            Comment[]
   cost                                                Cost?
@@ -346,11 +345,11 @@ model User {
   arrivals             Arrival[]
   asset_errors_added   AssetError[]   @relation("ErrorAddedBy")
   asset_errors_fixed   AssetError[]   @relation("ErrorFixedBy")
-  asset_history        AssetHistory[]
   comments             Comment[]
   departures           Departure[]
   departure_sales_reps Departure[]    @relation("SalesRep")
   files                File[]
+  History              History[]
   holds_created        Hold[]         @relation("HoldCreatedBy")
   holds_for            Hold[]         @relation("HoldCreatedFor")
   invoices_updated     Invoice[]
@@ -385,32 +384,10 @@ model Organization {
   @@index([name])
 }
 
-model AssetHistory {
-  id         Int      @id @default(autoincrement())
-  asset_id   Int
-  user_id    Int
-  action_id  Int
-  entity_id  Int
-  changed_on DateTime
-  changes    Json
-  Action     Action   @relation(fields: [action_id], references: [id])
-  asset      Asset    @relation(fields: [asset_id], references: [id])
-  Entity     Entity   @relation(fields: [entity_id], references: [id])
-  user       User     @relation(fields: [user_id], references: [id])
-
-  @@index([asset_id, changed_on(sort: Desc)])
-}
-
 model Accessory {
   id             Int              @id @default(autoincrement())
   accessory      String           @unique
   AssetAccessory AssetAccessory[]
-}
-
-model Action {
-  id           Int            @id @default(autoincrement())
-  action       String         @unique
-  AssetHistory AssetHistory[]
 }
 
 model AssetType {
@@ -423,12 +400,6 @@ model AvailabilityStatus {
   id     Int     @id @default(autoincrement())
   status String  @unique
   Asset  Asset[]
-}
-
-model Entity {
-  id           Int            @id @default(autoincrement())
-  entity       String         @unique
-  AssetHistory AssetHistory[]
 }
 
 model FileType {
@@ -494,4 +465,18 @@ model PartTransfer {
 
   @@index([donor_asset_id])
   @@index([recipient_asset_id])
+}
+
+model History {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  changed_on  DateTime
+  changes     Json
+  entity_type String
+  entity_id   Int
+  action_type String
+  User        User     @relation(fields: [user_id], references: [id])
+
+  @@index([entity_type, entity_id, changed_on(sort: Desc)])
+  @@index([user_id, changed_on(sort: Desc)])
 }

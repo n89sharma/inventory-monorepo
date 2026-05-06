@@ -10,6 +10,7 @@ import {
   getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
 import { Prisma } from '../../generated/prisma/client.js'
+import { recordAssetUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 function inFilter(col: string, ids: number[]) {
@@ -481,17 +482,28 @@ export async function updateAssetErrors(barcode: string, data: UpdateAssetErrors
         }
       }))
 
+    const prevErrorIds = currentRows.map(r => r.error_id).sort()
+    const nextErrorIds = [...inputIdMap.keys()].sort()
+
     await prisma.$transaction([...deletes, ...inserts, ...updates])
+
+    await recordAssetUpdate(assetId, { error_ids: prevErrorIds }, { error_ids: nextErrorIds }, userId)
+
     return successResponse(undefined)
   } catch (error) {
     return response500(`Failed to update errors for asset ${barcode}`)
   }
 }
 
-export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<ApiResponse<void>> {
+export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing, userId: number): Promise<ApiResponse<void>> {
   try {
     const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
     if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const currentCost = await prisma.cost.findUnique({
+      where: { asset_id: asset.id },
+      select: { purchase_cost: true, transport_cost: true, processing_cost: true, other_cost: true, parts_cost: true, total_cost: true, sale_price: true }
+    })
 
     const total_cost = data.purchase_cost + data.transport_cost + data.processing_cost + data.other_cost + data.parts_cost
 
@@ -500,15 +512,30 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
       update: { purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
       create: { asset_id: asset.id, purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
     })
+
+    await recordAssetUpdate(asset.id, {
+      purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
+      transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
+      processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
+      other_cost: currentCost?.other_cost?.toNumber() ?? null,
+      parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
+      total_cost: currentCost?.total_cost?.toNumber() ?? null,
+      sale_price: currentCost?.sale_price?.toNumber() ?? null
+    }, {
+      purchase_cost: data.purchase_cost, transport_cost: data.transport_cost,
+      processing_cost: data.processing_cost, other_cost: data.other_cost,
+      parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price
+    }, userId)
+
     return successResponse(undefined)
   } catch (error) {
     return response500(`Failed to update pricing for asset ${barcode}`)
   }
 }
 
-export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<ApiResponse<void>> {
+export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items'], userId: number): Promise<ApiResponse<void>> {
   const results = await Promise.allSettled(
-    items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing))
+    items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing, userId))
   )
   const failCount = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)).length
   if (failCount > 0) return response500(`Failed to update pricing for ${failCount} asset(s)`)
@@ -524,24 +551,35 @@ export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiR
   }
 }
 
-export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<ApiResponse<void>> {
+export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation, userId: number): Promise<ApiResponse<void>> {
   try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true, location_id: true } })
     if (!asset) return response400(`Asset ${barcode} not found`)
 
     const location = await prisma.location.findUnique({ where: { id: data.location_id } })
     if (!location) return response400('Location not found')
 
     await prisma.asset.update({ where: { barcode }, data: { location_id: data.location_id } })
+
+    await recordAssetUpdate(asset.id, { location_id: asset.location_id }, { location_id: data.location_id }, userId)
+
     return successResponse(undefined)
   } catch {
     return response500(`Failed to update location for asset ${barcode}`)
   }
 }
 
-export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<ApiResponse<void>> {
+export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs, userId: number): Promise<ApiResponse<void>> {
   try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    const asset = await prisma.asset.findUnique({
+      where: { barcode },
+      select: {
+        id: true,
+        technical_specification: {
+          select: { cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true, meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true }
+        }
+      }
+    })
     if (!asset) return response400(`Asset ${barcode} not found`)
 
     const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
@@ -560,6 +598,23 @@ export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs):
       prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
       ...accessories.map(a => prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: a.id } })),
     ])
+
+    await recordAssetUpdate(asset.id, {
+      cassettes: asset.technical_specification?.cassettes,
+      internal_finisher: asset.technical_specification?.internal_finisher,
+      meter_black: asset.technical_specification?.meter_black,
+      meter_colour: asset.technical_specification?.meter_colour,
+      meter_total: asset.technical_specification?.meter_total,
+      drum_life_c: asset.technical_specification?.drum_life_c,
+      drum_life_m: asset.technical_specification?.drum_life_m,
+      drum_life_y: asset.technical_specification?.drum_life_y,
+      drum_life_k: asset.technical_specification?.drum_life_k
+    }, {
+      cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+      meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
+      drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
+      drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+    }, userId)
 
     return successResponse(undefined)
   } catch (error) {

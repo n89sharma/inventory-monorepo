@@ -1,5 +1,6 @@
 import { ApiResponse, CreateInvoice, InvoiceDetail, UpdateInvoice, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
+import { recordAssetUpdate, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 export async function createInvoice(data: CreateInvoice, userId: number): Promise<ApiResponse<{ invoiceNumber: string }>> {
@@ -10,7 +11,10 @@ export async function createInvoice(data: CreateInvoice, userId: number): Promis
     if (existing) {
       return response400(`Invoice number ${data.invoice_number} already exists for this organization`)
     }
+
     const assetIds = data.assets.map(a => a.id)
+    const now = new Date()
+
     const invoice = await prisma.invoice.create({
       data: {
         invoice_number: data.invoice_number,
@@ -18,13 +22,23 @@ export async function createInvoice(data: CreateInvoice, userId: number): Promis
         updated_by_id: userId,
         is_cleared: data.is_cleared,
         invoice_type_id: data.invoice_type_id,
-        created_at: new Date()
+        created_at: now
       }
     })
-    await prisma.asset.updateMany({
-      where: { id: { in: assetIds } },
-      data: { purchase_invoice_id: invoice.id }
-    })
+    await prisma.asset.updateMany({ where: { id: { in: assetIds } }, data: { purchase_invoice_id: invoice.id } })
+
+    await recordInvoiceCreate(invoice.id, {
+      invoice_number: data.invoice_number,
+      organization_id: data.organization_id,
+      invoice_type_id: data.invoice_type_id,
+      is_cleared: data.is_cleared,
+      created_at: now
+    }, userId)
+
+    for (const assetId of assetIds) {
+      await recordAssetUpdate(assetId, { purchase_invoice_id: null }, { purchase_invoice_id: invoice.id }, userId)
+    }
+
     return successResponse({ invoiceNumber: invoice.invoice_number })
   } catch (error) {
     return response500('Failed to create invoice')
@@ -54,7 +68,7 @@ export async function getInvoiceForUpdate(invoiceNumber: string): Promise<ApiRes
   }
 }
 
-export async function updateInvoice(invoiceNumber: string, data: UpdateInvoice): Promise<ApiResponse<{ invoiceNumber: string }>> {
+export async function updateInvoice(invoiceNumber: string, data: UpdateInvoice, userId: number): Promise<ApiResponse<{ invoiceNumber: string }>> {
   try {
     const invoice = await prisma.invoice.findFirst({ where: { invoice_number: invoiceNumber } })
     if (!invoice) return response400(`Invoice ${invoiceNumber} not found`)
@@ -66,7 +80,6 @@ export async function updateInvoice(invoiceNumber: string, data: UpdateInvoice):
 
     const existingAssetIds = new Set(existingAssets.map(a => a.id))
     const incomingAssetIds = new Set(data.assets.map(a => a.id))
-
     const assetIdsToRemove = [...existingAssetIds].filter(id => !incomingAssetIds.has(id))
     const assetIdsToAdd = [...incomingAssetIds].filter(id => !existingAssetIds.has(id))
 
@@ -85,6 +98,15 @@ export async function updateInvoice(invoiceNumber: string, data: UpdateInvoice):
       prisma.asset.updateMany({ where: { id: { in: assetIdsToRemove } }, data: { purchase_invoice_id: null } }),
       prisma.asset.updateMany({ where: { id: { in: assetIdsToAdd } }, data: { purchase_invoice_id: invoice.id } })
     ])
+
+    await recordInvoiceUpdate(invoice.id, { is_cleared: invoice.is_cleared }, { is_cleared: data.is_cleared }, userId)
+
+    for (const assetId of assetIdsToRemove) {
+      await recordAssetUpdate(assetId, { purchase_invoice_id: invoice.id }, { purchase_invoice_id: null }, userId)
+    }
+    for (const assetId of assetIdsToAdd) {
+      await recordAssetUpdate(assetId, { purchase_invoice_id: null }, { purchase_invoice_id: invoice.id }, userId)
+    }
 
     return successResponse({ invoiceNumber })
   } catch {

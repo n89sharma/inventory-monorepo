@@ -77,7 +77,7 @@ export async function updateTransfer(req: Request, res: Response<{ transferNumbe
   const { transferNumber } = req.params
   try {
     const validated = UpdateTransferSchema.parse(req.body)
-    await updateTransferSer(validated)
+    await updateTransferSer(validated, res.locals.dbUserId)
     res.json({ transferNumber })
   } catch (error) {
     next(error)

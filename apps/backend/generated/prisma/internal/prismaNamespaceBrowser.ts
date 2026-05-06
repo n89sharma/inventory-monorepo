@@ -71,12 +71,9 @@ export const ModelName = {
   Comment: 'Comment',
   User: 'User',
   Organization: 'Organization',
-  AssetHistory: 'AssetHistory',
   Accessory: 'Accessory',
-  Action: 'Action',
   AssetType: 'AssetType',
   AvailabilityStatus: 'AvailabilityStatus',
-  Entity: 'Entity',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   Role: 'Role',
@@ -84,7 +81,8 @@ export const ModelName = {
   TrackingStatus: 'TrackingStatus',
   Sequence: 'Sequence',
   StorePart: 'StorePart',
-  PartTransfer: 'PartTransfer'
+  PartTransfer: 'PartTransfer',
+  History: 'History'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -373,33 +371,12 @@ export const OrganizationScalarFieldEnum = {
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
 
 
-export const AssetHistoryScalarFieldEnum = {
-  id: 'id',
-  asset_id: 'asset_id',
-  user_id: 'user_id',
-  action_id: 'action_id',
-  entity_id: 'entity_id',
-  changed_on: 'changed_on',
-  changes: 'changes'
-} as const
-
-export type AssetHistoryScalarFieldEnum = (typeof AssetHistoryScalarFieldEnum)[keyof typeof AssetHistoryScalarFieldEnum]
-
-
 export const AccessoryScalarFieldEnum = {
   id: 'id',
   accessory: 'accessory'
 } as const
 
 export type AccessoryScalarFieldEnum = (typeof AccessoryScalarFieldEnum)[keyof typeof AccessoryScalarFieldEnum]
-
-
-export const ActionScalarFieldEnum = {
-  id: 'id',
-  action: 'action'
-} as const
-
-export type ActionScalarFieldEnum = (typeof ActionScalarFieldEnum)[keyof typeof ActionScalarFieldEnum]
 
 
 export const AssetTypeScalarFieldEnum = {
@@ -416,14 +393,6 @@ export const AvailabilityStatusScalarFieldEnum = {
 } as const
 
 export type AvailabilityStatusScalarFieldEnum = (typeof AvailabilityStatusScalarFieldEnum)[keyof typeof AvailabilityStatusScalarFieldEnum]
-
-
-export const EntityScalarFieldEnum = {
-  id: 'id',
-  entity: 'entity'
-} as const
-
-export type EntityScalarFieldEnum = (typeof EntityScalarFieldEnum)[keyof typeof EntityScalarFieldEnum]
 
 
 export const FileTypeScalarFieldEnum = {
@@ -500,6 +469,19 @@ export const PartTransferScalarFieldEnum = {
 } as const
 
 export type PartTransferScalarFieldEnum = (typeof PartTransferScalarFieldEnum)[keyof typeof PartTransferScalarFieldEnum]
+
+
+export const HistoryScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  changed_on: 'changed_on',
+  changes: 'changes',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  action_type: 'action_type'
+} as const
+
+export type HistoryScalarFieldEnum = (typeof HistoryScalarFieldEnum)[keyof typeof HistoryScalarFieldEnum]
 
 
 export const SortOrder = {

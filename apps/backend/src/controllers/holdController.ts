@@ -63,7 +63,7 @@ export async function getHoldForUpdate(req: Request, res: Response, next: NextFu
 export async function updateHold(req: Request, res: Response, next: NextFunction) {
   try {
     const validated = UpdateHoldSchema.parse(req.body)
-    const response = await updateHoldSer(validated)
+    const response = await updateHoldSer(validated, res.locals.dbUserId)
     if (response.success) {
       return res.json({ holdNumber: req.params.holdNumber })
     }

@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateDeparture, DepartureDetail, UpdateDeparture, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { recordAssetUpdate, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceDepartureEntity = 'DEPARTURE'
@@ -70,7 +71,6 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   const originCode = departure.origin.city_code
   const currentDateTime = new Date()
   const departureNumber = await getNewDepartureNumber(originCode, currentDateTime)
-
   const assetIds = departure.assets.map(a => a.id)
 
   const assetsAlreadyOnDeparture = await prisma.asset.findMany({
@@ -94,26 +94,37 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     }
   })
 
-  await prisma.asset.updateMany({
-    where: { id: { in: assetIds } },
-    data: { departure_id: newDeparture.id }
-  })
+  await prisma.asset.updateMany({ where: { id: { in: assetIds } }, data: { departure_id: newDeparture.id } })
+
+  await recordDepartureCreate(newDeparture.id, {
+    departure_number: departureNumber,
+    origin_id: departure.origin.id,
+    destination_id: departure.customer.id,
+    transporter_id: departure.transporter.id,
+    notes: departure.comment ?? null,
+    created_at: currentDateTime
+  }, userId)
+
+  for (const assetId of assetIds) {
+    await recordAssetUpdate(assetId, { departure_id: null }, { departure_id: newDeparture.id }, userId)
+  }
 
   return departureNumber
 }
 
-export async function updateDeparture(departure: UpdateDeparture): Promise<void> {
-  const existingAssets = await prisma.asset.findMany({
-    where: { departure_id: departure.id },
-    select: { id: true }
-  })
-  const existingAssetIds = existingAssets.map(a => a.id)
+export async function updateDeparture(departure: UpdateDeparture, userId: number): Promise<void> {
+  const [currentDeparture, existingAssets] = await Promise.all([
+    prisma.departure.findUnique({
+      where: { id: departure.id },
+      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
+    }),
+    prisma.asset.findMany({ where: { departure_id: departure.id }, select: { id: true } })
+  ])
 
+  const existingAssetIds = existingAssets.map(a => a.id)
   const incomingAssetIds = new Set(departure.assets.map(a => a.id))
   const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-  const assetIdsToAdd = departure.assets
-    .map(a => a.id)
-    .filter(id => !existingAssetIds.includes(id))
+  const assetIdsToAdd = departure.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
 
   if (assetIdsToAdd.length > 0) {
     const conflicts = await prisma.asset.findMany({
@@ -136,15 +147,28 @@ export async function updateDeparture(departure: UpdateDeparture): Promise<void>
         notes: departure.comment
       }
     }),
-    prisma.asset.updateMany({
-      where: { id: { in: assetIdsToRemove } },
-      data: { departure_id: null }
-    }),
-    prisma.asset.updateMany({
-      where: { id: { in: assetIdsToAdd } },
-      data: { departure_id: departure.id }
-    })
+    prisma.asset.updateMany({ where: { id: { in: assetIdsToRemove } }, data: { departure_id: null } }),
+    prisma.asset.updateMany({ where: { id: { in: assetIdsToAdd } }, data: { departure_id: departure.id } })
   ])
+
+  await recordDepartureUpdate(departure.id, {
+    origin_id: currentDeparture?.origin_id,
+    destination_id: currentDeparture?.destination_id,
+    transporter_id: currentDeparture?.transporter_id,
+    notes: currentDeparture?.notes
+  }, {
+    origin_id: departure.origin.id,
+    destination_id: departure.customer.id,
+    transporter_id: departure.transporter.id,
+    notes: departure.comment
+  }, userId)
+
+  for (const assetId of assetIdsToRemove) {
+    await recordAssetUpdate(assetId, { departure_id: departure.id }, { departure_id: null }, userId)
+  }
+  for (const assetId of assetIdsToAdd) {
+    await recordAssetUpdate(assetId, { departure_id: null }, { departure_id: departure.id }, userId)
+  }
 }
 
 async function getNewDepartureNumber(originCode: string, date: Date): Promise<string> {

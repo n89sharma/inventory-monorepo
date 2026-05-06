@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateTransfer, TransferDetail, UpdateTransfer, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { recordTransferCreate, recordTransferUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceTransferEntity = 'TRANSFER'
@@ -67,7 +68,7 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
   const currentDateTime = new Date()
   const transferNumber = await getNewTransferNumber(originCode, currentDateTime)
 
-  await prisma.transfer.create({
+  const newTransfer = await prisma.transfer.create({
     data: {
       transfer_number: transferNumber,
       origin: { connect: { id: transfer.origin.id } },
@@ -82,20 +83,31 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
     }
   })
 
+  await recordTransferCreate(newTransfer.id, {
+    transfer_number: transferNumber,
+    origin_id: transfer.origin.id,
+    destination_id: transfer.destination.id,
+    transporter_id: transfer.transporter.id,
+    notes: transfer.comment ?? null,
+    created_at: currentDateTime
+  }, userId)
+
   return transferNumber
 }
 
-export async function updateTransfer(transfer: UpdateTransfer): Promise<void> {
-  const existingAssetIds = (await prisma.assetTransfer.findMany({
-    where: { transfer_id: transfer.id },
-    select: { asset_id: true }
-  })).map(at => at.asset_id)
+export async function updateTransfer(transfer: UpdateTransfer, userId: number): Promise<void> {
+  const [currentTransfer, existingAssetTransfers] = await Promise.all([
+    prisma.transfer.findUnique({
+      where: { id: transfer.id },
+      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
+    }),
+    prisma.assetTransfer.findMany({ where: { transfer_id: transfer.id }, select: { asset_id: true } })
+  ])
 
+  const existingAssetIds = existingAssetTransfers.map(at => at.asset_id)
   const incomingAssetIds = new Set(transfer.assets.map(a => a.id))
   const assetIdsToDelete = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-  const assetIdsToAdd = transfer.assets
-    .map(a => a.id)
-    .filter(id => !existingAssetIds.includes(id))
+  const assetIdsToAdd = transfer.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
 
   await prisma.$transaction([
     prisma.transfer.update({
@@ -107,15 +119,23 @@ export async function updateTransfer(transfer: UpdateTransfer): Promise<void> {
         notes: transfer.comment
       }
     }),
-    prisma.assetTransfer.deleteMany({
-      where: { transfer_id: transfer.id, asset_id: { in: assetIdsToDelete } }
-    }),
+    prisma.assetTransfer.deleteMany({ where: { transfer_id: transfer.id, asset_id: { in: assetIdsToDelete } } }),
     ...assetIdsToAdd.map(assetId =>
-      prisma.assetTransfer.create({
-        data: { transfer_id: transfer.id, asset_id: assetId }
-      })
+      prisma.assetTransfer.create({ data: { transfer_id: transfer.id, asset_id: assetId } })
     )
   ])
+
+  await recordTransferUpdate(transfer.id, {
+    origin_id: currentTransfer?.origin_id,
+    destination_id: currentTransfer?.destination_id,
+    transporter_id: currentTransfer?.transporter_id,
+    notes: currentTransfer?.notes
+  }, {
+    origin_id: transfer.origin.id,
+    destination_id: transfer.destination.id,
+    transporter_id: transfer.transporter.id,
+    notes: transfer.comment
+  }, userId)
 }
 
 async function getNewTransferNumber(originCode: string, date: Date): Promise<string> {

@@ -38,7 +38,7 @@ export async function updateInvoice(req: Request, res: Response<ApiResponse<{ in
   try {
     const { invoiceNumber } = req.params
     const data = UpdateInvoiceSchema.parse(req.body)
-    const response = await updateInvoiceSer(invoiceNumber, data)
+    const response = await updateInvoiceSer(invoiceNumber, data, res.locals.dbUserId)
     if (response.success) return res.json(response)
     if (response.error.status === 400) return res.status(400).json(response)
     return res.status(500).json(response)

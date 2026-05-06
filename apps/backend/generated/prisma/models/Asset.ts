@@ -348,7 +348,6 @@ export type AssetWhereInput = {
   TrackingStatus?: Prisma.XOR<Prisma.TrackingStatusScalarRelationFilter, Prisma.TrackingStatusWhereInput>
   asset_accessories?: Prisma.AssetAccessoryListRelationFilter
   asset_errors?: Prisma.AssetErrorListRelationFilter
-  asset_history?: Prisma.AssetHistoryListRelationFilter
   asset_transfers?: Prisma.AssetTransferListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   cost?: Prisma.XOR<Prisma.CostNullableScalarRelationFilter, Prisma.CostWhereInput> | null
@@ -386,7 +385,6 @@ export type AssetOrderByWithRelationInput = {
   TrackingStatus?: Prisma.TrackingStatusOrderByWithRelationInput
   asset_accessories?: Prisma.AssetAccessoryOrderByRelationAggregateInput
   asset_errors?: Prisma.AssetErrorOrderByRelationAggregateInput
-  asset_history?: Prisma.AssetHistoryOrderByRelationAggregateInput
   asset_transfers?: Prisma.AssetTransferOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   cost?: Prisma.CostOrderByWithRelationInput
@@ -427,7 +425,6 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   TrackingStatus?: Prisma.XOR<Prisma.TrackingStatusScalarRelationFilter, Prisma.TrackingStatusWhereInput>
   asset_accessories?: Prisma.AssetAccessoryListRelationFilter
   asset_errors?: Prisma.AssetErrorListRelationFilter
-  asset_history?: Prisma.AssetHistoryListRelationFilter
   asset_transfers?: Prisma.AssetTransferListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   cost?: Prisma.XOR<Prisma.CostNullableScalarRelationFilter, Prisma.CostWhereInput> | null
@@ -498,7 +495,6 @@ export type AssetCreateInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -526,7 +522,6 @@ export type AssetUncheckedCreateInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -553,7 +548,6 @@ export type AssetUpdateInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -581,7 +575,6 @@ export type AssetUncheckedUpdateInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -1151,20 +1144,6 @@ export type AssetUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AssetUpdateToOneWithWhereWithoutCommentsInput, Prisma.AssetUpdateWithoutCommentsInput>, Prisma.AssetUncheckedUpdateWithoutCommentsInput>
 }
 
-export type AssetCreateNestedOneWithoutAsset_historyInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAsset_historyInput, Prisma.AssetUncheckedCreateWithoutAsset_historyInput>
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAsset_historyInput
-  connect?: Prisma.AssetWhereUniqueInput
-}
-
-export type AssetUpdateOneRequiredWithoutAsset_historyNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAsset_historyInput, Prisma.AssetUncheckedCreateWithoutAsset_historyInput>
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAsset_historyInput
-  upsert?: Prisma.AssetUpsertWithoutAsset_historyInput
-  connect?: Prisma.AssetWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AssetUpdateToOneWithWhereWithoutAsset_historyInput, Prisma.AssetUpdateWithoutAsset_historyInput>, Prisma.AssetUncheckedUpdateWithoutAsset_historyInput>
-}
-
 export type AssetCreateNestedManyWithoutAvailabilityStatusInput = {
   create?: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput> | Prisma.AssetCreateWithoutAvailabilityStatusInput[] | Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput[]
   connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput | Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput[]
@@ -1336,7 +1315,6 @@ export type AssetCreateWithoutTechnical_specificationInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1363,7 +1341,6 @@ export type AssetUncheckedCreateWithoutTechnical_specificationInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1405,7 +1382,6 @@ export type AssetUpdateWithoutTechnical_specificationInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -1432,7 +1408,6 @@ export type AssetUncheckedUpdateWithoutTechnical_specificationInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -1458,7 +1433,6 @@ export type AssetCreateWithoutCostInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   files?: Prisma.FileCreateNestedManyWithoutAssetInput
@@ -1485,7 +1459,6 @@ export type AssetUncheckedCreateWithoutCostInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
@@ -1527,7 +1500,6 @@ export type AssetUpdateWithoutCostInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   files?: Prisma.FileUpdateManyWithoutAssetNestedInput
@@ -1554,7 +1526,6 @@ export type AssetUncheckedUpdateWithoutCostInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
@@ -1579,7 +1550,6 @@ export type AssetCreateWithoutAsset_accessoriesInput = {
   TechnicalStatus: Prisma.TechnicalStatusCreateNestedOneWithoutAssetInput
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1606,7 +1576,6 @@ export type AssetUncheckedCreateWithoutAsset_accessoriesInput = {
   is_held: boolean
   location_id?: number | null
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1648,7 +1617,6 @@ export type AssetUpdateWithoutAsset_accessoriesInput = {
   TechnicalStatus?: Prisma.TechnicalStatusUpdateOneRequiredWithoutAssetNestedInput
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -1675,7 +1643,6 @@ export type AssetUncheckedUpdateWithoutAsset_accessoriesInput = {
   is_held?: Prisma.BoolFieldUpdateOperationsInput | boolean
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -1701,7 +1668,6 @@ export type AssetCreateWithoutAsset_errorsInput = {
   TechnicalStatus: Prisma.TechnicalStatusCreateNestedOneWithoutAssetInput
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1728,7 +1694,6 @@ export type AssetUncheckedCreateWithoutAsset_errorsInput = {
   is_held: boolean
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1770,7 +1735,6 @@ export type AssetUpdateWithoutAsset_errorsInput = {
   TechnicalStatus?: Prisma.TechnicalStatusUpdateOneRequiredWithoutAssetNestedInput
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -1797,7 +1761,6 @@ export type AssetUncheckedUpdateWithoutAsset_errorsInput = {
   is_held?: Prisma.BoolFieldUpdateOperationsInput | boolean
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -1824,7 +1787,6 @@ export type AssetCreateWithoutAsset_transfersInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
   files?: Prisma.FileCreateNestedManyWithoutAssetInput
@@ -1851,7 +1813,6 @@ export type AssetUncheckedCreateWithoutAsset_transfersInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
@@ -1893,7 +1854,6 @@ export type AssetUpdateWithoutAsset_transfersInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
   files?: Prisma.FileUpdateManyWithoutAssetNestedInput
@@ -1920,7 +1880,6 @@ export type AssetUncheckedUpdateWithoutAsset_transfersInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
@@ -1945,7 +1904,6 @@ export type AssetCreateWithoutArrivalInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1972,7 +1930,6 @@ export type AssetUncheckedCreateWithoutArrivalInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2045,7 +2002,6 @@ export type AssetCreateWithoutDepartureInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2072,7 +2028,6 @@ export type AssetUncheckedCreateWithoutDepartureInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2124,7 +2079,6 @@ export type AssetCreateWithoutHoldInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2151,7 +2105,6 @@ export type AssetUncheckedCreateWithoutHoldInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2203,7 +2156,6 @@ export type AssetCreateWithoutPurchase_invoiceInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2230,7 +2182,6 @@ export type AssetUncheckedCreateWithoutPurchase_invoiceInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2266,7 +2217,6 @@ export type AssetCreateWithoutSales_invoiceInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2293,7 +2243,6 @@ export type AssetUncheckedCreateWithoutSales_invoiceInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2361,7 +2310,6 @@ export type AssetCreateWithoutLocationInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2388,7 +2336,6 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   is_held: boolean
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2440,7 +2387,6 @@ export type AssetCreateWithoutModelInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2467,7 +2413,6 @@ export type AssetUncheckedCreateWithoutModelInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2520,7 +2465,6 @@ export type AssetCreateWithoutFilesInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2547,7 +2491,6 @@ export type AssetUncheckedCreateWithoutFilesInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2589,7 +2532,6 @@ export type AssetUpdateWithoutFilesInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2616,7 +2558,6 @@ export type AssetUncheckedUpdateWithoutFilesInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2642,7 +2583,6 @@ export type AssetCreateWithoutCommentsInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
   files?: Prisma.FileCreateNestedManyWithoutAssetInput
@@ -2669,7 +2609,6 @@ export type AssetUncheckedCreateWithoutCommentsInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
@@ -2711,7 +2650,6 @@ export type AssetUpdateWithoutCommentsInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
   files?: Prisma.FileUpdateManyWithoutAssetNestedInput
@@ -2738,130 +2676,7 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
-  cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
-  files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
-  technical_specification?: Prisma.TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput
-}
-
-export type AssetCreateWithoutAsset_historyInput = {
-  barcode: string
-  serial_number: string
-  created_at: Date | string
-  is_held: boolean
-  arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
-  departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
-  hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
-  Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
-  model: Prisma.ModelCreateNestedOneWithoutAssetsInput
-  purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
-  TechnicalStatus: Prisma.TechnicalStatusCreateNestedOneWithoutAssetInput
-  TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
-  asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
-  asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
-  comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
-  cost?: Prisma.CostCreateNestedOneWithoutAssetInput
-  files?: Prisma.FileCreateNestedManyWithoutAssetInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
-  technical_specification?: Prisma.TechnicalSpecificationCreateNestedOneWithoutAssetInput
-}
-
-export type AssetUncheckedCreateWithoutAsset_historyInput = {
-  id?: number
-  barcode: string
-  serial_number: string
-  model_id: number
-  tracking_status_id: number
-  availability_status_id: number
-  technical_status_id: number
-  purchase_invoice_id?: number | null
-  sales_invoice_id?: number | null
-  arrival_id?: number | null
-  departure_id?: number | null
-  hold_id?: number | null
-  created_at: Date | string
-  is_held: boolean
-  location_id?: number | null
-  asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
-  asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
-  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
-  cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
-  files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
-  technical_specification?: Prisma.TechnicalSpecificationUncheckedCreateNestedOneWithoutAssetInput
-}
-
-export type AssetCreateOrConnectWithoutAsset_historyInput = {
-  where: Prisma.AssetWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetCreateWithoutAsset_historyInput, Prisma.AssetUncheckedCreateWithoutAsset_historyInput>
-}
-
-export type AssetUpsertWithoutAsset_historyInput = {
-  update: Prisma.XOR<Prisma.AssetUpdateWithoutAsset_historyInput, Prisma.AssetUncheckedUpdateWithoutAsset_historyInput>
-  create: Prisma.XOR<Prisma.AssetCreateWithoutAsset_historyInput, Prisma.AssetUncheckedCreateWithoutAsset_historyInput>
-  where?: Prisma.AssetWhereInput
-}
-
-export type AssetUpdateToOneWithWhereWithoutAsset_historyInput = {
-  where?: Prisma.AssetWhereInput
-  data: Prisma.XOR<Prisma.AssetUpdateWithoutAsset_historyInput, Prisma.AssetUncheckedUpdateWithoutAsset_historyInput>
-}
-
-export type AssetUpdateWithoutAsset_historyInput = {
-  barcode?: Prisma.StringFieldUpdateOperationsInput | string
-  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  is_held?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
-  departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
-  hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
-  Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
-  model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
-  purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
-  TechnicalStatus?: Prisma.TechnicalStatusUpdateOneRequiredWithoutAssetNestedInput
-  TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
-  asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
-  asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
-  comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
-  cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
-  files?: Prisma.FileUpdateManyWithoutAssetNestedInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
-  technical_specification?: Prisma.TechnicalSpecificationUpdateOneWithoutAssetNestedInput
-}
-
-export type AssetUncheckedUpdateWithoutAsset_historyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  barcode?: Prisma.StringFieldUpdateOperationsInput | string
-  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  tracking_status_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
-  technical_status_id?: Prisma.IntFieldUpdateOperationsInput | number
-  purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hold_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  is_held?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
-  asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
-  comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
   PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
@@ -2885,7 +2700,6 @@ export type AssetCreateWithoutAvailabilityStatusInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2912,7 +2726,6 @@ export type AssetUncheckedCreateWithoutAvailabilityStatusInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2964,7 +2777,6 @@ export type AssetCreateWithoutTechnicalStatusInput = {
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2991,7 +2803,6 @@ export type AssetUncheckedCreateWithoutTechnicalStatusInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3043,7 +2854,6 @@ export type AssetCreateWithoutTrackingStatusInput = {
   TechnicalStatus: Prisma.TechnicalStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3070,7 +2880,6 @@ export type AssetUncheckedCreateWithoutTrackingStatusInput = {
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3123,7 +2932,6 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3150,7 +2958,6 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_donor_asset_idT
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3181,7 +2988,6 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   TrackingStatus: Prisma.TrackingStatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3208,7 +3014,6 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_recipient_asset
   location_id?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_history?: Prisma.AssetHistoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3250,7 +3055,6 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3277,7 +3081,6 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_donor_asset_idT
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3314,7 +3117,6 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3341,7 +3143,6 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_recipient_asset
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3383,7 +3184,6 @@ export type AssetUpdateWithoutArrivalInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3410,7 +3210,6 @@ export type AssetUncheckedUpdateWithoutArrivalInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3470,7 +3269,6 @@ export type AssetUpdateWithoutDepartureInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3497,7 +3295,6 @@ export type AssetUncheckedUpdateWithoutDepartureInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3557,7 +3354,6 @@ export type AssetUpdateWithoutHoldInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3584,7 +3380,6 @@ export type AssetUncheckedUpdateWithoutHoldInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3661,7 +3456,6 @@ export type AssetUpdateWithoutPurchase_invoiceInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3688,7 +3482,6 @@ export type AssetUncheckedUpdateWithoutPurchase_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3731,7 +3524,6 @@ export type AssetUpdateWithoutSales_invoiceInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3758,7 +3550,6 @@ export type AssetUncheckedUpdateWithoutSales_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3818,7 +3609,6 @@ export type AssetUpdateWithoutLocationInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3845,7 +3635,6 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   is_held?: Prisma.BoolFieldUpdateOperationsInput | boolean
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3905,7 +3694,6 @@ export type AssetUpdateWithoutModelInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3932,7 +3720,6 @@ export type AssetUncheckedUpdateWithoutModelInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3992,7 +3779,6 @@ export type AssetUpdateWithoutAvailabilityStatusInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4019,7 +3805,6 @@ export type AssetUncheckedUpdateWithoutAvailabilityStatusInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4079,7 +3864,6 @@ export type AssetUpdateWithoutTechnicalStatusInput = {
   TrackingStatus?: Prisma.TrackingStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4106,7 +3890,6 @@ export type AssetUncheckedUpdateWithoutTechnicalStatusInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4166,7 +3949,6 @@ export type AssetUpdateWithoutTrackingStatusInput = {
   TechnicalStatus?: Prisma.TechnicalStatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4193,7 +3975,6 @@ export type AssetUncheckedUpdateWithoutTrackingStatusInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_history?: Prisma.AssetHistoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4228,7 +4009,6 @@ export type AssetUncheckedUpdateManyWithoutTrackingStatusInput = {
 export type AssetCountOutputType = {
   asset_accessories: number
   asset_errors: number
-  asset_history: number
   asset_transfers: number
   comments: number
   files: number
@@ -4239,7 +4019,6 @@ export type AssetCountOutputType = {
 export type AssetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset_accessories?: boolean | AssetCountOutputTypeCountAsset_accessoriesArgs
   asset_errors?: boolean | AssetCountOutputTypeCountAsset_errorsArgs
-  asset_history?: boolean | AssetCountOutputTypeCountAsset_historyArgs
   asset_transfers?: boolean | AssetCountOutputTypeCountAsset_transfersArgs
   comments?: boolean | AssetCountOutputTypeCountCommentsArgs
   files?: boolean | AssetCountOutputTypeCountFilesArgs
@@ -4269,13 +4048,6 @@ export type AssetCountOutputTypeCountAsset_accessoriesArgs<ExtArgs extends runti
  */
 export type AssetCountOutputTypeCountAsset_errorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetErrorWhereInput
-}
-
-/**
- * AssetCountOutputType without action
- */
-export type AssetCountOutputTypeCountAsset_historyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AssetHistoryWhereInput
 }
 
 /**
@@ -4342,7 +4114,6 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   TrackingStatus?: boolean | Prisma.TrackingStatusDefaultArgs<ExtArgs>
   asset_accessories?: boolean | Prisma.Asset$asset_accessoriesArgs<ExtArgs>
   asset_errors?: boolean | Prisma.Asset$asset_errorsArgs<ExtArgs>
-  asset_history?: boolean | Prisma.Asset$asset_historyArgs<ExtArgs>
   asset_transfers?: boolean | Prisma.Asset$asset_transfersArgs<ExtArgs>
   comments?: boolean | Prisma.Asset$commentsArgs<ExtArgs>
   cost?: boolean | Prisma.Asset$costArgs<ExtArgs>
@@ -4441,7 +4212,6 @@ export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   TrackingStatus?: boolean | Prisma.TrackingStatusDefaultArgs<ExtArgs>
   asset_accessories?: boolean | Prisma.Asset$asset_accessoriesArgs<ExtArgs>
   asset_errors?: boolean | Prisma.Asset$asset_errorsArgs<ExtArgs>
-  asset_history?: boolean | Prisma.Asset$asset_historyArgs<ExtArgs>
   asset_transfers?: boolean | Prisma.Asset$asset_transfersArgs<ExtArgs>
   comments?: boolean | Prisma.Asset$commentsArgs<ExtArgs>
   cost?: boolean | Prisma.Asset$costArgs<ExtArgs>
@@ -4491,7 +4261,6 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     TrackingStatus: Prisma.$TrackingStatusPayload<ExtArgs>
     asset_accessories: Prisma.$AssetAccessoryPayload<ExtArgs>[]
     asset_errors: Prisma.$AssetErrorPayload<ExtArgs>[]
-    asset_history: Prisma.$AssetHistoryPayload<ExtArgs>[]
     asset_transfers: Prisma.$AssetTransferPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     cost: Prisma.$CostPayload<ExtArgs> | null
@@ -4922,7 +4691,6 @@ export interface Prisma__AssetClient<T, Null = never, ExtArgs extends runtime.Ty
   TrackingStatus<T extends Prisma.TrackingStatusDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TrackingStatusDefaultArgs<ExtArgs>>): Prisma.Prisma__TrackingStatusClient<runtime.Types.Result.GetResult<Prisma.$TrackingStatusPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   asset_accessories<T extends Prisma.Asset$asset_accessoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_accessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors<T extends Prisma.Asset$asset_errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  asset_history<T extends Prisma.Asset$asset_historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_transfers<T extends Prisma.Asset$asset_transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.Asset$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cost<T extends Prisma.Asset$costArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$costArgs<ExtArgs>>): Prisma.Prisma__CostClient<runtime.Types.Result.GetResult<Prisma.$CostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -5543,30 +5311,6 @@ export type Asset$asset_errorsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
-}
-
-/**
- * Asset.asset_history
- */
-export type Asset$asset_historyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the AssetHistory
-   */
-  select?: Prisma.AssetHistorySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the AssetHistory
-   */
-  omit?: Prisma.AssetHistoryOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.AssetHistoryInclude<ExtArgs> | null
-  where?: Prisma.AssetHistoryWhereInput
-  orderBy?: Prisma.AssetHistoryOrderByWithRelationInput | Prisma.AssetHistoryOrderByWithRelationInput[]
-  cursor?: Prisma.AssetHistoryWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AssetHistoryScalarFieldEnum | Prisma.AssetHistoryScalarFieldEnum[]
 }
 
 /**
