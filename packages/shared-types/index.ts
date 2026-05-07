@@ -11,5 +11,6 @@ export * from './types/organization-types.js'
 export * from './types/reference-data-types.js'
 export * from './types/user-types.js'
 export * from './types/search-types.js'
+export * from './types/asset-history-types.js'
 export * from './mappers/asset-mappers.js'
 

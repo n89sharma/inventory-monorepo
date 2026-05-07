@@ -10,6 +10,7 @@ import {
   getAssetComments,
   getAssetDetail,
   getAssetErrors,
+  getAssetHistory,
   getAssetPartTransfer,
   getAssetSummaryByBarcode,
   getAssetTransfers,
@@ -33,6 +34,7 @@ router.get('/', validateQuery(AssetQuerySchema), getAssets)
 router.post('/export', exportAssets)
 router.get('/suggestions', validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
 router.get('/locations', validateQuery(LocationsByWarehouseQuerySchema), getLocationsByWarehouse)
+router.get('/:barcode/history', getAssetHistory)
 router.get('/:barcode/summary', getAssetSummaryByBarcode)
 router.get('/:barcode', getAssetDetail)
 router.get('/:barcode/accessories', getAssetAccessories)

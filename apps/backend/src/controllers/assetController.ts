@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, BulkUpdateAssetPricingSchema, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetHistory, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, BulkUpdateAssetPricingSchema, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -9,6 +9,7 @@ import {
   getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
   getErrors as getAssetErrorsSer,
+  getAssetHistory as getAssetHistorySer,
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
   createComment as createCommentSer,
@@ -127,6 +128,17 @@ export async function getAssetTransfers(req: Request, res: Response<ApiResponse<
     return res.json(response)
   } else {
     return res.status(500).json(response)
+  }
+}
+
+export async function getAssetHistory(req: Request, res: Response<ApiResponse<AssetHistory>>) {
+  const { barcode } = req.params
+  const response = await getAssetHistorySer(barcode)
+  if (response.success) {
+    return res.json(response)
+  } else {
+    const status = response.error.status === 400 ? 404 : 500
+    return res.status(status).json(response)
   }
 }
 

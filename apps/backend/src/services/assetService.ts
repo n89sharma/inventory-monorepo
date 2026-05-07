@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { ApiResponse, AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -566,6 +566,30 @@ export async function updateAssetLocation(barcode: string, data: UpdateAssetLoca
     return successResponse(undefined)
   } catch {
     return response500(`Failed to update location for asset ${barcode}`)
+  }
+}
+
+export async function getAssetHistory(barcode: string): Promise<ApiResponse<AssetHistory>> {
+  try {
+    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+    if (!asset) return response400(`Asset ${barcode} not found`)
+
+    const rows = await prisma.history.findMany({
+      where: { entity_type: 'Asset', entity_id: asset.id },
+      include: { User: { select: { name: true } } },
+      orderBy: { changed_on: 'desc' }
+    })
+
+    const records: AssetHistory = rows.map(row => ({
+      action_type: row.action_type as 'CREATE' | 'UPDATE',
+      user_name: row.User.name,
+      changed_on: row.changed_on,
+      changes: row.changes as AssetHistoryRecord['changes']
+    }) as AssetHistoryRecord)
+
+    return successResponse(records)
+  } catch {
+    return response500(`Failed to fetch history for asset ${barcode}`)
   }
 }
 
