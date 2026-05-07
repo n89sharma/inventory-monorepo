@@ -42,16 +42,20 @@ export const CreateTransferSchema = z.object({
 export type CreateTransfer = z.infer<typeof CreateTransferSchema>
 
 // GET /transfers/:transferNumber/edit
-// PUT /transfers/:transferNumber
 export const UpdateTransferSchema = z.object({
   id: z.number(),
-  origin: WarehouseSchema.refine(val => !!val, "Origin required"),
-  destination: WarehouseSchema.refine(val => !!val, "Destination required"),
-  transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
+  origin: WarehouseSchema,
+  destination: WarehouseSchema,
+  transporter: OrgSummarySchema,
   comment: z.string().nullable(),
+  assets: z.array(AssetSummarySchema)
+})
+export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>
+
+// PUT /transfers/:transferNumber
+export const SubmitUpdateTransferSchema = UpdateTransferSchema.extend({
   assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer")
 }).refine(data => data.origin.id !== data.destination.id, {
   message: "Origin and destination cannot be the same",
   path: ["destination"]
 })
-export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>

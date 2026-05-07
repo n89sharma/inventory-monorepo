@@ -33,13 +33,18 @@ export const CreateInvoiceSchema = z.object({
 })
 export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
 
-// GET /invoices/:invoiceNumber/edit and PUT /invoices/:invoiceNumber
+// GET /invoices/:invoiceNumber/edit
 export const UpdateInvoiceSchema = z.object({
   id: z.number().int(),
   invoice_number: z.string(),
   organization: OrgSummarySchema,
   invoice_type: z.object({ id: z.number().int(), type: z.string() }),
   is_cleared: z.boolean(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+  assets: z.array(AssetSummarySchema)
 })
 export type UpdateInvoice = z.infer<typeof UpdateInvoiceSchema>
+
+// PUT /invoices/:invoiceNumber
+export const SubmitUpdateInvoiceSchema = UpdateInvoiceSchema.extend({
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+})

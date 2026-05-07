@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateDepartureSchema, DepartureDetail, DepartureSummary, UpdateDepartureSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateDepartureSchema, DepartureDetail, DepartureSummary, SubmitUpdateDepartureSchema, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -61,7 +61,7 @@ export async function createDeparture(req: Request, res: Response, next: NextFun
 
 export async function updateDeparture(req: Request, res: Response, next: NextFunction) {
   try {
-    const departure = UpdateDepartureSchema.parse(req.body)
+    const departure = SubmitUpdateDepartureSchema.parse(req.body)
     await updateDepartureSer(departure, res.locals.dbUserId)
     res.json({ departureNumber: req.params.departureNumber })
   } catch (error) {

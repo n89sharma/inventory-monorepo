@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateHoldSchema, HoldDetail, HoldSummary, UpdateHoldSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -62,7 +62,7 @@ export async function getHoldForUpdate(req: Request, res: Response, next: NextFu
 
 export async function updateHold(req: Request, res: Response, next: NextFunction) {
   try {
-    const validated = UpdateHoldSchema.parse(req.body)
+    const validated = SubmitUpdateHoldSchema.parse(req.body)
     const response = await updateHoldSer(validated, res.locals.dbUserId)
     if (response.success) {
       return res.json({ holdNumber: req.params.holdNumber })

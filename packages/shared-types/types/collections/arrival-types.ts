@@ -52,7 +52,6 @@ export const CreateArrivalSchema = z.object({
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
 // GET /arrivals/1100034/edit
-// PUT /arrivals
 export const UpdateAssetSchema = CreateAssetSchema.extend({
   id: z.number().optional()
 })
@@ -60,6 +59,11 @@ export type UpdateAsset = z.infer<typeof UpdateAssetSchema>
 
 export const UpdateArrivalSchema = CreateArrivalSchema.extend({
   id: z.number(),
-  assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival")
+  assets: z.array(UpdateAssetSchema)
 })
 export type UpdateArrival = z.infer<typeof UpdateArrivalSchema>
+
+// PUT /arrivals
+export const SubmitUpdateArrivalSchema = UpdateArrivalSchema.extend({
+  assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival")
+})

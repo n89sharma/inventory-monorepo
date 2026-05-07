@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, ArrivalDetail, ArrivalSummary, CreateArrivalSchema, UpdateArrival, UpdateArrivalSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, ArrivalDetail, ArrivalSummary, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrival, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -73,7 +73,7 @@ export async function updateArrival(
 
   const { arrivalNumber } = req.params
   try {
-    const validated = UpdateArrivalSchema.parse(req.body)
+    const validated = SubmitUpdateArrivalSchema.parse(req.body)
     await updateArrivalSer(validated, res.locals.dbUserId)
     res.json({ arrivalNumber })
   } catch (error) {

@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, UpdateTransferSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -76,7 +76,7 @@ export async function createTransfer(req: Request, res: Response<{ transferNumbe
 export async function updateTransfer(req: Request, res: Response<{ transferNumber: string }>, next: NextFunction) {
   const { transferNumber } = req.params
   try {
-    const validated = UpdateTransferSchema.parse(req.body)
+    const validated = SubmitUpdateTransferSchema.parse(req.body)
     await updateTransferSer(validated, res.locals.dbUserId)
     res.json({ transferNumber })
   } catch (error) {
