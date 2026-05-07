@@ -3,9 +3,11 @@ import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custo
 import { useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useEffect, useMemo } from 'react'
+import type { RowSelectionState } from '@tanstack/react-table'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -30,9 +32,13 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     setLastPath('arrivals', pathname)
   }, [arrivalNumber])
 
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError.message}</div>
   if (!arrival) return <div>Arrival not found</div>
+
+  const selectedAssets = arrival.assets.filter(a => rowSelection[a.barcode])
 
   return (
     <div className="flex flex-col gap-4">
@@ -42,7 +48,15 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="arrivals" collectionId={arrivalNumber} assets={arrival.assets} />
       </div>
       <ArrivalSummaryStrip arrival={arrival} />
-      <DataTable columns={columns} data={arrival.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <DataTable
+        columns={columns}
+        data={arrival.assets}
+        onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={row => row.barcode}
+      />
     </div>
   )
 }

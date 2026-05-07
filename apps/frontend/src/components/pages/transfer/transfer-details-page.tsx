@@ -3,9 +3,11 @@ import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custo
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useTransferDetail } from '@/hooks/use-transfer-detail'
-import { useEffect, useMemo } from 'react'
+import type { RowSelectionState } from '@tanstack/react-table'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -29,9 +31,13 @@ export function TransferDetailsPage(): React.JSX.Element {
     setLastPath('transfers', pathname)
   }, [transferNumber])
 
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError.message}</div>
   if (!transfer) return <div>Transfer not found</div>
+
+  const selectedAssets = transfer.assets.filter(a => rowSelection[a.barcode])
 
   return (
     <div className="flex flex-col gap-4">
@@ -41,7 +47,15 @@ export function TransferDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="transfers" collectionId={transferNumber} assets={transfer.assets} />
       </div>
       <TransferSummaryStrip transfer={transfer} />
-      <DataTable columns={columns} data={transfer.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <DataTable
+        columns={columns}
+        data={transfer.assets}
+        onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={row => row.barcode}
+      />
     </div>
   )
 }

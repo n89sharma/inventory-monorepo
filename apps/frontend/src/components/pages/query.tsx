@@ -3,18 +3,16 @@ import { exportAssets, getAssetsForQuery } from "@/data/api/asset-api"
 import { useModelStore } from '@/data/store/model-store'
 import { useQueryStore } from '@/data/store/query-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
+import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
+import { BulkEditBar } from '../custom/bulk-edit-bar'
 import { InputWithClear } from '../custom/input-with-clear'
 import { MultiSelectOptions } from '../custom/multi-select-options'
 import { PopoverSearch } from '../custom/popover-search'
-import { AddToCollectionModal } from '../modals/add-to-collection-modal'
-import { BulkEditPricingModal } from '../modals/bulk-edit-pricing-modal'
 import { DataTable } from "../shadcn/data-table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../shadcn/dropdown-menu'
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 const searchColumns = createAssetSummaryColumns('search')
@@ -32,71 +30,27 @@ function QueryResultsTable({
   onBulkPriceSave: () => void
 }) {
   const [prevAssets, setPrevAssets] = useState(assets)
-  const [addToOpen, setAddToOpen] = useState(false)
-  const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
-  const [frozenAssets, setFrozenAssets] = useState<AssetSummary[]>([])
 
   if (assets !== prevAssets) {
     setPrevAssets(assets)
     onRowSelectionChange({})
   }
 
-  const selectedCount = Object.keys(rowSelection).length
   const selectedAssets = assets.filter(a => rowSelection[a.barcode])
-
-  function openAddTo() {
-    setFrozenAssets(selectedAssets)
-    setAddToOpen(true)
-  }
-
-  function openBulkPricing() {
-    setFrozenAssets(selectedAssets)
-    setBulkPricingOpen(true)
-  }
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center min-h-9 gap-2 rounded-md border bg-muted/50 px-3 text-sm text-muted-foreground">
-        {selectedCount > 0 ? (
-          <>
-            {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
-            <Button variant="ghost" size="sm" onClick={() => onRowSelectionChange({})}>
-              Clear
-            </Button>
-            <DropdownMenu>
-              <Button asChild variant="secondary">
-                <DropdownMenuTrigger>
-                  <PencilSimpleIcon />Bulk Edit
-                </DropdownMenuTrigger>
-              </Button>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
-                <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <span>Make a selection for bulk editing</span>
-        )}
-      </div>
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => onRowSelectionChange({})}
+        onPriceSaveSuccess={onBulkPriceSave}
+      />
       <DataTable
         columns={searchColumns}
         data={assets}
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
-      />
-      <AddToCollectionModal
-        open={addToOpen}
-        onOpenChange={setAddToOpen}
-        selectedAssets={frozenAssets}
-        onConfirmSuccess={() => onRowSelectionChange({})}
-      />
-      <BulkEditPricingModal
-        open={bulkPricingOpen}
-        onOpenChange={setBulkPricingOpen}
-        selectedAssets={frozenAssets}
-        onSaveSuccess={() => { onRowSelectionChange({}); onBulkPriceSave() }}
       />
     </div>
   )
