@@ -1,5 +1,4 @@
-import { Organization } from '@/components/custom/cards/organization-card'
-import { WarehouseCard } from '@/components/custom/cards/warehouse-card'
+import { DepartureSummaryStrip } from '@/components/custom/cards/departure-summary-strip'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -41,11 +40,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         <h1 className="text-2xl font-semibold p-2">Departure {departureNumber}</h1>
         <CollectionEditBar section="departures" collectionId={departureNumber} assets={departure.assets} />
       </div>
-      <div className="flex gap-4">
-        <WarehouseCard title="Warehouse" warehouse={departure.origin} />
-        <Organization title="Transporter" org={departure.transporter} />
-        <Organization title="Customer" org={departure.customer} />
-      </div>
+      <DepartureSummaryStrip departure={departure} />
       <DataTable columns={columns} data={departure.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )

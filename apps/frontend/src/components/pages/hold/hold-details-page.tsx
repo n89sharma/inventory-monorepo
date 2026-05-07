@@ -1,5 +1,4 @@
-import { Organization } from '@/components/custom/cards/organization-card'
-import { UserCard } from '@/components/custom/cards/user-card'
+import { HoldSummaryStrip } from '@/components/custom/cards/hold-summary-strip'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -41,11 +40,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         <h1 className="text-2xl font-semibold p-2">Hold {holdNumber}</h1>
         <CollectionEditBar section="holds" collectionId={holdNumber} assets={hold.assets} />
       </div>
-      <div className="flex gap-4">
-        <UserCard title="Created By" user={hold.created_by} />
-        <UserCard title="Created For" user={hold.created_for} />
-        <Organization title="Customer" org={hold.customer} />
-      </div>
+      <HoldSummaryStrip hold={hold} />
       <DataTable columns={columns} data={hold.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )

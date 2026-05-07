@@ -104,7 +104,7 @@ export function DataRow({
   labelClassName
 }: DataRowProps): React.JSX.Element {
   return (
-    <div className={cn("flex items-start gap-4 py-1.5", rowClassName)}>
+    <div className={cn("flex items-start gap24 py-1", rowClassName)}>
       <DataLabel label={label} className={labelClassName} />
       {children}
     </div>

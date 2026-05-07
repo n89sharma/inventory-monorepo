@@ -1,5 +1,4 @@
-import { Organization } from '@/components/custom/cards/organization-card'
-import { UserCard } from '@/components/custom/cards/user-card'
+import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-strip'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -41,10 +40,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <h1 className="text-2xl font-semibold p-2">Invoice {invoiceNumber}</h1>
         <CollectionEditBar section="invoices" collectionId={invoiceNumber} assets={invoice.assets} />
       </div>
-      <div className="flex gap-4">
-        <UserCard title="Created By" user={invoice.created_by} />
-        <Organization title="Customer" org={invoice.customer} />
-      </div>
+      <InvoiceSummaryStrip invoice={invoice} />
       <DataTable columns={columns} data={invoice.assets} onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)} />
     </div>
   )
