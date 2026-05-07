@@ -1,6 +1,4 @@
 import { useHoldStore } from '@/data/store/hold-store'
-import { useOrgStore } from '@/data/store/org-store'
-import { useUserStore } from '@/data/store/user-store'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -15,14 +13,10 @@ export function UpdateHoldPage(): React.JSX.Element {
   const getHoldForUpdate = useHoldStore(state => state.getHoldForUpdate)
   const submitUpdateHold = useHoldStore(state => state.submitUpdateHold)
 
-  const users = useUserStore(state => state.users)
-  const orgs = useOrgStore(state => state.organizations)
-
   useEffect(() => {
     if (!holdNumber) return
-    if (!users.length || !orgs.length) return
     getHoldForUpdate(holdNumber)
-  }, [holdNumber, users.length, orgs.length])
+  }, [holdNumber])
 
   const pageConfig = {
     pageHeading: `Edit Hold ${holdNumber}`,

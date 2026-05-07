@@ -1,5 +1,3 @@
-import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useTransferStore } from '@/data/store/transfer-store'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useEffect } from 'react'
@@ -15,14 +13,10 @@ export function UpdateTransferPage(): React.JSX.Element {
   const getTransferForUpdate = useTransferStore(state => state.getTransferForUpdate)
   const submitUpdateTransfer = useTransferStore(state => state.submitUpdateTransfer)
 
-  const orgs = useOrgStore(state => state.organizations)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-
   useEffect(() => {
     if (!transferNumber) return
-    if (!orgs.length || !warehouses.length) return
     getTransferForUpdate(transferNumber)
-  }, [transferNumber, orgs.length, warehouses.length])
+  }, [transferNumber])
 
   const pageConfig = {
     pageHeading: `Edit Transfer ${transferNumber}`,

@@ -1,6 +1,4 @@
 import { useDepartureStore } from '@/data/store/departure-store'
-import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -15,14 +13,10 @@ export function UpdateDeparturePage(): React.JSX.Element {
   const getDepartureForUpdate = useDepartureStore(state => state.getDepartureForUpdate)
   const submitUpdateDeparture = useDepartureStore(state => state.submitUpdateDeparture)
 
-  const orgs = useOrgStore(state => state.organizations)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-
   useEffect(() => {
     if (!departureNumber) return
-    if (!orgs.length || !warehouses.length) return
     getDepartureForUpdate(departureNumber)
-  }, [departureNumber, orgs.length, warehouses.length])
+  }, [departureNumber])
 
   const pageConfig = {
     pageHeading: `Edit Departure ${departureNumber}`,
