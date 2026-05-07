@@ -49,22 +49,17 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
     if (hold) {
       await recordHoldCreate(hold.id, {
         hold_number: holdNumber,
-        created_by_id: userId,
         created_for_id: data.created_for_id,
         customer_id: data.customer_id,
-        notes: data.notes ?? null,
-        from_dt: now,
-        to_dt: null
+        created_at: now
       }, userId)
 
       for (const assetId of assetIds) {
         const prev = assetStateMap.get(assetId)
         await recordAssetUpdate(assetId, {
-          hold_id: prev?.hold_id ?? null,
-          is_held: prev?.is_held ?? false
+          hold_id: prev?.hold_id ?? null
         }, {
-          hold_id: hold.id,
-          is_held: true
+          hold_id: hold.id
         }, userId)
       }
     }
@@ -163,19 +158,17 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<ApiR
 
     await recordHoldUpdate(data.id, {
       created_for_id: holdRecord.created_for_id,
-      customer_id: holdRecord.customer_id,
-      notes: holdRecord.notes
+      customer_id: holdRecord.customer_id
     }, {
       created_for_id: data.created_for.id,
-      customer_id: data.customer.id,
-      notes: data.notes ?? null
+      customer_id: data.customer.id
     }, userId)
 
     for (const assetId of assetIdsToRemove) {
-      await recordAssetUpdate(assetId, { hold_id: data.id, is_held: true }, { is_held: false }, userId)
+      await recordAssetUpdate(assetId, { hold_id: data.id }, { hold_id: null }, userId)
     }
     for (const assetId of assetIdsToAdd) {
-      await recordAssetUpdate(assetId, { is_held: false }, { hold_id: data.id, is_held: true }, userId)
+      await recordAssetUpdate(assetId, { hold_id: null }, { hold_id: data.id }, userId)
     }
 
     return successResponse(undefined)

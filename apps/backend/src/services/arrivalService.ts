@@ -140,8 +140,6 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
     arrival_number: arrivalNumber,
     origin_id: newArrival.vendor.id,
     destination_id: newArrival.warehouse.id,
-    transporter_id: newArrival.transporter.id,
-    notes: newArrival.comment ?? null,
     created_at: currentDateTime
   }, userId)
 
@@ -150,9 +148,6 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       barcode: asset.barcode,
       serial_number: asset.serial_number,
       model_id: asset.model_id,
-      tracking_status_id: asset.tracking_status_id,
-      availability_status_id: asset.availability_status_id,
-      technical_status_id: asset.technical_status_id,
       arrival_id: arrival.id
     }, userId)
   }
@@ -293,13 +288,11 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
   await recordArrivalUpdate(arrival.id, {
     origin_id: currentArrival?.origin_id,
     destination_id: currentArrival?.destination_id,
-    transporter_id: currentArrival?.transporter_id,
-    notes: currentArrival?.notes
+    transporter_id: currentArrival?.transporter_id
   }, {
     origin_id: arrival.vendor.id,
     destination_id: arrival.warehouse.id,
-    transporter_id: arrival.transporter.id,
-    notes: arrival.comment
+    transporter_id: arrival.transporter.id
   }, userId)
 
   for (const assetId of assetIdsToBeDeleted) {
@@ -311,9 +304,6 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       barcode: asset.barcode,
       serial_number: asset.serial_number,
       model_id: asset.model_id,
-      tracking_status_id: asset.tracking_status_id,
-      availability_status_id: asset.availability_status_id,
-      technical_status_id: asset.technical_status_id,
       arrival_id: arrival.id
     }, userId)
   }

@@ -3,70 +3,103 @@ import { prisma } from '../prisma.js'
 
 // ─── State types for CREATE ───────────────────────────────────────────────────
 
-type ArrivalState = {
-  arrival_number: string; origin_id: number; destination_id: number
-  transporter_id: number; notes: string | null; created_at: Date
+type ArrivalCreateState = {
+  arrival_number: string
+  origin_id: number
+  destination_id: number
+  created_at: Date
 }
 
 type AssetCreateState = {
-  barcode: string; serial_number: string; model_id: number
-  tracking_status_id: number; availability_status_id: number; technical_status_id: number
-  arrival_id?: number | null; departure_id?: number | null
-  hold_id?: number | null; is_held?: boolean; purchase_invoice_id?: number | null
+  barcode: string
+  serial_number: string
+  model_id: number
+  arrival_id?: number | null
 }
 
-type DepartureState = {
-  departure_number: string; origin_id: number; destination_id: number
-  transporter_id: number; notes: string | null; created_at: Date
+type DepartureCreateState = {
+  departure_number: string
+  origin_id: number
+  destination_id: number
+  created_at: Date
 }
 
-type HoldState = {
-  hold_number: string; created_by_id: number; created_for_id: number
-  customer_id: number; notes: string | null; from_dt: Date; to_dt: Date | null
+type HoldCreateState = {
+  hold_number: string
+  created_for_id: number
+  customer_id: number
+  created_at: Date
 }
 
-type InvoiceState = {
-  invoice_number: string; organization_id: number; invoice_type_id: number
-  is_cleared: boolean; created_at: Date
+type InvoiceCreateState = {
+  invoice_number: string
+  organization_id: number
+  invoice_type_id: number
+  created_at: Date
 }
 
-type TransferState = {
-  transfer_number: string; origin_id: number; destination_id: number
-  transporter_id: number; notes: string | null; created_at: Date
+type TransferCreateState = {
+  transfer_number: string
+  origin_id: number
+  destination_id: number
+  created_at: Date
 }
 
 // ─── Field types for UPDATE diffs ─────────────────────────────────────────────
 
 type ArrivalUpdateFields = Partial<{
-  origin_id: number; destination_id: number; transporter_id: number; notes: string | null
+  origin_id: number
+  destination_id: number
+  transporter_id: number
 }>
 
 type AssetUpdateFields = Partial<{
-  arrival_id: number | null; departure_id: number | null; hold_id: number | null
-  is_held: boolean; purchase_invoice_id: number | null; location_id: number | null
-  model_id: number; serial_number: string; technical_status_id: number
-  meter_black: number | null; meter_colour: number | null; meter_total: number | null
-  cassettes: number | null; internal_finisher: string | null
-  drum_life_c: number | null; drum_life_m: number | null
-  drum_life_y: number | null; drum_life_k: number | null
-  purchase_cost: number | null; transport_cost: number | null
-  processing_cost: number | null; other_cost: number | null
-  parts_cost: number | null; total_cost: number | null; sale_price: number | null
+  arrival_id: number | null
+  departure_id: number | null
+  hold_id: number | null
+  purchase_invoice_id: number | null
+  location_id: number | null
+  model_id: number
+  serial_number: string
+  technical_status_id: number
+  meter_black: number | null
+  meter_colour: number | null
+  meter_total: number | null
+  cassettes: number | null
+  internal_finisher: string | null
+  drum_life_c: number | null
+  drum_life_m: number | null
+  drum_life_y: number | null
+  drum_life_k: number | null
+  purchase_cost: number | null
+  transport_cost: number | null
+  processing_cost: number | null
+  other_cost: number | null
+  parts_cost: number | null
+  total_cost: number | null
+  sale_price: number | null
   error_ids: number[]
 }>
 
 type DepartureUpdateFields = Partial<{
-  origin_id: number; destination_id: number; transporter_id: number; notes: string | null
+  origin_id: number
+  destination_id: number
+  transporter_id: number
 }>
 
 type HoldUpdateFields = Partial<{
-  created_for_id: number; customer_id: number; notes: string | null
+  created_for_id: number
+  customer_id: number
 }>
 
-type InvoiceUpdateFields = Partial<{ is_cleared: boolean }>
+type InvoiceUpdateFields = Partial<{
+  is_cleared: boolean
+}>
 
 type TransferUpdateFields = Partial<{
-  origin_id: number; destination_id: number; transporter_id: number; notes: string | null
+  origin_id: number
+  destination_id: number
+  transporter_id: number
 }>
 
 // ─── Base utilities (private) ─────────────────────────────────────────────────
@@ -94,84 +127,531 @@ async function recordHistory(
   }
 }
 
-function buildUpdateDiff(
-  before: Record<string, unknown>,
-  after: Record<string, unknown>
-): { before: Record<string, unknown>; after: Record<string, unknown> } | null {
-  const diffBefore: Record<string, unknown> = {}
-  const diffAfter: Record<string, unknown> = {}
-  for (const key of Object.keys(after)) {
-    if (before[key] !== after[key]) {
-      diffBefore[key] = before[key]
-      diffAfter[key] = after[key]
-    }
-  }
-  if (Object.keys(diffAfter).length === 0) return null
-  return { before: diffBefore, after: diffAfter }
+async function resolveArrivalNumber(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.arrival.findUnique({ where: { id }, select: { arrival_number: true } })
+  return r?.arrival_number ?? null
+}
+
+async function resolveDepartureNumber(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.departure.findUnique({ where: { id }, select: { departure_number: true } })
+  return r?.departure_number ?? null
+}
+
+async function resolveHoldNumber(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.hold.findUnique({ where: { id }, select: { hold_number: true } })
+  return r?.hold_number ?? null
+}
+
+async function resolveInvoiceNumber(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.invoice.findUnique({ where: { id }, select: { invoice_number: true } })
+  return r?.invoice_number ?? null
+}
+
+async function resolveLocationString(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.location.findUnique({ where: { id }, select: { location: true } })
+  return r?.location ?? null
+}
+
+async function resolveUserDiff(
+  beforeId: number,
+  afterId: number
+): Promise<{ before: string | undefined; after: string | undefined }> {
+  const [beforeUser, afterUser] = await Promise.all([
+    prisma.user.findUnique({ where: { id: beforeId }, select: { name: true } }),
+    prisma.user.findUnique({ where: { id: afterId }, select: { name: true } })
+  ])
+  return { before: beforeUser?.name, after: afterUser?.name }
+}
+
+async function resolveOrgDiff(
+  beforeId: number,
+  afterId: number
+): Promise<{ before: string | undefined; after: string | undefined }> {
+  const [beforeOrg, afterOrg] = await Promise.all([
+    prisma.organization.findUnique({ where: { id: beforeId }, select: { name: true } }),
+    prisma.organization.findUnique({ where: { id: afterId }, select: { name: true } })
+  ])
+  return { before: beforeOrg?.name, after: afterOrg?.name }
+}
+
+async function resolveWarehouseDiff(
+  beforeId: number,
+  afterId: number
+): Promise<{ before: string | undefined; after: string | undefined }> {
+  const [beforeWh, afterWh] = await Promise.all([
+    prisma.warehouse.findUnique({ where: { id: beforeId }, select: { city_code: true } }),
+    prisma.warehouse.findUnique({ where: { id: afterId }, select: { city_code: true } })
+  ])
+  return { before: beforeWh?.city_code, after: afterWh?.city_code }
 }
 
 // ─── Arrival ──────────────────────────────────────────────────────────────────
 
-export async function recordArrivalCreate(arrivalId: number, state: ArrivalState, userId: number): Promise<void> {
-  await recordHistory('Arrival', arrivalId, 'CREATE', userId, { after: state })
+export async function recordArrivalCreate(
+  arrivalId: number,
+  state: ArrivalCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [vendor, warehouse, user] = await Promise.all([
+      prisma.organization.findUnique({ where: { id: state.origin_id }, select: { name: true } }),
+      prisma.warehouse.findUnique({
+        where: { id: state.destination_id },
+        select: { city_code: true }
+      }),
+      prisma.user.findUnique({ where: { id: userId }, select: { name: true } })
+    ])
+    await recordHistory('Arrival', arrivalId, 'CREATE', userId, {
+      after: {
+        arrival_number: state.arrival_number,
+        origin_name: vendor?.name,
+        destination_city_code: warehouse?.city_code,
+        created_by_name: user?.name,
+        created_at: state.created_at
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Arrival ${arrivalId}]:`, error)
+  }
 }
 
-export async function recordArrivalUpdate(arrivalId: number, before: ArrivalUpdateFields, after: ArrivalUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Arrival', arrivalId, 'UPDATE', userId, diff)
+export async function recordArrivalUpdate(
+  arrivalId: number,
+  before: ArrivalUpdateFields,
+  after: ArrivalUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.origin_id !== after.origin_id && before.origin_id && after.origin_id) {
+      const org = await resolveOrgDiff(before.origin_id, after.origin_id)
+      diffBefore.origin_name = org.before
+      diffAfter.origin_name = org.after
+    }
+
+    if (before.destination_id !== after.destination_id && before.destination_id && after.destination_id) {
+      const wh = await resolveWarehouseDiff(before.destination_id, after.destination_id)
+      diffBefore.destination_city_code = wh.before
+      diffAfter.destination_city_code = wh.after
+    }
+
+    if (before.transporter_id !== after.transporter_id && before.transporter_id && after.transporter_id) {
+      const org = await resolveOrgDiff(before.transporter_id, after.transporter_id)
+      diffBefore.transporter_name = org.before
+      diffAfter.transporter_name = org.after
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Arrival', arrivalId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Arrival ${arrivalId}]:`, error)
+  }
 }
 
 // ─── Asset ────────────────────────────────────────────────────────────────────
 
-export async function recordAssetCreate(assetId: number, state: AssetCreateState, userId: number): Promise<void> {
-  await recordHistory('Asset', assetId, 'CREATE', userId, { after: state })
+export async function recordAssetCreate(
+  assetId: number,
+  state: AssetCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [model, arrival] = await Promise.all([
+      prisma.model.findUnique({
+        where: { id: state.model_id },
+        select: { name: true, brand: { select: { name: true } } }
+      }),
+      state.arrival_id
+        ? prisma.arrival.findUnique({
+            where: { id: state.arrival_id },
+            select: { arrival_number: true }
+          })
+        : Promise.resolve(null)
+    ])
+    await recordHistory('Asset', assetId, 'CREATE', userId, {
+      after: {
+        barcode: state.barcode,
+        serial_number: state.serial_number,
+        brand_name: model?.brand.name,
+        model_name: model?.name,
+        arrival_number: arrival?.arrival_number ?? null
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Asset ${assetId}]:`, error)
+  }
 }
 
-export async function recordAssetUpdate(assetId: number, before: AssetUpdateFields, after: AssetUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Asset', assetId, 'UPDATE', userId, diff)
+export async function recordAssetUpdate(
+  assetId: number,
+  before: AssetUpdateFields,
+  after: AssetUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.arrival_id !== after.arrival_id) {
+      const [beforeArrivalNumber, afterArrivalNumber] = await Promise.all([
+        resolveArrivalNumber(before.arrival_id),
+        resolveArrivalNumber(after.arrival_id)
+      ])
+      diffBefore.arrival_number = beforeArrivalNumber
+      diffAfter.arrival_number = afterArrivalNumber
+    }
+
+    if (before.departure_id !== after.departure_id) {
+      const [beforeDepartureNumber, afterDepartureNumber] = await Promise.all([
+        resolveDepartureNumber(before.departure_id),
+        resolveDepartureNumber(after.departure_id)
+      ])
+      diffBefore.departure_number = beforeDepartureNumber
+      diffAfter.departure_number = afterDepartureNumber
+    }
+
+    if (before.hold_id !== after.hold_id) {
+      const [beforeHoldNumber, afterHoldNumber] = await Promise.all([
+        resolveHoldNumber(before.hold_id),
+        resolveHoldNumber(after.hold_id)
+      ])
+      diffBefore.hold_number = beforeHoldNumber
+      diffAfter.hold_number = afterHoldNumber
+    }
+
+    if (before.purchase_invoice_id !== after.purchase_invoice_id) {
+      const [beforeInvoiceNumber, afterInvoiceNumber] = await Promise.all([
+        resolveInvoiceNumber(before.purchase_invoice_id),
+        resolveInvoiceNumber(after.purchase_invoice_id)
+      ])
+      diffBefore.invoice_number = beforeInvoiceNumber
+      diffAfter.invoice_number = afterInvoiceNumber
+    }
+
+    if (before.location_id !== after.location_id) {
+      const [beforeLocation, afterLocation] = await Promise.all([
+        resolveLocationString(before.location_id),
+        resolveLocationString(after.location_id)
+      ])
+      diffBefore.location = beforeLocation
+      diffAfter.location = afterLocation
+    }
+
+    if (before.model_id !== after.model_id && before.model_id && after.model_id) {
+      const [beforeModel, afterModel] = await Promise.all([
+        prisma.model.findUnique({ where: { id: before.model_id }, select: { name: true } }),
+        prisma.model.findUnique({ where: { id: after.model_id }, select: { name: true } })
+      ])
+      diffBefore.model_name = beforeModel?.name
+      diffAfter.model_name = afterModel?.name
+    }
+
+    if (
+      before.technical_status_id !== after.technical_status_id &&
+      before.technical_status_id &&
+      after.technical_status_id
+    ) {
+      const [beforeStatus, afterStatus] = await Promise.all([
+        prisma.technicalStatus.findUnique({
+          where: { id: before.technical_status_id },
+          select: { status: true }
+        }),
+        prisma.technicalStatus.findUnique({
+          where: { id: after.technical_status_id },
+          select: { status: true }
+        })
+      ])
+      diffBefore.technical_status = beforeStatus?.status
+      diffAfter.technical_status = afterStatus?.status
+    }
+
+    const plainFields = [
+      'serial_number',
+      'meter_black', 'meter_colour', 'meter_total',
+      'cassettes', 'internal_finisher',
+      'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k',
+      'purchase_cost', 'transport_cost', 'processing_cost', 'other_cost',
+      'parts_cost', 'total_cost', 'sale_price'
+    ]
+    for (const field of plainFields) {
+      const beforeVal = (before as Record<string, unknown>)[field]
+      const afterVal = (after as Record<string, unknown>)[field]
+      if (beforeVal !== afterVal) {
+        diffBefore[field] = beforeVal
+        diffAfter[field] = afterVal
+      }
+    }
+
+    if (JSON.stringify(before.error_ids) !== JSON.stringify(after.error_ids)) {
+      const [beforeErrors, afterErrors] = await Promise.all([
+        prisma.error.findMany({
+          where: { id: { in: before.error_ids ?? [] } },
+          select: { code: true }
+        }),
+        prisma.error.findMany({
+          where: { id: { in: after.error_ids ?? [] } },
+          select: { code: true }
+        })
+      ])
+      diffBefore.error_codes = beforeErrors.map(e => e.code)
+      diffAfter.error_codes = afterErrors.map(e => e.code)
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Asset', assetId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Asset ${assetId}]:`, error)
+  }
 }
 
 // ─── Departure ────────────────────────────────────────────────────────────────
 
-export async function recordDepartureCreate(departureId: number, state: DepartureState, userId: number): Promise<void> {
-  await recordHistory('Departure', departureId, 'CREATE', userId, { after: state })
+export async function recordDepartureCreate(
+  departureId: number,
+  state: DepartureCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [warehouse, customer, user] = await Promise.all([
+      prisma.warehouse.findUnique({ where: { id: state.origin_id }, select: { city_code: true } }),
+      prisma.organization.findUnique({
+        where: { id: state.destination_id },
+        select: { name: true }
+      }),
+      prisma.user.findUnique({ where: { id: userId }, select: { name: true } })
+    ])
+    await recordHistory('Departure', departureId, 'CREATE', userId, {
+      after: {
+        departure_number: state.departure_number,
+        origin_city_code: warehouse?.city_code,
+        destination_name: customer?.name,
+        created_by_name: user?.name,
+        created_at: state.created_at
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Departure ${departureId}]:`, error)
+  }
 }
 
-export async function recordDepartureUpdate(departureId: number, before: DepartureUpdateFields, after: DepartureUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Departure', departureId, 'UPDATE', userId, diff)
+export async function recordDepartureUpdate(
+  departureId: number,
+  before: DepartureUpdateFields,
+  after: DepartureUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.origin_id !== after.origin_id && before.origin_id && after.origin_id) {
+      const wh = await resolveWarehouseDiff(before.origin_id, after.origin_id)
+      diffBefore.origin_city_code = wh.before
+      diffAfter.origin_city_code = wh.after
+    }
+
+    if (before.destination_id !== after.destination_id && before.destination_id && after.destination_id) {
+      const org = await resolveOrgDiff(before.destination_id, after.destination_id)
+      diffBefore.destination_name = org.before
+      diffAfter.destination_name = org.after
+    }
+
+    if (before.transporter_id !== after.transporter_id && before.transporter_id && after.transporter_id) {
+      const org = await resolveOrgDiff(before.transporter_id, after.transporter_id)
+      diffBefore.transporter_name = org.before
+      diffAfter.transporter_name = org.after
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Departure', departureId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Departure ${departureId}]:`, error)
+  }
 }
 
 // ─── Hold ─────────────────────────────────────────────────────────────────────
 
-export async function recordHoldCreate(holdId: number, state: HoldState, userId: number): Promise<void> {
-  await recordHistory('Hold', holdId, 'CREATE', userId, { after: state })
+export async function recordHoldCreate(
+  holdId: number,
+  state: HoldCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [createdBy, createdFor, customer] = await Promise.all([
+      prisma.user.findUnique({ where: { id: userId }, select: { name: true } }),
+      prisma.user.findUnique({ where: { id: state.created_for_id }, select: { name: true } }),
+      prisma.organization.findUnique({ where: { id: state.customer_id }, select: { name: true } })
+    ])
+    await recordHistory('Hold', holdId, 'CREATE', userId, {
+      after: {
+        hold_number: state.hold_number,
+        created_by_name: createdBy?.name,
+        created_for_name: createdFor?.name,
+        customer_name: customer?.name,
+        created_at: state.created_at
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Hold ${holdId}]:`, error)
+  }
 }
 
-export async function recordHoldUpdate(holdId: number, before: HoldUpdateFields, after: HoldUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Hold', holdId, 'UPDATE', userId, diff)
+export async function recordHoldUpdate(
+  holdId: number,
+  before: HoldUpdateFields,
+  after: HoldUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.created_for_id !== after.created_for_id && before.created_for_id && after.created_for_id) {
+      const user = await resolveUserDiff(before.created_for_id, after.created_for_id)
+      diffBefore.created_for_name = user.before
+      diffAfter.created_for_name = user.after
+    }
+
+    if (before.customer_id !== after.customer_id && before.customer_id && after.customer_id) {
+      const org = await resolveOrgDiff(before.customer_id, after.customer_id)
+      diffBefore.customer_name = org.before
+      diffAfter.customer_name = org.after
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Hold', holdId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Hold ${holdId}]:`, error)
+  }
 }
 
 // ─── Invoice ──────────────────────────────────────────────────────────────────
 
-export async function recordInvoiceCreate(invoiceId: number, state: InvoiceState, userId: number): Promise<void> {
-  await recordHistory('Invoice', invoiceId, 'CREATE', userId, { after: state })
+export async function recordInvoiceCreate(
+  invoiceId: number,
+  state: InvoiceCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [customer, invoiceType] = await Promise.all([
+      prisma.organization.findUnique({
+        where: { id: state.organization_id },
+        select: { name: true }
+      }),
+      prisma.invoiceType.findUnique({
+        where: { id: state.invoice_type_id },
+        select: { type: true }
+      })
+    ])
+    await recordHistory('Invoice', invoiceId, 'CREATE', userId, {
+      after: {
+        invoice_number: state.invoice_number,
+        customer_name: customer?.name,
+        invoice_type: invoiceType?.type,
+        created_at: state.created_at
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Invoice ${invoiceId}]:`, error)
+  }
 }
 
-export async function recordInvoiceUpdate(invoiceId: number, before: InvoiceUpdateFields, after: InvoiceUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Invoice', invoiceId, 'UPDATE', userId, diff)
+export async function recordInvoiceUpdate(
+  invoiceId: number,
+  before: InvoiceUpdateFields,
+  after: InvoiceUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.is_cleared !== after.is_cleared) {
+      diffBefore.is_cleared = before.is_cleared
+      diffAfter.is_cleared = after.is_cleared
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Invoice', invoiceId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Invoice ${invoiceId}]:`, error)
+  }
 }
 
 // ─── Transfer ─────────────────────────────────────────────────────────────────
 
-export async function recordTransferCreate(transferId: number, state: TransferState, userId: number): Promise<void> {
-  await recordHistory('Transfer', transferId, 'CREATE', userId, { after: state })
+export async function recordTransferCreate(
+  transferId: number,
+  state: TransferCreateState,
+  userId: number
+): Promise<void> {
+  try {
+    const [origin, destination, user] = await Promise.all([
+      prisma.warehouse.findUnique({ where: { id: state.origin_id }, select: { city_code: true } }),
+      prisma.warehouse.findUnique({
+        where: { id: state.destination_id },
+        select: { city_code: true }
+      }),
+      prisma.user.findUnique({ where: { id: userId }, select: { name: true } })
+    ])
+    await recordHistory('Transfer', transferId, 'CREATE', userId, {
+      after: {
+        transfer_number: state.transfer_number,
+        origin_city_code: origin?.city_code,
+        destination_city_code: destination?.city_code,
+        created_by_name: user?.name,
+        created_at: state.created_at
+      }
+    })
+  } catch (error) {
+    console.error(`History write failed [CREATE Transfer ${transferId}]:`, error)
+  }
 }
 
-export async function recordTransferUpdate(transferId: number, before: TransferUpdateFields, after: TransferUpdateFields, userId: number): Promise<void> {
-  const diff = buildUpdateDiff(before as Record<string, unknown>, after as Record<string, unknown>)
-  if (diff) await recordHistory('Transfer', transferId, 'UPDATE', userId, diff)
+export async function recordTransferUpdate(
+  transferId: number,
+  before: TransferUpdateFields,
+  after: TransferUpdateFields,
+  userId: number
+): Promise<void> {
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (before.origin_id !== after.origin_id && before.origin_id && after.origin_id) {
+      const wh = await resolveWarehouseDiff(before.origin_id, after.origin_id)
+      diffBefore.origin_city_code = wh.before
+      diffAfter.origin_city_code = wh.after
+    }
+
+    if (before.destination_id !== after.destination_id && before.destination_id && after.destination_id) {
+      const wh = await resolveWarehouseDiff(before.destination_id, after.destination_id)
+      diffBefore.destination_city_code = wh.before
+      diffAfter.destination_city_code = wh.after
+    }
+
+    if (before.transporter_id !== after.transporter_id && before.transporter_id && after.transporter_id) {
+      const org = await resolveOrgDiff(before.transporter_id, after.transporter_id)
+      diffBefore.transporter_name = org.before
+      diffAfter.transporter_name = org.after
+    }
+
+    if (Object.keys(diffAfter).length > 0) {
+      await recordHistory('Transfer', transferId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+  } catch (error) {
+    console.error(`History write failed [UPDATE Transfer ${transferId}]:`, error)
+  }
 }

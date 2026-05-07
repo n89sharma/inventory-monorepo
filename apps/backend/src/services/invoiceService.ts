@@ -31,7 +31,6 @@ export async function createInvoice(data: CreateInvoice, userId: number): Promis
       invoice_number: data.invoice_number,
       organization_id: data.organization_id,
       invoice_type_id: data.invoice_type_id,
-      is_cleared: data.is_cleared,
       created_at: now
     }, userId)
 

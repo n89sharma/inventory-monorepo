@@ -100,8 +100,6 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     departure_number: departureNumber,
     origin_id: departure.origin.id,
     destination_id: departure.customer.id,
-    transporter_id: departure.transporter.id,
-    notes: departure.comment ?? null,
     created_at: currentDateTime
   }, userId)
 
@@ -154,13 +152,11 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
   await recordDepartureUpdate(departure.id, {
     origin_id: currentDeparture?.origin_id,
     destination_id: currentDeparture?.destination_id,
-    transporter_id: currentDeparture?.transporter_id,
-    notes: currentDeparture?.notes
+    transporter_id: currentDeparture?.transporter_id
   }, {
     origin_id: departure.origin.id,
     destination_id: departure.customer.id,
-    transporter_id: departure.transporter.id,
-    notes: departure.comment
+    transporter_id: departure.transporter.id
   }, userId)
 
   for (const assetId of assetIdsToRemove) {

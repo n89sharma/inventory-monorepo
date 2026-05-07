@@ -87,8 +87,6 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
     transfer_number: transferNumber,
     origin_id: transfer.origin.id,
     destination_id: transfer.destination.id,
-    transporter_id: transfer.transporter.id,
-    notes: transfer.comment ?? null,
     created_at: currentDateTime
   }, userId)
 
@@ -128,13 +126,11 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
   await recordTransferUpdate(transfer.id, {
     origin_id: currentTransfer?.origin_id,
     destination_id: currentTransfer?.destination_id,
-    transporter_id: currentTransfer?.transporter_id,
-    notes: currentTransfer?.notes
+    transporter_id: currentTransfer?.transporter_id
   }, {
     origin_id: transfer.origin.id,
     destination_id: transfer.destination.id,
-    transporter_id: transfer.transporter.id,
-    notes: transfer.comment
+    transporter_id: transfer.transporter.id
   }, userId)
 }
 

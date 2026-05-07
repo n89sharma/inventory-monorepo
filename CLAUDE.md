@@ -60,6 +60,21 @@ function SearchPopoverContent({ isLoading, hasResults, ... }) {
 
 ---
 
+## Code Style
+
+**Line length:** Keep all lines under 100 characters (ruler at col 100).
+- Wrap function signatures so each parameter is on its own line, with the return type on a separate line:
+  ```ts
+  export async function myFunction(
+    paramOne: string,
+    paramTwo: number,
+    userId: number
+  ): Promise<void> {
+  ```
+- Wrap long object arguments (e.g. Prisma queries) when the single-line form exceeds 100 chars.
+
+---
+
 ## Developer Guide
 
 ### The Stack
