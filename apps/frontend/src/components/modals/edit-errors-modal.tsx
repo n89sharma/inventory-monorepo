@@ -101,21 +101,21 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
         </div>
 
         <div className="rounded-md border">
-          <div className="flex items-center border-b px-3 py-1.5 text-sm text-muted-foreground">
+          <div className="flex items-center border-b px-3 py-1.5 text-muted-foreground">
             <span className="flex-1">Code</span>
             <span className="w-16 text-center">Fixed?</span>
             <span className="w-8" />
           </div>
           {localErrors.length === 0
             ? (
-              <p className="px-3 py-4 text-center text-sm text-muted-foreground">
+              <p className="px-3 py-4 text-center text-muted-foreground">
                 No errors — add at least one.
               </p>
             )
             : localErrors.map(e => {
               const description = allErrors.find(a => a.code === e.code)?.description
               return (
-                <div key={e.code} className="flex items-center border-b px-3 py-2 text-sm last:border-0">
+                <div key={e.code} className="flex items-center border-b px-3 py-2 last:border-0">
                   <div className="flex flex-1 flex-col">
                     <span className="font-medium">{e.code}</span>
                     {description && <span className="text-xs text-muted-foreground">{description}</span>}

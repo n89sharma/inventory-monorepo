@@ -13,7 +13,7 @@ type CMYKDataProps = {
   m_value: number | undefined | null,
   y_value: number | undefined | null,
   k_value: number | undefined | null,
-  className?: string
+  rowClassName?: string
 }
 
 type ErrorRowProps = {
@@ -23,44 +23,47 @@ type ErrorRowProps = {
 
 type InvoiceClearedRowProps = {
   isCleared: boolean,
-  className?: string
+  rowClassName?: string
 }
 
 type AccessoryDataProps = {
   label: string,
   accessories: string[],
-  className?: string
+  rowClassName?: string
 }
 
 type DataRowProps = {
   label: string,
   children: React.ReactNode,
-  className?: string
+  rowClassName?: string,
+  labelClassName?: string
 }
 
 type DataValueRowProps = {
   label: string,
   value: string | number | undefined | null,
-  className?: string
+  rowClassName?: string,
+  labelClassName?: string,
+  valueClassName?: string
 }
 
 type DataCurrencyRowProps = {
   label: string,
   value: number | null | undefined,
-  className?: string
+  rowClassName?: string
 }
 
 type DataLinkRowProps = {
   label: string,
   value: string | undefined | null,
   to: string,
-  className?: string
+  rowClassName?: string
 }
 
 type DataDateRowProps = {
   label: string,
   value: Date | null | undefined,
-  className?: string
+  rowClassName?: string
 }
 
 type LabelProps = {
@@ -75,7 +78,7 @@ type ValueProps = {
 
 export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
   return (
-    <dt className={cn("text-left text-muted-foreground min-w-28", className)}>
+    <dt className={cn("text-left text-muted-foreground min-w-26", className)}>
       {label}
     </dt>
   )
@@ -94,28 +97,43 @@ export function DataValue({ value, className }: ValueProps): React.JSX.Element {
 }
 
 // Composable shell — label + arbitrary children in the value slot
-export function DataRow({ label, children, className }: DataRowProps): React.JSX.Element {
+export function DataRow({
+  label,
+  children,
+  rowClassName,
+  labelClassName
+}: DataRowProps): React.JSX.Element {
   return (
-    <div className={cn("flex items-start gap-4 py-1.5 text-sm", className)}>
-      <DataLabel label={label} />
+    <div className={cn("flex items-start gap-4 py-1.5", rowClassName)}>
+      <DataLabel label={label} className={labelClassName} />
       {children}
     </div>
   )
 }
 
 // Plain text value row
-export function DataValueRow({ label, value, className }: DataValueRowProps): React.JSX.Element {
+export function DataValueRow({
+  label,
+  value,
+  rowClassName,
+  labelClassName,
+  valueClassName
+}: DataValueRowProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
-      <DataValue value={value} />
+    <DataRow label={label} rowClassName={rowClassName} labelClassName={labelClassName}>
+      <DataValue value={value} className={valueClassName} />
     </DataRow>
   )
 }
 
 // Currency value row — formats number internally, shows '-' for null/undefined
-export function DataCurrencyRow({ label, value, className }: DataCurrencyRowProps): React.JSX.Element {
+export function DataCurrencyRow({
+  label,
+  value,
+  rowClassName
+}: DataCurrencyRowProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
+    <DataRow label={label} rowClassName={rowClassName}>
       <dd className="flex min-w-0 items-center gap-1">
         {value != null && <span><CurrencyDollarIcon /></span>}
         <span className="tabular-nums text-right w-20">
@@ -127,9 +145,14 @@ export function DataCurrencyRow({ label, value, className }: DataCurrencyRowProp
 }
 
 // Link value row
-export function DataLinkRow({ label, value, to, className }: DataLinkRowProps): React.JSX.Element {
+export function DataLinkRow({
+  label,
+  value,
+  to,
+  rowClassName
+}: DataLinkRowProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
+    <DataRow label={label} rowClassName={rowClassName}>
       <dd className="group flex min-w-0 items-center gap-2">
         {value
           ? <Link to={to} className="text-primary hover:underline wrap-break-words min-w-0">{value}</Link>
@@ -141,9 +164,13 @@ export function DataLinkRow({ label, value, to, className }: DataLinkRowProps): 
 }
 
 // Date value row — formats Date internally, shows '-' for null/undefined
-export function DataDateRow({ label, value, className }: DataDateRowProps): React.JSX.Element {
+export function DataDateRow({
+  label,
+  value,
+  rowClassName
+}: DataDateRowProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
+    <DataRow label={label} rowClassName={rowClassName}>
       <dd>
         {value ? formatDate(value) : '-'}
       </dd>
@@ -157,10 +184,10 @@ export function CMYKRow({
   m_value,
   y_value,
   k_value,
-  className
+  rowClassName
 }: CMYKDataProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
+    <DataRow label={label} rowClassName={rowClassName}>
       <dd className="flex min-w-0 items-center gap-2">
         <span className="flex items-baseline">
           <span className="text-cyan-500 text-xs">C</span>
@@ -186,10 +213,10 @@ export function CMYKRow({
 export function AccessoryRow({
   label,
   accessories,
-  className
+  rowClassName
 }: AccessoryDataProps): React.JSX.Element {
   return (
-    <DataRow label={label} className={className}>
+    <DataRow label={label} rowClassName={rowClassName}>
       <div className="grid grid-cols-2">
         {accessories.map(a => (
           <Badge variant="outline" key={a}>{a}</Badge>
@@ -199,9 +226,12 @@ export function AccessoryRow({
   )
 }
 
-export function InvoiceClearedRow({ isCleared, className }: InvoiceClearedRowProps): React.JSX.Element {
+export function InvoiceClearedRow({
+  isCleared,
+  rowClassName
+}: InvoiceClearedRowProps): React.JSX.Element {
   return (
-    <DataRow label="Cleared?" className={className}>
+    <DataRow label="Cleared?" rowClassName={rowClassName}>
       <dd className="flex min-w-0 items-center gap-1">
         <Checkbox checked={isCleared} />
       </dd>
@@ -211,7 +241,7 @@ export function InvoiceClearedRow({ isCleared, className }: InvoiceClearedRowPro
 
 export function ErrorHeader({ className }: { className?: string }): React.JSX.Element {
   return (
-    <div className={cn("flex border-b border-t-2 items-center py-0.5 text-sm", className)}>
+    <div className={cn("flex border-b border-t-2 items-center py-0.5", className)}>
       <dt className={cn("text-muted-foreground min-w-28", className)}>Code</dt>
       <dd className={cn("text-muted-foreground", className)}>Fixed?</dd>
     </div>
@@ -220,7 +250,7 @@ export function ErrorHeader({ className }: { className?: string }): React.JSX.El
 
 export function ErrorRow({ error, className }: ErrorRowProps): React.JSX.Element {
   return (
-    <div className={cn("flex border-b py-0.5 text-sm", className)}>
+    <div className={cn("flex border-b py-0.5", className)}>
       <dt className={cn("text-left font-medium text-semibold min-w-28", className)}>
         {error.code}
       </dt>
@@ -233,7 +263,7 @@ export function ErrorRow({ error, className }: ErrorRowProps): React.JSX.Element
 
 export function PartsHeader({ className }: { className?: string }): React.JSX.Element {
   return (
-    <div className={cn("flex items-center py-0.5 text-sm", className)}>
+    <div className={cn("flex items-center py-0.5", className)}>
       <dt className={cn("text-muted-foreground min-w-28", className)}>Part</dt>
       <dd className={cn("text-muted-foreground", className)}>Donor</dd>
     </div>

@@ -43,9 +43,9 @@ function toNum(value: string): number {
 function PriceInput({ label, value, onChange }: { label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium">{label}</label>
+      <label className="font-medium">{label}</label>
       <div className="relative">
-        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm">$</span>
+        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
         <Input
           value={value}
           onChange={onChange}
@@ -61,10 +61,10 @@ function PriceInput({ label, value, onChange }: { label: string; value: string; 
 function ReadOnlyPrice({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium">{label}</label>
+      <label className="font-medium">{label}</label>
       <div className="relative">
-        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm">$</span>
-        <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border pl-7 pr-3 text-sm">
+        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
+        <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border pl-7 pr-3">
           {formatUSD(value)}
         </div>
       </div>

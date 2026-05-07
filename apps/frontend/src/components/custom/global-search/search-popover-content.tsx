@@ -30,7 +30,7 @@ export function SearchPopoverContent({ isLoading, hasResults, results, activeTab
   )
 
   if (!hasResults) return (
-    <p className="py-6 text-center text-sm text-muted-foreground">No results</p>
+    <p className="py-6 text-center text-muted-foreground">No results</p>
   )
 
   return (

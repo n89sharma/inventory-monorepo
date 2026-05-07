@@ -69,7 +69,7 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
         <div className="flex flex-col gap-4">
           <Field>
             <FieldLabel>Recipient Asset</FieldLabel>
-            <p className="text-sm">{recipientBarcode}</p>
+            <p>{recipientBarcode}</p>
           </Field>
 
           <Controller
@@ -114,7 +114,7 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
                   onCheckedChange={field.onChange}
                   id="is_exchange"
                 />
-                <label htmlFor="is_exchange" className="text-sm cursor-pointer">
+                <label htmlFor="is_exchange" className="cursor-pointer">
                   Exchange (part swapped in both directions)
                 </label>
               </div>

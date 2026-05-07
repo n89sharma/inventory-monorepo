@@ -82,7 +82,7 @@ export function AppSidebar(): React.JSX.Element {
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <StackIcon aria-hidden="true" />
               </div>
-              <div className="flex items-center text-sm">
+              <div className="flex items-center">
                 <span className="truncate font-medium">Shiva Exports Ltd</span>
               </div>
             </div>

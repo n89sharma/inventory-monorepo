@@ -63,7 +63,7 @@ function PriceCell({ value, onChange }: { value: string; onChange: (v: string) =
         onChange={e => onChange(sanitize(e.target.value))}
         inputMode="decimal"
         placeholder="0.00"
-        className="h-8 pl-5 text-sm"
+        className="h-8 pl-5"
       />
     </div>
   )

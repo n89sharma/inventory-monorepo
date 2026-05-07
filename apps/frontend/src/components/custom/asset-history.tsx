@@ -42,7 +42,7 @@ function FieldDiffRow(
   const beforeStr = formatFieldValue(before)
   const afterStr = formatFieldValue(after)
   return (
-    <div className="flex gap-2 text-sm">
+    <div className="flex gap-2">
       <span className="text-muted-foreground w-36 shrink-0">{label}</span>
       <span>{beforeStr} → {afterStr}</span>
     </div>
@@ -53,12 +53,12 @@ function AssetHistoryCreateEntry({ record }: { record: CreateRecord }) {
   const { after } = record.changes
   return (
     <div className="flex justify-between items-start gap-4">
-      <p className="text-sm">
+      <p>
         {after.barcode} {after.brand_name} {after.model_name} {after.serial_number} created
         by {record.user_name}
         {after.arrival_number ? ` (arrival ${after.arrival_number})` : ''}
       </p>
-      <span className="text-sm text-muted-foreground whitespace-nowrap">
+      <span className="text-muted-foreground whitespace-nowrap">
         {formatHistoryTimestamp(record.changed_on)}
       </span>
     </div>
@@ -73,8 +73,8 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex justify-between items-start gap-4">
-        <p className="text-sm font-medium">Asset updated by {record.user_name}</p>
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
+        <p className="font-medium">Asset updated by {record.user_name}</p>
+        <span className="text-muted-foreground whitespace-nowrap">
           {formatHistoryTimestamp(record.changed_on)}
         </span>
       </div>
@@ -89,7 +89,7 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
 
 export function AssetHistoryList({ history }: { history: AssetHistory }) {
   if (history.length === 0) {
-    return <p className="text-sm text-muted-foreground">No history on record</p>
+    return <p className="text-muted-foreground">No history on record</p>
   }
   return (
     <div className="flex flex-col gap-4">

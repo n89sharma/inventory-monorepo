@@ -69,15 +69,15 @@ function InformationSection({ assetCount, selected, duplicateCount, isLoadingDet
   let secondLine: React.ReactNode = null
   if (selected !== null) {
     if (isLoadingDetail) {
-      secondLine = <p className="text-sm text-muted-foreground">Checking for duplicates…</p>
+      secondLine = <p className="text-muted-foreground">Checking for duplicates…</p>
     } else if (duplicateCount > 0) {
-      secondLine = <p className="text-sm text-amber-600">Found {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}. Duplicates will be skipped</p>
+      secondLine = <p className="text-amber-600">Found {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}. Duplicates will be skipped</p>
     }
   }
 
   return (
     <div className="flex flex-col gap-1 rounded-md border px-3 py-2">
-      <p className="text-sm">
+      <p>
         Add {assetCount} asset{assetCount !== 1 ? 's' : ''} to{target}
       </p>
       {secondLine}

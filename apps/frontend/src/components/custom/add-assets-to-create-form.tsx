@@ -68,7 +68,7 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
             onChange={() => setBarcodeError(null)}
           />
           {barcodeError && (
-            <p className='text-sm text-destructive mt-1'>{barcodeError}</p>
+            <p className='text-destructive mt-1'>{barcodeError}</p>
           )}
         </Field>
       </div>
@@ -112,8 +112,8 @@ export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: Add
 
           <div className='flex flex-col'>
             <div className='flex-1 flex flex-col justify-center gap-1'>
-              <p className='text-sm font-medium'>Hold</p>
-              <p className='text-sm text-muted-foreground'>Adds all assets from the selected hold</p>
+              <p className='font-medium'>Hold</p>
+              <p className='text-muted-foreground'>Adds all assets from the selected hold</p>
             </div>
             <Button
               variant='secondary'

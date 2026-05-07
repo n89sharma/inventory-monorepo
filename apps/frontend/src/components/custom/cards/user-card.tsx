@@ -11,8 +11,8 @@ export function UserCard({ title, user }: { title: string, user: User }) {
       </CardHeader>
       <CardContent>
         <DataRowContainer>
-          <DataValueRow label="Name" value={user.name} />
-          <DataValueRow label="Email" value={user.email} />
+          <DataValueRow label="Name" value={user.name} labelClassName="min-w-20"/>
+          <DataValueRow label="Email" value={user.email} labelClassName="min-w-20"/>
         </DataRowContainer>
       </CardContent>
     </Card>

@@ -69,17 +69,17 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
 
               <Field className='max-w-60'>
                 <FieldLabel>Invoice Number</FieldLabel>
-                <p className='text-sm py-2'>{defaultValues.invoice_number}</p>
+                <p className='py-2'>{defaultValues.invoice_number}</p>
               </Field>
 
               <Field className='max-w-60'>
                 <FieldLabel>Organization</FieldLabel>
-                <p className='text-sm py-2'>{defaultValues.organization.name}</p>
+                <p className='py-2'>{defaultValues.organization.name}</p>
               </Field>
 
               <Field className='max-w-60'>
                 <FieldLabel>Invoice Type</FieldLabel>
-                <p className='text-sm py-2'>{defaultValues.invoice_type.type}</p>
+                <p className='py-2'>{defaultValues.invoice_type.type}</p>
               </Field>
 
             </FieldGroup>

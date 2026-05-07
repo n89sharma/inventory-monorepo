@@ -12,11 +12,11 @@ export function Organization({ title, org }: { title: string, org: OrgDetail }) 
       </CardHeader>
       <CardContent>
         <DataRowContainer>
-          <DataValueRow label="Name" value={org.name} />
-          <DataValueRow label="Phone" value={org.phone} />
-          <DataValueRow label="Email" value={org.primary_email} />
-          <DataValueRow label="Account" value={org.account_number} />
-          <DataValueRow label="Address" value={org.address} />
+          <DataValueRow label="Name" value={org.name} labelClassName="min-w-20" />
+          <DataValueRow label="Phone" value={org.phone} labelClassName="min-w-20" />
+          <DataValueRow label="Email" value={org.primary_email} labelClassName="min-w-20" />
+          <DataValueRow label="Account" value={org.account_number} labelClassName="min-w-20" />
+          <DataValueRow label="Address" value={org.address} labelClassName="min-w-20" />
         </DataRowContainer>
       </CardContent>
     </Card>

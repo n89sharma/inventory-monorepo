@@ -119,9 +119,9 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
           </Field>
 
           {fetchingLocations
-            ? <div className="flex items-center gap-2 text-sm text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading locations…</div>
+            ? <div className="flex items-center gap-2 text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading locations…</div>
             : selectedWarehouse && locations.length === 0
-              ? <p className="text-sm text-muted-foreground">No locations available</p>
+              ? <p className="text-muted-foreground">No locations available</p>
               : <PopoverSearch
                   selection={selectedLocation}
                   onSelectionChange={setSelectedLocation}

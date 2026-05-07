@@ -28,7 +28,7 @@ export function TransferSection({ transfers }: TransferSectionProps) {
         <SectionHeader title="Transfer" />
         {transfers.length > 0 && (
           <div className="flex items-center justify-between w-full ml-10">
-            <span className="text-sm font-medium text-muted-foreground">{`${currentIndex + 1}/${transfers.length}`}</span>
+            <span className="font-medium text-muted-foreground">{`${currentIndex + 1}/${transfers.length}`}</span>
             <div>
               <Button variant="outline" size="xs" onClick={handlePreviousTransfer} aria-label="Previous transfer">
                 <CaretLeftIcon weight="fill" aria-hidden="true" />

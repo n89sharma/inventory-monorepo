@@ -29,8 +29,8 @@ export function Comment({
         </Avatar>
         <div className="flex flex-col gap-1">
           <div className="flex flex-row gap-4">
-            <span className="text-sm font-semibold">{user}</span>
-            <span className="text-sm text-muted-foreground">{date}</span>
+            <span className="font-semibold">{user}</span>
+            <span className="text-muted-foreground">{date}</span>
           </div>
           <div className="flex flex-row gap-2">
             {

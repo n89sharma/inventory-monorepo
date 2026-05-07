@@ -6,6 +6,10 @@
 
 @theme {
   --font-sans: "Geist Variable", sans-serif;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: calc(1.25 / 0.8125);
+  --text-base: 0.875rem;
+  --text-base--line-height: calc(1.5 / 0.875);
 }
 
 @theme inline {

@@ -33,7 +33,7 @@ function ResultButton({ label, sub, onClick }: { label: string; sub: string; onC
   return (
     <button
       type="button"
-      className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+      className="w-full rounded-md px-3 py-2 text-left hover:bg-muted"
       onClick={onClick}
     >
       <span className="font-medium">{label}</span>
@@ -71,9 +71,9 @@ function SearchContent({ query, isLoading, results, onSelect }: {
   results: CollectionResults
   onSelect: (c: SelectedCollection) => void
 }) {
-  if (!query) return <p className="px-3 py-2 text-sm text-muted-foreground">Start typing above to see suggestions…</p>
-  if (isLoading) return <p className="px-3 py-2 text-sm text-muted-foreground">Searching…</p>
-  if (!hasAnyResults(results)) return <p className="px-3 py-2 text-sm text-muted-foreground">No results.</p>
+  if (!query) return <p className="px-3 py-2 text-muted-foreground">Start typing above to see suggestions…</p>
+  if (isLoading) return <p className="px-3 py-2 text-muted-foreground">Searching…</p>
+  if (!hasAnyResults(results)) return <p className="px-3 py-2 text-muted-foreground">No results.</p>
   return <ResultsList results={results} onSelect={onSelect} />
 }
 
@@ -88,7 +88,7 @@ export function SearchView({ query, onQueryChange, isLoading, results, onSelect,
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">{label}</label>
+        <label className="font-medium">{label}</label>
         <Input
           autoFocus
           placeholder="Search by ID…"
@@ -111,10 +111,10 @@ export function DetailGrid({ title, fields, onClear }: {
   return (
     <div className="flex flex-col gap-3 rounded-md border p-2">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium px-1">{title}</p>
+        <p className="font-medium px-1">{title}</p>
         <Button variant="secondary" size="sm" onClick={onClear}>Change</Button>
       </div>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-1 text-sm">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-1">
         {fields.map(({ label, value }) => (
           <div key={label}>
             <p className="text-xs text-muted-foreground">{label}</p>

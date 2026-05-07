@@ -50,7 +50,7 @@ function toNullableInt(value: string): number | null {
 function IntInput({ label, value, onChange }: { label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium">{label}</label>
+      <label className="font-medium">{label}</label>
       <Input value={value} onChange={onChange} inputMode="numeric" placeholder="0" />
     </div>
   )
@@ -59,8 +59,8 @@ function IntInput({ label, value, onChange }: { label: string; value: string; on
 function ReadOnlyInt({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium">{label}</label>
-      <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border px-3 text-sm">
+      <label className="font-medium">{label}</label>
+      <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border px-3">
         {value}
       </div>
     </div>
@@ -145,7 +145,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         <div className="flex gap-6">
           <div className="flex flex-1 flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold">Meter</span>
+              <span className="font-semibold">Meter</span>
               <div className="grid grid-cols-2 gap-3">
                 <IntInput label="Black" value={fields.meter_black} onChange={setIntField('meter_black')} />
                 <IntInput label="Colour" value={fields.meter_colour} onChange={setIntField('meter_colour')} />
@@ -154,7 +154,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
             <ReadOnlyInt label="Meter Total" value={meterTotal} />
             <IntInput label="Cassettes" value={fields.cassettes} onChange={setIntField('cassettes')} />
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Internal Finisher</label>
+              <label className="font-medium">Internal Finisher</label>
               <Input
                 value={fields.internal_finisher}
                 onChange={e => setFields(prev => ({ ...prev, internal_finisher: e.target.value }))}
@@ -165,7 +165,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
 
           <div className="flex flex-1 flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold">Drum Life</span>
+              <span className="font-semibold">Drum Life</span>
               <div className="grid grid-cols-2 gap-3">
                 <IntInput label="C" value={fields.drum_life_c} onChange={setIntField('drum_life_c')} />
                 <IntInput label="M" value={fields.drum_life_m} onChange={setIntField('drum_life_m')} />
@@ -174,7 +174,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">Core Functions</label>
+              <label className="font-medium">Core Functions</label>
               <MultipleSelector
                 options={coreFunctionOptions}
                 value={selectedOptions}

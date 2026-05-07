@@ -11,8 +11,8 @@ export function WarehouseCard({ title, warehouse }: { title: string, warehouse: 
       </CardHeader>
       <CardContent>
         <DataRowContainer>
-          <DataValueRow label="Code" value={warehouse?.city_code} />
-          <DataValueRow label="Street" value={warehouse?.street} />
+          <DataValueRow label="Code" value={warehouse?.city_code} labelClassName="min-w-20" />
+          <DataValueRow label="Street" value={warehouse?.street} labelClassName="min-w-20" />
         </DataRowContainer>
       </CardContent>
     </Card>

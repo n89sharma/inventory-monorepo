@@ -7,5 +7,5 @@ interface OptionalSectionProps {
 export function OptionalSection({ condition, fallback, children }: OptionalSectionProps) {
   return condition
     ? <>{children}</>
-    : <p className="text-sm text-muted-foreground py-1">{fallback}</p>
+    : <p className="text-muted-foreground py-1">{fallback}</p>
 }
