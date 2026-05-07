@@ -3,6 +3,7 @@ import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataR
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
+import { AssetHistoryList } from '@/components/custom/asset-history'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
@@ -12,13 +13,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/ta
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
+import { useAssetHistory } from '@/hooks/use-asset-history'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
+import type { AssetHistory } from 'shared-types'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
+
+function AssetHistoryTabContent(
+  { barcode, enabled }: { barcode: string; enabled: boolean }
+) {
+  const { data, isLoading } = useAssetHistory(barcode, enabled)
+  if (!enabled || isLoading) {
+    return <p className="text-sm text-muted-foreground">Loading…</p>
+  }
+  return <AssetHistoryList history={data as AssetHistory} />
+}
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 
@@ -29,6 +42,7 @@ export const AssetDetailsPage = () => {
   const setLastPath = useNavigationStore(state => state.setLastPath)
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editLocationOpen, setEditLocationOpen] = useState(false)
+  const [historyEnabled, setHistoryEnabled] = useState(false)
 
   const assetDetails = data?.assetDetails ?? null
   const accessories = data?.accessories ?? []
@@ -189,7 +203,10 @@ export const AssetDetailsPage = () => {
 
         </SectionRow>
 
-        <Tabs defaultValue="comments">
+        <Tabs
+          defaultValue="comments"
+          onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
+        >
           <TabsList variant="line">
             <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2" /></TabsTrigger>
             <TabsTrigger value="history"><SectionHeader title="History" className="px-2" /></TabsTrigger>
@@ -208,8 +225,8 @@ export const AssetDetailsPage = () => {
               : <p className="text-sm text-muted-foreground">No comments on record</p>
             }
           </TabsContent>
-          <TabsContent value="history">
-            <p className="text-sm text-muted-foreground">No history on record</p>
+          <TabsContent value="history" className="py-3">
+            <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
           </TabsContent>
         </Tabs>
 

@@ -4,6 +4,7 @@ import type {
   ApiResponse,
   AssetDetails,
   AssetError,
+  AssetHistory,
   AssetLocation,
   AssetSummary,
   AssetTransfer,
@@ -168,6 +169,12 @@ export async function exportAssets(barcodes: string[], filename?: string): Promi
   a.click()
   a.remove()
   URL.revokeObjectURL(url)
+}
+
+export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
+  const { data } = await api.get<ApiResponse<AssetHistory>>(`/assets/${barcode}/history`)
+  if (data.success) return data.data
+  throw new Error(data.error.summary)
 }
 
 export async function getAssetsForQuery(
