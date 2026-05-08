@@ -1,8 +1,10 @@
 import { MainLayout } from '@/components/layout/layout'
 import { PageTitleUpdater } from '@/components/layout/page-title-updater'
 import { ProtectedRoute } from '@/components/custom/protected-route'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { ErrorFallback } from '@/components/custom/error-fallback'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { useAxiosAuth } from './hooks/use-axios-auth'
 import { useAuth } from '@clerk/react'
 import { useGlobalData } from './hooks/use-global-data'
@@ -38,19 +40,19 @@ const AssetDetailsPage     = lazy(() => import('./components/pages/asset-details
 const QueryPage            = lazy(() => import('./components/pages/query').then(m => ({ default: m.QueryPage })))
 const SettingsPage         = lazy(() => import('./components/pages/settings/settings-page').then(m => ({ default: m.SettingsPage })))
 
-function App() {
-  useAxiosAuth()
-  const { isSignedIn, isLoaded } = useAuth()
-  useGlobalData(isLoaded && !!isSignedIn)
+function AppRoutes() {
+  const location = useLocation()
 
   return (
-    <BrowserRouter>
-      <PageTitleUpdater />
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={
-          <ProtectedRoute>
-          <MainLayout>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="*" element={
+        <ProtectedRoute>
+        <MainLayout>
+          <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            resetKeys={[location.pathname]}
+          >
             <Suspense fallback={null}>
               <Routes>
                 <Route path="/" element={<Navigate to="/arrivals" replace />} />
@@ -90,10 +92,23 @@ function App() {
                 <Route path="/settings" element={<SettingsPage />} />
               </Routes>
             </Suspense>
-          </MainLayout>
-          </ProtectedRoute>
-        } />
-      </Routes>
+          </ErrorBoundary>
+        </MainLayout>
+        </ProtectedRoute>
+      } />
+    </Routes>
+  )
+}
+
+function App() {
+  useAxiosAuth()
+  const { isSignedIn, isLoaded } = useAuth()
+  useGlobalData(isLoaded && !!isSignedIn)
+
+  return (
+    <BrowserRouter>
+      <PageTitleUpdater />
+      <AppRoutes />
     </BrowserRouter>
   )
 }
