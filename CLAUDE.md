@@ -132,7 +132,7 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 
 **Logging:** Never use `console.log/error/warn` in the backend — import `logger` from `src/lib/logger.ts` instead. HTTP logging (Morgan) and Prisma query events are handled automatically; do not add manual logs in routes or services. Use `logger.error` for failures (include `requestId`), `logger.warn` for slow/recoverable issues, `logger.info` for lifecycle events, `logger.debug` for dev-only detail.
 
-**Authentication:** Not yet implemented. Any field requiring a `created_by` / `updated_by` user ID defaults to hardcoded ID `178`.
+**Authentication:** Clerk is integrated end-to-end. `requireAuth` middleware resolves the Clerk JWT to a local DB user and stores the result in `res.locals.dbUserId`. All controllers pass `res.locals.dbUserId` to service functions for `created_by` / `updated_by` fields. No hardcoded user IDs anywhere in the codebase.
 
 **Prisma:** Schema at `apps/backend/prisma/schema.prisma`. Generated client at `apps/backend/generated/prisma`. Config at `apps/backend/prisma.config.ts`. Preview features: `relationJoins`, `typedSql`.
 

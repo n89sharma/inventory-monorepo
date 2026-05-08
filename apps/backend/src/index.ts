@@ -2,6 +2,7 @@ import { clerkMiddleware } from '@clerk/express'
 import cors from 'cors'
 import 'dotenv/config'
 import express, { Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
 import morgan from 'morgan'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
@@ -25,8 +26,17 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 morgan.token('id', (req: Request) => req.id)
 
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' },
+})
+
 app.use(clerkMiddleware())
 app.use('/webhooks', webhookRoutes)
+app.use(limiter)
 app.use(express.json());
 app.use(cors({
   origin: [
