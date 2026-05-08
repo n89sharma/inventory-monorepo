@@ -12,8 +12,8 @@ const SEQ_NAMES: Record<string, string> = {
 export async function getNextSequence(entityType: string): Promise<number> {
   const seqName = SEQ_NAMES[entityType.toLowerCase()]
   if (!seqName) throw new Error(`Unknown sequence entity type: ${entityType}`)
-  const result = await prisma.$queryRawUnsafe<[{ nextval: bigint }]>(
-    `SELECT nextval('public.${seqName}')`
-  )
+  const result = await prisma.$queryRaw<[{ nextval: bigint }]>`
+    SELECT nextval(${`public.${seqName}`}::regclass)
+  `
   return Number(result[0].nextval)
 }

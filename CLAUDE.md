@@ -136,6 +136,8 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 
 **Prisma:** Schema at `apps/backend/prisma/schema.prisma`. Generated client at `apps/backend/generated/prisma`. Config at `apps/backend/prisma.config.ts`. Preview features: `relationJoins`, `typedSql`.
 
+**Raw query safety:** Never use `$queryRawUnsafe` or `$executeRawUnsafe` — they disable Prisma's parameterization and open SQL injection vectors. Always use the tagged-template forms: `` prisma.$queryRaw`SELECT ...` `` and `` prisma.$executeRaw`...` ``. If a DB identifier (table/sequence name) must be interpolated, cast it via `::regclass` or validate against an explicit whitelist before passing it in.
+
 ---
 
 ### Frontend Layers (`apps/frontend/src/`)
