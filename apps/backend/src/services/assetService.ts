@@ -137,7 +137,7 @@ function mapDeparture(r: getAssetDetailsQuery.Result) {
   return {
     departure_number: r.departure_number,
     origin_code: r.departure_origin_city_code,
-    origin_street: r.departure_origin_city_code,
+    origin_street: r.departure_origin_street,
     destination: r.departure_destination,
     transporter: r.departure_transporter,
     created_by: r.departure_created_by_name,
@@ -395,7 +395,68 @@ export async function bulkUpdateAssetPricing(
   items: BulkUpdateAssetPricing['items'],
   userId: number
 ): Promise<void> {
-  await Promise.all(items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing, userId)))
+  const assets = await prisma.asset.findMany({
+    where: { barcode: { in: items.map(i => i.barcode) } },
+    select: { id: true, barcode: true }
+  })
+  if (assets.length !== items.length) {
+    const found = new Set(assets.map(a => a.barcode))
+    const missing = items.map(i => i.barcode).filter(b => !found.has(b))
+    throw new NotFoundError(`Assets not found: ${missing.join(', ')}`)
+  }
+  const assetMap = new Map(assets.map(a => [a.barcode, a.id]))
+
+  const currentCosts = await prisma.cost.findMany({
+    where: { asset_id: { in: assets.map(a => a.id) } },
+    select: {
+      asset_id: true, purchase_cost: true, transport_cost: true,
+      processing_cost: true, other_cost: true, parts_cost: true,
+      total_cost: true, sale_price: true
+    }
+  })
+  const costMap = new Map(currentCosts.map(c => [c.asset_id, c]))
+
+  await prisma.$transaction(async (tx) => {
+    for (const item of items) {
+      const assetId = assetMap.get(item.barcode)!
+      const total_cost = item.purchase_cost + item.transport_cost + item.processing_cost
+        + item.other_cost + item.parts_cost
+      await tx.cost.upsert({
+        where: { asset_id: assetId },
+        update: {
+          purchase_cost: item.purchase_cost, transport_cost: item.transport_cost,
+          processing_cost: item.processing_cost, other_cost: item.other_cost,
+          parts_cost: item.parts_cost, total_cost, sale_price: item.sale_price
+        },
+        create: {
+          asset_id: assetId, purchase_cost: item.purchase_cost,
+          transport_cost: item.transport_cost, processing_cost: item.processing_cost,
+          other_cost: item.other_cost, parts_cost: item.parts_cost,
+          total_cost, sale_price: item.sale_price
+        }
+      })
+    }
+  })
+
+  await Promise.all(items.map(item => {
+    const assetId = assetMap.get(item.barcode)!
+    const currentCost = costMap.get(assetId)
+    const total_cost = item.purchase_cost + item.transport_cost + item.processing_cost
+      + item.other_cost + item.parts_cost
+    return recordAssetUpdate(assetId, {
+      purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
+      transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
+      processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
+      other_cost: currentCost?.other_cost?.toNumber() ?? null,
+      parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
+      total_cost: currentCost?.total_cost?.toNumber() ?? null,
+      sale_price: currentCost?.sale_price?.toNumber() ?? null
+    }, {
+      purchase_cost: item.purchase_cost, transport_cost: item.transport_cost,
+      processing_cost: item.processing_cost, other_cost: item.other_cost,
+      parts_cost: item.parts_cost, total_cost, sale_price: item.sale_price
+    }, userId)
+  }))
 }
 
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
