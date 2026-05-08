@@ -1,6 +1,6 @@
 import { ApiResponse, CreateInvoice, InvoiceDetail, UpdateInvoice, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
-import { recordAssetUpdate, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
+import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 export async function createInvoice(data: CreateInvoice, userId: number): Promise<ApiResponse<{ invoiceNumber: string }>> {
@@ -34,9 +34,8 @@ export async function createInvoice(data: CreateInvoice, userId: number): Promis
       created_at: now
     }, userId)
 
-    for (const assetId of assetIds) {
-      await recordAssetUpdate(assetId, { purchase_invoice_id: null }, { purchase_invoice_id: invoice.id }, userId)
-    }
+    await recordCollectionUpdateOnAssets([], assetIds, 'purchase_invoice_id', invoice.id, userId)
+    await recordAssetUpdateOnCollection('Invoice', invoice.id, assetIds, [], userId)
 
     return successResponse({ invoiceNumber: invoice.invoice_number })
   } catch (error) {
@@ -100,12 +99,8 @@ export async function updateInvoice(invoiceNumber: string, data: UpdateInvoice, 
 
     await recordInvoiceUpdate(invoice.id, { is_cleared: invoice.is_cleared }, { is_cleared: data.is_cleared }, userId)
 
-    for (const assetId of assetIdsToRemove) {
-      await recordAssetUpdate(assetId, { purchase_invoice_id: invoice.id }, { purchase_invoice_id: null }, userId)
-    }
-    for (const assetId of assetIdsToAdd) {
-      await recordAssetUpdate(assetId, { purchase_invoice_id: null }, { purchase_invoice_id: invoice.id }, userId)
-    }
+    await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'purchase_invoice_id', invoice.id, userId)
+    await recordAssetUpdateOnCollection('Invoice', invoice.id, assetIdsToAdd, assetIdsToRemove, userId)
 
     return successResponse({ invoiceNumber })
   } catch {

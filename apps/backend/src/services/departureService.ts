@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateDeparture, DepartureDetail, UpdateDeparture, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordAssetUpdate, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceDepartureEntity = 'DEPARTURE'
@@ -103,9 +103,8 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     created_at: currentDateTime
   }, userId)
 
-  for (const assetId of assetIds) {
-    await recordAssetUpdate(assetId, { departure_id: null }, { departure_id: newDeparture.id }, userId)
-  }
+  await recordCollectionUpdateOnAssets([], assetIds, 'departure_id', newDeparture.id, userId)
+  await recordAssetUpdateOnCollection('Departure', newDeparture.id, assetIds, [], userId)
 
   return departureNumber
 }
@@ -159,12 +158,8 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
     transporter_id: departure.transporter.id
   }, userId)
 
-  for (const assetId of assetIdsToRemove) {
-    await recordAssetUpdate(assetId, { departure_id: departure.id }, { departure_id: null }, userId)
-  }
-  for (const assetId of assetIdsToAdd) {
-    await recordAssetUpdate(assetId, { departure_id: null }, { departure_id: departure.id }, userId)
-  }
+  await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'departure_id', departure.id, userId)
+  await recordAssetUpdateOnCollection('Departure', departure.id, assetIdsToAdd, assetIdsToRemove, userId)
 }
 
 async function getNewDepartureNumber(originCode: string, date: Date): Promise<string> {

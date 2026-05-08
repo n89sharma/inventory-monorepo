@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, response400, response500, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer, getInvoiceForUpdate as getInvoiceForUpdateSer, updateInvoice as updateInvoiceSer } from '../services/invoiceService.js'
+import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export async function createInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
   try {
@@ -58,5 +59,22 @@ export async function getInvoiceDetail(req: Request, res: Response<ApiResponse<I
     } else {
       return res.status(500).json(response)
     }
+  }
+}
+
+export async function getInvoiceHistory(
+  req: Request,
+  res: Response<ApiResponse<CollectionHistory>>
+) {
+  const { invoiceNumber } = req.params
+  try {
+    const invoice = await prisma.invoice.findFirst({
+      where: { invoice_number: invoiceNumber }, select: { id: true }
+    })
+    if (!invoice) return res.status(404).json(response400(`Invoice ${invoiceNumber} not found`))
+    const history = await getCollectionHistorySer('Invoice', invoice.id)
+    return res.json(successResponse(history))
+  } catch {
+    return res.status(500).json(response500(`Failed to fetch history for invoice ${invoiceNumber}`))
   }
 }

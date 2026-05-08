@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateDepartureSchema, DepartureDetail, DepartureSummary, SubmitUpdateDepartureSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, CollectionHistory, CreateDepartureSchema, DepartureDetail, DepartureSummary, SubmitUpdateDepartureSchema, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -10,6 +10,7 @@ import {
   getDeparture as getDepartureSer,
   updateDeparture as updateDepartureSer
 } from '../services/departureService.js'
+import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export async function getDepartures(req: Request, res: Response<ApiResponse<DepartureSummary[]>>) {
   try {
@@ -66,5 +67,22 @@ export async function updateDeparture(req: Request, res: Response, next: NextFun
     res.json({ departureNumber: req.params.departureNumber })
   } catch (error) {
     next(error)
+  }
+}
+
+export async function getDepartureHistory(
+  req: Request,
+  res: Response<ApiResponse<CollectionHistory>>
+) {
+  const { departureNumber } = req.params
+  try {
+    const departure = await prisma.departure.findUnique({
+      where: { departure_number: departureNumber }, select: { id: true }
+    })
+    if (!departure) return res.status(404).json(response400(`Departure ${departureNumber} not found`))
+    const history = await getCollectionHistorySer('Departure', departure.id)
+    return res.json(successResponse(history))
+  } catch {
+    return res.status(500).json(response500(`Failed to fetch history for departure ${departureNumber}`))
   }
 }

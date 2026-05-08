@@ -1,5 +1,5 @@
 import express from 'express'
-import { createDeparture, getDepartureDetail, getDepartureForUpdate, getDepartures, updateDeparture } from '../controllers/departureController.js'
+import { createDeparture, getDepartureDetail, getDepartureForUpdate, getDepartureHistory, getDepartures, updateDeparture } from '../controllers/departureController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { DateRangeWithWarehouseSchema, validateQuery } from '../middleware/validation.js'
 
@@ -9,6 +9,7 @@ router.use(requireAuth)
 
 router.get('/', validateQuery(DateRangeWithWarehouseSchema), getDepartures)
 router.post('/', createDeparture)
+router.get('/:departureNumber/history', getDepartureHistory)
 router.get('/:departureNumber/edit', getDepartureForUpdate)
 router.get('/:departureNumber', getDepartureDetail)
 router.put('/:departureNumber', updateDeparture)

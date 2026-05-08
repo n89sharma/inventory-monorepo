@@ -5,7 +5,7 @@ import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/mo
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordArrivalCreate, recordArrivalUpdate, recordAssetCreate, recordAssetUpdate } from './historyService.js'
+import { recordArrivalCreate, recordArrivalUpdate, recordAssetCreate, recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -152,6 +152,8 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
     }, userId)
   }
 
+  await recordAssetUpdateOnCollection('Arrival', arrival.id, arrival.assets.map(a => a.id), [], userId)
+
   return arrival.arrival_number
 }
 
@@ -295,9 +297,7 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
     transporter_id: arrival.transporter.id
   }, userId)
 
-  for (const assetId of assetIdsToBeDeleted) {
-    await recordAssetUpdate(assetId, { arrival_id: arrival.id }, { arrival_id: null }, userId)
-  }
+  await recordCollectionUpdateOnAssets(assetIdsToBeDeleted, [], 'arrival_id', arrival.id, userId)
 
   for (const asset of newAssets) {
     await recordAssetCreate(asset.id, {
@@ -307,6 +307,8 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       arrival_id: arrival.id
     }, userId)
   }
+
+  await recordAssetUpdateOnCollection('Arrival', arrival.id, newAssets.map(a => a.id), assetIdsToBeDeleted, userId)
 
   for (const asset of assetsToUpdate) {
     const existing = existingAssets.find(a => a.id === asset.id)

@@ -1,3 +1,4 @@
+import { CollectionHistory, CollectionHistoryRecord } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../prisma.js'
 
@@ -107,7 +108,7 @@ type TransferUpdateFields = Partial<{
 async function recordHistory(
   entityType: string,
   entityId: number,
-  actionType: 'CREATE' | 'UPDATE' | 'DELETE',
+  actionType: string,
   userId: number,
   changes: Record<string, unknown>
 ): Promise<void> {
@@ -654,4 +655,77 @@ export async function recordTransferUpdate(
   } catch (error) {
     console.error(`History write failed [UPDATE Transfer ${transferId}]:`, error)
   }
+}
+
+// ─── Collection asset membership ──────────────────────────────────────────────
+
+export async function recordAssetUpdateOnCollection(
+  entityType: string,
+  entityId: number,
+  addedAssetIds: number[],
+  removedAssetIds: number[],
+  userId: number
+): Promise<void> {
+  try {
+    const [addedBarcodes, removedBarcodes] = await Promise.all([
+      addedAssetIds.length > 0
+        ? prisma.asset.findMany({ where: { id: { in: addedAssetIds } }, select: { barcode: true } })
+            .then(r => r.map(a => a.barcode))
+        : Promise.resolve([] as string[]),
+      removedAssetIds.length > 0
+        ? prisma.asset.findMany({ where: { id: { in: removedAssetIds } }, select: { barcode: true } })
+            .then(r => r.map(a => a.barcode))
+        : Promise.resolve([] as string[])
+    ])
+    const writes: Promise<void>[] = []
+    if (addedBarcodes.length > 0) {
+      writes.push(recordHistory(entityType, entityId, 'ASSETS_ADDED', userId, { barcodes: addedBarcodes }))
+    }
+    if (removedBarcodes.length > 0) {
+      writes.push(recordHistory(entityType, entityId, 'ASSETS_REMOVED', userId, { barcodes: removedBarcodes }))
+    }
+    await Promise.all(writes)
+  } catch (error) {
+    console.error(`History write failed [ASSETS_CHANGED ${entityType} ${entityId}]:`, error)
+  }
+}
+
+export async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
+  assetIds: number[],
+  field: K,
+  beforeValue: AssetUpdateFields[K],
+  afterValue: AssetUpdateFields[K],
+  userId: number
+): Promise<void> {
+  for (const assetId of assetIds) {
+    await recordAssetUpdate(assetId, { [field]: beforeValue } as AssetUpdateFields, { [field]: afterValue } as AssetUpdateFields, userId)
+  }
+}
+
+export async function recordCollectionUpdateOnAssets<K extends keyof AssetUpdateFields>(
+  assetIdsToRemove: number[],
+  assetIdsToAdd: number[],
+  field: K,
+  value: AssetUpdateFields[K],
+  userId: number
+): Promise<void> {
+  await recordBatchAssetUpdate(assetIdsToRemove, field, value, null as AssetUpdateFields[K], userId)
+  await recordBatchAssetUpdate(assetIdsToAdd, field, null as AssetUpdateFields[K], value, userId)
+}
+
+export async function getCollectionHistory(
+  entityType: string,
+  entityId: number
+): Promise<CollectionHistory> {
+  const rows = await prisma.history.findMany({
+    where: { entity_type: entityType, entity_id: entityId },
+    include: { User: { select: { name: true } } },
+    orderBy: { changed_on: 'desc' }
+  })
+  return rows.map(row => ({
+    action_type: row.action_type as CollectionHistoryRecord['action_type'],
+    user_name: row.User.name,
+    changed_on: row.changed_on,
+    changes: row.changes
+  })) as CollectionHistory
 }

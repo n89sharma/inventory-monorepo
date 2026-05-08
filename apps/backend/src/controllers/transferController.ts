@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, response500, successResponse } from 'shared-types'
+import { ApiResponse, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
@@ -10,6 +10,7 @@ import {
   getTransferForUpdate as getTransferForUpdateSer,
   updateTransfer as updateTransferSer
 } from '../services/transferService.js'
+import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export const TransferQuerySchema = z.object({
   fromDate: z.string(),
@@ -81,5 +82,22 @@ export async function updateTransfer(req: Request, res: Response<{ transferNumbe
     res.json({ transferNumber })
   } catch (error) {
     next(error)
+  }
+}
+
+export async function getTransferHistory(
+  req: Request,
+  res: Response<ApiResponse<CollectionHistory>>
+) {
+  const { transferNumber } = req.params
+  try {
+    const transfer = await prisma.transfer.findUnique({
+      where: { transfer_number: transferNumber }, select: { id: true }
+    })
+    if (!transfer) return res.status(404).json(response400(`Transfer ${transferNumber} not found`))
+    const history = await getCollectionHistorySer('Transfer', transfer.id)
+    return res.json(successResponse(history))
+  } catch {
+    return res.status(500).json(response500(`Failed to fetch history for transfer ${transferNumber}`))
   }
 }

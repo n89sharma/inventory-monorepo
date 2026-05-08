@@ -1,10 +1,11 @@
 import { isAfter } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, response500, successResponse } from 'shared-types'
+import { ApiResponse, CollectionHistory, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 import { createHold as createHoldSer, getHold as getHoldSer, getHoldForUpdate as getHoldForUpdateSer, updateHold as updateHoldSer } from '../services/holdService.js'
+import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export const HoldQuerySchema = z.object({
   fromDate: z.string(),
@@ -87,5 +88,22 @@ export async function getHoldDetail(req: Request, res: Response<ApiResponse<Hold
     } else {
       return res.status(500).json(response)
     }
+  }
+}
+
+export async function getHoldHistory(
+  req: Request,
+  res: Response<ApiResponse<CollectionHistory>>
+) {
+  const { holdNumber } = req.params
+  try {
+    const hold = await prisma.hold.findUnique({
+      where: { hold_number: holdNumber }, select: { id: true }
+    })
+    if (!hold) return res.status(404).json(response400(`Hold ${holdNumber} not found`))
+    const history = await getCollectionHistorySer('Hold', hold.id)
+    return res.json(successResponse(history))
+  } catch {
+    return res.status(500).json(response500(`Failed to fetch history for hold ${holdNumber}`))
   }
 }

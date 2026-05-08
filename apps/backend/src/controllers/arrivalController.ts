@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, ArrivalDetail, ArrivalSummary, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrival, response500, successResponse } from 'shared-types'
+import { ApiResponse, ArrivalDetail, ArrivalSummary, CollectionHistory, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrival, response400, response500, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import { createArrival as createArrivalSer, getArrivalForUpdate as getArrivalForEditSer, getArrival as getArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
+import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export async function getArrivals(
   req: Request,
@@ -78,5 +79,22 @@ export async function updateArrival(
     res.json({ arrivalNumber })
   } catch (error) {
     next(error)
+  }
+}
+
+export async function getArrivalHistory(
+  req: Request,
+  res: Response<ApiResponse<CollectionHistory>>
+) {
+  const { arrivalNumber } = req.params
+  try {
+    const arrival = await prisma.arrival.findUnique({
+      where: { arrival_number: arrivalNumber }, select: { id: true }
+    })
+    if (!arrival) return res.status(404).json(response400(`Arrival ${arrivalNumber} not found`))
+    const history = await getCollectionHistorySer('Arrival', arrival.id)
+    return res.json(successResponse(history))
+  } catch {
+    return res.status(500).json(response500(`Failed to fetch history for arrival ${arrivalNumber}`))
   }
 }

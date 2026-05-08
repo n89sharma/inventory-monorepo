@@ -4,6 +4,7 @@ import {
   createTransfer,
   getTransferDetail,
   getTransferForUpdate,
+  getTransferHistory,
   getTransfers,
   updateTransfer
 } from '../controllers/transferController.js'
@@ -16,6 +17,7 @@ router.use(requireAuth)
 
 router.get('/', validateQuery(TransferQuerySchema), getTransfers)
 router.post('/', createTransfer)
+router.get('/:transferNumber/history', getTransferHistory)
 router.get('/:transferNumber/edit', getTransferForUpdate)
 router.get('/:transferNumber', getTransferDetail)
 router.put('/:transferNumber', updateTransfer)

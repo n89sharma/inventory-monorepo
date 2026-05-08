@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateHold, HoldDetail, UpdateHold, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordAssetUpdate, recordHoldCreate, recordHoldUpdate } from './historyService.js'
+import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordHoldCreate, recordHoldUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 
@@ -62,12 +62,10 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
 
       for (const assetId of assetIds) {
         const prev = assetStateMap.get(assetId)
-        await recordAssetUpdate(assetId, {
-          hold_id: prev?.hold_id ?? null
-        }, {
-          hold_id: hold.id
-        }, userId)
+        await recordAssetUpdate(assetId, { hold_id: prev?.hold_id ?? null }, { hold_id: hold.id }, userId)
       }
+
+      await recordAssetUpdateOnCollection('Hold', hold.id, assetIds, [], userId)
     }
 
     return successResponse(holdNumber)
@@ -181,12 +179,8 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<ApiR
       customer_id: data.customer.id
     }, userId)
 
-    for (const assetId of assetIdsToRemove) {
-      await recordAssetUpdate(assetId, { hold_id: data.id }, { hold_id: null }, userId)
-    }
-    for (const assetId of assetIdsToAdd) {
-      await recordAssetUpdate(assetId, { hold_id: null }, { hold_id: data.id }, userId)
-    }
+    await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'hold_id', data.id, userId)
+    await recordAssetUpdateOnCollection('Hold', data.id, assetIdsToAdd, assetIdsToRemove, userId)
 
     return successResponse(undefined)
   } catch (error) {

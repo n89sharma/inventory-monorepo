@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ApiResponse, CreateTransfer, TransferDetail, UpdateTransfer, response400, response500, successResponse } from 'shared-types'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordTransferCreate, recordTransferUpdate } from './historyService.js'
+import { recordAssetUpdateOnCollection, recordTransferCreate, recordTransferUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceTransferEntity = 'TRANSFER'
@@ -90,6 +90,8 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
     created_at: currentDateTime
   }, userId)
 
+  await recordAssetUpdateOnCollection('Transfer', newTransfer.id, transfer.assets.map(a => a.id), [], userId)
+
   return transferNumber
 }
 
@@ -132,6 +134,8 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
     destination_id: transfer.destination.id,
     transporter_id: transfer.transporter.id
   }, userId)
+
+  await recordAssetUpdateOnCollection('Transfer', transfer.id, assetIdsToAdd, assetIdsToDelete, userId)
 }
 
 async function getNewTransferNumber(originCode: string, date: Date): Promise<string> {
