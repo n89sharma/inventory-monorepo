@@ -73,28 +73,36 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   const departureNumber = await getNewDepartureNumber(originCode, currentDateTime)
   const assetIds = departure.assets.map(a => a.id)
 
-  const assetsAlreadyOnDeparture = await prisma.asset.findMany({
-    where: { id: { in: assetIds }, departure_id: { not: null } },
-    select: { barcode: true }
-  })
-  if (assetsAlreadyOnDeparture.length > 0) {
-    const barcodes = assetsAlreadyOnDeparture.map(a => a.barcode).join(', ')
-    throw new Error(`Assets already assigned to a departure: ${barcodes}`)
-  }
-
-  const newDeparture = await prisma.departure.create({
-    data: {
-      departure_number: departureNumber,
-      origin: { connect: { id: departure.origin.id } },
-      destination: { connect: { id: departure.customer.id } },
-      transporter: { connect: { id: departure.transporter.id } },
-      created_by: { connect: { id: userId } },
-      notes: departure.comment,
-      created_at: currentDateTime
+  const newDeparture = await prisma.$transaction(async (tx) => {
+    const assetsAlreadyOnDeparture = await tx.asset.findMany({
+      where: { id: { in: assetIds }, departure_id: { not: null } },
+      select: { barcode: true }
+    })
+    if (assetsAlreadyOnDeparture.length > 0) {
+      throw new Error(
+        `Assets already assigned to a departure: ${assetsAlreadyOnDeparture.map(a => a.barcode).join(', ')}`
+      )
     }
-  })
 
-  await prisma.asset.updateMany({ where: { id: { in: assetIds } }, data: { departure_id: newDeparture.id } })
+    const created = await tx.departure.create({
+      data: {
+        departure_number: departureNumber,
+        origin: { connect: { id: departure.origin.id } },
+        destination: { connect: { id: departure.customer.id } },
+        transporter: { connect: { id: departure.transporter.id } },
+        created_by: { connect: { id: userId } },
+        notes: departure.comment,
+        created_at: currentDateTime
+      }
+    })
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds } },
+      data: { departure_id: created.id }
+    })
+
+    return created
+  })
 
   await recordDepartureCreate(newDeparture.id, {
     departure_number: departureNumber,
@@ -110,32 +118,33 @@ export async function createDeparture(departure: CreateDeparture, userId: number
 }
 
 export async function updateDeparture(departure: UpdateDeparture, userId: number): Promise<void> {
-  const [currentDeparture, existingAssets] = await Promise.all([
-    prisma.departure.findUnique({
-      where: { id: departure.id },
-      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
-    }),
-    prisma.asset.findMany({ where: { departure_id: departure.id }, select: { id: true } })
-  ])
+  const { currentDeparture, assetIdsToRemove, assetIdsToAdd } = await prisma.$transaction(async (tx) => {
+    const [currentDeparture, existingAssets] = await Promise.all([
+      tx.departure.findUnique({
+        where: { id: departure.id },
+        select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
+      }),
+      tx.asset.findMany({ where: { departure_id: departure.id }, select: { id: true } })
+    ])
 
-  const existingAssetIds = existingAssets.map(a => a.id)
-  const incomingAssetIds = new Set(departure.assets.map(a => a.id))
-  const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-  const assetIdsToAdd = departure.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
+    const existingAssetIds = existingAssets.map(a => a.id)
+    const incomingAssetIds = new Set(departure.assets.map(a => a.id))
+    const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
+    const assetIdsToAdd = departure.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
 
-  if (assetIdsToAdd.length > 0) {
-    const conflicts = await prisma.asset.findMany({
-      where: { id: { in: assetIdsToAdd }, departure_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (conflicts.length > 0) {
-      const barcodes = conflicts.map(a => a.barcode).join(', ')
-      throw new Error(`Assets already assigned to a departure: ${barcodes}`)
+    if (assetIdsToAdd.length > 0) {
+      const conflicts = await tx.asset.findMany({
+        where: { id: { in: assetIdsToAdd }, departure_id: { not: null } },
+        select: { barcode: true }
+      })
+      if (conflicts.length > 0) {
+        throw new Error(
+          `Assets already assigned to a departure: ${conflicts.map(a => a.barcode).join(', ')}`
+        )
+      }
     }
-  }
 
-  await prisma.$transaction([
-    prisma.departure.update({
+    await tx.departure.update({
       where: { id: departure.id },
       data: {
         origin_id: departure.origin.id,
@@ -143,10 +152,20 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
         transporter_id: departure.transporter.id,
         notes: departure.comment
       }
-    }),
-    prisma.asset.updateMany({ where: { id: { in: assetIdsToRemove } }, data: { departure_id: null } }),
-    prisma.asset.updateMany({ where: { id: { in: assetIdsToAdd } }, data: { departure_id: departure.id } })
-  ])
+    })
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToRemove } },
+      data: { departure_id: null }
+    })
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToAdd } },
+      data: { departure_id: departure.id }
+    })
+
+    return { currentDeparture, assetIdsToRemove, assetIdsToAdd }
+  })
 
   await recordDepartureUpdate(departure.id, {
     origin_id: currentDeparture?.origin_id,

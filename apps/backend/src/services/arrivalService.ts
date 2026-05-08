@@ -191,101 +191,101 @@ function mapInputAssetToPrismaCreateAsset(
 
 
 export async function updateArrival(arrival: UpdateArrival, userId: number) {
-  const [currentArrival, existingAssets] = await Promise.all([
-    prisma.arrival.findUnique({
-      where: { id: arrival.id },
-      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
-    }),
-    prisma.asset.findMany({
-      where: { arrival_id: arrival.id },
-      select: {
-        id: true,
-        model_id: true,
-        serial_number: true,
-        technical_status_id: true,
-        technical_specification: {
-          select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
-        }
-      }
-    })
-  ])
-
-  const existingAssetIds = existingAssets.map(a => a.id)
-  const receivedAssetIds = new Set(arrival.assets.map(a => a.id).filter(id => id != null))
-  const assetIdsToBeDeleted = existingAssetIds.filter(id => !receivedAssetIds.has(id))
-
   const assetsToUpdate = arrival.assets.filter(a => !!a.id)
   const assetsToCreate = arrival.assets.filter(a => a.id === undefined || a.id === null)
 
-  let assetCreates: ReturnType<typeof prisma.asset.create>[] = []
+  // Generate barcodes for new assets outside the transaction (sequence function is atomic)
+  let newAssetBarcodes: Record<string, string> = {}
+  const newAssetDateTime = new Date()
   if (assetsToCreate.length > 0) {
-    const warehouseCode = arrival.warehouse.city_code
-    const currentDateTime = new Date()
-    const barcodes = await generateBarcodes(assetsToCreate, warehouseCode, currentDateTime)
-    assetCreates = assetsToCreate.map(asset => prisma.asset.create({
-      data: {
-        ...mapInputAssetToPrismaCreateAsset(asset, barcodes, arrival.warehouse.id, currentDateTime),
-        arrival: { connect: { id: arrival.id } }
-      }
-    }))
+    newAssetBarcodes = await generateBarcodes(assetsToCreate, arrival.warehouse.city_code, newAssetDateTime)
   }
 
-  const assetUpdates = assetsToUpdate.map(asset =>
-    prisma.asset.update({
-      where: { id: asset.id },
-      data: {
-        model_id: asset.model.id,
-        serial_number: asset.serialNumber,
-        technical_status_id: asset.technicalStatus.id,
-        technical_specification: {
-          update: {
-            meter_black: asset.meterBlack,
-            meter_colour: asset.meterColour,
-            meter_total: asset.meterBlack + asset.meterColour,
-            cassettes: asset.cassettes,
-            internal_finisher: asset.internalFinisher
+  const { currentArrival, existingAssets, existingAssetIds, assetIdsToBeDeleted, newAssets } =
+    await prisma.$transaction(async (tx) => {
+      const [currentArrival, existingAssets] = await Promise.all([
+        tx.arrival.findUnique({
+          where: { id: arrival.id },
+          select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
+        }),
+        tx.asset.findMany({
+          where: { arrival_id: arrival.id },
+          select: {
+            id: true,
+            model_id: true,
+            serial_number: true,
+            technical_status_id: true,
+            technical_specification: {
+              select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
+            }
           }
-        }
-      }
-    })
-  )
+        })
+      ])
 
-  const accessoryDeletes = assetsToUpdate.map(asset =>
-    prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } })
-  )
+      const existingAssetIds = existingAssets.map(a => a.id)
+      const receivedAssetIds = new Set(arrival.assets.map(a => a.id).filter(id => id != null))
+      const assetIdsToBeDeleted = existingAssetIds.filter(id => !receivedAssetIds.has(id))
 
-  const accessoryCreates = assetsToUpdate.flatMap(asset =>
-    asset.coreFunctions.map(cf =>
-      prisma.assetAccessory.create({ data: { asset_id: asset.id!, accessory_id: cf.id } })
-    )
-  )
+      await tx.asset.updateMany({
+        where: { id: { in: assetIdsToBeDeleted } },
+        data: { arrival_id: null }
+      })
 
-  await prisma.$transaction([
-    prisma.asset.updateMany({ where: { id: { in: assetIdsToBeDeleted } }, data: { arrival_id: null } }),
-    prisma.arrival.update({
-      where: { id: arrival.id },
-      data: {
-        origin_id: arrival.vendor.id,
-        transporter_id: arrival.transporter.id,
-        destination_id: arrival.warehouse.id,
-        notes: arrival.comment
-      }
-    }),
-    ...assetUpdates,
-    ...accessoryDeletes,
-    ...accessoryCreates,
-    ...assetCreates
-  ])
-
-  const newAssets = assetsToCreate.length > 0
-    ? await prisma.asset.findMany({
-        where: { arrival_id: arrival.id, id: { notIn: existingAssetIds } },
-        select: {
-          id: true, barcode: true, serial_number: true, model_id: true,
-          tracking_status_id: true, availability_status_id: true, technical_status_id: true
+      await tx.arrival.update({
+        where: { id: arrival.id },
+        data: {
+          origin_id: arrival.vendor.id,
+          transporter_id: arrival.transporter.id,
+          destination_id: arrival.warehouse.id,
+          notes: arrival.comment
         }
       })
-    : []
+
+      for (const asset of assetsToUpdate) {
+        await tx.asset.update({
+          where: { id: asset.id },
+          data: {
+            model_id: asset.model.id,
+            serial_number: asset.serialNumber,
+            technical_status_id: asset.technicalStatus.id,
+            technical_specification: {
+              update: {
+                meter_black: asset.meterBlack,
+                meter_colour: asset.meterColour,
+                meter_total: asset.meterBlack + asset.meterColour,
+                cassettes: asset.cassettes,
+                internal_finisher: asset.internalFinisher
+              }
+            }
+          }
+        })
+        await tx.assetAccessory.deleteMany({ where: { asset_id: asset.id } })
+        for (const cf of asset.coreFunctions) {
+          await tx.assetAccessory.create({ data: { asset_id: asset.id!, accessory_id: cf.id } })
+        }
+      }
+
+      for (const asset of assetsToCreate) {
+        await tx.asset.create({
+          data: {
+            ...mapInputAssetToPrismaCreateAsset(asset, newAssetBarcodes, arrival.warehouse.id, newAssetDateTime),
+            arrival: { connect: { id: arrival.id } }
+          }
+        })
+      }
+
+      const newAssets = assetsToCreate.length > 0
+        ? await tx.asset.findMany({
+            where: { arrival_id: arrival.id, id: { notIn: existingAssetIds } },
+            select: {
+              id: true, barcode: true, serial_number: true, model_id: true,
+              tracking_status_id: true, availability_status_id: true, technical_status_id: true
+            }
+          })
+        : []
+
+      return { currentArrival, existingAssets, existingAssetIds, assetIdsToBeDeleted, newAssets }
+    })
 
   await recordArrivalUpdate(arrival.id, {
     origin_id: currentArrival?.origin_id,

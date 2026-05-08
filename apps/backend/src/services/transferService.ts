@@ -96,21 +96,21 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
 }
 
 export async function updateTransfer(transfer: UpdateTransfer, userId: number): Promise<void> {
-  const [currentTransfer, existingAssetTransfers] = await Promise.all([
-    prisma.transfer.findUnique({
-      where: { id: transfer.id },
-      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
-    }),
-    prisma.assetTransfer.findMany({ where: { transfer_id: transfer.id }, select: { asset_id: true } })
-  ])
+  const { currentTransfer, assetIdsToDelete, assetIdsToAdd } = await prisma.$transaction(async (tx) => {
+    const [currentTransfer, existingAssetTransfers] = await Promise.all([
+      tx.transfer.findUnique({
+        where: { id: transfer.id },
+        select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
+      }),
+      tx.assetTransfer.findMany({ where: { transfer_id: transfer.id }, select: { asset_id: true } })
+    ])
 
-  const existingAssetIds = existingAssetTransfers.map(at => at.asset_id)
-  const incomingAssetIds = new Set(transfer.assets.map(a => a.id))
-  const assetIdsToDelete = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-  const assetIdsToAdd = transfer.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
+    const existingAssetIds = existingAssetTransfers.map(at => at.asset_id)
+    const incomingAssetIds = new Set(transfer.assets.map(a => a.id))
+    const assetIdsToDelete = existingAssetIds.filter(id => !incomingAssetIds.has(id))
+    const assetIdsToAdd = transfer.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
 
-  await prisma.$transaction([
-    prisma.transfer.update({
+    await tx.transfer.update({
       where: { id: transfer.id },
       data: {
         origin_id: transfer.origin.id,
@@ -118,12 +118,18 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
         transporter_id: transfer.transporter.id,
         notes: transfer.comment
       }
-    }),
-    prisma.assetTransfer.deleteMany({ where: { transfer_id: transfer.id, asset_id: { in: assetIdsToDelete } } }),
-    ...assetIdsToAdd.map(assetId =>
-      prisma.assetTransfer.create({ data: { transfer_id: transfer.id, asset_id: assetId } })
-    )
-  ])
+    })
+
+    await tx.assetTransfer.deleteMany({
+      where: { transfer_id: transfer.id, asset_id: { in: assetIdsToDelete } }
+    })
+
+    for (const assetId of assetIdsToAdd) {
+      await tx.assetTransfer.create({ data: { transfer_id: transfer.id, asset_id: assetId } })
+    }
+
+    return { currentTransfer, assetIdsToDelete, assetIdsToAdd }
+  })
 
   await recordTransferUpdate(transfer.id, {
     origin_id: currentTransfer?.origin_id,
