@@ -1,6 +1,5 @@
 import { clerkMiddleware } from '@clerk/express'
 import cors from 'cors'
-import 'dotenv/config'
 import express, { Request, Response } from 'express'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
@@ -22,8 +21,10 @@ import { errorHandler } from './lib/errorHandler.js'
 import { requestId } from './middleware/requestId.js'
 import { logger } from './lib/logger.js'
 
-const app = express();
 const isDev = process.env.NODE_ENV !== 'production'
+if (isDev) { await import('dotenv/config') }
+
+const app = express();
 
 morgan.token('id', (req: Request) => req.id)
 
