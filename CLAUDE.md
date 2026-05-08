@@ -130,6 +130,12 @@ In practice: every create/update form gets a `XyzFormSchema` + `XyzForm` type in
 
 **Controller vs service separation:** Controllers own HTTP concerns only — parse query/body params, call a service, return the right status code. All DB logic (Prisma calls, raw SQL, business rules) belongs in the service. Never call `prisma` directly from a controller.
 
+**Transactional pattern — TOCTOU rule:** Every service function that performs a conflict or uniqueness check before a write must use `prisma.$transaction(async (tx) => { ... })` (interactive/callback form) so the check and the write are atomic. Never use the array form `prisma.$transaction([...])` when conditional logic is involved — it cannot contain reads or early-returns between operations. The pattern is:
+1. Reference-data lookups (statuses, warehouses) and sequence-number generation may happen **outside** the transaction — they are immutable or atomically generated.
+2. All conflict checks, pre-reads used to compute diffs, and the writes themselves go **inside** the interactive transaction using `tx.*` instead of `prisma.*`.
+3. Business-rule failures inside the tx throw `ConflictError` or `NotFoundError` (from `src/lib/errors.ts`); the outer `catch` maps these to `response400`, everything else to `response500`.
+4. History/audit writes remain **outside** the transaction — they are best-effort and must not extend the transaction boundary.
+
 **After removing a feature or query:** Delete any `.sql` files in `prisma/sql/` that are no longer used, then run `npm run prisma` to regenerate `generated/prisma/sql/`. Also check for orphaned imports across the controller, service, and API layers.
 
 **Key backend utilities:**
