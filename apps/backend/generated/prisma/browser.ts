@@ -158,11 +158,6 @@ export type TechnicalStatus = Prisma.TechnicalStatusModel
  */
 export type TrackingStatus = Prisma.TrackingStatusModel
 /**
- * Model Sequence
- * 
- */
-export type Sequence = Prisma.SequenceModel
-/**
  * Model StorePart
  * 
  */

@@ -13,3 +13,5 @@ from "Invoice" i
   join "Organization" o on o.id = i.organization_id
   join "User" u on u.id = i.updated_by_id
 where i.created_at between $1 and $2
+order by i.created_at desc
+limit 500

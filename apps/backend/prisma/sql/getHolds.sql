@@ -16,3 +16,5 @@ join "Organization" c on c.id = h.customer_id
 where h.created_at between $1 and $2
 and ($3 = 0 or ub.id = $3)
 and ($4 = 0 or uf.id = $4)
+order by h.created_at desc
+limit 500

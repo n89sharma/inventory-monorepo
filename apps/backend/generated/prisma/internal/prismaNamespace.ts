@@ -412,7 +412,6 @@ export const ModelName = {
   Role: 'Role',
   TechnicalStatus: 'TechnicalStatus',
   TrackingStatus: 'TrackingStatus',
-  Sequence: 'Sequence',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History'
@@ -431,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "role" | "technicalStatus" | "trackingStatus" | "sequence" | "storePart" | "partTransfer" | "history"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "role" | "technicalStatus" | "trackingStatus" | "storePart" | "partTransfer" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2507,80 +2506,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Sequence: {
-      payload: Prisma.$SequencePayload<ExtArgs>
-      fields: Prisma.SequenceFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.SequenceFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.SequenceFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        findFirst: {
-          args: Prisma.SequenceFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.SequenceFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        findMany: {
-          args: Prisma.SequenceFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
-        }
-        create: {
-          args: Prisma.SequenceCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        createMany: {
-          args: Prisma.SequenceCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.SequenceCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
-        }
-        delete: {
-          args: Prisma.SequenceDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        update: {
-          args: Prisma.SequenceUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        deleteMany: {
-          args: Prisma.SequenceDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.SequenceUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.SequenceUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
-        }
-        upsert: {
-          args: Prisma.SequenceUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
-        }
-        aggregate: {
-          args: Prisma.SequenceAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSequence>
-        }
-        groupBy: {
-          args: Prisma.SequenceGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SequenceGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.SequenceCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SequenceCountAggregateOutputType> | number
-        }
-      }
-    }
     StorePart: {
       payload: Prisma.$StorePartPayload<ExtArgs>
       fields: Prisma.StorePartFieldRefs
@@ -3180,16 +3105,6 @@ export const TrackingStatusScalarFieldEnum = {
 export type TrackingStatusScalarFieldEnum = (typeof TrackingStatusScalarFieldEnum)[keyof typeof TrackingStatusScalarFieldEnum]
 
 
-export const SequenceScalarFieldEnum = {
-  entity_type: 'entity_type',
-  warehouse_code: 'warehouse_code',
-  sequence_date: 'sequence_date',
-  last_number: 'last_number'
-} as const
-
-export type SequenceScalarFieldEnum = (typeof SequenceScalarFieldEnum)[keyof typeof SequenceScalarFieldEnum]
-
-
 export const StorePartScalarFieldEnum = {
   id: 'id',
   part_number: 'part_number',
@@ -3502,7 +3417,6 @@ export type GlobalOmitConfig = {
   role?: Prisma.RoleOmit
   technicalStatus?: Prisma.TechnicalStatusOmit
   trackingStatus?: Prisma.TrackingStatusOmit
-  sequence?: Prisma.SequenceOmit
   storePart?: Prisma.StorePartOmit
   partTransfer?: Prisma.PartTransferOmit
   history?: Prisma.HistoryOmit

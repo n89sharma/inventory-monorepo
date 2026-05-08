@@ -18,3 +18,4 @@ where t.created_at between $1 and $2
 and ($3 = 0 or wo.id = $3)
 and ($4 = 0 or wd.id = $4)
 order by t.created_at desc
+limit 500

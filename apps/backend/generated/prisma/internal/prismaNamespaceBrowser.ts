@@ -79,7 +79,6 @@ export const ModelName = {
   Role: 'Role',
   TechnicalStatus: 'TechnicalStatus',
   TrackingStatus: 'TrackingStatus',
-  Sequence: 'Sequence',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History'
@@ -433,16 +432,6 @@ export const TrackingStatusScalarFieldEnum = {
 } as const
 
 export type TrackingStatusScalarFieldEnum = (typeof TrackingStatusScalarFieldEnum)[keyof typeof TrackingStatusScalarFieldEnum]
-
-
-export const SequenceScalarFieldEnum = {
-  entity_type: 'entity_type',
-  warehouse_code: 'warehouse_code',
-  sequence_date: 'sequence_date',
-  last_number: 'last_number'
-} as const
-
-export type SequenceScalarFieldEnum = (typeof SequenceScalarFieldEnum)[keyof typeof SequenceScalarFieldEnum]
 
 
 export const StorePartScalarFieldEnum = {
