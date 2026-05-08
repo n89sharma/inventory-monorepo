@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { Prisma } from '../../generated/prisma/client.js'
 import { response400, response500 } from 'shared-types'
 import { ConflictError, NotFoundError, ValidationError } from './errors.js'
+import { logger } from './logger.js'
 
 export function errorHandler(
   err: unknown,
@@ -34,6 +35,10 @@ export function errorHandler(
     res.status(400).json(response400('A record with these details already exists'))
     return
   }
-  console.error(err)
+  logger.error('Unhandled error', {
+    requestId: req.id ?? 'unknown',
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  })
   res.status(500).json(response500('An unexpected error occurred'))
 }
