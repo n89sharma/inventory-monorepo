@@ -18,6 +18,7 @@ import userRoutes from './routes/userRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
 import { errorHandler } from './lib/errorHandler.js'
 import { requestId } from './middleware/requestId.js'
+import { logger } from './lib/logger.js'
 
 const app = express();
 const isDev = process.env.NODE_ENV !== 'production'
@@ -35,8 +36,30 @@ app.use(cors({
 }))
 app.use(requestId)
 
+const red    = (s: string | number) => `\x1b[31m${s}\x1b[0m`
+const yellow = (s: string | number) => `\x1b[33m${s}\x1b[0m`
+const cyan   = (s: string | number) => `\x1b[36m${s}\x1b[0m`
+const green  = (s: string | number) => `\x1b[32m${s}\x1b[0m`
+
+function colorForStatus(status: number): string {
+  if (status >= 500) return red(status)
+  if (status >= 400) return yellow(status)
+  if (status >= 300) return cyan(status)
+  return green(status)
+}
+
+function colorForTime(ms: number): string {
+  if (ms >= 500) return red(`${ms}ms`)
+  if (ms >= 100) return yellow(`${ms}ms`)
+  return green(`${ms}ms`)
+}
+
 if (isDev) {
-  app.use(morgan(':id :method :url :status :response-time[0]ms'))
+  app.use(morgan((tokens, req: Request, res: Response) => {
+    const status = Number(tokens['status'](req, res))
+    const ms = Math.round(parseFloat(tokens['response-time'](req, res) ?? '0'))
+    return `${req.id} ${tokens['method'](req, res)} ${tokens['url'](req, res)} ${colorForStatus(status)} ${colorForTime(ms)}`
+  }))
 } else {
   app.use(morgan((tokens, req: Request, res: Response) =>
     JSON.stringify({
@@ -77,5 +100,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`)
 })

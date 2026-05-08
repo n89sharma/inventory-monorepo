@@ -3,6 +3,7 @@ import { Pool } from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../generated/prisma/client.js'
 import { logger } from './lib/logger.js'
+import { requestContext } from './lib/context.js'
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -18,17 +19,28 @@ const prisma = new PrismaClient({
     adapter,
     log: [
         { emit: 'event', level: 'query' },
-        { emit: 'stdout', level: 'error' },
-        { emit: 'stdout', level: 'warn' },
+        { emit: 'event', level: 'error' },
+        { emit: 'event', level: 'warn' },
     ],
 })
 
 prisma.$on('query', (e) => {
+    const { requestId } = requestContext.getStore() ?? {}
     if (isDev) {
-        logger.debug(`[prisma] query ${e.duration}ms`)
+        logger.debug(`[prisma] query ${e.duration}ms`, { requestId })
     } else if (e.duration > SLOW_QUERY_THRESHOLD_MS) {
-        logger.warn(`Slow query ${e.duration}ms`)
+        logger.warn(`[prisma] slow query ${e.duration}ms`, { requestId })
     }
+})
+
+prisma.$on('error', (e) => {
+    const { requestId } = requestContext.getStore() ?? {}
+    logger.error(`[prisma] ${e.message}`, { target: e.target, requestId })
+})
+
+prisma.$on('warn', (e) => {
+    const { requestId } = requestContext.getStore() ?? {}
+    logger.warn(`[prisma] ${e.message}`, { target: e.target, requestId })
 })
 
 export { prisma }

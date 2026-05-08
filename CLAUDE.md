@@ -53,6 +53,8 @@ No tests are configured yet.
 
 **Line length:** Keep all lines under 100 characters (ruler at col 100). Wrap function signatures so each parameter is on its own line with the return type on a separate line. Wrap long object arguments (e.g. Prisma queries) when the single-line form exceeds 100 chars.
 
+**Conditionals:** Prefer `if/else if` with early returns over ternary chains for range or multi-branch logic. Ternaries are acceptable for simple binary expressions only.
+
 ---
 
 ## Developer Guide
@@ -127,6 +129,8 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 - `response400`, `response500`, `successResponse` from `shared-types` — standard response wrappers
 - `getNextSequence(entityType, warehouseCode, date)` in `src/lib/db-utils.ts` — generates a sequential number for an entity on a given date; combine with date formatting to produce numbers like `H-260409-001`
 - POST body validation: parse inline in the controller with `XyzSchema.parse(req.body)` — adding a shared `validateBody` middleware is a known technical debt
+
+**Logging:** Never use `console.log/error/warn` in the backend — import `logger` from `src/lib/logger.ts` instead. HTTP logging (Morgan) and Prisma query events are handled automatically; do not add manual logs in routes or services. Use `logger.error` for failures (include `requestId`), `logger.warn` for slow/recoverable issues, `logger.info` for lifecycle events, `logger.debug` for dev-only detail.
 
 **Authentication:** Not yet implemented. Any field requiring a `created_by` / `updated_by` user ID defaults to hardcoded ID `178`.
 
