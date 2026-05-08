@@ -2,6 +2,7 @@ import { clerkMiddleware } from '@clerk/express'
 import cors from 'cors'
 import 'dotenv/config'
 import express, { Request, Response } from 'express'
+import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import morgan from 'morgan'
 import arrivalRoutes from './routes/arrivalRoutes.js'
@@ -34,6 +35,9 @@ const limiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' },
 })
 
+app.use(helmet.xContentTypeOptions())
+app.use(helmet.frameguard({ action: 'deny' }))
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }))
 app.use(clerkMiddleware())
 app.use('/webhooks', webhookRoutes)
 app.use(limiter)
