@@ -36,6 +36,16 @@ const limiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' },
 })
 
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'https://shiva-inv.vercel.app',
+  ],
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(helmet.xContentTypeOptions())
 app.use(helmet.frameguard({ action: 'deny' }))
 app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }))
@@ -49,13 +59,7 @@ app.use((_req, res, next) => {
 app.use(clerkMiddleware())
 app.use('/webhooks', webhookRoutes)
 app.use(limiter)
-app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:4173",
-    "https://shiva-inv.vercel.app"]
-}))
+app.use(express.json({ limit: '500kb' }))
 app.use(requestId)
 
 const red    = (s: string | number) => `\x1b[31m${s}\x1b[0m`
