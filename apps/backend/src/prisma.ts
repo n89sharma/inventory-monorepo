@@ -8,7 +8,7 @@ import { requestContext } from './lib/context.js'
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     idleTimeoutMillis: 30000,
-    max: 5,
+    max: 40,
 })
 
 const adapter = new PrismaPg(pool)
