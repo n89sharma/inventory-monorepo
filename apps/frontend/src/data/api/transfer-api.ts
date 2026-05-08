@@ -3,7 +3,7 @@ import { apiErrorHandler } from '@/lib/error-handler'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, AssetSummary, TransferDetail, TransferSummary, UpdateTransfer, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetSummary, CollectionHistory, TransferDetail, TransferSummary, UpdateTransfer, Warehouse } from 'shared-types'
 import { AssetSummarySchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -32,6 +32,12 @@ export async function getTransfers(
 export async function getTransferDetail(transferNumber: string): Promise<TransferDetail> {
   const { data } = await api.get<ApiResponse<TransferDetail>>(`/transfers/${transferNumber}`)
   if (data.success) return TransferDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
+}
+
+export async function getTransferHistory(transferNumber: string): Promise<CollectionHistory> {
+  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/transfers/${transferNumber}/history`)
+  if (data.success) return data.data
   throw new Error(data.error.summary)
 }
 

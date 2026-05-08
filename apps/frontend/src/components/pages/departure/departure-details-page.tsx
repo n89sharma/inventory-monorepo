@@ -1,5 +1,6 @@
 import { DepartureSummaryStrip } from '@/components/custom/cards/departure-summary-strip'
 import { CollectionHistorySection } from '@/components/custom/collection-history-section'
+import { getDepartureHistory } from '@/data/api/departure-api'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -57,9 +58,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
       />
-      <CollectionHistorySection>
-        <p className="text-sm text-muted-foreground">History coming soon.</p>
-      </CollectionHistorySection>
+      <CollectionHistorySection
+        cacheKey={`departure-history:${departureNumber}`}
+        fetcher={() => getDepartureHistory(departureNumber)}
+      />
     </div>
   )
 }

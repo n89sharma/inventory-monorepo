@@ -1,5 +1,6 @@
 import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-strip'
 import { CollectionHistorySection } from '@/components/custom/collection-history-section'
+import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -57,9 +58,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
       />
-      <CollectionHistorySection>
-        <p className="text-sm text-muted-foreground">History coming soon.</p>
-      </CollectionHistorySection>
+      <CollectionHistorySection
+        cacheKey={`invoice-history:${invoiceNumber}`}
+        fetcher={() => getInvoiceHistory(invoiceNumber)}
+      />
     </div>
   )
 }

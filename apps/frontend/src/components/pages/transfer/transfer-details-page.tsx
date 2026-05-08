@@ -1,5 +1,6 @@
 import { TransferSummaryStrip } from '@/components/custom/cards/transfer-summary-strip'
 import { CollectionHistorySection } from '@/components/custom/collection-history-section'
+import { getTransferHistory } from '@/data/api/transfer-api'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -57,9 +58,10 @@ export function TransferDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
       />
-      <CollectionHistorySection>
-        <p className="text-sm text-muted-foreground">History coming soon.</p>
-      </CollectionHistorySection>
+      <CollectionHistorySection
+        cacheKey={`transfer-history:${transferNumber}`}
+        fetcher={() => getTransferHistory(transferNumber)}
+      />
     </div>
   )
 }

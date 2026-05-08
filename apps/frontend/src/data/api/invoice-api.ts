@@ -2,7 +2,7 @@ import { api } from '@/data/api/axios-client'
 import { apiErrorHandler } from '@/lib/error-handler'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { ApiResponse, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import type { ApiResponse, CollectionHistory, InvoiceDetail, UpdateInvoice } from 'shared-types'
 import { type InvoiceSummary, InvoiceDetailSchema, InvoiceSummarySchema, UpdateInvoiceSchema } from 'shared-types'
 import type { AxiosResponse } from 'axios'
 import { z } from 'zod'
@@ -87,5 +87,11 @@ export async function updateInvoice(
 export async function getInvoiceDetail(invoiceNumber: string): Promise<InvoiceDetail> {
   const { data } = await api.get<ApiResponse<InvoiceDetail>>(`/invoices/${invoiceNumber}`)
   if (data.success) return InvoiceDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
+}
+
+export async function getInvoiceHistory(invoiceNumber: string): Promise<CollectionHistory> {
+  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/invoices/${invoiceNumber}/history`)
+  if (data.success) return data.data
   throw new Error(data.error.summary)
 }

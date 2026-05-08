@@ -3,7 +3,7 @@ import { apiErrorHandler } from '@/lib/error-handler'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
+import type { ApiResponse, CollectionHistory, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
 import { type DepartureSummary, DepartureDetailSchema, DepartureSummarySchema, UpdateDepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -31,6 +31,12 @@ export async function getDepartures(
 export async function getDepartureDetail(departureNumber: string): Promise<DepartureDetail> {
   const { data } = await api.get<ApiResponse<DepartureDetail>>(`/departures/${departureNumber}`)
   if (data.success) return DepartureDetailSchema.parse(data.data)
+  throw new Error(data.error.summary)
+}
+
+export async function getDepartureHistory(departureNumber: string): Promise<CollectionHistory> {
+  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/departures/${departureNumber}/history`)
+  if (data.success) return data.data
   throw new Error(data.error.summary)
 }
 

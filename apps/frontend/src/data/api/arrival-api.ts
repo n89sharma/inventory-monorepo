@@ -3,7 +3,7 @@ import { apiErrorHandler } from '@/lib/error-handler'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { AxiosResponse } from 'axios'
-import type { ApiResponse, ArrivalDetail, ArrivalSummary, UpdateArrival, Warehouse } from 'shared-types'
+import type { ApiResponse, ArrivalDetail, ArrivalSummary, CollectionHistory, UpdateArrival, Warehouse } from 'shared-types'
 import { ArrivalDetailSchema, ArrivalSummarySchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -117,4 +117,10 @@ export async function createArrival(a: ArrivalForm): Promise<ApiResponse<CreateA
       data: response.data
     }))
     .catch(apiErrorHandler<CreateArrivalResponse>)
+}
+
+export async function getArrivalHistory(arrivalNumber: string): Promise<CollectionHistory> {
+  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/arrivals/${arrivalNumber}/history`)
+  if (data.success) return data.data
+  throw new Error(data.error.summary)
 }
