@@ -1,8 +1,9 @@
 import { createTransfer, getTransferForUpdate, getTransfers as getTransfersApi, updateTransfer } from '@/data/api/transfer-api'
 import { transferDetailKey } from '@/hooks/use-transfer-detail'
+import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
-import type { ApiResponse, TransferSummary, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetSummary, TransferSummary, Warehouse } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -27,6 +28,7 @@ interface TransferStore {
   getTransferForUpdate: (transferNumber: string) => Promise<void>
   submitCreateTransfer: (data: TransferForm) => Promise<ApiResponse<{ transferNumber: string }>>
   submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<ApiResponse<void>>
+  addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   clearTransfers: () => void
 }
 
@@ -59,6 +61,15 @@ export const useTransferStore = create<TransferStore>((set) => ({
     const response = await updateTransfer(transferNumber, data)
     if (response.success) mutate(transferDetailKey(transferNumber))
     return response
+  },
+  addAssets: async (transferNumber, assets) => {
+    const form = await getTransferForUpdate(transferNumber)
+    if (!form) throw new Error(`Transfer ${transferNumber} not found`)
+    const { merged, added, skipped } = mergeAssets(form.assets, assets)
+    const response = await updateTransfer(transferNumber, { ...form, assets: merged })
+    if (!response.success) throw new Error(response.error.summary)
+    mutate(transferDetailKey(transferNumber))
+    return { added, skipped }
   },
   clearTransfers: () => set({ transfers: [] })
 }))

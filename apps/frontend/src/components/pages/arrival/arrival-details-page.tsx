@@ -1,6 +1,6 @@
 import { ArrivalSummaryStrip } from '@/components/custom/cards/arrival-summary-strip'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
-import { useArrivalDetail } from '@/hooks/use-arrival-detail'
+import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import type { RowSelectionState } from '@tanstack/react-table'
@@ -48,7 +48,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="arrivals" collectionId={arrivalNumber} assets={arrival.assets} />
       </div>
       <ArrivalSummaryStrip arrival={arrival} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={arrivalDetailKey(arrivalNumber)} />
       <DataTable
         columns={columns}
         data={arrival.assets}

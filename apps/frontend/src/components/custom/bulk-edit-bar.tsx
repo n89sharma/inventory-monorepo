@@ -15,12 +15,14 @@ type BulkEditBarProps = {
   selectedAssets: AssetSummary[]
   onClear: () => void
   onPriceSaveSuccess?: () => void
+  refreshKey?: string
 }
 
 export function BulkEditBar({
   selectedAssets,
   onClear,
   onPriceSaveSuccess,
+  refreshKey,
 }: BulkEditBarProps): React.JSX.Element {
   const [addToOpen, setAddToOpen] = useState(false)
   const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
@@ -68,6 +70,7 @@ export function BulkEditBar({
         onOpenChange={setAddToOpen}
         selectedAssets={assets}
         onConfirmSuccess={onClear}
+        refreshKey={refreshKey}
       />
       <BulkEditPricingModal
         open={bulkPricingOpen}

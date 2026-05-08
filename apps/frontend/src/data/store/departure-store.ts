@@ -1,8 +1,9 @@
 import { createDeparture, getDepartureForUpdate, getDepartures, updateDeparture } from '@/data/api/departure-api'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
+import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
-import type { ApiResponse, DepartureSummary, Warehouse } from 'shared-types'
+import type { ApiResponse, AssetSummary, DepartureSummary, Warehouse } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -27,6 +28,7 @@ interface DepartureStore {
   getDepartureForUpdate: (departureNumber: string) => Promise<void>
   submitCreateDeparture: (data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
   submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
+  addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   clearDepartures: () => void
 }
 
@@ -60,6 +62,15 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     const response = await updateDeparture(departureNumber, data)
     if (response.success) mutate(departureDetailKey(departureNumber))
     return response
+  },
+  addAssets: async (departureNumber, assets) => {
+    const form = await getDepartureForUpdate(departureNumber)
+    if (!form) throw new Error(`Departure ${departureNumber} not found`)
+    const { merged, added, skipped } = mergeAssets(form.assets, assets)
+    const response = await updateDeparture(departureNumber, { ...form, assets: merged })
+    if (!response.success) throw new Error(response.error.summary)
+    mutate(departureDetailKey(departureNumber))
+    return { added, skipped }
   },
   clearDepartures: () => set({ departures: [] })
 }))

@@ -1,8 +1,9 @@
 import { createHold, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
 import { holdDetailKey } from '@/hooks/use-hold-detail'
+import { mergeAssets } from '@/lib/collection-utils'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, HoldSummary, User } from 'shared-types'
+import type { ApiResponse, AssetSummary, HoldSummary, User } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -31,6 +32,7 @@ interface HoldStore {
   getHoldForUpdate: (holdNumber: string) => Promise<void>
   submitCreateHold: (data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
   submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
+  addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   clearHolds: () => void
 }
 
@@ -67,6 +69,15 @@ export const useHoldStore = create<HoldStore>((set) => ({
     const response = await updateHold(holdNumber, data)
     if (response.success) mutate(holdDetailKey(holdNumber))
     return response
+  },
+  addAssets: async (holdNumber, assets) => {
+    const form = await getHoldForUpdate(holdNumber)
+    if (!form) throw new Error(`Hold ${holdNumber} not found`)
+    const { merged, added, skipped } = mergeAssets(form.assets, assets)
+    const response = await updateHold(holdNumber, { ...form, assets: merged })
+    if (!response.success) throw new Error(response.error.summary)
+    mutate(holdDetailKey(holdNumber))
+    return { added, skipped }
   },
   clearHolds: () => set({ holds: [] })
 }))

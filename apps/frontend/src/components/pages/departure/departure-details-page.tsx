@@ -2,7 +2,7 @@ import { DepartureSummaryStrip } from '@/components/custom/cards/departure-summa
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useDepartureDetail } from '@/hooks/use-departure-detail'
+import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure-detail'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -47,7 +47,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="departures" collectionId={departureNumber} assets={departure.assets} />
       </div>
       <DepartureSummaryStrip departure={departure} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={departureDetailKey(departureNumber)} />
       <DataTable
         columns={columns}
         data={departure.assets}

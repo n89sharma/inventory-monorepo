@@ -1,8 +1,9 @@
 import { createInvoice, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
+import { mergeAssets } from '@/lib/collection-utils'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, InvoiceSummary } from 'shared-types'
+import type { ApiResponse, AssetSummary, InvoiceSummary } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -23,6 +24,7 @@ interface InvoiceStore {
   submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
   getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
   submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
+  addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   clearInvoices: () => void
 }
 
@@ -55,6 +57,15 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     const response = await updateInvoice(invoiceNumber, data)
     if (response.success) mutate(invoiceDetailKey(invoiceNumber))
     return response
+  },
+  addAssets: async (invoiceNumber, assets) => {
+    const form = await getInvoiceForUpdate(invoiceNumber)
+    if (!form) throw new Error(`Invoice ${invoiceNumber} not found`)
+    const { merged, added, skipped } = mergeAssets(form.assets, assets)
+    const response = await updateInvoice(invoiceNumber, { ...form, assets: merged })
+    if (!response.success) throw new Error(response.error.summary)
+    mutate(invoiceDetailKey(invoiceNumber))
+    return { added, skipped }
   },
   clearInvoices: () => set({ invoices: [] })
 }))

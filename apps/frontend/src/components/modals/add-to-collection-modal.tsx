@@ -1,7 +1,12 @@
-import { addAssetsToCollection, getCollectionAssets, type CollectionTarget } from '@/data/api/add-to-collection-api'
+import { getCollectionAssets, type CollectionTarget } from '@/data/api/add-to-collection-api'
+import { useDepartureStore } from '@/data/store/departure-store'
+import { useHoldStore } from '@/data/store/hold-store'
+import { useInvoiceStore } from '@/data/store/invoice-store'
+import { useTransferStore } from '@/data/store/transfer-store'
 import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { mutate } from 'swr'
 import type { AssetSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -91,9 +96,16 @@ interface AddToCollectionModalProps {
   onOpenChange: (open: boolean) => void
   selectedAssets: AssetSummary[]
   onConfirmSuccess: () => void
+  refreshKey?: string
 }
 
-export function AddToCollectionModal({ open, onOpenChange, selectedAssets, onConfirmSuccess }: AddToCollectionModalProps) {
+export function AddToCollectionModal({
+  open,
+  onOpenChange,
+  selectedAssets,
+  onConfirmSuccess,
+  refreshKey,
+}: AddToCollectionModalProps) {
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<CollectionResults>(emptyResults)
@@ -101,6 +113,11 @@ export function AddToCollectionModal({ open, onOpenChange, selectedAssets, onCon
   const [duplicateCount, setDuplicateCount] = useState(0)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [isConfirming, setIsConfirming] = useState(false)
+
+  const addAssetsToHold = useHoldStore(s => s.addAssets)
+  const addAssetsToDeparture = useDepartureStore(s => s.addAssets)
+  const addAssetsToTransfer = useTransferStore(s => s.addAssets)
+  const addAssetsToInvoice = useInvoiceStore(s => s.addAssets)
 
   const assetCount = selectedAssets.length
 
@@ -145,11 +162,31 @@ export function AddToCollectionModal({ open, onOpenChange, selectedAssets, onCon
     if (!selected) return
     setIsConfirming(true)
     try {
-      const { added, skipped } = await addAssetsToCollection(toCollectionTarget(selected), selectedAssets)
+      let added: number
+      let skipped: number
+      switch (selected.kind) {
+        case 'hold': {
+          ({ added, skipped } = await addAssetsToHold(selected.data.hold_number, selectedAssets))
+          break
+        }
+        case 'departure': {
+          ({ added, skipped } = await addAssetsToDeparture(selected.data.departure_number, selectedAssets))
+          break
+        }
+        case 'transfer': {
+          ({ added, skipped } = await addAssetsToTransfer(selected.data.transfer_number, selectedAssets))
+          break
+        }
+        case 'invoice': {
+          ({ added, skipped } = await addAssetsToInvoice(selected.data.invoice_number, selectedAssets))
+          break
+        }
+      }
       const msg = skipped > 0
-        ? `${added} asset${added !== 1 ? 's' : ''} added. ${skipped} already present and skipped.`
-        : `${added} asset${added !== 1 ? 's' : ''} added to ${collectionLabel(selected)}.`
+        ? `${added!} asset${added! !== 1 ? 's' : ''} added. ${skipped} already present and skipped.`
+        : `${added!} asset${added! !== 1 ? 's' : ''} added to ${collectionLabel(selected)}.`
       toast.success(msg, { position: 'top-center' })
+      if (refreshKey) mutate(refreshKey)
       onConfirmSuccess()
       handleOpenChange(false)
     } catch (err) {

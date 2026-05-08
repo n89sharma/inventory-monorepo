@@ -2,7 +2,7 @@ import { TransferSummaryStrip } from '@/components/custom/cards/transfer-summary
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useTransferDetail } from '@/hooks/use-transfer-detail'
+import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer-detail'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -47,7 +47,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="transfers" collectionId={transferNumber} assets={transfer.assets} />
       </div>
       <TransferSummaryStrip transfer={transfer} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={transferDetailKey(transferNumber)} />
       <DataTable
         columns={columns}
         data={transfer.assets}

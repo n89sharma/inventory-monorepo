@@ -2,7 +2,7 @@ import { HoldSummaryStrip } from '@/components/custom/cards/hold-summary-strip'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useHoldDetail } from '@/hooks/use-hold-detail'
+import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold-detail'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -47,7 +47,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="holds" collectionId={holdNumber} assets={hold.assets} />
       </div>
       <HoldSummaryStrip hold={hold} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} />
+      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={holdDetailKey(holdNumber)} />
       <DataTable
         columns={columns}
         data={hold.assets}
