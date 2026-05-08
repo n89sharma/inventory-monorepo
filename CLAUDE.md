@@ -136,7 +136,9 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 
 **Prisma:** Schema at `apps/backend/prisma/schema.prisma`. Generated client at `apps/backend/generated/prisma`. Config at `apps/backend/prisma.config.ts`. Preview features: `relationJoins`, `typedSql`.
 
-**Raw query safety:** Never use `$queryRawUnsafe` or `$executeRawUnsafe` — they disable Prisma's parameterization and open SQL injection vectors. Always use the tagged-template forms: `` prisma.$queryRaw`SELECT ...` `` and `` prisma.$executeRaw`...` ``. If a DB identifier (table/sequence name) must be interpolated, cast it via `::regclass` or validate against an explicit whitelist before passing it in.
+**All SQL belongs in typed `.sql` files:** Never write inline SQL in service or controller files. Every query — simple or complex — goes in `prisma/sql/getSomething.sql` and is called via `prisma.$queryRawTyped(...)`. This keeps parameterization enforced by the Prisma type pipeline and prevents `Prisma.raw()` from being used as a workaround. Never use `$queryRaw`, `$queryRawUnsafe`, or `$executeRawUnsafe` anywhere in application code.
+
+**Text search input safety:** Any controller field that feeds a SQL text-search or regex operator (e.g. `~*`, `LIKE`, `ILIKE`) must be validated with a Zod character allowlist before the query runs. Strip all POSIX regex metacharacters by constraining to safe characters only — e.g. `z.string().max(100).regex(/^[a-zA-Z0-9\s\-_.]*$/)`. Parameterization prevents SQL injection but does not prevent ReDoS: a bound parameter that contains `(a{1,50}){1,50}` is still evaluated as a regex by PostgreSQL's POSIX engine.
 
 ---
 
