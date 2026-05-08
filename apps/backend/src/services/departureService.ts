@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { CreateDeparture, DepartureDetail, UpdateDeparture } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -6,7 +5,7 @@ import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
-const sequenceDepartureEntity = 'DEPARTURE'
+
 
 export async function getDeparture(departureNumber: string): Promise<DepartureDetail> {
   const [departure, assets] = await Promise.all([
@@ -59,7 +58,7 @@ export async function getDepartureForUpdate(departureNumber: string): Promise<Up
 export async function createDeparture(departure: CreateDeparture, userId: number): Promise<string> {
   const originCode = departure.origin.city_code
   const currentDateTime = new Date()
-  const departureNumber = await getNewDepartureNumber(originCode, currentDateTime)
+  const departureNumber = await getNewDepartureNumber(originCode)
   const assetIds = departure.assets.map(a => a.id)
 
   const newDeparture = await prisma.$transaction(async (tx) => {
@@ -170,8 +169,7 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
   await recordAssetUpdateOnCollection('Departure', departure.id, assetIdsToAdd, assetIdsToRemove, userId)
 }
 
-async function getNewDepartureNumber(originCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceDepartureEntity, originCode, date)
-  return `D${originCode}-${formattedDate}-${String(sequence).padStart(3, '0')}`
+async function getNewDepartureNumber(originCode: string): Promise<string> {
+  const sequence = await getNextSequence('departure')
+  return `D-${originCode}-${String(sequence).padStart(7, '0')}`
 }

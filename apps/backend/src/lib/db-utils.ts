@@ -1,8 +1,19 @@
-import { format } from 'date-fns'
 import { prisma } from '../prisma.js'
 
-export async function getNextSequence(entityType: string, warehouseCode: string, date: Date): Promise<number> {
-  const formattedDate = format(date, 'yyyy-MM-dd')
-  const result = await prisma.$queryRaw<[{ get_next_sequence: number }]>`SELECT get_next_sequence(${entityType}, ${warehouseCode}, ${formattedDate})`
-  return result[0].get_next_sequence
+const SEQ_NAMES: Record<string, string> = {
+  asset:     'seq_asset',
+  arrival:   'seq_arrival',
+  departure: 'seq_departure',
+  transfer:  'seq_transfer',
+  hold:      'seq_hold',
+  invoice:   'seq_invoice',
+}
+
+export async function getNextSequence(entityType: string): Promise<number> {
+  const seqName = SEQ_NAMES[entityType.toLowerCase()]
+  if (!seqName) throw new Error(`Unknown sequence entity type: ${entityType}`)
+  const result = await prisma.$queryRawUnsafe<[{ nextval: bigint }]>(
+    `SELECT nextval('public.${seqName}')`
+  )
+  return Number(result[0].nextval)
 }

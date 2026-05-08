@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { CreateHold, HoldDetail, UpdateHold } from 'shared-types'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -16,7 +15,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   })
 
   const now = new Date()
-  const holdNumber = await getNewHoldNumber(now)
+  const holdNumber = await getNewHoldNumber()
 
   const { hold, assetStateMap } = await prisma.$transaction(async (tx) => {
     const conflicting = await tx.asset.findMany({
@@ -75,10 +74,9 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   return holdNumber
 }
 
-async function getNewHoldNumber(date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence('HOLD', '', date)
-  return `H-${formattedDate}-${String(sequence).padStart(3, '0')}`
+async function getNewHoldNumber(): Promise<string> {
+  const sequence = await getNextSequence('hold')
+  return `H-${String(sequence).padStart(7, '0')}`
 }
 
 export async function getHoldForUpdate(holdNumber: string): Promise<UpdateHold> {

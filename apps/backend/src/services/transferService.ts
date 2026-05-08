@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { CreateTransfer, TransferDetail, UpdateTransfer } from 'shared-types'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -6,7 +5,7 @@ import { NotFoundError } from '../lib/errors.js'
 import { recordAssetUpdateOnCollection, recordTransferCreate, recordTransferUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
-const sequenceTransferEntity = 'TRANSFER'
+
 
 export async function getTransfer(transferNumber: string): Promise<TransferDetail> {
   const [transfer, assets] = await Promise.all([
@@ -55,7 +54,7 @@ export async function getTransferForUpdate(transferNumber: string): Promise<Upda
 export async function createTransfer(transfer: CreateTransfer, userId: number): Promise<string> {
   const originCode = transfer.origin.city_code
   const currentDateTime = new Date()
-  const transferNumber = await getNewTransferNumber(originCode, currentDateTime)
+  const transferNumber = await getNewTransferNumber(originCode)
 
   const newTransfer = await prisma.transfer.create({
     data: {
@@ -135,8 +134,7 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
   await recordAssetUpdateOnCollection('Transfer', transfer.id, assetIdsToAdd, assetIdsToDelete, userId)
 }
 
-async function getNewTransferNumber(originCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceTransferEntity, originCode, date)
-  return `T${originCode}-${formattedDate}-${String(sequence).padStart(3, '0')}`
+async function getNewTransferNumber(originCode: string): Promise<string> {
+  const sequence = await getNextSequence('transfer')
+  return `T-${originCode}-${String(sequence).padStart(7, '0')}`
 }

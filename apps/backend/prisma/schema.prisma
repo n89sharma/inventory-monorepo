@@ -432,15 +432,6 @@ model TrackingStatus {
   Asset  Asset[]
 }
 
-model Sequence {
-  entity_type    String
-  warehouse_code String
-  sequence_date  DateTime @db.Date
-  last_number    Int      @default(0)
-
-  @@id([entity_type, warehouse_code, sequence_date])
-}
-
 model StorePart {
   id           Int     @id @default(autoincrement())
   part_number  String  @unique @db.VarChar(50)

@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { ArrivalDetail, CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
@@ -9,8 +8,6 @@ import { NotFoundError } from '../lib/errors.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
 
-const sequenceArrivalEntity = 'ARRIVAL'
-const sequenceAssetEntity = 'ASSET'
 
 const arrivalLocation = 'ARRIVAL'
 const arrivalTrackingStatus = 'RECEIVING'
@@ -99,8 +96,8 @@ async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<Upda
 export async function createArrival(newArrival: CreateArrival, userId: number) {
   const warehouseCode = newArrival.warehouse.city_code
   const currentDateTime = new Date()
-  const barcodes = await generateBarcodes(newArrival.assets, warehouseCode, currentDateTime)
-  const arrivalNumber = await getNewArrivalNumber(warehouseCode, currentDateTime)
+  const barcodes = await generateBarcodes(newArrival.assets, warehouseCode)
+  const arrivalNumber = await getNewArrivalNumber(warehouseCode)
 
   const arrival = await prisma.arrival.create({
     data: {
@@ -187,9 +184,8 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
 
   // Generate barcodes for new assets outside the transaction (sequence function is atomic)
   let newAssetBarcodes: Record<string, string> = {}
-  const newAssetDateTime = new Date()
   if (assetsToCreate.length > 0) {
-    newAssetBarcodes = await generateBarcodes(assetsToCreate, arrival.warehouse.city_code, newAssetDateTime)
+    newAssetBarcodes = await generateBarcodes(assetsToCreate, arrival.warehouse.city_code)
   }
 
   const { currentArrival, existingAssets, existingAssetIds, assetIdsToBeDeleted, newAssets } =
@@ -269,7 +265,7 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       for (const asset of assetsToCreate) {
         await tx.asset.create({
           data: {
-            ...mapInputAssetToPrismaCreateAsset(asset, newAssetBarcodes, arrival.warehouse.id, newAssetDateTime),
+            ...mapInputAssetToPrismaCreateAsset(asset, newAssetBarcodes, arrival.warehouse.id, new Date()),
             arrival: { connect: { id: arrival.id } }
           }
         })
@@ -336,22 +332,20 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
   }
 }
 
-async function generateBarcodes(assets: CreateAsset[], warehouseCode: string, date: Date) {
+async function generateBarcodes(assets: CreateAsset[], warehouseCode: string) {
   const barcodes: Record<string, string> = {}
   for (const asset of assets) {
-    barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode, date)
+    barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode)
   }
   return barcodes
 }
 
-async function getNewArrivalNumber(warehouseCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceArrivalEntity, warehouseCode, date)
-  return `A${warehouseCode}-${formattedDate}-${String(sequence).padStart(3, '0')}`
+async function getNewArrivalNumber(warehouseCode: string): Promise<string> {
+  const sequence = await getNextSequence('arrival')
+  return `A-${warehouseCode}-${String(sequence).padStart(7, '0')}`
 }
 
-async function getNewAssetBarcode(warehouseCode: string, date: Date): Promise<string> {
-  const formattedDate = format(date, 'yyMMdd')
-  const sequence = await getNextSequence(sequenceAssetEntity, warehouseCode, date)
-  return `${warehouseCode}-${formattedDate}-${String(sequence).padStart(4, '0')}`
+async function getNewAssetBarcode(warehouseCode: string): Promise<string> {
+  const sequence = await getNextSequence('asset')
+  return `${warehouseCode}-${String(sequence).padStart(7, '0')}`
 }
