@@ -33,6 +33,7 @@ interface HoldStore {
   submitCreateHold: (data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
   submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
   addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
+  getAssets: (holdNumber: string) => Promise<AssetSummary[]>
   clearHolds: () => void
 }
 
@@ -78,6 +79,10 @@ export const useHoldStore = create<HoldStore>((set) => ({
     if (!response.success) throw new Error(response.error.summary)
     mutate(holdDetailKey(holdNumber))
     return { added, skipped }
+  },
+  getAssets: async (holdNumber) => {
+    const form = await getHoldForUpdate(holdNumber)
+    return form?.assets ?? []
   },
   clearHolds: () => set({ holds: [] })
 }))

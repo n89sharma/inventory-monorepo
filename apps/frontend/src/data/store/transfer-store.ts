@@ -29,6 +29,7 @@ interface TransferStore {
   submitCreateTransfer: (data: TransferForm) => Promise<ApiResponse<{ transferNumber: string }>>
   submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<ApiResponse<void>>
   addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
+  getAssets: (transferNumber: string) => Promise<AssetSummary[]>
   clearTransfers: () => void
 }
 
@@ -70,6 +71,10 @@ export const useTransferStore = create<TransferStore>((set) => ({
     if (!response.success) throw new Error(response.error.summary)
     mutate(transferDetailKey(transferNumber))
     return { added, skipped }
+  },
+  getAssets: async (transferNumber) => {
+    const form = await getTransferForUpdate(transferNumber)
+    return form?.assets ?? []
   },
   clearTransfers: () => set({ transfers: [] })
 }))

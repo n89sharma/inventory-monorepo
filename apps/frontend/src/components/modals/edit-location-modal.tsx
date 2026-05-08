@@ -8,7 +8,6 @@ import {
 } from "@/components/shadcn/dialog"
 import { Field, FieldLabel } from "@/components/shadcn/field"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
-import { getLocationsByWarehouse } from "@/data/api/asset-api"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { CircleNotchIcon } from "@phosphor-icons/react"
@@ -31,6 +30,7 @@ function filterLocationInput(val: string): string {
 
 export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLocationModalProps) {
   const updateAssetLocation = useAssetStore(state => state.updateAssetLocation)
+  const getLocationsByWarehouse = useAssetStore(state => state.getLocationsByWarehouse)
   const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = warehouses.filter(w => w.is_active)
 

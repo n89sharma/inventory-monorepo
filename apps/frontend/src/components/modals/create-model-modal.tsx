@@ -1,4 +1,3 @@
-import { createModel, getModels } from '@/data/api/model-api'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -24,7 +23,7 @@ interface CreateModelModalProps {
 export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps): React.JSX.Element {
   const brands = useReferenceDataStore(state => state.brands)
   const assetTypes = useReferenceDataStore(state => state.assetTypes)
-  const setModels = useModelStore(state => state.setModels)
+  const createModel = useModelStore(state => state.createModel)
 
   const form = useForm<ModelForm>({
     resolver: zodResolver(ModelFormSchema),
@@ -48,7 +47,6 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
   async function onValidSubmit(data: ModelForm) {
     const result = await createModel(data)
     if (result.success) {
-      getModels().then(setModels)
       toast.success('Model created')
       onOpenChange(false)
     } else {

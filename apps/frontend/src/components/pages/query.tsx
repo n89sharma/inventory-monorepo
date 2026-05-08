@@ -1,5 +1,5 @@
 import { Button } from "@/components/shadcn/button"
-import { exportAssets, getAssetsForQuery } from "@/data/api/asset-api"
+import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useQueryStore } from '@/data/store/query-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
@@ -57,6 +57,8 @@ function QueryResultsTable({
 }
 
 export function QueryPage(): React.JSX.Element {
+  const searchAssets = useQueryStore(state => state.searchAssets)
+  const exportAssets = useAssetStore(state => state.exportAssets)
   const [loading, setLoading] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -74,20 +76,17 @@ export function QueryPage(): React.JSX.Element {
   const technicalStatuses = useQueryStore(state => state.technicalStatuses)
   const selectedWarehouses = useQueryStore(state => state.selectedWarehouses)
 
-  const setAssets = useQueryStore(state => state.setAssets)
   const setModel = useQueryStore(state => state.setModel)
   const setMeter = useQueryStore(state => state.setMeter)
   const setAvailabilityStatuses = useQueryStore(state => state.setAvailabilityStatuses)
   const setTechnicalStatuses = useQueryStore(state => state.setTechnicalStatuses)
   const setSelectedWarehouses = useQueryStore(state => state.setSelectedWarehouses)
-  const setHasSearched = useQueryStore(state => state.setHasSearched)
 
   async function submitQuery() {
     setLoading(true)
     try {
       if (model) {
-        setAssets(await getAssetsForQuery(model, meter, availabilityStatuses, technicalStatuses, selectedWarehouses))
-        setHasSearched(true)
+        await searchAssets(model, meter, availabilityStatuses, technicalStatuses, selectedWarehouses)
       }
     } finally {
       setLoading(false)

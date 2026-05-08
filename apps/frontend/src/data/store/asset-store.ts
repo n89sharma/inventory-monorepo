@@ -1,6 +1,30 @@
-import { createPartTransfer as createPartTransferApi, postComment as postCommentApi, updateAssetErrors as updateAssetErrorsApi, updateAssetLocation as updateAssetLocationApi, updateAssetPricing as updateAssetPricingApi, updateAssetSpecs as updateAssetSpecsApi } from '@/data/api/asset-api'
+import {
+  bulkUpdateAssetPricing as bulkUpdateAssetPricingApi,
+  createPartTransfer as createPartTransferApi,
+  exportAssets as exportAssetsApi,
+  getAssetDetail as getAssetDetailApi,
+  getLocationsByWarehouse as getLocationsByWarehouseApi,
+  postComment as postCommentApi,
+  updateAssetErrors as updateAssetErrorsApi,
+  updateAssetLocation as updateAssetLocationApi,
+  updateAssetPricing as updateAssetPricingApi,
+  updateAssetSpecs as updateAssetSpecsApi,
+} from '@/data/api/asset-api'
+import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
 import { assetDetailKey } from '@/hooks/use-asset-detail'
-import type { ApiResponse, CreateComment, CreatePartTransfer, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError } from 'shared-types'
+import type {
+  ApiResponse,
+  AssetDetails,
+  AssetLocation,
+  AssetSummary,
+  BulkUpdateAssetPricing,
+  CreateComment,
+  CreatePartTransfer,
+  UpdateAssetLocation,
+  UpdateAssetPricing,
+  UpdateAssetSpecs,
+  UpdateError,
+} from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -11,6 +35,11 @@ interface AssetStore {
   updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<ApiResponse<void>>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<ApiResponse<void>>
   updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<ApiResponse<void>>
+  getAssetByBarcode: (barcode: string) => Promise<AssetSummary>
+  getAssetDetail: (barcode: string) => Promise<AssetDetails>
+  getLocationsByWarehouse: (warehouseId: number) => Promise<ApiResponse<AssetLocation[]>>
+  exportAssets: (barcodes: string[], filename?: string) => Promise<void>
+  bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<ApiResponse<void>>
 }
 
 export const useAssetStore = create<AssetStore>(() => ({
@@ -47,6 +76,20 @@ export const useAssetStore = create<AssetStore>(() => ({
   updateAssetSpecs: async (barcode, data) => {
     const response = await updateAssetSpecsApi(barcode, data)
     if (response.success) mutate(assetDetailKey(barcode))
+    return response
+  },
+
+  getAssetByBarcode: (barcode) => getAssetByBarcodeApi(barcode),
+
+  getAssetDetail: (barcode) => getAssetDetailApi({ barcode }),
+
+  getLocationsByWarehouse: (warehouseId) => getLocationsByWarehouseApi(warehouseId),
+
+  exportAssets: (barcodes, filename) => exportAssetsApi(barcodes, filename),
+
+  bulkUpdatePricing: async (items) => {
+    const response = await bulkUpdateAssetPricingApi(items)
+    if (response.success) items.forEach(item => mutate(assetDetailKey(item.barcode)))
     return response
   },
 }))

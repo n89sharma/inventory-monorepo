@@ -1,4 +1,4 @@
-import { exportAssets } from '@/data/api/asset-api'
+import { useAssetStore } from '@/data/store/asset-store'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
@@ -22,6 +22,7 @@ export function CollectionEditBar({
   assets,
 }: CollectionEditBarProps): React.JSX.Element {
 
+  const exportAssets = useAssetStore(state => state.exportAssets)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
 

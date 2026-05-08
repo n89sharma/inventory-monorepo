@@ -1,4 +1,4 @@
-import { getCollectionAssets, type CollectionTarget } from '@/data/api/add-to-collection-api'
+import type { AssetSummary } from 'shared-types'
 import { useDepartureStore } from '@/data/store/departure-store'
 import { useHoldStore } from '@/data/store/hold-store'
 import { useInvoiceStore } from '@/data/store/invoice-store'
@@ -7,19 +7,9 @@ import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
-import type { AssetSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { DetailGrid, emptyResults, SearchView, type CollectionResults, type SelectedCollection } from './collection-search'
-
-function toCollectionTarget(s: SelectedCollection): CollectionTarget {
-  switch (s.kind) {
-    case 'departure': return { kind: 'departure', number: s.data.departure_number }
-    case 'transfer':  return { kind: 'transfer',  number: s.data.transfer_number }
-    case 'hold':      return { kind: 'hold',       number: s.data.hold_number }
-    case 'invoice':   return { kind: 'invoice',    number: s.data.invoice_number }
-  }
-}
 
 function collectionLabel(s: SelectedCollection): string {
   switch (s.kind) {
@@ -115,9 +105,13 @@ export function AddToCollectionModal({
   const [isConfirming, setIsConfirming] = useState(false)
 
   const addAssetsToHold = useHoldStore(s => s.addAssets)
+  const getHoldAssets = useHoldStore(s => s.getAssets)
   const addAssetsToDeparture = useDepartureStore(s => s.addAssets)
+  const getDepartureAssets = useDepartureStore(s => s.getAssets)
   const addAssetsToTransfer = useTransferStore(s => s.addAssets)
+  const getTransferAssets = useTransferStore(s => s.getAssets)
   const addAssetsToInvoice = useInvoiceStore(s => s.addAssets)
+  const getInvoiceAssets = useInvoiceStore(s => s.getAssets)
 
   const assetCount = selectedAssets.length
 
@@ -147,7 +141,13 @@ export function AddToCollectionModal({
     setDuplicateCount(0)
     setIsLoadingDetail(true)
     try {
-      const existing = await getCollectionAssets(toCollectionTarget(collection))
+      let existing: AssetSummary[]
+      switch (collection.kind) {
+        case 'hold':      existing = await getHoldAssets(collection.data.hold_number); break
+        case 'departure': existing = await getDepartureAssets(collection.data.departure_number); break
+        case 'transfer':  existing = await getTransferAssets(collection.data.transfer_number); break
+        case 'invoice':   existing = await getInvoiceAssets(collection.data.invoice_number); break
+      }
       const existingIds = new Set(existing.map(a => a.id))
       setDuplicateCount(selectedAssets.filter(a => existingIds.has(a.id)).length)
     } catch {

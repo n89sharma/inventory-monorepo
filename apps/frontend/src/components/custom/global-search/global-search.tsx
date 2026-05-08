@@ -1,6 +1,6 @@
 import { Input } from '@/components/shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
-import { getGlobalSearchResults } from '@/data/api/search-api'
+import { useSearchStore } from '@/data/store/search-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
@@ -15,6 +15,7 @@ const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoice
 type Tab = typeof tabs[number]
 
 export const GlobalSearch = ({ className }: { className?: string }) => {
+  const searchGlobal = useSearchStore(state => state.searchGlobal)
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<GlobalSearchResult>(emptyResults)
@@ -41,7 +42,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   useEffect(() => {
     if (!query) return
     const t = setTimeout(async () => {
-      const res = await getGlobalSearchResults(query)
+      const res = await searchGlobal(query)
       setResults(res)
       setIsLoading(false)
       const firstWithResults = tabs.find(tab => res[tab].length > 0)

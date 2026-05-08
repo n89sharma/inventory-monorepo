@@ -29,6 +29,7 @@ interface DepartureStore {
   submitCreateDeparture: (data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
   submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
+  getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   clearDepartures: () => void
 }
 
@@ -71,6 +72,10 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     if (!response.success) throw new Error(response.error.summary)
     mutate(departureDetailKey(departureNumber))
     return { added, skipped }
+  },
+  getAssets: async (departureNumber) => {
+    const form = await getDepartureForUpdate(departureNumber)
+    return form?.assets ?? []
   },
   clearDepartures: () => set({ departures: [] })
 }))

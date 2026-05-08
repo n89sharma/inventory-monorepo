@@ -25,6 +25,7 @@ interface InvoiceStore {
   getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
   submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
+  getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
   clearInvoices: () => void
 }
 
@@ -66,6 +67,10 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     if (!response.success) throw new Error(response.error.summary)
     mutate(invoiceDetailKey(invoiceNumber))
     return { added, skipped }
+  },
+  getAssets: async (invoiceNumber) => {
+    const form = await getInvoiceForUpdate(invoiceNumber)
+    return form?.assets ?? []
   },
   clearInvoices: () => set({ invoices: [] })
 }))

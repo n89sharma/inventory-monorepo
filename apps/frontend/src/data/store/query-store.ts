@@ -1,3 +1,4 @@
+import { getAssetsForQuery as getAssetsForQueryApi } from '@/data/api/asset-api'
 import type { AssetSummary, ModelSummary, Status, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
@@ -17,6 +18,13 @@ interface QueryStore {
   setTechnicalStatuses: (statuses: Status[]) => void
   setSelectedWarehouses: (warehouses: Warehouse[]) => void
   setHasSearched: (hasSearched: boolean) => void
+  searchAssets: (
+    model: ModelSummary,
+    meter: number | null,
+    availabilityStatuses: Status[],
+    technicalStatuses: Status[],
+    warehouses: Warehouse[]
+  ) => Promise<void>
 }
 
 export const useQueryStore = create<QueryStore>((set) => ({
@@ -35,4 +43,8 @@ export const useQueryStore = create<QueryStore>((set) => ({
   setTechnicalStatuses: (technicalStatuses) => set({ technicalStatuses }),
   setSelectedWarehouses: (selectedWarehouses) => set({ selectedWarehouses }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
+  searchAssets: async (model, meter, availabilityStatuses, technicalStatuses, warehouses) => {
+    const assets = await getAssetsForQueryApi(model, meter, availabilityStatuses, technicalStatuses, warehouses)
+    set({ assets, hasSearched: true })
+  },
 }))

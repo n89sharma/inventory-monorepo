@@ -12,7 +12,7 @@ import { Button } from '@/components/shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/dialog'
 import { Input } from '@/components/shadcn/input'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
-import { bulkUpdateAssetPricing, getAssetDetail } from '@/data/api/asset-api'
+import { useAssetStore } from '@/data/store/asset-store'
 import { formatThousandsK } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import type { CellContext, ColumnDef } from '@tanstack/react-table'
@@ -126,6 +126,8 @@ function checkDirty(rows: PricingRow[], initial: PricingRow[]): boolean {
 }
 
 export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSaveSuccess }: BulkEditPricingModalProps) {
+  const getAssetDetail = useAssetStore(state => state.getAssetDetail)
+  const bulkUpdatePricing = useAssetStore(state => state.bulkUpdatePricing)
   const [rows, setRows] = useState<PricingRow[]>([])
   const [initialRows, setInitialRows] = useState<PricingRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -135,7 +137,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
   useEffect(() => {
     if (!open) return
     setLoading(true)
-    Promise.allSettled(selectedAssets.map(a => getAssetDetail({ barcode: a.barcode }))).then(results => {
+    Promise.allSettled(selectedAssets.map(a => getAssetDetail(a.barcode))).then(results => {
       const loaded: PricingRow[] = results.map((r, i) => {
         const asset = selectedAssets[i]
         if (r.status === 'fulfilled') {
@@ -198,7 +200,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
 
   async function handleSave() {
     setSaving(true)
-    const response = await bulkUpdateAssetPricing(
+    const response = await bulkUpdatePricing(
       rows.map(r => ({
         barcode: r.barcode,
         purchase_cost: parseFloat(r.purchase_cost) || 0,

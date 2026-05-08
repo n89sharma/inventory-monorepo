@@ -1,5 +1,5 @@
 import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
-import { getAssetByBarcode } from '@/data/api/transfer-api'
+import { useAssetStore } from '@/data/store/asset-store'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
@@ -15,6 +15,7 @@ interface AddAssetByBarcodeProps {
 }
 
 export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateAsset }: AddAssetByBarcodeProps): React.JSX.Element {
+  const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
   const barcodeInputRef = useRef<HTMLInputElement>(null)
   const [barcodeError, setBarcodeError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)

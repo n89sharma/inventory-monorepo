@@ -1,4 +1,3 @@
-import { createBrand, getBrands } from '@/data/api/brand-api'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { BrandFormSchema, type BrandForm } from '@/ui-types/brand-form-types'
@@ -17,7 +16,7 @@ interface CreateBrandModalProps {
 }
 
 export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps): React.JSX.Element {
-  const setBrands = useReferenceDataStore(state => state.setBrands)
+  const createBrand = useReferenceDataStore(state => state.createBrand)
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(BrandFormSchema),
@@ -31,7 +30,6 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
   async function onValidSubmit(data: BrandForm) {
     const result = await createBrand(data)
     if (result.success) {
-      getBrands().then(setBrands)
       toast.success('Brand created')
       onOpenChange(false)
     } else {

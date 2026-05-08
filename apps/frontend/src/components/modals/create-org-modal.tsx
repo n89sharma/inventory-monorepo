@@ -1,4 +1,3 @@
-import { createOrg, getOrgs } from '@/data/api/org-api'
 import { useOrgStore } from '@/data/store/org-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { OrgFormSchema, type OrgForm } from '@/ui-types/org-form-types'
@@ -17,7 +16,7 @@ interface CreateOrgModalProps {
 }
 
 export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): React.JSX.Element {
-  const setOrganizations = useOrgStore(state => state.setOrganizations)
+  const createOrg = useOrgStore(state => state.createOrg)
 
   const form = useForm<OrgForm>({
     resolver: zodResolver(OrgFormSchema),
@@ -46,7 +45,6 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
   async function onValidSubmit(data: OrgForm) {
     const result = await createOrg(data)
     if (result.success) {
-      getOrgs().then(setOrganizations)
       toast.success('Organization created')
       onOpenChange(false)
     } else {

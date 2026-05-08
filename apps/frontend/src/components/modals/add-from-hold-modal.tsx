@@ -1,4 +1,5 @@
-import { getHoldDetail } from '@/data/api/hold-api'
+import { useHoldStore } from '@/data/store/hold-store'
+import { useSearchStore } from '@/data/store/search-store'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +25,8 @@ interface AddFromHoldModalProps {
 }
 
 export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: AddFromHoldModalProps) {
+  const searchGlobal = useSearchStore(state => state.searchGlobal)
+  const getHoldAssets = useHoldStore(state => state.getAssets)
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<CollectionResults>(emptyResults)
@@ -40,8 +43,7 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: 
     setIsLoading(true)
     const t = setTimeout(async () => {
       try {
-        const { getGlobalSearchResults } = await import('@/data/api/search-api')
-        const res = await getGlobalSearchResults(value)
+        const res = await searchGlobal(value)
         setResults({ ...emptyResults, holds: res.holds })
       } finally {
         setIsLoading(false)
@@ -54,11 +56,11 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: 
     if (!selected) return
     setIsConfirming(true)
     try {
-      const hold = await getHoldDetail(selected.hold_number)
+      const holdAssets = await getHoldAssets(selected.hold_number)
       const currentIds = new Set(getAssets().map(a => a.id))
-      const toAdd = hold.assets.filter(a => !currentIds.has(a.id))
+      const toAdd = holdAssets.filter(a => !currentIds.has(a.id))
       toAdd.forEach(asset => onAddAsset(asset))
-      const skipped = hold.assets.length - toAdd.length
+      const skipped = holdAssets.length - toAdd.length
       const msg = skipped > 0
         ? `${toAdd.length} asset${toAdd.length !== 1 ? 's' : ''} added. ${skipped} duplicate${skipped !== 1 ? 's' : ''} skipped.`
         : `${toAdd.length} asset${toAdd.length !== 1 ? 's' : ''} added from Hold ${selected.hold_number}.`
