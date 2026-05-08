@@ -1,6 +1,7 @@
 import { verifyWebhook } from '@clerk/express/webhooks'
 import { Request, Response } from 'express'
 import { prisma } from '../prisma.js'
+import { logger } from '../lib/logger.js'
 
 const DEFAULT_ROLE_ID = 2 // MEMBER (read-only)
 
@@ -38,7 +39,7 @@ export async function handleClerkWebhook(req: Request, res: Response) {
 
     res.status(200).send('Webhook received')
   } catch (err) {
-    console.error('Error verifying webhook:', err)
+    logger.error('Error verifying webhook', { error: err })
     res.status(400).send('Error verifying webhook')
   }
 }

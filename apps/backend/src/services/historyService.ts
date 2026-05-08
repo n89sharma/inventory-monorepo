@@ -1,6 +1,7 @@
 import { CollectionHistory, CollectionHistoryRecord } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../prisma.js'
+import { logger } from '../lib/logger.js'
 
 // ─── State types for CREATE ───────────────────────────────────────────────────
 
@@ -124,7 +125,7 @@ async function recordHistory(
       }
     })
   } catch (error) {
-    console.error(`History write failed [${actionType} ${entityType} ${entityId}]:`, error)
+    logger.error(`History write failed [${actionType} ${entityType} ${entityId}]`, { error })
   }
 }
 
@@ -217,7 +218,7 @@ export async function recordArrivalCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Arrival ${arrivalId}]:`, error)
+    logger.error(`History write failed [CREATE Arrival ${arrivalId}]`, { error })
   }
 }
 
@@ -253,7 +254,7 @@ export async function recordArrivalUpdate(
       await recordHistory('Arrival', arrivalId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Arrival ${arrivalId}]:`, error)
+    logger.error(`History write failed [UPDATE Arrival ${arrivalId}]`, { error })
   }
 }
 
@@ -287,7 +288,7 @@ export async function recordAssetCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Asset ${assetId}]:`, error)
+    logger.error(`History write failed [CREATE Asset ${assetId}]`, { error })
   }
 }
 
@@ -410,7 +411,7 @@ export async function recordAssetUpdate(
       await recordHistory('Asset', assetId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Asset ${assetId}]:`, error)
+    logger.error(`History write failed [UPDATE Asset ${assetId}]`, { error })
   }
 }
 
@@ -440,7 +441,7 @@ export async function recordDepartureCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Departure ${departureId}]:`, error)
+    logger.error(`History write failed [CREATE Departure ${departureId}]`, { error })
   }
 }
 
@@ -476,7 +477,7 @@ export async function recordDepartureUpdate(
       await recordHistory('Departure', departureId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Departure ${departureId}]:`, error)
+    logger.error(`History write failed [UPDATE Departure ${departureId}]`, { error })
   }
 }
 
@@ -503,7 +504,7 @@ export async function recordHoldCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Hold ${holdId}]:`, error)
+    logger.error(`History write failed [CREATE Hold ${holdId}]`, { error })
   }
 }
 
@@ -533,7 +534,7 @@ export async function recordHoldUpdate(
       await recordHistory('Hold', holdId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Hold ${holdId}]:`, error)
+    logger.error(`History write failed [UPDATE Hold ${holdId}]`, { error })
   }
 }
 
@@ -564,7 +565,7 @@ export async function recordInvoiceCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Invoice ${invoiceId}]:`, error)
+    logger.error(`History write failed [CREATE Invoice ${invoiceId}]`, { error })
   }
 }
 
@@ -587,7 +588,7 @@ export async function recordInvoiceUpdate(
       await recordHistory('Invoice', invoiceId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Invoice ${invoiceId}]:`, error)
+    logger.error(`History write failed [UPDATE Invoice ${invoiceId}]`, { error })
   }
 }
 
@@ -617,7 +618,7 @@ export async function recordTransferCreate(
       }
     })
   } catch (error) {
-    console.error(`History write failed [CREATE Transfer ${transferId}]:`, error)
+    logger.error(`History write failed [CREATE Transfer ${transferId}]`, { error })
   }
 }
 
@@ -653,7 +654,7 @@ export async function recordTransferUpdate(
       await recordHistory('Transfer', transferId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
     }
   } catch (error) {
-    console.error(`History write failed [UPDATE Transfer ${transferId}]:`, error)
+    logger.error(`History write failed [UPDATE Transfer ${transferId}]`, { error })
   }
 }
 
@@ -686,7 +687,7 @@ export async function recordAssetUpdateOnCollection(
     }
     await Promise.all(writes)
   } catch (error) {
-    console.error(`History write failed [ASSETS_CHANGED ${entityType} ${entityId}]:`, error)
+    logger.error(`History write failed [ASSETS_CHANGED ${entityType} ${entityId}]`, { error })
   }
 }
 
@@ -746,7 +747,7 @@ export async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
       }))
     })
   } catch (error) {
-    console.error(`History batch write failed [UPDATE Asset batch ${field}]:`, error)
+    logger.error(`History batch write failed [UPDATE Asset batch ${field}]`, { error })
   }
 }
 
@@ -804,7 +805,7 @@ export async function recordBatchAssetCreate(
       })
     })
   } catch (error) {
-    console.error(`History batch write failed [CREATE Asset batch]:`, error)
+    logger.error(`History batch write failed [CREATE Asset batch]`, { error })
   }
 }
 
