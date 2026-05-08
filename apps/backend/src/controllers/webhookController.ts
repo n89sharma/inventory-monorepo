@@ -1,5 +1,6 @@
 import { verifyWebhook } from '@clerk/express/webhooks'
 import { Request, Response } from 'express'
+import { userIdCache } from '../middleware/requireAuth.js'
 import { prisma } from '../prisma.js'
 import { logger } from '../lib/logger.js'
 
@@ -72,6 +73,7 @@ export async function handleClerkWebhook(req: Request, res: Response) {
       const { id } = evt.data
 
       if (id) {
+        userIdCache.delete(id)
         await prisma.user.update({
           where: { clerk_id: id },
           data: { is_active: false, clerk_id: null },
