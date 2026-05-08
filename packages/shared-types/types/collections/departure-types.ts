@@ -32,7 +32,7 @@ export const CreateDepartureSchema = z.object({
   customer: OrgSummarySchema,
   transporter: OrgSummarySchema,
   comment: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure")
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure").max(2000)
 })
 export type CreateDeparture = z.infer<typeof CreateDepartureSchema>
 
@@ -45,5 +45,5 @@ export type UpdateDeparture = z.infer<typeof UpdateDepartureSchema>
 
 // PUT /departures/:departureNumber
 export const SubmitUpdateDepartureSchema = UpdateDepartureSchema.extend({
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure")
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure").max(2000)
 })

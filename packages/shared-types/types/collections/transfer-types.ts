@@ -34,7 +34,7 @@ export const CreateTransferSchema = z.object({
   destination: WarehouseSchema.refine(val => !!val, "Destination required"),
   transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
   comment: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer")
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer").max(2000)
 }).refine(data => data.origin.id !== data.destination.id, {
   message: "Origin and destination cannot be the same",
   path: ["destination"]
@@ -54,7 +54,7 @@ export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>
 
 // PUT /transfers/:transferNumber
 export const SubmitUpdateTransferSchema = UpdateTransferSchema.extend({
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer")
+  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer").max(2000)
 }).refine(data => data.origin.id !== data.destination.id, {
   message: "Origin and destination cannot be the same",
   path: ["destination"]

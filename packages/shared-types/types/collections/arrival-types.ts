@@ -47,7 +47,7 @@ export const CreateArrivalSchema = z.object({
   transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
   warehouse: WarehouseSchema.refine(val => !!val, "Warehouse required"),
   comment: z.string().nullable(),
-  assets: z.array(CreateAssetSchema).nonempty("No assets in the arrival")
+  assets: z.array(CreateAssetSchema).nonempty("No assets in the arrival").max(2000)
 })
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
@@ -65,5 +65,5 @@ export type UpdateArrival = z.infer<typeof UpdateArrivalSchema>
 
 // PUT /arrivals
 export const SubmitUpdateArrivalSchema = UpdateArrivalSchema.extend({
-  assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival")
+  assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival").max(2000)
 })

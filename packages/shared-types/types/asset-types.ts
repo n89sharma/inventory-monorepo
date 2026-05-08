@@ -147,7 +147,7 @@ export const UpdateErrorSchema = z.object({
 })
 
 export const UpdateAssetErrorsSchema = z.object({
-  errors: z.array(UpdateErrorSchema)
+  errors: z.array(UpdateErrorSchema).max(100)
 })
 
 export type UpdateError = z.infer<typeof UpdateErrorSchema>
@@ -180,7 +180,7 @@ export const UpdateAssetPricingSchema = z.object({
 export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
 
 export const BulkUpdateAssetPricingSchema = z.object({
-  items: z.array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema))
+  items: z.array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema)).min(1).max(2000)
 })
 
 export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
