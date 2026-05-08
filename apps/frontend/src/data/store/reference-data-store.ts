@@ -1,6 +1,6 @@
 import { createBrand as createBrandApi, getBrands as getBrandsApi } from '@/data/api/brand-api'
 import type { BrandForm } from '@/ui-types/brand-form-types'
-import type { ApiResponse, AssetType, Brand, CoreFunction, Error, InvoiceType, ReferenceData, Role, Status, Warehouse } from 'shared-types'
+import type { AssetType, Brand, CoreFunction, Error, InvoiceType, ReferenceData, Role, Status, Warehouse } from 'shared-types'
 import { create } from 'zustand'
 
 interface ReferenceDataStore {
@@ -19,7 +19,7 @@ interface ReferenceDataStore {
   setReferenceData: (refData: ReferenceData) => void
   setBrands: (brands: Brand[]) => void
   setLoading: (loading: boolean) => void
-  createBrand: (data: BrandForm) => Promise<ApiResponse<{ id: number }>>
+  createBrand: (data: BrandForm) => Promise<{ id: number }>
 
   clearReferenceData: () => void
 }
@@ -52,12 +52,9 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   setBrands: (brands) => set({ brands }),
   setLoading: (loading) => set({ loading }),
   createBrand: async (data) => {
-    const response = await createBrandApi(data)
-    if (response.success) {
-      const brands = await getBrandsApi()
-      set({ brands })
-    }
-    return response
+    const result = await createBrandApi(data)
+    set({ brands: await getBrandsApi() })
+    return result
   },
 
   clearReferenceData: () => set({

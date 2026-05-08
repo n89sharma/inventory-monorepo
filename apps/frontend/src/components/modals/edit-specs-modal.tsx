@@ -115,24 +115,24 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
 
   async function handleSave() {
     setSaving(true)
-    const response = await updateAssetSpecs(assetDetails!.barcode, {
-      cassettes: toNullableInt(fields.cassettes),
-      internal_finisher: fields.internal_finisher || null,
-      meter_black: toNullableInt(fields.meter_black),
-      meter_colour: toNullableInt(fields.meter_colour),
-      drum_life_c: toNullableInt(fields.drum_life_c),
-      drum_life_m: toNullableInt(fields.drum_life_m),
-      drum_life_y: toNullableInt(fields.drum_life_y),
-      drum_life_k: toNullableInt(fields.drum_life_k),
-      accessory_names: selectedFunctions.map(cf => cf.accessory),
-    })
-    setSaving(false)
-    if (response.success) {
+    try {
+      await updateAssetSpecs(assetDetails!.barcode, {
+        cassettes: toNullableInt(fields.cassettes),
+        internal_finisher: fields.internal_finisher || null,
+        meter_black: toNullableInt(fields.meter_black),
+        meter_colour: toNullableInt(fields.meter_colour),
+        drum_life_c: toNullableInt(fields.drum_life_c),
+        drum_life_m: toNullableInt(fields.drum_life_m),
+        drum_life_y: toNullableInt(fields.drum_life_y),
+        drum_life_k: toNullableInt(fields.drum_life_k),
+        accessory_names: selectedFunctions.map(cf => cf.accessory),
+      })
       toast.success('Specifications updated.')
       onOpenChange(false)
-    } else {
-      toast.error(response.error.summary)
+    } catch {
+      // interceptor already showed the error toast
     }
+    setSaving(false)
   }
 
   return (

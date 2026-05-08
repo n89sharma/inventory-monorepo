@@ -1,7 +1,6 @@
 import { useInvoiceStore } from '@/data/store/invoice-store'
 import type { InvoiceForm } from '@/ui-types/invoice-form-types'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { InvoiceFormPage } from './invoice-form-page'
 
 export function CreateInvoicePage(): React.JSX.Element {
@@ -22,16 +21,12 @@ export function CreateInvoicePage(): React.JSX.Element {
 
   async function onValidInvoiceCreateSubmit(data: InvoiceForm) {
     try {
-      const res = await submitCreateInvoice(data)
-      if (res.success) {
-        navigate(`/invoices/${res.data.invoiceNumber}`, {
-          state: { successMessage: `Invoice ${res.data.invoiceNumber} created!` }
-        })
-      } else {
-        toast.error(res.error.summary, { position: 'top-center' })
-      }
+      const { invoiceNumber } = await submitCreateInvoice(data)
+      navigate(`/invoices/${invoiceNumber}`, {
+        state: { successMessage: `Invoice ${invoiceNumber} created!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

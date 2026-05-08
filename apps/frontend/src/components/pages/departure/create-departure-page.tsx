@@ -1,7 +1,6 @@
 import { useDepartureStore } from '@/data/store/departure-store'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { DepartureFormPage } from './departure-form-page'
 
 export function CreateDeparturePage(): React.JSX.Element {
@@ -22,14 +21,12 @@ export function CreateDeparturePage(): React.JSX.Element {
 
   async function onValidDepartureCreateSubmit(data: DepartureForm) {
     try {
-      const res = await submitCreateDeparture(data)
-      if (res.success) {
-        navigate(`/departures/${res.data.departureNumber}`, {
-          state: { successMessage: `Departure ${res.data.departureNumber} created!` }
-        })
-      }
+      const { departureNumber } = await submitCreateDeparture(data)
+      navigate(`/departures/${departureNumber}`, {
+        state: { successMessage: `Departure ${departureNumber} created!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

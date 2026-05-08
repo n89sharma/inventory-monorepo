@@ -3,7 +3,7 @@ import { holdDetailKey } from '@/hooks/use-hold-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, AssetSummary, HoldSummary, User } from 'shared-types'
+import type { AssetSummary, HoldSummary, User } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -30,8 +30,8 @@ interface HoldStore {
     holdBy: SelectOption<User>,
     holdFor: SelectOption<User>) => Promise<void>
   getHoldForUpdate: (holdNumber: string) => Promise<void>
-  submitCreateHold: (data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
-  submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<ApiResponse<{ holdNumber: string }>>
+  submitCreateHold: (data: HoldForm) => Promise<{ holdNumber: string }>
+  submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<{ holdNumber: string }>
   addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (holdNumber: string) => Promise<AssetSummary[]>
   clearHolds: () => void
@@ -62,21 +62,19 @@ export const useHoldStore = create<HoldStore>((set) => ({
     set({ holdFormData: await getHoldForUpdate(holdNumber) })
   },
   submitCreateHold: async (data) => {
-    const response = await createHold(data)
+    const result = await createHold(data)
     set({ hasSearched: false })
-    return response
+    return result
   },
   submitUpdateHold: async (holdNumber, data) => {
-    const response = await updateHold(holdNumber, data)
-    if (response.success) mutate(holdDetailKey(holdNumber))
-    return response
+    const result = await updateHold(holdNumber, data)
+    mutate(holdDetailKey(holdNumber))
+    return result
   },
   addAssets: async (holdNumber, assets) => {
     const form = await getHoldForUpdate(holdNumber)
-    if (!form) throw new Error(`Hold ${holdNumber} not found`)
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    const response = await updateHold(holdNumber, { ...form, assets: merged })
-    if (!response.success) throw new Error(response.error.summary)
+    await updateHold(holdNumber, { ...form, assets: merged })
     mutate(holdDetailKey(holdNumber))
     return { added, skipped }
   },

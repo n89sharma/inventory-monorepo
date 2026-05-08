@@ -2,7 +2,6 @@ import { useTransferStore } from '@/data/store/transfer-store'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 import { TransferFormPage } from './transfer-form-page'
 
 export function UpdateTransferPage(): React.JSX.Element {
@@ -33,14 +32,12 @@ export function UpdateTransferPage(): React.JSX.Element {
 
   async function onValidTransferUpdateSubmit(transferForm: TransferForm) {
     try {
-      const res = await submitUpdateTransfer(transferNumber!, transferForm)
-      if (res.success) {
-        navigate(`/transfers/${transferNumber}`, {
-          state: { successMessage: `Transfer ${transferNumber} updated!` }
-        })
-      }
+      await submitUpdateTransfer(transferNumber!, transferForm)
+      navigate(`/transfers/${transferNumber}`, {
+        state: { successMessage: `Transfer ${transferNumber} updated!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

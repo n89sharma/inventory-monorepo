@@ -50,12 +50,12 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
       return
     }
 
-    const response = await createPartTransfer(recipientBarcode!, data)
-    if (response.success) {
+    try {
+      await createPartTransfer(recipientBarcode!, data)
       toast.success('Part transfer recorded.')
       onOpenChange(false)
-    } else {
-      toast.error(response.error.summary)
+    } catch {
+      // interceptor already showed the error toast
     }
   }
 

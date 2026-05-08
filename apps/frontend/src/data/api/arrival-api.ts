@@ -1,9 +1,7 @@
 import { api } from '@/data/api/axios-client'
-import { apiErrorHandler } from '@/lib/error-handler'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AxiosResponse } from 'axios'
-import type { ApiResponse, ArrivalDetail, ArrivalSummary, CollectionHistory, UpdateArrival, Warehouse } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, CollectionHistory, UpdateArrival, Warehouse } from 'shared-types'
 import { ArrivalDetailSchema, ArrivalSummarySchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -16,28 +14,24 @@ export async function getArrivals(
   toDate: SelectOption<Date>,
   destination: SelectOption<Warehouse>
 ): Promise<ArrivalSummary[]> {
-
-  const { data } = await api.get<ApiResponse<ArrivalSummary[]>>(`/arrivals`, {
+  const { data } = await api.get<{ success: true; data: ArrivalSummary[] }>(`/arrivals`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(destination)
     }
   })
-  if (data.success) return z.array(ArrivalSummarySchema).parse(data.data)
-  throw new Error(data.error.summary)
+  return z.array(ArrivalSummarySchema).parse(data.data)
 }
 
 export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDetail> {
-  const { data } = await api.get<ApiResponse<ArrivalDetail>>(`/arrivals/${arrivalNumber}`)
-  if (data.success) return ArrivalDetailSchema.parse(data.data)
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: ArrivalDetail }>(`/arrivals/${arrivalNumber}`)
+  return ArrivalDetailSchema.parse(data.data)
 }
 
 export async function getArrivalForUpdate(arrivalNumber: string): Promise<ArrivalForm> {
-  const { data } = await api.get<ApiResponse<UpdateArrival>>(`/arrivals/${arrivalNumber}/edit`)
-  if (data.success) return mapUpdateArrivalToUiArrivalForm(UpdateArrivalSchema.parse(data.data))
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: UpdateArrival }>(`/arrivals/${arrivalNumber}/edit`)
+  return mapUpdateArrivalToUiArrivalForm(UpdateArrivalSchema.parse(data.data))
 }
 
 export function mapUpdateArrivalToUiArrivalForm(arrival: UpdateArrival): ArrivalForm {
@@ -64,63 +58,47 @@ export function mapUpdateArrivalToUiArrivalForm(arrival: UpdateArrival): Arrival
 export async function updateArrival(
   arrivalNumber: string,
   a: ArrivalForm
-): Promise<ApiResponse<void>> {
-  return api.put(
-    `/arrivals/${arrivalNumber}`,
-    {
-      id: a.id,
-      vendor: a.vendor,
-      transporter: a.transporter,
-      warehouse: getSelectedOrNull(a.warehouse),
-      comment: a.comment,
-      assets: a.assets.map(s => ({
-        id: s.id,
-        model: s.model,
-        serialNumber: s.serialNumber,
-        meterBlack: s.meterBlack,
-        meterColour: s.meterColour,
-        cassettes: s.cassettes,
-        technicalStatus: getSelectedOrNull(s.technicalStatus),
-        internalFinisher: s.internalFinisher,
-        coreFunctions: s.coreFunctions
-      }))
-    },
-    { headers: { "Content-Type": "application/json" } }
-  )
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+): Promise<void> {
+  await api.put(`/arrivals/${arrivalNumber}`, {
+    id: a.id,
+    vendor: a.vendor,
+    transporter: a.transporter,
+    warehouse: getSelectedOrNull(a.warehouse),
+    comment: a.comment,
+    assets: a.assets.map(s => ({
+      id: s.id,
+      model: s.model,
+      serialNumber: s.serialNumber,
+      meterBlack: s.meterBlack,
+      meterColour: s.meterColour,
+      cassettes: s.cassettes,
+      technicalStatus: getSelectedOrNull(s.technicalStatus),
+      internalFinisher: s.internalFinisher,
+      coreFunctions: s.coreFunctions
+    }))
+  })
 }
 
-export async function createArrival(a: ArrivalForm): Promise<ApiResponse<CreateArrivalResponse>> {
-  return api.post(
-    '/arrivals',
-    {
-      vendor: a.vendor,
-      transporter: a.transporter,
-      warehouse: getSelectedOrNull(a.warehouse),
-      comment: a.comment,
-      assets: a.assets.map(s => ({
-        model: s.model,
-        serialNumber: s.serialNumber,
-        meterBlack: s.meterBlack,
-        meterColour: s.meterColour,
-        cassettes: s.cassettes,
-        technicalStatus: getSelectedOrNull(s.technicalStatus),
-        internalFinisher: s.internalFinisher,
-        coreFunctions: s.coreFunctions
-      }))
-    },
-    { headers: { "Content-Type": "application/json" } }
-  )
-    .then((response: AxiosResponse<CreateArrivalResponse>) => ({
-      success: true as const,
-      data: response.data
+export async function createArrival(a: ArrivalForm): Promise<CreateArrivalResponse> {
+  return (await api.post<CreateArrivalResponse>('/arrivals', {
+    vendor: a.vendor,
+    transporter: a.transporter,
+    warehouse: getSelectedOrNull(a.warehouse),
+    comment: a.comment,
+    assets: a.assets.map(s => ({
+      model: s.model,
+      serialNumber: s.serialNumber,
+      meterBlack: s.meterBlack,
+      meterColour: s.meterColour,
+      cassettes: s.cassettes,
+      technicalStatus: getSelectedOrNull(s.technicalStatus),
+      internalFinisher: s.internalFinisher,
+      coreFunctions: s.coreFunctions
     }))
-    .catch(apiErrorHandler<CreateArrivalResponse>)
+  })).data
 }
 
 export async function getArrivalHistory(arrivalNumber: string): Promise<CollectionHistory> {
-  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/arrivals/${arrivalNumber}/history`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: CollectionHistory }>(`/arrivals/${arrivalNumber}/history`)
+  return data.data
 }

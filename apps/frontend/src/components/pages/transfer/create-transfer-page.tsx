@@ -1,7 +1,6 @@
 import { useTransferStore } from '@/data/store/transfer-store'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { TransferFormPage } from './transfer-form-page'
 
 export function CreateTransferPage(): React.JSX.Element {
@@ -22,14 +21,12 @@ export function CreateTransferPage(): React.JSX.Element {
 
   async function onValidTransferCreateSubmit(data: TransferForm) {
     try {
-      const res = await submitCreateTransfer(data)
-      if (res.success) {
-        navigate(`/transfers/${res.data.transferNumber}`, {
-          state: { successMessage: `Transfer ${res.data.transferNumber} created!` }
-        })
-      }
+      const { transferNumber } = await submitCreateTransfer(data)
+      navigate(`/transfers/${transferNumber}`, {
+        state: { successMessage: `Transfer ${transferNumber} created!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

@@ -1,10 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import { apiErrorHandler } from '@/lib/error-handler'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { getIdOrNullFromSelection, getSelectOption, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { ApiResponse, CollectionHistory, HoldDetail, UpdateHold, User } from 'shared-types'
+import type { CollectionHistory, HoldDetail, UpdateHold, User } from 'shared-types'
 import { HoldDetailSchema, HoldSummarySchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
-import type { AxiosResponse } from 'axios'
 import { z } from 'zod'
 
 interface CreateHoldResponse {
@@ -17,7 +15,7 @@ export async function getHolds(
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>
 ): Promise<HoldSummary[]> {
-  const { data } = await api.get<ApiResponse<HoldSummary[]>>(`/holds`, {
+  const { data } = await api.get<{ success: true; data: HoldSummary[] }>(`/holds`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
@@ -25,32 +23,21 @@ export async function getHolds(
       holdFor: getIdOrNullFromSelection(holdFor)
     }
   })
-  if (data.success) return z.array(HoldSummarySchema).parse(data.data)
-  throw new Error(data.error.summary)
+  return z.array(HoldSummarySchema).parse(data.data)
 }
 
-export async function createHold(d: HoldForm): Promise<ApiResponse<CreateHoldResponse>> {
-  return api.post(
-    '/holds',
-    {
-      created_for_id: getIdOrNullFromSelection(d.created_for),
-      customer_id: d.customer!.id,
-      notes: d.notes || null,
-      assets: d.assets
-    },
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-    .then((response: AxiosResponse<CreateHoldResponse>) => ({
-      success: true as const,
-      data: response.data
-    }))
-    .catch(apiErrorHandler<CreateHoldResponse>)
+export async function createHold(d: HoldForm): Promise<CreateHoldResponse> {
+  return (await api.post<CreateHoldResponse>('/holds', {
+    created_for_id: getIdOrNullFromSelection(d.created_for),
+    customer_id: d.customer!.id,
+    notes: d.notes || null,
+    assets: d.assets
+  })).data
 }
 
 export async function getHoldForUpdate(holdNumber: string): Promise<HoldForm> {
-  const { data } = await api.get<ApiResponse<UpdateHold>>(`/holds/${holdNumber}/edit`)
-  if (data.success) return mapUpdateHoldToHoldForm(UpdateHoldSchema.parse(data.data))
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: UpdateHold }>(`/holds/${holdNumber}/edit`)
+  return mapUpdateHoldToHoldForm(UpdateHoldSchema.parse(data.data))
 }
 
 export function mapUpdateHoldToHoldForm(hold: UpdateHold): HoldForm {
@@ -66,33 +53,22 @@ export function mapUpdateHoldToHoldForm(hold: UpdateHold): HoldForm {
 export async function updateHold(
   holdNumber: string,
   d: HoldForm
-): Promise<ApiResponse<{ holdNumber: string }>> {
-  return api.put(
-    `/holds/${holdNumber}`,
-    {
-      id: d.id,
-      created_for: getSelectedOrNull(d.created_for),
-      customer: d.customer,
-      notes: d.notes || null,
-      assets: d.assets
-    },
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-    .then((response: AxiosResponse<{ holdNumber: string }>) => ({
-      success: true as const,
-      data: response.data
-    }))
-    .catch(apiErrorHandler<{ holdNumber: string }>)
+): Promise<{ holdNumber: string }> {
+  return (await api.put<{ holdNumber: string }>(`/holds/${holdNumber}`, {
+    id: d.id,
+    created_for: getSelectedOrNull(d.created_for),
+    customer: d.customer,
+    notes: d.notes || null,
+    assets: d.assets
+  })).data
 }
 
 export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
-  const { data } = await api.get<ApiResponse<HoldDetail>>(`/holds/${holdNumber}`)
-  if (data.success) return HoldDetailSchema.parse(data.data)
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: HoldDetail }>(`/holds/${holdNumber}`)
+  return HoldDetailSchema.parse(data.data)
 }
 
 export async function getHoldHistory(holdNumber: string): Promise<CollectionHistory> {
-  const { data } = await api.get<ApiResponse<CollectionHistory>>(`/holds/${holdNumber}/history`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: CollectionHistory }>(`/holds/${holdNumber}/history`)
+  return data.data
 }

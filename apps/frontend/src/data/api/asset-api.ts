@@ -1,5 +1,4 @@
 import { api } from '@/data/api/axios-client'
-import { apiErrorHandler } from '@/lib/error-handler'
 import type {
   ApiResponse,
   AssetDetails,
@@ -34,96 +33,69 @@ export async function getBarcodeSuggestions(q: string): Promise<BarcodeSuggestio
   }
 }
 
-export async function verifyAssetExists(barcode: string): Promise<ApiResponse<void>> {
-  return api.get<ApiResponse<AssetSummary>>(`/assets/${barcode}/summary`)
-    .then(({ data }) => data.success
-      ? { success: true as const, data: undefined }
-      : { success: false as const, error: data.error })
-    .catch(apiErrorHandler<void>)
-}
-
 export async function getAssetDetail(params: { barcode: string }): Promise<AssetDetails> {
-  const { data } = await api.get<ApiResponse<AssetDetails>>(`/assets/${params.barcode}`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: AssetDetails }>(`/assets/${params.barcode}`)
+  return data.data
 }
 
 export async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
-  const { data } = await api.get<ApiResponse<string[]>>(`/assets/${params.barcode}/accessories`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: string[] }>(`/assets/${params.barcode}/accessories`)
+  return data.data
 }
 
 export async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
-  const { data } = await api.get<ApiResponse<AssetError[]>>(`/assets/${params.barcode}/errors`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: AssetError[] }>(`/assets/${params.barcode}/errors`)
+  return data.data
 }
 
 export async function getAssetComments(params: { barcode: string }): Promise<Comment[]> {
-  const { data } = await api.get<ApiResponse<Comment[]>>(`/assets/${params.barcode}/comments`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: Comment[] }>(`/assets/${params.barcode}/comments`)
+  return data.data
 }
 
 export async function getAssetTransfers(params: { barcode: string }): Promise<AssetTransfer[]> {
-  const { data } = await api.get<ApiResponse<AssetTransfer[]>>(`/assets/${params.barcode}/transfers`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: AssetTransfer[] }>(`/assets/${params.barcode}/transfers`)
+  return data.data
 }
 
 export async function getAssetPartTransfers(params: { barcode: string }): Promise<PartTransfer[]> {
-  const { data } = await api.get<ApiResponse<PartTransfer[]>>(`/assets/${params.barcode}/parts`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: PartTransfer[] }>(`/assets/${params.barcode}/parts`)
+  return data.data
 }
 
-export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<ApiResponse<void>> {
-  return api.put(`/assets/${barcode}/errors`, { errors })
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<void> {
+  await api.put(`/assets/${barcode}/errors`, { errors })
 }
 
-export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<ApiResponse<void>> {
-  return api.put(`/assets/${barcode}/pricing`, data)
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<void> {
+  await api.put(`/assets/${barcode}/pricing`, data)
 }
 
-export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<ApiResponse<void>> {
-  return api.put('/assets/bulk/pricing', { items })
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<void> {
+  await api.put('/assets/bulk/pricing', { items })
 }
 
-export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<ApiResponse<void>> {
-  return api.put(`/assets/${barcode}/specs`, data)
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<void> {
+  await api.put(`/assets/${barcode}/specs`, data)
 }
 
-export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiResponse<AssetLocation[]>> {
-  return api.get<ApiResponse<AssetLocation[]>>('/assets/locations', { params: { warehouseId } })
-    .then(({ data }) => data)
-    .catch(apiErrorHandler<AssetLocation[]>)
+export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
+  const { data } = await api.get<{ success: true; data: AssetLocation[] }>(
+    '/assets/locations', { params: { warehouseId } }
+  )
+  return data.data
 }
 
-export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<ApiResponse<void>> {
-  return api.put(`/assets/${barcode}/location`, data)
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<void> {
+  await api.put(`/assets/${barcode}/location`, data)
 }
 
-export async function postComment(barcode: string, data: CreateComment): Promise<ApiResponse<void>> {
-  return api.post(`/assets/${barcode}/comments`, data)
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function postComment(barcode: string, data: CreateComment): Promise<void> {
+  await api.post(`/assets/${barcode}/comments`, data)
 }
 
-export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<ApiResponse<void>> {
-  return api.post(`/assets/${recipientBarcode}/parts`, data)
-    .then(() => ({ success: true as const, data: undefined }))
-    .catch(apiErrorHandler<void>)
+export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<void> {
+  await api.post(`/assets/${recipientBarcode}/parts`, data)
 }
 
 export type AssetAllDetails = {
@@ -172,9 +144,8 @@ export async function exportAssets(barcodes: string[], filename?: string): Promi
 }
 
 export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
-  const { data } = await api.get<ApiResponse<AssetHistory>>(`/assets/${barcode}/history`)
-  if (data.success) return data.data
-  throw new Error(data.error.summary)
+  const { data } = await api.get<{ success: true; data: AssetHistory }>(`/assets/${barcode}/history`)
+  return data.data
 }
 
 export async function getAssetsForQuery(
@@ -184,7 +155,7 @@ export async function getAssetsForQuery(
   technicalStatuses: Status[],
   warehouses: Warehouse[]): Promise<AssetSummary[]> {
 
-  const { data } = await api.get<ApiResponse<AssetSummary[]>>(`/assets`, {
+  const { data } = await api.get<{ success: true; data: AssetSummary[] }>(`/assets`, {
     params: {
       model: model.model_name,
       meter: meter ?? undefined,
@@ -193,6 +164,5 @@ export async function getAssetsForQuery(
       warehouseIds: warehouses.map(w => w.id),
     }
   })
-  if (data.success) return z.array(AssetSummarySchema).parse(data.data)
-  throw new Error(data.error.summary)
+  return z.array(AssetSummarySchema).parse(data.data)
 }

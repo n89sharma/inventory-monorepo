@@ -55,8 +55,11 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   async function loadLocations(warehouse: Warehouse) {
     setFetchingLocations(true)
     setLocations([])
-    const response = await getLocationsByWarehouse(warehouse.id)
-    setLocations(response.success ? response.data : [])
+    try {
+      setLocations(await getLocationsByWarehouse(warehouse.id))
+    } catch {
+      // interceptor already showed the error toast
+    }
     setFetchingLocations(false)
   }
 
@@ -79,14 +82,14 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
       return
     }
     setSaving(true)
-    const response = await updateAssetLocation(assetDetails!.barcode, { location_id: selectedLocation.id })
-    setSaving(false)
-    if (response.success) {
+    try {
+      await updateAssetLocation(assetDetails!.barcode, { location_id: selectedLocation.id })
       toast.success('Location updated.')
       onOpenChange(false)
-    } else {
-      toast.error(response.error.summary)
+    } catch {
+      // interceptor already showed the error toast
     }
+    setSaving(false)
   }
 
   return (

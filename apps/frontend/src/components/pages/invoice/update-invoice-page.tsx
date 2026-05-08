@@ -2,7 +2,6 @@ import { useInvoiceStore } from '@/data/store/invoice-store'
 import type { InvoiceEditForm } from '@/ui-types/invoice-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 import { InvoiceEditFormPage } from './invoice-edit-form-page'
 
 export function UpdateInvoicePage(): React.JSX.Element {
@@ -33,16 +32,12 @@ export function UpdateInvoicePage(): React.JSX.Element {
 
   async function onValidInvoiceUpdateSubmit(invoiceForm: InvoiceEditForm) {
     try {
-      const res = await submitUpdateInvoice(invoiceNumber!, invoiceForm)
-      if (res.success) {
-        navigate(`/invoices/${invoiceNumber}`, {
-          state: { successMessage: `Invoice ${invoiceNumber} updated!` }
-        })
-      } else {
-        toast.error(res.error.summary, { position: 'top-center' })
-      }
+      await submitUpdateInvoice(invoiceNumber!, invoiceForm)
+      navigate(`/invoices/${invoiceNumber}`, {
+        state: { successMessage: `Invoice ${invoiceNumber} updated!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

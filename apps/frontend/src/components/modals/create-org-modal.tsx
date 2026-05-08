@@ -43,12 +43,12 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
   }
 
   async function onValidSubmit(data: OrgForm) {
-    const result = await createOrg(data)
-    if (result.success) {
+    try {
+      await createOrg(data)
       toast.success('Organization created')
       onOpenChange(false)
-    } else {
-      toast.error(result.error.summary, { position: 'top-center' })
+    } catch {
+      // interceptor already showed the error toast
     }
   }
 

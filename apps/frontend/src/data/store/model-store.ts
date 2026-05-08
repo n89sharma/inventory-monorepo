@@ -1,6 +1,6 @@
 import { createModel as createModelApi, getModels as getModelsApi } from '@/data/api/model-api'
 import type { ModelForm } from '@/ui-types/model-form-types'
-import type { ApiResponse, ModelSummary } from 'shared-types'
+import type { ModelSummary } from 'shared-types'
 import { create } from 'zustand'
 
 interface ModelStore {
@@ -9,7 +9,7 @@ interface ModelStore {
 
   setModels: (models: ModelSummary[]) => void
   setLoading: (loading: boolean) => void
-  createModel: (data: ModelForm) => Promise<ApiResponse<{ id: number }>>
+  createModel: (data: ModelForm) => Promise<{ id: number }>
   clearModels: () => void
 }
 
@@ -20,9 +20,9 @@ export const useModelStore = create<ModelStore>((set) => ({
   setModels: (models) => set({ models }),
   setLoading: (loading) => set({ loading }),
   createModel: async (data) => {
-    const response = await createModelApi(data)
-    if (response.success) set({ models: await getModelsApi() })
-    return response
+    const result = await createModelApi(data)
+    set({ models: await getModelsApi() })
+    return result
   },
   clearModels: () => set({ models: [] })
 }))

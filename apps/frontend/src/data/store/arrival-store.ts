@@ -1,7 +1,7 @@
 import { createArrival, getArrivalForUpdate, getArrivals, updateArrival } from '@/data/api/arrival-api'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, ArrivalSummary, Warehouse } from 'shared-types'
+import type { ArrivalSummary, Warehouse } from 'shared-types'
 import { arrivalDetailKey } from '@/hooks/use-arrival-detail'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -26,8 +26,8 @@ interface ArrivalStore {
     toDate: SelectOption<Date>,
     destination: SelectOption<Warehouse>) => Promise<void>
   getArrivalForUpdate: (arrivalNumber: string) => Promise<void>
-  submitCreateArrival: (data: ArrivalForm) => Promise<ApiResponse<{ arrivalNumber: string }>>
-  submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<ApiResponse<void>>
+  submitCreateArrival: (data: ArrivalForm) => Promise<{ arrivalNumber: string }>
+  submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<void>
   clearArrivals: () => void
 }
 
@@ -55,14 +55,13 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
     set({ arrivalFormData: await getArrivalForUpdate(arrivalNumber) })
   },
   submitCreateArrival: async (data: ArrivalForm) => {
-    const response = await createArrival(data)
+    const result = await createArrival(data)
     set({ hasSearched: false })
-    return response
+    return result
   },
   submitUpdateArrival: async (arrivalNumber, data) => {
-    const response = await updateArrival(arrivalNumber, data)
-    if (response.success) mutate(arrivalDetailKey(arrivalNumber))
-    return response
+    await updateArrival(arrivalNumber, data)
+    mutate(arrivalDetailKey(arrivalNumber))
   },
 
   clearArrivals: () => set({ arrivals: [] })

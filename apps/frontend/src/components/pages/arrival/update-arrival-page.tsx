@@ -2,7 +2,6 @@ import { useArrivalStore } from '@/data/store/arrival-store'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 import { ArrivalFormPage } from './arrival-form-page'
 
 export function UpdateArrivalPage(): React.JSX.Element {
@@ -33,14 +32,12 @@ export function UpdateArrivalPage(): React.JSX.Element {
 
   async function onValidArrivalUpdateSubmit(arrivalForm: ArrivalForm) {
     try {
-      const res = await submitUpdateArrival(arrivalNumber!, arrivalForm)
-      if (res.success) {
-        navigate(`/arrivals/${arrivalNumber}`, {
-          state: { successMessage: `Arrival ${arrivalNumber} updated!` }
-        })
-      }
+      await submitUpdateArrival(arrivalNumber!, arrivalForm)
+      navigate(`/arrivals/${arrivalNumber}`, {
+        state: { successMessage: `Arrival ${arrivalNumber} updated!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

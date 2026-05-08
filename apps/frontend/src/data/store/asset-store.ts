@@ -13,7 +13,6 @@ import {
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
 import { assetDetailKey } from '@/hooks/use-asset-detail'
 import type {
-  ApiResponse,
   AssetDetails,
   AssetLocation,
   AssetSummary,
@@ -29,54 +28,48 @@ import { mutate } from 'swr'
 import { create } from 'zustand'
 
 interface AssetStore {
-  updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<ApiResponse<void>>
-  createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<ApiResponse<void>>
-  createComment: (barcode: string, data: CreateComment) => Promise<ApiResponse<void>>
-  updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<ApiResponse<void>>
-  updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<ApiResponse<void>>
-  updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<ApiResponse<void>>
+  updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<void>
+  createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<void>
+  createComment: (barcode: string, data: CreateComment) => Promise<void>
+  updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<void>
+  updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
+  updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<void>
   getAssetByBarcode: (barcode: string) => Promise<AssetSummary>
   getAssetDetail: (barcode: string) => Promise<AssetDetails>
-  getLocationsByWarehouse: (warehouseId: number) => Promise<ApiResponse<AssetLocation[]>>
+  getLocationsByWarehouse: (warehouseId: number) => Promise<AssetLocation[]>
   exportAssets: (barcodes: string[], filename?: string) => Promise<void>
-  bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<ApiResponse<void>>
+  bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
 
 export const useAssetStore = create<AssetStore>(() => ({
   updateAssetErrors: async (barcode, errors) => {
-    const response = await updateAssetErrorsApi(barcode, errors)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await updateAssetErrorsApi(barcode, errors)
+    mutate(assetDetailKey(barcode))
   },
 
   createPartTransfer: async (barcode, data) => {
-    const response = await createPartTransferApi(barcode, data)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await createPartTransferApi(barcode, data)
+    mutate(assetDetailKey(barcode))
   },
 
   createComment: async (barcode, data) => {
-    const response = await postCommentApi(barcode, data)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await postCommentApi(barcode, data)
+    mutate(assetDetailKey(barcode))
   },
 
   updateAssetLocation: async (barcode, data) => {
-    const response = await updateAssetLocationApi(barcode, data)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await updateAssetLocationApi(barcode, data)
+    mutate(assetDetailKey(barcode))
   },
 
   updateAssetPricing: async (barcode, data) => {
-    const response = await updateAssetPricingApi(barcode, data)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await updateAssetPricingApi(barcode, data)
+    mutate(assetDetailKey(barcode))
   },
 
   updateAssetSpecs: async (barcode, data) => {
-    const response = await updateAssetSpecsApi(barcode, data)
-    if (response.success) mutate(assetDetailKey(barcode))
-    return response
+    await updateAssetSpecsApi(barcode, data)
+    mutate(assetDetailKey(barcode))
   },
 
   getAssetByBarcode: (barcode) => getAssetByBarcodeApi(barcode),
@@ -88,8 +81,7 @@ export const useAssetStore = create<AssetStore>(() => ({
   exportAssets: (barcodes, filename) => exportAssetsApi(barcodes, filename),
 
   bulkUpdatePricing: async (items) => {
-    const response = await bulkUpdateAssetPricingApi(items)
-    if (response.success) items.forEach(item => mutate(assetDetailKey(item.barcode)))
-    return response
+    await bulkUpdateAssetPricingApi(items)
+    items.forEach(item => mutate(assetDetailKey(item.barcode)))
   },
 }))

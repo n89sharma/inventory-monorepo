@@ -200,25 +200,25 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
 
   async function handleSave() {
     setSaving(true)
-    const response = await bulkUpdatePricing(
-      rows.map(r => ({
-        barcode: r.barcode,
-        purchase_cost: parseFloat(r.purchase_cost) || 0,
-        transport_cost: parseFloat(r.transport_cost) || 0,
-        processing_cost: parseFloat(r.processing_cost) || 0,
-        other_cost: parseFloat(r.other_cost) || 0,
-        parts_cost: parseFloat(r.parts_cost) || 0,
-        sale_price: parseFloat(r.sale_price) || 0,
-      }))
-    )
-    setSaving(false)
-    if (response.success) {
+    try {
+      await bulkUpdatePricing(
+        rows.map(r => ({
+          barcode: r.barcode,
+          purchase_cost: parseFloat(r.purchase_cost) || 0,
+          transport_cost: parseFloat(r.transport_cost) || 0,
+          processing_cost: parseFloat(r.processing_cost) || 0,
+          other_cost: parseFloat(r.other_cost) || 0,
+          parts_cost: parseFloat(r.parts_cost) || 0,
+          sale_price: parseFloat(r.sale_price) || 0,
+        }))
+      )
       toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
       onSaveSuccess()
-    } else {
-      toast.error(response.error.summary, { position: 'top-center' })
+    } catch {
+      // interceptor already showed the error toast
     }
+    setSaving(false)
   }
 
   return (

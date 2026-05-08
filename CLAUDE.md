@@ -107,6 +107,13 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 3. Business-rule failures inside the tx throw `ConflictError` or `NotFoundError` (from `src/lib/errors.ts`); the outer `catch` maps these to `response400`, everything else to `response500`.
 4. History/audit writes remain **outside** the transaction — they are best-effort and must not extend the transaction boundary.
 
+**Error handling rules — services know nothing about HTTP:**
+- Services return `T` directly on success and throw typed errors on failure. They never import or use `response400`, `response500`, `successResponse`, or `ApiResponse`. HTTP is the controller's concern.
+- Typed errors (defined in `src/lib/errors.ts`): `NotFoundError` → 404, `ConflictError` → 409, `ValidationError` → 400 (cross-field business rules), `ZodError` → 400 (schema validation). All are caught by the global error handler in `src/lib/errorHandler.ts`.
+- When adding a new failure mode: first check if an existing error class fits. Only add a new class to `errors.ts` and a new branch in `errorHandler.ts` if none of the existing types are semantically correct. Never set HTTP status codes inside a service.
+- Controllers use `asyncHandler` (from `src/lib/asyncHandler.ts`) on every route handler — no explicit try/catch. Thrown errors propagate automatically to the global handler.
+- Prisma P2002 (unique constraint violation) is handled globally → 400. Services should still throw `ConflictError` for application-level conflict checks (e.g. asset already on hold) so the message is meaningful.
+
 **Query efficiency rules — no N+1 queries:**
 1. **Never query inside a loop.** A `for` loop that calls `prisma.*` per iteration is always wrong unless the iteration count is guaranteed to be 1.
 2. **Collect, then bulk-operate.** Gather all IDs or rows you need to create/delete during a loop, then execute one `createMany` / `deleteMany` after the loop.

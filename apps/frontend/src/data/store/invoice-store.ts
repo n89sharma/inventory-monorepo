@@ -3,7 +3,7 @@ import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ApiResponse, AssetSummary, InvoiceSummary } from 'shared-types'
+import type { AssetSummary, InvoiceSummary } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -21,9 +21,9 @@ interface InvoiceStore {
   setToDate: (date: SelectOption<Date>) => void
   setHasSearched: (hasSearched: boolean) => void
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
-  submitCreateInvoice: (data: InvoiceForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
+  submitCreateInvoice: (data: InvoiceForm) => Promise<{ invoiceNumber: string }>
   getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
-  submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<ApiResponse<{ invoiceNumber: string }>>
+  submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<{ invoiceNumber: string }>
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
   clearInvoices: () => void
@@ -46,25 +46,23 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     set({ hasSearched: true, invoices: await getInvoices(fromDate, toDate) })
   },
   submitCreateInvoice: async (data) => {
-    const response = await createInvoice(data)
+    const result = await createInvoice(data)
     set({ hasSearched: false })
-    return response
+    return result
   },
   getInvoiceForUpdate: async (invoiceNumber) => {
     set({ invoiceEditFormData: null })
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
   },
   submitUpdateInvoice: async (invoiceNumber, data) => {
-    const response = await updateInvoice(invoiceNumber, data)
-    if (response.success) mutate(invoiceDetailKey(invoiceNumber))
-    return response
+    const result = await updateInvoice(invoiceNumber, data)
+    mutate(invoiceDetailKey(invoiceNumber))
+    return result
   },
   addAssets: async (invoiceNumber, assets) => {
     const form = await getInvoiceForUpdate(invoiceNumber)
-    if (!form) throw new Error(`Invoice ${invoiceNumber} not found`)
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    const response = await updateInvoice(invoiceNumber, { ...form, assets: merged })
-    if (!response.success) throw new Error(response.error.summary)
+    await updateInvoice(invoiceNumber, { ...form, assets: merged })
     mutate(invoiceDetailKey(invoiceNumber))
     return { added, skipped }
   },

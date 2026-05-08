@@ -2,7 +2,6 @@ import { useHoldStore } from '@/data/store/hold-store'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 import { HoldFormPage } from './hold-form-page'
 
 export function UpdateHoldPage(): React.JSX.Element {
@@ -33,16 +32,12 @@ export function UpdateHoldPage(): React.JSX.Element {
 
   async function onValidHoldUpdateSubmit(holdForm: HoldForm) {
     try {
-      const res = await submitUpdateHold(holdNumber!, holdForm)
-      if (res.success) {
-        navigate(`/holds/${holdNumber}`, {
-          state: { successMessage: `Hold ${holdNumber} updated!` }
-        })
-      } else {
-        toast.error(res.error.summary, { position: 'top-center' })
-      }
+      await submitUpdateHold(holdNumber!, holdForm)
+      navigate(`/holds/${holdNumber}`, {
+        state: { successMessage: `Hold ${holdNumber} updated!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

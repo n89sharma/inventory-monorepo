@@ -61,14 +61,14 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
   async function handleSave() {
     if (!assetDetails) return
     setSaving(true)
-    const response = await updateAssetErrors(assetDetails.barcode, localErrors)
-    setSaving(false)
-    if (response.success) {
+    try {
+      await updateAssetErrors(assetDetails.barcode, localErrors)
       toast.success('Errors updated.')
       onOpenChange(false)
-    } else {
-      toast.error(response.error.summary)
+    } catch {
+      // interceptor already showed the error toast
     }
+    setSaving(false)
   }
 
   return (

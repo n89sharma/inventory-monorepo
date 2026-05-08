@@ -3,7 +3,7 @@ import { departureDetailKey } from '@/hooks/use-departure-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
-import type { ApiResponse, AssetSummary, DepartureSummary, Warehouse } from 'shared-types'
+import type { AssetSummary, DepartureSummary, Warehouse } from 'shared-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
@@ -26,8 +26,8 @@ interface DepartureStore {
     toDate: SelectOption<Date>,
     origin: SelectOption<Warehouse>) => Promise<void>
   getDepartureForUpdate: (departureNumber: string) => Promise<void>
-  submitCreateDeparture: (data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
-  submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<ApiResponse<{ departureNumber: string }>>
+  submitCreateDeparture: (data: DepartureForm) => Promise<{ departureNumber: string }>
+  submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<void>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   clearDepartures: () => void
@@ -55,21 +55,18 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     set({ departureFormData: await getDepartureForUpdate(departureNumber) })
   },
   submitCreateDeparture: async (data) => {
-    const response = await createDeparture(data)
+    const result = await createDeparture(data)
     set({ hasSearched: false })
-    return response
+    return result
   },
   submitUpdateDeparture: async (departureNumber, data) => {
-    const response = await updateDeparture(departureNumber, data)
-    if (response.success) mutate(departureDetailKey(departureNumber))
-    return response
+    await updateDeparture(departureNumber, data)
+    mutate(departureDetailKey(departureNumber))
   },
   addAssets: async (departureNumber, assets) => {
     const form = await getDepartureForUpdate(departureNumber)
-    if (!form) throw new Error(`Departure ${departureNumber} not found`)
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    const response = await updateDeparture(departureNumber, { ...form, assets: merged })
-    if (!response.success) throw new Error(response.error.summary)
+    await updateDeparture(departureNumber, { ...form, assets: merged })
     mutate(departureDetailKey(departureNumber))
     return { added, skipped }
   },

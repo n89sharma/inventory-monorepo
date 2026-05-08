@@ -28,12 +28,12 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
   }, [open])
 
   async function onValidSubmit(data: BrandForm) {
-    const result = await createBrand(data)
-    if (result.success) {
+    try {
+      await createBrand(data)
       toast.success('Brand created')
       onOpenChange(false)
-    } else {
-      toast.error(result.error.summary, { position: 'top-center' })
+    } catch {
+      // interceptor already showed the error toast
     }
   }
 

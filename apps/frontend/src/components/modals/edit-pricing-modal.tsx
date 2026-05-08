@@ -115,21 +115,21 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
 
   async function handleSave() {
     setSaving(true)
-    const response = await updateAssetPricing(assetDetails!.barcode, {
-      purchase_cost: toNum(fields.purchase_cost),
-      transport_cost: toNum(fields.transport_cost),
-      processing_cost: toNum(fields.processing_cost),
-      other_cost: toNum(fields.other_cost),
-      parts_cost: toNum(fields.parts_cost),
-      sale_price: toNum(fields.sale_price),
-    })
-    setSaving(false)
-    if (response.success) {
+    try {
+      await updateAssetPricing(assetDetails!.barcode, {
+        purchase_cost: toNum(fields.purchase_cost),
+        transport_cost: toNum(fields.transport_cost),
+        processing_cost: toNum(fields.processing_cost),
+        other_cost: toNum(fields.other_cost),
+        parts_cost: toNum(fields.parts_cost),
+        sale_price: toNum(fields.sale_price),
+      })
       toast.success('Pricing updated.')
       onOpenChange(false)
-    } else {
-      toast.error(response.error.summary)
+    } catch {
+      // interceptor already showed the error toast
     }
+    setSaving(false)
   }
 
   return (

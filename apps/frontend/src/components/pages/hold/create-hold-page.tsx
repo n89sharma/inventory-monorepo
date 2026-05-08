@@ -1,7 +1,6 @@
 import { useHoldStore } from '@/data/store/hold-store'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { HoldFormPage } from './hold-form-page'
 
 export function CreateHoldPage(): React.JSX.Element {
@@ -22,16 +21,12 @@ export function CreateHoldPage(): React.JSX.Element {
 
   async function onValidHoldCreateSubmit(data: HoldForm) {
     try {
-      const res = await submitCreateHold(data)
-      if (res.success) {
-        navigate(`/holds/${res.data.holdNumber}`, {
-          state: { successMessage: `Hold ${res.data.holdNumber} created!` }
-        })
-      } else {
-        toast.error(res.error.summary, { position: 'top-center' })
-      }
+      const { holdNumber } = await submitCreateHold(data)
+      navigate(`/holds/${holdNumber}`, {
+        state: { successMessage: `Hold ${holdNumber} created!` }
+      })
     } catch {
-      toast.error('Something went wrong on the server.', { position: 'top-center' })
+      // interceptor already showed the error toast
     }
   }
 

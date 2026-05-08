@@ -45,12 +45,12 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
   }
 
   async function onValidSubmit(data: ModelForm) {
-    const result = await createModel(data)
-    if (result.success) {
+    try {
+      await createModel(data)
       toast.success('Model created')
       onOpenChange(false)
-    } else {
-      toast.error(result.error.summary, { position: 'top-center' })
+    } catch {
+      // interceptor already showed the error toast
     }
   }
 
