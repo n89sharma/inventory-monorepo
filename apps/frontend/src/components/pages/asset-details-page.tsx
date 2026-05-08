@@ -1,4 +1,4 @@
-import { AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
+import { ActivitySection, AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
 import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow } from '@/components/custom/asset-details/detail-row'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
@@ -203,31 +203,33 @@ export const AssetDetailsPage = () => {
 
         </SectionRow>
 
-        <Tabs
-          defaultValue="comments"
-          onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
-        >
-          <TabsList variant="line">
-            <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2" /></TabsTrigger>
-            <TabsTrigger value="history"><SectionHeader title="History" className="px-2" /></TabsTrigger>
-          </TabsList>
-          <TabsContent value="comments" className="flex flex-col gap-3 py-3">
-            <AddCommentInput barcode={assetDetails.barcode} />
-            {
-              sortedComments.map(c => (<Comment
-                key={`${c.username}-${c.created_at}`}
-                user={c.username}
-                date={formatDateWithTime(c.created_at)}
-                avatarFallback={c.initials}
-                comment={c.comment}
-                tags={EMPTY_TAGS}
-              />))
-            }
-          </TabsContent>
-          <TabsContent value="history" className="py-3">
-            <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
-          </TabsContent>
-        </Tabs>
+        <ActivitySection>
+          <Tabs
+            defaultValue="comments"
+            onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
+          >
+            <TabsList variant="line">
+              <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2 mb-0" /></TabsTrigger>
+              <TabsTrigger value="history"><SectionHeader title="History" className="px-2 mb-0" /></TabsTrigger>
+            </TabsList>
+            <TabsContent value="comments" className="flex flex-col gap-3 py-3 overflow-y-auto max-h-105 pr-1">
+              <AddCommentInput barcode={assetDetails.barcode} />
+              {
+                sortedComments.map(c => (<Comment
+                  key={`${c.username}-${c.created_at}`}
+                  user={c.username}
+                  date={formatDateWithTime(c.created_at)}
+                  avatarFallback={c.initials}
+                  comment={c.comment}
+                  tags={EMPTY_TAGS}
+                />))
+              }
+            </TabsContent>
+            <TabsContent value="history" className="py-3 overflow-y-auto max-h-105 pr-1">
+              <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
+            </TabsContent>
+          </Tabs>
+        </ActivitySection>
 
       </DetailsContainer>
 

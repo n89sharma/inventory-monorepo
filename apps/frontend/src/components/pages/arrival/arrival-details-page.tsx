@@ -1,4 +1,5 @@
 import { ArrivalSummaryStrip } from '@/components/custom/cards/arrival-summary-strip'
+import { CollectionHistorySection } from '@/components/custom/collection-history-section'
 import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -57,6 +58,9 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
       />
+      <CollectionHistorySection>
+        <p className="text-sm text-muted-foreground">History coming soon.</p>
+      </CollectionHistorySection>
     </div>
   )
 }

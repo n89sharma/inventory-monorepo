@@ -36,32 +36,58 @@ function formatFieldValue(value: unknown): string {
   return String(value)
 }
 
+function EntryHeader(
+  { userName, timestamp, verb }: { userName: string; timestamp: Date | string; verb: string }
+) {
+  return (
+    <p className="text-sm">{userName} {verb} {formatHistoryTimestamp(timestamp)}</p>
+  )
+}
+
 function FieldDiffRow(
   { label, before, after }: { label: string; before: unknown; after: unknown }
 ) {
   const beforeStr = formatFieldValue(before)
   const afterStr = formatFieldValue(after)
+  const hadBefore = beforeStr !== ''
+  const hasAfter = afterStr !== ''
+
+  let content: React.ReactNode
+  if (!hadBefore && hasAfter) {
+    content = (
+      <>
+        <span className="text-muted-foreground">Added</span>{' '}
+        {label} <span className="font-medium">{afterStr}</span>
+      </>
+    )
+  } else if (hadBefore && !hasAfter) {
+    content = (
+      <>
+        <span className="text-muted-foreground">Removed</span>{' '}
+        {label} <span className="font-medium">{beforeStr}</span>
+      </>
+    )
+  } else {
+    content = (
+      <>
+        {label}{' '}
+        <span className="text-muted-foreground">{beforeStr}</span>
+        {' → '}
+        <span className="font-medium">{afterStr}</span>
+      </>
+    )
+  }
+
   return (
-    <div className="flex gap-2">
-      <span className="text-muted-foreground w-36 shrink-0">{label}</span>
-      <span>{beforeStr} → {afterStr}</span>
+    <div className="text-sm font-mono bg-muted/50 rounded px-2 py-0.5">
+      {content}
     </div>
   )
 }
 
 function AssetHistoryCreateEntry({ record }: { record: CreateRecord }) {
-  const { after } = record.changes
   return (
-    <div className="flex justify-between items-start gap-4">
-      <p>
-        {after.barcode} {after.brand_name} {after.model_name} {after.serial_number} created
-        by {record.user_name}
-        {after.arrival_number ? ` (arrival ${after.arrival_number})` : ''}
-      </p>
-      <span className="text-muted-foreground whitespace-nowrap">
-        {formatHistoryTimestamp(record.changed_on)}
-      </span>
-    </div>
+    <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="created" />
   )
 }
 
@@ -71,14 +97,9 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
     ({ key }) => key in after || key in before
   )
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between items-start gap-4">
-        <p className="font-medium">Asset updated by {record.user_name}</p>
-        <span className="text-muted-foreground whitespace-nowrap">
-          {formatHistoryTimestamp(record.changed_on)}
-        </span>
-      </div>
-      <div className="flex flex-col gap-0.5 pl-2">
+    <div className="flex flex-col gap-1.5">
+      <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="updated" />
+      <div className="flex flex-col gap-0.5">
         {changedFields.map(({ key, label }) => (
           <FieldDiffRow key={key} label={label} before={before[key]} after={after[key]} />
         ))}
@@ -89,15 +110,22 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
 
 export function AssetHistoryList({ history }: { history: AssetHistory }) {
   if (history.length === 0) {
-    return <p className="text-muted-foreground">No history on record</p>
+    return <p className="text-sm text-muted-foreground">No history on record</p>
   }
   return (
-    <div className="flex flex-col gap-4">
+    <ol className="flex flex-col gap-6 ml-4">
       {history.map((record, i) => (
-        record.action_type === 'CREATE'
-          ? <AssetHistoryCreateEntry key={i} record={record} />
-          : <AssetHistoryUpdateEntry key={i} record={record} />
+        <li key={i} className="relative pl-6">
+          <span className="absolute left-0 top-1 h-3 w-3 rounded-full bg-muted ring-4 ring-card border border-border" />
+          {i < history.length - 1 && (
+            <span className="absolute left-1.5 top-4 bottom-[-1.5rem] w-px bg-border" />
+          )}
+          {record.action_type === 'CREATE'
+            ? <AssetHistoryCreateEntry record={record} />
+            : <AssetHistoryUpdateEntry record={record} />
+          }
+        </li>
       ))}
-    </div>
+    </ol>
   )
 }

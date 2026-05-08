@@ -20,7 +20,7 @@ type TitleProps = {
 
 export function DetailsContainer({ children, className }: ChildrenProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col rounded-sm bg-card p-2 gap-8", className)}>
+    <div className={cn("flex flex-col rounded-md bg-card border p-6 gap-8", className)}>
       {children}
     </div>
   )
@@ -44,22 +44,25 @@ export function Section({ children, className }: ChildrenProps): React.JSX.Eleme
 
 export function AssetTitle({ brand, model, barcode, className }: TitleProps): React.JSX.Element {
   return (
-    <h1 className={cn("text-2xl font-semibold flex flex-col gap-1", className)}>
-      <span className="group flex items-center gap-2">
+    <div className={cn("flex flex-col gap-0.5", className)}>
+      <h1 className="text-2xl font-semibold group flex items-center gap-2">
         {barcode}
         <CopyButton value={barcode} />
-      </span>
-      <span className="group flex items-center gap-2">
+      </h1>
+      <p className="text-lg group flex items-center gap-2">
         {`${brand} ${model}`}
         <CopyButton value={model} />
-      </span>
-    </h1>
+      </p>
+    </div>
   )
 }
 
 export function SectionHeader({ title, className }: SectionHeaderProps): React.JSX.Element {
   return (
-    <h2 className={cn("text-xl font-semibold tracking-tight text-left", className)}>
+    <h2 className={cn(
+      "text-base font-semibold tracking-tight mb-2",
+      className
+    )}>
       {title}
     </h2>
   )
@@ -68,6 +71,14 @@ export function SectionHeader({ title, className }: SectionHeaderProps): React.J
 export function DataRowContainer({ children, className }: ChildrenProps): React.JSX.Element {
   return (
     <div className={cn("flex flex-col", className)}>
+      {children}
+    </div>
+  )
+}
+
+export function ActivitySection({ children, className }: ChildrenProps): React.JSX.Element {
+  return (
+    <div className={cn("border-t pt-6", className)}>
       {children}
     </div>
   )
