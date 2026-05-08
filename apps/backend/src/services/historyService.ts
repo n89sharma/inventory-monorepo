@@ -697,8 +697,114 @@ export async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
   afterValue: AssetUpdateFields[K],
   userId: number
 ): Promise<void> {
-  for (const assetId of assetIds) {
-    await recordAssetUpdate(assetId, { [field]: beforeValue } as AssetUpdateFields, { [field]: afterValue } as AssetUpdateFields, userId)
+  if (assetIds.length === 0) return
+  try {
+    const diffBefore: Record<string, unknown> = {}
+    const diffAfter: Record<string, unknown> = {}
+
+    if (field === 'hold_id') {
+      const [before, after] = await Promise.all([
+        resolveHoldNumber(beforeValue as number | null),
+        resolveHoldNumber(afterValue as number | null)
+      ])
+      diffBefore.hold_number = before
+      diffAfter.hold_number = after
+    } else if (field === 'arrival_id') {
+      const [before, after] = await Promise.all([
+        resolveArrivalNumber(beforeValue as number | null),
+        resolveArrivalNumber(afterValue as number | null)
+      ])
+      diffBefore.arrival_number = before
+      diffAfter.arrival_number = after
+    } else if (field === 'departure_id') {
+      const [before, after] = await Promise.all([
+        resolveDepartureNumber(beforeValue as number | null),
+        resolveDepartureNumber(afterValue as number | null)
+      ])
+      diffBefore.departure_number = before
+      diffAfter.departure_number = after
+    } else if (field === 'purchase_invoice_id') {
+      const [before, after] = await Promise.all([
+        resolveInvoiceNumber(beforeValue as number | null),
+        resolveInvoiceNumber(afterValue as number | null)
+      ])
+      diffBefore.invoice_number = before
+      diffAfter.invoice_number = after
+    }
+
+    if (Object.keys(diffAfter).length === 0) return
+
+    const now = new Date()
+    await prisma.history.createMany({
+      data: assetIds.map(assetId => ({
+        entity_type: 'Asset',
+        entity_id: assetId,
+        action_type: 'UPDATE',
+        user_id: userId,
+        changed_on: now,
+        changes: { before: diffBefore, after: diffAfter } as Prisma.InputJsonValue
+      }))
+    })
+  } catch (error) {
+    console.error(`History batch write failed [UPDATE Asset batch ${field}]:`, error)
+  }
+}
+
+export async function recordBatchAssetCreate(
+  assets: Array<{
+    id: number
+    barcode: string
+    serial_number: string
+    model_id: number
+    arrival_id?: number | null
+  }>,
+  userId: number
+): Promise<void> {
+  if (assets.length === 0) return
+  try {
+    const uniqueModelIds = [...new Set(assets.map(a => a.model_id))]
+    const uniqueArrivalIds = [
+      ...new Set(assets.map(a => a.arrival_id).filter((id): id is number => !!id))
+    ]
+    const [models, arrivals] = await Promise.all([
+      prisma.model.findMany({
+        where: { id: { in: uniqueModelIds } },
+        select: { id: true, name: true, brand: { select: { name: true } } }
+      }),
+      uniqueArrivalIds.length > 0
+        ? prisma.arrival.findMany({
+            where: { id: { in: uniqueArrivalIds } },
+            select: { id: true, arrival_number: true }
+          })
+        : Promise.resolve([])
+    ])
+    const modelMap = new Map(models.map(m => [m.id, m]))
+    const arrivalMap = new Map(arrivals.map(a => [a.id, a]))
+    const now = new Date()
+    await prisma.history.createMany({
+      data: assets.map(asset => {
+        const model = modelMap.get(asset.model_id)
+        const arrival = asset.arrival_id ? arrivalMap.get(asset.arrival_id) : null
+        return {
+          entity_type: 'Asset',
+          entity_id: asset.id,
+          action_type: 'CREATE',
+          user_id: userId,
+          changed_on: now,
+          changes: {
+            after: {
+              barcode: asset.barcode,
+              serial_number: asset.serial_number,
+              brand_name: model?.brand.name,
+              model_name: model?.name,
+              arrival_number: arrival?.arrival_number ?? null
+            }
+          } as Prisma.InputJsonValue
+        }
+      })
+    })
+  } catch (error) {
+    console.error(`History batch write failed [CREATE Asset batch]:`, error)
   }
 }
 

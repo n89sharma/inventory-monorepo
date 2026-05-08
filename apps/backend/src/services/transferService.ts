@@ -124,8 +124,10 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
       where: { transfer_id: transfer.id, asset_id: { in: assetIdsToDelete } }
     })
 
-    for (const assetId of assetIdsToAdd) {
-      await tx.assetTransfer.create({ data: { transfer_id: transfer.id, asset_id: assetId } })
+    if (assetIdsToAdd.length > 0) {
+      await tx.assetTransfer.createMany({
+        data: assetIdsToAdd.map(assetId => ({ transfer_id: transfer.id, asset_id: assetId }))
+      })
     }
 
     return { currentTransfer, assetIdsToDelete, assetIdsToAdd }

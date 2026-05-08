@@ -457,28 +457,32 @@ export async function updateAssetErrors(
 
       const now = new Date()
 
-      for (const ae of currentRows) {
-        if (!inputIdMap.has(ae.error_id)) {
-          await tx.assetError.delete({
-            where: { asset_id_error_id: { asset_id: assetId, error_id: ae.error_id } }
-          })
-        }
+      const errorIdsToDelete = currentRows
+        .filter(ae => !inputIdMap.has(ae.error_id))
+        .map(ae => ae.error_id)
+      if (errorIdsToDelete.length > 0) {
+        await tx.assetError.deleteMany({
+          where: { asset_id: assetId, error_id: { in: errorIdsToDelete } }
+        })
+      }
+
+      const rowsToCreate = [...inputIdMap.entries()]
+        .filter(([errorId]) => !currentIdMap.has(errorId))
+        .map(([errorId, is_fixed]) => ({
+          asset_id: assetId,
+          error_id: errorId,
+          is_fixed,
+          added_by: userId,
+          added_at: now,
+          fixed_at: is_fixed ? now : null,
+          fixed_by: is_fixed ? userId : null
+        }))
+      if (rowsToCreate.length > 0) {
+        await tx.assetError.createMany({ data: rowsToCreate })
       }
 
       for (const [errorId, is_fixed] of inputIdMap.entries()) {
-        if (!currentIdMap.has(errorId)) {
-          await tx.assetError.create({
-            data: {
-              asset_id: assetId,
-              error_id: errorId,
-              is_fixed,
-              added_by: userId,
-              added_at: now,
-              fixed_at: is_fixed ? now : null,
-              fixed_by: is_fixed ? userId : null
-            }
-          })
-        } else if (currentIdMap.get(errorId) !== is_fixed) {
+        if (currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed) {
           await tx.assetError.update({
             where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
             data: {

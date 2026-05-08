@@ -5,7 +5,7 @@ import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/mo
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordArrivalCreate, recordArrivalUpdate, recordAssetCreate, recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets } from './historyService.js'
+import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
 
 const sequenceArrivalEntity = 'ARRIVAL'
@@ -143,14 +143,16 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
     created_at: currentDateTime
   }, userId)
 
-  for (const asset of arrival.assets) {
-    await recordAssetCreate(asset.id, {
-      barcode: asset.barcode,
-      serial_number: asset.serial_number,
-      model_id: asset.model_id,
+  await recordBatchAssetCreate(
+    arrival.assets.map(a => ({
+      id: a.id,
+      barcode: a.barcode,
+      serial_number: a.serial_number,
+      model_id: a.model_id,
       arrival_id: arrival.id
-    }, userId)
-  }
+    })),
+    userId
+  )
 
   await recordAssetUpdateOnCollection('Arrival', arrival.id, arrival.assets.map(a => a.id), [], userId)
 
@@ -241,6 +243,13 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
         }
       })
 
+      if (assetsToUpdate.length > 0) {
+        await tx.assetAccessory.deleteMany({
+          where: { asset_id: { in: assetsToUpdate.map(a => a.id!) } }
+        })
+      }
+
+      const allNewAccessories: { asset_id: number; accessory_id: number }[] = []
       for (const asset of assetsToUpdate) {
         await tx.asset.update({
           where: { id: asset.id },
@@ -259,10 +268,13 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
             }
           }
         })
-        await tx.assetAccessory.deleteMany({ where: { asset_id: asset.id } })
         for (const cf of asset.coreFunctions) {
-          await tx.assetAccessory.create({ data: { asset_id: asset.id!, accessory_id: cf.id } })
+          allNewAccessories.push({ asset_id: asset.id!, accessory_id: cf.id })
         }
+      }
+
+      if (allNewAccessories.length > 0) {
+        await tx.assetAccessory.createMany({ data: allNewAccessories })
       }
 
       for (const asset of assetsToCreate) {
@@ -299,14 +311,16 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
 
   await recordCollectionUpdateOnAssets(assetIdsToBeDeleted, [], 'arrival_id', arrival.id, userId)
 
-  for (const asset of newAssets) {
-    await recordAssetCreate(asset.id, {
-      barcode: asset.barcode,
-      serial_number: asset.serial_number,
-      model_id: asset.model_id,
+  await recordBatchAssetCreate(
+    newAssets.map(a => ({
+      id: a.id,
+      barcode: a.barcode,
+      serial_number: a.serial_number,
+      model_id: a.model_id,
       arrival_id: arrival.id
-    }, userId)
-  }
+    })),
+    userId
+  )
 
   await recordAssetUpdateOnCollection('Arrival', arrival.id, newAssets.map(a => a.id), assetIdsToBeDeleted, userId)
 
