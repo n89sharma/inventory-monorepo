@@ -5,15 +5,34 @@ import { logger } from '../lib/logger.js'
 
 const DEFAULT_ROLE_ID = 2 // MEMBER (read-only)
 
+function getPrimaryEmail(
+  emailAddresses: { id: string; email_address: string }[],
+  primaryEmailAddressId: string | null | undefined,
+): string | null {
+  if (primaryEmailAddressId) {
+    const primary = emailAddresses.find(e => e.id === primaryEmailAddressId)
+    if (primary) return primary.email_address
+  }
+  return emailAddresses[0]?.email_address ?? null
+}
+
+function buildName(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+  fallback: string,
+): string {
+  return [firstName, lastName].filter(Boolean).join(' ') || fallback
+}
+
 export async function handleClerkWebhook(req: Request, res: Response) {
   try {
     const evt = await verifyWebhook(req)
 
     if (evt.type === 'user.created') {
-      const { id, email_addresses, first_name, last_name } = evt.data
+      const { id, email_addresses, first_name, last_name, primary_email_address_id } = evt.data
 
-      const email = email_addresses?.[0]?.email_address ?? null
-      const name = [first_name, last_name].filter(Boolean).join(' ') || (email?.split('@')[0] ?? id)
+      const email = getPrimaryEmail(email_addresses, primary_email_address_id)
+      const name = buildName(first_name, last_name, email?.split('@')[0] ?? id)
 
       const existingUser = email
         ? await prisma.user.findUnique({ where: { email } })
@@ -21,18 +40,41 @@ export async function handleClerkWebhook(req: Request, res: Response) {
 
       if (existingUser) {
         await prisma.user.update({
-          where: { email },
-          data: { clerk_id: id, is_active: true }
+          where: { id: existingUser.id },
+          data: { clerk_id: id, is_active: true },
         })
       } else {
         await prisma.user.create({
           data: {
             clerk_id: id,
-            email,
+            email: email ?? undefined,
             name,
             role_id: DEFAULT_ROLE_ID,
-            is_active: true
-          }
+            is_active: true,
+          },
+        })
+      }
+    }
+
+    if (evt.type === 'user.updated') {
+      const { id, email_addresses, first_name, last_name, primary_email_address_id } = evt.data
+
+      const email = getPrimaryEmail(email_addresses, primary_email_address_id)
+      const name = buildName(first_name, last_name, email?.split('@')[0] ?? id)
+
+      await prisma.user.update({
+        where: { clerk_id: id },
+        data: { email: email ?? undefined, name },
+      })
+    }
+
+    if (evt.type === 'user.deleted') {
+      const { id } = evt.data
+
+      if (id) {
+        await prisma.user.update({
+          where: { clerk_id: id },
+          data: { is_active: false, clerk_id: null },
         })
       }
     }
