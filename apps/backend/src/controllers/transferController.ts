@@ -1,8 +1,10 @@
 import { isAfter } from 'date-fns'
-import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, response400, response500, successResponse } from 'shared-types'
+import { Request, Response } from 'express'
+import { ApiResponse, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
+import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createTransfer as createTransferSer,
@@ -26,78 +28,43 @@ export const TransferQuerySchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
-export async function getTransfers(req: Request, res: Response<ApiResponse<TransferSummary[]>>) {
-  try {
-    const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<typeof TransferQuerySchema>
-    const transfers = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0))
-    res.json(successResponse(transfers))
-  } catch (error) {
-    res.status(500).json(response500('Failed to fetch transfers'))
-  }
-}
+export const getTransfers = asyncHandler(async (req: Request, res: Response<ApiResponse<TransferSummary[]>>) => {
+  const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<typeof TransferQuerySchema>
+  const transfers = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0))
+  res.json(successResponse(transfers))
+})
 
-export async function getTransferDetail(req: Request, res: Response<ApiResponse<TransferDetail>>) {
+export const getTransferDetail = asyncHandler(async (req: Request, res: Response<ApiResponse<TransferDetail>>) => {
   const { transferNumber } = req.params
-  const response = await getTransferSer(transferNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getTransferSer(transferNumber)
+  res.json(successResponse(data))
+})
 
-export async function getTransferForUpdate(req: Request, res: Response<ApiResponse<UpdateTransfer>>) {
+export const getTransferForUpdate = asyncHandler(async (req: Request, res: Response<ApiResponse<UpdateTransfer>>) => {
   const { transferNumber } = req.params
-  const response = await getTransferForUpdateSer(transferNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getTransferForUpdateSer(transferNumber)
+  res.json(successResponse(data))
+})
 
-export async function createTransfer(req: Request, res: Response<{ transferNumber: string }>, next: NextFunction) {
-  try {
-    const validated = CreateTransferSchema.parse(req.body)
-    const transferNumber = await createTransferSer(validated, res.locals.dbUserId)
-    res.status(201).json({ transferNumber })
-  } catch (error) {
-    next(error)
-  }
-}
+export const createTransfer = asyncHandler(async (req, res) => {
+  const validated = CreateTransferSchema.parse(req.body)
+  const transferNumber = await createTransferSer(validated, res.locals.dbUserId)
+  res.status(201).json({ transferNumber })
+})
 
-export async function updateTransfer(req: Request, res: Response<{ transferNumber: string }>, next: NextFunction) {
+export const updateTransfer = asyncHandler(async (req, res) => {
   const { transferNumber } = req.params
-  try {
-    const validated = SubmitUpdateTransferSchema.parse(req.body)
-    await updateTransferSer(validated, res.locals.dbUserId)
-    res.json({ transferNumber })
-  } catch (error) {
-    next(error)
-  }
-}
+  const validated = SubmitUpdateTransferSchema.parse(req.body)
+  await updateTransferSer(validated, res.locals.dbUserId)
+  res.json({ transferNumber })
+})
 
-export async function getTransferHistory(
-  req: Request,
-  res: Response<ApiResponse<CollectionHistory>>
-) {
+export const getTransferHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
   const { transferNumber } = req.params
-  try {
-    const transfer = await prisma.transfer.findUnique({
-      where: { transfer_number: transferNumber }, select: { id: true }
-    })
-    if (!transfer) return res.status(404).json(response400(`Transfer ${transferNumber} not found`))
-    const history = await getCollectionHistorySer('Transfer', transfer.id)
-    return res.json(successResponse(history))
-  } catch {
-    return res.status(500).json(response500(`Failed to fetch history for transfer ${transferNumber}`))
-  }
-}
+  const transfer = await prisma.transfer.findUnique({
+    where: { transfer_number: transferNumber }, select: { id: true }
+  })
+  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+  const history = await getCollectionHistorySer('Transfer', transfer.id)
+  res.json(successResponse(history))
+})

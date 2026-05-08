@@ -1,19 +1,19 @@
-import { Request, Response } from 'express'
-import { ApiResponse, CreateModelSchema, ModelSummary, response400, response500, successResponse } from 'shared-types'
-import { Prisma } from '../../generated/prisma/client.js'
+import { NextFunction, Request, Response } from 'express'
+import { ApiResponse, CreateModelSchema, ModelSummary, successResponse } from 'shared-types'
 import { getModels as getModelsDb } from '../../generated/prisma/sql.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
 import { prisma } from '../prisma.js'
 
-export async function getModels(req: Request, res: Response<ApiResponse<ModelSummary[]>>) {
-  try {
-    const models = await prisma.$queryRawTyped(getModelsDb())
-    res.json(successResponse(models))
-  } catch (error) {
-    res.status(500).json(response500('Failed to fetch models'))
-  }
-}
+export const getModels = asyncHandler(async (req: Request, res: Response<ApiResponse<ModelSummary[]>>) => {
+  const models = await prisma.$queryRawTyped(getModelsDb())
+  res.json(successResponse(models))
+})
 
-export async function createModel(req: Request, res: Response<ApiResponse<{ id: number }>>) {
+export async function createModel(
+  req: Request,
+  res: Response<ApiResponse<{ id: number }>>,
+  next: NextFunction
+) {
   try {
     const body = CreateModelSchema.parse(req.body)
     const model = await prisma.model.create({
@@ -27,10 +27,7 @@ export async function createModel(req: Request, res: Response<ApiResponse<{ id: 
     })
     res.status(201).json(successResponse({ id: model.id }))
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      return res.status(400).json(response400('A model with this name already exists for this brand'))
-    }
-    res.status(500).json(response500('Failed to create model'))
+    next(error)
   }
 }
 

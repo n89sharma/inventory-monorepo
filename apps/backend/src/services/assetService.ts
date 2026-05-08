@@ -1,4 +1,4 @@
-import { ApiResponse, AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, response400, response500, successResponse, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -10,7 +10,7 @@ import {
   getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
 import { Prisma } from '../../generated/prisma/client.js'
-import { NotFoundError } from '../lib/errors.js'
+import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { recordAssetUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
@@ -26,111 +26,65 @@ export async function getAssets(
   technicalStatusIds: number[],
   warehouseIds: number[],
   meterParam: number
-): Promise<ApiResponse<AssetSummary[]>> {
-  try {
-    const assets = await prisma.$queryRaw<AssetSummary[]>`
-      SELECT a.id, b."name" AS brand, m."name" AS model,
-             at.asset_type, a.barcode, a.serial_number, t.meter_total,
-             w.city_code AS warehouse_city_code, w.street AS warehouse_street,
-             tr.status AS tracking_status,
-             av.status AS availability_status,
-             te.status AS technical_status
-      FROM "Asset" a
-        JOIN "TechnicalSpecification" t ON t.asset_id = a.id
-        JOIN "Model" m ON m.id = a.model_id
-        JOIN "Brand" b ON b.id = m.brand_id
-        JOIN "AssetType" at ON at.id = m.asset_type_id
-        JOIN "TrackingStatus" tr ON tr.id = a.tracking_status_id
-        JOIN "AvailabilityStatus" av ON av.id = a.availability_status_id
-        JOIN "TechnicalStatus" te ON te.id = a.technical_status_id
-        LEFT JOIN "Location" l ON l.id = a.location_id
-        LEFT JOIN "Warehouse" w ON w.id = l.warehouse_id
-      WHERE m."name" ~* ${model}
-        AND (${trackingId} = 0 OR tr.id = ${trackingId})
-        AND ${inFilter('av.id', availabilityStatusIds)}
-        AND ${inFilter('te.id', technicalStatusIds)}
-        AND ${inFilter('w.id', warehouseIds)}
-        AND (${meterParam} = -1 OR t.meter_total <= ${meterParam})
-    `
-    return successResponse(assets)
-  } catch {
-    return response500('Failed to fetch assets')
-  }
+): Promise<AssetSummary[]> {
+  return prisma.$queryRaw<AssetSummary[]>`
+    SELECT a.id, b."name" AS brand, m."name" AS model,
+           at.asset_type, a.barcode, a.serial_number, t.meter_total,
+           w.city_code AS warehouse_city_code, w.street AS warehouse_street,
+           tr.status AS tracking_status,
+           av.status AS availability_status,
+           te.status AS technical_status
+    FROM "Asset" a
+      JOIN "TechnicalSpecification" t ON t.asset_id = a.id
+      JOIN "Model" m ON m.id = a.model_id
+      JOIN "Brand" b ON b.id = m.brand_id
+      JOIN "AssetType" at ON at.id = m.asset_type_id
+      JOIN "TrackingStatus" tr ON tr.id = a.tracking_status_id
+      JOIN "AvailabilityStatus" av ON av.id = a.availability_status_id
+      JOIN "TechnicalStatus" te ON te.id = a.technical_status_id
+      LEFT JOIN "Location" l ON l.id = a.location_id
+      LEFT JOIN "Warehouse" w ON w.id = l.warehouse_id
+    WHERE m."name" ~* ${model}
+      AND (${trackingId} = 0 OR tr.id = ${trackingId})
+      AND ${inFilter('av.id', availabilityStatusIds)}
+      AND ${inFilter('te.id', technicalStatusIds)}
+      AND ${inFilter('w.id', warehouseIds)}
+      AND (${meterParam} = -1 OR t.meter_total <= ${meterParam})
+  `
 }
 
-
-export async function getAssetDetail(barcode: string): Promise<ApiResponse<AssetDetails>> {
-  try {
-    const assets = await prisma.$queryRawTyped(getAssetDetailsQuery(barcode))
-    if (!assets || assets.length === 0) {
-      return response400(`Asset ${barcode} not found`)
-    }
-    return successResponse(mapAssetDetail(assets[0]))
-  } catch (error) {
-    return response500(`Failed to fetch asset ${barcode}`)
-  }
+export async function getAssetDetail(barcode: string): Promise<AssetDetails> {
+  const assets = await prisma.$queryRawTyped(getAssetDetailsQuery(barcode))
+  if (!assets || assets.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
+  return mapAssetDetail(assets[0])
 }
 
-export async function getAccessories(barcode: string): Promise<ApiResponse<string[]>> {
-  try {
-    const accessories = await prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
-    return successResponse(accessories.map(a => a.accessory))
-  } catch (error) {
-    return response500(`Failed to fetch accessories for ${barcode}`)
-  }
+export async function getAccessories(barcode: string): Promise<string[]> {
+  const accessories = await prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
+  return accessories.map(a => a.accessory)
 }
 
-export async function getErrors(barcode: string): Promise<ApiResponse<AssetError[]>> {
-  try {
-    const errors = await prisma.$queryRawTyped(getAssetErrorsQuery(barcode))
-    return successResponse(errors)
-  } catch (error) {
-    return response500(`Failed to fetch errors for ${barcode}`)
-  }
+export async function getErrors(barcode: string): Promise<AssetError[]> {
+  return prisma.$queryRawTyped(getAssetErrorsQuery(barcode))
 }
 
 export function getInitials(name: string): string {
   const words = name.trim().split(/\s+/)
-
-  if (words.length === 1) {
-    // Single word: take first 2 characters
-    return words[0].slice(0, 2).toUpperCase()
-  }
-
-  // Multiple words: take first letter of first 2 words
-  return words
-    .slice(0, 2)
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return words.slice(0, 2).map(word => word[0]).join('').toUpperCase()
 }
 
-export async function getComments(barcode: string): Promise<ApiResponse<Comment[]>> {
-  try {
-    const comments = await prisma.$queryRawTyped(getAssetCommentsQuery(barcode))
-    const commentsWithInitials = comments.map(c => ({ ...c, initials: getInitials(c.username) }))
-    return successResponse(commentsWithInitials)
-  } catch (error) {
-    return response500(`Failed to fetch comments for ${barcode}`)
-  }
+export async function getComments(barcode: string): Promise<Comment[]> {
+  const comments = await prisma.$queryRawTyped(getAssetCommentsQuery(barcode))
+  return comments.map(c => ({ ...c, initials: getInitials(c.username) }))
 }
 
-export async function getAssetPartTransfer(barcode: string): Promise<ApiResponse<PartTransfer[]>> {
-  try {
-    const parts = await prisma.$queryRawTyped(getAssetPartTransferQuery(barcode))
-    return successResponse(parts)
-  } catch (error) {
-    return response500(`Failed to fetch part transfers for ${barcode}`)
-  }
+export async function getAssetPartTransfer(barcode: string): Promise<PartTransfer[]> {
+  return prisma.$queryRawTyped(getAssetPartTransferQuery(barcode))
 }
 
-export async function getTransfers(barcode: string): Promise<ApiResponse<AssetTransfer[]>> {
-  try {
-    const transfers = await prisma.$queryRawTyped(getAssetTransfersQuery(barcode))
-    return successResponse(transfers)
-  } catch (error) {
-    return response500(`Failed to fetch transfers for ${barcode}`)
-  }
+export async function getTransfers(barcode: string): Promise<AssetTransfer[]> {
+  return prisma.$queryRawTyped(getAssetTransfersQuery(barcode))
 }
 
 function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
@@ -226,15 +180,10 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
   }
 }
 
-export async function exportAssets(barcodes: string[]): Promise<ApiResponse<string>> {
-  if (barcodes.length > 2000) return response400('Cannot export more than 2000 assets')
-  try {
-    const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
-    const details = results.map(r => mapAssetDetail(r as unknown as getAssetDetailsQuery.Result))
-    return successResponse(generateCsv(details))
-  } catch {
-    return response500('Failed to export assets')
-  }
+export async function exportAssets(barcodes: string[]): Promise<string> {
+  const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
+  const details = results.map(r => mapAssetDetail(r as unknown as getAssetDetailsQuery.Result))
+  return generateCsv(details)
 }
 
 function escapeCSV(val: unknown): string {
@@ -247,416 +196,333 @@ function escapeCSV(val: unknown): string {
 }
 
 const CSV_HEADERS = [
-  'barcode',
-  'serial_number',
-  'model',
-  'brand',
-  'asset_type',
-  'tracking_status',
-  'availability_status',
-  'technical_status',
-  'location',
-  'warehouse_code',
-  'warehouse_street',
-  'created_at',
-  'is_held',
-  'cost_purchase_cost',
-  'cost_transport_cost',
-  'cost_processing_cost',
-  'cost_other_cost',
-  'cost_parts_cost',
-  'cost_total_cost',
-  'cost_sale_price',
-  'specs_cassettes',
-  'specs_internal_finisher',
-  'specs_meter_black',
-  'specs_meter_colour',
-  'specs_meter_total',
-  'specs_drum_life_c',
-  'specs_drum_life_m',
-  'specs_drum_life_y',
-  'specs_drum_life_k',
-  'hold_created_by',
-  'hold_created_for',
-  'hold_created_at',
-  'hold_customer',
-  'hold_from_dt',
-  'hold_to_dt',
-  'hold_notes',
-  'hold_hold_number',
-  'arrival_arrival_number',
-  'arrival_origin',
-  'arrival_destination_code',
-  'arrival_destination_street',
-  'arrival_transporter',
-  'arrival_created_by',
-  'arrival_notes',
-  'arrival_created_at',
-  'departure_departure_number',
-  'departure_origin_code',
-  'departure_origin_street',
-  'departure_destination',
-  'departure_transporter',
-  'departure_created_by',
-  'departure_notes',
-  'departure_created_at',
-  'purchase_invoice_invoice_number',
-  'purchase_invoice_is_cleared',
+  'barcode', 'serial_number', 'model', 'brand', 'asset_type',
+  'tracking_status', 'availability_status', 'technical_status',
+  'location', 'warehouse_code', 'warehouse_street', 'created_at', 'is_held',
+  'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
+  'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
+  'specs_cassettes', 'specs_internal_finisher', 'specs_meter_black',
+  'specs_meter_colour', 'specs_meter_total', 'specs_drum_life_c',
+  'specs_drum_life_m', 'specs_drum_life_y', 'specs_drum_life_k',
+  'hold_created_by', 'hold_created_for', 'hold_created_at', 'hold_customer',
+  'hold_from_dt', 'hold_to_dt', 'hold_notes', 'hold_hold_number',
+  'arrival_arrival_number', 'arrival_origin', 'arrival_destination_code',
+  'arrival_destination_street', 'arrival_transporter', 'arrival_created_by',
+  'arrival_notes', 'arrival_created_at', 'departure_departure_number',
+  'departure_origin_code', 'departure_origin_street', 'departure_destination',
+  'departure_transporter', 'departure_created_by', 'departure_notes',
+  'departure_created_at', 'purchase_invoice_invoice_number', 'purchase_invoice_is_cleared',
 ]
 
 function generateCsv(assets: AssetDetails[]): string {
   const rows = assets.map(a => [
-    a.barcode,
-    a.serial_number,
-    a.model,
-    a.brand,
-    a.asset_type,
-    a.tracking_status,
-    a.availability_status,
-    a.technical_status,
-    a.location,
-    a.warehouse_code,
-    a.warehouse_street,
-    a.created_at,
-    a.is_held,
-    a.cost.purchase_cost,
-    a.cost.transport_cost,
-    a.cost.processing_cost,
-    a.cost.other_cost,
-    a.cost.parts_cost,
-    a.cost.total_cost,
-    a.cost.sale_price,
-    a.specs.cassettes,
-    a.specs.internal_finisher,
-    a.specs.meter_black,
-    a.specs.meter_colour,
-    a.specs.meter_total,
-    a.specs.drum_life_c,
-    a.specs.drum_life_m,
-    a.specs.drum_life_y,
-    a.specs.drum_life_k,
-    a.hold?.created_by,
-    a.hold?.created_for,
-    a.hold?.created_at,
-    a.hold?.customer,
-    a.hold?.from_dt,
-    a.hold?.to_dt,
-    a.hold?.notes,
-    a.hold?.hold_number,
-    a.arrival?.arrival_number,
-    a.arrival?.origin,
-    a.arrival?.destination_code,
-    a.arrival?.destination_street,
-    a.arrival?.transporter,
-    a.arrival?.created_by,
-    a.arrival?.notes,
-    a.arrival?.created_at,
-    a.departure?.departure_number,
-    a.departure?.origin_code,
-    a.departure?.origin_street,
-    a.departure?.destination,
-    a.departure?.transporter,
-    a.departure?.created_by,
-    a.departure?.notes,
-    a.departure?.created_at,
-    a.purchase_invoice?.invoice_number,
+    a.barcode, a.serial_number, a.model, a.brand, a.asset_type,
+    a.tracking_status, a.availability_status, a.technical_status,
+    a.location, a.warehouse_code, a.warehouse_street, a.created_at, a.is_held,
+    a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
+    a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,
+    a.specs.cassettes, a.specs.internal_finisher, a.specs.meter_black,
+    a.specs.meter_colour, a.specs.meter_total, a.specs.drum_life_c,
+    a.specs.drum_life_m, a.specs.drum_life_y, a.specs.drum_life_k,
+    a.hold?.created_by, a.hold?.created_for, a.hold?.created_at,
+    a.hold?.customer, a.hold?.from_dt, a.hold?.to_dt,
+    a.hold?.notes, a.hold?.hold_number,
+    a.arrival?.arrival_number, a.arrival?.origin, a.arrival?.destination_code,
+    a.arrival?.destination_street, a.arrival?.transporter, a.arrival?.created_by,
+    a.arrival?.notes, a.arrival?.created_at, a.departure?.departure_number,
+    a.departure?.origin_code, a.departure?.origin_street, a.departure?.destination,
+    a.departure?.transporter, a.departure?.created_by, a.departure?.notes,
+    a.departure?.created_at, a.purchase_invoice?.invoice_number,
     a.purchase_invoice?.is_cleared,
   ].map(escapeCSV))
-
   return [CSV_HEADERS.join(','), ...rows.map(r => r.join(','))].join('\n')
 }
 
-export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<ApiResponse<void>> {
-  try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
-    if (!asset) return response400(`Asset ${barcode} not found`)
-    const now = new Date()
-    await prisma.comment.create({
-      data: {
-        asset_id: asset.id,
-        created_by_id: userId,
-        comment: data.comment,
-        created_at: now,
-        updated_at: now
-      }
-    })
-    return successResponse(undefined)
-  } catch {
-    return response500(`Failed to create comment for ${barcode}`)
-  }
+export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<void> {
+  const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+  const now = new Date()
+  await prisma.comment.create({
+    data: {
+      asset_id: asset.id,
+      created_by_id: userId,
+      comment: data.comment,
+      created_at: now,
+      updated_at: now
+    }
+  })
 }
 
-export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer, userId: number): Promise<ApiResponse<void>> {
+export async function createPartTransfer(
+  recipientBarcode: string,
+  data: CreatePartTransfer,
+  userId: number
+): Promise<void> {
   if (data.donor_barcode === recipientBarcode) {
-    return response400('Donor and recipient cannot be the same asset')
+    throw new ValidationError('Donor and recipient cannot be the same asset')
   }
+  const recipient = await prisma.asset.findUnique({
+    where: { barcode: recipientBarcode },
+    select: { id: true }
+  })
+  if (!recipient) throw new NotFoundError(`Asset ${recipientBarcode} not found`)
 
-  try {
-    const recipient = await prisma.asset.findUnique({
-      where: { barcode: recipientBarcode },
-      select: { id: true }
-    })
-    if (!recipient) return response400(`Asset ${recipientBarcode} not found`)
+  const donor = await prisma.asset.findUnique({
+    where: { barcode: data.donor_barcode },
+    select: { id: true }
+  })
+  if (!donor) throw new NotFoundError(`Donor asset ${data.donor_barcode} not found`)
 
-    const donor = await prisma.asset.findUnique({
-      where: { barcode: data.donor_barcode },
-      select: { id: true }
-    })
-    if (!donor) return response400(`Donor asset ${data.donor_barcode} not found`)
-
-    await prisma.partTransfer.create({
-      data: {
-        recipient_asset_id: recipient.id,
-        donor_asset_id: donor.id,
-        part: data.part,
-        is_exchange: data.is_exchange,
-        notes: data.notes,
-        fixed_at: new Date(),
-        fixed_by: userId
-      }
-    })
-    return successResponse(undefined)
-  } catch (error) {
-    return response500(`Failed to create part transfer for ${recipientBarcode}`)
-  }
+  await prisma.partTransfer.create({
+    data: {
+      recipient_asset_id: recipient.id,
+      donor_asset_id: donor.id,
+      part: data.part,
+      is_exchange: data.is_exchange,
+      notes: data.notes,
+      fixed_at: new Date(),
+      fixed_by: userId
+    }
+  })
 }
 
 export async function updateAssetErrors(
   barcode: string,
   data: UpdateAssetErrors,
   userId: number
-): Promise<ApiResponse<void>> {
-  try {
-    const { assetId, prevErrorIds, nextErrorIds } = await prisma.$transaction(async (tx) => {
-      const asset = await tx.asset.findUnique({
-        where: { barcode },
-        select: { id: true, model: { select: { brand_id: true } } }
+): Promise<void> {
+  const { assetId, prevErrorIds, nextErrorIds } = await prisma.$transaction(async (tx) => {
+    const asset = await tx.asset.findUnique({
+      where: { barcode },
+      select: { id: true, model: { select: { brand_id: true } } }
+    })
+    if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+
+    const assetId = asset.id
+    const brandId = asset.model.brand_id
+
+    const errorRecords = await tx.error.findMany({
+      where: { brand_id: brandId, code: { in: data.errors.map(e => e.code) } },
+      select: { id: true, code: true }
+    })
+    const codeToId = new Map(errorRecords.map(e => [e.code, e.id]))
+
+    const currentRows = await tx.assetError.findMany({
+      where: { asset_id: assetId },
+      select: { error_id: true, is_fixed: true }
+    })
+    const currentIdMap = new Map(currentRows.map(ae => [ae.error_id, ae.is_fixed]))
+
+    const inputIdMap = new Map(
+      data.errors
+        .filter(e => codeToId.has(e.code))
+        .map(e => [codeToId.get(e.code)!, e.is_fixed])
+    )
+
+    const now = new Date()
+
+    const errorIdsToDelete = currentRows
+      .filter(ae => !inputIdMap.has(ae.error_id))
+      .map(ae => ae.error_id)
+    if (errorIdsToDelete.length > 0) {
+      await tx.assetError.deleteMany({
+        where: { asset_id: assetId, error_id: { in: errorIdsToDelete } }
       })
-      if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+    }
 
-      const assetId = asset.id
-      const brandId = asset.model.brand_id
+    const rowsToCreate = [...inputIdMap.entries()]
+      .filter(([errorId]) => !currentIdMap.has(errorId))
+      .map(([errorId, is_fixed]) => ({
+        asset_id: assetId,
+        error_id: errorId,
+        is_fixed,
+        added_by: userId,
+        added_at: now,
+        fixed_at: is_fixed ? now : null,
+        fixed_by: is_fixed ? userId : null
+      }))
+    if (rowsToCreate.length > 0) {
+      await tx.assetError.createMany({ data: rowsToCreate })
+    }
 
-      const errorRecords = await tx.error.findMany({
-        where: { brand_id: brandId, code: { in: data.errors.map(e => e.code) } },
-        select: { id: true, code: true }
-      })
-      const codeToId = new Map(errorRecords.map(e => [e.code, e.id]))
-
-      const currentRows = await tx.assetError.findMany({
-        where: { asset_id: assetId },
-        select: { error_id: true, is_fixed: true }
-      })
-      const currentIdMap = new Map(currentRows.map(ae => [ae.error_id, ae.is_fixed]))
-
-      const inputIdMap = new Map(
-        data.errors
-          .filter(e => codeToId.has(e.code))
-          .map(e => [codeToId.get(e.code)!, e.is_fixed])
-      )
-
-      const now = new Date()
-
-      const errorIdsToDelete = currentRows
-        .filter(ae => !inputIdMap.has(ae.error_id))
-        .map(ae => ae.error_id)
-      if (errorIdsToDelete.length > 0) {
-        await tx.assetError.deleteMany({
-          where: { asset_id: assetId, error_id: { in: errorIdsToDelete } }
+    for (const [errorId, is_fixed] of inputIdMap.entries()) {
+      if (currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed) {
+        await tx.assetError.update({
+          where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
+          data: {
+            is_fixed,
+            fixed_at: is_fixed ? now : null,
+            fixed_by: is_fixed ? userId : null
+          }
         })
       }
+    }
 
-      const rowsToCreate = [...inputIdMap.entries()]
-        .filter(([errorId]) => !currentIdMap.has(errorId))
-        .map(([errorId, is_fixed]) => ({
-          asset_id: assetId,
-          error_id: errorId,
-          is_fixed,
-          added_by: userId,
-          added_at: now,
-          fixed_at: is_fixed ? now : null,
-          fixed_by: is_fixed ? userId : null
-        }))
-      if (rowsToCreate.length > 0) {
-        await tx.assetError.createMany({ data: rowsToCreate })
-      }
+    return {
+      assetId,
+      prevErrorIds: currentRows.map(r => r.error_id).sort(),
+      nextErrorIds: [...inputIdMap.keys()].sort()
+    }
+  })
 
-      for (const [errorId, is_fixed] of inputIdMap.entries()) {
-        if (currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed) {
-          await tx.assetError.update({
-            where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
-            data: {
-              is_fixed,
-              fixed_at: is_fixed ? now : null,
-              fixed_by: is_fixed ? userId : null
-            }
-          })
-        }
-      }
-
-      return {
-        assetId,
-        prevErrorIds: currentRows.map(r => r.error_id).sort(),
-        nextErrorIds: [...inputIdMap.keys()].sort()
-      }
-    })
-
-    await recordAssetUpdate(assetId, { error_ids: prevErrorIds }, { error_ids: nextErrorIds }, userId)
-
-    return successResponse(undefined)
-  } catch (error) {
-    if (error instanceof NotFoundError) return response400(error.message)
-    return response500(`Failed to update errors for asset ${barcode}`)
-  }
+  await recordAssetUpdate(assetId, { error_ids: prevErrorIds }, { error_ids: nextErrorIds }, userId)
 }
 
-export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing, userId: number): Promise<ApiResponse<void>> {
-  try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
-    if (!asset) return response400(`Asset ${barcode} not found`)
+export async function updateAssetPricing(
+  barcode: string,
+  data: UpdateAssetPricing,
+  userId: number
+): Promise<void> {
+  const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-    const currentCost = await prisma.cost.findUnique({
-      where: { asset_id: asset.id },
-      select: { purchase_cost: true, transport_cost: true, processing_cost: true, other_cost: true, parts_cost: true, total_cost: true, sale_price: true }
-    })
+  const currentCost = await prisma.cost.findUnique({
+    where: { asset_id: asset.id },
+    select: {
+      purchase_cost: true, transport_cost: true, processing_cost: true,
+      other_cost: true, parts_cost: true, total_cost: true, sale_price: true
+    }
+  })
 
-    const total_cost = data.purchase_cost + data.transport_cost + data.processing_cost + data.other_cost + data.parts_cost
+  const total_cost = data.purchase_cost + data.transport_cost + data.processing_cost
+    + data.other_cost + data.parts_cost
 
-    await prisma.cost.upsert({
-      where: { asset_id: asset.id },
-      update: { purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
-      create: { asset_id: asset.id, purchase_cost: data.purchase_cost, transport_cost: data.transport_cost, processing_cost: data.processing_cost, other_cost: data.other_cost, parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price },
-    })
-
-    await recordAssetUpdate(asset.id, {
-      purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
-      transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
-      processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
-      other_cost: currentCost?.other_cost?.toNumber() ?? null,
-      parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
-      total_cost: currentCost?.total_cost?.toNumber() ?? null,
-      sale_price: currentCost?.sale_price?.toNumber() ?? null
-    }, {
+  await prisma.cost.upsert({
+    where: { asset_id: asset.id },
+    update: {
       purchase_cost: data.purchase_cost, transport_cost: data.transport_cost,
       processing_cost: data.processing_cost, other_cost: data.other_cost,
       parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price
-    }, userId)
+    },
+    create: {
+      asset_id: asset.id, purchase_cost: data.purchase_cost,
+      transport_cost: data.transport_cost, processing_cost: data.processing_cost,
+      other_cost: data.other_cost, parts_cost: data.parts_cost,
+      total_cost, sale_price: data.sale_price
+    },
+  })
 
-    return successResponse(undefined)
-  } catch (error) {
-    return response500(`Failed to update pricing for asset ${barcode}`)
-  }
+  await recordAssetUpdate(asset.id, {
+    purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
+    transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
+    processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
+    other_cost: currentCost?.other_cost?.toNumber() ?? null,
+    parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
+    total_cost: currentCost?.total_cost?.toNumber() ?? null,
+    sale_price: currentCost?.sale_price?.toNumber() ?? null
+  }, {
+    purchase_cost: data.purchase_cost, transport_cost: data.transport_cost,
+    processing_cost: data.processing_cost, other_cost: data.other_cost,
+    parts_cost: data.parts_cost, total_cost, sale_price: data.sale_price
+  }, userId)
 }
 
-export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items'], userId: number): Promise<ApiResponse<void>> {
-  const results = await Promise.allSettled(
-    items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing, userId))
-  )
-  const failCount = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success)).length
-  if (failCount > 0) return response500(`Failed to update pricing for ${failCount} asset(s)`)
-  return successResponse(undefined)
+export async function bulkUpdateAssetPricing(
+  items: BulkUpdateAssetPricing['items'],
+  userId: number
+): Promise<void> {
+  await Promise.all(items.map(({ barcode, ...pricing }) => updateAssetPricing(barcode, pricing, userId)))
 }
 
-export async function getLocationsByWarehouse(warehouseId: number): Promise<ApiResponse<AssetLocation[]>> {
-  try {
-    const locations = await prisma.$queryRawTyped(getLocationsByWarehouseQuery(warehouseId))
-    return successResponse(locations)
-  } catch {
-    return response500('Failed to fetch locations')
-  }
+export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
+  return prisma.$queryRawTyped(getLocationsByWarehouseQuery(warehouseId))
 }
 
-export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation, userId: number): Promise<ApiResponse<void>> {
-  try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true, location_id: true } })
-    if (!asset) return response400(`Asset ${barcode} not found`)
+export async function updateAssetLocation(
+  barcode: string,
+  data: UpdateAssetLocation,
+  userId: number
+): Promise<void> {
+  const asset = await prisma.asset.findUnique({
+    where: { barcode }, select: { id: true, location_id: true }
+  })
+  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-    const location = await prisma.location.findUnique({ where: { id: data.location_id } })
-    if (!location) return response400('Location not found')
+  const location = await prisma.location.findUnique({ where: { id: data.location_id } })
+  if (!location) throw new NotFoundError('Location not found')
 
-    await prisma.asset.update({ where: { barcode }, data: { location_id: data.location_id } })
-
-    await recordAssetUpdate(asset.id, { location_id: asset.location_id }, { location_id: data.location_id }, userId)
-
-    return successResponse(undefined)
-  } catch {
-    return response500(`Failed to update location for asset ${barcode}`)
-  }
+  await prisma.asset.update({ where: { barcode }, data: { location_id: data.location_id } })
+  await recordAssetUpdate(asset.id, { location_id: asset.location_id }, { location_id: data.location_id }, userId)
 }
 
-export async function getAssetHistory(barcode: string): Promise<ApiResponse<AssetHistory>> {
-  try {
-    const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
-    if (!asset) return response400(`Asset ${barcode} not found`)
+export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
+  const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
+  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-    const rows = await prisma.history.findMany({
-      where: { entity_type: 'Asset', entity_id: asset.id },
-      include: { User: { select: { name: true } } },
-      orderBy: { changed_on: 'desc' }
-    })
+  const rows = await prisma.history.findMany({
+    where: { entity_type: 'Asset', entity_id: asset.id },
+    include: { User: { select: { name: true } } },
+    orderBy: { changed_on: 'desc' }
+  })
 
-    const records: AssetHistory = rows.map(row => ({
-      action_type: row.action_type as 'CREATE' | 'UPDATE',
-      user_name: row.User.name,
-      changed_on: row.changed_on,
-      changes: row.changes as AssetHistoryRecord['changes']
-    }) as AssetHistoryRecord)
-
-    return successResponse(records)
-  } catch {
-    return response500(`Failed to fetch history for asset ${barcode}`)
-  }
+  return rows.map(row => ({
+    action_type: row.action_type as 'CREATE' | 'UPDATE',
+    user_name: row.User.name,
+    changed_on: row.changed_on,
+    changes: row.changes as AssetHistoryRecord['changes']
+  }) as AssetHistoryRecord)
 }
 
-export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs, userId: number): Promise<ApiResponse<void>> {
-  try {
-    const asset = await prisma.asset.findUnique({
-      where: { barcode },
-      select: {
-        id: true,
-        technical_specification: {
-          select: { cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true, meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true }
+export async function updateAssetSpecs(
+  barcode: string,
+  data: UpdateAssetSpecs,
+  userId: number
+): Promise<void> {
+  const asset = await prisma.asset.findUnique({
+    where: { barcode },
+    select: {
+      id: true,
+      technical_specification: {
+        select: {
+          cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true,
+          meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true
         }
       }
-    })
-    if (!asset) return response400(`Asset ${barcode} not found`)
+    }
+  })
+  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-    const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
+  const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
 
-    const accessories = await prisma.accessory.findMany({
-      where: { accessory: { in: data.accessory_names } },
-      select: { id: true },
-    })
+  const accessories = await prisma.accessory.findMany({
+    where: { accessory: { in: data.accessory_names } },
+    select: { id: true },
+  })
 
-    await prisma.$transaction([
-      prisma.technicalSpecification.upsert({
-        where: { asset_id: asset.id },
-        update: { cassettes: data.cassettes, internal_finisher: data.internal_finisher, meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total, drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m, drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k },
-        create: { asset_id: asset.id, cassettes: data.cassettes, internal_finisher: data.internal_finisher, meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total, drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m, drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k },
-      }),
-      prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
-      ...accessories.map(a => prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: a.id } })),
-    ])
+  await prisma.$transaction([
+    prisma.technicalSpecification.upsert({
+      where: { asset_id: asset.id },
+      update: {
+        cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+        meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
+        drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
+        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+      },
+      create: {
+        asset_id: asset.id, cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+        meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
+        drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
+        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+      },
+    }),
+    prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
+    ...accessories.map(a => prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: a.id } })),
+  ])
 
-    await recordAssetUpdate(asset.id, {
-      cassettes: asset.technical_specification?.cassettes,
-      internal_finisher: asset.technical_specification?.internal_finisher,
-      meter_black: asset.technical_specification?.meter_black,
-      meter_colour: asset.technical_specification?.meter_colour,
-      meter_total: asset.technical_specification?.meter_total,
-      drum_life_c: asset.technical_specification?.drum_life_c,
-      drum_life_m: asset.technical_specification?.drum_life_m,
-      drum_life_y: asset.technical_specification?.drum_life_y,
-      drum_life_k: asset.technical_specification?.drum_life_k
-    }, {
-      cassettes: data.cassettes, internal_finisher: data.internal_finisher,
-      meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
-      drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
-      drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
-    }, userId)
-
-    return successResponse(undefined)
-  } catch (error) {
-    return response500(`Failed to update specs for asset ${barcode}`)
-  }
+  await recordAssetUpdate(asset.id, {
+    cassettes: asset.technical_specification?.cassettes,
+    internal_finisher: asset.technical_specification?.internal_finisher,
+    meter_black: asset.technical_specification?.meter_black,
+    meter_colour: asset.technical_specification?.meter_colour,
+    meter_total: asset.technical_specification?.meter_total,
+    drum_life_c: asset.technical_specification?.drum_life_c,
+    drum_life_m: asset.technical_specification?.drum_life_m,
+    drum_life_y: asset.technical_specification?.drum_life_y,
+    drum_life_k: asset.technical_specification?.drum_life_k
+  }, {
+    cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+    meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
+    drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
+    drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+  }, userId)
 }

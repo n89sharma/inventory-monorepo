@@ -1,10 +1,11 @@
 import { format } from 'date-fns'
-import { ApiResponse, ArrivalDetail, CreateArrival, CreateAsset, response400, response500, successResponse, UpdateArrival } from 'shared-types'
+import { ArrivalDetail, CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { NotFoundError } from '../lib/errors.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
 
@@ -40,47 +41,35 @@ const arrivalIncludeArgs = {
 
 type UpdateArrivalDb = ArrivalGetPayload<typeof arrivalIncludeArgs>
 
-export async function getArrival(arrivalNumber: string): Promise<ApiResponse<ArrivalDetail>> {
-  try {
-    const [arrival, assets] = await Promise.all([
-      prisma.arrival.findUnique({
-        where: { arrival_number: arrivalNumber },
-        include: { origin: true, destination: true, transporter: true, created_by: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForArrival(arrivalNumber))
-    ])
-    if (!arrival) {
-      return response400(`Arrival ${arrivalNumber} not found`)
-    }
-    return successResponse({
-      arrival_number: arrival.arrival_number,
-      vendor: arrival.origin,
-      transporter: arrival.transporter,
-      warehouse: arrival.destination,
-      comment: arrival.notes,
-      created_at: arrival.created_at,
-      created_by: arrival.created_by.name,
-      assets
-    })
-  } catch (error) {
-    return response500(`Failed to fetch arrival ${arrivalNumber}`)
+export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> {
+  const [arrival, assets] = await Promise.all([
+    prisma.arrival.findUnique({
+      where: { arrival_number: arrivalNumber },
+      include: { origin: true, destination: true, transporter: true, created_by: true }
+    }),
+    prisma.$queryRawTyped(getAssetsForArrival(arrivalNumber))
+  ])
+  if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+  return {
+    arrival_number: arrival.arrival_number,
+    vendor: arrival.origin,
+    transporter: arrival.transporter,
+    warehouse: arrival.destination,
+    comment: arrival.notes,
+    created_at: arrival.created_at,
+    created_by: arrival.created_by.name,
+    assets
   }
 }
 
 
-export async function getArrivalForUpdate(arrivalNumber: string): Promise<ApiResponse<UpdateArrival>> {
-  try {
-    const dbArrival = await prisma.arrival.findUnique({
-      where: { arrival_number: arrivalNumber },
-      ...arrivalIncludeArgs
-    })
-    if (!dbArrival) {
-      return response400(`Arrival ${arrivalNumber} not found`)
-    }
-    return successResponse(await mapDbToGetUpdateArrival(dbArrival))
-  } catch (error) {
-    return response500(`Failed to fetch arrival ${arrivalNumber} for edit`)
-  }
+export async function getArrivalForUpdate(arrivalNumber: string): Promise<UpdateArrival> {
+  const dbArrival = await prisma.arrival.findUnique({
+    where: { arrival_number: arrivalNumber },
+    ...arrivalIncludeArgs
+  })
+  if (!dbArrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+  return mapDbToGetUpdateArrival(dbArrival)
 }
 
 async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<UpdateArrival> {

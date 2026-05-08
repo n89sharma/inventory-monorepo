@@ -1,65 +1,54 @@
 import { format } from 'date-fns'
-import { ApiResponse, CreateTransfer, TransferDetail, UpdateTransfer, response400, response500, successResponse } from 'shared-types'
+import { CreateTransfer, TransferDetail, UpdateTransfer } from 'shared-types'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { NotFoundError } from '../lib/errors.js'
 import { recordAssetUpdateOnCollection, recordTransferCreate, recordTransferUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceTransferEntity = 'TRANSFER'
 
-export async function getTransfer(transferNumber: string): Promise<ApiResponse<TransferDetail>> {
-  try {
-    const [transfer, assets] = await Promise.all([
-      prisma.transfer.findUnique({
-        where: { transfer_number: transferNumber },
-        include: { origin: true, destination: true, transporter: true, created_by: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForTransfers(transferNumber))
-    ])
-    if (!transfer) {
-      return response400(`Transfer ${transferNumber} not found`)
-    }
-    return successResponse({
-      transfer_number: transfer.transfer_number,
-      origin: transfer.origin,
-      destination: transfer.destination,
-      transporter: transfer.transporter,
-      notes: transfer.notes,
-      created_at: transfer.created_at,
-      created_by: transfer.created_by?.name,
-      assets
-    })
-  } catch (error) {
-    return response500(`Failed to fetch transfer ${transferNumber}`)
+export async function getTransfer(transferNumber: string): Promise<TransferDetail> {
+  const [transfer, assets] = await Promise.all([
+    prisma.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      include: { origin: true, destination: true, transporter: true, created_by: true }
+    }),
+    prisma.$queryRawTyped(getAssetsForTransfers(transferNumber))
+  ])
+  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+  return {
+    transfer_number: transfer.transfer_number,
+    origin: transfer.origin,
+    destination: transfer.destination,
+    transporter: transfer.transporter,
+    notes: transfer.notes,
+    created_at: transfer.created_at,
+    created_by: transfer.created_by?.name,
+    assets
   }
 }
 
-export async function getTransferForUpdate(transferNumber: string): Promise<ApiResponse<UpdateTransfer>> {
-  try {
-    const [transfer, assets] = await Promise.all([
-      prisma.transfer.findUnique({
-        where: { transfer_number: transferNumber },
-        include: { origin: true, destination: true, transporter: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForTransfers(transferNumber))
-    ])
-    if (!transfer) {
-      return response400(`Transfer ${transferNumber} not found`)
-    }
-    return successResponse({
-      id: transfer.id,
-      origin: transfer.origin,
-      destination: transfer.destination,
-      transporter: {
-        id: transfer.transporter.id,
-        account_number: transfer.transporter.account_number,
-        name: transfer.transporter.name
-      },
-      comment: transfer.notes,
-      assets
-    })
-  } catch (error) {
-    return response500(`Failed to fetch transfer ${transferNumber} for edit`)
+export async function getTransferForUpdate(transferNumber: string): Promise<UpdateTransfer> {
+  const [transfer, assets] = await Promise.all([
+    prisma.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      include: { origin: true, destination: true, transporter: true }
+    }),
+    prisma.$queryRawTyped(getAssetsForTransfers(transferNumber))
+  ])
+  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+  return {
+    id: transfer.id,
+    origin: transfer.origin,
+    destination: transfer.destination,
+    transporter: {
+      id: transfer.transporter.id,
+      account_number: transfer.transporter.account_number,
+      name: transfer.transporter.name
+    },
+    comment: transfer.notes,
+    assets
   }
 }
 

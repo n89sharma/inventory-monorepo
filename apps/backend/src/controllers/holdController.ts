@@ -1,10 +1,17 @@
 import { isAfter } from 'date-fns'
-import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, CollectionHistory, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, response400, response500, successResponse } from 'shared-types'
+import { Request, Response } from 'express'
+import { ApiResponse, CollectionHistory, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
+import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createHold as createHoldSer, getHold as getHoldSer, getHoldForUpdate as getHoldForUpdateSer, updateHold as updateHoldSer } from '../services/holdService.js'
+import {
+  createHold as createHoldSer,
+  getHold as getHoldSer,
+  getHoldForUpdate as getHoldForUpdateSer,
+  updateHold as updateHoldSer
+} from '../services/holdService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export const HoldQuerySchema = z.object({
@@ -21,89 +28,42 @@ export const HoldQuerySchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
-export async function getHolds(req: Request, res: Response<ApiResponse<HoldSummary[]>>) {
-  try {
-    const { fromDate, toDate, holdBy, holdFor } = res.locals.query as z.infer<typeof HoldQuerySchema>
-    const holds = await prisma.$queryRawTyped(getHoldsDb(fromDate, toDate, holdBy ?? 0, holdFor ?? 0))
-    res.json(successResponse(holds))
-  } catch (error) {
-    res.status(500).json(response500('Failed to fetch holds'))
-  }
-}
+export const getHolds = asyncHandler(async (req: Request, res: Response<ApiResponse<HoldSummary[]>>) => {
+  const { fromDate, toDate, holdBy, holdFor } = res.locals.query as z.infer<typeof HoldQuerySchema>
+  const holds = await prisma.$queryRawTyped(getHoldsDb(fromDate, toDate, holdBy ?? 0, holdFor ?? 0))
+  res.json(successResponse(holds))
+})
 
-export async function createHold(req: Request, res: Response, next: NextFunction) {
-  try {
-    const validated = CreateHoldSchema.parse(req.body)
-    const response = await createHoldSer(validated, res.locals.dbUserId)
-    if (response.success) {
-      return res.status(201).json({ holdNumber: response.data })
-    }
-    if (response.error.status === 400) {
-      return res.status(400).json(response)
-    }
-    return res.status(500).json(response)
-  } catch (error) {
-    next(error)
-  }
-}
+export const createHold = asyncHandler(async (req, res) => {
+  const validated = CreateHoldSchema.parse(req.body)
+  const holdNumber = await createHoldSer(validated, res.locals.dbUserId)
+  res.status(201).json({ holdNumber })
+})
 
-export async function getHoldForUpdate(req: Request, res: Response, next: NextFunction) {
+export const getHoldForUpdate = asyncHandler(async (req, res) => {
   const { holdNumber } = req.params
-  const response = await getHoldForUpdateSer(holdNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getHoldForUpdateSer(holdNumber)
+  res.json(successResponse(data))
+})
 
-export async function updateHold(req: Request, res: Response, next: NextFunction) {
-  try {
-    const validated = SubmitUpdateHoldSchema.parse(req.body)
-    const response = await updateHoldSer(validated, res.locals.dbUserId)
-    if (response.success) {
-      return res.json({ holdNumber: req.params.holdNumber })
-    }
-    if (response.error.status === 400) {
-      return res.status(400).json(response)
-    }
-    return res.status(500).json(response)
-  } catch (error) {
-    next(error)
-  }
-}
+export const updateHold = asyncHandler(async (req, res) => {
+  const validated = SubmitUpdateHoldSchema.parse(req.body)
+  await updateHoldSer(validated, res.locals.dbUserId)
+  res.json({ holdNumber: req.params.holdNumber })
+})
 
-export async function getHoldDetail(req: Request, res: Response<ApiResponse<HoldDetail>>) {
+export const getHoldDetail = asyncHandler(async (req: Request, res: Response<ApiResponse<HoldDetail>>) => {
   const { holdNumber } = req.params
-  const response = await getHoldSer(holdNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getHoldSer(holdNumber)
+  res.json(successResponse(data))
+})
 
-export async function getHoldHistory(
-  req: Request,
-  res: Response<ApiResponse<CollectionHistory>>
-) {
+export const getHoldHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
   const { holdNumber } = req.params
-  try {
-    const hold = await prisma.hold.findUnique({
-      where: { hold_number: holdNumber }, select: { id: true }
-    })
-    if (!hold) return res.status(404).json(response400(`Hold ${holdNumber} not found`))
-    const history = await getCollectionHistorySer('Hold', hold.id)
-    return res.json(successResponse(history))
-  } catch {
-    return res.status(500).json(response500(`Failed to fetch history for hold ${holdNumber}`))
-  }
-}
+  const hold = await prisma.hold.findUnique({
+    where: { hold_number: holdNumber }, select: { id: true }
+  })
+  if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
+  const history = await getCollectionHistorySer('Hold', hold.id)
+  res.json(successResponse(history))
+})

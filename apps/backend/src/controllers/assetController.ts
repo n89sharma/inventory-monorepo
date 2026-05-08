@@ -1,7 +1,9 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDetails, AssetError, AssetHistory, AssetLocation, AssetSummary, AssetTransfer, BarcodeSuggestion, BulkUpdateAssetPricingSchema, Comment, CreateCommentSchema, CreatePartTransferSchema, PartTransfer, response400, response500, successResponse, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema } from 'shared-types'
+import { ApiResponse, AssetSummary, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, BarcodeSuggestion, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
+import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   getAssets as getAssetsSer,
@@ -43,16 +45,11 @@ export const AssetQuerySchema = z.object({
   meter: z.string().optional().transform(Number)
 })
 
-export async function getAssets(req: Request, res: Response<ApiResponse<AssetSummary[]>>) {
+export const getAssets = asyncHandler(async (req, res) => {
   const {
-    model,
-    trackingStatusId,
-    availabilityStatusIds,
-    technicalStatusIds,
-    warehouseIds,
-    meter } = res.locals.query as z.infer<typeof AssetQuerySchema>
-
-  const response = await getAssetsSer(
+    model, trackingStatusId, availabilityStatusIds, technicalStatusIds, warehouseIds, meter
+  } = res.locals.query as z.infer<typeof AssetQuerySchema>
+  const data = await getAssetsSer(
     model,
     isNaN(trackingStatusId) ? 0 : trackingStatusId,
     availabilityStatusIds,
@@ -60,216 +57,127 @@ export async function getAssets(req: Request, res: Response<ApiResponse<AssetSum
     warehouseIds,
     isNaN(meter) ? -1 : meter
   )
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  res.json(successResponse(data))
+})
 
-export async function getAssetDetail(req: Request, res: Response<ApiResponse<AssetDetails>>) {
+export const getAssetDetail = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetDetailSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getAssetDetailSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetAccessories(req: Request, res: Response<ApiResponse<string[]>>) {
+export const getAssetAccessories = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetAccessoriesSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getAssetAccessoriesSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetErrors(req: Request, res: Response<ApiResponse<AssetError[]>>) {
+export const getAssetErrors = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetErrorsSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getAssetErrorsSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetComments(req: Request, res: Response<ApiResponse<Comment[]>>) {
+export const getAssetComments = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetCommentsSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getAssetCommentsSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetPartTransfer(req: Request, res: Response<ApiResponse<PartTransfer[]>>) {
+export const getAssetPartTransfer = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetPartTransferSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getAssetPartTransferSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetTransfers(req: Request, res: Response<ApiResponse<AssetTransfer[]>>) {
+export const getAssetTransfers = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetTransfersSer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getAssetTransfersSer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetHistory(req: Request, res: Response<ApiResponse<AssetHistory>>) {
+export const getAssetHistory = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const response = await getAssetHistorySer(barcode)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    const status = response.error.status === 400 ? 404 : 500
-    return res.status(status).json(response)
-  }
-}
+  const data = await getAssetHistorySer(barcode)
+  res.json(successResponse(data))
+})
 
-export async function getAssetSummaryByBarcode(req: Request, res: Response<ApiResponse<AssetSummary>>) {
-  try {
-    const { barcode } = req.params
-    const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
-    if (results.length === 0) {
-      return res.status(404).json(response400(`Asset ${barcode} not found`))
-    }
-    return res.json(successResponse(results[0]))
-  } catch (error) {
-    return res.status(500).json(response500('Failed to fetch asset'))
-  }
-}
+export const getAssetSummaryByBarcode = asyncHandler(async (req: Request, res: Response<ApiResponse<AssetSummary>>) => {
+  const { barcode } = req.params
+  const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
+  if (results.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
+  res.json(successResponse(results[0]))
+})
 
-export async function createAssetComment(req: Request, res: Response<ApiResponse<void>>) {
+export const createAssetComment = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = CreateCommentSchema.parse(req.body)
-  const response = await createCommentSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.status(201).json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 400 : 500
-    return res.status(status).json(response)
-  }
-}
+  await createCommentSer(barcode, validated, res.locals.dbUserId)
+  res.status(201).json(successResponse(null))
+})
 
-export async function createPartTransfer(req: Request, res: Response<ApiResponse<void>>) {
+export const createPartTransfer = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = CreatePartTransferSchema.parse(req.body)
-  const response = await createPartTransferSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.status(201).json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 400 : 500
-    return res.status(status).json(response)
-  }
-}
+  await createPartTransferSer(barcode, validated, res.locals.dbUserId)
+  res.status(201).json(successResponse(null))
+})
 
-export async function updateAssetErrors(req: Request, res: Response<ApiResponse<void>>) {
+export const updateAssetErrors = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetErrorsSchema.parse(req.body)
-  const response = await updateAssetErrorsSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 404 : 500
-    return res.status(status).json(response)
-  }
-}
+  await updateAssetErrorsSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
 
-export async function updateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
+export const updateAssetPricing = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetPricingSchema.parse(req.body)
-  const response = await updateAssetPricingSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 404 : 500
-    return res.status(status).json(response)
-  }
-}
+  await updateAssetPricingSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
 
-export async function bulkUpdateAssetPricing(req: Request, res: Response<ApiResponse<void>>) {
+export const bulkUpdateAssetPricing = asyncHandler(async (req, res) => {
   const { items } = BulkUpdateAssetPricingSchema.parse(req.body)
-  const response = await bulkUpdateAssetPricingSer(items, res.locals.dbUserId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  await bulkUpdateAssetPricingSer(items, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
 
-export async function updateAssetSpecs(req: Request, res: Response<ApiResponse<void>>) {
+export const updateAssetSpecs = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetSpecsSchema.parse(req.body)
-  const response = await updateAssetSpecsSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 404 : 500
-    return res.status(status).json(response)
-  }
-}
+  await updateAssetSpecsSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
 
-export async function getLocationsByWarehouse(req: Request, res: Response<ApiResponse<AssetLocation[]>>) {
+export const getLocationsByWarehouse = asyncHandler(async (req, res) => {
   const { warehouseId } = res.locals.query as z.infer<typeof LocationsByWarehouseQuerySchema>
-  const response = await getLocationsByWarehouseSer(warehouseId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+  const data = await getLocationsByWarehouseSer(warehouseId)
+  res.json(successResponse(data))
+})
 
-export async function updateAssetLocation(req: Request, res: Response<ApiResponse<void>>) {
+export const updateAssetLocation = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetLocationSchema.parse(req.body)
-  const response = await updateAssetLocationSer(barcode, validated, res.locals.dbUserId)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    const status = response.error.type === 'API_ERROR' ? 400 : 500
-    return res.status(status).json(response)
-  }
-}
+  await updateAssetLocationSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
 
 export const ExportAssetsSchema = z.object({
   barcodes: z.array(z.string()).min(1).max(2000)
 })
 
-export async function exportAssets(req: Request, res: Response) {
+export const exportAssets = asyncHandler(async (req, res) => {
   const { barcodes } = ExportAssetsSchema.parse(req.body)
-  const response = await exportAssetsSer(barcodes)
-  if (response.success) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    res.setHeader('Content-Type', 'text/csv')
-    res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
-    return res.send(response.data)
-  }
-  const status = response.error.type === 'API_ERROR' ? 400 : 500
-  return res.status(status).json(response)
-}
+  const csv = await exportAssetsSer(barcodes)
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+  res.setHeader('Content-Type', 'text/csv')
+  res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
+  res.send(csv)
+})
 
-export async function getBarcodeSuggestions(req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) {
-  try {
-    const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
-    const results = await prisma.$queryRawTyped(searchBarcodes(q.toUpperCase()))
-    res.json(successResponse(results))
-  } catch {
-    res.status(500).json(response500('Failed to fetch suggestions'))
-  }
-}
+export const getBarcodeSuggestions = asyncHandler(async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {
+  const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
+  const results = await prisma.$queryRawTyped(searchBarcodes(q.toUpperCase()))
+  res.json(successResponse(results))
+})

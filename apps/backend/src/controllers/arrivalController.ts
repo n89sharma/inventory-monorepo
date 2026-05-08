@@ -1,100 +1,56 @@
-import { NextFunction, Request, Response } from 'express'
-import { ApiResponse, ArrivalDetail, ArrivalSummary, CollectionHistory, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrival, response400, response500, successResponse } from 'shared-types'
+import { Request, Response } from 'express'
+import { ApiResponse, CollectionHistory, CreateArrivalSchema, SubmitUpdateArrivalSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
+import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createArrival as createArrivalSer, getArrivalForUpdate as getArrivalForEditSer, getArrival as getArrivalSer, updateArrival as updateArrivalSer } from '../services/arrivalService.js'
+import {
+  createArrival as createArrivalSer,
+  getArrivalForUpdate as getArrivalForEditSer,
+  getArrival as getArrivalSer,
+  updateArrival as updateArrivalSer
+} from '../services/arrivalService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
-export async function getArrivals(
-  req: Request,
-  res: Response<ApiResponse<ArrivalSummary[]>>) {
-  try {
-    const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
-    const arrivals = await prisma.$queryRawTyped(getArrivalsDb(fromDate, toDate, warehouse ?? 0))
-    res.json(successResponse(arrivals))
-  } catch (error) {
-    res.status(500).json(response500('Failed to fetch arrivals'))
-  }
-}
+export const getArrivals = asyncHandler(async (req, res) => {
+  const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
+  const arrivals = await prisma.$queryRawTyped(getArrivalsDb(fromDate, toDate, warehouse ?? 0))
+  res.json(successResponse(arrivals))
+})
 
-export async function getArrival(
-  req: Request,
-  res: Response<ApiResponse<ArrivalDetail>>) {
-
+export const getArrival = asyncHandler(async (req, res) => {
   const { arrivalNumber } = req.params
-  const response = await getArrivalSer(arrivalNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getArrivalSer(arrivalNumber)
+  res.json(successResponse(data))
+})
 
-export async function createArrival(
-  req: Request,
-  res: Response<{ arrivalNumber: string }>,
-  next: NextFunction) {
+export const createArrival = asyncHandler(async (req, res) => {
+  const validatedArrival = CreateArrivalSchema.parse(req.body)
+  const arrivalNumber = await createArrivalSer(validatedArrival, res.locals.dbUserId)
+  res.status(201).json({ arrivalNumber })
+})
 
-  try {
-    const validatedArrival = CreateArrivalSchema.parse(req.body)
-    const arrivalNumber = await createArrivalSer(validatedArrival, res.locals.dbUserId)
-    res.status(201).json({ arrivalNumber: arrivalNumber })
-  } catch (error) {
-    next(error)
-  }
-}
-
-export async function getArrivalForUpdate(
-  req: Request,
-  res: Response<ApiResponse<UpdateArrival>>) {
-
+export const getArrivalForUpdate = asyncHandler(async (req, res) => {
   const { arrivalNumber } = req.params
-  const response = await getArrivalForEditSer(arrivalNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = await getArrivalForEditSer(arrivalNumber)
+  res.json(successResponse(data))
+})
 
-export async function updateArrival(
-  req: Request,
-  res: Response<{ arrivalNumber: string }>,
-  next: NextFunction) {
-
+export const updateArrival = asyncHandler(async (req, res) => {
   const { arrivalNumber } = req.params
-  try {
-    const validated = SubmitUpdateArrivalSchema.parse(req.body)
-    await updateArrivalSer(validated, res.locals.dbUserId)
-    res.json({ arrivalNumber })
-  } catch (error) {
-    next(error)
-  }
-}
+  const validated = SubmitUpdateArrivalSchema.parse(req.body)
+  await updateArrivalSer(validated, res.locals.dbUserId)
+  res.json({ arrivalNumber })
+})
 
-export async function getArrivalHistory(
-  req: Request,
-  res: Response<ApiResponse<CollectionHistory>>
-) {
+export const getArrivalHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
   const { arrivalNumber } = req.params
-  try {
-    const arrival = await prisma.arrival.findUnique({
-      where: { arrival_number: arrivalNumber }, select: { id: true }
-    })
-    if (!arrival) return res.status(404).json(response400(`Arrival ${arrivalNumber} not found`))
-    const history = await getCollectionHistorySer('Arrival', arrival.id)
-    return res.json(successResponse(history))
-  } catch {
-    return res.status(500).json(response500(`Failed to fetch history for arrival ${arrivalNumber}`))
-  }
-}
+  const arrival = await prisma.arrival.findUnique({
+    where: { arrival_number: arrivalNumber }, select: { id: true }
+  })
+  if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+  const history = await getCollectionHistorySer('Arrival', arrival.id)
+  res.json(successResponse(history))
+})

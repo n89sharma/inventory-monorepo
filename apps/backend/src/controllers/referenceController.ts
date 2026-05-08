@@ -1,12 +1,8 @@
-import { Request, Response } from 'express'
-import { ApiResponse, ReferenceData } from 'shared-types'
+import { successResponse } from 'shared-types'
+import { asyncHandler } from '../lib/asyncHandler.js'
 import { getReferenceData as getReferenceDataSer } from '../services/referenceService.js'
 
-export async function getReferenceData(req: Request, res: Response<ApiResponse<ReferenceData>>) {
-  const response = await getReferenceDataSer()
-  if (response.success) {
-    return res.json(response)
-  } else {
-    return res.status(500).json(response)
-  }
-}
+export const getReferenceData = asyncHandler(async (req, res) => {
+  const data = await getReferenceDataSer()
+  res.json(successResponse(data))
+})

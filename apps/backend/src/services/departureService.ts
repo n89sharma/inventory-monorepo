@@ -1,69 +1,58 @@
 import { format } from 'date-fns'
-import { ApiResponse, CreateDeparture, DepartureDetail, UpdateDeparture, response400, response500, successResponse } from 'shared-types'
+import { CreateDeparture, DepartureDetail, UpdateDeparture } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 const sequenceDepartureEntity = 'DEPARTURE'
 
-export async function getDeparture(departureNumber: string): Promise<ApiResponse<DepartureDetail>> {
-  try {
-    const [departure, assets] = await Promise.all([
-      prisma.departure.findUnique({
-        where: { departure_number: departureNumber },
-        include: { origin: true, destination: true, transporter: true, created_by: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForDepartures(departureNumber))
-    ])
-    if (!departure) {
-      return response400(`Departure ${departureNumber} not found`)
-    }
-    return successResponse({
-      departure_number: departure.departure_number,
-      origin: departure.origin,
-      customer: departure.destination,
-      transporter: departure.transporter,
-      notes: departure.notes,
-      created_at: departure.created_at,
-      created_by: departure.created_by?.name,
-      assets
-    })
-  } catch (error) {
-    return response500(`Failed to fetch departure ${departureNumber}`)
+export async function getDeparture(departureNumber: string): Promise<DepartureDetail> {
+  const [departure, assets] = await Promise.all([
+    prisma.departure.findUnique({
+      where: { departure_number: departureNumber },
+      include: { origin: true, destination: true, transporter: true, created_by: true }
+    }),
+    prisma.$queryRawTyped(getAssetsForDepartures(departureNumber))
+  ])
+  if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+  return {
+    departure_number: departure.departure_number,
+    origin: departure.origin,
+    customer: departure.destination,
+    transporter: departure.transporter,
+    notes: departure.notes,
+    created_at: departure.created_at,
+    created_by: departure.created_by?.name,
+    assets
   }
 }
 
-export async function getDepartureForUpdate(departureNumber: string): Promise<ApiResponse<UpdateDeparture>> {
-  try {
-    const [departure, assets] = await Promise.all([
-      prisma.departure.findUnique({
-        where: { departure_number: departureNumber },
-        include: { origin: true, destination: true, transporter: true }
-      }),
-      prisma.$queryRawTyped(getAssetsForDepartures(departureNumber))
-    ])
-    if (!departure) {
-      return response400(`Departure ${departureNumber} not found`)
-    }
-    return successResponse({
-      id: departure.id,
-      origin: departure.origin,
-      customer: {
-        id: departure.destination.id,
-        account_number: departure.destination.account_number,
-        name: departure.destination.name
-      },
-      transporter: {
-        id: departure.transporter.id,
-        account_number: departure.transporter.account_number,
-        name: departure.transporter.name
-      },
-      comment: departure.notes,
-      assets
-    })
-  } catch (error) {
-    return response500(`Failed to fetch departure ${departureNumber} for edit`)
+export async function getDepartureForUpdate(departureNumber: string): Promise<UpdateDeparture> {
+  const [departure, assets] = await Promise.all([
+    prisma.departure.findUnique({
+      where: { departure_number: departureNumber },
+      include: { origin: true, destination: true, transporter: true }
+    }),
+    prisma.$queryRawTyped(getAssetsForDepartures(departureNumber))
+  ])
+  if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+  return {
+    id: departure.id,
+    origin: departure.origin,
+    customer: {
+      id: departure.destination.id,
+      account_number: departure.destination.account_number,
+      name: departure.destination.name
+    },
+    transporter: {
+      id: departure.transporter.id,
+      account_number: departure.transporter.account_number,
+      name: departure.transporter.name
+    },
+    comment: departure.notes,
+    assets
   }
 }
 
@@ -79,7 +68,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
       select: { barcode: true }
     })
     if (assetsAlreadyOnDeparture.length > 0) {
-      throw new Error(
+      throw new ConflictError(
         `Assets already assigned to a departure: ${assetsAlreadyOnDeparture.map(a => a.barcode).join(', ')}`
       )
     }
@@ -138,7 +127,7 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
         select: { barcode: true }
       })
       if (conflicts.length > 0) {
-        throw new Error(
+        throw new ConflictError(
           `Assets already assigned to a departure: ${conflicts.map(a => a.barcode).join(', ')}`
         )
       }

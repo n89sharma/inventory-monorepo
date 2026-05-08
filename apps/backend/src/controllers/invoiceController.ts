@@ -1,80 +1,54 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, response400, response500, successResponse } from 'shared-types'
+import { ApiResponse, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
+import { asyncHandler } from '../lib/asyncHandler.js'
+import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createInvoice as createInvoiceSer, getInvoice as getInvoiceSer, getInvoiceForUpdate as getInvoiceForUpdateSer, updateInvoice as updateInvoiceSer } from '../services/invoiceService.js'
+import {
+  createInvoice as createInvoiceSer,
+  getInvoice as getInvoiceSer,
+  getInvoiceForUpdate as getInvoiceForUpdateSer,
+  updateInvoice as updateInvoiceSer
+} from '../services/invoiceService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
-export async function createInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
-  try {
-    const data = CreateInvoiceSchema.parse(req.body)
-    const response = await createInvoiceSer(data, res.locals.dbUserId)
-    if (response.success) return res.status(201).json(response)
-    if (response.error.status === 400) return res.status(400).json(response)
-    return res.status(500).json(response)
-  } catch (error) {
-    res.status(500).json(response500('Failed to create invoice'))
-  }
-}
+export const createInvoice = asyncHandler(async (req, res) => {
+  const data = CreateInvoiceSchema.parse(req.body)
+  const result = await createInvoiceSer(data, res.locals.dbUserId)
+  res.status(201).json(successResponse(result))
+})
 
-export async function getInvoices(req: Request, res: Response<ApiResponse<InvoiceSummary[]>>) {
-  try {
-    const { fromDate, toDate } = res.locals.parsedDates
-    const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
-    res.json(successResponse(invoices))
-  } catch (error) {
-    res.status(500).json(response500('Failed to fetch invoices'))
-  }
-}
+export const getInvoices = asyncHandler(async (req: Request, res: Response<ApiResponse<InvoiceSummary[]>>) => {
+  const { fromDate, toDate } = res.locals.parsedDates
+  const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
+  res.json(successResponse(invoices))
+})
 
-export async function getInvoiceForUpdate(req: Request, res: Response<ApiResponse<UpdateInvoice>>) {
+export const getInvoiceForUpdate = asyncHandler(async (req: Request, res: Response<ApiResponse<UpdateInvoice>>) => {
   const { invoiceNumber } = req.params
-  const response = await getInvoiceForUpdateSer(invoiceNumber)
-  if (response.success) return res.json(response)
-  if (response.error.status === 400) return res.status(404).json(response)
-  return res.status(500).json(response)
-}
+  const data = await getInvoiceForUpdateSer(invoiceNumber)
+  res.json(successResponse(data))
+})
 
-export async function updateInvoice(req: Request, res: Response<ApiResponse<{ invoiceNumber: string }>>) {
-  try {
-    const { invoiceNumber } = req.params
-    const data = SubmitUpdateInvoiceSchema.parse(req.body)
-    const response = await updateInvoiceSer(invoiceNumber, data, res.locals.dbUserId)
-    if (response.success) return res.json(response)
-    if (response.error.status === 400) return res.status(400).json(response)
-    return res.status(500).json(response)
-  } catch {
-    res.status(500).json(response500('Failed to update invoice'))
-  }
-}
-
-export async function getInvoiceDetail(req: Request, res: Response<ApiResponse<InvoiceDetail>>) {
+export const updateInvoice = asyncHandler(async (req, res) => {
   const { invoiceNumber } = req.params
-  const response = await getInvoiceSer(invoiceNumber)
-  if (response.success) {
-    return res.json(response)
-  } else {
-    if (response.error.status === 400) {
-      return res.status(404).json(response)
-    } else {
-      return res.status(500).json(response)
-    }
-  }
-}
+  const data = SubmitUpdateInvoiceSchema.parse(req.body)
+  const result = await updateInvoiceSer(invoiceNumber, data, res.locals.dbUserId)
+  res.json(successResponse(result))
+})
 
-export async function getInvoiceHistory(
-  req: Request,
-  res: Response<ApiResponse<CollectionHistory>>
-) {
+export const getInvoiceDetail = asyncHandler(async (req: Request, res: Response<ApiResponse<InvoiceDetail>>) => {
   const { invoiceNumber } = req.params
-  try {
-    const invoice = await prisma.invoice.findFirst({
-      where: { invoice_number: invoiceNumber }, select: { id: true }
-    })
-    if (!invoice) return res.status(404).json(response400(`Invoice ${invoiceNumber} not found`))
-    const history = await getCollectionHistorySer('Invoice', invoice.id)
-    return res.json(successResponse(history))
-  } catch {
-    return res.status(500).json(response500(`Failed to fetch history for invoice ${invoiceNumber}`))
-  }
-}
+  const data = await getInvoiceSer(invoiceNumber)
+  res.json(successResponse(data))
+})
+
+export const getInvoiceHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
+  const { invoiceNumber } = req.params
+  const invoice = await prisma.invoice.findFirst({
+    where: { invoice_number: invoiceNumber }, select: { id: true }
+  })
+  if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
+  const history = await getCollectionHistorySer('Invoice', invoice.id)
+  res.json(successResponse(history))
+})

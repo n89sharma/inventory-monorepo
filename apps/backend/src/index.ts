@@ -16,6 +16,7 @@ import transferRoutes from './routes/transferRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
+import { errorHandler } from './lib/errorHandler.js'
 
 const app = express();
 
@@ -46,6 +47,8 @@ app.use('/models', modelRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
 app.use('/search', searchRoutes)
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

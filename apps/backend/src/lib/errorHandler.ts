@@ -1,0 +1,39 @@
+import { NextFunction, Request, Response } from 'express'
+import { ZodError } from 'zod'
+import { Prisma } from '../../generated/prisma/client.js'
+import { response400, response500 } from 'shared-types'
+import { ConflictError, NotFoundError, ValidationError } from './errors.js'
+
+export function errorHandler(
+  err: unknown,
+  req: Request,
+  res: Response,
+  _next: NextFunction
+): void {
+  if (err instanceof ZodError) {
+    const details = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ')
+    res.status(400).json(response400('Validation failed', details))
+    return
+  }
+  if (err instanceof ConflictError) {
+    res.status(409).json(response400(err.message))
+    return
+  }
+  if (err instanceof NotFoundError) {
+    res.status(404).json(response400(err.message))
+    return
+  }
+  if (err instanceof ValidationError) {
+    res.status(400).json(response400(err.message))
+    return
+  }
+  if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === 'P2002'
+  ) {
+    res.status(400).json(response400('A record with these details already exists'))
+    return
+  }
+  console.error(err)
+  res.status(500).json(response500('An unexpected error occurred'))
+}
