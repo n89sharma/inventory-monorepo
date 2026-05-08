@@ -44,17 +44,6 @@ No tests are configured yet.
 - Always use ternary over `&&` for conditional JSX — `&&` can render `0` or `false` to the DOM
 
 **Three or more states (e.g. loading / empty / content):** Extract a dedicated component and use early returns — never nest ternaries.
-```tsx
-// WRONG — nested ternary
-{isLoading ? <Spinner /> : !hasResults ? <Empty /> : <Content />}
-
-// RIGHT — extracted component with early returns
-function SearchPopoverContent({ isLoading, hasResults, ... }) {
-  if (isLoading) return <Spinner />
-  if (!hasResults) return <Empty />
-  return <Content />
-}
-```
 
 **After every code change, run `npm run bbuild && npm run fbuild` from the repo root. Summarize any errors and fix them before considering the task complete.**
 
@@ -62,16 +51,7 @@ function SearchPopoverContent({ isLoading, hasResults, ... }) {
 
 ## Code Style
 
-**Line length:** Keep all lines under 100 characters (ruler at col 100).
-- Wrap function signatures so each parameter is on its own line, with the return type on a separate line:
-  ```ts
-  export async function myFunction(
-    paramOne: string,
-    paramTwo: number,
-    userId: number
-  ): Promise<void> {
-  ```
-- Wrap long object arguments (e.g. Prisma queries) when the single-line form exceeds 100 chars.
+**Line length:** Keep all lines under 100 characters (ruler at col 100). Wrap function signatures so each parameter is on its own line with the return type on a separate line. Wrap long object arguments (e.g. Prisma queries) when the single-line form exceeds 100 chars.
 
 ---
 
@@ -104,16 +84,7 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 
 ### Two Type Systems: Shared vs UI
 
-**Shared types** (`packages/shared-types/`) represent the **API contract** — plain data (IDs, strings, numbers, dates) that crosses the network. Used by both backend (request validation) and frontend (response parsing).
-
-**UI types** (`apps/frontend/src/ui-types/`) represent **form state** — frontend-only, never sent to the backend. They differ from shared types in two ways:
-
-1. **Dropdowns hold rich objects, not IDs.** The form holds `SelectOption<User>`; the API layer maps it to `created_for_id: number` before sending the request.
-2. **Nullable fields need a UI-safe starting state.** A required field starts as `null` (unselected) in the form before the user picks a value.
-
-Decision rule: if the shape crosses the network → `shared-types`; if it only exists in a form → `ui-types`.
-
-In practice: every create/update form gets a `XyzFormSchema` + `XyzForm` type in `ui-types/`. The corresponding `CreateXyzSchema` + `CreateXyz` lives in `shared-types/`. The API layer file is the bridge that maps one to the other before sending the request.
+**Shared types** (`packages/shared-types/`) are the API contract — plain data that crosses the network. **UI types** (`apps/frontend/src/ui-types/`) are form state only — dropdowns hold rich objects instead of IDs, and nullable fields start as `null` before the user picks a value. If the shape crosses the network → `shared-types`; if it only exists in a form → `ui-types`. Every create/update form gets a `XyzFormSchema` + `XyzForm` in `ui-types/`; the corresponding `CreateXyzSchema` + `CreateXyz` lives in `shared-types/`; the API layer file bridges them.
 
 ---
 
@@ -135,6 +106,13 @@ In practice: every create/update form gets a `XyzFormSchema` + `XyzForm` type in
 2. All conflict checks, pre-reads used to compute diffs, and the writes themselves go **inside** the interactive transaction using `tx.*` instead of `prisma.*`.
 3. Business-rule failures inside the tx throw `ConflictError` or `NotFoundError` (from `src/lib/errors.ts`); the outer `catch` maps these to `response400`, everything else to `response500`.
 4. History/audit writes remain **outside** the transaction — they are best-effort and must not extend the transaction boundary.
+
+**Query efficiency rules — no N+1 queries:**
+1. **Never query inside a loop.** A `for` loop that calls `prisma.*` per iteration is always wrong unless the iteration count is guaranteed to be 1.
+2. **Collect, then bulk-operate.** Gather all IDs or rows you need to create/delete during a loop, then execute one `createMany` / `deleteMany` after the loop.
+3. **Resolve foreign keys once.** When the same FK needs to be resolved to a display name for N records (e.g. hold number from hold ID), resolve it once with a single query and reuse the result — never resolve inside a loop.
+4. **Batch reads with `findMany` + `in`.** Fetch a set of related records in one query using `where: { id: { in: ids } }`, then build a `Map` for O(1) lookups.
+5. **Acceptable exceptions (not N+1 bugs):** `updateMany` applies one `data` object to all rows — use individual `update` calls when each row differs. `createMany` cannot nest relation writes — use individual `create` when nested relations are required. `getNextSequence` must be called sequentially per record to guarantee monotonically increasing numbers.
 
 **After removing a feature or query:** Delete any `.sql` files in `prisma/sql/` that are no longer used, then run `npm run prisma` to regenerate `generated/prisma/sql/`. Also check for orphaned imports across the controller, service, and API layers.
 
@@ -163,47 +141,18 @@ Path alias `@/` maps to `src/`.
 | **Components** | `components/custom/` | `descriptive-name.tsx` | Reusable UI not tied to a specific entity — `add-assets-to-create-form.tsx`, `collection-edit-bar.tsx`, `controlled-popover-search.tsx`, etc. |
 | **Hooks** | `hooks/use-kebab-case.ts` | `use-kebab-case.ts` | Custom React hooks — see descriptions below |
 
-**Store-first rule:** Components, pages, and modals must never import from `data/api/` directly. All data fetching and mutations go through a store action. The store calls the API layer, handles SWR invalidation, and updates state. The only legitimate exception is custom hooks that wrap `useSWR` (e.g. `use-hold-detail.ts`) — these exist specifically to integrate with SWR caching and live in `hooks/`. This is the standard unidirectional data-flow pattern: component → store → API.
+**Store-first rule:** Components, pages, and modals must never import from `data/api/` directly. All data fetching and mutations go through a store action. The only legitimate exception is custom hooks that wrap `useSWR` (e.g. `use-hold-detail.ts`) — these exist specifically to integrate with SWR caching and live in `hooks/`.
 
 **Toast position:** Always pass `{ position: 'top-center' }` to every `toast.error()`, `toast.success()`, and `toast.warning()` call — e.g. `toast.error('Something went wrong', { position: 'top-center' })`.
 
-**Form page anatomy** — all form pages follow this JSX structure:
-```tsx
-<FieldSet>
-  <FieldLegend>Section Title</FieldLegend>
-  <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
-
-    {/* Dropdown backed by SelectOption<T> */}
-    <Controller control={form.control} name='field'
-      render={({ field: { onChange, value }, fieldState }) => (
-        <SelectOptions selection={value} onSelectionChange={onChange} ... />
-      )}
-    />
-
-    {/* Searchable org/entity picker — value is T | null */}
-    <ControlledPopoverSearch control={form.control} name='org' options={orgs} ... />
-
-    {/* Plain text input */}
-    <Controller control={form.control} name='notes'
-      render={({ field }) => <Textarea {...field} />}
-    />
-
-  </FieldGroup>
-</FieldSet>
-
-{/* Asset barcode scanner — outside FieldSet */}
-<AddAssetByBarcode getAssets={...} onAddAsset={...} validateAsset={...} />
-
-{/* Asset table — outside the form border */}
-<DataTable columns={assetTableColumns} data={assets} />
-```
-- Form validation errors are surfaced via `toast.error(flattenFieldErrors(errors, []))` in the `onInvalid` handler passed to `form.handleSubmit`
-- Asset field errors are shown inline using a `<Controller name='assets'>` that renders `<FieldError>` when `fieldState.invalid`
+**Form page anatomy** — `FieldSet` + `FieldLegend` + `FieldGroup` wraps all fields; barcode scanner and asset table sit outside the `FieldSet`. Read any existing form page (e.g. `create-hold-page.tsx`) for the exact pattern.
+- Form validation errors: `toast.error(flattenFieldErrors(errors, []))` in the `onInvalid` handler passed to `form.handleSubmit`
+- Asset field errors: `<Controller name='assets'>` renders `<FieldError>` when `fieldState.invalid`
 
 **Hooks:**
-- `useGlobalData` — fetches users, organizations, models, and all reference data once at app start; called in `App.tsx`; results available anywhere via `useUserStore` (users), `useOrgStore` (orgs), `useModelStore` (models), `useReferenceDataStore` (warehouses, invoice types, asset types, statuses, roles) — no need to fetch these in a form or page
-- `useAutoSearch` — triggers a search on page load if the entity has not been searched yet in the current session; used on every summary/list page to pre-populate results on first visit
-- `useLocalStorage` — persists a value to `localStorage` with a versioned key; used for lightweight client-side preferences
+- `useGlobalData` — fetches users, orgs, models, and reference data once at app start (`App.tsx`); results available via `useUserStore`, `useOrgStore`, `useModelStore`, `useReferenceDataStore` — never re-fetch these in a form or page
+- `useAutoSearch` — pre-populates list pages on first visit; used on every summary/list page
+- `useLocalStorage` — persists a value to `localStorage` with a versioned key
 
 **`SelectOption<T>` pattern** — typed wrapper for dropdown state, defined in `ui-types/select-option-types.ts`:
 - Three states: `SELECTED { selected: T }`, `UNSELECTED`, `ANY`
