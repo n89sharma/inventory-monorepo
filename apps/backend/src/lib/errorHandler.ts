@@ -5,6 +5,8 @@ import { response400, response500 } from 'shared-types'
 import { ConflictError, NotFoundError, ValidationError } from './errors.js'
 import { logger } from './logger.js'
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 export function errorHandler(
   err: unknown,
   req: Request,
@@ -12,7 +14,12 @@ export function errorHandler(
   _next: NextFunction
 ): void {
   if (err instanceof ZodError) {
-    const details = err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ')
+    const details = isDev
+      ? err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ')
+      : (() => {
+          const fields = [...new Set(err.issues.map((e) => e.path.join('.')).filter(Boolean))].join(', ')
+          return fields ? `Invalid fields: ${fields}` : 'Invalid request'
+        })()
     res.status(400).json(response400('Validation failed', details))
     return
   }
