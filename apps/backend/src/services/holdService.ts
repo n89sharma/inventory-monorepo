@@ -19,10 +19,13 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
       return response400(`The following assets already have an active hold: ${barcodes}`)
     }
 
-    const currentAssets = await prisma.asset.findMany({
-      where: { id: { in: assetIds } },
-      select: { id: true, hold_id: true, is_held: true }
-    })
+    const [currentAssets, heldStatus] = await Promise.all([
+      prisma.asset.findMany({
+        where: { id: { in: assetIds } },
+        select: { id: true, hold_id: true, is_held: true }
+      }),
+      prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } })
+    ])
     const assetStateMap = new Map(currentAssets.map(a => [a.id, { hold_id: a.hold_id, is_held: a.is_held }]))
 
     const now = new Date()
@@ -42,7 +45,10 @@ export async function createHold(data: CreateHold, userId: number): Promise<ApiR
           assets: { connect: assetIds.map(id => ({ id })) }
         }
       }),
-      prisma.asset.updateMany({ where: { id: { in: assetIds } }, data: { is_held: true } })
+      prisma.asset.updateMany({
+        where: { id: { in: assetIds } },
+        data: { is_held: true, availability_status_id: heldStatus.id }
+      })
     ])
 
     const hold = await prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true } })
@@ -128,15 +134,20 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<ApiR
     const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
     const assetIdsToAdd = data.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
 
-    if (assetIdsToAdd.length > 0) {
-      const conflicts = await prisma.asset.findMany({
-        where: { id: { in: assetIdsToAdd }, is_held: true },
-        select: { barcode: true }
-      })
-      if (conflicts.length > 0) {
-        const barcodes = conflicts.map(a => a.barcode).join(', ')
-        return response400(`The following assets already have an active hold: ${barcodes}`)
-      }
+    const [conflicts, heldStatus, availableStatus] = await Promise.all([
+      assetIdsToAdd.length > 0
+        ? prisma.asset.findMany({
+            where: { id: { in: assetIdsToAdd }, is_held: true },
+            select: { barcode: true }
+          })
+        : Promise.resolve([]),
+      prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
+      prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'AVAILABLE' }, select: { id: true } })
+    ])
+
+    if (conflicts.length > 0) {
+      const barcodes = conflicts.map(a => a.barcode).join(', ')
+      return response400(`The following assets already have an active hold: ${barcodes}`)
     }
 
     await prisma.$transaction([
@@ -152,8 +163,14 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<ApiR
           }
         }
       }),
-      prisma.asset.updateMany({ where: { id: { in: assetIdsToRemove } }, data: { is_held: false } }),
-      prisma.asset.updateMany({ where: { id: { in: assetIdsToAdd } }, data: { is_held: true } })
+      prisma.asset.updateMany({
+        where: { id: { in: assetIdsToRemove } },
+        data: { is_held: false, availability_status_id: availableStatus.id }
+      }),
+      prisma.asset.updateMany({
+        where: { id: { in: assetIdsToAdd } },
+        data: { is_held: true, availability_status_id: heldStatus.id }
+      })
     ])
 
     await recordHoldUpdate(data.id, {
