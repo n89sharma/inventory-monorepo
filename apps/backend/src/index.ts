@@ -39,6 +39,13 @@ const limiter = rateLimit({
 app.use(helmet.xContentTypeOptions())
 app.use(helmet.frameguard({ action: 'deny' }))
 app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true }))
+app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }))
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
+app.use(helmet.crossOriginOpenerPolicy({ policy: 'same-origin' }))
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()')
+  next()
+})
 app.use(clerkMiddleware())
 app.use('/webhooks', webhookRoutes)
 app.use(limiter)
