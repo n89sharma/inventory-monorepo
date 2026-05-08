@@ -1,4 +1,4 @@
-import { clerkMiddleware } from '@clerk/express'
+import { clerkMiddleware, getAuth } from '@clerk/express'
 import cors from 'cors'
 import express, { Request, Response } from 'express'
 import helmet from 'helmet'
@@ -30,7 +30,8 @@ morgan.token('id', (req: Request) => req.id)
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 100,
+  max: 400,
+  keyGenerator: (req) => getAuth(req).userId ?? req.ip ?? 'unknown',
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },

@@ -17,6 +17,16 @@ api.interceptors.response.use(
   (error: unknown) => {
     if (isAxiosError(error)) {
       if (error.response) {
+        if (error.response.status === 429) {
+          const message = 'Too many requests. Please slow down and try again.'
+          toast.error(message, { position: 'top-center' })
+          throw new Error(message)
+        }
+        if (error.response.status === 413) {
+          const message = 'Request too large. Please reduce the number of items and try again.'
+          toast.error(message, { position: 'top-center' })
+          throw new Error(message)
+        }
         const body = error.response.data as ApiResponse<unknown> | undefined
         const message = (body && !body.success) ? body.error.summary : 'Request failed'
         toast.error(message, { position: 'top-center' })
