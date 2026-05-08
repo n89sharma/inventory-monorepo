@@ -19,6 +19,8 @@ export * from "./sql/getAssetErrors.js"
 
 export * from "./sql/getAssetPartTransfer.js"
 
+export * from "./sql/getAssets.js"
+
 export * from "./sql/getAssetsForArrival.js"
 
 export * from "./sql/getAssetsForDepartures.js"
