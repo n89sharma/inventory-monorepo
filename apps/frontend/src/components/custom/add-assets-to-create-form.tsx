@@ -1,11 +1,14 @@
 import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
+import { useSearchStore } from '@/data/store/search-store'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useRef, useState } from 'react'
-import type { AssetSummary } from 'shared-types'
+import { useEffect, useRef, useState } from 'react'
+import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { Field, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
 import { Input } from '../shadcn/input'
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
+import { CommandResultList } from './global-search/command-result-list'
 
 interface AddAssetByBarcodeProps {
   getAssets: () => AssetSummary[]
@@ -15,45 +18,97 @@ interface AddAssetByBarcodeProps {
 }
 
 export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateAsset }: AddAssetByBarcodeProps): React.JSX.Element {
-  const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
-  const barcodeInputRef = useRef<HTMLInputElement>(null)
-  const [barcodeError, setBarcodeError] = useState<string | null>(null)
+  const getAssetByIdentifier = useAssetStore(state => state.getAssetByBarcode)
+  const searchGlobal = useSearchStore(state => state.searchGlobal)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [displayValue, setDisplayValue] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [resolvedBarcode, setResolvedBarcode] = useState<string | null>(null)
+  const [assetError, setAssetError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
+  const [suggestions, setSuggestions] = useState<BarcodeSuggestion[]>([])
+  const [popoverOpen, setPopoverOpen] = useState(false)
 
-  async function handleAddAsset() {
-    const barcode = barcodeInputRef.current?.value.trim()
-    if (!barcode) return
-
-    const currentAssets = getAssets()
-    if (currentAssets.some(a => a.barcode === barcode)) {
-      setBarcodeError(`Asset ${barcode} is already in this ${entityName}.`)
+  useEffect(() => {
+    if (!searchQuery) {
+      setSuggestions([])
+      setPopoverOpen(false)
       return
     }
+    const t = setTimeout(async () => {
+      const res = await searchGlobal(searchQuery)
+      setSuggestions(res.assets)
+      setPopoverOpen(res.assets.length > 0)
+    }, 150)
+    return () => clearTimeout(t)
+  }, [searchQuery])
 
-    setBarcodeError(null)
+  async function handleAddAsset() {
+    const identifier = resolvedBarcode ?? displayValue
+    if (!identifier) return
+
+    setAssetError(null)
     setIsLookingUp(true)
     try {
-      const asset = await getAssetByBarcode(barcode)
+      const asset = await getAssetByIdentifier(identifier)
+      if (getAssets().some(a => a.barcode === asset.barcode)) {
+        setAssetError(`Asset ${asset.barcode} is already in this ${entityName}.`)
+        return
+      }
       if (validateAsset) {
         const validationError = validateAsset(asset)
         if (validationError) {
-          setBarcodeError(validationError)
+          setAssetError(validationError)
           return
         }
       }
       onAddAsset(asset)
-      if (barcodeInputRef.current) barcodeInputRef.current.value = ''
+      setDisplayValue('')
+      setSearchQuery('')
+      setResolvedBarcode(null)
+      setSuggestions([])
+      setPopoverOpen(false)
     } catch {
-      setBarcodeError('Asset not found.')
+      setAssetError('Asset not found.')
     } finally {
       setIsLookingUp(false)
     }
   }
 
-  function onBarcodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (resolvedBarcode !== null) {
+      // displayValue holds "BC · SN" which contains characters outside the allowed set.
+      // Sanitizing the edited value would produce garbled output — reset to empty instead.
+      setDisplayValue('')
+      setSearchQuery('')
+      setResolvedBarcode(null)
+      setAssetError(null)
+      return
+    }
+    const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()
+    setDisplayValue(val)
+    setSearchQuery(val)
+    setAssetError(null)
+  }
+
+  function handleSuggestionSelect(suggestion: BarcodeSuggestion) {
+    setDisplayValue(suggestion.serial_number
+      ? `${suggestion.barcode} · ${suggestion.serial_number}`
+      : suggestion.barcode
+    )
+    setSearchQuery('')
+    setResolvedBarcode(suggestion.barcode)
+    setPopoverOpen(false)
+    inputRef.current?.focus()
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
+      setPopoverOpen(false)
       handleAddAsset()
+    } else if (e.key === 'Escape') {
+      setPopoverOpen(false)
     }
   }
 
@@ -61,15 +116,35 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
     <div className='flex flex-col'>
       <div className='flex-1 flex flex-col justify-center'>
         <Field>
-          <FieldLabel>Barcode</FieldLabel>
-          <Input
-            ref={barcodeInputRef}
-            placeholder='Scan or enter barcode…'
-            onKeyDown={onBarcodeKeyDown}
-            onChange={() => setBarcodeError(null)}
-          />
-          {barcodeError && (
-            <p className='text-destructive mt-1'>{barcodeError}</p>
+          <FieldLabel>Barcode / Serial</FieldLabel>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild><div /></PopoverTrigger>
+            <PopoverAnchor asChild>
+              <Input
+                ref={inputRef}
+                placeholder='Scan or enter barcode / serial…'
+                value={displayValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+              />
+            </PopoverAnchor>
+            <PopoverContent
+              align='start'
+              onOpenAutoFocus={e => e.preventDefault()}
+              onCloseAutoFocus={e => e.preventDefault()}
+              className='w-[--radix-popover-anchor-width] min-w-80 p-1'
+            >
+              <CommandResultList
+                items={suggestions}
+                getKey={s => s.barcode}
+                getValue={s => s.barcode}
+                getColumns={s => [s.barcode, s.serial_number, s.asset_type, s.model]}
+                onSelect={handleSuggestionSelect}
+              />
+            </PopoverContent>
+          </Popover>
+          {assetError && (
+            <p className='text-destructive mt-1'>{assetError}</p>
           )}
         </Field>
       </div>
