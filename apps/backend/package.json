@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
-    "postbuild": "find dist -name '*.map' -delete",
     "start": "node dist/src/index.js",
     "prisma": "npx prisma generate --sql"
   },
