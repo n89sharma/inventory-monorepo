@@ -18,7 +18,7 @@ interface AddAssetByBarcodeProps {
 }
 
 export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateAsset }: AddAssetByBarcodeProps): React.JSX.Element {
-  const getAssetByIdentifier = useAssetStore(state => state.getAssetByBarcode)
+  const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
   const searchGlobal = useSearchStore(state => state.searchGlobal)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')
@@ -44,13 +44,12 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
   }, [searchQuery])
 
   async function handleAddAsset() {
-    const identifier = resolvedBarcode ?? displayValue
-    if (!identifier) return
+    if (!resolvedBarcode) return
 
     setAssetError(null)
     setIsLookingUp(true)
     try {
-      const asset = await getAssetByIdentifier(identifier)
+      const asset = await getAssetByBarcode(resolvedBarcode)
       if (getAssets().some(a => a.barcode === asset.barcode)) {
         setAssetError(`Asset ${asset.barcode} is already in this ${entityName}.`)
         return
@@ -152,7 +151,7 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
         variant='secondary'
         type='button'
         onClick={handleAddAsset}
-        disabled={isLookingUp}
+        disabled={!resolvedBarcode || isLookingUp}
         className='mt-3'
       >
         {isLookingUp

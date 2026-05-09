@@ -23,4 +23,4 @@ from "Asset" a
   join "TechnicalStatus" te on te.id = a.technical_status_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
-where a.barcode = $1 OR a.serial_number = $1
+where a.barcode = $1
