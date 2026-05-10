@@ -11,6 +11,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { CopyButton } from '../../custom/copy-button'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
@@ -45,7 +46,12 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     <div className="flex flex-col gap-4">
       <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)} />
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold p-2">Invoice {invoiceNumber}</h1>
+        <div className="group flex items-center gap-2">
+          <h1 className="text-2xl font-semibold group flex items-center gap-2">
+            Invoice {invoiceNumber}
+            <CopyButton value={invoiceNumber} />
+          </h1>
+        </div>
         <CollectionEditBar section="invoices" collectionId={invoiceNumber} assets={invoice.assets} />
       </div>
       <InvoiceSummaryStrip invoice={invoice} />
