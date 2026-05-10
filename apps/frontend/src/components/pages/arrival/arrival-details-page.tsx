@@ -56,7 +56,12 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="arrivals" collectionId={arrivalNumber} assets={arrival.assets} />
       </div>
       <ArrivalSummaryStrip arrival={arrival} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={arrivalDetailKey(arrivalNumber)} />
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => setRowSelection({})}
+        refreshKey={arrivalDetailKey(arrivalNumber)}
+        returnTo={`/arrivals/${arrivalNumber}`}
+      />
       <DataTable
         columns={columns}
         data={arrival.assets}

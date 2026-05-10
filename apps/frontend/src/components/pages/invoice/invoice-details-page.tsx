@@ -55,7 +55,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="invoices" collectionId={invoiceNumber} assets={invoice.assets} />
       </div>
       <InvoiceSummaryStrip invoice={invoice} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={invoiceDetailKey(invoiceNumber)} />
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => setRowSelection({})}
+        refreshKey={invoiceDetailKey(invoiceNumber)}
+        currentCollectionType="invoice"
+        returnTo={`/invoices/${invoiceNumber}`}
+      />
       <DataTable
         columns={columns}
         data={invoice.assets}

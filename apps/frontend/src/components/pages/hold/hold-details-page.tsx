@@ -55,7 +55,13 @@ export function HoldDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="holds" collectionId={holdNumber} assets={hold.assets} />
       </div>
       <HoldSummaryStrip hold={hold} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={holdDetailKey(holdNumber)} />
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => setRowSelection({})}
+        refreshKey={holdDetailKey(holdNumber)}
+        currentCollectionType="hold"
+        returnTo={`/holds/${holdNumber}`}
+      />
       <DataTable
         columns={columns}
         data={hold.assets}

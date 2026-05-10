@@ -55,7 +55,13 @@ export function DepartureDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="departures" collectionId={departureNumber} assets={departure.assets} />
       </div>
       <DepartureSummaryStrip departure={departure} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={departureDetailKey(departureNumber)} />
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => setRowSelection({})}
+        refreshKey={departureDetailKey(departureNumber)}
+        currentCollectionType="departure"
+        returnTo={`/departures/${departureNumber}`}
+      />
       <DataTable
         columns={columns}
         data={departure.assets}

@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
 interface InvoiceFormPageProps {
+  defaultValues?: InvoiceForm
   pageConfig: {
     pageHeading: string
     saveButtonText: string
@@ -37,11 +38,13 @@ function validateInvoiceAsset(asset: AssetSummary): string | null {
   return null
 }
 
-export function InvoiceFormPage({ pageConfig, breadcrumbs, onValidSubmit }: InvoiceFormPageProps): React.JSX.Element {
+export function InvoiceFormPage(
+  { defaultValues, pageConfig, breadcrumbs, onValidSubmit }: InvoiceFormPageProps
+): React.JSX.Element {
   const navigate = useNavigate()
   const form = useForm<InvoiceForm>({
     resolver: zodResolver(InvoiceFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       invoice_number: '',
       organization: null,
       invoice_type: UNSELECTED,

@@ -55,7 +55,13 @@ export function TransferDetailsPage(): React.JSX.Element {
         <CollectionEditBar section="transfers" collectionId={transferNumber} assets={transfer.assets} />
       </div>
       <TransferSummaryStrip transfer={transfer} />
-      <BulkEditBar selectedAssets={selectedAssets} onClear={() => setRowSelection({})} refreshKey={transferDetailKey(transferNumber)} />
+      <BulkEditBar
+        selectedAssets={selectedAssets}
+        onClear={() => setRowSelection({})}
+        refreshKey={transferDetailKey(transferNumber)}
+        currentCollectionType="transfer"
+        returnTo={`/transfers/${transferNumber}`}
+      />
       <DataTable
         columns={columns}
         data={transfer.assets}

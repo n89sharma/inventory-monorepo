@@ -1,11 +1,17 @@
 import { useDepartureStore } from '@/data/store/departure-store'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
-import { useNavigate } from 'react-router-dom'
+import { UNSELECTED } from '@/ui-types/select-option-types'
+import { useLocation, useNavigate } from 'react-router-dom'
+import type { AssetSummary } from 'shared-types'
 import { DepartureFormPage } from './departure-form-page'
 
 export function CreateDeparturePage(): React.JSX.Element {
   const navigate = useNavigate()
-  const submitCreateDeparture = useDepartureStore(state => state.submitCreateDeparture)
+  const { state } = useLocation()
+  const { preloadedAssets, returnTo } =
+    (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
+
+  const submitCreateDeparture = useDepartureStore(s => s.submitCreateDeparture)
 
   const pageConfig = {
     pageHeading: 'Create Departure',
@@ -19,16 +25,26 @@ export function CreateDeparturePage(): React.JSX.Element {
     { label: 'Create' },
   ]
 
+  const defaultValues: DepartureForm | undefined = preloadedAssets?.length
+    ? { origin: UNSELECTED, customer: null, transporter: null, comment: '', assets: preloadedAssets }
+    : undefined
+
   async function onValidDepartureCreateSubmit(data: DepartureForm) {
     try {
       const { departureNumber } = await submitCreateDeparture(data)
-      navigate(`/departures/${departureNumber}`, {
-        state: { successMessage: `Departure ${departureNumber} created!` }
-      })
+      const destination = returnTo ?? `/departures/${departureNumber}`
+      navigate(destination, { state: { successMessage: `Departure ${departureNumber} created!` } })
     } catch {
       // interceptor already showed the error toast
     }
   }
 
-  return <DepartureFormPage pageConfig={pageConfig} breadcrumbs={breadcrumbs} onValidSubmit={onValidDepartureCreateSubmit} />
+  return (
+    <DepartureFormPage
+      pageConfig={pageConfig}
+      breadcrumbs={breadcrumbs}
+      onValidSubmit={onValidDepartureCreateSubmit}
+      defaultValues={defaultValues}
+    />
+  )
 }
