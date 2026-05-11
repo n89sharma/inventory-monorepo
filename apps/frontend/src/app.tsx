@@ -38,8 +38,9 @@ const InvoiceDetailsPage   = lazy(() => import('./components/pages/invoice/invoi
 
 const AssetDetailsPage     = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
 const QueryPage            = lazy(() => import('./components/pages/query').then(m => ({ default: m.QueryPage })))
-const SettingsPage         = lazy(() => import('./components/pages/settings/settings-page').then(m => ({ default: m.SettingsPage })))
-const AdminDashboardPage   = lazy(() => import('./components/pages/admin/admin-dashboard-page').then(m => ({ default: m.AdminDashboardPage })))
+const CatalogSettingsPage        = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
+const OrganizationsSettingsPage  = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
+const UserManagementPage         = lazy(() => import('./components/pages/admin/user-management-page').then(m => ({ default: m.AdminDashboardPage })))
 
 function AppRoutes() {
   const location = useLocation()
@@ -90,9 +91,10 @@ function AppRoutes() {
                 <Route path="/search" element={<QueryPage />} />
                 <Route path="/search/:assetId" element={<AssetDetailsPage />} />
 
-                <Route path="/settings" element={<SettingsPage />} />
-
-                <Route path="/admin" element={<AdminDashboardPage />} />
+                <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
+                <Route path="/settings/catalog" element={<CatalogSettingsPage />} />
+                <Route path="/settings/organizations" element={<OrganizationsSettingsPage />} />
+                <Route path="/settings/user-permissions" element={<UserManagementPage />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

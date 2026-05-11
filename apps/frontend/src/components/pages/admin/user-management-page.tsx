@@ -25,15 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/shadcn/select'
+import { Toggle } from '@/components/shadcn/toggle'
 import { useUserStore } from '@/data/store/user-store'
 import { useHasRole } from '@/hooks/use-role'
+import { formatSentenceCase } from '@/lib/formatters'
 import { useUser } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { AppRoles, type AppRole, type User } from 'shared-types'
 import { toast } from 'sonner'
-import { formatSentenceCase } from '@/lib/formatters'
 import { createUserPermissionTableColumns } from '../column-defs/user-permission-table-columns'
 
 const ASSIGNABLE_ROLES = AppRoles.filter(r => r !== 'admin')
@@ -110,16 +111,17 @@ function AdminDashboardContent() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">User Management</h1>
-        <Button
-          variant={showActiveOnly ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setShowActiveOnly(prev => !prev)}
-        >
-          Active only
-        </Button>
-      </div>
+      <h1 className="text-2xl font-semibold">User Management</h1>
+
+      <Toggle
+        size="sm"
+        pressed={showActiveOnly}
+        onPressedChange={setShowActiveOnly}
+        className="w-fit"
+        variant="outline"
+      >
+        Active only
+      </Toggle>
 
       <DataTable columns={columns} data={displayedUsers} initialPageSize={25} />
 

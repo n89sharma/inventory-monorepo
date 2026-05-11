@@ -648,7 +648,7 @@ function SidebarMenuSubItem({
 function SidebarMenuSubButton({
   asChild = false,
   size = "md",
-  isActive = false,
+  isActive = undefined,
   className,
   ...props
 }: React.ComponentProps<"a"> & {
