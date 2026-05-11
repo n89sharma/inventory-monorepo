@@ -16,7 +16,8 @@ type DeleteEntityDialogProps = {
   entityId: string | undefined,
   children?: ReactNode,
   open?: boolean,
-  onOpenChange?: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void,
+  onConfirm?: () => void,
 }
 
 export function DeleteEntityDialog({
@@ -24,7 +25,9 @@ export function DeleteEntityDialog({
   entityId,
   children,
   open,
-  onOpenChange }: DeleteEntityDialogProps) {
+  onOpenChange,
+  onConfirm,
+}: DeleteEntityDialogProps) {
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -38,7 +41,7 @@ export function DeleteEntityDialog({
         {children}
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">Delete</AlertDialogAction>
+          <AlertDialogAction variant="destructive" onClick={onConfirm}>Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

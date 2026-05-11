@@ -39,6 +39,7 @@ const InvoiceDetailsPage   = lazy(() => import('./components/pages/invoice/invoi
 const AssetDetailsPage     = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
 const QueryPage            = lazy(() => import('./components/pages/query').then(m => ({ default: m.QueryPage })))
 const SettingsPage         = lazy(() => import('./components/pages/settings/settings-page').then(m => ({ default: m.SettingsPage })))
+const AdminDashboardPage   = lazy(() => import('./components/pages/admin/admin-dashboard-page').then(m => ({ default: m.AdminDashboardPage })))
 
 function AppRoutes() {
   const location = useLocation()
@@ -90,6 +91,8 @@ function AppRoutes() {
                 <Route path="/search/:assetId" element={<AssetDetailsPage />} />
 
                 <Route path="/settings" element={<SettingsPage />} />
+
+                <Route path="/admin" element={<AdminDashboardPage />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

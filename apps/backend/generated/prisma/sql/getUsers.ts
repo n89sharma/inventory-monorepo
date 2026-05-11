@@ -6,17 +6,17 @@
 import * as $runtime from "@prisma/client/runtime/client"
 
 /**
- * @param bool
  */
-export const getUsers = $runtime.makeTypedQueryFactory("select\nu.id,\nu.name,\nu.email,\nu.role_id,\nr.role\nfrom \"User\" u\njoin \"Role\" r on r.id = u.role_id\nwhere ($1 = false or u.is_active = true)\norder by u.name") as (bool: boolean) => $runtime.TypedSql<getUsers.Parameters, getUsers.Result>
+export const getUsers = $runtime.makeTypedQueryFactory("select\nu.id,\nu.clerk_id,\nu.name,\nu.email,\nu.role,\nu.is_active\nfrom \"User\" u\norder by u.name") as () => $runtime.TypedSql<getUsers.Parameters, getUsers.Result>
 
 export namespace getUsers {
-  export type Parameters = [bool: boolean]
+  export type Parameters = []
   export type Result = {
     id: number
+    clerk_id: string | null
     name: string
     email: string | null
-    role_id: number | null
-    role: string
+    role: string | null
+    is_active: boolean
   }
 }

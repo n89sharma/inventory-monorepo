@@ -76,7 +76,6 @@ export const ModelName = {
   AvailabilityStatus: 'AvailabilityStatus',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
-  Role: 'Role',
   TechnicalStatus: 'TechnicalStatus',
   TrackingStatus: 'TrackingStatus',
   StorePart: 'StorePart',
@@ -342,9 +341,9 @@ export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   name: 'name',
-  role_id: 'role_id',
   is_active: 'is_active',
-  clerk_id: 'clerk_id'
+  clerk_id: 'clerk_id',
+  role: 'role'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -408,14 +407,6 @@ export const InvoiceTypeScalarFieldEnum = {
 } as const
 
 export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
-
-
-export const RoleScalarFieldEnum = {
-  id: 'id',
-  role: 'role'
-} as const
-
-export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
 
 
 export const TechnicalStatusScalarFieldEnum = {

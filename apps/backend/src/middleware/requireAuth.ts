@@ -8,11 +8,13 @@ import { prisma } from '../prisma.js'
 export const userIdCache = new LRUCache<string, number>({ max: 500, ttl: 1000 * 60 * 60 })
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const { userId } = getAuth(req)
+  const { userId, sessionClaims } = getAuth(req)
 
   if (!userId) {
     return res.status(401).json(response400('Unauthorized'))
   }
+
+  res.locals.dbUserRole = sessionClaims?.metadata?.role ?? null
 
   const cached = userIdCache.get(userId)
   if (cached !== undefined) {

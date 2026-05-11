@@ -1,4 +1,4 @@
-import { CreateHold, HoldDetail, UpdateHold } from 'shared-types'
+import { AppRole, CreateHold, HoldDetail, UpdateHold } from 'shared-types'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -84,7 +84,7 @@ export async function getHoldForUpdate(holdNumber: string): Promise<UpdateHold> 
     prisma.hold.findUnique({
       where: { hold_number: holdNumber },
       include: {
-        created_for: { include: { Role: true } },
+        created_for: true,
         customer: true
       }
     }),
@@ -96,9 +96,9 @@ export async function getHoldForUpdate(holdNumber: string): Promise<UpdateHold> 
     created_for: {
       id: hold.created_for.id,
       name: hold.created_for.name,
-      email: hold.created_for.email ?? '',
-      role_id: hold.created_for.role_id ?? 0,
-      role: hold.created_for.Role?.role ?? ''
+      email: hold.created_for.email,
+      is_active: hold.created_for.is_active,
+      role: hold.created_for.role as AppRole | null,
     },
     customer: {
       id: hold.customer.id,
@@ -183,8 +183,8 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
     prisma.hold.findUnique({
       where: { hold_number: holdNumber },
       include: {
-        created_by: { include: { Role: true } },
-        created_for: { include: { Role: true } },
+        created_by: true,
+        created_for: true,
         customer: true
       }
     }),
@@ -196,16 +196,16 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
     created_by: {
       id: hold.created_by.id,
       name: hold.created_by.name,
-      email: hold.created_by.email ?? '',
-      role_id: hold.created_by.role_id ?? 0,
-      role: hold.created_by.Role?.role ?? ''
+      email: hold.created_by.email,
+      is_active: hold.created_by.is_active,
+      role: hold.created_by.role as AppRole | null,
     },
     created_for: {
       id: hold.created_for.id,
       name: hold.created_for.name,
-      email: hold.created_for.email ?? '',
-      role_id: hold.created_for.role_id ?? 0,
-      role: hold.created_for.Role?.role ?? ''
+      email: hold.created_for.email,
+      is_active: hold.created_for.is_active,
+      role: hold.created_for.role as AppRole | null,
     },
     customer: hold.customer,
     notes: hold.notes,

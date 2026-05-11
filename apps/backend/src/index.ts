@@ -2,7 +2,7 @@ import { clerkMiddleware, getAuth } from '@clerk/express'
 import cors from 'cors'
 import express, { Request, Response } from 'express'
 import helmet from 'helmet'
-import rateLimit from 'express-rate-limit'
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit'
 import morgan from 'morgan'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
@@ -16,6 +16,7 @@ import constantRoutes from './routes/referenceRoutes.js'
 import transferRoutes from './routes/transferRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import adminRoutes from './routes/adminRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
 import { errorHandler } from './lib/errorHandler.js'
 import { requestId } from './middleware/requestId.js'
@@ -31,7 +32,7 @@ morgan.token('id', (req: Request) => req.id)
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 400,
-  keyGenerator: (req) => getAuth(req).userId ?? req.ip ?? 'unknown',
+  keyGenerator: (req) => getAuth(req).userId?.toString() ?? ipKeyGenerator(req.ip ?? 'unknown', 56),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
@@ -121,6 +122,7 @@ app.use('/invoices', invoiceRoutes);
 app.use('/models', modelRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
+app.use('/admin', adminRoutes)
 app.use('/search', searchRoutes)
 
 app.use(errorHandler)

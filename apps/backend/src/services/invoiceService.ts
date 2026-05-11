@@ -1,4 +1,4 @@
-import { CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import { AppRole, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
@@ -137,7 +137,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
     prisma.invoice.findFirst({
       where: { invoice_number: invoiceNumber },
       include: {
-        updated_by: { include: { Role: true } },
+        updated_by: true,
         organization: true,
         InvoiceType: true
       }
@@ -153,9 +153,9 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
     created_by: {
       id: invoice.updated_by.id,
       name: invoice.updated_by.name,
-      email: invoice.updated_by.email ?? '',
-      role_id: invoice.updated_by.role_id ?? 0,
-      role: invoice.updated_by.Role?.role ?? ''
+      email: invoice.updated_by.email,
+      is_active: invoice.updated_by.is_active,
+      role: invoice.updated_by.role as AppRole | null,
     },
     customer: invoice.organization,
     assets

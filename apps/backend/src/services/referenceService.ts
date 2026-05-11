@@ -9,7 +9,6 @@ export async function getReferenceData(): Promise<ReferenceData> {
     trackingStatuses,
     availabilityStatuses,
     technicalStatuses,
-    roles,
     invoiceTypes,
     warehouses,
     errors
@@ -20,7 +19,6 @@ export async function getReferenceData(): Promise<ReferenceData> {
     prisma.trackingStatus.findMany(),
     prisma.availabilityStatus.findMany(),
     prisma.technicalStatus.findMany(),
-    prisma.role.findMany(),
     prisma.invoiceType.findMany(),
     prisma.warehouse.findMany(),
     prisma.error.findMany()
@@ -33,7 +31,6 @@ export async function getReferenceData(): Promise<ReferenceData> {
     trackingStatuses,
     availabilityStatuses,
     technicalStatuses,
-    roles,
     invoiceTypes,
     warehouses,
     errors

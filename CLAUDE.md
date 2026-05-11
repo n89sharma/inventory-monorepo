@@ -37,6 +37,10 @@ No tests are configured yet.
 **Before making a complicated refactor on a UI component in the frontend, load the skill:**
 1. `/vercel-composition-patterns`
 
+**Before writing or changing any code that uses a third-party library or framework API** (Clerk, Prisma, express-rate-limit, Zod, Axios, TanStack, Zustand, SWR, React Router, etc.), always check Context7 first:
+1. `mcp__context7__resolve-library-id` → then `mcp__context7__query-docs`
+This applies even for APIs you think you know — library versions change and Context7 reflects current docs.
+
 ### Conditional Rendering Rules
 
 **Binary condition (show or fallback):** Use a Guard Component (`condition: boolean`, `fallback: ReactNode`, `children: ReactNode`). Reference: `apps/frontend/src/components/custom/asset-details/optional-section.tsx`.
@@ -54,6 +58,8 @@ No tests are configured yet.
 **Line length:** Keep all lines under 100 characters (ruler at col 100). Wrap function signatures so each parameter is on its own line with the return type on a separate line. Wrap long object arguments (e.g. Prisma queries) when the single-line form exceeds 100 chars.
 
 **Conditionals:** Prefer `if/else if` with early returns over ternary chains for range or multi-branch logic. Ternaries are acceptable for simple binary expressions only.
+
+**Static values:** Declare magic strings, event names, default values, and any named literals as `const` at the top of the file — never inline. Example: `const DEFAULT_ROLE = 'member'` instead of `role: 'member'` scattered through the file. One place to change, not many.
 
 ---
 

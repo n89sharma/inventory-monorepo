@@ -18,10 +18,6 @@ export const StatusSchema = z.object({
   id: z.number(),
   status: z.string()
 });
-const RoleSchema = z.object({
-  id: z.number(),
-  role: z.string()
-});
 const InvoiceTypeSchema = z.object({
   id: z.number(),
   type: z.string()
@@ -55,7 +51,6 @@ export const ReferenceDataSchema = z.object({
   trackingStatuses: z.array(StatusSchema),
   availabilityStatuses: z.array(StatusSchema),
   technicalStatuses: z.array(StatusSchema),
-  roles: z.array(RoleSchema),
   invoiceTypes: z.array(InvoiceTypeSchema),
   warehouses: z.array(WarehouseSchema),
   errors: z.array(ErrorSchema)
@@ -71,7 +66,6 @@ export type CoreFunction = z.infer<typeof CoreFunctionsSchema>;
 export type AssetType = z.infer<typeof AssetTypeSchema>;
 export type Brand = z.infer<typeof BrandSchema>;
 export type Status = z.infer<typeof StatusSchema>;
-export type Role = z.infer<typeof RoleSchema>;
 export type InvoiceType = z.infer<typeof InvoiceTypeSchema>;
 export type Warehouse = z.infer<typeof WarehouseSchema>;
 export type AssetLocation = z.infer<typeof AssetLocationSchema>;

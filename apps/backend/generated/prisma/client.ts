@@ -167,11 +167,6 @@ export type FileType = Prisma.FileTypeModel
  */
 export type InvoiceType = Prisma.InvoiceTypeModel
 /**
- * Model Role
- * 
- */
-export type Role = Prisma.RoleModel
-/**
  * Model TechnicalStatus
  * 
  */
