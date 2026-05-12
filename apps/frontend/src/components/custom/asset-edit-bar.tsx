@@ -34,6 +34,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canCreateHold = useCan('create_update_hold')
   const canCreateInvoice = useCan('create_update_invoice')
   const canCreateSomeCollections = canCreateDeparture || canCreateHold || canCreateInvoice || canCreateTransfer
+  const canDelete = useCan('delete_asset')
 
   return (
     <div className="flex gap-2">
@@ -56,13 +57,21 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           </DropdownMenuContent>
         </DropdownMenu>
       }
-
-      <EditErrorsModal
-        open={editErrorsOpen}
-        onOpenChange={setEditErrorsOpen}
-        assetDetails={assetDetails}
-        errors={errors}
-      />
+      {
+        canDelete &&
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" aria-label="More options">
+              <DotsThreeVerticalIcon aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+              <TrashIcon />Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      }
 
       <EditPricingModal
         open={editPricingOpen}
@@ -77,32 +86,26 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         accessories={accessories}
       />
 
+      <EditErrorsModal
+        open={editErrorsOpen}
+        onOpenChange={setEditErrorsOpen}
+        assetDetails={assetDetails}
+        errors={errors}
+      />
+
       <AddPartTransferModal
         open={addPartTransferOpen}
         onOpenChange={setAddPartTransferOpen}
         recipientBarcode={assetDetails?.barcode ?? null}
       />
 
-
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" aria-label="More options">
-            <DotsThreeVerticalIcon aria-hidden="true" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-            <TrashIcon />Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
       <AddToCollectionModal
         open={addToCollectionOpen}
         onOpenChange={setAddToCollectionOpen}
         selectedAssets={assetAsSummary ? [assetAsSummary] : []}
         onConfirmSuccess={() => { }}
       />
+
       <DeleteEntityDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
