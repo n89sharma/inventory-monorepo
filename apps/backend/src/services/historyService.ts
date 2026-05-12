@@ -3,6 +3,16 @@ import { Prisma } from '../../generated/prisma/client.js'
 import { prisma } from '../prisma.js'
 import { logger } from '../lib/logger.js'
 
+type HistoryEntityType =
+  | 'Arrival'
+  | 'Asset'
+  | 'AssetSalePrice'
+  | 'AssetPurchaseCost'
+  | 'Departure'
+  | 'Hold'
+  | 'Invoice'
+  | 'Transfer'
+
 // ─── State types for CREATE ───────────────────────────────────────────────────
 
 type ArrivalCreateState = {
@@ -83,6 +93,15 @@ type AssetUpdateFields = Partial<{
   error_ids: number[]
 }>
 
+const PURCHASE_COST_FIELDS = [
+  'purchase_cost',
+  'transport_cost',
+  'processing_cost',
+  'other_cost',
+  'parts_cost',
+  'total_cost'
+] as const
+
 type DepartureUpdateFields = Partial<{
   origin_id: number
   destination_id: number
@@ -107,7 +126,7 @@ type TransferUpdateFields = Partial<{
 // ─── Base utilities (private) ─────────────────────────────────────────────────
 
 async function recordHistory(
-  entityType: string,
+  entityType: HistoryEntityType,
   entityId: number,
   actionType: string,
   userId: number,
@@ -379,9 +398,7 @@ export async function recordAssetUpdate(
       'serial_number',
       'meter_black', 'meter_colour', 'meter_total',
       'cassettes', 'internal_finisher',
-      'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k',
-      'purchase_cost', 'transport_cost', 'processing_cost', 'other_cost',
-      'parts_cost', 'total_cost', 'sale_price'
+      'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k'
     ]
     for (const field of plainFields) {
       const beforeVal = (before as Record<string, unknown>)[field]
@@ -409,6 +426,28 @@ export async function recordAssetUpdate(
 
     if (Object.keys(diffAfter).length > 0) {
       await recordHistory('Asset', assetId, 'UPDATE', userId, { before: diffBefore, after: diffAfter })
+    }
+
+    const purchaseBefore: Record<string, unknown> = {}
+    const purchaseAfter: Record<string, unknown> = {}
+    for (const field of PURCHASE_COST_FIELDS) {
+      if (before[field] !== after[field]) {
+        purchaseBefore[field] = before[field]
+        purchaseAfter[field] = after[field]
+      }
+    }
+    if (Object.keys(purchaseAfter).length > 0) {
+      await recordHistory('AssetPurchaseCost', assetId, 'UPDATE', userId, {
+        before: purchaseBefore,
+        after: purchaseAfter
+      })
+    }
+
+    if (before.sale_price !== after.sale_price) {
+      await recordHistory('AssetSalePrice', assetId, 'UPDATE', userId, {
+        before: { sale_price: before.sale_price },
+        after: { sale_price: after.sale_price }
+      })
     }
   } catch (error) {
     logger.error(`History write failed [UPDATE Asset ${assetId}]`, { error })
@@ -661,7 +700,7 @@ export async function recordTransferUpdate(
 // ─── Collection asset membership ──────────────────────────────────────────────
 
 export async function recordAssetUpdateOnCollection(
-  entityType: string,
+  entityType: HistoryEntityType,
   entityId: number,
   addedAssetIds: number[],
   removedAssetIds: number[],
@@ -821,7 +860,7 @@ export async function recordCollectionUpdateOnAssets<K extends keyof AssetUpdate
 }
 
 export async function getCollectionHistory(
-  entityType: string,
+  entityType: HistoryEntityType,
   entityId: number
 ): Promise<CollectionHistory> {
   const rows = await prisma.history.findMany({

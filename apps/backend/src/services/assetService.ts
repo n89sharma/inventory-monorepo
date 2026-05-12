@@ -1,4 +1,4 @@
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
 import {
   getAssets as getAssetsQuery,
   getAssetAccessories as getAssetAccessoriesQuery,
@@ -27,10 +27,31 @@ export async function getAssets(
   )
 }
 
-export async function getAssetDetail(barcode: string): Promise<AssetDetails> {
+export async function getAssetDetail(
+  barcode: string,
+  role: AppRole | null
+): Promise<AssetDetails> {
   const assets = await prisma.$queryRawTyped(getAssetDetailsQuery(barcode))
   if (!assets || assets.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
-  return mapAssetDetail(assets[0])
+  return redactCost(mapAssetDetail(assets[0]), role)
+}
+
+function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
+  const permissions = role ? ROLE_PERMISSIONS[role] : []
+  const canViewSale = permissions.includes('view_sale_price')
+  const canViewPurchase = permissions.includes('view_purchase_price')
+  return {
+    ...detail,
+    cost: {
+      purchase_cost: canViewPurchase ? detail.cost.purchase_cost : null,
+      transport_cost: canViewPurchase ? detail.cost.transport_cost : null,
+      processing_cost: canViewPurchase ? detail.cost.processing_cost : null,
+      other_cost: canViewPurchase ? detail.cost.other_cost : null,
+      parts_cost: canViewPurchase ? detail.cost.parts_cost : null,
+      total_cost: canViewPurchase ? detail.cost.total_cost : null,
+      sale_price: canViewSale ? detail.cost.sale_price : null
+    }
+  }
 }
 
 export async function getAccessories(barcode: string): Promise<string[]> {
@@ -154,9 +175,15 @@ function mapInvoice(r: getAssetDetailsQuery.Result) {
   }
 }
 
-export async function exportAssets(barcodes: string[]): Promise<string> {
+export async function exportAssets(
+  barcodes: string[],
+  role: AppRole | null
+): Promise<string> {
   const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
-  const details = results.map(r => mapAssetDetail(r as unknown as getAssetDetailsQuery.Result))
+  const details = results.map(r => redactCost(
+    mapAssetDetail(r as unknown as getAssetDetailsQuery.Result),
+    role
+  ))
   return generateCsv(details)
 }
 
@@ -480,12 +507,20 @@ export async function updateAssetLocation(
   await recordAssetUpdate(asset.id, { location_id: asset.location_id }, { location_id: data.location_id }, userId)
 }
 
-export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
+export async function getAssetHistory(
+  barcode: string,
+  role: AppRole | null
+): Promise<AssetHistory> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
+  const permissions = role ? ROLE_PERMISSIONS[role] : []
+  const entityTypes: string[] = ['Asset']
+  if (permissions.includes('view_purchase_price')) entityTypes.push('AssetPurchaseCost')
+  if (permissions.includes('view_sale_price')) entityTypes.push('AssetSalePrice')
+
   const rows = await prisma.history.findMany({
-    where: { entity_type: 'Asset', entity_id: asset.id },
+    where: { entity_type: { in: entityTypes }, entity_id: asset.id },
     include: { User: { select: { name: true } } },
     orderBy: { changed_on: 'desc' }
   })

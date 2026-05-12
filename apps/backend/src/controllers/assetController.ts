@@ -62,7 +62,7 @@ export const getAssets = asyncHandler(async (req, res) => {
 
 export const getAssetDetail = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const data = await getAssetDetailSer(barcode)
+  const data = await getAssetDetailSer(barcode, res.locals.dbUserRole)
   res.json(successResponse(data))
 })
 
@@ -98,7 +98,7 @@ export const getAssetTransfers = asyncHandler(async (req, res) => {
 
 export const getAssetHistory = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const data = await getAssetHistorySer(barcode)
+  const data = await getAssetHistorySer(barcode, res.locals.dbUserRole)
   res.json(successResponse(data))
 })
 
@@ -169,7 +169,7 @@ export const ExportAssetsSchema = z.object({
 
 export const exportAssets = asyncHandler(async (req, res) => {
   const { barcodes } = ExportAssetsSchema.parse(req.body)
-  const csv = await exportAssetsSer(barcodes)
+  const csv = await exportAssetsSer(barcodes, res.locals.dbUserRole)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
