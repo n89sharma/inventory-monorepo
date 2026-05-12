@@ -59,7 +59,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={holdDetailKey(holdNumber)}
-        currentCollectionType="hold"
+        currentCollectionType="holds"
         returnTo={`/holds/${holdNumber}`}
       />
       <DataTable

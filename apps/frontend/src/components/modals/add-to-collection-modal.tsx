@@ -1,10 +1,12 @@
-import type { AssetSummary } from 'shared-types'
+import { getGlobalSearchResults } from '@/data/api/search-api'
 import { useDepartureStore } from '@/data/store/departure-store'
 import { useHoldStore } from '@/data/store/hold-store'
 import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useTransferStore } from '@/data/store/transfer-store'
+import { useCan } from '@/hooks/use-can'
 import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
+import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { Button } from '../shadcn/button'
@@ -14,9 +16,9 @@ import { DetailGrid, emptyResults, SearchView, type CollectionResults, type Sele
 function collectionLabel(s: SelectedCollection): string {
   switch (s.kind) {
     case 'departure': return `Departure ${s.data.departure_number}`
-    case 'transfer':  return `Transfer ${s.data.transfer_number}`
-    case 'hold':      return `Hold ${s.data.hold_number}`
-    case 'invoice':   return `Invoice ${s.data.invoice_number}`
+    case 'transfer': return `Transfer ${s.data.transfer_number}`
+    case 'hold': return `Hold ${s.data.hold_number}`
+    case 'invoice': return `Invoice ${s.data.invoice_number}`
   }
 }
 
@@ -24,31 +26,31 @@ function getDetailFields(s: SelectedCollection): { label: string; value: string 
   switch (s.kind) {
     case 'departure':
       return [
-        { label: 'Origin',      value: s.data.origin_code },
+        { label: 'Origin', value: s.data.origin_code },
         { label: 'Destination', value: s.data.destination },
         { label: 'Transporter', value: null },
-        { label: 'Date',        value: formatDate(s.data.created_at) },
+        { label: 'Date', value: formatDate(s.data.created_at) },
       ]
     case 'transfer':
       return [
-        { label: 'Origin',      value: s.data.origin_code },
+        { label: 'Origin', value: s.data.origin_code },
         { label: 'Destination', value: s.data.destination_code },
         { label: 'Transporter', value: null },
-        { label: 'Date',        value: formatDate(s.data.created_at) },
+        { label: 'Date', value: formatDate(s.data.created_at) },
       ]
     case 'hold':
       return [
         { label: 'Created for', value: s.data.created_for },
-        { label: 'Customer',    value: s.data.customer },
-        { label: 'From',        value: null },
-        { label: 'To',          value: null },
+        { label: 'Customer', value: s.data.customer },
+        { label: 'From', value: null },
+        { label: 'To', value: null },
       ]
     case 'invoice':
       return [
         { label: 'Organization', value: s.data.organization },
         { label: 'Invoice type', value: s.data.invoice_type },
-        { label: 'Cleared',      value: null },
-        { label: 'Date',         value: formatDate(s.data.created_at) },
+        { label: 'Cleared', value: null },
+        { label: 'Date', value: formatDate(s.data.created_at) },
       ]
   }
 }
@@ -104,6 +106,11 @@ export function AddToCollectionModal({
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [isConfirming, setIsConfirming] = useState(false)
 
+  const canCreateTransfer = useCan('create_update_transfer')
+  const canCreateDeparture = useCan('create_update_departure')
+  const canCreateHold = useCan('create_update_hold')
+  const canCreateInvoice = useCan('create_update_invoice')
+
   const addAssetsToHold = useHoldStore(s => s.addAssets)
   const getHoldAssets = useHoldStore(s => s.getAssets)
   const addAssetsToDeparture = useDepartureStore(s => s.addAssets)
@@ -118,9 +125,13 @@ export function AddToCollectionModal({
   useEffect(() => {
     if (!query) return
     const t = setTimeout(async () => {
-      const { getGlobalSearchResults } = await import('@/data/api/search-api')
       const res = await getGlobalSearchResults(query)
-      setResults({ departures: res.departures, transfers: res.transfers, holds: res.holds, invoices: res.invoices })
+      setResults({
+        departures: canCreateDeparture ? res.departures : [],
+        transfers: canCreateTransfer ? res.transfers : [],
+        holds: canCreateHold ? res.holds : [],
+        invoices: canCreateInvoice ? res.invoices : []
+      })
       setIsLoading(false)
     }, 150)
     return () => clearTimeout(t)
@@ -143,10 +154,10 @@ export function AddToCollectionModal({
     try {
       let existing: AssetSummary[]
       switch (collection.kind) {
-        case 'hold':      existing = await getHoldAssets(collection.data.hold_number); break
+        case 'hold': existing = await getHoldAssets(collection.data.hold_number); break
         case 'departure': existing = await getDepartureAssets(collection.data.departure_number); break
-        case 'transfer':  existing = await getTransferAssets(collection.data.transfer_number); break
-        case 'invoice':   existing = await getInvoiceAssets(collection.data.invoice_number); break
+        case 'transfer': existing = await getTransferAssets(collection.data.transfer_number); break
+        case 'invoice': existing = await getInvoiceAssets(collection.data.invoice_number); break
       }
       const existingIds = new Set(existing.map(a => a.id))
       setDuplicateCount(selectedAssets.filter(a => existingIds.has(a.id)).length)

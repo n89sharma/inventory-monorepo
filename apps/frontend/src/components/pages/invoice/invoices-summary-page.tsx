@@ -3,8 +3,9 @@ import { CollectionPage } from "@/components/pages/collection-page"
 import { invoiceTableColumns } from "@/components/pages/column-defs/invoice-columns"
 import { Button } from "@/components/shadcn/button"
 import { useInvoiceStore } from "@/data/store/invoice-store"
-import { preloadInvoiceDetail } from "@/hooks/use-invoice-detail"
 import { useAutoSearch } from "@/hooks/use-auto-search"
+import { useCan } from "@/hooks/use-can"
+import { preloadInvoiceDetail } from "@/hooks/use-invoice-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
@@ -25,6 +26,8 @@ export function InvoicesSummaryPage(): React.JSX.Element {
 
   useAutoSearch(hasSearched, onInvoiceSearch, { setFromDate, setToDate })
 
+  const canCreate = useCan('create_update_invoice')
+
   return (
     <CollectionPage
       title="Invoices"
@@ -38,10 +41,11 @@ export function InvoicesSummaryPage(): React.JSX.Element {
           onSearch={onInvoiceSearch}
         />
       }
-      actions={
+      actions={canCreate ? (
         <Button asChild>
           <Link to="/invoices/new"><PlusIcon />Create Invoice</Link>
         </Button>
+      ) : undefined
       }
     />
   )

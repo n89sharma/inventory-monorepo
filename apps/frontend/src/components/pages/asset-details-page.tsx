@@ -14,6 +14,7 @@ import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
+import { useCan } from '@/hooks/use-can'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
 import type { NavigationSection } from '@/ui-types/navigation-context'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
@@ -54,6 +55,9 @@ export const AssetDetailsPage = () => {
   useEffect(() => {
     if (section) setLastPath(section as NavigationSection, pathname)
   }, [assetId])
+
+  const canViewSalePrice = useCan('view_sale_price')
+  const canViewPurchasePrice = useCan('view_purchase_price')
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError.message}</div>
@@ -105,19 +109,25 @@ export const AssetDetailsPage = () => {
             </DataRowContainer>
           </Section>
 
-          <Section>
-            <SectionHeader title="Pricing"></SectionHeader>
-            <DataRowContainer>
-              <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} />
-              <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} />
-              <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} />
-              <DataCurrencyRow label="Other Cost" value={cost.other_cost} />
-              <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} />
-              <DataCurrencyRow label="Total Cost" value={cost.total_cost} />
-              <DataCurrencyRow label="Sale Price" value={cost.sale_price} />
-            </DataRowContainer>
-          </Section>
-
+          {(canViewPurchasePrice || canViewSalePrice) &&
+            <Section>
+              <SectionHeader title="Pricing"></SectionHeader>
+              <DataRowContainer>
+                {
+                  canViewPurchasePrice &&
+                  <>
+                    <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} />
+                    <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} />
+                    <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} />
+                    <DataCurrencyRow label="Other Cost" value={cost.other_cost} />
+                    <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} />
+                    <DataCurrencyRow label="Total Cost" value={cost.total_cost} />
+                  </>
+                }
+                {canViewSalePrice && <DataCurrencyRow label="Sale Price" value={cost.sale_price} />}
+              </DataRowContainer>
+            </Section>
+          }
           <Section>
             <SectionHeader title="Hold"></SectionHeader>
             <OptionalSection condition={!!hold} fallback="No hold on record">

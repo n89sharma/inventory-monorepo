@@ -1,4 +1,5 @@
 import { useAssetDetail } from "@/hooks/use-asset-detail"
+import { useCan } from "@/hooks/use-can"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { assetDetailsToSummary } from "shared-types"
@@ -26,30 +27,35 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
 
   const assetAsSummary = assetDetails ? assetDetailsToSummary(assetDetails) : null
 
+  const canEditPrice = useCan('edit_prices')
+  const canEditSpecs = useCan('edit_tech_specs')
+  const canCreateTransfer = useCan('create_update_transfer')
+  const canCreateDeparture = useCan('create_update_departure')
+  const canCreateHold = useCan('create_update_hold')
+  const canCreateInvoice = useCan('create_update_invoice')
+  const canCreateSomeCollections = canCreateDeparture || canCreateHold || canCreateInvoice || canCreateTransfer
+
   return (
     <div className="flex gap-2">
       <ShareButton />
-      <DropdownMenu>
-        <Button asChild>
-          <DropdownMenuTrigger>
-            <PencilSimpleIcon />Edit
-          </DropdownMenuTrigger>
-        </Button>
-        <DropdownMenuContent>
-          <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setEditSpecsOpen(true)}>Specifications</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>
-            Errors
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setAddPartTransferOpen(true)}>
-            Parts
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>
-            Add to Collection
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {
+        (canCreateSomeCollections || canEditPrice || canEditSpecs) &&
+        <DropdownMenu>
+          <Button asChild>
+            <DropdownMenuTrigger>
+              <PencilSimpleIcon />Edit
+            </DropdownMenuTrigger>
+          </Button>
+          <DropdownMenuContent>
+            {canEditPrice && <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>}
+            {canEditSpecs && <DropdownMenuItem onSelect={() => setEditSpecsOpen(true)}>Specifications</DropdownMenuItem>}
+            {canEditSpecs && <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>Errors</DropdownMenuItem>}
+            {canEditSpecs && <DropdownMenuItem onSelect={() => setAddPartTransferOpen(true)}>Parts</DropdownMenuItem>}
+            {(canEditPrice || canEditSpecs) && canCreateSomeCollections && <DropdownMenuSeparator />}
+            {canCreateSomeCollections && <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>Add to Collection</DropdownMenuItem>}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      }
 
       <EditErrorsModal
         open={editErrorsOpen}

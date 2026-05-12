@@ -1,14 +1,23 @@
 import { useAssetStore } from '@/data/store/asset-store'
+import { useCan } from '@/hooks/use-can'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import type { AssetSummary } from "shared-types"
+import { type AssetSummary, type Permission } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
 import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
+
+const SECTION_EDIT_PERMISSION: Record<string, Permission> = {
+  arrivals:   'create_update_arrival',
+  transfers:  'create_update_transfer',
+  departures: 'create_update_departure',
+  holds:      'create_update_hold',
+  invoices:   'create_update_invoice',
+}
 
 type CollectionEditBarProps = {
   section: string
@@ -21,6 +30,9 @@ export function CollectionEditBar({
   collectionId,
   assets,
 }: CollectionEditBarProps): React.JSX.Element {
+
+  const canEdit   = useCan(SECTION_EDIT_PERMISSION[section])
+  const canDelete = useCan('delete_collection')
 
   const exportAssets = useAssetStore(state => state.exportAssets)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -64,21 +76,25 @@ export function CollectionEditBar({
             : <DownloadSimpleIcon />}
         </Button>
       )}
-      <Button asChild>
-        <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" aria-label="More options">
-            <DotsThreeVerticalIcon aria-hidden="true" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-            <TrashIcon />Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {canEdit && (
+        <Button asChild>
+          <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
+        </Button>
+      )}
+      {canDelete && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" aria-label="More options">
+              <DotsThreeVerticalIcon aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+              <TrashIcon />Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       <DeleteEntityDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}

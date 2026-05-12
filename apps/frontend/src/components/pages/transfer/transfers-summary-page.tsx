@@ -1,8 +1,9 @@
 import { Button } from "@/components/shadcn/button"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useTransferStore } from "@/data/store/transfer-store"
-import { preloadTransferDetail } from "@/hooks/use-transfer-detail"
 import { useAutoSearch } from "@/hooks/use-auto-search"
+import { useCan } from "@/hooks/use-can"
+import { preloadTransferDetail } from "@/hooks/use-transfer-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
@@ -33,6 +34,8 @@ export function TransferSummaryPage(): React.JSX.Element {
   }
 
   useAutoSearch(hasSearched, onTransferSearch, { setFromDate, setToDate, setOrigin, setDestination })
+
+  const canCreate = useCan('create_update_transfer')
 
   return (
     <CollectionPage
@@ -66,10 +69,11 @@ export function TransferSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
+      actions={canCreate ? (
         <Button asChild>
           <Link to="/transfers/new"><PlusIcon />Create Transfer</Link>
         </Button>
+      ) : undefined
       }
     />
   )

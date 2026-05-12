@@ -1,7 +1,8 @@
 import { useHoldStore } from "@/data/store/hold-store"
-import { preloadHoldDetail } from "@/hooks/use-hold-detail"
 import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
+import { useCan } from "@/hooks/use-can"
+import { preloadHoldDetail } from "@/hooks/use-hold-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
@@ -31,6 +32,8 @@ export function HoldSummaryPage(): React.JSX.Element {
   }
 
   useAutoSearch(hasSearched, onHoldSearch, { setFromDate, setToDate, setHoldBy, setHoldFor })
+
+  const canCreate = useCan('create_update_hold')
 
   return (
     <CollectionPage
@@ -66,10 +69,11 @@ export function HoldSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
+      actions={canCreate ? (
         <Button asChild>
           <Link to="/holds/new"><PlusIcon />Create Hold</Link>
         </Button>
+      ) : undefined
       }
     />
   )

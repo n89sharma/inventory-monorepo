@@ -59,7 +59,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={departureDetailKey(departureNumber)}
-        currentCollectionType="departure"
+        currentCollectionType="departures"
         returnTo={`/departures/${departureNumber}`}
       />
       <DataTable

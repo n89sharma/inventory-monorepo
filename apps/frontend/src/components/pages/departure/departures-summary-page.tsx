@@ -1,7 +1,7 @@
 import { useDepartureStore } from "@/data/store/departure-store"
-import { preloadDepartureDetail } from "@/hooks/use-departure-detail"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
+import { preloadDepartureDetail } from "@/hooks/use-departure-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
@@ -12,6 +12,7 @@ import { SelectOptions } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
 import { CollectionPage } from "../collection-page"
 import { departureTableColumns } from "../column-defs/departure-columns"
+import { useCan } from "@/hooks/use-can"
 
 export function DepartureSummaryPage(): React.JSX.Element {
   const departures = useDepartureStore(state => state.departures)
@@ -31,6 +32,8 @@ export function DepartureSummaryPage(): React.JSX.Element {
   }
 
   useAutoSearch(hasSearched, onDepartureSearch, { setFromDate, setToDate, setOrigin })
+
+  const canCreate = useCan('create_update_departure')
 
   return (
     <CollectionPage
@@ -55,11 +58,12 @@ export function DepartureSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
+
+      actions={canCreate ? (
         <Button asChild>
           <Link to="/departures/new"><PlusIcon />Create Departure</Link>
         </Button>
-      }
+      ) : undefined}
     />
   )
 }

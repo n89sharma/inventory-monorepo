@@ -59,7 +59,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={invoiceDetailKey(invoiceNumber)}
-        currentCollectionType="invoice"
+        currentCollectionType="invoices"
         returnTo={`/invoices/${invoiceNumber}`}
       />
       <DataTable

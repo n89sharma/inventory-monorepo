@@ -63,11 +63,6 @@ const sidebarItems = [
     title: "Search",
     url: "/search",
     icon: <MagnifyingGlassIcon aria-hidden="true" />
-  },
-  {
-    title: "Reports",
-    url: "/reports",
-    icon: <ChartLineUpIcon aria-hidden="true" />
   }
 ]
 
@@ -82,7 +77,11 @@ export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const lastPaths = useNavigationStore(state => state.lastPaths)
   const clearLastPath = useNavigationStore(state => state.clearLastPath)
+
+  const canManageSettings = useCan('manage_settings')
   const canManageUsers = useCan('manage_users')
+  const canViewReports = useCan('view_reports')
+
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
 
@@ -135,48 +134,59 @@ export function AppSidebar(): React.JSX.Element {
                   </SidebarMenuItem>
                 )
               })}
-              <Collapsible
-                open={settingsOpen}
-                onOpenChange={setSettingsOpen}
-                className="group/collapsible"
-                asChild
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton isActive={isSettingsActive ? true : undefined}>
-                      <GearIcon aria-hidden="true" />
-                      <span>Settings</span>
-                      <CaretDownIcon
-                        className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
-                        aria-hidden="true"
-                      />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {SETTINGS_SUB_ITEMS.map(item => (
-                        <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
-                            <Link to={item.url}>{item.title}</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                      {canManageUsers && (
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={location.pathname === USER_PERMISSIONS_ITEM.url ? true : undefined}
-                          >
-                            <Link to={USER_PERMISSIONS_ITEM.url}>
-                              {USER_PERMISSIONS_ITEM.title}
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      )}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
+              {
+                canViewReports &&
+                <SidebarMenuItem key='Reports'>
+                  <SidebarMenuButton asChild isActive={location.pathname.startsWith('/reports') ? true : undefined}>
+                    <Link to='/reports'><ChartLineUpIcon aria-hidden="true" /><span>Reports</span></Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-              </Collapsible>
+              }
+              {
+                canManageSettings &&
+                <Collapsible
+                  open={settingsOpen}
+                  onOpenChange={setSettingsOpen}
+                  className="group/collapsible"
+                  asChild
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton isActive={isSettingsActive ? true : undefined}>
+                        <GearIcon aria-hidden="true" />
+                        <span>Settings</span>
+                        <CaretDownIcon
+                          className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
+                          aria-hidden="true"
+                        />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {SETTINGS_SUB_ITEMS.map(item => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
+                              <Link to={item.url}>{item.title}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                        {canManageUsers && (
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={location.pathname === USER_PERMISSIONS_ITEM.url ? true : undefined}
+                            >
+                              <Link to={USER_PERMISSIONS_ITEM.url}>
+                                {USER_PERMISSIONS_ITEM.title}
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        )}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              }
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

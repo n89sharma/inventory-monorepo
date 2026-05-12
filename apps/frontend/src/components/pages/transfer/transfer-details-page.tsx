@@ -59,7 +59,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={transferDetailKey(transferNumber)}
-        currentCollectionType="transfer"
+        currentCollectionType="transfers"
         returnTo={`/transfers/${transferNumber}`}
       />
       <DataTable

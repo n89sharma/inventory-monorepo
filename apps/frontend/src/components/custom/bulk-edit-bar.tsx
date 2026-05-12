@@ -1,3 +1,4 @@
+import { useCan } from '@/hooks/use-can'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -16,14 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
 
-type CollectionType = 'transfer' | 'departure' | 'hold' | 'invoice' | 'arrival'
-
-const CREATE_COLLECTION_TYPES = [
-  { type: 'transfer' as CollectionType, label: 'Transfer', route: '/transfers/new' },
-  { type: 'departure' as CollectionType, label: 'Departure', route: '/departures/new' },
-  { type: 'hold' as CollectionType, label: 'Hold', route: '/holds/new' },
-  { type: 'invoice' as CollectionType, label: 'Invoice', route: '/invoices/new' },
-]
+type CollectionType = 'transfers' | 'departures' | 'holds' | 'invoices' | 'arrivals'
 
 type BulkEditBarProps = {
   selectedAssets: AssetSummary[]
@@ -47,6 +41,12 @@ export function BulkEditBar({
   const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
   const [assets, setAssets] = useState<AssetSummary[]>([])
 
+  const canCreateTransfer = useCan('create_update_transfer')
+  const canCreateDeparture = useCan('create_update_departure')
+  const canCreateHold = useCan('create_update_hold')
+  const canCreateInvoice = useCan('create_update_invoice')
+  const canEditPrices = useCan('edit_prices')
+
   const selectedCount = selectedAssets.length
 
   function openAddTo() {
@@ -63,8 +63,6 @@ export function BulkEditBar({
     navigate(route, { state: { preloadedAssets: selectedAssets, returnTo } })
   }
 
-  const newCollectionOptions = CREATE_COLLECTION_TYPES.filter(t => t.type !== currentCollectionType)
-
   return (
     <>
       <div className="flex items-center min-h-9 gap-2 rounded-md border bg-muted/50 px-3 text-sm text-muted-foreground">
@@ -74,28 +72,31 @@ export function BulkEditBar({
             <Button variant="ghost" size="sm" onClick={onClear}>
               Clear
             </Button>
-            <DropdownMenu>
-              <Button asChild variant="secondary">
-                <DropdownMenuTrigger>
-                  <PencilSimpleIcon />Bulk Edit
-                </DropdownMenuTrigger>
-              </Button>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
-                <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Create new collection</DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {newCollectionOptions.map(t => (
-                      <DropdownMenuItem key={t.type} onSelect={() => createNewCollection(t.route)}>
-                        {t.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {(canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice) &&
+              <DropdownMenu>
+                <Button asChild variant="secondary">
+                  <DropdownMenuTrigger>
+                    <PencilSimpleIcon />Bulk Edit
+                  </DropdownMenuTrigger>
+                </Button>
+                <DropdownMenuContent>
+                  {canEditPrices && <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>}
+
+                  <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Create new collection</DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {currentCollectionType !== 'transfers' && canCreateTransfer && <DropdownMenuItem key='transfers' onSelect={() => createNewCollection('/transfers/new')}>Transfer</DropdownMenuItem>}
+                      {currentCollectionType !== 'departures' && canCreateDeparture && <DropdownMenuItem key='departures' onSelect={() => createNewCollection('/departures/new')}>Departure</DropdownMenuItem>}
+                      {currentCollectionType !== 'holds' && canCreateHold && <DropdownMenuItem key='holds' onSelect={() => createNewCollection('/holds/new')}>Hold</DropdownMenuItem>}
+                      {currentCollectionType !== 'invoices' && canCreateInvoice && <DropdownMenuItem key='invoices' onSelect={() => createNewCollection('/invoices/new')}>Invoice</DropdownMenuItem>}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
           </>
         ) : (
           <span>Make a selection for bulk editing</span>

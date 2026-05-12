@@ -4,6 +4,7 @@ import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { ANY_OPTION } from "@/ui-types/select-option-types"
+import { useCan } from "@/hooks/use-can"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
@@ -32,6 +33,8 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
 
   useAutoSearch(hasSearched, onArrivalSearch, { setFromDate, setToDate, setDestination })
 
+  const canCreate = useCan('create_update_arrival')
+
   return (
     <CollectionPage
       title="Arrivals"
@@ -55,11 +58,11 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
           />
         </SearchBar>
       }
-      actions={
+      actions={canCreate ? (
         <Button asChild>
           <Link to="/arrivals/new"><PlusIcon />Create Arrival</Link>
         </Button>
-      }
+      ) : undefined}
     />
   )
 }
