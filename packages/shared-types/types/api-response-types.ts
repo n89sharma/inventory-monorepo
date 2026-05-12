@@ -30,6 +30,54 @@ export function response400<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
+export function response401<T>(summary: string, details?: any): ApiResponse<T> {
+  return {
+    success: false,
+    error: {
+      type: 'API_ERROR',
+      status: 401,
+      summary: summary,
+      details: details
+    }
+  }
+}
+
+export function response403<T>(summary: string, details?: any): ApiResponse<T> {
+  return {
+    success: false,
+    error: {
+      type: 'API_ERROR',
+      status: 403,
+      summary: summary,
+      details: details
+    }
+  }
+}
+
+export function response404<T>(summary: string, details?: any): ApiResponse<T> {
+  return {
+    success: false,
+    error: {
+      type: 'API_ERROR',
+      status: 404,
+      summary: summary,
+      details: details
+    }
+  }
+}
+
+export function response409<T>(summary: string, details?: any): ApiResponse<T> {
+  return {
+    success: false,
+    error: {
+      type: 'API_ERROR',
+      status: 409,
+      summary: summary,
+      details: details
+    }
+  }
+}
+
 export function response500<T>(summary: string, details?: any): ApiResponse<T> {
   return {
     success: false,

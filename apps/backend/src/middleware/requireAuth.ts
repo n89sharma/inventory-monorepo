@@ -1,7 +1,7 @@
 import { getAuth } from '@clerk/express'
 import { NextFunction, Request, Response } from 'express'
 import { LRUCache } from 'lru-cache'
-import { response400 } from 'shared-types'
+import { response401 } from 'shared-types'
 import { prisma } from '../prisma.js'
 
 // clerk_id → internal DB user id; TTL 1 hour, max 500 entries
@@ -11,7 +11,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   const { userId, sessionClaims } = getAuth(req)
 
   if (!userId) {
-    return res.status(401).json(response400('Unauthorized'))
+    return res.status(401).json(response401('Unauthorized'))
   }
 
   res.locals.dbUserRole = sessionClaims?.metadata?.role ?? null
@@ -28,7 +28,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   })
 
   if (!user) {
-    return res.status(401).json(response400('User not found or account is deactivated'))
+    return res.status(401).json(response401('User not found or account is deactivated'))
   }
 
   userIdCache.set(userId, user.id)

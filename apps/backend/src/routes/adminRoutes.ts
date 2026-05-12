@@ -1,14 +1,13 @@
 import express from 'express'
 import { setUserRole, toggleUserActive } from '../controllers/userController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
-import { requireRole } from '../middleware/requireRole.js'
+import { requirePermission } from '../middleware/requirePermission.js'
 
 const router = express.Router()
 
 router.use(requireAuth)
-router.use(requireRole('admin'))
 
-router.put('/users/:userId/role', setUserRole)
-router.patch('/users/:userId', toggleUserActive)
+router.put('/users/:userId/role', requirePermission('assign_roles'), setUserRole)
+router.patch('/users/:userId',    requirePermission('manage_users'), toggleUserActive)
 
 export default router

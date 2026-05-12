@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ZodError } from 'zod'
 import { Prisma } from '../../generated/prisma/client.js'
-import { response400, response500 } from 'shared-types'
+import { response400, response404, response409, response500 } from 'shared-types'
 import { ConflictError, NotFoundError, ValidationError } from './errors.js'
 import { logger } from './logger.js'
 
@@ -24,11 +24,11 @@ export function errorHandler(
     return
   }
   if (err instanceof ConflictError) {
-    res.status(409).json(response400(err.message))
+    res.status(409).json(response409(err.message))
     return
   }
   if (err instanceof NotFoundError) {
-    res.status(404).json(response400(err.message))
+    res.status(404).json(response404(err.message))
     return
   }
   if (err instanceof ValidationError) {
