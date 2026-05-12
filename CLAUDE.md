@@ -61,6 +61,8 @@ This applies even for APIs you think you know — library versions change and Co
 
 **Static values:** Declare magic strings, event names, default values, and any named literals as `const` at the top of the file — never inline. Example: `const DEFAULT_ROLE = 'member'` instead of `role: 'member'` scattered through the file. One place to change, not many.
 
+**Constant maps:** For fixed key→value lookups, use `as const satisfies Type` with **no variable annotation** — the annotation widens the type and erases the literal keys, breaking `keyof typeof MAP`. Example: `const X = { a: 1, b: 2 } as const satisfies Record<string, number>`, then `keyof typeof X` is `'a' | 'b'`.
+
 ---
 
 ## Developer Guide

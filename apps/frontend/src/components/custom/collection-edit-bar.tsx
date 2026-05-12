@@ -11,13 +11,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
-const SECTION_EDIT_PERMISSION: Record<string, Permission> = {
+const SECTION_EDIT_PERMISSION = {
   arrivals: 'create_update_arrival',
   transfers: 'create_update_transfer',
   departures: 'create_update_departure',
   holds: 'create_update_hold',
   invoices: 'create_update_invoice',
-}
+} as const satisfies Record<string, Permission>
 
 type CollectionEditBarProps = {
   section: keyof typeof SECTION_EDIT_PERMISSION
