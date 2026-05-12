@@ -1,6 +1,5 @@
 import { api } from '@/data/api/axios-client'
 import type {
-  ApiResponse,
   AssetDetails,
   AssetError,
   AssetHistory,
@@ -15,87 +14,115 @@ import type {
   ModelSummary,
   PartTransfer,
   Status,
+  UpdateAssetErrors,
   UpdateAssetLocation,
   UpdateAssetPricing,
   UpdateAssetSpecs,
   UpdateError,
   Warehouse
 } from 'shared-types'
-import { AssetSummarySchema } from 'shared-types'
+
+import {
+  AssetDetailsSchema,
+  AssetErrorSchema,
+  AssetHistorySchema,
+  AssetLocationSchema,
+  AssetSummarySchema,
+  AssetTransferSchema,
+  BarcodeSuggestionSchema,
+  BulkUpdateAssetPricingSchema,
+  CommentSchema,
+  CreateCommentSchema,
+  CreatePartTransferSchema,
+  PartTransferSchema,
+  UpdateAssetErrorsSchema,
+  UpdateAssetLocationSchema,
+  UpdateAssetPricingSchema,
+  UpdateAssetSpecsSchema
+} from 'shared-types'
 import { z } from 'zod'
+
+const ExportAssetsBodySchema = z.object({ barcodes: z.array(z.string()).min(1) })
 
 export async function getBarcodeSuggestions(q: string): Promise<BarcodeSuggestion[]> {
   try {
-    const { data } = await api.get<ApiResponse<BarcodeSuggestion[]>>('/assets/suggestions', { params: { q } })
-    return data.success ? data.data : []
+    const { data } = await api.get<BarcodeSuggestion[]>('/assets/suggestions', { params: { q } })
+    return z.array(BarcodeSuggestionSchema).parse(data)
   } catch {
     return []
   }
 }
 
 export async function getAssetDetail(params: { barcode: string }): Promise<AssetDetails> {
-  const { data } = await api.get<{ success: true; data: AssetDetails }>(`/assets/${params.barcode}`)
-  return data.data
+  const { data } = await api.get<AssetDetails>(`/assets/${params.barcode}`)
+  return AssetDetailsSchema.parse(data)
 }
 
 export async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
-  const { data } = await api.get<{ success: true; data: string[] }>(`/assets/${params.barcode}/accessories`)
-  return data.data
+  const { data } = await api.get<string[]>(`/assets/${params.barcode}/accessories`)
+  return z.array(z.string()).parse(data)
 }
 
 export async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
-  const { data } = await api.get<{ success: true; data: AssetError[] }>(`/assets/${params.barcode}/errors`)
-  return data.data
+  const { data } = await api.get<AssetError[]>(`/assets/${params.barcode}/errors`)
+  return z.array(AssetErrorSchema).parse(data)
 }
 
 export async function getAssetComments(params: { barcode: string }): Promise<Comment[]> {
-  const { data } = await api.get<{ success: true; data: Comment[] }>(`/assets/${params.barcode}/comments`)
-  return data.data
+  const { data } = await api.get<Comment[]>(`/assets/${params.barcode}/comments`)
+  return z.array(CommentSchema).parse(data)
 }
 
 export async function getAssetTransfers(params: { barcode: string }): Promise<AssetTransfer[]> {
-  const { data } = await api.get<{ success: true; data: AssetTransfer[] }>(`/assets/${params.barcode}/transfers`)
-  return data.data
+  const { data } = await api.get<AssetTransfer[]>(`/assets/${params.barcode}/transfers`)
+  return z.array(AssetTransferSchema).parse(data)
 }
 
 export async function getAssetPartTransfers(params: { barcode: string }): Promise<PartTransfer[]> {
-  const { data } = await api.get<{ success: true; data: PartTransfer[] }>(`/assets/${params.barcode}/parts`)
-  return data.data
+  const { data } = await api.get<PartTransfer[]>(`/assets/${params.barcode}/parts`)
+  return z.array(PartTransferSchema).parse(data)
 }
 
 export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<void> {
-  await api.put(`/assets/${barcode}/errors`, { errors })
+  const updateAssetErrorsBody = UpdateAssetErrorsSchema.parse({ errors } satisfies UpdateAssetErrors)
+  await api.put(`/assets/${barcode}/errors`, updateAssetErrorsBody)
 }
 
 export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<void> {
-  await api.put(`/assets/${barcode}/pricing`, data)
+  const updateAssetPricingBody = UpdateAssetPricingSchema.parse(data satisfies UpdateAssetPricing)
+  await api.put(`/assets/${barcode}/pricing`, updateAssetPricingBody)
 }
 
 export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<void> {
-  await api.put('/assets/bulk/pricing', { items })
+  const bulkUpdateAssetPricingBody = BulkUpdateAssetPricingSchema.parse({ items } satisfies BulkUpdateAssetPricing)
+  await api.put('/assets/bulk/pricing', bulkUpdateAssetPricingBody)
 }
 
 export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs): Promise<void> {
-  await api.put(`/assets/${barcode}/specs`, data)
+  const updateAssetSpecsBody = UpdateAssetSpecsSchema.parse(data satisfies UpdateAssetSpecs)
+  await api.put(`/assets/${barcode}/specs`, updateAssetSpecsBody)
 }
 
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
-  const { data } = await api.get<{ success: true; data: AssetLocation[] }>(
+  const { data } = await api.get<AssetLocation[]>(
     '/assets/locations', { params: { warehouseId } }
   )
-  return data.data
+  return z.array(AssetLocationSchema).parse(data)
 }
 
 export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<void> {
-  await api.put(`/assets/${barcode}/location`, data)
+  const updateAssetLocationBody = UpdateAssetLocationSchema.parse(data satisfies UpdateAssetLocation)
+  await api.put(`/assets/${barcode}/location`, updateAssetLocationBody)
 }
 
 export async function postComment(barcode: string, data: CreateComment): Promise<void> {
-  await api.post(`/assets/${barcode}/comments`, data)
+  const postCommentBody = CreateCommentSchema.parse(data satisfies CreateComment)
+  await api.post(`/assets/${barcode}/comments`, postCommentBody)
 }
 
 export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<void> {
-  await api.post(`/assets/${recipientBarcode}/parts`, data)
+  const createPartTransferBody = CreatePartTransferSchema.parse(data satisfies CreatePartTransfer)
+  await api.post(`/assets/${recipientBarcode}/parts`, createPartTransferBody)
 }
 
 export type AssetAllDetails = {
@@ -128,7 +155,8 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
 }
 
 export async function exportAssets(barcodes: string[], filename?: string): Promise<void> {
-  const response = await api.post('/assets/export', { barcodes }, { responseType: 'blob' })
+  const exportAssetsBody = ExportAssetsBodySchema.parse({ barcodes } satisfies z.infer<typeof ExportAssetsBodySchema>)
+  const response = await api.post('/assets/export', exportAssetsBody, { responseType: 'blob' })
   const disposition = response.headers['content-disposition'] as string | undefined
   const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
   const blob = new Blob([response.data], { type: 'text/csv' })
@@ -144,8 +172,8 @@ export async function exportAssets(barcodes: string[], filename?: string): Promi
 }
 
 export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
-  const { data } = await api.get<{ success: true; data: AssetHistory }>(`/assets/${barcode}/history`)
-  return data.data
+  const { data } = await api.get<AssetHistory>(`/assets/${barcode}/history`)
+  return AssetHistorySchema.parse(data)
 }
 
 export async function getAssetsForQuery(
@@ -155,7 +183,7 @@ export async function getAssetsForQuery(
   technicalStatuses: Status[],
   warehouses: Warehouse[]): Promise<AssetSummary[]> {
 
-  const { data } = await api.get<{ success: true; data: AssetSummary[] }>(`/assets`, {
+  const { data } = await api.get<AssetSummary[]>(`/assets`, {
     params: {
       model: model.model_name,
       meter: meter ?? undefined,
@@ -164,5 +192,5 @@ export async function getAssetsForQuery(
       warehouseIds: warehouses.map(w => w.id),
     }
   })
-  return z.array(AssetSummarySchema).parse(data.data)
+  return z.array(AssetSummarySchema).parse(data)
 }

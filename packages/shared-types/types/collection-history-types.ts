@@ -1,27 +1,37 @@
-export type CollectionHistoryRecord =
-  | {
-      action_type: 'CREATE'
-      user_name: string
-      changed_on: Date
-      changes: Record<string, unknown>
-    }
-  | {
-      action_type: 'UPDATE'
-      user_name: string
-      changed_on: Date
-      changes: { before: Record<string, unknown>; after: Record<string, unknown> }
-    }
-  | {
-      action_type: 'ASSETS_ADDED'
-      user_name: string
-      changed_on: Date
-      changes: { barcodes: string[] }
-    }
-  | {
-      action_type: 'ASSETS_REMOVED'
-      user_name: string
-      changed_on: Date
-      changes: { barcodes: string[] }
-    }
+import { z } from 'zod'
 
-export type CollectionHistory = CollectionHistoryRecord[]
+const RecordBase = {
+  user_name: z.string(),
+  changed_on: z.coerce.date(),
+}
+
+export const CollectionHistoryRecordSchema = z.discriminatedUnion('action_type', [
+  z.object({
+    action_type: z.literal('CREATE'),
+    ...RecordBase,
+    changes: z.record(z.string(), z.unknown())
+  }),
+  z.object({
+    action_type: z.literal('UPDATE'),
+    ...RecordBase,
+    changes: z.object({
+      before: z.record(z.string(), z.unknown()),
+      after: z.record(z.string(), z.unknown())
+    })
+  }),
+  z.object({
+    action_type: z.literal('ASSETS_ADDED'),
+    ...RecordBase,
+    changes: z.object({ barcodes: z.array(z.string()) })
+  }),
+  z.object({
+    action_type: z.literal('ASSETS_REMOVED'),
+    ...RecordBase,
+    changes: z.object({ barcodes: z.array(z.string()) })
+  })
+])
+
+export const CollectionHistorySchema = z.array(CollectionHistoryRecordSchema)
+
+export type CollectionHistoryRecord = z.infer<typeof CollectionHistoryRecordSchema>
+export type CollectionHistory = z.infer<typeof CollectionHistorySchema>

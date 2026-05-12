@@ -1,20 +1,19 @@
 import { api } from '@/data/api/axios-client'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetSummary, CollectionHistory, TransferDetail, TransferSummary, UpdateTransfer, Warehouse } from 'shared-types'
-import { AssetSummarySchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferSchema } from 'shared-types'
+import type { AssetSummary, CollectionHistory, CreateTransfer, TransferDetail, TransferSummary, UpdateTransfer, Warehouse } from 'shared-types'
+import { AssetSummarySchema, CollectionHistorySchema, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferSchema } from 'shared-types'
 import { z } from 'zod'
 
-interface CreateTransferResponse {
-  transferNumber: string
-}
+const CreateTransferResponseSchema = z.object({ transferNumber: z.string() })
+type CreateTransferResponse = z.infer<typeof CreateTransferResponseSchema>
 
 export async function getTransfers(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
   destination: SelectOption<Warehouse>): Promise<TransferSummary[]> {
-  const { data } = await api.get<{ success: true; data: TransferSummary[] }>(`/transfers`, {
+  const { data } = await api.get<TransferSummary[]>(`/transfers`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
@@ -22,22 +21,22 @@ export async function getTransfers(
       destination: getIdOrNullFromSelection(destination),
     }
   })
-  return z.array(TransferSummarySchema).parse(data.data)
+  return z.array(TransferSummarySchema).parse(data)
 }
 
 export async function getTransferDetail(transferNumber: string): Promise<TransferDetail> {
-  const { data } = await api.get<{ success: true; data: TransferDetail }>(`/transfers/${transferNumber}`)
-  return TransferDetailSchema.parse(data.data)
+  const { data } = await api.get<TransferDetail>(`/transfers/${transferNumber}`)
+  return TransferDetailSchema.parse(data)
 }
 
 export async function getTransferHistory(transferNumber: string): Promise<CollectionHistory> {
-  const { data } = await api.get<{ success: true; data: CollectionHistory }>(`/transfers/${transferNumber}/history`)
-  return data.data
+  const { data } = await api.get<CollectionHistory>(`/transfers/${transferNumber}/history`)
+  return CollectionHistorySchema.parse(data)
 }
 
 export async function getTransferForUpdate(transferNumber: string): Promise<TransferForm> {
-  const { data } = await api.get<{ success: true; data: UpdateTransfer }>(`/transfers/${transferNumber}/edit`)
-  return mapUpdateTransferToTransferForm(UpdateTransferSchema.parse(data.data))
+  const { data } = await api.get<UpdateTransfer>(`/transfers/${transferNumber}/edit`)
+  return mapUpdateTransferToTransferForm(UpdateTransferSchema.parse(data))
 }
 
 export function mapUpdateTransferToTransferForm(transfer: UpdateTransfer): TransferForm {
@@ -52,30 +51,33 @@ export function mapUpdateTransferToTransferForm(transfer: UpdateTransfer): Trans
 }
 
 export async function createTransfer(t: TransferForm): Promise<CreateTransferResponse> {
-  return (await api.post<CreateTransferResponse>('/transfers', {
-    origin: getSelectedOrNull(t.origin),
-    destination: getSelectedOrNull(t.destination),
-    transporter: t.transporter,
+  const createTransferBody = CreateTransferSchema.parse({
+    origin: getSelectedOrNull(t.origin)!,
+    destination: getSelectedOrNull(t.destination)!,
+    transporter: t.transporter!,
     comment: t.comment,
-    assets: t.assets
-  })).data
+    assets: t.assets as CreateTransfer['assets']
+  } satisfies CreateTransfer)
+  const { data } = await api.post<CreateTransferResponse>('/transfers', createTransferBody)
+  return CreateTransferResponseSchema.parse(data)
 }
 
 export async function updateTransfer(
   transferNumber: string,
   t: TransferForm
 ): Promise<void> {
-  await api.put(`/transfers/${transferNumber}`, {
-    id: t.id,
-    origin: getSelectedOrNull(t.origin),
-    destination: getSelectedOrNull(t.destination),
-    transporter: t.transporter,
+  const updateTransferBody = SubmitUpdateTransferSchema.parse({
+    id: t.id!,
+    origin: getSelectedOrNull(t.origin)!,
+    destination: getSelectedOrNull(t.destination)!,
+    transporter: t.transporter!,
     comment: t.comment,
     assets: t.assets
-  })
+  } satisfies UpdateTransfer)
+  await api.put(`/transfers/${transferNumber}`, updateTransferBody)
 }
 
 export async function getAssetByBarcode(barcode: string): Promise<AssetSummary> {
-  const { data } = await api.get<{ success: true; data: AssetSummary }>(`/assets/${barcode}/summary`)
-  return AssetSummarySchema.parse(data.data)
+  const { data } = await api.get<AssetSummary>(`/assets/${barcode}/summary`)
+  return AssetSummarySchema.parse(data)
 }

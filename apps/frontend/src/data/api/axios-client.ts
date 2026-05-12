@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from "axios"
 import { toast } from 'sonner'
 import type { ApiResponse } from 'shared-types'
+import { z } from 'zod'
 
 const apiUrl = import.meta.env.VITE_INVENTORY_API_URL
 
@@ -12,8 +13,16 @@ export const api = axios.create({
   }
 })
 
+const EnvelopeSchema = z.object({ success: z.literal(true), data: z.unknown() })
+
 api.interceptors.response.use(
-  response => response,
+  response => {
+    const envelope = EnvelopeSchema.safeParse(response.data)
+    if (envelope.success) {
+      response.data = envelope.data.data
+    }
+    return response
+  },
   (error: unknown) => {
     if (isAxiosError(error)) {
       if (error.response) {

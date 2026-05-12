@@ -166,6 +166,8 @@ Path alias `@/` maps to `src/`.
 
 **Store-first rule:** Components, pages, and modals must never import from `data/api/` directly. All data fetching and mutations go through a store action. The only legitimate exception is custom hooks that wrap `useSWR` (e.g. `use-hold-detail.ts`) — these exist specifically to integrate with SWR caching and live in `hooks/`.
 
+**API layer parsing & typing rule:** Every `*-api.ts` function must (1) construct outgoing bodies with `const <fn>Body = <Schema>.parse({...} satisfies <Type>)` — `satisfies` gives compile-time field enforcement, `.parse()` gives runtime validation; and (2) parse every server response with `<Schema>.parse(data.data)` before returning. No bare `return data.data` and no inline object literals passed directly to `api.post`/`api.put`. If a response type has no schema in `shared-types`, add one (or a local `z.object({...})` for endpoint-specific wrappers like `{ id: number }`).
+
 **Toast position:** Always pass `{ position: 'top-center' }` to every `toast.error()`, `toast.success()`, and `toast.warning()` call — e.g. `toast.error('Something went wrong', { position: 'top-center' })`.
 
 **Form page anatomy** — `FieldSet` + `FieldLegend` + `FieldGroup` wraps all fields; barcode scanner and asset table sit outside the `FieldSet`. Read any existing form page (e.g. `create-hold-page.tsx`) for the exact pattern.

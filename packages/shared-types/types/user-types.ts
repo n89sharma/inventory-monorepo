@@ -19,6 +19,7 @@ export type AppRole = typeof AppRoles[number]
 export const SetRoleSchema = z.object({
   role: z.enum(AppRoles),
 })
+export type SetRole = z.infer<typeof SetRoleSchema>;
 
 export const UserSchema = z.object({
   id: z.int(),
@@ -33,3 +34,4 @@ export type User = z.infer<typeof UserSchema>;
 export const ToggleActiveSchema = z.object({
   is_active: z.boolean(),
 })
+export type ToggleActive = z.infer<typeof ToggleActiveSchema>;

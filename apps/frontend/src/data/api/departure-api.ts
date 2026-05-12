@@ -1,42 +1,41 @@
 import { api } from '@/data/api/axios-client'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { CollectionHistory, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
-import { type DepartureSummary, DepartureDetailSchema, DepartureSummarySchema, UpdateDepartureSchema } from 'shared-types'
+import type { CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
+import { type DepartureSummary, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
-interface CreateDepartureResponse {
-  departureNumber: string
-}
+const CreateDepartureResponseSchema = z.object({ departureNumber: z.string() })
+type CreateDepartureResponse = z.infer<typeof CreateDepartureResponseSchema>
 
 export async function getDepartures(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>
 ): Promise<DepartureSummary[]> {
-  const { data } = await api.get<{ success: true; data: DepartureSummary[] }>(`/departures`, {
+  const { data } = await api.get<DepartureSummary[]>(`/departures`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(origin),
     }
   })
-  return z.array(DepartureSummarySchema).parse(data.data)
+  return z.array(DepartureSummarySchema).parse(data)
 }
 
 export async function getDepartureDetail(departureNumber: string): Promise<DepartureDetail> {
-  const { data } = await api.get<{ success: true; data: DepartureDetail }>(`/departures/${departureNumber}`)
-  return DepartureDetailSchema.parse(data.data)
+  const { data } = await api.get<DepartureDetail>(`/departures/${departureNumber}`)
+  return DepartureDetailSchema.parse(data)
 }
 
 export async function getDepartureHistory(departureNumber: string): Promise<CollectionHistory> {
-  const { data } = await api.get<{ success: true; data: CollectionHistory }>(`/departures/${departureNumber}/history`)
-  return data.data
+  const { data } = await api.get<CollectionHistory>(`/departures/${departureNumber}/history`)
+  return CollectionHistorySchema.parse(data)
 }
 
 export async function getDepartureForUpdate(departureNumber: string): Promise<DepartureForm> {
-  const { data } = await api.get<{ success: true; data: UpdateDeparture }>(`/departures/${departureNumber}/edit`)
-  return mapUpdateDepartureToDepartureForm(UpdateDepartureSchema.parse(data.data))
+  const { data } = await api.get<UpdateDeparture>(`/departures/${departureNumber}/edit`)
+  return mapUpdateDepartureToDepartureForm(UpdateDepartureSchema.parse(data))
 }
 
 export function mapUpdateDepartureToDepartureForm(departure: UpdateDeparture): DepartureForm {
@@ -51,25 +50,28 @@ export function mapUpdateDepartureToDepartureForm(departure: UpdateDeparture): D
 }
 
 export async function createDeparture(d: DepartureForm): Promise<CreateDepartureResponse> {
-  return (await api.post<CreateDepartureResponse>('/departures', {
-    origin: getSelectedOrNull(d.origin),
-    customer: d.customer,
-    transporter: d.transporter,
+  const createDepartureBody = CreateDepartureSchema.parse({
+    origin: getSelectedOrNull(d.origin)!,
+    customer: d.customer!,
+    transporter: d.transporter!,
     comment: d.comment,
-    assets: d.assets
-  })).data
+    assets: d.assets as CreateDeparture['assets']
+  } satisfies CreateDeparture)
+  const { data } = await api.post<CreateDepartureResponse>('/departures', createDepartureBody)
+  return CreateDepartureResponseSchema.parse(data)
 }
 
 export async function updateDeparture(
   departureNumber: string,
   d: DepartureForm
 ): Promise<void> {
-  await api.put(`/departures/${departureNumber}`, {
-    id: d.id,
-    origin: getSelectedOrNull(d.origin),
-    customer: d.customer,
-    transporter: d.transporter,
+  const updateDepartureBody = SubmitUpdateDepartureSchema.parse({
+    id: d.id!,
+    origin: getSelectedOrNull(d.origin)!,
+    customer: d.customer!,
+    transporter: d.transporter!,
     comment: d.comment,
     assets: d.assets
-  })
+  } satisfies UpdateDeparture)
+  await api.put(`/departures/${departureNumber}`, updateDepartureBody)
 }
