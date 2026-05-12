@@ -1,4 +1,5 @@
 import { createDeparture, getDepartureForUpdate, getDepartures, updateDeparture } from '@/data/api/departure-api'
+import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
@@ -56,18 +57,25 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   },
   submitCreateDeparture: async (data) => {
     const result = await createDeparture(data)
+    invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
   submitUpdateDeparture: async (departureNumber, data) => {
+    const previousAssets = useDepartureStore.getState().departureFormData?.assets ?? []
+    const affected = new Set<string>()
+    for (const a of previousAssets) affected.add(a.barcode)
+    for (const a of data.assets) affected.add(a.barcode)
     await updateDeparture(departureNumber, data)
     mutate(departureDetailKey(departureNumber))
+    invalidateAssetDetails([...affected])
   },
   addAssets: async (departureNumber, assets) => {
     const form = await getDepartureForUpdate(departureNumber)
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
     await updateDeparture(departureNumber, { ...form, assets: merged })
     mutate(departureDetailKey(departureNumber))
+    invalidateAssetDetails(assets.map(a => a.barcode))
     return { added, skipped }
   },
   getAssets: async (departureNumber) => {

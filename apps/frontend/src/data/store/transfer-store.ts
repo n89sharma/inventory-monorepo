@@ -1,4 +1,5 @@
 import { createTransfer, getTransferForUpdate, getTransfers as getTransfersApi, updateTransfer } from '@/data/api/transfer-api'
+import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { transferDetailKey } from '@/hooks/use-transfer-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
@@ -55,18 +56,25 @@ export const useTransferStore = create<TransferStore>((set) => ({
   },
   submitCreateTransfer: async (data) => {
     const result = await createTransfer(data)
+    invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
   submitUpdateTransfer: async (transferNumber, data) => {
+    const previousAssets = useTransferStore.getState().transferFormData?.assets ?? []
+    const affected = new Set<string>()
+    for (const a of previousAssets) affected.add(a.barcode)
+    for (const a of data.assets) affected.add(a.barcode)
     await updateTransfer(transferNumber, data)
     mutate(transferDetailKey(transferNumber))
+    invalidateAssetDetails([...affected])
   },
   addAssets: async (transferNumber, assets) => {
     const form = await getTransferForUpdate(transferNumber)
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
     await updateTransfer(transferNumber, { ...form, assets: merged })
     mutate(transferDetailKey(transferNumber))
+    invalidateAssetDetails(assets.map(a => a.barcode))
     return { added, skipped }
   },
   getAssets: async (transferNumber) => {

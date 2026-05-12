@@ -1,4 +1,5 @@
 import { createHold, getHoldForUpdate, getHolds, updateHold } from '@/data/api/hold-api'
+import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { holdDetailKey } from '@/hooks/use-hold-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import type { HoldForm } from '@/ui-types/hold-form-types'
@@ -63,12 +64,18 @@ export const useHoldStore = create<HoldStore>((set) => ({
   },
   submitCreateHold: async (data) => {
     const result = await createHold(data)
+    invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
   submitUpdateHold: async (holdNumber, data) => {
+    const previousAssets = useHoldStore.getState().holdFormData?.assets ?? []
+    const affected = new Set<string>()
+    for (const a of previousAssets) affected.add(a.barcode)
+    for (const a of data.assets) affected.add(a.barcode)
     const result = await updateHold(holdNumber, data)
     mutate(holdDetailKey(holdNumber))
+    invalidateAssetDetails([...affected])
     return result
   },
   addAssets: async (holdNumber, assets) => {
@@ -76,6 +83,7 @@ export const useHoldStore = create<HoldStore>((set) => ({
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
     await updateHold(holdNumber, { ...form, assets: merged })
     mutate(holdDetailKey(holdNumber))
+    invalidateAssetDetails(assets.map(a => a.barcode))
     return { added, skipped }
   },
   getAssets: async (holdNumber) => {
