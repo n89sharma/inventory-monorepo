@@ -16,7 +16,7 @@ import {
   SidebarRail
 } from "@/components/shadcn/sidebar"
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useHasRole } from '@/hooks/use-role'
+import { useCan } from '@/hooks/use-can'
 import { isNavigationSection, type NavigationSection } from "@/ui-types/navigation-context"
 import {
   CaretDownIcon,
@@ -82,7 +82,7 @@ export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const lastPaths = useNavigationStore(state => state.lastPaths)
   const clearLastPath = useNavigationStore(state => state.clearLastPath)
-  const isAdmin = useHasRole('admin')
+  const canManageUsers = useCan('manage_users')
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
 
@@ -161,7 +161,7 @@ export function AppSidebar(): React.JSX.Element {
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
-                      {isAdmin && (
+                      {canManageUsers && (
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild

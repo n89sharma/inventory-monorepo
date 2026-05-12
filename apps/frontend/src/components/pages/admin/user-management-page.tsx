@@ -27,26 +27,17 @@ import {
 } from '@/components/shadcn/select'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useUserStore } from '@/data/store/user-store'
-import { useHasRole } from '@/hooks/use-role'
 import { formatSentenceCase } from '@/lib/formatters'
 import { useUser } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
-import { Navigate } from 'react-router-dom'
 import { AppRoles, type AppRole, type User } from 'shared-types'
 import { toast } from 'sonner'
 import { createUserPermissionTableColumns } from '../column-defs/user-permission-table-columns'
 
 const ASSIGNABLE_ROLES = AppRoles.filter(r => r !== 'admin')
 
-export function AdminDashboardPage() {
-  const isAdmin = useHasRole('admin')
-  if (!isAdmin) return <Navigate to="/" replace />
-
-  return <AdminDashboardContent />
-}
-
-function AdminDashboardContent() {
+export function UserManagementPage() {
   const { user: clerkUser } = useUser()
   const currentUserEmail = clerkUser?.primaryEmailAddress?.emailAddress
 
