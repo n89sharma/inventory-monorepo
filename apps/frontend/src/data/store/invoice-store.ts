@@ -1,4 +1,5 @@
 import { createInvoice, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
+import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
@@ -47,6 +48,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   },
   submitCreateInvoice: async (data) => {
     const result = await createInvoice(data)
+    invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
@@ -55,8 +57,13 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
   },
   submitUpdateInvoice: async (invoiceNumber, data) => {
+    const previousAssets = useInvoiceStore.getState().invoiceEditFormData?.assets ?? []
+    const affected = new Set<string>()
+    for (const a of previousAssets) affected.add(a.barcode)
+    for (const a of data.assets) affected.add(a.barcode)
     const result = await updateInvoice(invoiceNumber, data)
     mutate(invoiceDetailKey(invoiceNumber))
+    invalidateAssetDetails([...affected])
     return result
   },
   addAssets: async (invoiceNumber, assets) => {
@@ -64,6 +71,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     const { merged, added, skipped } = mergeAssets(form.assets, assets)
     await updateInvoice(invoiceNumber, { ...form, assets: merged })
     mutate(invoiceDetailKey(invoiceNumber))
+    invalidateAssetDetails(assets.map(a => a.barcode))
     return { added, skipped }
   },
   getAssets: async (invoiceNumber) => {

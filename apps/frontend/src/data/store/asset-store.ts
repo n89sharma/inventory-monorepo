@@ -11,6 +11,7 @@ import {
   updateAssetSpecs as updateAssetSpecsApi,
 } from '@/data/api/asset-api'
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
+import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { assetDetailKey } from '@/hooks/use-asset-detail'
 import type {
   AssetDetails,
@@ -82,6 +83,6 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)
-    items.forEach(item => mutate(assetDetailKey(item.barcode)))
+    invalidateAssetDetails(items.map(item => item.barcode))
   },
 }))
