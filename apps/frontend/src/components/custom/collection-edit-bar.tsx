@@ -12,15 +12,15 @@ import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
 const SECTION_EDIT_PERMISSION: Record<string, Permission> = {
-  arrivals:   'create_update_arrival',
-  transfers:  'create_update_transfer',
+  arrivals: 'create_update_arrival',
+  transfers: 'create_update_transfer',
   departures: 'create_update_departure',
-  holds:      'create_update_hold',
-  invoices:   'create_update_invoice',
+  holds: 'create_update_hold',
+  invoices: 'create_update_invoice',
 }
 
 type CollectionEditBarProps = {
-  section: string
+  section: keyof typeof SECTION_EDIT_PERMISSION
   collectionId: string
   assets?: AssetSummary[]
 }
@@ -31,7 +31,7 @@ export function CollectionEditBar({
   assets,
 }: CollectionEditBarProps): React.JSX.Element {
 
-  const canEdit   = useCan(SECTION_EDIT_PERMISSION[section])
+  const canEdit = useCan(SECTION_EDIT_PERMISSION[section])
   const canDelete = useCan('delete_collection')
 
   const exportAssets = useAssetStore(state => state.exportAssets)

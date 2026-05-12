@@ -1,8 +1,8 @@
 import { useAssetDetail } from "@/hooks/use-asset-detail"
 import { useCan } from "@/hooks/use-can"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
-import { useState } from "react"
-import { assetDetailsToSummary } from "shared-types"
+import { Fragment, useState } from "react"
+import { assetDetailsToSummary, type Permission } from "shared-types"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
@@ -12,6 +12,20 @@ import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
+
+const COLLECTION_PERMISSIONS: Permission[] = [
+  'create_update_transfer',
+  'create_update_departure',
+  'create_update_hold',
+  'create_update_invoice',
+]
+
+type MenuItem = {
+  key: string
+  label: string
+  onSelect: () => void
+  disabled?: boolean
+}
 
 export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Element {
   const { data } = useAssetDetail(barcode)
@@ -25,22 +39,37 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
-  const assetAsSummary = assetDetails ? assetDetailsToSummary(assetDetails) : null
+  const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails) : null
+  const can = useCan()
 
-  const canEditPrice = useCan('edit_prices')
-  const canEditSpecs = useCan('edit_tech_specs')
-  const canCreateTransfer = useCan('create_update_transfer')
-  const canCreateDeparture = useCan('create_update_departure')
-  const canCreateHold = useCan('create_update_hold')
-  const canCreateInvoice = useCan('create_update_invoice')
-  const canCreateSomeCollections = canCreateDeparture || canCreateHold || canCreateInvoice || canCreateTransfer
-  const canDelete = useCan('delete_asset')
+  const canEditPrice = can('edit_prices')
+  const canEditSpecs = can('edit_tech_specs')
+  const canCreateSomeCollections = COLLECTION_PERMISSIONS.some(p => can(p))
+
+  const editGroup: MenuItem[] = [
+    canEditPrice && { key: 'pricing', label: 'Pricing', onSelect: () => setEditPricingOpen(true) },
+    canEditSpecs && { key: 'specs', label: 'Specifications', onSelect: () => setEditSpecsOpen(true) },
+    canEditSpecs && { key: 'errors', label: 'Errors', onSelect: () => setEditErrorsOpen(true) },
+    canEditSpecs && { key: 'parts', label: 'Parts', onSelect: () => setAddPartTransferOpen(true) },
+  ].filter((i): i is MenuItem => i !== false)
+
+  const collectionGroup: MenuItem[] = canCreateSomeCollections
+    ? [{
+      key: 'add-to-collection',
+      label: 'Add to Collection',
+      onSelect: () => setAddToCollectionOpen(true),
+      disabled: !assetSummaries,
+    }]
+    : []
+
+  const groups = [editGroup, collectionGroup].filter(g => g.length > 0)
+  const showEditMenu = groups.length > 0
+  const canDelete = can('delete_asset')
 
   return (
     <div className="flex gap-2">
       <ShareButton />
-      {
-        (canCreateSomeCollections || canEditPrice || canEditSpecs) &&
+      {showEditMenu &&
         <DropdownMenu>
           <Button asChild>
             <DropdownMenuTrigger>
@@ -48,17 +77,24 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             </DropdownMenuTrigger>
           </Button>
           <DropdownMenuContent>
-            {canEditPrice && <DropdownMenuItem onSelect={() => setEditPricingOpen(true)}>Pricing</DropdownMenuItem>}
-            {canEditSpecs && <DropdownMenuItem onSelect={() => setEditSpecsOpen(true)}>Specifications</DropdownMenuItem>}
-            {canEditSpecs && <DropdownMenuItem onSelect={() => setEditErrorsOpen(true)}>Errors</DropdownMenuItem>}
-            {canEditSpecs && <DropdownMenuItem onSelect={() => setAddPartTransferOpen(true)}>Parts</DropdownMenuItem>}
-            {(canEditPrice || canEditSpecs) && canCreateSomeCollections && <DropdownMenuSeparator />}
-            {canCreateSomeCollections && <DropdownMenuItem disabled={!assetAsSummary} onSelect={() => setAddToCollectionOpen(true)}>Add to Collection</DropdownMenuItem>}
+            {groups.map((group, groupIdx) => (
+              <Fragment key={groupIdx}>
+                {groupIdx > 0 && <DropdownMenuSeparator />}
+                {group.map(item => (
+                  <DropdownMenuItem
+                    key={item.key}
+                    disabled={item.disabled}
+                    onSelect={item.onSelect}
+                  >
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
+              </Fragment>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       }
-      {
-        canDelete &&
+      {canDelete &&
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -102,7 +138,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
       <AddToCollectionModal
         open={addToCollectionOpen}
         onOpenChange={setAddToCollectionOpen}
-        selectedAssets={assetAsSummary ? [assetAsSummary] : []}
+        selectedAssets={assetSummaries ? [assetSummaries] : []}
         onConfirmSuccess={() => { }}
       />
 
