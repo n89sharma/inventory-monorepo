@@ -46,7 +46,7 @@ export function createUserPermissionTableColumns(
         <div className="flex gap-2 justify-center">
           {
             row.original.clerk_id
-              ? <CheckCircleIcon weight="fill" className="text-green-600" />
+              ? <CheckCircleIcon weight="fill" className="text-green-600 size-4.5" />
               : null
           }
         </div>
@@ -64,7 +64,7 @@ export function createUserPermissionTableColumns(
     },
     {
       id: 'actions',
-      size: 200,
+      size: 180,
       header: 'Actions',
       cell: ({ row }) => {
         const user = row.original
@@ -72,7 +72,7 @@ export function createUserPermissionTableColumns(
         return (
           <div className="flex gap-2 justify-center">
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>
-              Edit Role
+              Edit
             </Button>
             {user.is_active
               ? (
