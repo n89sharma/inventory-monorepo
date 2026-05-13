@@ -1,5 +1,5 @@
 import { Button } from '@/components/shadcn/button'
-import { ArrowsDownUpIcon } from '@phosphor-icons/react'
+import { ArrowsDownUpIcon, CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { User } from 'shared-types'
 
@@ -36,7 +36,21 @@ export function createUserPermissionTableColumns(
           Role <ArrowsDownUpIcon />
         </Button>
       ),
-      cell: ({ row }) => row.original.role ?? 'Unassigned',
+      cell: ({ row }) => row.original.role ?? '',
+    },
+    {
+      id: 'clerk_user',
+      size: 100,
+      header: () => <div className="px-3">Clerk user</div>,
+      cell: ({ row }) => (
+        <div className="flex gap-2 justify-center">
+          {
+            row.original.clerk_id
+              ? <CheckCircleIcon weight="fill" className="text-green-600" />
+              : null
+          }
+        </div>
+      ),
     },
     {
       accessorKey: 'is_active',
@@ -51,9 +65,10 @@ export function createUserPermissionTableColumns(
     {
       id: 'actions',
       size: 200,
+      header: 'Actions',
       cell: ({ row }) => {
         const user = row.original
-        if (user.email === currentUserEmail || user.role === 'admin') return null
+        if (user.email === currentUserEmail || user.role === 'admin' || !user.clerk_id) return null
         return (
           <div className="flex gap-2 justify-center">
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>

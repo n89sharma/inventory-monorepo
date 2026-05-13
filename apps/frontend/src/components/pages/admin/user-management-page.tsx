@@ -46,12 +46,16 @@ export function UserManagementPage() {
   const toggleUserActive = useUserStore(state => state.toggleUserActive)
 
   const [showActiveOnly, setShowActiveOnly] = useState(true)
+  const [showClerkOnly, setShowClerkOnly] = useState(true)
   const [editRoleTarget, setEditRoleTarget] = useState<User | null>(null)
   const [selectedRole, setSelectedRole] = useState<AppRole | ''>('')
   const [roleSaving, setRoleSaving] = useState(false)
   const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null)
 
-  const displayedUsers = showActiveOnly ? users.filter(u => u.is_active) : users
+  const displayedUsers = users.filter(u =>
+    (!showActiveOnly || u.is_active) &&
+    (!showClerkOnly || u.clerk_id !== null)
+  )
 
   function handleEditRole(user: User) {
     setSelectedRole('')
@@ -104,15 +108,26 @@ export function UserManagementPage() {
     <div className="flex flex-col gap-4 p-4">
       <h1 className="text-2xl font-semibold">User Management</h1>
 
-      <Toggle
-        size="sm"
-        pressed={showActiveOnly}
-        onPressedChange={setShowActiveOnly}
-        className="w-fit"
-        variant="outline"
-      >
-        Active only
-      </Toggle>
+      <div className="flex gap-2">
+        <Toggle
+          size="sm"
+          pressed={showActiveOnly}
+          onPressedChange={setShowActiveOnly}
+          className="w-fit"
+          variant="outline"
+        >
+          Active only
+        </Toggle>
+        <Toggle
+          size="sm"
+          pressed={showClerkOnly}
+          onPressedChange={setShowClerkOnly}
+          className="w-fit"
+          variant="outline"
+        >
+          Clerk users
+        </Toggle>
+      </div>
 
       <DataTable columns={columns} data={displayedUsers} initialPageSize={25} />
 

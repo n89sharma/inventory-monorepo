@@ -99,6 +99,7 @@ export async function getHoldForUpdate(holdNumber: string): Promise<UpdateHold> 
       email: hold.created_for.email,
       is_active: hold.created_for.is_active,
       role: hold.created_for.role as AppRole | null,
+      clerk_id: hold.created_for.clerk_id,
     },
     customer: {
       id: hold.customer.id,
@@ -199,6 +200,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
       email: hold.created_by.email,
       is_active: hold.created_by.is_active,
       role: hold.created_by.role as AppRole | null,
+      clerk_id: hold.created_by.clerk_id,
     },
     created_for: {
       id: hold.created_for.id,
@@ -206,6 +208,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
       email: hold.created_for.email,
       is_active: hold.created_for.is_active,
       role: hold.created_for.role as AppRole | null,
+      clerk_id: hold.created_for.clerk_id,
     },
     customer: hold.customer,
     notes: hold.notes,
