@@ -1,9 +1,13 @@
 import { clerkMiddleware, getAuth } from '@clerk/express'
 import cors from 'cors'
 import express, { Request, Response } from 'express'
-import helmet from 'helmet'
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit'
+import helmet from 'helmet'
 import morgan from 'morgan'
+import { errorHandler } from './lib/errorHandler.js'
+import { logger } from './lib/logger.js'
+import { requestId } from './middleware/requestId.js'
+import adminRoutes from './routes/adminRoutes.js'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
 import brandRoutes from './routes/brandRoutes.js'
@@ -13,14 +17,10 @@ import invoiceRoutes from './routes/invoiceRoutes.js'
 import modelRoutes from './routes/modelRoutes.js'
 import organizationRoutes from './routes/organizationRoutes.js'
 import constantRoutes from './routes/referenceRoutes.js'
-import transferRoutes from './routes/transferRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
+import transferRoutes from './routes/transferRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-import adminRoutes from './routes/adminRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
-import { errorHandler } from './lib/errorHandler.js'
-import { requestId } from './middleware/requestId.js'
-import { logger } from './lib/logger.js'
 
 const isDev = process.env.NODE_ENV !== 'production'
 if (isDev) { await import('dotenv/config') }
@@ -43,6 +43,7 @@ const corsOptions = {
     'http://localhost:5173',
     'http://localhost:4173',
     'https://shiva-inv.vercel.app',
+    'https://instock.copierexports.com'
   ],
 }
 
@@ -64,10 +65,10 @@ app.use(limiter)
 app.use(express.json({ limit: '500kb' }))
 app.use(requestId)
 
-const red    = (s: string | number) => `\x1b[31m${s}\x1b[0m`
+const red = (s: string | number) => `\x1b[31m${s}\x1b[0m`
 const yellow = (s: string | number) => `\x1b[33m${s}\x1b[0m`
-const cyan   = (s: string | number) => `\x1b[36m${s}\x1b[0m`
-const green  = (s: string | number) => `\x1b[32m${s}\x1b[0m`
+const cyan = (s: string | number) => `\x1b[36m${s}\x1b[0m`
+const green = (s: string | number) => `\x1b[32m${s}\x1b[0m`
 
 function colorForStatus(status: number): string {
   if (status >= 500) return red(status)

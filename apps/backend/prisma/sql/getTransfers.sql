@@ -8,12 +8,15 @@ select
 	wd.street as destination_street,
 	tr."name" as transporter,
   u."name"  as created_by,
-  (select count(*)::int from "AssetTransfer" at where at.transfer_id = t.id) as asset_count
+  ac.asset_count as asset_count
 from "Transfer" t
-join "User" u on u.id = t.created_by_id 
-join "Warehouse" wo on wo.id = t.origin_id  
-join "Warehouse" wd on wd.id = t.destination_id 
-join "Organization" tr on tr.id = t.transporter_id 
+join "User" u on u.id = t.created_by_id
+join "Warehouse" wo on wo.id = t.origin_id
+join "Warehouse" wd on wd.id = t.destination_id
+join "Organization" tr on tr.id = t.transporter_id
+left join lateral (
+  select count(*)::int as asset_count from "AssetTransfer" at where at.transfer_id = t.id
+) ac on true
 where t.created_at between $1 and $2
 and ($3 = 0 or wo.id = $3)
 and ($4 = 0 or wd.id = $4)

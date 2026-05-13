@@ -7,12 +7,15 @@ select
 	t."name" as transporter,
 	d.created_at as created_at,
 	u."name"  as created_by,
-  (select count(*)::int from "Asset" ast where ast.departure_id = d.id) as asset_count
+  ac.asset_count as asset_count
 from "Departure" d
-join "User" u on u.id = d.created_by_id 
+join "User" u on u.id = d.created_by_id
 join "Warehouse" wo on wo.id = d.origin_id
-join "Organization" od on od.id = d.destination_id 
-join "Organization" t on t.id = d.transporter_id 
+join "Organization" od on od.id = d.destination_id
+join "Organization" t on t.id = d.transporter_id
+left join lateral (
+  select count(*)::int as asset_count from "Asset" ast where ast.departure_id = d.id
+) ac on true
 where d.created_at between $1 and $2
 and ($3 = 0 or wo.id = $3)
 order by d.created_at desc
