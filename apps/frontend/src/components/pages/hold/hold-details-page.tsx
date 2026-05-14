@@ -1,7 +1,7 @@
 import { HoldSummaryStrip } from '@/components/custom/cards/hold-summary-strip'
-import { CollectionHistorySection } from '@/components/custom/collection-history-section'
 import { getHoldHistory } from '@/data/api/hold-api'
-import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
+import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold-detail'
@@ -11,7 +11,6 @@ import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
-import { CopyButton } from '../../custom/copy-button'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
@@ -44,16 +43,20 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('holds', holdNumber)} />
-      <div className="flex items-center justify-between">
-        <div className="group flex items-center gap-2">
-          <h1 className="text-2xl font-semibold group flex items-center gap-2">
-            Hold {holdNumber}
-            <CopyButton value={holdNumber} />
-          </h1>
-        </div>
-        <CollectionEditBar section="holds" collectionId={holdNumber} assets={hold.assets} />
-      </div>
+      <StickyDetailsPageHeader
+        breadcrumbSegments={getBreadcrumbForAssetSummary('holds', holdNumber)}
+        title={`Hold ${holdNumber}`}
+        copyValue={holdNumber}
+        actions={
+          <CollectionEditBar
+            section="holds"
+            collectionId={holdNumber}
+            assets={hold.assets}
+            historyCacheKey={`hold-history:${holdNumber}`}
+            historyFetcher={() => getHoldHistory(holdNumber)}
+          />
+        }
+      />
       <HoldSummaryStrip hold={hold} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -70,10 +73,6 @@ export function HoldDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
-      />
-      <CollectionHistorySection
-        cacheKey={`hold-history:${holdNumber}`}
-        fetcher={() => getHoldHistory(holdNumber)}
       />
     </div>
   )

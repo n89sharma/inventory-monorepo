@@ -1,7 +1,7 @@
 import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-strip'
-import { CollectionHistorySection } from '@/components/custom/collection-history-section'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
-import { getBreadcrumbForAssetSummary, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
+import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice-detail'
@@ -11,7 +11,6 @@ import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
-import { CopyButton } from '../../custom/copy-button'
 import { DataTable } from '../../shadcn/data-table'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
@@ -44,16 +43,20 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageBreadcrumb segments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)} />
-      <div className="flex items-center justify-between">
-        <div className="group flex items-center gap-2">
-          <h1 className="text-2xl font-semibold group flex items-center gap-2">
-            Invoice {invoiceNumber}
-            <CopyButton value={invoiceNumber} />
-          </h1>
-        </div>
-        <CollectionEditBar section="invoices" collectionId={invoiceNumber} assets={invoice.assets} />
-      </div>
+      <StickyDetailsPageHeader
+        breadcrumbSegments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)}
+        title={`Invoice ${invoiceNumber}`}
+        copyValue={invoiceNumber}
+        actions={
+          <CollectionEditBar
+            section="invoices"
+            collectionId={invoiceNumber}
+            assets={invoice.assets}
+            historyCacheKey={`invoice-history:${invoiceNumber}`}
+            historyFetcher={() => getInvoiceHistory(invoiceNumber)}
+          />
+        }
+      />
       <InvoiceSummaryStrip invoice={invoice} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -70,10 +73,6 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
-      />
-      <CollectionHistorySection
-        cacheKey={`invoice-history:${invoiceNumber}`}
-        fetcher={() => getInvoiceHistory(invoiceNumber)}
       />
     </div>
   )

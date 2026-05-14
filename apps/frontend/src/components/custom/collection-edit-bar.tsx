@@ -3,11 +3,12 @@ import { useCan } from '@/hooks/use-can'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { type AssetSummary, type Permission } from "shared-types"
+import { type AssetSummary, type CollectionHistory, type Permission } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
 import { Button } from "../shadcn/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
+import { CollectionHistorySheet } from "./collection-history-sheet"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
@@ -23,12 +24,16 @@ type CollectionEditBarProps = {
   section: keyof typeof SECTION_EDIT_PERMISSION
   collectionId: string
   assets?: AssetSummary[]
+  historyCacheKey: string
+  historyFetcher: () => Promise<CollectionHistory>
 }
 
 export function CollectionEditBar({
   section,
   collectionId,
   assets,
+  historyCacheKey,
+  historyFetcher,
 }: CollectionEditBarProps): React.JSX.Element {
 
   const canEdit = useCan(SECTION_EDIT_PERMISSION[section])
@@ -63,6 +68,7 @@ export function CollectionEditBar({
   return (
     <div className="flex gap-2">
       <ShareButton />
+      <CollectionHistorySheet cacheKey={historyCacheKey} fetcher={historyFetcher} />
       {assets !== undefined && (
         <Button
           variant="outline"
