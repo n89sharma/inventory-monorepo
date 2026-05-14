@@ -5,25 +5,35 @@ import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { Button } from '../shadcn/button'
-import { Field, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
 import { Input } from '../shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 import { CommandResultList } from './global-search/command-result-list'
+
+const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
+const SUGGESTION_DEBOUNCE_MS = 150
 
 interface AddAssetByBarcodeProps {
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
   entityName: string
   validateAsset?: (asset: AssetSummary) => string | null
+  disabled?: boolean
+  className?: string
 }
 
-export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateAsset }: AddAssetByBarcodeProps): React.JSX.Element {
+export function AddAssetByBarcode({
+  getAssets,
+  onAddAsset,
+  entityName,
+  validateAsset,
+  disabled,
+  className
+}: AddAssetByBarcodeProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
   const searchGlobal = useSearchStore(state => state.searchGlobal)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [resolvedBarcode, setResolvedBarcode] = useState<string | null>(null)
   const [assetError, setAssetError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
   const [suggestions, setSuggestions] = useState<BarcodeSuggestion[]>([])
@@ -39,17 +49,15 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
       const res = await searchGlobal(searchQuery)
       setSuggestions(res.assets)
       setPopoverOpen(res.assets.length > 0)
-    }, 150)
+    }, SUGGESTION_DEBOUNCE_MS)
     return () => clearTimeout(t)
   }, [searchQuery])
 
-  async function handleAddAsset() {
-    if (!resolvedBarcode) return
-
+  async function addByBarcode(barcode: string) {
     setAssetError(null)
     setIsLookingUp(true)
     try {
-      const asset = await getAssetByBarcode(resolvedBarcode)
+      const asset = await getAssetByBarcode(barcode)
       if (getAssets().some(a => a.barcode === asset.barcode)) {
         setAssetError(`Asset ${asset.barcode} is already in this ${entityName}.`)
         return
@@ -64,9 +72,9 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
       onAddAsset(asset)
       setDisplayValue('')
       setSearchQuery('')
-      setResolvedBarcode(null)
       setSuggestions([])
       setPopoverOpen(false)
+      inputRef.current?.focus()
     } catch {
       setAssetError('Asset not found.')
     } finally {
@@ -75,134 +83,94 @@ export function AddAssetByBarcode({ getAssets, onAddAsset, entityName, validateA
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (resolvedBarcode !== null) {
-      // displayValue holds "BC · SN" which contains characters outside the allowed set.
-      // Sanitizing the edited value would produce garbled output — reset to empty instead.
-      setDisplayValue('')
-      setSearchQuery('')
-      setResolvedBarcode(null)
-      setAssetError(null)
-      return
-    }
-    const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()
+    const val = e.target.value.replace(BARCODE_INPUT_SANITIZER, '').toUpperCase()
     setDisplayValue(val)
     setSearchQuery(val)
     setAssetError(null)
   }
 
   function handleSuggestionSelect(suggestion: BarcodeSuggestion) {
-    setDisplayValue(suggestion.serial_number
-      ? `${suggestion.barcode} · ${suggestion.serial_number}`
-      : suggestion.barcode
-    )
-    setSearchQuery('')
-    setResolvedBarcode(suggestion.barcode)
     setPopoverOpen(false)
-    inputRef.current?.focus()
+    addByBarcode(suggestion.barcode)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
       setPopoverOpen(false)
-      handleAddAsset()
+      if (displayValue) addByBarcode(displayValue)
     } else if (e.key === 'Escape') {
       setPopoverOpen(false)
     }
   }
 
   return (
-    <div className='flex flex-col'>
-      <div className='flex-1 flex flex-col justify-center'>
-        <Field>
-          <FieldLabel>Barcode / Serial</FieldLabel>
-          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-            <PopoverTrigger asChild><div /></PopoverTrigger>
-            <PopoverAnchor asChild>
-              <Input
-                ref={inputRef}
-                placeholder='Scan or enter barcode / serial…'
-                value={displayValue}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
+    <div className={className}>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild><div /></PopoverTrigger>
+        <PopoverAnchor asChild>
+          <div className='relative'>
+            <Input
+              ref={inputRef}
+              placeholder='Scan or enter barcode / serial…'
+              aria-label='Add asset by barcode or serial number'
+              value={displayValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={disabled || isLookingUp}
+              className='pr-8'
+            />
+            {isLookingUp && (
+              <CircleNotchIcon
+                className='absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground'
+                size={16}
               />
-            </PopoverAnchor>
-            <PopoverContent
-              align='start'
-              onOpenAutoFocus={e => e.preventDefault()}
-              onCloseAutoFocus={e => e.preventDefault()}
-              className='w-[--radix-popover-anchor-width] min-w-80 p-1'
-            >
-              <CommandResultList
-                items={suggestions}
-                getKey={s => s.barcode}
-                getValue={s => s.barcode}
-                getColumns={s => [s.barcode, s.serial_number, s.asset_type, s.model]}
-                onSelect={handleSuggestionSelect}
-              />
-            </PopoverContent>
-          </Popover>
-          {assetError && (
-            <p className='text-destructive mt-1'>{assetError}</p>
-          )}
-        </Field>
-      </div>
-      <Button
-        variant='secondary'
-        type='button'
-        onClick={handleAddAsset}
-        disabled={!resolvedBarcode || isLookingUp}
-        className='mt-3'
-      >
-        {isLookingUp
-          ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />Looking up…</>
-          : <>Add Asset</>
-        }
-      </Button>
+            )}
+          </div>
+        </PopoverAnchor>
+        <PopoverContent
+          align='start'
+          onOpenAutoFocus={e => e.preventDefault()}
+          onCloseAutoFocus={e => e.preventDefault()}
+          className='w-[--radix-popover-anchor-width] min-w-80 p-1'
+        >
+          <CommandResultList
+            items={suggestions}
+            getKey={s => s.barcode}
+            getValue={s => s.barcode}
+            getColumns={s => [s.barcode, s.serial_number, s.asset_type, s.model]}
+            onSelect={handleSuggestionSelect}
+          />
+        </PopoverContent>
+      </Popover>
+      {assetError && <p className='text-destructive mt-1'>{assetError}</p>}
     </div>
   )
 }
 
-interface AddAssetsToCreateFormProps {
+interface AddFromHoldButtonProps {
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
-  entityName: string
+  disabled?: boolean
 }
 
-export function AddAssetsToCreateForm({ getAssets, onAddAsset, entityName }: AddAssetsToCreateFormProps): React.JSX.Element {
+export function AddFromHoldButton({
+  getAssets,
+  onAddAsset,
+  disabled
+}: AddFromHoldButtonProps): React.JSX.Element {
   const [isHoldModalOpen, setIsHoldModalOpen] = useState(false)
 
   return (
     <>
-      <FieldSet className='border rounded-md p-4'>
-        <FieldLegend>Add assets by:</FieldLegend>
-        <div className='grid grid-cols-[1fr_auto_1fr] gap-6 items-stretch'>
-
-          <AddAssetByBarcode getAssets={getAssets} onAddAsset={onAddAsset} entityName={entityName} />
-
-          <div className='relative flex flex-col items-center'>
-            <div className='flex-1 w-px bg-border' />
-            <span className='absolute top-1/2 -translate-y-1/2 bg-background px-1.5 text-xs text-muted-foreground'>or</span>
-          </div>
-
-          <div className='flex flex-col'>
-            <div className='flex-1 flex flex-col justify-center gap-1'>
-              <p className='font-medium'>Hold</p>
-              <p className='text-muted-foreground'>Adds all assets from the selected hold</p>
-            </div>
-            <Button
-              variant='secondary'
-              type='button'
-              onClick={() => setIsHoldModalOpen(true)}
-              className='mt-3'
-            >
-              Add from Hold
-            </Button>
-          </div>
-
-        </div>
-      </FieldSet>
-
+      <Button
+        variant='secondary'
+        type='button'
+        onClick={() => setIsHoldModalOpen(true)}
+        disabled={disabled}
+      >
+        Add from Hold
+      </Button>
       <AddFromHoldModal
         open={isHoldModalOpen}
         onOpenChange={setIsHoldModalOpen}

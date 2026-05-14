@@ -1,0 +1,56 @@
+import { CircleNotchIcon } from '@phosphor-icons/react'
+import { Button } from '../shadcn/button'
+import { PageBreadcrumb } from './page-breadcrumb'
+
+interface StickyEditPageHeaderProps {
+  breadcrumbs: { label: string; href?: string }[]
+  pageHeading: string
+  onNavigate: (url: string) => void
+  cancelNavUrl: string
+  isSubmitting: boolean
+  isDirty: boolean
+  submittingText: string
+  saveButtonText: string
+  onSave: () => void
+}
+
+export function StickyEditPageHeader({
+  breadcrumbs,
+  pageHeading,
+  onNavigate,
+  cancelNavUrl,
+  isSubmitting,
+  isDirty,
+  submittingText,
+  saveButtonText,
+  onSave
+}: StickyEditPageHeaderProps): React.JSX.Element {
+  return (
+    <div className='sticky top-[var(--app-header-height)] z-10 bg-background -mt-4 pt-4 pb-3 flex flex-col gap-2 shadow-[0_6px_8px_-6px_rgb(0_0_0_/_0.10)]'>
+      <PageBreadcrumb segments={breadcrumbs} onNavigate={onNavigate} />
+      <div className='flex items-center justify-between gap-4'>
+        <h1 className='text-2xl font-semibold'>{pageHeading}</h1>
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            type='button'
+            disabled={isSubmitting}
+            onClick={() => onNavigate(cancelNavUrl)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type='button'
+            onClick={onSave}
+            disabled={!isDirty || isSubmitting}
+          >
+            {isSubmitting
+              ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />{submittingText}</>
+              : saveButtonText
+            }
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

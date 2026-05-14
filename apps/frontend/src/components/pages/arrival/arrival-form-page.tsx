@@ -5,12 +5,11 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleNotchIcon, PlusIcon } from '@phosphor-icons/react'
+import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
-import { PageBreadcrumb } from '../../custom/page-breadcrumb'
 import { SelectOptions } from '../../custom/select-options'
 import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { AssetModal } from '../../modals/create-asset-modal'
@@ -61,13 +60,6 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
     }
   }
 
-  function getSubmitButtonContent() {
-    if (isSubmitting) {
-      return <><CircleNotchIcon className='animate-spin mr-1' size={16} />{pageConfig.submittingText}</>
-    }
-    return pageConfig.saveButtonText
-  }
-
   function submitArrival() {
     form.handleSubmit(onValidSubmit, onInvalidArrival)()
   }
@@ -77,30 +69,18 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
   }
 
   return (
-    <div className='flex flex-col gap-2 max-w-6xl'>
-      <div className='sticky top-[53px] z-10 bg-background -mt-4 pt-4 pb-3 flex flex-col gap-2 shadow-[0_6px_8px_-6px_rgb(0_0_0_/_0.10)]'>
-        <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
-        <div className='flex items-center justify-between gap-4'>
-          <h1 className='text-2xl font-semibold'>{pageConfig.pageHeading}</h1>
-          <div className='flex gap-2'>
-            <Button
-              variant='outline'
-              type='button'
-              disabled={isSubmitting}
-              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type='button'
-              onClick={submitArrival}
-              disabled={!isDirty || isSubmitting}
-            >
-              {getSubmitButtonContent()}
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className='flex flex-col gap-4 max-w-6xl'>
+      <StickyEditPageHeader
+        breadcrumbs={breadcrumbs}
+        pageHeading={pageConfig.pageHeading}
+        onNavigate={guard.guardedNavigate}
+        cancelNavUrl={pageConfig.cancelNavUrl}
+        isSubmitting={isSubmitting}
+        isDirty={isDirty}
+        submittingText={pageConfig.submittingText}
+        saveButtonText={pageConfig.saveButtonText}
+        onSave={submitArrival}
+      />
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -179,15 +159,6 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
               )}
             />
           </FieldSet>
-
-          <Button
-            variant='secondary'
-            type='button'
-            onClick={() => { setEditingAssetIndex(null); setIsAssetModalOpen(true) }}
-            className='w-fit'
-          >
-            <PlusIcon /> Add Asset
-          </Button>
         </fieldset>
       </form>
       <AssetModal
@@ -199,7 +170,20 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
         editingIndex={editingAssetIndex}
       />
 
-      <DataTable columns={assetTableColumns} data={assets} />
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-lg font-semibold'>Assets</h2>
+          <Button
+            variant='secondary'
+            type='button'
+            disabled={isSubmitting}
+            onClick={() => { setEditingAssetIndex(null); setIsAssetModalOpen(true) }}
+          >
+            Add Asset
+          </Button>
+        </div>
+        <DataTable columns={assetTableColumns} data={assets} />
+      </div>
 
       <UnsavedChangesDialog
         open={guard.isBlocked}

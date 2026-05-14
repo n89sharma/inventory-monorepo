@@ -1,7 +1,6 @@
 import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
-import { PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
-import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
@@ -10,7 +9,6 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceEditFormSchema, type InvoiceEditForm } from '@/ui-types/invoice-form-types'
 import type { AssetSummary } from 'shared-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -43,13 +41,6 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
-  function getSubmitButtonContent() {
-    if (isSubmitting) {
-      return <><CircleNotchIcon className='animate-spin mr-1' size={16} />{pageConfig.submittingText}</>
-    }
-    return pageConfig.saveButtonText
-  }
-
   function submitInvoice() {
     form.handleSubmit(onValidSubmit, onInvalidInvoice)()
   }
@@ -60,29 +51,17 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <div className='sticky top-[53px] z-10 bg-background -mt-4 pt-4 pb-3 flex flex-col gap-2 shadow-[0_6px_8px_-6px_rgb(0_0_0_/_0.10)]'>
-        <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
-        <div className='flex items-center justify-between gap-4'>
-          <h1 className='text-2xl font-semibold'>{pageConfig.pageHeading}</h1>
-          <div className='flex gap-2'>
-            <Button
-              variant='outline'
-              type='button'
-              disabled={isSubmitting}
-              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type='button'
-              onClick={submitInvoice}
-              disabled={!isDirty || isSubmitting}
-            >
-              {getSubmitButtonContent()}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <StickyEditPageHeader
+        breadcrumbs={breadcrumbs}
+        pageHeading={pageConfig.pageHeading}
+        onNavigate={guard.guardedNavigate}
+        cancelNavUrl={pageConfig.cancelNavUrl}
+        isSubmitting={isSubmitting}
+        isDirty={isDirty}
+        submittingText={pageConfig.submittingText}
+        saveButtonText={pageConfig.saveButtonText}
+        onSave={submitInvoice}
+      />
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -133,17 +112,23 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
               )}
             />
           </FieldSet>
-
-          <AddAssetByBarcode
-            getAssets={() => form.getValues('assets')}
-            onAddAsset={addAsset}
-            entityName='invoice'
-            validateAsset={validateInvoiceAsset}
-          />
         </fieldset>
       </form>
 
-      <DataTable columns={assetTableColumns} data={assets} />
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-lg font-semibold'>Assets</h2>
+        </div>
+        <AddAssetByBarcode
+          getAssets={() => form.getValues('assets')}
+          onAddAsset={addAsset}
+          entityName='invoice'
+          validateAsset={validateInvoiceAsset}
+          disabled={isSubmitting}
+          className='max-w-xl'
+        />
+        <DataTable columns={assetTableColumns} data={assets} />
+      </div>
 
       <UnsavedChangesDialog
         open={guard.isBlocked}
