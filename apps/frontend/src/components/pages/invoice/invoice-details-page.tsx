@@ -69,6 +69,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
+        defaultSort={{ id: 'barcode', desc: true }}
       />
       <CollectionHistorySection
         cacheKey={`invoice-history:${invoiceNumber}`}

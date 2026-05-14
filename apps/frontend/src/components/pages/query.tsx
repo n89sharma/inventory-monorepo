@@ -51,6 +51,7 @@ function QueryResultsTable({
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
+        defaultSort={{ id: 'barcode', desc: true }}
       />
     </div>
   )

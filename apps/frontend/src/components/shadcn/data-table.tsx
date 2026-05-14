@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
   getRowId?: (originalRow: TData, index: number) => string
   initialPageSize?: number
+  defaultSort?: { id: string; desc: boolean }
 }
 
 export function DataTable<TData, TValue>({
@@ -39,9 +40,10 @@ export function DataTable<TData, TValue>({
   onRowSelectionChange: onControlledRowSelectionChange,
   getRowId,
   initialPageSize = 25,
+  defaultSort,
 }: DataTableProps<TData, TValue>) {
 
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
@@ -65,13 +67,7 @@ export function DataTable<TData, TValue>({
       pagination: {
         pageSize: initialPageSize,
         pageIndex: 0
-      },
-      sorting: [
-        {
-          id: 'Date',
-          desc: true
-        }
-      ]
+      }
     }
   })
 

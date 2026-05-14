@@ -69,6 +69,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         getRowId={row => row.barcode}
+        defaultSort={{ id: 'barcode', desc: true }}
       />
       <CollectionHistorySection
         cacheKey={`arrival-history:${arrivalNumber}`}

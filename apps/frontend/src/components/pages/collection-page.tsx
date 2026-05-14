@@ -18,7 +18,12 @@ export function CollectionPage<TData, TValue>({ title, columns, data, searchBar,
         {actions}
       </div>
       {searchBar}
-      <DataTable columns={columns} data={data} onRowMouseEnter={onRowMouseEnter} />
+      <DataTable
+        columns={columns}
+        data={data}
+        onRowMouseEnter={onRowMouseEnter}
+        defaultSort={{ id: 'created_at', desc: true }}
+      />
     </div>
   )
 }

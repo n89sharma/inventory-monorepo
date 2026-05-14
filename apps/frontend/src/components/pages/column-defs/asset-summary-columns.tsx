@@ -2,11 +2,9 @@ import { AvailabilityStatusBadge } from "@/components/custom/availability-status
 import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
 import { TrackingStatusBadge } from "@/components/custom/tracking-status-badge"
 import { CopyButton } from "@/components/custom/copy-button"
-import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSummary } from 'shared-types'
@@ -44,17 +42,7 @@ export function createAssetSummaryColumns(
     },
     {
       accessorKey: "barcode",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Barcode
-            <ArrowsDownUpIcon />
-          </Button>
-        )
-      },
+      header: "Barcode",
       cell: ({ row }) => (
         <div className="group flex items-center justify-center gap-2">
           <Link
