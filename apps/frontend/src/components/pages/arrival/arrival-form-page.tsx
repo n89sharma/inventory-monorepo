@@ -78,8 +78,29 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
-      <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
+      <div className='sticky top-[53px] z-10 bg-background -mt-4 pt-4 pb-3 flex flex-col gap-2 shadow-[0_6px_8px_-6px_rgb(0_0_0_/_0.10)]'>
+        <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
+        <div className='flex items-center justify-between gap-4'>
+          <h1 className='text-2xl font-semibold'>{pageConfig.pageHeading}</h1>
+          <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='button'
+              onClick={submitArrival}
+              disabled={!isDirty || isSubmitting}
+            >
+              {getSubmitButtonContent()}
+            </Button>
+          </div>
+        </div>
+      </div>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -167,24 +188,6 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
           >
             <PlusIcon /> Add Asset
           </Button>
-
-          <div className='flex gap-4'>
-            <Button
-              className='rounded-md'
-              onClick={submitArrival}
-              type='submit'
-            >
-              {getSubmitButtonContent()}
-            </Button>
-            <Button
-              variant='outline'
-              type='button'
-              disabled={isSubmitting}
-              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
-            >
-              Cancel
-            </Button>
-          </div>
         </fieldset>
       </form>
       <AssetModal

@@ -30,7 +30,6 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
   const modalConfig = {
     title: isEditMode ? 'Edit Asset' : 'Create Asset',
     submitLabel: isEditMode ? 'Update Asset' : 'Save Asset',
-    clearLabel: isEditMode ? 'Reset' : 'Clear',
   }
 
   const newAssetForm = useForm<AssetForm>({
@@ -65,14 +64,6 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
       cassettes: null,
       internalFinisher: '',
       coreFunctions: []
-    }
-  }
-
-  function clearOrReset() {
-    if (isEditMode) {
-      newAssetForm.reset(editingAsset!)
-    } else {
-      newAssetForm.reset(getDefaultNewAsset())
     }
   }
 
@@ -198,11 +189,11 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='secondary' onClick={submitAsset} type='button'>
-            {modalConfig.submitLabel}
+          <Button variant='outline' onClick={() => handleOpenChange(false)} type='button'>
+            Cancel
           </Button>
-          <Button variant='outline' onClick={clearOrReset} type='button'>
-            {modalConfig.clearLabel}
+          <Button onClick={submitAsset} type='button'>
+            {modalConfig.submitLabel}
           </Button>
         </DialogFooter>
       </DialogContent>
