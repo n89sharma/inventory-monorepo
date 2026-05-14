@@ -18,9 +18,26 @@ interface BreadcrumbSegment {
 
 interface PageBreadcrumbProps {
   segments: BreadcrumbSegment[]
+  onNavigate?: (href: string) => void
 }
 
-export function PageBreadcrumb({ segments }: PageBreadcrumbProps): React.JSX.Element {
+export function PageBreadcrumb({ segments, onNavigate }: PageBreadcrumbProps): React.JSX.Element {
+  function renderLink(href: string, label: string) {
+    if (!onNavigate) {
+      return <BreadcrumbLink asChild><Link to={href}>{label}</Link></BreadcrumbLink>
+    }
+    return (
+      <BreadcrumbLink asChild>
+        <Link
+          to={href}
+          onClick={e => { e.preventDefault(); onNavigate(href) }}
+        >
+          {label}
+        </Link>
+      </BreadcrumbLink>
+    )
+  }
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -32,7 +49,7 @@ export function PageBreadcrumb({ segments }: PageBreadcrumbProps): React.JSX.Ele
               <BreadcrumbItem>
                 {isLast
                   ? <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-                  : <BreadcrumbLink asChild><Link to={seg.href!}>{seg.label}</Link></BreadcrumbLink>
+                  : renderLink(seg.href!, seg.label)
                 }
               </BreadcrumbItem>
             </React.Fragment>

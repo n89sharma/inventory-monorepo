@@ -2,6 +2,7 @@ import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form
 import { ControlledPopoverSearch } from '@/components/custom/controlled-popover-search'
 import { PageBreadcrumb } from '@/components/custom/page-breadcrumb'
 import { SelectOptions } from '@/components/custom/select-options'
+import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
@@ -9,6 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from
 import { Input } from '@/components/shadcn/input'
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceFormSchema, type InvoiceForm } from '@/ui-types/invoice-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
@@ -16,7 +18,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { getFormAssetColumns } from '../column-defs/form-asset-columns'
@@ -41,7 +42,6 @@ function validateInvoiceAsset(asset: AssetSummary): string | null {
 export function InvoiceFormPage(
   { defaultValues, pageConfig, breadcrumbs, onValidSubmit }: InvoiceFormPageProps
 ): React.JSX.Element {
-  const navigate = useNavigate()
   const form = useForm<InvoiceForm>({
     resolver: zodResolver(InvoiceFormSchema),
     defaultValues: defaultValues ?? {
@@ -55,7 +55,8 @@ export function InvoiceFormPage(
   const orgs = useOrgStore(state => state.organizations)
   const invoiceTypes = useReferenceDataStore(state => state.invoiceTypes)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting } = form.formState
+  const { isSubmitting, isDirty } = form.formState
+  const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getSubmitButtonContent() {
@@ -75,7 +76,7 @@ export function InvoiceFormPage(
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <PageBreadcrumb segments={breadcrumbs} />
+      <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
       <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
@@ -170,7 +171,7 @@ export function InvoiceFormPage(
               variant='outline'
               type='button'
               disabled={isSubmitting}
-              onClick={() => navigate(pageConfig.cancelNavUrl)}
+              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
             >
               Cancel
             </Button>
@@ -179,6 +180,12 @@ export function InvoiceFormPage(
       </form>
 
       <DataTable columns={assetTableColumns} data={assets} />
+
+      <UnsavedChangesDialog
+        open={guard.isBlocked}
+        onOpenChange={guard.onOpenChange}
+        onDiscard={guard.onDiscard}
+      />
     </div>
   )
 }

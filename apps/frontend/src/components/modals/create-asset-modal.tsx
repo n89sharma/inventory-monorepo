@@ -3,12 +3,13 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm, type UseFieldArrayAppend, type UseFieldArrayUpdate } from 'react-hook-form'
 import type { CoreFunction, ModelSummary } from 'shared-types'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
 import { SelectOptions } from '../custom/select-options'
+import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
@@ -36,6 +37,8 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
     resolver: zodResolver(AssetFormSchema),
     defaultValues: getDefaultNewAsset()
   })
+  const isDirty = newAssetForm.formState.isDirty
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
   const technicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const models = useModelStore(state => state.models)
@@ -76,6 +79,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
   function onValidAsset(asset: AssetForm) {
     if (isEditMode) {
       updateAsset(editingIndex!, asset)
+      newAssetForm.reset(asset)
     } else {
       addNewAsset(asset)
       newAssetForm.reset(getDefaultNewAsset())
@@ -87,8 +91,21 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
     newAssetForm.handleSubmit(onValidAsset)()
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && isDirty) {
+      setConfirmCloseOpen(true)
+      return
+    }
+    onOpenChange(nextOpen)
+  }
+
+  function discardAndClose() {
+    setConfirmCloseOpen(false)
+    onOpenChange(false)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='sm:max-w-2xl overflow-y-auto max-h-[90vh]'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
@@ -189,6 +206,11 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
           </Button>
         </DialogFooter>
       </DialogContent>
+      <UnsavedChangesDialog
+        open={confirmCloseOpen}
+        onOpenChange={setConfirmCloseOpen}
+        onDiscard={discardAndClose}
+      />
     </Dialog>
   )
 }

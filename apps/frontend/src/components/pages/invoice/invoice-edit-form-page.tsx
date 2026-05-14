@@ -1,9 +1,11 @@
 import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
 import { PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
+import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceEditFormSchema, type InvoiceEditForm } from '@/ui-types/invoice-form-types'
 import type { AssetSummary } from 'shared-types'
@@ -11,7 +13,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
@@ -33,13 +34,13 @@ function validateInvoiceAsset(asset: AssetSummary): string | null {
 }
 
 export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: InvoiceEditFormPageProps): React.JSX.Element {
-  const navigate = useNavigate()
   const form = useForm<InvoiceEditForm>({
     resolver: zodResolver(InvoiceEditFormSchema),
     defaultValues
   })
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting } = form.formState
+  const { isSubmitting, isDirty } = form.formState
+  const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
   function getSubmitButtonContent() {
@@ -59,7 +60,7 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <PageBreadcrumb segments={breadcrumbs} />
+      <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
       <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
@@ -127,7 +128,7 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
               variant='outline'
               type='button'
               disabled={isSubmitting}
-              onClick={() => navigate(pageConfig.cancelNavUrl)}
+              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
             >
               Cancel
             </Button>
@@ -136,6 +137,12 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
       </form>
 
       <DataTable columns={assetTableColumns} data={assets} />
+
+      <UnsavedChangesDialog
+        open={guard.isBlocked}
+        onOpenChange={guard.onOpenChange}
+        onDiscard={guard.onDiscard}
+      />
     </div>
   )
 }

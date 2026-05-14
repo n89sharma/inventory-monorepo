@@ -1,5 +1,6 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
@@ -7,11 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon, PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
 import { PageBreadcrumb } from '../../custom/page-breadcrumb'
 import { SelectOptions } from '../../custom/select-options'
+import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { AssetModal } from '../../modals/create-asset-modal'
 import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
@@ -32,7 +33,6 @@ interface ArrivalFormPageProps {
 }
 
 export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: ArrivalFormPageProps): React.JSX.Element {
-  const navigate = useNavigate()
   const form = useForm<ArrivalForm>({
     resolver: zodResolver(ArrivalFormSchema),
     defaultValues: defaultValues ?? getDefaultArrival()
@@ -41,7 +41,8 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset, update: updateAsset } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting } = form.formState
+  const { isSubmitting, isDirty } = form.formState
+  const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetIndex, setEditingAssetIndex] = useState<number | null>(null)
   const assetTableColumns = useMemo(() => getNewAssetTableColumns({
@@ -77,7 +78,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <PageBreadcrumb segments={breadcrumbs} />
+      <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
       <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
@@ -179,7 +180,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
               variant='outline'
               type='button'
               disabled={isSubmitting}
-              onClick={() => navigate(pageConfig.cancelNavUrl)}
+              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
             >
               Cancel
             </Button>
@@ -197,6 +198,11 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
 
       <DataTable columns={assetTableColumns} data={assets} />
 
+      <UnsavedChangesDialog
+        open={guard.isBlocked}
+        onOpenChange={guard.onOpenChange}
+        onDiscard={guard.onDiscard}
+      />
     </div>
   )
 }

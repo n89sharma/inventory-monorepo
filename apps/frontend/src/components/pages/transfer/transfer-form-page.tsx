@@ -1,5 +1,6 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { TransferFormSchema, type TransferForm } from '@/ui-types/transfer-form-types'
@@ -7,12 +8,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { AddAssetsToCreateForm } from '../../custom/add-assets-to-create-form'
 import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
 import { PageBreadcrumb } from '../../custom/page-breadcrumb'
 import { SelectOptions } from '../../custom/select-options'
+import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
@@ -32,7 +33,6 @@ interface TransferFormPageProps {
 }
 
 export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: TransferFormPageProps): React.JSX.Element {
-  const navigate = useNavigate()
   const form = useForm<TransferForm>({
     resolver: zodResolver(TransferFormSchema),
     defaultValues: defaultValues ?? getDefaultTransfer()
@@ -41,7 +41,8 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting } = form.formState
+  const { isSubmitting, isDirty } = form.formState
+  const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
 
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
@@ -72,7 +73,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
 
   return (
     <div className='flex flex-col gap-2 max-w-6xl'>
-      <PageBreadcrumb segments={breadcrumbs} />
+      <PageBreadcrumb segments={breadcrumbs} onNavigate={guard.guardedNavigate} />
       <h1 className='text-2xl font-semibold p-2'>{pageConfig.pageHeading}</h1>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
@@ -171,7 +172,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
               variant='outline'
               type='button'
               disabled={isSubmitting}
-              onClick={() => navigate(pageConfig.cancelNavUrl)}
+              onClick={() => guard.guardedNavigate(pageConfig.cancelNavUrl)}
             >
               Cancel
             </Button>
@@ -180,6 +181,12 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
       </form>
 
       <DataTable columns={assetTableColumns} data={assets} />
+
+      <UnsavedChangesDialog
+        open={guard.isBlocked}
+        onOpenChange={guard.onOpenChange}
+        onDiscard={guard.onDiscard}
+      />
     </div>
   )
 }

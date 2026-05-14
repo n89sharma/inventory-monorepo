@@ -79,7 +79,7 @@ export function BulkEditBar({
                     <PencilSimpleIcon />Bulk Edit
                   </DropdownMenuTrigger>
                 </Button>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="w-max">
                   {canEditPrices && <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>}
 
                   <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
