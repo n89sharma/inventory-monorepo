@@ -1,6 +1,7 @@
 import { DepartureSummaryStrip } from '@/components/custom/cards/departure-summary-strip'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -42,7 +43,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const selectedAssets = departure.assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary('departures', departureNumber)}
         title={`Departure ${departureNumber}`}
@@ -57,6 +58,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
           />
         }
       />
+      <PageContent className="flex flex-col gap-4">
       <DepartureSummaryStrip departure={departure} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -74,6 +76,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

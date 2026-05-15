@@ -1,3 +1,4 @@
+import { PageContent } from "@/components/layout/page-content"
 import { DataTable } from "@/components/shadcn/data-table"
 import type { ColumnDef } from "@tanstack/react-table"
 
@@ -12,7 +13,7 @@ interface CollectionPageProps<TData, TValue> {
 
 export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions, onRowMouseEnter }: CollectionPageProps<TData, TValue>) {
   return (
-    <div className="flex flex-col gap-2">
+    <PageContent className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold p-2">{title}</h1>
         {actions}
@@ -24,6 +25,6 @@ export function CollectionPage<TData, TValue>({ title, columns, data, searchBar,
         onRowMouseEnter={onRowMouseEnter}
         defaultSort={{ id: 'created_at', desc: true }}
       />
-    </div>
+    </PageContent>
   )
 }

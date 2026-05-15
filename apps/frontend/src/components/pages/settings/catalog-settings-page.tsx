@@ -1,3 +1,4 @@
+import { PageContent } from '@/components/layout/page-content'
 import { CreateBrandModal } from '@/components/modals/create-brand-modal'
 import { CreateModelModal } from '@/components/modals/create-model-modal'
 import { Button } from '@/components/shadcn/button'
@@ -9,7 +10,7 @@ export function CatalogSettingsPage(): React.JSX.Element {
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
 
   return (
-    <div className='flex flex-col gap-2 max-w-6xl'>
+    <PageContent className='flex flex-col gap-2'>
       <h1 className='text-2xl font-semibold p-2'>Catalog</h1>
       <Button variant='secondary' onClick={() => setIsBrandModalOpen(true)} className='w-fit'>
         <PlusIcon /> Add Brand
@@ -19,6 +20,6 @@ export function CatalogSettingsPage(): React.JSX.Element {
       </Button>
       <CreateBrandModal open={isBrandModalOpen} onOpenChange={setIsBrandModalOpen} />
       <CreateModelModal open={isModelModalOpen} onOpenChange={setIsModelModalOpen} />
-    </div>
+    </PageContent>
   )
 }

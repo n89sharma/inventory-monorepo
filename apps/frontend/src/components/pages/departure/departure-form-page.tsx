@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to-create-form'
 import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
 import { SelectOptions } from '../../custom/select-options'
+import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { DataTable } from '../../shadcn/data-table'
@@ -63,7 +64,7 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
   }
 
   return (
-    <div className='flex flex-col gap-2 max-w-6xl'>
+    <>
       <StickyEditPageHeader
         breadcrumbs={breadcrumbs}
         pageHeading={pageConfig.pageHeading}
@@ -75,6 +76,7 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitDeparture}
       />
+      <PageContent className='flex flex-col gap-2'>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -177,6 +179,7 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
         onOpenChange={guard.onOpenChange}
         onDiscard={guard.onDiscard}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

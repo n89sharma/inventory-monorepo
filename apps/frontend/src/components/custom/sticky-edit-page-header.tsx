@@ -26,29 +26,31 @@ export function StickyEditPageHeader({
   onSave
 }: StickyEditPageHeaderProps): React.JSX.Element {
   return (
-    <div className='sticky top-[var(--app-header-height)] z-10 bg-background -mt-4 pt-4 pb-3 flex flex-col gap-2 shadow-[0_6px_8px_-6px_rgb(0_0_0_/_0.10)]'>
-      <PageBreadcrumb segments={breadcrumbs} onNavigate={onNavigate} />
-      <div className='flex items-center justify-between gap-4'>
-        <h1 className='text-2xl font-semibold'>{pageHeading}</h1>
-        <div className='flex gap-2'>
-          <Button
-            variant='outline'
-            type='button'
-            disabled={isSubmitting}
-            onClick={() => onNavigate(cancelNavUrl)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type='button'
-            onClick={onSave}
-            disabled={!isDirty || isSubmitting}
-          >
-            {isSubmitting
-              ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />{submittingText}</>
-              : saveButtonText
-            }
-          </Button>
+    <div className='sticky top-[var(--app-header-height)] z-10 bg-background border-b'>
+      <div className='max-w-5xl mx-auto w-full px-4 pt-4 pb-3 flex flex-col gap-2'>
+        <PageBreadcrumb segments={breadcrumbs} onNavigate={onNavigate} />
+        <div className='flex items-center justify-between gap-4'>
+          <h1 className='text-2xl font-semibold'>{pageHeading}</h1>
+          <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => onNavigate(cancelNavUrl)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='button'
+              onClick={onSave}
+              disabled={!isDirty || isSubmitting}
+            >
+              {isSubmitting
+                ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />{submittingText}</>
+                : saveButtonText
+              }
+            </Button>
+          </div>
         </div>
       </div>
     </div>

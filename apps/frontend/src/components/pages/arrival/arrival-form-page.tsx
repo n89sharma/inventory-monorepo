@@ -5,6 +5,7 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
@@ -69,7 +70,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
   }
 
   return (
-    <div className='flex flex-col gap-4 max-w-6xl'>
+    <>
       <StickyEditPageHeader
         breadcrumbs={breadcrumbs}
         pageHeading={pageConfig.pageHeading}
@@ -81,6 +82,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitArrival}
       />
+      <PageContent className='flex flex-col gap-4'>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -190,6 +192,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
         onOpenChange={guard.onOpenChange}
         onDiscard={guard.onDiscard}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

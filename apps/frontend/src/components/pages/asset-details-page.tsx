@@ -6,7 +6,9 @@ import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { AssetHistoryList } from '@/components/custom/asset-history'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
-import { getBreadcrumForAssetDetails, PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { getBreadcrumForAssetDetails } from '@/components/custom/page-breadcrumb'
+import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { EditLocationModal } from '@/components/modals/edit-location-modal'
 import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
@@ -67,13 +69,20 @@ export const AssetDetailsPage = () => {
   const sortedComments = [...(comments ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
-    <div className="flex flex-col gap-2">
-      <PageBreadcrumb segments={getBreadcrumForAssetDetails(section, collectionId, assetId)} />
+    <>
+      <StickyDetailsPageHeader
+        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, assetId)}
+        titleNode={
+          <AssetTitle
+            brand={assetDetails.brand}
+            model={assetDetails.model}
+            barcode={assetDetails.barcode}
+          />
+        }
+        actions={<AssetEditBar barcode={assetId} />}
+      />
+      <PageContent className="flex flex-col gap-2">
       <DetailsContainer>
-        <div className="flex items-start justify-between">
-          <AssetTitle brand={assetDetails.brand} model={assetDetails.model} barcode={assetDetails.barcode} />
-          <AssetEditBar barcode={assetId} />
-        </div>
         <SectionRow>
           <Section>
             <SectionHeader title="Summary"></SectionHeader>
@@ -248,6 +257,7 @@ export const AssetDetailsPage = () => {
         onOpenChange={setEditLocationOpen}
         assetDetails={assetDetails}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

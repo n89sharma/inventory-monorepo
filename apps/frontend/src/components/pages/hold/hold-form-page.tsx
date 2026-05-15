@@ -2,6 +2,7 @@ import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form
 import { ControlledPopoverSearch } from '@/components/custom/controlled-popover-search'
 import { SelectOptions } from '@/components/custom/select-options'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
@@ -63,7 +64,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
   }
 
   return (
-    <div className='flex flex-col gap-2 max-w-6xl'>
+    <>
       <StickyEditPageHeader
         breadcrumbs={breadcrumbs}
         pageHeading={pageConfig.pageHeading}
@@ -75,6 +76,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitHold}
       />
+      <PageContent className='flex flex-col gap-2'>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -163,6 +165,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
         onOpenChange={guard.onOpenChange}
         onDiscard={guard.onDiscard}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

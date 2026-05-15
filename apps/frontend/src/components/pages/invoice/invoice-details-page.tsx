@@ -2,6 +2,7 @@ import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-s
 import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice-detail'
@@ -42,7 +43,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const selectedAssets = invoice.assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)}
         title={`Invoice ${invoiceNumber}`}
@@ -57,6 +58,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
           />
         }
       />
+      <PageContent className="flex flex-col gap-4">
       <InvoiceSummaryStrip invoice={invoice} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -74,6 +76,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

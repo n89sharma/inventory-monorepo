@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/shadcn/select'
 import { Toggle } from '@/components/shadcn/toggle'
+import { PageContent } from '@/components/layout/page-content'
 import { useUserStore } from '@/data/store/user-store'
 import { formatSentenceCase } from '@/lib/formatters'
 import { useUser } from '@clerk/react'
@@ -105,7 +106,7 @@ export function UserManagementPage() {
   )
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <PageContent className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">User Management</h1>
 
       <div className="flex gap-2">
@@ -183,6 +184,6 @@ export function UserManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </PageContent>
   )
 }

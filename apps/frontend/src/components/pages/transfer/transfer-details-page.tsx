@@ -2,6 +2,7 @@ import { TransferSummaryStrip } from '@/components/custom/cards/transfer-summary
 import { getTransferHistory } from '@/data/api/transfer-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer-detail'
@@ -42,7 +43,7 @@ export function TransferDetailsPage(): React.JSX.Element {
   const selectedAssets = transfer.assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary('transfers', transferNumber)}
         title={`Transfer ${transferNumber}`}
@@ -57,6 +58,7 @@ export function TransferDetailsPage(): React.JSX.Element {
           />
         }
       />
+      <PageContent className="flex flex-col gap-4">
       <TransferSummaryStrip transfer={transfer} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -74,6 +76,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

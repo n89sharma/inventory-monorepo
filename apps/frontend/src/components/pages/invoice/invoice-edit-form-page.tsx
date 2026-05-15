@@ -1,5 +1,6 @@
 import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
@@ -50,7 +51,7 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
   }
 
   return (
-    <div className='flex flex-col gap-2 max-w-6xl'>
+    <>
       <StickyEditPageHeader
         breadcrumbs={breadcrumbs}
         pageHeading={pageConfig.pageHeading}
@@ -62,6 +63,7 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitInvoice}
       />
+      <PageContent className='flex flex-col gap-2'>
       <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
         <fieldset disabled={isSubmitting} className='contents'>
           <FieldSet>
@@ -135,6 +137,7 @@ export function InvoiceEditFormPage({ defaultValues, pageConfig, breadcrumbs, on
         onOpenChange={guard.onOpenChange}
         onDiscard={guard.onDiscard}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }

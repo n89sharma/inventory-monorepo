@@ -2,6 +2,7 @@ import { ArrivalSummaryStrip } from '@/components/custom/cards/arrival-summary-s
 import { getArrivalHistory } from '@/data/api/arrival-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { PageContent } from '@/components/layout/page-content'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'
@@ -43,7 +44,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const selectedAssets = arrival.assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary('arrivals', arrivalNumber)}
         title={`Arrival ${arrivalNumber}`}
@@ -58,6 +59,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
           />
         }
       />
+      <PageContent className="flex flex-col gap-4">
       <ArrivalSummaryStrip arrival={arrival} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -74,6 +76,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         getRowId={row => row.barcode}
         defaultSort={{ id: 'barcode', desc: true }}
       />
-    </div>
+      </PageContent>
+    </>
   )
 }
