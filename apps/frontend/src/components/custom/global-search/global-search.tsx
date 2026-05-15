@@ -1,6 +1,6 @@
 import { Input } from '@/components/shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
-import { useSearchStore } from '@/data/store/search-store'
+import { useGlobalSearchStore } from '@/data/store/global-search-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
@@ -15,7 +15,7 @@ const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoice
 type Tab = typeof tabs[number]
 
 export const GlobalSearch = ({ className }: { className?: string }) => {
-  const searchGlobal = useSearchStore(state => state.searchGlobal)
+  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<GlobalSearchResult>(emptyResults)

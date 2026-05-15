@@ -1,6 +1,6 @@
 import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useSearchStore } from '@/data/store/search-store'
+import { useGlobalSearchStore } from '@/data/store/global-search-store'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
@@ -30,7 +30,7 @@ export function AddAssetByBarcode({
   className
 }: AddAssetByBarcodeProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
-  const searchGlobal = useSearchStore(state => state.searchGlobal)
+  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')

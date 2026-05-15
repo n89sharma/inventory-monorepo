@@ -2,7 +2,7 @@ import { PageContent } from "@/components/layout/page-content"
 import { Button } from "@/components/shadcn/button"
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
-import { useQueryStore } from '@/data/store/query-store'
+import { useSearchStore } from '@/data/store/search-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
@@ -59,7 +59,7 @@ function QueryResultsTable({
 }
 
 export function QueryPage(): React.JSX.Element {
-  const searchAssets = useQueryStore(state => state.searchAssets)
+  const searchAssets = useSearchStore(state => state.searchAssets)
   const exportAssets = useAssetStore(state => state.exportAssets)
   const [loading, setLoading] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
@@ -71,18 +71,18 @@ export function QueryPage(): React.JSX.Element {
   const allWarehouses = useReferenceDataStore((state) => state.warehouses)
   const activeWarehouses = allWarehouses.filter(w => w.is_active)
 
-  const assets = useQueryStore(state => state.assets)
-  const model = useQueryStore(state => state.model)
-  const meter = useQueryStore(state => state.meter)
-  const availabilityStatuses = useQueryStore(state => state.availabilityStatuses)
-  const technicalStatuses = useQueryStore(state => state.technicalStatuses)
-  const selectedWarehouses = useQueryStore(state => state.selectedWarehouses)
+  const assets = useSearchStore(state => state.assets)
+  const model = useSearchStore(state => state.model)
+  const meter = useSearchStore(state => state.meter)
+  const availabilityStatuses = useSearchStore(state => state.availabilityStatuses)
+  const technicalStatuses = useSearchStore(state => state.technicalStatuses)
+  const selectedWarehouses = useSearchStore(state => state.selectedWarehouses)
 
-  const setModel = useQueryStore(state => state.setModel)
-  const setMeter = useQueryStore(state => state.setMeter)
-  const setAvailabilityStatuses = useQueryStore(state => state.setAvailabilityStatuses)
-  const setTechnicalStatuses = useQueryStore(state => state.setTechnicalStatuses)
-  const setSelectedWarehouses = useQueryStore(state => state.setSelectedWarehouses)
+  const setModel = useSearchStore(state => state.setModel)
+  const setMeter = useSearchStore(state => state.setMeter)
+  const setAvailabilityStatuses = useSearchStore(state => state.setAvailabilityStatuses)
+  const setTechnicalStatuses = useSearchStore(state => state.setTechnicalStatuses)
+  const setSelectedWarehouses = useSearchStore(state => state.setSelectedWarehouses)
 
   async function submitQuery() {
     setLoading(true)

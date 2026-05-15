@@ -1,19 +1,19 @@
+import { useGlobalSearchStore } from '@/data/store/global-search-store'
 import { useHoldStore } from '@/data/store/hold-store'
-import { useSearchStore } from '@/data/store/search-store'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import type { AssetSummary, HoldSuggestion } from 'shared-types'
+import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { DetailGrid, emptyResults, SearchView, type CollectionResults } from './collection-search'
 
 function holdDetailFields(h: HoldSuggestion): { label: string; value: string | null }[] {
   return [
-    { label: 'Customer',    value: h.customer },
-    { label: 'Date',        value: formatDate(h.created_at) },
+    { label: 'Customer', value: h.customer },
+    { label: 'Date', value: formatDate(h.created_at) },
     { label: 'Created for', value: h.created_for },
-    { label: 'Created by',  value: h.created_by },
+    { label: 'Created by', value: h.created_by },
   ]
 }
 
@@ -25,7 +25,7 @@ interface AddFromHoldModalProps {
 }
 
 export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: AddFromHoldModalProps) {
-  const searchGlobal = useSearchStore(state => state.searchGlobal)
+  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
   const getHoldAssets = useHoldStore(state => state.getAssets)
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -98,18 +98,18 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: 
 
         {selected !== null
           ? <DetailGrid
-              title={`Hold ${selected.hold_number}`}
-              fields={holdDetailFields(selected)}
-              onClear={handleClearSelection}
-            />
+            title={`Hold ${selected.hold_number}`}
+            fields={holdDetailFields(selected)}
+            onClear={handleClearSelection}
+          />
           : <SearchView
-              label="Hold"
-              query={query}
-              onQueryChange={handleQueryChange}
-              isLoading={isLoading}
-              results={results}
-              onSelect={c => { if (c.kind === 'hold') setSelected(c.data) }}
-            />
+            label="Hold"
+            query={query}
+            onQueryChange={handleQueryChange}
+            isLoading={isLoading}
+            results={results}
+            onSelect={c => { if (c.kind === 'hold') setSelected(c.data) }}
+          />
         }
 
         <DialogFooter>

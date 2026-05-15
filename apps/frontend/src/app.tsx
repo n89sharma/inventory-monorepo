@@ -38,7 +38,7 @@ const UpdateInvoicePage         = lazy(() => import('./components/pages/invoice/
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
-const QueryPage                 = lazy(() => import('./components/pages/search').then(m => ({ default: m.QueryPage })))
+const QueryPage                 = lazy(() => import('./components/pages/search-page').then(m => ({ default: m.QueryPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
 const UserManagementPage        = lazy(() => import('./components/pages/admin/user-management-page').then(m => ({ default: m.UserManagementPage })))
