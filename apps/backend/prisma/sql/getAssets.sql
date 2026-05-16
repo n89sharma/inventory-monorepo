@@ -22,7 +22,7 @@ from "Asset" a
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
 where m."name" ~* $1
-  and ($2 = 0 or tr.id = $2)
+  and (array_length($2::int[], 1) is null or tr.id = any($2::int[]))
   and (array_length($3::int[], 1) is null or av.id = any($3::int[]))
   and (array_length($4::int[], 1) is null or te.id = any($4::int[]))
   and (array_length($5::int[], 1) is null or w.id = any($5::int[]))

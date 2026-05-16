@@ -2,6 +2,7 @@ import type { ModelSummary, Status, Warehouse } from 'shared-types'
 
 const PARAM_MODEL = 'model'
 const PARAM_METER = 'meter'
+const PARAM_TRACK = 'track'
 const PARAM_AVAIL = 'avail'
 const PARAM_TECH = 'tech'
 const PARAM_WH = 'wh'
@@ -9,6 +10,7 @@ const PARAM_WH = 'wh'
 export type SearchFilters = {
   model: ModelSummary | null
   meter: number | null
+  trackingStatuses: Status[]
   availabilityStatuses: Status[]
   technicalStatuses: Status[]
   selectedWarehouses: Warehouse[]
@@ -16,6 +18,7 @@ export type SearchFilters = {
 
 export type SearchReferenceData = {
   models: ModelSummary[]
+  trackingStatuses: Status[]
   availabilityStatuses: Status[]
   technicalStatuses: Status[]
   warehouses: Warehouse[]
@@ -24,6 +27,7 @@ export type SearchReferenceData = {
 export const EMPTY_FILTERS: SearchFilters = {
   model: null,
   meter: null,
+  trackingStatuses: [],
   availabilityStatuses: [],
   technicalStatuses: [],
   selectedWarehouses: [],
@@ -47,6 +51,9 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.model) params.set(PARAM_MODEL, String(filters.model.id))
   if (filters.meter !== null) params.set(PARAM_METER, String(filters.meter))
+  if (filters.trackingStatuses.length > 0) {
+    params.set(PARAM_TRACK, encodeIds(filters.trackingStatuses))
+  }
   if (filters.availabilityStatuses.length > 0) {
     params.set(PARAM_AVAIL, encodeIds(filters.availabilityStatuses))
   }
@@ -72,6 +79,7 @@ export function paramsToFilters(
       ? ref.models.find(m => m.id === Number.parseInt(modelId, 10)) ?? null
       : null,
     meter: meter === null || Number.isNaN(meter) ? null : meter,
+    trackingStatuses: decodeIds(params.get(PARAM_TRACK), ref.trackingStatuses),
     availabilityStatuses: decodeIds(params.get(PARAM_AVAIL), ref.availabilityStatuses),
     technicalStatuses: decodeIds(params.get(PARAM_TECH), ref.technicalStatuses),
     selectedWarehouses: decodeIds(params.get(PARAM_WH), ref.warehouses),

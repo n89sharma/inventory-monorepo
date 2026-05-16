@@ -11,6 +11,7 @@ export function useSearchResults(filters: SearchFilters) {
     ([, f]: [string, SearchFilters]) => getAssetsForQuery(
       f.model!,
       f.meter,
+      f.trackingStatuses,
       f.availabilityStatuses,
       f.technicalStatuses,
       f.selectedWarehouses,

@@ -74,6 +74,7 @@ export function QueryPage(): React.JSX.Element {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const models = useModelStore(state => state.models)
+  const allTrackingStatuses = useReferenceDataStore(state => state.trackingStatuses)
   const allAvailabilityStatuses = useReferenceDataStore(state => state.availabilityStatuses)
   const allTechnicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
@@ -85,11 +86,12 @@ export function QueryPage(): React.JSX.Element {
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
       models,
+      trackingStatuses: allTrackingStatuses,
       availabilityStatuses: allAvailabilityStatuses,
       technicalStatuses: allTechnicalStatuses,
       warehouses: allWarehouses,
     }),
-    [searchParams, models, allAvailabilityStatuses, allTechnicalStatuses, allWarehouses],
+    [searchParams, models, allTrackingStatuses, allAvailabilityStatuses, allTechnicalStatuses, allWarehouses],
   )
 
   const [draft, setDraft] = useState<SearchFilters>(urlFilters)
@@ -137,13 +139,6 @@ export function QueryPage(): React.JSX.Element {
           <h1 className="text-2xl font-semibold">Search</h1>
           <div className="flex gap-2">
             <Button
-              onClick={submitQuery}
-              disabled={searchDisabled}
-              type="button"
-            >
-              Search
-            </Button>
-            <Button
               variant="outline"
               size="icon"
               onClick={handleExport}
@@ -154,12 +149,17 @@ export function QueryPage(): React.JSX.Element {
                 ? <SpinnerGapIcon className="animate-spin" />
                 : <DownloadSimpleIcon />}
             </Button>
+            <Button
+              onClick={submitQuery}
+              disabled={searchDisabled}
+              type="button"
+            >
+              Search
+            </Button>
           </div>
         </div>
-      </StickyPageHeader>
-      <PageContent className="flex flex-col gap-2">
         <form
-          className="flex flex-row gap-2 border rounded-md p-2 items-end"
+          className="flex flex-row flex-wrap gap-2 items-end"
           onSubmit={e => { e.preventDefault(); submitQuery() }}
         >
           <fieldset disabled={exportLoading} className="contents">
@@ -181,6 +181,15 @@ export function QueryPage(): React.JSX.Element {
               options={allAvailabilityStatuses}
               getLabel={s => s.status}
               fieldLabel='Availability'
+              className='w-45'
+            />
+
+            <MultiSelectOptionsInline
+              selection={draft.trackingStatuses}
+              onSelectionChange={s => setDraft({ ...draft, trackingStatuses: s })}
+              options={allTrackingStatuses}
+              getLabel={s => s.status}
+              fieldLabel='Tracking Status'
               className='w-45'
             />
 
@@ -214,6 +223,8 @@ export function QueryPage(): React.JSX.Element {
             />
           </fieldset>
         </form>
+      </StickyPageHeader>
+      <PageContent className="flex flex-col gap-2">
         <div hidden={!isLoading} role="status" aria-live="polite">
           <span>Loading…</span>
         </div>

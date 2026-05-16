@@ -16,14 +16,14 @@ import { prisma } from '../prisma.js'
 
 export async function getAssets(
   model: string,
-  trackingId: number,
+  trackingStatusIds: number[],
   availabilityStatusIds: number[],
   technicalStatusIds: number[],
   warehouseIds: number[],
   meterParam: number
 ): Promise<AssetSummary[]> {
   return prisma.$queryRawTyped(
-    getAssetsQuery(model, trackingId, availabilityStatusIds, technicalStatusIds, warehouseIds, meterParam)
+    getAssetsQuery(model, trackingStatusIds, availabilityStatusIds, technicalStatusIds, warehouseIds, meterParam)
   )
 }
 
