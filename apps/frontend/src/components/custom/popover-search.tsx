@@ -21,25 +21,32 @@ export type PopoverSearchProps<T> = {
   filterInput?: (val: string) => string
 }
 
-export function PopoverSearch<T>({
+type PopoverSearchBodyProps<T> = Omit<PopoverSearchProps<T>, 'fieldLabel' | 'fieldRequired'> & {
+  placeholder: string
+  header: React.ReactNode
+  required: boolean
+}
+
+function PopoverSearchBody<T>({
   selection,
   onSelectionChange,
   onClear,
   options,
   getLabel,
   searchKey,
-  fieldLabel,
-  fieldRequired,
   error,
   className,
-  filterInput }: PopoverSearchProps<T>): React.JSX.Element {
+  filterInput,
+  placeholder,
+  header,
+  required,
+}: PopoverSearchBodyProps<T>): React.JSX.Element {
 
   const [matches, setMatches] = useState<T[]>([])
   const [userInput, setUserInput] = useState(selection ? getLabel(selection) : '')
   const [popoverOpen, setPopoverOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
-
 
   useEffect(() => {
     if (!selection) setUserInput('')
@@ -126,18 +133,15 @@ export function PopoverSearch<T>({
         </PopoverTrigger>
         <PopoverAnchor asChild>
           <Field data-invalid={error}>
-            <FieldLabel>
-              {fieldLabel}
-              {fieldRequired && <span className="text-destructive">*</span>}
-            </FieldLabel>
+            {header}
             <InputGroup>
               <InputGroupInput
                 value={userInput ?? ''}
                 onChange={e => updateSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
                 ref={inputRef}
-                placeholder='Start typing to see suggestions…'
-                required={fieldRequired}
+                placeholder={placeholder}
+                required={required}
                 autoComplete="off"
                 role="combobox"
                 aria-invalid={error}
@@ -185,5 +189,41 @@ export function PopoverSearch<T>({
         </PopoverContent>
       </Popover>
     </div>
+  )
+}
+
+export function PopoverSearch<T>({
+  fieldLabel,
+  fieldRequired,
+  ...rest
+}: PopoverSearchProps<T>): React.JSX.Element {
+  return (
+    <PopoverSearchBody
+      {...rest}
+      placeholder="Start typing to see suggestions…"
+      required={fieldRequired}
+      header={
+        <FieldLabel>
+          {fieldLabel}
+          {fieldRequired && <span className="text-destructive">*</span>}
+        </FieldLabel>
+      }
+    />
+  )
+}
+
+export function PopoverSearchInline<T>({
+  fieldLabel,
+  fieldRequired,
+  ...rest
+}: PopoverSearchProps<T>): React.JSX.Element {
+  const placeholder = fieldRequired ? `${fieldLabel} *` : fieldLabel
+  return (
+    <PopoverSearchBody
+      {...rest}
+      placeholder={placeholder}
+      required={fieldRequired}
+      header={null}
+    />
   )
 }

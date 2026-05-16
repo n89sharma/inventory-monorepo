@@ -1,4 +1,4 @@
-import type { ColumnDef, OnChangeFn, RowSelectionState, SortingState } from "@tanstack/react-table"
+import type { ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
@@ -6,7 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 import {
   Table,
@@ -108,25 +108,12 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows?.length
               ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
+                  <DataRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="cursor-pointer"
-                    onMouseEnter={() => onRowMouseEnter?.(row.original)}
-                    onClick={(e) => {
-                      if (!(e.target as HTMLElement).closest('a, button')) row.toggleSelected()
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        style={{ width: cell.column.getSize() }}
-                        className="whitespace-normal text-center"
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                    row={row}
+                    isSelected={row.getIsSelected()}
+                    onRowMouseEnter={onRowMouseEnter}
+                  />
                 )))
               : (
                 <TableRow role="status" aria-live="polite">
@@ -166,3 +153,36 @@ export function DataTable<TData, TValue>({
     </div>
   )
 }
+
+function DataRowImpl<TData>({
+  row,
+  isSelected,
+  onRowMouseEnter
+}: {
+  row: Row<TData>
+  isSelected: boolean
+  onRowMouseEnter?: (row: TData) => void
+}) {
+  return (
+    <TableRow
+      data-state={isSelected && "selected"}
+      className="cursor-pointer"
+      onMouseEnter={() => onRowMouseEnter?.(row.original)}
+      onClick={(e) => {
+        if (!(e.target as HTMLElement).closest('a, button')) row.toggleSelected()
+      }}
+    >
+      {row.getVisibleCells().map((cell) => (
+        <TableCell
+          key={cell.id}
+          style={{ width: cell.column.getSize() }}
+          className="whitespace-normal text-center"
+        >
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
+  )
+}
+
+const DataRow = memo(DataRowImpl) as typeof DataRowImpl

@@ -1,25 +1,34 @@
+import { StickyPageHeader } from "@/components/custom/sticky-page-header"
 import { PageContent } from "@/components/layout/page-content"
 import { Button } from "@/components/shadcn/button"
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
-import { useSearchStore } from '@/data/store/search-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useSearchResults } from '@/hooks/use-search-results'
+import {
+  filtersToParams,
+  paramsToFilters,
+  type SearchFilters,
+} from '@/lib/search-url-params'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
-import { InputWithClear } from '../custom/input-with-clear'
-import { MultiSelectOptions } from '../custom/multi-select-options'
-import { PopoverSearch } from '../custom/popover-search'
+import { InputWithClearInline } from '../custom/input-with-clear'
+import { MultiSelectOptionsInline } from '../custom/multi-select-options'
+import { PopoverSearchInline } from '../custom/popover-search'
 import { DataTable } from "../shadcn/data-table"
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
 const searchColumns = createAssetSummaryColumns('search')
 const getAssetRowId = (row: AssetSummary) => row.barcode
+const defaultSort = { id: 'barcode', desc: true } as const
+const EMPTY_ASSETS: AssetSummary[] = []
 
-function QueryResultsTable({
+const QueryResultsTable = memo(function QueryResultsTable({
   assets,
   rowSelection,
   onRowSelectionChange,
@@ -52,47 +61,49 @@ function QueryResultsTable({
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
-        defaultSort={{ id: 'barcode', desc: true }}
+        defaultSort={defaultSort}
       />
     </div>
   )
-}
+})
 
 export function QueryPage(): React.JSX.Element {
-  const searchAssets = useSearchStore(state => state.searchAssets)
+  const [searchParams, setSearchParams] = useSearchParams()
   const exportAssets = useAssetStore(state => state.exportAssets)
-  const [loading, setLoading] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const models = useModelStore((state) => state.models)
-  const allAvailabilityStatuses = useReferenceDataStore((state) => state.availabilityStatuses)
-  const allTechnicalStatuses = useReferenceDataStore((state) => state.technicalStatuses)
-  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
-  const activeWarehouses = allWarehouses.filter(w => w.is_active)
+  const models = useModelStore(state => state.models)
+  const allAvailabilityStatuses = useReferenceDataStore(state => state.availabilityStatuses)
+  const allTechnicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
+  const allWarehouses = useReferenceDataStore(state => state.warehouses)
+  const activeWarehouses = useMemo(
+    () => allWarehouses.filter(w => w.is_active),
+    [allWarehouses],
+  )
 
-  const assets = useSearchStore(state => state.assets)
-  const model = useSearchStore(state => state.model)
-  const meter = useSearchStore(state => state.meter)
-  const availabilityStatuses = useSearchStore(state => state.availabilityStatuses)
-  const technicalStatuses = useSearchStore(state => state.technicalStatuses)
-  const selectedWarehouses = useSearchStore(state => state.selectedWarehouses)
+  const urlFilters = useMemo(
+    () => paramsToFilters(searchParams, {
+      models,
+      availabilityStatuses: allAvailabilityStatuses,
+      technicalStatuses: allTechnicalStatuses,
+      warehouses: allWarehouses,
+    }),
+    [searchParams, models, allAvailabilityStatuses, allTechnicalStatuses, allWarehouses],
+  )
 
-  const setModel = useSearchStore(state => state.setModel)
-  const setMeter = useSearchStore(state => state.setMeter)
-  const setAvailabilityStatuses = useSearchStore(state => state.setAvailabilityStatuses)
-  const setTechnicalStatuses = useSearchStore(state => state.setTechnicalStatuses)
-  const setSelectedWarehouses = useSearchStore(state => state.setSelectedWarehouses)
+  const [draft, setDraft] = useState<SearchFilters>(urlFilters)
+  const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
+  if (urlFilters !== prevUrlFilters) {
+    setPrevUrlFilters(urlFilters)
+    setDraft(urlFilters)
+  }
 
-  async function submitQuery() {
-    setLoading(true)
-    try {
-      if (model) {
-        await searchAssets(model, meter, availabilityStatuses, technicalStatuses, selectedWarehouses)
-      }
-    } finally {
-      setLoading(false)
-    }
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchResults(urlFilters)
+  const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
+
+  function submitQuery() {
+    setSearchParams(filtersToParams(draft))
   }
 
   async function handleExport() {
@@ -117,94 +128,102 @@ export function QueryPage(): React.JSX.Element {
   }
 
   const exportDisabled = assets.length === 0 || exportLoading
+  const searchDisabled = !draft.model || isLoading || exportLoading
 
   return (
-    <PageContent className="flex flex-col gap-2">
-      <div className="flex items-center justify-between p-2">
-        <h1 className="text-2xl font-semibold">
-          Search
-        </h1>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleExport}
-          disabled={exportDisabled}
-          aria-label="Export to CSV"
+    <>
+      <StickyPageHeader>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold">Search</h1>
+          <div className="flex gap-2">
+            <Button
+              onClick={submitQuery}
+              disabled={searchDisabled}
+              type="button"
+            >
+              Search
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleExport}
+              disabled={exportDisabled}
+              aria-label="Export to CSV"
+            >
+              {exportLoading
+                ? <SpinnerGapIcon className="animate-spin" />
+                : <DownloadSimpleIcon />}
+            </Button>
+          </div>
+        </div>
+      </StickyPageHeader>
+      <PageContent className="flex flex-col gap-2">
+        <form
+          className="flex flex-row gap-2 border rounded-md p-2 items-end"
+          onSubmit={e => { e.preventDefault(); submitQuery() }}
         >
-          {exportLoading
-            ? <SpinnerGapIcon className="animate-spin" />
-            : <DownloadSimpleIcon />}
-        </Button>
-      </div>
-      <form
-        className="flex flex-row gap-2 border rounded-md p-2 items-end"
-        onSubmit={e => e.preventDefault()}
-      >
-        <fieldset disabled={exportLoading} className="contents">
-          <PopoverSearch
-            selection={model}
-            onSelectionChange={setModel}
-            onClear={() => setModel(null)}
-            options={models}
-            searchKey='model_name'
-            getLabel={m => `${m.brand_name} ${m.model_name}`}
-            fieldLabel='Model'
-            fieldRequired={true}
-          />
+          <fieldset disabled={exportLoading} className="contents">
+            <PopoverSearchInline
+              selection={draft.model}
+              onSelectionChange={m => setDraft({ ...draft, model: m })}
+              onClear={() => setDraft({ ...draft, model: null })}
+              options={models}
+              searchKey='model_name'
+              getLabel={m => `${m.brand_name} ${m.model_name}`}
+              fieldLabel='Model'
+              fieldRequired={true}
+              className='w-45'
+            />
 
-          <MultiSelectOptions
-            selection={availabilityStatuses}
-            onSelectionChange={setAvailabilityStatuses}
-            options={allAvailabilityStatuses}
-            getLabel={s => s.status}
-            fieldLabel='Availability'
-            className='max-w-36'
-          />
+            <MultiSelectOptionsInline
+              selection={draft.availabilityStatuses}
+              onSelectionChange={s => setDraft({ ...draft, availabilityStatuses: s })}
+              options={allAvailabilityStatuses}
+              getLabel={s => s.status}
+              fieldLabel='Availability'
+              className='w-45'
+            />
 
-          <MultiSelectOptions
-            selection={technicalStatuses}
-            onSelectionChange={setTechnicalStatuses}
-            options={allTechnicalStatuses}
-            getLabel={s => s.status}
-            fieldLabel='Testing Status'
-            className='max-w-36'
-          />
+            <MultiSelectOptionsInline
+              selection={draft.technicalStatuses}
+              onSelectionChange={s => setDraft({ ...draft, technicalStatuses: s })}
+              options={allTechnicalStatuses}
+              getLabel={s => s.status}
+              fieldLabel='Testing Status'
+              className='w-45'
+            />
 
-          <MultiSelectOptions
-            selection={selectedWarehouses}
-            onSelectionChange={setSelectedWarehouses}
-            options={activeWarehouses}
-            getLabel={w => w.city_code}
-            fieldLabel='Warehouse'
-            className='max-w-36'
-          />
+            <MultiSelectOptionsInline
+              selection={draft.selectedWarehouses}
+              onSelectionChange={w => setDraft({ ...draft, selectedWarehouses: w })}
+              options={activeWarehouses}
+              getLabel={w => w.city_code}
+              fieldLabel='Warehouse'
+              className='w-45'
+            />
 
-          <InputWithClear
-            value={meter}
-            onValueChange={val => setMeter(typeof val === 'string' ? null : val)}
-            fieldLabel='Meter'
-            inputType='number'
-            className='max-w-36'
-          />
-
-          <Button
-            className="rounded-md"
-            onClick={submitQuery}
-            type="submit"
-          >
-            Search
-          </Button>
-        </fieldset>
-      </form>
-      <div hidden={!loading} role="status" aria-live="polite">
-        <span>Loading…</span>
-      </div>
-      <QueryResultsTable
-        assets={assets}
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        onBulkPriceSave={submitQuery}
-      />
-    </PageContent>
+            <InputWithClearInline
+              value={draft.meter}
+              onValueChange={val => setDraft({
+                ...draft,
+                meter: typeof val === 'string' ? null : val,
+              })}
+              fieldLabel='Meter'
+              inputType='number'
+              className='w-45'
+            />
+          </fieldset>
+        </form>
+        <div hidden={!isLoading} role="status" aria-live="polite">
+          <span>Loading…</span>
+        </div>
+        <QueryResultsTable
+          assets={assets}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          onBulkPriceSave={handleBulkPriceSave}
+        />
+      </PageContent>
+    </>
   )
 }

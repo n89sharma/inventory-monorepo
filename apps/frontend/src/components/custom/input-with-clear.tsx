@@ -12,14 +12,20 @@ export type InputWithClearProps = {
   className?: string
 }
 
-export function InputWithClear({
+type InputWithClearBodyProps = Omit<InputWithClearProps, 'fieldLabel' | 'fieldRequired'> & {
+  placeholder?: string
+  header: React.ReactNode
+}
+
+function InputWithClearBody({
   inputType,
   value,
   onValueChange,
-  fieldLabel,
-  fieldRequired,
   error,
-  className }: InputWithClearProps): React.JSX.Element {
+  className,
+  placeholder,
+  header,
+}: InputWithClearBodyProps): React.JSX.Element {
 
   const resolvedInputType = inputType ?? 'string'
 
@@ -39,15 +45,13 @@ export function InputWithClear({
 
   return (
     <Field className={className} data-invalid={error}>
-      <FieldLabel>
-        {fieldLabel}
-        {fieldRequired && <span className="text-destructive">*</span>}
-      </FieldLabel>
+      {header}
       <InputGroup>
         <InputGroupInput
           type={resolvedInputType}
           value={value ?? ''}
           onChange={e => onValueChange(coerce(e.target.value))}
+          placeholder={placeholder}
           aria-invalid={error}
         >
         </InputGroupInput>
@@ -64,5 +68,38 @@ export function InputWithClear({
         </InputGroupAddon>
       </InputGroup>
     </Field>
+  )
+}
+
+export function InputWithClear({
+  fieldLabel,
+  fieldRequired,
+  ...rest
+}: InputWithClearProps): React.JSX.Element {
+  return (
+    <InputWithClearBody
+      {...rest}
+      header={
+        <FieldLabel>
+          {fieldLabel}
+          {fieldRequired && <span className="text-destructive">*</span>}
+        </FieldLabel>
+      }
+    />
+  )
+}
+
+export function InputWithClearInline({
+  fieldLabel,
+  fieldRequired,
+  ...rest
+}: InputWithClearProps): React.JSX.Element {
+  const placeholder = fieldRequired ? `${fieldLabel} *` : fieldLabel
+  return (
+    <InputWithClearBody
+      {...rest}
+      placeholder={placeholder}
+      header={null}
+    />
   )
 }
