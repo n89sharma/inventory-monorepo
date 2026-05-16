@@ -28,6 +28,8 @@ type BulkEditBarProps = {
   refreshKey?: string
   currentCollectionType?: CollectionType
   returnTo?: string
+  totalCount?: number
+  onSelectAll?: () => void
 }
 
 export function BulkEditBar({
@@ -37,6 +39,8 @@ export function BulkEditBar({
   refreshKey,
   currentCollectionType,
   returnTo,
+  totalCount,
+  onSelectAll,
 }: BulkEditBarProps): React.JSX.Element {
   const navigate = useNavigate()
   const { state: sidebarState, isMobile } = useSidebar()
@@ -56,6 +60,18 @@ export function BulkEditBar({
 
   const selectedCount = selectedAssets.length
   const hasSelection = selectedCount > 0
+  const canShowSelectAll =
+    totalCount !== undefined && onSelectAll !== undefined && selectedCount < totalCount
+
+  function getCountLabel() {
+    if (totalCount === undefined) {
+      return `${selectedCount} asset${selectedCount !== 1 ? 's' : ''} selected`
+    }
+    if (selectedCount === totalCount) {
+      return `All ${totalCount} assets selected`
+    }
+    return `${selectedCount} of ${totalCount} selected`
+  }
 
   useEffect(() => {
     if (!hasSelection) return
@@ -90,9 +106,12 @@ export function BulkEditBar({
           aria-label="Bulk edit actions"
         >
           <div className="flex items-center gap-2 rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg">
-            <span aria-live="polite">
-              {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
-            </span>
+            <span aria-live="polite">{getCountLabel()}</span>
+            {canShowSelectAll && (
+              <Button variant="ghost" onClick={onSelectAll}>
+                Select all
+              </Button>
+            )}
             <Button variant="ghost" onClick={onClear}>
               Clear
             </Button>

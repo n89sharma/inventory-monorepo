@@ -48,12 +48,20 @@ const QueryResultsTable = memo(function QueryResultsTable({
 
   const selectedAssets = assets.filter(a => rowSelection[a.barcode])
 
+  function selectAllAssets() {
+    const all: RowSelectionState = {}
+    for (const asset of assets) all[asset.barcode] = true
+    onRowSelectionChange(all)
+  }
+
   return (
     <>
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => onRowSelectionChange({})}
         onPriceSaveSuccess={onBulkPriceSave}
+        totalCount={assets.length}
+        onSelectAll={selectAllAssets}
       />
       <DataTable
         columns={searchColumns}
