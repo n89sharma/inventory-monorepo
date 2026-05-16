@@ -1,6 +1,7 @@
 import { useCan } from '@/hooks/use-can'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { AddToCollectionModal } from '../modals/add-to-collection-modal'
@@ -16,6 +17,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
+import { useSidebar } from '../shadcn/sidebar'
 
 type CollectionType = 'transfers' | 'departures' | 'holds' | 'invoices' | 'arrivals'
 
@@ -37,6 +39,11 @@ export function BulkEditBar({
   returnTo,
 }: BulkEditBarProps): React.JSX.Element {
   const navigate = useNavigate()
+  const { state: sidebarState, isMobile } = useSidebar()
+  const sidebarVisible = !isMobile && sidebarState === 'expanded'
+  const barLeft = sidebarVisible
+    ? 'calc(50% + var(--sidebar-width) / 2)'
+    : '50%'
   const [addToOpen, setAddToOpen] = useState(false)
   const [bulkPricingOpen, setBulkPricingOpen] = useState(false)
   const [assets, setAssets] = useState<AssetSummary[]>([])
@@ -48,6 +55,16 @@ export function BulkEditBar({
   const canEditPrices = useCan('edit_prices')
 
   const selectedCount = selectedAssets.length
+  const hasSelection = selectedCount > 0
+
+  useEffect(() => {
+    if (!hasSelection) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClear()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [hasSelection, onClear])
 
   function openAddTo() {
     setAssets(selectedAssets)
@@ -65,11 +82,18 @@ export function BulkEditBar({
 
   return (
     <>
-      <div className="flex items-center min-h-9 gap-2 rounded-md border bg-muted/50 px-3 text-sm text-muted-foreground">
-        {selectedCount > 0 ? (
-          <>
-            {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
-            <Button variant="ghost" size="sm" onClick={onClear}>
+      {hasSelection && createPortal(
+        <div
+          className="fixed bottom-4 z-50 -translate-x-1/2 animate-in slide-in-from-bottom-4 fade-in-0 duration-50 ease-in-out transition-[left] motion-safe:duration-200"
+          style={{ left: barLeft }}
+          role="region"
+          aria-label="Bulk edit actions"
+        >
+          <div className="flex items-center gap-2 rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg">
+            <span aria-live="polite">
+              {selectedCount} asset{selectedCount !== 1 ? 's' : ''} selected
+            </span>
+            <Button variant="ghost" onClick={onClear}>
               Clear
             </Button>
             {(canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice) &&
@@ -79,7 +103,7 @@ export function BulkEditBar({
                     <PencilSimpleIcon />Bulk Edit
                   </DropdownMenuTrigger>
                 </Button>
-                <DropdownMenuContent className="w-max">
+                <DropdownMenuContent className="w-max" side="top" align="end">
                   {canEditPrices && <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>}
 
                   <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
@@ -97,11 +121,10 @@ export function BulkEditBar({
                 </DropdownMenuContent>
               </DropdownMenu>
             }
-          </>
-        ) : (
-          <span>Make a selection for bulk editing</span>
-        )}
-      </div>
+          </div>
+        </div>,
+        document.getElementById('main-content') ?? document.body,
+      )}
       <AddToCollectionModal
         open={addToOpen}
         onOpenChange={setAddToOpen}

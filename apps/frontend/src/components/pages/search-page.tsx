@@ -49,7 +49,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
   const selectedAssets = assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => onRowSelectionChange({})}
@@ -63,7 +63,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
         getRowId={getAssetRowId}
         defaultSort={defaultSort}
       />
-    </div>
+    </>
   )
 })
 
