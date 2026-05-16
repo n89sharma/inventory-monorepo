@@ -10,7 +10,7 @@ import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
-import { SelectOptions } from "../../custom/select-options"
+import { SelectOptionsInline } from "../../custom/select-options"
 import { CollectionPage } from "../collection-page"
 import { transferTableColumns } from "../column-defs/transfer-columns"
 
@@ -49,23 +49,21 @@ export function TransferSummaryPage(): React.JSX.Element {
           setSearchOptions={{ setFromDate, setToDate, setOrigin, setDestination }}
           onSearch={onTransferSearch}
         >
-          <SelectOptions
+          <SelectOptionsInline
             selection={origin!}
             onSelectionChange={setOrigin!}
             options={activeWarehouses}
             getLabel={w => w.city_code}
-            fieldLabel="Warehouse"
+            fieldLabel="Origin"
             anyAllowed={true}
-            className="max-w-40"
           />
-          <SelectOptions
+          <SelectOptionsInline
             selection={destination!}
             onSelectionChange={setDestination!}
             options={activeWarehouses}
             getLabel={w => w.city_code}
-            fieldLabel="Warehouse"
+            fieldLabel="Destination"
             anyAllowed={true}
-            className="max-w-40"
           />
         </SearchBar>
       }

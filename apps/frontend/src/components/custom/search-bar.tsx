@@ -1,10 +1,9 @@
 import { Button } from "@/components/shadcn/button"
-import { Field, FieldGroup, FieldLabel } from "@/components/shadcn/field"
 import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-types'
 import { ANY_OPTION, getSelectOption, isSelected, type SelectOption } from '@/ui-types/select-option-types'
 import { subDays } from "date-fns"
 import React from 'react'
-import { DatePickerField } from './date-picker'
+import { DatePickerFieldInline } from './date-picker'
 import { QuickSearchButtons } from './quick-search-buttons'
 
 
@@ -53,39 +52,28 @@ export function SearchBar({
   }
 
   return (
-    <FieldGroup className="flex flex-col gap-2 border rounded-md p-2">
-      <Field>
-        <FieldLabel>Quick Search</FieldLabel>
-        <QuickSearchButtons days={[7, 30, 60]} onSearch={handleQuickSearch} />
-      </Field>
+    <div className="flex flex-row flex-wrap gap-2 items-end">
+      <QuickSearchButtons days={[7, 30, 60]} onSearch={handleQuickSearch} />
 
-      <div className="flex flex-row gap-2 items-end">
-        <DatePickerField
-          label="From Date"
-          id="from-date"
-          date={fromDate}
-          setDate={setFromDate}
-          className="max-w-40"
-        />
+      <DatePickerFieldInline
+        label="From"
+        id="from-date"
+        date={fromDate}
+        setDate={setFromDate}
+      />
 
-        <DatePickerField
-          label="To Date"
-          id="to-date"
-          date={toDate}
-          setDate={setToDate}
-          className="max-w-40"
-        />
+      <DatePickerFieldInline
+        label="To"
+        id="to-date"
+        date={toDate}
+        setDate={setToDate}
+      />
 
-        {children}
+      {children}
 
-        <Button
-          variant="secondary"
-          className="rounded-md"
-          onClick={handleSearch}
-        >
-          Search
-        </Button>
-      </div>
-    </FieldGroup>
+      <Button onClick={handleSearch} variant="secondary">
+        Search
+      </Button>
+    </div>
   )
 }

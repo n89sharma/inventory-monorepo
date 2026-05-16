@@ -9,7 +9,7 @@ import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
-import { SelectOptions } from "../../custom/select-options"
+import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
 import { CollectionPage } from "../collection-page"
 import { arrivalTableColumns } from "../column-defs/arrival-columns"
@@ -47,14 +47,13 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
           setSearchOptions={{ setFromDate, setToDate, setDestination }}
           onSearch={onArrivalSearch}
         >
-          <SelectOptions
+          <SelectOptionsInline
             selection={destination!}
             onSelectionChange={setDestination!}
             options={activeWarehouses}
             getLabel={w => w.city_code}
             fieldLabel="Warehouse"
             anyAllowed={true}
-            className="max-w-40"
           />
         </SearchBar>
       }

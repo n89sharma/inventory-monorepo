@@ -10,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/select"
-import { type SelectOption, ANY_OPTION, getSelectOption, isSelected, UNSELECTED } from "@/ui-types/select-option-types"
+import { ANY_OPTION, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
+import { cn } from "@/lib/utils"
 import type React from "react"
 
 type SelectOptionsProps<T> = {
@@ -80,5 +81,61 @@ export function SelectOptions<T>({
         </SelectContent>
       </Select>
     </Field>
+  )
+}
+
+export function SelectOptionsInline<T>({
+  fieldLabel,
+  selection,
+  options,
+  onSelectionChange,
+  getLabel,
+  getKey,
+  anyAllowed,
+  className,
+}: SelectOptionsProps<T>): React.JSX.Element {
+
+  function getKeyFromEntity(entity: T): string {
+    return getKey ? getKey(entity) : String((entity as { id: number }).id)
+  }
+
+  function getValueFromSelection(sel: SelectOption<T>) {
+    if (isSelected(sel))
+      return getKeyFromEntity(sel.selected)
+    return sel.state
+  }
+
+  function getSelectionFromKey(key: string): SelectOption<T> {
+    if (key === 'ANY')
+      return ANY_OPTION
+    const found = options.find(o => getKeyFromEntity(o) === key)
+    if (found)
+      return getSelectOption(found)
+    return UNSELECTED
+  }
+
+  function getTriggerLabel() {
+    if (isSelected(selection)) return `${fieldLabel}: ${getLabel(selection.selected)}`
+    if (selection.state === 'ANY') return `${fieldLabel}: Any`
+    return fieldLabel
+  }
+
+  return (
+    <Select
+      value={getValueFromSelection(selection)}
+      onValueChange={key => onSelectionChange(getSelectionFromKey(key))}
+    >
+      <SelectTrigger className={cn("font-normal gap-2", className)}>
+        {getTriggerLabel()}
+      </SelectTrigger>
+      <SelectContent position="popper">
+        <SelectGroup>
+          {anyAllowed && <SelectItem key="ANY" value="ANY">Any</SelectItem>}
+          {options?.map(o => (
+            <SelectItem key={getKeyFromEntity(o)} value={getKeyFromEntity(o)}>{getLabel(o)}</SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }

@@ -8,7 +8,7 @@ import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
-import { SelectOptions } from "../../custom/select-options"
+import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
 import { CollectionPage } from "../collection-page"
 import { holdTableColumns } from "../column-defs/hold-columns"
@@ -47,7 +47,7 @@ export function HoldSummaryPage(): React.JSX.Element {
           setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
           onSearch={onHoldSearch}
         >
-          <SelectOptions
+          <SelectOptionsInline
             selection={holdBy!}
             onSelectionChange={setHoldBy!}
             options={activeUsers}
@@ -55,9 +55,8 @@ export function HoldSummaryPage(): React.JSX.Element {
             getKey={u => u.name}
             fieldLabel="Hold By"
             anyAllowed={true}
-            className="max-w-40"
           />
-          <SelectOptions
+          <SelectOptionsInline
             selection={holdFor!}
             onSelectionChange={setHoldFor!}
             options={activeUsers}
@@ -65,7 +64,6 @@ export function HoldSummaryPage(): React.JSX.Element {
             getKey={u => u.name}
             fieldLabel="Hold For"
             anyAllowed={true}
-            className="max-w-40"
           />
         </SearchBar>
       }

@@ -43,3 +43,30 @@ export function DatePickerField({ label, date, setDate, id, className }: DatePic
     </Field>
   )
 }
+
+export function DatePickerFieldInline({ label, date, setDate, id, className }: DatePickerFieldProps): React.JSX.Element {
+  const triggerLabel = isSelected(date)
+    ? `${label}: ${format(date.selected, "PPP")}`
+    : label
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          id={id}
+          className={`justify-start font-normal gap-2 ${className ?? ''}`}
+        >
+          {triggerLabel}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-1" align="start">
+        <Calendar
+          mode="single"
+          selected={getSelectedOrNull(date)}
+          onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
+          defaultMonth={getSelectedOrNull(date)}
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
