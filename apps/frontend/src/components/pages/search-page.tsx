@@ -137,26 +137,17 @@ export function QueryPage(): React.JSX.Element {
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold">Search</h1>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleExport}
-              disabled={exportDisabled}
-              aria-label="Export to CSV"
-            >
-              {exportLoading
-                ? <SpinnerGapIcon className="animate-spin" />
-                : <DownloadSimpleIcon />}
-            </Button>
-            <Button
-              onClick={submitQuery}
-              disabled={searchDisabled}
-              type="button"
-            >
-              Search
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleExport}
+            disabled={exportDisabled}
+            aria-label="Export to CSV"
+          >
+            {exportLoading
+              ? <SpinnerGapIcon className="animate-spin" />
+              : <DownloadSimpleIcon />}
+          </Button>
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
@@ -221,6 +212,13 @@ export function QueryPage(): React.JSX.Element {
               inputType='number'
               className='w-45'
             />
+
+            <Button
+              type="submit"
+              disabled={searchDisabled}
+            >
+              Search
+            </Button>
           </fieldset>
         </form>
       </StickyPageHeader>
