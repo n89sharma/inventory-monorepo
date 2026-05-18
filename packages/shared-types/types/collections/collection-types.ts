@@ -7,3 +7,10 @@ export const CollectionSummarySchema = z.object({
   asset_count: z.coerce.number().int().nullable()
 })
 export type CollectionSummarySchema = z.infer<typeof CollectionSummarySchema>
+
+// PATCH /<collection>/:number/assets — delta-style add/remove
+export const AssetDeltaSchema = z.object({
+  assetIdsToAdd: z.array(z.number().int()).default([]),
+  assetIdsToRemove: z.array(z.number().int()).default([])
+})
+export type AssetDelta = z.infer<typeof AssetDeltaSchema>

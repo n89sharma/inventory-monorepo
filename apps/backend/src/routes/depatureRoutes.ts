@@ -1,5 +1,5 @@
 import express from 'express'
-import { createDeparture, getDepartureDetail, getDepartureForUpdate, getDepartureHistory, getDepartures, updateDeparture } from '../controllers/departureController.js'
+import { createDeparture, getDepartureDetail, getDepartureForUpdate, getDepartureHistory, getDepartures, patchDepartureAssets, updateDeparture } from '../controllers/departureController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
 import { DateRangeWithWarehouseSchema, validateQuery } from '../middleware/validation.js'
@@ -14,5 +14,6 @@ router.get('/:departureNumber/history', requirePermission('view_collections'),  
 router.get('/:departureNumber/edit',    requirePermission('create_update_departure'),   getDepartureForUpdate)
 router.get('/:departureNumber',         requirePermission('view_collections'),          getDepartureDetail)
 router.put('/:departureNumber',         requirePermission('create_update_departure'),   updateDeparture)
+router.patch('/:departureNumber/assets',requirePermission('create_update_departure'),   patchDepartureAssets)
 
 export default router

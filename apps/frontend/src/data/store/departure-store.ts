@@ -1,12 +1,20 @@
-import { createDeparture, getDepartureForUpdate, getDepartures, updateDeparture } from '@/data/api/departure-api'
+import { createDeparture, getDepartureForUpdate, getDepartures, patchDepartureAssets, updateDeparture } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
-import type { AssetSummary, DepartureSummary, Warehouse } from 'shared-types'
+import type { AssetSummary, DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
+import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
+
+const UNDO_WINDOW_MS = 5000
+const pendingRemovals = new Map<string, { timer: ReturnType<typeof setTimeout>; commit: () => Promise<void> }>()
+
+function pendingKey(departureNumber: string, assetId: number): string {
+  return `${departureNumber}:${assetId}`
+}
 
 interface DepartureStore {
   departures: DepartureSummary[]
@@ -31,6 +39,9 @@ interface DepartureStore {
   submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<void>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (departureNumber: string) => Promise<AssetSummary[]>
+  removeAssetFromDeparture: (departureNumber: string, asset: AssetSummary) => void
+  bulkRemoveAssetsFromDeparture: (departureNumber: string, assets: AssetSummary[]) => void
+  flushPendingRemovals: (departureNumber: string) => void
   clearDepartures: () => void
 }
 
@@ -81,6 +92,93 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   getAssets: async (departureNumber) => {
     const form = await getDepartureForUpdate(departureNumber)
     return form?.assets ?? []
+  },
+  removeAssetFromDeparture: (departureNumber, asset) => {
+    const key = pendingKey(departureNumber, asset.id)
+    const cacheKey = departureDetailKey(departureNumber)
+
+    mutate<DepartureDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: current.assets.filter(a => a.id !== asset.id) } : current,
+      { revalidate: false }
+    )
+
+    const commit = async () => {
+      pendingRemovals.delete(key)
+      try {
+        await patchDepartureAssets(departureNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
+        invalidateAssetDetails([asset.barcode])
+      } finally {
+        mutate(cacheKey)
+      }
+    }
+
+    const undo = () => {
+      const pending = pendingRemovals.get(key)
+      if (!pending) return
+      clearTimeout(pending.timer)
+      pendingRemovals.delete(key)
+      mutate(cacheKey)
+    }
+
+    const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+    pendingRemovals.set(key, { timer, commit })
+
+    toast.success(`Asset ${asset.barcode} removed`, {
+      position: 'top-center',
+      duration: UNDO_WINDOW_MS,
+      action: { label: 'Undo', onClick: undo }
+    })
+  },
+  bulkRemoveAssetsFromDeparture: (departureNumber, assets) => {
+    if (assets.length === 0) return
+    const ids = assets.map(a => a.id)
+    const idSet = new Set(ids)
+    const barcodes = assets.map(a => a.barcode)
+    const key = `${departureNumber}:bulk:${Date.now()}`
+    const cacheKey = departureDetailKey(departureNumber)
+
+    mutate<DepartureDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: current.assets.filter(a => !idSet.has(a.id)) } : current,
+      { revalidate: false }
+    )
+
+    const commit = async () => {
+      pendingRemovals.delete(key)
+      try {
+        await patchDepartureAssets(departureNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
+        invalidateAssetDetails(barcodes)
+      } finally {
+        mutate(cacheKey)
+      }
+    }
+
+    const undo = () => {
+      const pending = pendingRemovals.get(key)
+      if (!pending) return
+      clearTimeout(pending.timer)
+      pendingRemovals.delete(key)
+      mutate(cacheKey)
+    }
+
+    const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+    pendingRemovals.set(key, { timer, commit })
+
+    const label = assets.length === 1 ? 'Removed 1 asset' : `Removed ${assets.length} assets`
+    toast.success(label, {
+      position: 'top-center',
+      duration: UNDO_WINDOW_MS,
+      action: { label: 'Undo', onClick: undo }
+    })
+  },
+  flushPendingRemovals: (departureNumber) => {
+    const prefix = `${departureNumber}:`
+    for (const [key, pending] of pendingRemovals) {
+      if (!key.startsWith(prefix)) continue
+      clearTimeout(pending.timer)
+      void pending.commit()
+    }
   },
   clearDepartures: () => set({ departures: [] })
 }))

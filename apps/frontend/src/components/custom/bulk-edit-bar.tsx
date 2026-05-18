@@ -1,5 +1,5 @@
 import { useCan } from '@/hooks/use-can'
-import { PencilSimpleIcon } from '@phosphor-icons/react'
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
@@ -30,6 +30,7 @@ type BulkEditBarProps = {
   returnTo?: string
   totalCount?: number
   onSelectAll?: () => void
+  onBulkRemove?: (assets: AssetSummary[]) => void
 }
 
 export function BulkEditBar({
@@ -41,6 +42,7 @@ export function BulkEditBar({
   returnTo,
   totalCount,
   onSelectAll,
+  onBulkRemove,
 }: BulkEditBarProps): React.JSX.Element {
   const navigate = useNavigate()
   const { state: sidebarState, isMobile } = useSidebar()
@@ -57,6 +59,24 @@ export function BulkEditBar({
   const canCreateHold = useCan('create_update_hold')
   const canCreateInvoice = useCan('create_update_invoice')
   const canEditPrices = useCan('edit_prices')
+
+  const collectionPermissionMap = {
+    transfers: canCreateTransfer,
+    departures: canCreateDeparture,
+    holds: canCreateHold,
+    invoices: canCreateInvoice,
+    arrivals: false
+  } as const satisfies Record<CollectionType, boolean>
+
+  const canRemoveFromCollection = currentCollectionType !== undefined
+    && collectionPermissionMap[currentCollectionType]
+  const showBulkRemove = onBulkRemove !== undefined && canRemoveFromCollection
+
+  function handleBulkRemove() {
+    if (!onBulkRemove) return
+    onBulkRemove(selectedAssets)
+    onClear()
+  }
 
   const selectedCount = selectedAssets.length
   const hasSelection = selectedCount > 0
@@ -140,6 +160,11 @@ export function BulkEditBar({
                 </DropdownMenuContent>
               </DropdownMenu>
             }
+            {showBulkRemove && (
+              <Button variant="destructive" className="ml-6" onClick={handleBulkRemove}>
+                <TrashIcon />Remove
+              </Button>
+            )}
           </div>
         </div>,
         document.getElementById('main-content') ?? document.body,

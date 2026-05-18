@@ -2,18 +2,21 @@ import { AvailabilityStatusBadge } from "@/components/custom/availability-status
 import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
 import { TrackingStatusBadge } from "@/components/custom/tracking-status-badge"
 import { CopyButton } from "@/components/custom/copy-button"
+import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
+import { TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSummary } from 'shared-types'
 
 export function createAssetSummaryColumns(
   navigationSection: NavigationSection,
-  collectionId?: string): ColumnDef<AssetSummary>[] {
+  collectionId?: string,
+  onDelete?: (asset: AssetSummary) => void): ColumnDef<AssetSummary>[] {
 
-  return [
+  const columns: ColumnDef<AssetSummary>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -107,4 +110,26 @@ export function createAssetSummaryColumns(
       size: 80
     }
   ]
+
+  if (onDelete) {
+    columns.push({
+      id: 'delete',
+      cell: ({ row }) => (
+        <Button
+          variant="outline"
+          size="icon"
+          type="button"
+          aria-label="Remove asset"
+          onClick={() => onDelete(row.original)}
+        >
+          <TrashIcon />
+        </Button>
+      ),
+      size: 50,
+      enableSorting: false,
+      enableHiding: false
+    })
+  }
+
+  return columns
 }

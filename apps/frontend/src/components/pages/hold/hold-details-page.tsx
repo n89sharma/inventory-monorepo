@@ -1,8 +1,10 @@
 import { HoldSummaryStrip } from '@/components/custom/cards/hold-summary-strip'
+import { SummaryField } from '@/components/custom/cards/summary-field'
 import { getHoldHistory } from '@/data/api/hold-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
+import { formatDate } from '@/lib/formatters'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold-detail'
@@ -56,6 +58,13 @@ export function HoldDetailsPage(): React.JSX.Element {
             historyCacheKey={`hold-history:${holdNumber}`}
             historyFetcher={() => getHoldHistory(holdNumber)}
           />
+        }
+        subtitle={
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+            <SummaryField label="Customer" value={hold.customer.name} />
+            <SummaryField label="For" value={hold.created_for.name} />
+            {hold.to_dt && <SummaryField label="To" value={formatDate(hold.to_dt)} />}
+          </div>
         }
       />
       <PageContent className="flex flex-col gap-4">

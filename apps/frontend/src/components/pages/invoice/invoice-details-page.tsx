@@ -1,8 +1,10 @@
 import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-strip'
+import { SummaryField } from '@/components/custom/cards/summary-field'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
+import { formatDate } from '@/lib/formatters'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice-detail'
@@ -56,6 +58,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
             historyCacheKey={`invoice-history:${invoiceNumber}`}
             historyFetcher={() => getInvoiceHistory(invoiceNumber)}
           />
+        }
+        subtitle={
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+            <SummaryField label="Customer" value={invoice.customer.name} />
+            <SummaryField label="Date" value={formatDate(invoice.created_at)} />
+            <SummaryField label="Type" value={invoice.invoice_type} />
+          </div>
         }
       />
       <PageContent className="flex flex-col gap-4">

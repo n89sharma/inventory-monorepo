@@ -1,8 +1,10 @@
 import { ArrivalSummaryStrip } from '@/components/custom/cards/arrival-summary-strip'
+import { SummaryField } from '@/components/custom/cards/summary-field'
 import { getArrivalHistory } from '@/data/api/arrival-api'
 import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
+import { formatDate } from '@/lib/formatters'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'
@@ -57,6 +59,12 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             historyCacheKey={`arrival-history:${arrivalNumber}`}
             historyFetcher={() => getArrivalHistory(arrivalNumber)}
           />
+        }
+        subtitle={
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+            <SummaryField label="Vendor" value={arrival.vendor.name} />
+            <SummaryField label="Arrived" value={formatDate(arrival.created_at)} />
+          </div>
         }
       />
       <PageContent className="flex flex-col gap-4">

@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
-import { type DepartureSummary, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureSchema } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
+import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateDepartureResponseSchema = z.object({ departureNumber: z.string() })
@@ -74,4 +74,12 @@ export async function updateDeparture(
     assets: d.assets
   } satisfies UpdateDeparture)
   await api.put(`/departures/${departureNumber}`, updateDepartureBody)
+}
+
+export async function patchDepartureAssets(
+  departureNumber: string,
+  delta: AssetDelta
+): Promise<void> {
+  const patchDepartureAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
+  await api.patch(`/departures/${departureNumber}/assets`, patchDepartureAssetsBody)
 }
