@@ -1,12 +1,20 @@
-import { createInvoice, getInvoiceForUpdate, getInvoices, updateInvoice } from '@/data/api/invoice-api'
+import { createInvoice, getInvoiceForUpdate, getInvoices, patchInvoiceAssets, updateInvoice } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { AssetSummary, InvoiceSummary } from 'shared-types'
+import type { AssetSummary, InvoiceDetail, InvoiceSummary } from 'shared-types'
+import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
+
+const UNDO_WINDOW_MS = 5000
+const pendingRemovals = new Map<string, { timer: ReturnType<typeof setTimeout>; commit: () => Promise<void> }>()
+
+function pendingKey(invoiceNumber: string, assetId: number): string {
+  return `${invoiceNumber}:${assetId}`
+}
 
 interface InvoiceStore {
   invoices: InvoiceSummary[]
@@ -27,6 +35,9 @@ interface InvoiceStore {
   submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<{ invoiceNumber: string }>
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
+  removeAssetFromInvoice: (invoiceNumber: string, asset: AssetSummary) => void
+  bulkRemoveAssetsFromInvoice: (invoiceNumber: string, assets: AssetSummary[]) => void
+  flushPendingRemovals: (invoiceNumber: string) => void
   clearInvoices: () => void
 }
 
@@ -77,6 +88,93 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   getAssets: async (invoiceNumber) => {
     const form = await getInvoiceForUpdate(invoiceNumber)
     return form?.assets ?? []
+  },
+  removeAssetFromInvoice: (invoiceNumber, asset) => {
+    const key = pendingKey(invoiceNumber, asset.id)
+    const cacheKey = invoiceDetailKey(invoiceNumber)
+
+    mutate<InvoiceDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: current.assets.filter(a => a.id !== asset.id) } : current,
+      { revalidate: false }
+    )
+
+    const commit = async () => {
+      pendingRemovals.delete(key)
+      try {
+        await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
+        invalidateAssetDetails([asset.barcode])
+      } finally {
+        mutate(cacheKey)
+      }
+    }
+
+    const undo = () => {
+      const pending = pendingRemovals.get(key)
+      if (!pending) return
+      clearTimeout(pending.timer)
+      pendingRemovals.delete(key)
+      mutate(cacheKey)
+    }
+
+    const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+    pendingRemovals.set(key, { timer, commit })
+
+    toast.success(`Asset ${asset.barcode} removed`, {
+      position: 'top-center',
+      duration: UNDO_WINDOW_MS,
+      action: { label: 'Undo', onClick: undo }
+    })
+  },
+  bulkRemoveAssetsFromInvoice: (invoiceNumber, assets) => {
+    if (assets.length === 0) return
+    const ids = assets.map(a => a.id)
+    const idSet = new Set(ids)
+    const barcodes = assets.map(a => a.barcode)
+    const key = `${invoiceNumber}:bulk:${Date.now()}`
+    const cacheKey = invoiceDetailKey(invoiceNumber)
+
+    mutate<InvoiceDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: current.assets.filter(a => !idSet.has(a.id)) } : current,
+      { revalidate: false }
+    )
+
+    const commit = async () => {
+      pendingRemovals.delete(key)
+      try {
+        await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
+        invalidateAssetDetails(barcodes)
+      } finally {
+        mutate(cacheKey)
+      }
+    }
+
+    const undo = () => {
+      const pending = pendingRemovals.get(key)
+      if (!pending) return
+      clearTimeout(pending.timer)
+      pendingRemovals.delete(key)
+      mutate(cacheKey)
+    }
+
+    const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+    pendingRemovals.set(key, { timer, commit })
+
+    const label = assets.length === 1 ? 'Removed 1 asset' : `Removed ${assets.length} assets`
+    toast.success(label, {
+      position: 'top-center',
+      duration: UNDO_WINDOW_MS,
+      action: { label: 'Undo', onClick: undo }
+    })
+  },
+  flushPendingRemovals: (invoiceNumber) => {
+    const prefix = `${invoiceNumber}:`
+    for (const [key, pending] of pendingRemovals) {
+      if (!key.startsWith(prefix)) continue
+      clearTimeout(pending.timer)
+      void pending.commit()
+    }
   },
   clearInvoices: () => set({ invoices: [] })
 }))

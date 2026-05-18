@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CollectionHistory, CreateArrivalSchema, SubmitUpdateArrivalSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, SubmitUpdateArrivalSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -10,6 +10,7 @@ import {
   createArrival as createArrivalSer,
   getArrivalForUpdate as getArrivalForEditSer,
   getArrival as getArrivalSer,
+  patchArrivalAssets as patchArrivalAssetsSer,
   updateArrival as updateArrivalSer
 } from '../services/arrivalService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -43,6 +44,12 @@ export const updateArrival = asyncHandler(async (req, res) => {
   const validated = SubmitUpdateArrivalSchema.parse(req.body)
   await updateArrivalSer(validated, res.locals.dbUserId)
   res.json({ arrivalNumber })
+})
+
+export const patchArrivalAssets = asyncHandler(async (req, res) => {
+  const delta = AssetDeltaSchema.parse(req.body)
+  await patchArrivalAssetsSer(req.params.arrivalNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const getArrivalHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {

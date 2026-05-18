@@ -5,6 +5,7 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
+import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold-detail'
@@ -25,7 +26,18 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('holds', holdNumber), [holdNumber])
+  const removeAssetFromHold = useHoldStore(state => state.removeAssetFromHold)
+  const bulkRemoveAssetsFromHold = useHoldStore(state => state.bulkRemoveAssetsFromHold)
+  const flushPendingRemovals = useHoldStore(state => state.flushPendingRemovals)
+
+  const columns = useMemo(
+    () => createAssetSummaryColumns(
+      'holds',
+      holdNumber,
+      asset => removeAssetFromHold(holdNumber, asset)
+    ),
+    [holdNumber, removeAssetFromHold]
+  )
   const { data: hold, error: detailError, isLoading: detailLoading } = useHoldDetail(holdNumber)
 
   useEffect(() => {
@@ -35,6 +47,10 @@ export function HoldDetailsPage(): React.JSX.Element {
   useEffect(() => {
     setLastPath('holds', pathname)
   }, [holdNumber])
+
+  useEffect(() => {
+    return () => flushPendingRemovals(holdNumber)
+  }, [holdNumber, flushPendingRemovals])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -75,6 +91,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         refreshKey={holdDetailKey(holdNumber)}
         currentCollectionType="holds"
         returnTo={`/holds/${holdNumber}`}
+        onBulkRemove={assets => bulkRemoveAssetsFromHold(holdNumber, assets)}
         totalCount={hold.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(hold.assets.map(a => [a.barcode, true])))}
       />

@@ -1,4 +1,5 @@
-import { CreateTransfer, TransferDetail, UpdateTransfer } from 'shared-types'
+import { AssetDelta, CreateTransfer, TransferDetail, UpdateTransfer } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -132,6 +133,49 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
   }, userId)
 
   await recordAssetUpdateOnCollection('Transfer', transfer.id, assetIdsToAdd, assetIdsToDelete, userId)
+}
+
+export async function patchTransferAssets(
+  transferNumber: string,
+  delta: AssetDelta,
+  userId: number
+): Promise<void> {
+  const transfer = await prisma.transfer.findUnique({
+    where: { transfer_number: transferNumber },
+    select: { id: true }
+  })
+  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+
+  await prisma.$transaction(async (tx) => {
+    await applyTransferAssetDelta(tx, transfer.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
+  })
+
+  await recordAssetUpdateOnCollection(
+    'Transfer',
+    transfer.id,
+    delta.assetIdsToAdd,
+    delta.assetIdsToRemove,
+    userId
+  )
+}
+
+async function applyTransferAssetDelta(
+  tx: Prisma.TransactionClient,
+  transferId: number,
+  assetIdsToAdd: number[],
+  assetIdsToRemove: number[]
+): Promise<void> {
+  if (assetIdsToRemove.length > 0) {
+    await tx.assetTransfer.deleteMany({
+      where: { transfer_id: transferId, asset_id: { in: assetIdsToRemove } }
+    })
+  }
+
+  if (assetIdsToAdd.length > 0) {
+    await tx.assetTransfer.createMany({
+      data: assetIdsToAdd.map(assetId => ({ transfer_id: transferId, asset_id: assetId }))
+    })
+  }
 }
 
 async function getNewTransferNumber(originCode: string): Promise<string> {

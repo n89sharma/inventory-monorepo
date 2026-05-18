@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, CollectionHistory, CreateArrival, UpdateArrival, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, CollectionHistorySchema, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, AssetDelta, CollectionHistory, CreateArrival, UpdateArrival, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, CollectionHistorySchema, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateArrivalResponseSchema = z.object({ arrivalNumber: z.string() })
@@ -103,4 +103,12 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
 export async function getArrivalHistory(arrivalNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/arrivals/${arrivalNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function patchArrivalAssets(
+  arrivalNumber: string,
+  delta: AssetDelta
+): Promise<void> {
+  const patchArrivalAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
+  await api.patch(`/arrivals/${arrivalNumber}/assets`, patchArrivalAssetsBody)
 }

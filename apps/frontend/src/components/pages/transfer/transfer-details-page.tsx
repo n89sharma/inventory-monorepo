@@ -6,6 +6,7 @@ import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { useNavigationStore } from '@/data/store/navigation-store'
+import { useTransferStore } from '@/data/store/transfer-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer-detail'
 import type { RowSelectionState } from '@tanstack/react-table'
@@ -25,7 +26,18 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   if (transferNumber === undefined) throw new Error('Missing collectionId/transferNumber parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('transfers', transferNumber), [transferNumber])
+  const removeAssetFromTransfer = useTransferStore(state => state.removeAssetFromTransfer)
+  const bulkRemoveAssetsFromTransfer = useTransferStore(state => state.bulkRemoveAssetsFromTransfer)
+  const flushPendingRemovals = useTransferStore(state => state.flushPendingRemovals)
+
+  const columns = useMemo(
+    () => createAssetSummaryColumns(
+      'transfers',
+      transferNumber,
+      asset => removeAssetFromTransfer(transferNumber, asset)
+    ),
+    [transferNumber, removeAssetFromTransfer]
+  )
   const { data: transfer, error: detailError, isLoading: detailLoading } = useTransferDetail(transferNumber)
 
   useEffect(() => {
@@ -35,6 +47,10 @@ export function TransferDetailsPage(): React.JSX.Element {
   useEffect(() => {
     setLastPath('transfers', pathname)
   }, [transferNumber])
+
+  useEffect(() => {
+    return () => flushPendingRemovals(transferNumber)
+  }, [transferNumber, flushPendingRemovals])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -75,6 +91,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         refreshKey={transferDetailKey(transferNumber)}
         currentCollectionType="transfers"
         returnTo={`/transfers/${transferNumber}`}
+        onBulkRemove={assets => bulkRemoveAssetsFromTransfer(transferNumber, assets)}
         totalCount={transfer.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(transfer.assets.map(a => [a.barcode, true])))}
       />

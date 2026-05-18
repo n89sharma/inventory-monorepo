@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -8,6 +8,7 @@ import {
   createInvoice as createInvoiceSer,
   getInvoice as getInvoiceSer,
   getInvoiceForUpdate as getInvoiceForUpdateSer,
+  patchInvoiceAssets as patchInvoiceAssetsSer,
   updateInvoice as updateInvoiceSer
 } from '../services/invoiceService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -35,6 +36,12 @@ export const updateInvoice = asyncHandler(async (req, res) => {
   const data = SubmitUpdateInvoiceSchema.parse(req.body)
   const result = await updateInvoiceSer(invoiceNumber, data, res.locals.dbUserId)
   res.json(successResponse(result))
+})
+
+export const patchInvoiceAssets = asyncHandler(async (req, res) => {
+  const delta = AssetDeltaSchema.parse(req.body)
+  await patchInvoiceAssetsSer(req.params.invoiceNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const getInvoiceDetail = asyncHandler(async (req: Request, res: Response<ApiResponse<InvoiceDetail>>) => {

@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { getIdOrNullFromSelection, getSelectOption, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { CollectionHistory, CreateHold, HoldDetail, UpdateHold, User } from 'shared-types'
-import { CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, SubmitUpdateHoldSchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHold, User } from 'shared-types'
+import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, SubmitUpdateHoldSchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
 import { z } from 'zod'
 
 const CreateHoldResponseSchema = z.object({ holdNumber: z.string() })
@@ -76,4 +76,12 @@ export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
 export async function getHoldHistory(holdNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/holds/${holdNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function patchHoldAssets(
+  holdNumber: string,
+  delta: AssetDelta
+): Promise<void> {
+  const patchHoldAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
+  await api.patch(`/holds/${holdNumber}/assets`, patchHoldAssetsBody)
 }

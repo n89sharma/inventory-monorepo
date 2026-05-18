@@ -1,4 +1,5 @@
-import { AppRole, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import { AppRole, AssetDelta, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
@@ -130,6 +131,70 @@ export async function updateInvoice(
   await recordAssetUpdateOnCollection('Invoice', invoice.id, assetIdsToAdd, assetIdsToRemove, userId)
 
   return { invoiceNumber }
+}
+
+export async function patchInvoiceAssets(
+  invoiceNumber: string,
+  delta: AssetDelta,
+  userId: number
+): Promise<void> {
+  const invoice = await prisma.invoice.findFirst({
+    where: { invoice_number: invoiceNumber },
+    select: { id: true }
+  })
+  if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
+
+  await prisma.$transaction(async (tx) => {
+    await applyInvoiceAssetDelta(tx, invoice.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
+  })
+
+  await recordCollectionUpdateOnAssets(
+    delta.assetIdsToRemove,
+    delta.assetIdsToAdd,
+    'purchase_invoice_id',
+    invoice.id,
+    userId
+  )
+  await recordAssetUpdateOnCollection(
+    'Invoice',
+    invoice.id,
+    delta.assetIdsToAdd,
+    delta.assetIdsToRemove,
+    userId
+  )
+}
+
+async function applyInvoiceAssetDelta(
+  tx: Prisma.TransactionClient,
+  invoiceId: number,
+  assetIdsToAdd: number[],
+  assetIdsToRemove: number[]
+): Promise<void> {
+  if (assetIdsToAdd.length > 0) {
+    const conflicts = await tx.asset.findMany({
+      where: { id: { in: assetIdsToAdd }, purchase_invoice_id: { not: null } },
+      select: { barcode: true }
+    })
+    if (conflicts.length > 0) {
+      throw new ConflictError(
+        `Assets already in another invoice: ${conflicts.map(a => a.barcode).join(', ')}`
+      )
+    }
+  }
+
+  if (assetIdsToRemove.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToRemove } },
+      data: { purchase_invoice_id: null }
+    })
+  }
+
+  if (assetIdsToAdd.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToAdd } },
+      data: { purchase_invoice_id: invoiceId }
+    })
+  }
 }
 
 export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> {

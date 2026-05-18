@@ -1,4 +1,5 @@
-import { AppRole, CreateHold, HoldDetail, UpdateHold } from 'shared-types'
+import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHold } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -177,6 +178,92 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<void
 
   await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'hold_id', data.id, userId)
   await recordAssetUpdateOnCollection('Hold', data.id, assetIdsToAdd, assetIdsToRemove, userId)
+}
+
+export async function patchHoldAssets(
+  holdNumber: string,
+  delta: AssetDelta,
+  userId: number
+): Promise<void> {
+  const [heldStatus, availableStatus, hold] = await Promise.all([
+    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
+    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'AVAILABLE' }, select: { id: true } }),
+    prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true } })
+  ])
+  if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
+
+  await prisma.$transaction(async (tx) => {
+    await applyHoldAssetDelta(
+      tx,
+      hold.id,
+      delta.assetIdsToAdd,
+      delta.assetIdsToRemove,
+      heldStatus.id,
+      availableStatus.id
+    )
+  })
+
+  await recordCollectionUpdateOnAssets(
+    delta.assetIdsToRemove,
+    delta.assetIdsToAdd,
+    'hold_id',
+    hold.id,
+    userId
+  )
+  await recordAssetUpdateOnCollection(
+    'Hold',
+    hold.id,
+    delta.assetIdsToAdd,
+    delta.assetIdsToRemove,
+    userId
+  )
+}
+
+async function applyHoldAssetDelta(
+  tx: Prisma.TransactionClient,
+  holdId: number,
+  assetIdsToAdd: number[],
+  assetIdsToRemove: number[],
+  heldStatusId: number,
+  availableStatusId: number
+): Promise<void> {
+  if (assetIdsToAdd.length > 0) {
+    const conflicts = await tx.asset.findMany({
+      where: { id: { in: assetIdsToAdd }, is_held: true },
+      select: { barcode: true }
+    })
+    if (conflicts.length > 0) {
+      throw new ConflictError(
+        `The following assets already have an active hold: ${conflicts.map(a => a.barcode).join(', ')}`
+      )
+    }
+  }
+
+  if (assetIdsToAdd.length > 0 || assetIdsToRemove.length > 0) {
+    await tx.hold.update({
+      where: { id: holdId },
+      data: {
+        assets: {
+          disconnect: assetIdsToRemove.map(id => ({ id })),
+          connect: assetIdsToAdd.map(id => ({ id }))
+        }
+      }
+    })
+  }
+
+  if (assetIdsToRemove.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToRemove } },
+      data: { is_held: false, availability_status_id: availableStatusId }
+    })
+  }
+
+  if (assetIdsToAdd.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToAdd } },
+      data: { is_held: true, availability_status_id: heldStatusId }
+    })
+  }
 }
 
 export async function getHold(holdNumber: string): Promise<HoldDetail> {

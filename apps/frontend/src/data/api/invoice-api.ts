@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
 import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { CollectionHistory, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
-import { CollectionHistorySchema, CreateInvoiceSchema, InvoiceDetailSchema, InvoiceSummarySchema, SubmitUpdateInvoiceSchema, UpdateInvoiceSchema, type InvoiceSummary } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import { AssetDeltaSchema, CollectionHistorySchema, CreateInvoiceSchema, InvoiceDetailSchema, InvoiceSummarySchema, SubmitUpdateInvoiceSchema, UpdateInvoiceSchema, type InvoiceSummary } from 'shared-types'
 import { z } from 'zod'
 
 const CreateInvoiceResponseSchema = z.object({ invoiceNumber: z.string() })
@@ -75,4 +75,12 @@ export async function getInvoiceDetail(invoiceNumber: string): Promise<InvoiceDe
 export async function getInvoiceHistory(invoiceNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/invoices/${invoiceNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function patchInvoiceAssets(
+  invoiceNumber: string,
+  delta: AssetDelta
+): Promise<void> {
+  const patchInvoiceAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
+  await api.patch(`/invoices/${invoiceNumber}/assets`, patchInvoiceAssetsBody)
 }

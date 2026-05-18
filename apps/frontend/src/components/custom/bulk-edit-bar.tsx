@@ -54,6 +54,7 @@ export function BulkEditBar({
   const canCreateDeparture = useCan('create_update_departure')
   const canCreateHold = useCan('create_update_hold')
   const canCreateInvoice = useCan('create_update_invoice')
+  const canCreateArrival = useCan('create_update_arrival')
   const canEditPrices = useCan('edit_prices')
 
   const collectionPermissionMap = {
@@ -61,7 +62,7 @@ export function BulkEditBar({
     departures: canCreateDeparture,
     holds: canCreateHold,
     invoices: canCreateInvoice,
-    arrivals: false
+    arrivals: canCreateArrival
   } as const satisfies Record<CollectionType, boolean>
 
   const canRemoveFromCollection = currentCollectionType !== undefined

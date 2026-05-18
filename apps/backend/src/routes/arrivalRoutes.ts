@@ -1,5 +1,5 @@
 import express from 'express'
-import { createArrival, getArrival, getArrivalForUpdate, getArrivalHistory, getArrivals, updateArrival } from '../controllers/arrivalController.js'
+import { createArrival, getArrival, getArrivalForUpdate, getArrivalHistory, getArrivals, patchArrivalAssets, updateArrival } from '../controllers/arrivalController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
 import { DateRangeWithWarehouseSchema, validateQuery } from '../middleware/validation.js'
@@ -14,5 +14,6 @@ router.get('/:arrivalNumber/history', requirePermission('view_collections'),    
 router.get('/:arrivalNumber/edit',    requirePermission('create_update_arrival'),   getArrivalForUpdate)
 router.get('/:arrivalNumber',         requirePermission('view_collections'),        getArrival)
 router.put('/:arrivalNumber',         requirePermission('create_update_arrival'),   updateArrival)
+router.patch('/:arrivalNumber/assets',requirePermission('create_update_arrival'),   patchArrivalAssets)
 
 export default router

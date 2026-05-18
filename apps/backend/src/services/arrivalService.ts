@@ -1,10 +1,11 @@
-import { ArrivalDetail, CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
+import { ArrivalDetail, AssetDelta, CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { NotFoundError } from '../lib/errors.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
 
@@ -329,6 +330,70 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       cassettes: asset.cassettes,
       internal_finisher: asset.internalFinisher
     }, userId)
+  }
+}
+
+export async function patchArrivalAssets(
+  arrivalNumber: string,
+  delta: AssetDelta,
+  userId: number
+): Promise<void> {
+  const arrival = await prisma.arrival.findUnique({
+    where: { arrival_number: arrivalNumber },
+    select: { id: true }
+  })
+  if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+
+  await prisma.$transaction(async (tx) => {
+    await applyArrivalAssetDelta(tx, arrival.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
+  })
+
+  await recordCollectionUpdateOnAssets(
+    delta.assetIdsToRemove,
+    delta.assetIdsToAdd,
+    'arrival_id',
+    arrival.id,
+    userId
+  )
+  await recordAssetUpdateOnCollection(
+    'Arrival',
+    arrival.id,
+    delta.assetIdsToAdd,
+    delta.assetIdsToRemove,
+    userId
+  )
+}
+
+async function applyArrivalAssetDelta(
+  tx: Prisma.TransactionClient,
+  arrivalId: number,
+  assetIdsToAdd: number[],
+  assetIdsToRemove: number[]
+): Promise<void> {
+  if (assetIdsToAdd.length > 0) {
+    const conflicts = await tx.asset.findMany({
+      where: { id: { in: assetIdsToAdd }, arrival_id: { not: null } },
+      select: { barcode: true }
+    })
+    if (conflicts.length > 0) {
+      throw new ConflictError(
+        `Assets already assigned to an arrival: ${conflicts.map(a => a.barcode).join(', ')}`
+      )
+    }
+  }
+
+  if (assetIdsToRemove.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToRemove } },
+      data: { arrival_id: null }
+    })
+  }
+
+  if (assetIdsToAdd.length > 0) {
+    await tx.asset.updateMany({
+      where: { id: { in: assetIdsToAdd } },
+      data: { arrival_id: arrivalId }
+    })
   }
 }
 

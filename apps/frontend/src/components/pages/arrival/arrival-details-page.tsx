@@ -7,6 +7,7 @@ import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { useArrivalStore } from '@/data/store/arrival-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -25,7 +26,18 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   if (arrivalNumber === undefined) throw new Error('Missing collectionId/arrivalNumber parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('arrivals', arrivalNumber), [arrivalNumber])
+  const removeAssetFromArrival = useArrivalStore(state => state.removeAssetFromArrival)
+  const bulkRemoveAssetsFromArrival = useArrivalStore(state => state.bulkRemoveAssetsFromArrival)
+  const flushPendingRemovals = useArrivalStore(state => state.flushPendingRemovals)
+
+  const columns = useMemo(
+    () => createAssetSummaryColumns(
+      'arrivals',
+      arrivalNumber,
+      asset => removeAssetFromArrival(arrivalNumber, asset)
+    ),
+    [arrivalNumber, removeAssetFromArrival]
+  )
 
   const { data: arrival, error: detailError, isLoading: detailLoading } = useArrivalDetail(arrivalNumber)
 
@@ -36,6 +48,10 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   useEffect(() => {
     setLastPath('arrivals', pathname)
   }, [arrivalNumber])
+
+  useEffect(() => {
+    return () => flushPendingRemovals(arrivalNumber)
+  }, [arrivalNumber, flushPendingRemovals])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -73,7 +89,9 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={arrivalDetailKey(arrivalNumber)}
+        currentCollectionType="arrivals"
         returnTo={`/arrivals/${arrivalNumber}`}
+        onBulkRemove={assets => bulkRemoveAssetsFromArrival(arrivalNumber, assets)}
         totalCount={arrival.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(arrival.assets.map(a => [a.barcode, true])))}
       />

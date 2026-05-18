@@ -6,6 +6,7 @@ import {
   getTransferForUpdate,
   getTransferHistory,
   getTransfers,
+  patchTransferAssets,
   updateTransfer
 } from '../controllers/transferController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -22,5 +23,6 @@ router.get('/:transferNumber/history', requirePermission('view_collections'),   
 router.get('/:transferNumber/edit',    requirePermission('create_update_transfer'),   getTransferForUpdate)
 router.get('/:transferNumber',         requirePermission('view_collections'),         getTransferDetail)
 router.put('/:transferNumber',         requirePermission('create_update_transfer'),   updateTransfer)
+router.patch('/:transferNumber/assets',requirePermission('create_update_transfer'),   patchTransferAssets)
 
 export default router

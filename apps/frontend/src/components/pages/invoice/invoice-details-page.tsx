@@ -5,6 +5,7 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
+import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice-detail'
@@ -25,7 +26,18 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const columns = useMemo(() => createAssetSummaryColumns('invoices', invoiceNumber), [invoiceNumber])
+  const removeAssetFromInvoice = useInvoiceStore(state => state.removeAssetFromInvoice)
+  const bulkRemoveAssetsFromInvoice = useInvoiceStore(state => state.bulkRemoveAssetsFromInvoice)
+  const flushPendingRemovals = useInvoiceStore(state => state.flushPendingRemovals)
+
+  const columns = useMemo(
+    () => createAssetSummaryColumns(
+      'invoices',
+      invoiceNumber,
+      asset => removeAssetFromInvoice(invoiceNumber, asset)
+    ),
+    [invoiceNumber, removeAssetFromInvoice]
+  )
   const { data: invoice, error: detailError, isLoading: detailLoading } = useInvoiceDetail(invoiceNumber)
 
   useEffect(() => {
@@ -35,6 +47,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   useEffect(() => {
     setLastPath('invoices', pathname)
   }, [invoiceNumber])
+
+  useEffect(() => {
+    return () => flushPendingRemovals(invoiceNumber)
+  }, [invoiceNumber, flushPendingRemovals])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -75,6 +91,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         refreshKey={invoiceDetailKey(invoiceNumber)}
         currentCollectionType="invoices"
         returnTo={`/invoices/${invoiceNumber}`}
+        onBulkRemove={assets => bulkRemoveAssetsFromInvoice(invoiceNumber, assets)}
         totalCount={invoice.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(invoice.assets.map(a => [a.barcode, true])))}
       />
