@@ -13,9 +13,11 @@ import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
+import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function TransferDetailsPage(): React.JSX.Element {
@@ -28,7 +30,10 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   const removeAssetFromTransfer = useTransferStore(state => state.removeAssetFromTransfer)
   const bulkRemoveAssetsFromTransfer = useTransferStore(state => state.bulkRemoveAssetsFromTransfer)
+  const addAssetToTransfer = useTransferStore(state => state.addAssetToTransfer)
+  const addAssetsToTransfer = useTransferStore(state => state.addAssetsToTransfer)
   const flushPendingRemovals = useTransferStore(state => state.flushPendingRemovals)
+  const canEditTransfer = useCan('create_update_transfer')
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -85,6 +90,14 @@ export function TransferDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <TransferSummaryStrip transfer={transfer} />
+      {canEditTransfer && (
+        <AddAssetBar
+          existingAssets={transfer.assets}
+          entityName='transfer'
+          onAddSingle={asset => addAssetToTransfer(transferNumber, asset)}
+          onAddBatchFromHold={assets => addAssetsToTransfer(transferNumber, assets)}
+        />
+      )}
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}

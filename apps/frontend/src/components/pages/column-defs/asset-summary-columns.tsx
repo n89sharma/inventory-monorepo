@@ -6,7 +6,7 @@ import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
-import { TrashIcon } from "@phosphor-icons/react"
+import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSummary } from 'shared-types'
@@ -14,7 +14,9 @@ import type { AssetSummary } from 'shared-types'
 export function createAssetSummaryColumns(
   navigationSection: NavigationSection,
   collectionId?: string,
-  onDelete?: (asset: AssetSummary) => void): ColumnDef<AssetSummary>[] {
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
 
   const columns: ColumnDef<AssetSummary>[] = [
     {
@@ -111,6 +113,26 @@ export function createAssetSummaryColumns(
     }
   ]
 
+  if (onEdit) {
+    columns.push({
+      id: 'edit',
+      cell: ({ row }) => (
+        <Button
+          variant="outline"
+          size="icon"
+          type="button"
+          aria-label="Edit asset"
+          onClick={() => onEdit(row.original)}
+        >
+          <PencilSimpleIcon />
+        </Button>
+      ),
+      size: 50,
+      enableSorting: false,
+      enableHiding: false
+    })
+  }
+
   if (onDelete) {
     columns.push({
       id: 'delete',
@@ -121,6 +143,7 @@ export function createAssetSummaryColumns(
           type="button"
           aria-label="Remove asset"
           onClick={() => onDelete(row.original)}
+          disabled={disabledRowId === row.original.id}
         >
           <TrashIcon />
         </Button>

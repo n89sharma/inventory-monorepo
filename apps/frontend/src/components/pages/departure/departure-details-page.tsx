@@ -13,9 +13,11 @@ import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
+import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function DepartureDetailsPage(): React.JSX.Element {
@@ -28,7 +30,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   const removeAssetFromDeparture = useDepartureStore(state => state.removeAssetFromDeparture)
   const bulkRemoveAssetsFromDeparture = useDepartureStore(state => state.bulkRemoveAssetsFromDeparture)
+  const addAssetToDeparture = useDepartureStore(state => state.addAssetToDeparture)
+  const addAssetsToDeparture = useDepartureStore(state => state.addAssetsToDeparture)
   const flushPendingRemovals = useDepartureStore(state => state.flushPendingRemovals)
+  const canEditDeparture = useCan('create_update_departure')
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -84,6 +89,14 @@ export function DepartureDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <DepartureSummaryStrip departure={departure} />
+      {canEditDeparture && (
+        <AddAssetBar
+          existingAssets={departure.assets}
+          entityName='departure'
+          onAddSingle={asset => addAssetToDeparture(departureNumber, asset)}
+          onAddBatchFromHold={assets => addAssetsToDeparture(departureNumber, assets)}
+        />
+      )}
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}

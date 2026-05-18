@@ -39,6 +39,8 @@ interface TransferStore {
   submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<void>
   addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (transferNumber: string) => Promise<AssetSummary[]>
+  addAssetToTransfer: (transferNumber: string, asset: AssetSummary) => Promise<void>
+  addAssetsToTransfer: (transferNumber: string, assets: AssetSummary[]) => Promise<void>
   removeAssetFromTransfer: (transferNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromTransfer: (transferNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (transferNumber: string) => void
@@ -91,6 +93,43 @@ export const useTransferStore = create<TransferStore>((set) => ({
   getAssets: async (transferNumber) => {
     const form = await getTransferForUpdate(transferNumber)
     return form?.assets ?? []
+  },
+  addAssetToTransfer: async (transferNumber, asset) => {
+    const cacheKey = transferDetailKey(transferNumber)
+    mutate<TransferDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, asset] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchTransferAssets(transferNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
+      invalidateAssetDetails([asset.barcode])
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
+  },
+  addAssetsToTransfer: async (transferNumber, assets) => {
+    if (assets.length === 0) return
+    const cacheKey = transferDetailKey(transferNumber)
+    const ids = assets.map(a => a.id)
+    const barcodes = assets.map(a => a.barcode)
+    mutate<TransferDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, ...assets] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchTransferAssets(transferNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
+      invalidateAssetDetails(barcodes)
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
   },
   removeAssetFromTransfer: (transferNumber, asset) => {
     const key = pendingKey(transferNumber, asset.id)

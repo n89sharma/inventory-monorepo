@@ -43,6 +43,7 @@ interface HoldStore {
   submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<{ holdNumber: string }>
   addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (holdNumber: string) => Promise<AssetSummary[]>
+  addAssetToHold: (holdNumber: string, asset: AssetSummary) => Promise<void>
   removeAssetFromHold: (holdNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromHold: (holdNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (holdNumber: string) => void
@@ -100,6 +101,23 @@ export const useHoldStore = create<HoldStore>((set) => ({
   getAssets: async (holdNumber) => {
     const form = await getHoldForUpdate(holdNumber)
     return form?.assets ?? []
+  },
+  addAssetToHold: async (holdNumber, asset) => {
+    const cacheKey = holdDetailKey(holdNumber)
+    mutate<HoldDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, asset] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchHoldAssets(holdNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
+      invalidateAssetDetails([asset.barcode])
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
   },
   removeAssetFromHold: (holdNumber, asset) => {
     const key = pendingKey(holdNumber, asset.id)

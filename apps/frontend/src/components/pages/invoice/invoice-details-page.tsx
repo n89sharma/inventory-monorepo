@@ -13,9 +13,11 @@ import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
+import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
@@ -28,7 +30,9 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   const removeAssetFromInvoice = useInvoiceStore(state => state.removeAssetFromInvoice)
   const bulkRemoveAssetsFromInvoice = useInvoiceStore(state => state.bulkRemoveAssetsFromInvoice)
+  const addAssetToInvoice = useInvoiceStore(state => state.addAssetToInvoice)
   const flushPendingRemovals = useInvoiceStore(state => state.flushPendingRemovals)
+  const canEditInvoice = useCan('create_update_invoice')
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -85,6 +89,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <InvoiceSummaryStrip invoice={invoice} />
+      {canEditInvoice && (
+        <AddAssetBar
+          existingAssets={invoice.assets}
+          entityName='invoice'
+          onAddSingle={asset => addAssetToInvoice(invoiceNumber, asset)}
+        />
+      )}
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}

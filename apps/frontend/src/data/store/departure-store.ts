@@ -38,6 +38,8 @@ interface DepartureStore {
   submitCreateDeparture: (data: DepartureForm) => Promise<{ departureNumber: string }>
   submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<void>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
+  addAssetToDeparture: (departureNumber: string, asset: AssetSummary) => Promise<void>
+  addAssetsToDeparture: (departureNumber: string, assets: AssetSummary[]) => Promise<void>
   getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   removeAssetFromDeparture: (departureNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromDeparture: (departureNumber: string, assets: AssetSummary[]) => void
@@ -92,6 +94,43 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   getAssets: async (departureNumber) => {
     const form = await getDepartureForUpdate(departureNumber)
     return form?.assets ?? []
+  },
+  addAssetToDeparture: async (departureNumber, asset) => {
+    const cacheKey = departureDetailKey(departureNumber)
+    mutate<DepartureDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, asset] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchDepartureAssets(departureNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
+      invalidateAssetDetails([asset.barcode])
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
+  },
+  addAssetsToDeparture: async (departureNumber, assets) => {
+    if (assets.length === 0) return
+    const cacheKey = departureDetailKey(departureNumber)
+    const ids = assets.map(a => a.id)
+    const barcodes = assets.map(a => a.barcode)
+    mutate<DepartureDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, ...assets] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchDepartureAssets(departureNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
+      invalidateAssetDetails(barcodes)
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
   },
   removeAssetFromDeparture: (departureNumber, asset) => {
     const key = pendingKey(departureNumber, asset.id)

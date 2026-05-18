@@ -13,9 +13,11 @@ import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { DataTable } from '../../shadcn/data-table'
+import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
@@ -28,7 +30,9 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   const removeAssetFromHold = useHoldStore(state => state.removeAssetFromHold)
   const bulkRemoveAssetsFromHold = useHoldStore(state => state.bulkRemoveAssetsFromHold)
+  const addAssetToHold = useHoldStore(state => state.addAssetToHold)
   const flushPendingRemovals = useHoldStore(state => state.flushPendingRemovals)
+  const canEditHold = useCan('create_update_hold')
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -85,6 +89,14 @@ export function HoldDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <HoldSummaryStrip hold={hold} />
+      {canEditHold && (
+        <AddAssetBar
+          existingAssets={hold.assets}
+          entityName='hold'
+          onAddSingle={asset => addAssetToHold(holdNumber, asset)}
+          validateAsset={asset => asset.is_held ? `Asset ${asset.barcode} is already on a hold.` : null}
+        />
+      )}
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}

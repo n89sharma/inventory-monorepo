@@ -1,6 +1,6 @@
-import { createArrival, getArrivalForUpdate, getArrivals, patchArrivalAssets, updateArrival } from '@/data/api/arrival-api'
+import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, getArrivalForUpdate, getArrivals, patchArrivalAssets, updateArrival, updateArrivalAsset as updateArrivalAssetApi } from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
-import type { ArrivalForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ArrivalDetail, ArrivalSummary, AssetSummary, Warehouse } from 'shared-types'
 import { arrivalDetailKey } from '@/hooks/use-arrival-detail'
@@ -37,6 +37,9 @@ interface ArrivalStore {
   getArrivalForUpdate: (arrivalNumber: string) => Promise<void>
   submitCreateArrival: (data: ArrivalForm) => Promise<{ arrivalNumber: string }>
   submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<void>
+  createArrivalAsset: (arrivalNumber: string, asset: AssetForm) => Promise<void>
+  getArrivalAssetForEdit: (arrivalNumber: string, assetId: number) => Promise<AssetForm>
+  updateArrivalAsset: (arrivalNumber: string, assetId: number, asset: AssetForm) => Promise<void>
   removeAssetFromArrival: (arrivalNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromArrival: (arrivalNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (arrivalNumber: string) => void
@@ -74,6 +77,33 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
   submitUpdateArrival: async (arrivalNumber, data) => {
     await updateArrival(arrivalNumber, data)
     mutate(arrivalDetailKey(arrivalNumber))
+  },
+  createArrivalAsset: async (arrivalNumber, asset) => {
+    const cacheKey = arrivalDetailKey(arrivalNumber)
+    const created = await createSingleArrivalAsset(arrivalNumber, asset)
+    mutate<ArrivalDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, created] } : current,
+      { revalidate: false }
+    )
+    invalidateAssetDetails([created.barcode])
+    mutate(cacheKey)
+  },
+  getArrivalAssetForEdit: async (arrivalNumber, assetId) => {
+    return getArrivalAssetForUpdate(arrivalNumber, assetId)
+  },
+  updateArrivalAsset: async (arrivalNumber, assetId, asset) => {
+    const cacheKey = arrivalDetailKey(arrivalNumber)
+    const updated = await updateArrivalAssetApi(arrivalNumber, assetId, asset)
+    mutate<ArrivalDetail>(
+      cacheKey,
+      current => current
+        ? { ...current, assets: current.assets.map(a => a.id === assetId ? updated : a) }
+        : current,
+      { revalidate: false }
+    )
+    invalidateAssetDetails([updated.barcode])
+    mutate(cacheKey)
   },
   removeAssetFromArrival: (arrivalNumber, asset) => {
     const key = pendingKey(arrivalNumber, asset.id)

@@ -1,8 +1,9 @@
-import { ArrivalDetail, AssetDelta, CreateArrival, CreateAsset, UpdateArrival } from 'shared-types'
+import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrival, UpdateAsset } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
-import { getAssetsForArrival } from '../../generated/prisma/sql.js'
+import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
+import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -38,6 +39,7 @@ const arrivalIncludeArgs = {
 } satisfies ArrivalDefaultArgs
 
 type UpdateArrivalDb = ArrivalGetPayload<typeof arrivalIncludeArgs>
+type UpdateArrivalAssetDb = AssetGetPayload<typeof assetIncludeArgs>
 
 export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> {
   const [arrival, assets] = await Promise.all([
@@ -80,17 +82,21 @@ async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<Upda
     warehouse: destination,
     transporter: transporter,
     comment: notes,
-    assets: assets.map((a, i) => ({
-      id: a.id,
-      model: models[i],
-      serialNumber: a.serial_number,
-      meterBlack: a.technical_specification?.meter_black ?? 0,
-      meterColour: a.technical_specification?.meter_colour ?? 0,
-      cassettes: a.technical_specification?.cassettes ?? 0,
-      technicalStatus: a.TechnicalStatus,
-      internalFinisher: a.technical_specification?.internal_finisher ?? '',
-      coreFunctions: a.asset_accessories.map(ac => ac.Accessory)
-    }))
+    assets: assets.map((a, i) => mapDbAssetToUpdateAsset(a, models[i]))
+  }
+}
+
+function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSummary): UpdateAsset {
+  return {
+    id: dbAsset.id,
+    model,
+    serialNumber: dbAsset.serial_number,
+    meterBlack: dbAsset.technical_specification?.meter_black ?? 0,
+    meterColour: dbAsset.technical_specification?.meter_colour ?? 0,
+    cassettes: dbAsset.technical_specification?.cassettes ?? 0,
+    technicalStatus: dbAsset.TechnicalStatus,
+    internalFinisher: dbAsset.technical_specification?.internal_finisher ?? '',
+    coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory)
   }
 }
 
@@ -110,7 +116,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       created_at: currentDateTime,
       created_by: { connect: { id: userId } },
       assets: {
-        create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(a, barcodes, newArrival.warehouse.id, currentDateTime))
+        create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(a, barcodes[a.serialNumber], newArrival.warehouse.id, currentDateTime))
       }
     },
     include: {
@@ -148,12 +154,12 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
 
 function mapInputAssetToPrismaCreateAsset(
   asset: CreateAsset,
-  barcodes: Record<string, string>,
+  barcode: string,
   warehouseId: number,
   currentDateTime: Date): AssetCreateWithoutArrivalInput {
 
   return {
-    barcode: barcodes[asset.serialNumber],
+    barcode,
     serial_number: asset.serialNumber,
     model: { connect: { id: asset.model.id } },
     Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
@@ -237,23 +243,7 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
 
       const allNewAccessories: { asset_id: number; accessory_id: number }[] = []
       for (const asset of assetsToUpdate) {
-        await tx.asset.update({
-          where: { id: asset.id },
-          data: {
-            model_id: asset.model.id,
-            serial_number: asset.serialNumber,
-            technical_status_id: asset.technicalStatus.id,
-            technical_specification: {
-              update: {
-                meter_black: asset.meterBlack,
-                meter_colour: asset.meterColour,
-                meter_total: asset.meterBlack + asset.meterColour,
-                cassettes: asset.cassettes,
-                internal_finisher: asset.internalFinisher
-              }
-            }
-          }
-        })
+        await updateArrivalAssetCoreFields(tx, asset)
         for (const cf of asset.coreFunctions) {
           allNewAccessories.push({ asset_id: asset.id!, accessory_id: cf.id })
         }
@@ -264,12 +254,9 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       }
 
       for (const asset of assetsToCreate) {
-        await tx.asset.create({
-          data: {
-            ...mapInputAssetToPrismaCreateAsset(asset, newAssetBarcodes, arrival.warehouse.id, new Date()),
-            arrival: { connect: { id: arrival.id } }
-          }
-        })
+        await createArrivalAssetInTx(
+          tx, arrival.id, asset, newAssetBarcodes[asset.serialNumber], arrival.warehouse.id, new Date()
+        )
       }
 
       const newAssets = assetsToCreate.length > 0
@@ -395,6 +382,149 @@ async function applyArrivalAssetDelta(
       data: { arrival_id: arrivalId }
     })
   }
+}
+
+async function updateArrivalAssetCoreFields(
+  tx: Prisma.TransactionClient,
+  asset: UpdateAsset
+): Promise<void> {
+  await tx.asset.update({
+    where: { id: asset.id! },
+    data: {
+      model_id: asset.model.id,
+      serial_number: asset.serialNumber,
+      technical_status_id: asset.technicalStatus.id,
+      technical_specification: {
+        update: {
+          meter_black: asset.meterBlack,
+          meter_colour: asset.meterColour,
+          meter_total: asset.meterBlack + asset.meterColour,
+          cassettes: asset.cassettes,
+          internal_finisher: asset.internalFinisher
+        }
+      }
+    }
+  })
+}
+
+export async function getArrivalAssetForUpdate(
+  arrivalNumber: string,
+  assetId: number
+): Promise<UpdateAsset> {
+  const dbAsset = await prisma.asset.findFirst({
+    where: { id: assetId, arrival: { arrival_number: arrivalNumber } },
+    ...assetIncludeArgs
+  })
+  if (!dbAsset) throw new NotFoundError(`Asset ${assetId} not found on arrival ${arrivalNumber}`)
+  const model = await mapDbModelToSummaryModel(dbAsset.model_id)
+  return mapDbAssetToUpdateAsset(dbAsset, model)
+}
+
+export async function updateArrivalAsset(
+  arrivalNumber: string,
+  assetId: number,
+  asset: UpdateAsset,
+  userId: number
+): Promise<AssetSummary> {
+  const existing = await prisma.asset.findFirst({
+    where: { id: assetId, arrival: { arrival_number: arrivalNumber } },
+    select: {
+      id: true, barcode: true, model_id: true, serial_number: true, technical_status_id: true,
+      technical_specification: {
+        select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
+      }
+    }
+  })
+  if (!existing) throw new NotFoundError(`Asset ${assetId} not found on arrival ${arrivalNumber}`)
+
+  const assetWithId: UpdateAsset = { ...asset, id: assetId }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.assetAccessory.deleteMany({ where: { asset_id: assetId } })
+    await updateArrivalAssetCoreFields(tx, assetWithId)
+    if (asset.coreFunctions.length > 0) {
+      await tx.assetAccessory.createMany({
+        data: asset.coreFunctions.map(cf => ({ asset_id: assetId, accessory_id: cf.id }))
+      })
+    }
+  })
+
+  await recordAssetUpdate(assetId, {
+    model_id: existing.model_id,
+    serial_number: existing.serial_number,
+    technical_status_id: existing.technical_status_id,
+    meter_black: existing.technical_specification?.meter_black,
+    meter_colour: existing.technical_specification?.meter_colour,
+    cassettes: existing.technical_specification?.cassettes,
+    internal_finisher: existing.technical_specification?.internal_finisher
+  }, {
+    model_id: asset.model.id,
+    serial_number: asset.serialNumber,
+    technical_status_id: asset.technicalStatus.id,
+    meter_black: asset.meterBlack,
+    meter_colour: asset.meterColour,
+    cassettes: asset.cassettes,
+    internal_finisher: asset.internalFinisher
+  }, userId)
+
+  const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(existing.barcode))
+  if (!summary) throw new NotFoundError(`Asset ${existing.barcode} not found after update`)
+  return summary
+}
+
+async function createArrivalAssetInTx(
+  tx: Prisma.TransactionClient,
+  arrivalId: number,
+  asset: CreateAsset,
+  barcode: string,
+  warehouseId: number,
+  now: Date
+) {
+  return tx.asset.create({
+    data: {
+      ...mapInputAssetToPrismaCreateAsset(asset, barcode, warehouseId, now),
+      arrival: { connect: { id: arrivalId } }
+    },
+    select: {
+      id: true, barcode: true, serial_number: true, model_id: true,
+      tracking_status_id: true, availability_status_id: true, technical_status_id: true
+    }
+  })
+}
+
+export async function createSingleArrivalAsset(
+  arrivalNumber: string,
+  asset: CreateAsset,
+  userId: number
+): Promise<AssetSummary> {
+  const arrival = await prisma.arrival.findUnique({
+    where: { arrival_number: arrivalNumber },
+    select: { id: true, destination_id: true, destination: { select: { city_code: true } } }
+  })
+  if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+
+  const barcode = await getNewAssetBarcode(arrival.destination.city_code)
+  const now = new Date()
+
+  const created = await prisma.$transaction(async (tx) => {
+    return createArrivalAssetInTx(tx, arrival.id, asset, barcode, arrival.destination_id, now)
+  })
+
+  await recordBatchAssetCreate(
+    [{
+      id: created.id,
+      barcode: created.barcode,
+      serial_number: created.serial_number,
+      model_id: created.model_id,
+      arrival_id: arrival.id
+    }],
+    userId
+  )
+  await recordAssetUpdateOnCollection('Arrival', arrival.id, [created.id], [], userId)
+
+  const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(created.barcode))
+  if (!summary) throw new NotFoundError(`Asset ${created.barcode} not found after create`)
+  return summary
 }
 
 async function generateBarcodes(assets: CreateAsset[], warehouseCode: string) {

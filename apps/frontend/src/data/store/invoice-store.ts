@@ -35,6 +35,7 @@ interface InvoiceStore {
   submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<{ invoiceNumber: string }>
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
+  addAssetToInvoice: (invoiceNumber: string, asset: AssetSummary) => Promise<void>
   removeAssetFromInvoice: (invoiceNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromInvoice: (invoiceNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (invoiceNumber: string) => void
@@ -88,6 +89,23 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   getAssets: async (invoiceNumber) => {
     const form = await getInvoiceForUpdate(invoiceNumber)
     return form?.assets ?? []
+  },
+  addAssetToInvoice: async (invoiceNumber, asset) => {
+    const cacheKey = invoiceDetailKey(invoiceNumber)
+    mutate<InvoiceDetail>(
+      cacheKey,
+      current => current ? { ...current, assets: [...current.assets, asset] } : current,
+      { revalidate: false }
+    )
+    try {
+      await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
+      invalidateAssetDetails([asset.barcode])
+    } catch (err) {
+      mutate(cacheKey)
+      throw err
+    } finally {
+      mutate(cacheKey)
+    }
   },
   removeAssetFromInvoice: (invoiceNumber, asset) => {
     const key = pendingKey(invoiceNumber, asset.id)

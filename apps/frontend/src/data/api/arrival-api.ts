@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { ArrivalForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetDelta, CollectionHistory, CreateArrival, UpdateArrival, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, CollectionHistorySchema, CreateArrivalSchema, SubmitUpdateArrivalSchema, UpdateArrivalSchema } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrival, UpdateAsset, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalSchema, UpdateAssetSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateArrivalResponseSchema = z.object({ arrivalNumber: z.string() })
@@ -111,4 +111,64 @@ export async function patchArrivalAssets(
 ): Promise<void> {
   const patchArrivalAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/arrivals/${arrivalNumber}/assets`, patchArrivalAssetsBody)
+}
+
+export async function createSingleArrivalAsset(
+  arrivalNumber: string,
+  asset: AssetForm
+): Promise<AssetSummary> {
+  const createSingleArrivalAssetBody = CreateAssetSchema.parse({
+    model: asset.model!,
+    serialNumber: asset.serialNumber,
+    meterBlack: asset.meterBlack!,
+    meterColour: asset.meterColour!,
+    cassettes: asset.cassettes!,
+    technicalStatus: getSelectedOrNull(asset.technicalStatus)!,
+    internalFinisher: asset.internalFinisher,
+    coreFunctions: asset.coreFunctions
+  } satisfies CreateAsset)
+  const { data } = await api.post<AssetSummary>(`/arrivals/${arrivalNumber}/assets`, createSingleArrivalAssetBody)
+  return AssetSummarySchema.parse(data)
+}
+
+export async function getArrivalAssetForUpdate(
+  arrivalNumber: string,
+  assetId: number
+): Promise<AssetForm> {
+  const { data } = await api.get<UpdateAsset>(`/arrivals/${arrivalNumber}/assets/${assetId}/edit`)
+  return mapUpdateAssetToAssetForm(UpdateAssetSchema.parse(data))
+}
+
+function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
+  return {
+    id: asset.id,
+    model: asset.model,
+    serialNumber: asset.serialNumber,
+    meterBlack: asset.meterBlack,
+    meterColour: asset.meterColour,
+    cassettes: asset.cassettes,
+    technicalStatus: getSelectOption(asset.technicalStatus),
+    internalFinisher: asset.internalFinisher,
+    coreFunctions: asset.coreFunctions
+  }
+}
+
+export async function updateArrivalAsset(
+  arrivalNumber: string,
+  assetId: number,
+  asset: AssetForm
+): Promise<AssetSummary> {
+  const updateArrivalAssetBody = UpdateAssetSchema.parse({
+    id: assetId,
+    model: asset.model!,
+    serialNumber: asset.serialNumber,
+    meterBlack: asset.meterBlack!,
+    meterColour: asset.meterColour!,
+    cassettes: asset.cassettes!,
+    technicalStatus: getSelectedOrNull(asset.technicalStatus)!,
+    internalFinisher: asset.internalFinisher,
+    coreFunctions: asset.coreFunctions
+  } satisfies UpdateAsset)
+  const { data } = await api.patch<AssetSummary>(`/arrivals/${arrivalNumber}/assets/${assetId}`, updateArrivalAssetBody)
+  return AssetSummarySchema.parse(data)
 }

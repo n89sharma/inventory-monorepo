@@ -22,9 +22,10 @@ interface AddFromHoldModalProps {
   onOpenChange: (open: boolean) => void
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
+  onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
 }
 
-export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: AddFromHoldModalProps) {
+export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, onCommitBatch }: AddFromHoldModalProps) {
   const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
   const getHoldAssets = useHoldStore(state => state.getAssets)
   const [query, setQuery] = useState('')
@@ -59,7 +60,11 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset }: 
       const holdAssets = await getHoldAssets(selected.hold_number)
       const currentIds = new Set(getAssets().map(a => a.id))
       const toAdd = holdAssets.filter(a => !currentIds.has(a.id))
-      toAdd.forEach(asset => onAddAsset(asset))
+      if (onCommitBatch) {
+        if (toAdd.length > 0) await onCommitBatch(toAdd)
+      } else {
+        toAdd.forEach(asset => onAddAsset(asset))
+      }
       const skipped = holdAssets.length - toAdd.length
       const msg = skipped > 0
         ? `${toAdd.length} asset${toAdd.length !== 1 ? 's' : ''} added. ${skipped} duplicate${skipped !== 1 ? 's' : ''} skipped.`

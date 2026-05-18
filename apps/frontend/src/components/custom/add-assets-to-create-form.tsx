@@ -1,7 +1,7 @@
 import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useGlobalSearchStore } from '@/data/store/global-search-store'
-import { CircleNotchIcon } from '@phosphor-icons/react'
+import { CircleNotchIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { Button } from '../shadcn/button'
@@ -19,6 +19,8 @@ interface AddAssetByBarcodeProps {
   validateAsset?: (asset: AssetSummary) => string | null
   disabled?: boolean
   className?: string
+  onCommit?: (asset: AssetSummary) => Promise<void>
+  showLeadingIcon?: boolean
 }
 
 export function AddAssetByBarcode({
@@ -27,7 +29,9 @@ export function AddAssetByBarcode({
   entityName,
   validateAsset,
   disabled,
-  className
+  className,
+  onCommit,
+  showLeadingIcon
 }: AddAssetByBarcodeProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
   const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
@@ -69,7 +73,15 @@ export function AddAssetByBarcode({
           return
         }
       }
-      onAddAsset(asset)
+      if (onCommit) {
+        try {
+          await onCommit(asset)
+        } catch {
+          return
+        }
+      } else {
+        onAddAsset(asset)
+      }
       setDisplayValue('')
       setSearchQuery('')
       setSuggestions([])
@@ -110,6 +122,11 @@ export function AddAssetByBarcode({
         <PopoverTrigger asChild><div /></PopoverTrigger>
         <PopoverAnchor asChild>
           <div className='relative'>
+            {showLeadingIcon && (
+              <MagnifyingGlassIcon
+                className='absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none'
+              />
+            )}
             <Input
               ref={inputRef}
               placeholder='Scan or enter barcode / serial…'
@@ -118,7 +135,7 @@ export function AddAssetByBarcode({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               disabled={disabled || isLookingUp}
-              className='pr-8'
+              className={showLeadingIcon ? 'pl-8 pr-8' : 'pr-8'}
             />
             {isLookingUp && (
               <CircleNotchIcon
@@ -152,12 +169,14 @@ interface AddFromHoldButtonProps {
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
   disabled?: boolean
+  onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
 }
 
 export function AddFromHoldButton({
   getAssets,
   onAddAsset,
-  disabled
+  disabled,
+  onCommitBatch
 }: AddFromHoldButtonProps): React.JSX.Element {
   const [isHoldModalOpen, setIsHoldModalOpen] = useState(false)
 
@@ -176,6 +195,7 @@ export function AddFromHoldButton({
         onOpenChange={setIsHoldModalOpen}
         getAssets={getAssets}
         onAddAsset={onAddAsset}
+        onCommitBatch={onCommitBatch}
       />
     </>
   )

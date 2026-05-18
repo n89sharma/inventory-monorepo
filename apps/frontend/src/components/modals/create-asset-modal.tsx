@@ -18,14 +18,17 @@ import MultipleSelector from '../shadcn/multiple-selector'
 interface AssetModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  addNewAsset: UseFieldArrayAppend<ArrivalForm, 'assets'>
-  updateAsset: UseFieldArrayUpdate<ArrivalForm, 'assets'>
-  editingAsset: AssetForm | null
-  editingIndex: number | null
+  addNewAsset?: UseFieldArrayAppend<ArrivalForm, 'assets'>
+  updateAsset?: UseFieldArrayUpdate<ArrivalForm, 'assets'>
+  editingAsset?: AssetForm | null
+  editingIndex?: number | null
+  onCreateAsset?: (asset: AssetForm) => Promise<void>
+  onUpdateAsset?: (asset: AssetForm) => Promise<void>
 }
 
-export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editingAsset, editingIndex }: AssetModalProps): React.JSX.Element {
-  const isEditMode = editingAsset !== null
+export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editingAsset, editingIndex, onCreateAsset, onUpdateAsset }: AssetModalProps): React.JSX.Element {
+  const isEditMode = editingAsset != null
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const modalConfig = {
     title: isEditMode ? 'Edit Asset' : 'Create Asset',
@@ -67,14 +70,41 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
     }
   }
 
-  function onValidAsset(asset: AssetForm) {
-    if (isEditMode) {
-      updateAsset(editingIndex!, asset)
-      newAssetForm.reset(asset)
-    } else {
-      addNewAsset(asset)
-      newAssetForm.reset(getDefaultNewAsset())
+  async function onValidAsset(asset: AssetForm) {
+    if (isEditMode && onUpdateAsset) {
+      setIsSubmitting(true)
+      try {
+        await onUpdateAsset(asset)
+        newAssetForm.reset(asset)
+        onOpenChange(false)
+      } catch {
+        // interceptor already showed the error toast — keep modal open
+      } finally {
+        setIsSubmitting(false)
+      }
+      return
     }
+    if (isEditMode) {
+      updateAsset!(editingIndex!, asset)
+      newAssetForm.reset(asset)
+      onOpenChange(false)
+      return
+    }
+    if (onCreateAsset) {
+      setIsSubmitting(true)
+      try {
+        await onCreateAsset(asset)
+        newAssetForm.reset(getDefaultNewAsset())
+        onOpenChange(false)
+      } catch {
+        // interceptor already showed the error toast — keep modal open
+      } finally {
+        setIsSubmitting(false)
+      }
+      return
+    }
+    addNewAsset!(asset)
+    newAssetForm.reset(getDefaultNewAsset())
     onOpenChange(false)
   }
 
@@ -189,11 +219,11 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => handleOpenChange(false)} type='button'>
+          <Button variant='outline' onClick={() => handleOpenChange(false)} type='button' disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button onClick={submitAsset} type='button'>
-            {modalConfig.submitLabel}
+          <Button onClick={submitAsset} type='button' disabled={isSubmitting}>
+            {isSubmitting ? 'Saving…' : modalConfig.submitLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

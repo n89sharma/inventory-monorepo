@@ -13,9 +13,13 @@ import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import type { AssetForm } from '@/ui-types/arrival-form-types'
+import { AddAssetBarForArrival } from '../../custom/add-asset-bar-for-arrival'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { AssetModal } from '../../modals/create-asset-modal'
 import { DataTable } from '../../shadcn/data-table'
+import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
@@ -28,15 +32,43 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const removeAssetFromArrival = useArrivalStore(state => state.removeAssetFromArrival)
   const bulkRemoveAssetsFromArrival = useArrivalStore(state => state.bulkRemoveAssetsFromArrival)
+  const createArrivalAsset = useArrivalStore(state => state.createArrivalAsset)
+  const getArrivalAssetForEdit = useArrivalStore(state => state.getArrivalAssetForEdit)
+  const updateArrivalAsset = useArrivalStore(state => state.updateArrivalAsset)
   const flushPendingRemovals = useArrivalStore(state => state.flushPendingRemovals)
+  const canEditArrival = useCan('create_update_arrival')
+  const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
+  const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
+  const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
+
+  async function handleEditAsset(assetId: number) {
+    setEditingAssetId(assetId)
+    try {
+      const form = await getArrivalAssetForEdit(arrivalNumber!, assetId)
+      setEditingAssetForm(form)
+      setIsAssetModalOpen(true)
+    } catch {
+      setEditingAssetId(null)
+    }
+  }
+
+  function handleModalOpenChange(open: boolean) {
+    setIsAssetModalOpen(open)
+    if (!open) {
+      setEditingAssetId(null)
+      setEditingAssetForm(null)
+    }
+  }
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
       'arrivals',
       arrivalNumber,
-      asset => removeAssetFromArrival(arrivalNumber, asset)
+      asset => removeAssetFromArrival(arrivalNumber, asset),
+      canEditArrival ? asset => handleEditAsset(asset.id) : undefined,
+      editingAssetId
     ),
-    [arrivalNumber, removeAssetFromArrival]
+    [arrivalNumber, removeAssetFromArrival, canEditArrival, editingAssetId]
   )
 
   const { data: arrival, error: detailError, isLoading: detailLoading } = useArrivalDetail(arrivalNumber)
@@ -85,6 +117,16 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <ArrivalSummaryStrip arrival={arrival} />
+      {canEditArrival && (
+        <AddAssetBarForArrival onCreate={() => setIsAssetModalOpen(true)} />
+      )}
+      <AssetModal
+        open={isAssetModalOpen}
+        onOpenChange={handleModalOpenChange}
+        editingAsset={editingAssetForm}
+        onCreateAsset={asset => createArrivalAsset(arrivalNumber, asset)}
+        onUpdateAsset={asset => updateArrivalAsset(arrivalNumber!, editingAssetId!, asset)}
+      />
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
