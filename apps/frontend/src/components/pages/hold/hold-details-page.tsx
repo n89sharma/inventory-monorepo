@@ -67,7 +67,7 @@ export function HoldDetailsPage(): React.JSX.Element {
           </div>
         }
       />
-      <PageContent className="flex flex-col gap-4">
+      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <HoldSummaryStrip hold={hold} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -75,6 +75,8 @@ export function HoldDetailsPage(): React.JSX.Element {
         refreshKey={holdDetailKey(holdNumber)}
         currentCollectionType="holds"
         returnTo={`/holds/${holdNumber}`}
+        totalCount={hold.assets.length}
+        onSelectAll={() => setRowSelection(Object.fromEntries(hold.assets.map(a => [a.barcode, true])))}
       />
       <DataTable
         columns={columns}

@@ -67,7 +67,7 @@ export function TransferDetailsPage(): React.JSX.Element {
           </div>
         }
       />
-      <PageContent className="flex flex-col gap-4">
+      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <TransferSummaryStrip transfer={transfer} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -75,6 +75,8 @@ export function TransferDetailsPage(): React.JSX.Element {
         refreshKey={transferDetailKey(transferNumber)}
         currentCollectionType="transfers"
         returnTo={`/transfers/${transferNumber}`}
+        totalCount={transfer.assets.length}
+        onSelectAll={() => setRowSelection(Object.fromEntries(transfer.assets.map(a => [a.barcode, true])))}
       />
       <DataTable
         columns={columns}

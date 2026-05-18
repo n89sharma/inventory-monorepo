@@ -1,5 +1,5 @@
 import { useCan } from '@/hooks/use-can'
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
+import { DotsThreeVerticalIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
@@ -11,10 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
 import { useSidebar } from '../shadcn/sidebar'
@@ -71,6 +67,7 @@ export function BulkEditBar({
   const canRemoveFromCollection = currentCollectionType !== undefined
     && collectionPermissionMap[currentCollectionType]
   const showBulkRemove = onBulkRemove !== undefined && canRemoveFromCollection
+  const canCreateAnyCollection = canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
 
   function handleBulkRemove() {
     if (!onBulkRemove) return
@@ -125,7 +122,7 @@ export function BulkEditBar({
           role="region"
           aria-label="Bulk edit actions"
         >
-          <div className="flex items-center gap-2 rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg">
+          <div className="flex flex-nowrap items-center gap-2 whitespace-nowrap rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg">
             <span aria-live="polite">{getCountLabel()}</span>
             {canShowSelectAll && (
               <Button variant="ghost" onClick={onSelectAll}>
@@ -135,31 +132,36 @@ export function BulkEditBar({
             <Button variant="ghost" onClick={onClear}>
               Clear
             </Button>
-            {(canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice) &&
+            {canCreateAnyCollection && (
               <DropdownMenu>
-                <Button asChild variant="secondary">
+                <Button asChild variant="default">
                   <DropdownMenuTrigger>
-                    <PencilSimpleIcon />Bulk Edit
+                    <PlusIcon />Create
                   </DropdownMenuTrigger>
                 </Button>
                 <DropdownMenuContent className="w-max" side="top" align="end">
-                  {canEditPrices && <DropdownMenuItem onSelect={openBulkPricing}>Prices</DropdownMenuItem>}
-
-                  <DropdownMenuItem onSelect={openAddTo}>Add to collection</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Create new collection</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {currentCollectionType !== 'transfers' && canCreateTransfer && <DropdownMenuItem key='transfers' onSelect={() => createNewCollection('/transfers/new')}>Transfer</DropdownMenuItem>}
-                      {currentCollectionType !== 'departures' && canCreateDeparture && <DropdownMenuItem key='departures' onSelect={() => createNewCollection('/departures/new')}>Departure</DropdownMenuItem>}
-                      {currentCollectionType !== 'holds' && canCreateHold && <DropdownMenuItem key='holds' onSelect={() => createNewCollection('/holds/new')}>Hold</DropdownMenuItem>}
-                      {currentCollectionType !== 'invoices' && canCreateInvoice && <DropdownMenuItem key='invoices' onSelect={() => createNewCollection('/invoices/new')}>Invoice</DropdownMenuItem>}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-
+                  {currentCollectionType !== 'transfers' && canCreateTransfer && <DropdownMenuItem key='transfers' onSelect={() => createNewCollection('/transfers/new')}>Transfer</DropdownMenuItem>}
+                  {currentCollectionType !== 'departures' && canCreateDeparture && <DropdownMenuItem key='departures' onSelect={() => createNewCollection('/departures/new')}>Departure</DropdownMenuItem>}
+                  {currentCollectionType !== 'holds' && canCreateHold && <DropdownMenuItem key='holds' onSelect={() => createNewCollection('/holds/new')}>Hold</DropdownMenuItem>}
+                  {currentCollectionType !== 'invoices' && canCreateInvoice && <DropdownMenuItem key='invoices' onSelect={() => createNewCollection('/invoices/new')}>Invoice</DropdownMenuItem>}
                 </DropdownMenuContent>
               </DropdownMenu>
-            }
+            )}
+            {canCreateAnyCollection && (
+              <Button variant="secondary" onClick={openAddTo}>Add to</Button>
+            )}
+            {canEditPrices && (
+              <DropdownMenu>
+                <Button asChild variant="ghost" size="icon" aria-label="More actions">
+                  <DropdownMenuTrigger>
+                    <DotsThreeVerticalIcon />
+                  </DropdownMenuTrigger>
+                </Button>
+                <DropdownMenuContent className="w-max" side="top" align="end">
+                  <DropdownMenuItem onSelect={openBulkPricing}>Edit prices</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {showBulkRemove && (
               <Button variant="destructive" className="ml-6" onClick={handleBulkRemove}>
                 <TrashIcon />Remove

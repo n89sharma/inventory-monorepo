@@ -67,7 +67,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
           </div>
         }
       />
-      <PageContent className="flex flex-col gap-4">
+      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <InvoiceSummaryStrip invoice={invoice} />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -75,6 +75,8 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         refreshKey={invoiceDetailKey(invoiceNumber)}
         currentCollectionType="invoices"
         returnTo={`/invoices/${invoiceNumber}`}
+        totalCount={invoice.assets.length}
+        onSelectAll={() => setRowSelection(Object.fromEntries(invoice.assets.map(a => [a.barcode, true])))}
       />
       <DataTable
         columns={columns}

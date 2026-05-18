@@ -67,13 +67,15 @@ export function ArrivalDetailsPage(): React.JSX.Element {
           </div>
         }
       />
-      <PageContent className="flex flex-col gap-4">
+      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <ArrivalSummaryStrip arrival={arrival} />
       <BulkEditBar
         selectedAssets={selectedAssets}
         onClear={() => setRowSelection({})}
         refreshKey={arrivalDetailKey(arrivalNumber)}
         returnTo={`/arrivals/${arrivalNumber}`}
+        totalCount={arrival.assets.length}
+        onSelectAll={() => setRowSelection(Object.fromEntries(arrival.assets.map(a => [a.barcode, true])))}
       />
       <DataTable
         columns={columns}

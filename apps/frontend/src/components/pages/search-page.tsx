@@ -230,7 +230,7 @@ export function QueryPage(): React.JSX.Element {
           </fieldset>
         </form>
       </StickyPageHeader>
-      <PageContent className="flex flex-col gap-2">
+      <PageContent className={`flex flex-col gap-2 ${Object.keys(rowSelection).length > 0 ? 'pb-24' : ''}`}>
         <div hidden={!isLoading} role="status" aria-live="polite">
           <span>Loading…</span>
         </div>
