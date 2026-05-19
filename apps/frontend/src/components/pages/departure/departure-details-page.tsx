@@ -5,7 +5,6 @@ import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { getDepartureHistory } from '@/data/api/departure-api'
-import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
@@ -23,12 +22,9 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
-
-  const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { pathname, state } = useLocation()
-
   if (departureNumber === undefined) throw new Error('Missing collectionId parameter')
-
+  
+  const { state } = useLocation()
   const mutations = useDepartureMutations()
   const canEditDeparture = useCan('create_update_departure')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
@@ -46,10 +42,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
   }, [])
-
-  useEffect(() => {
-    setLastPath('departures', pathname)
-  }, [departureNumber])
 
   useEffect(() => {
     return () => mutations.flushPending(departureNumber)

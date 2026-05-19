@@ -12,16 +12,13 @@ import { PageContent } from '@/components/layout/page-content'
 import { EditLocationModal } from '@/components/modals/edit-location-modal'
 import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
-import { useNavigationStore } from '@/data/store/navigation-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
 import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
-import type { NavigationSection } from '@/ui-types/navigation-context'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import type { AssetHistory } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
@@ -41,8 +38,6 @@ const EMPTY_TAGS: { display: string; id: string }[] = []
 export const AssetDetailsPage = () => {
 
   const { section, collectionId, assetId } = useAssetDetailsParams()
-  const { pathname } = useLocation()
-  const setLastPath = useNavigationStore(state => state.setLastPath)
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [historyEnabled, setHistoryEnabled] = useState(false)
@@ -53,10 +48,6 @@ export const AssetDetailsPage = () => {
   const comments = data?.comments ?? []
   const transfers = data?.transfers ?? []
   const partTransfers = data?.partTransfers ?? []
-
-  useEffect(() => {
-    if (section) setLastPath(section as NavigationSection, pathname)
-  }, [assetId])
 
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')

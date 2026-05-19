@@ -5,7 +5,6 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
-import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
@@ -23,12 +22,9 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
-
-  const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { pathname, state } = useLocation()
-
   if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
 
+  const { state } = useLocation()
   const mutations = useInvoiceMutations()
   const canEditInvoice = useCan('create_update_invoice')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
@@ -46,10 +42,6 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
   }, [])
-
-  useEffect(() => {
-    setLastPath('invoices', pathname)
-  }, [invoiceNumber])
 
   useEffect(() => {
     return () => mutations.flushPending(invoiceNumber)

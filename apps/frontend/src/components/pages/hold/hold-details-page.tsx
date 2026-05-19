@@ -5,7 +5,6 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
-import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
@@ -23,12 +22,9 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function HoldDetailsPage(): React.JSX.Element {
   const { collectionId: holdNumber } = useParams<{ collectionId: string }>()
-
-  const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { pathname, state } = useLocation()
-
   if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
-
+  
+  const { state } = useLocation()
   const mutations = useHoldMutations()
   const canEditHold = useCan('create_update_hold')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
@@ -46,10 +42,6 @@ export function HoldDetailsPage(): React.JSX.Element {
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
   }, [])
-
-  useEffect(() => {
-    setLastPath('holds', pathname)
-  }, [holdNumber])
 
   useEffect(() => {
     return () => mutations.flushPending(holdNumber)

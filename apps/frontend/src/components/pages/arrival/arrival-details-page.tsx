@@ -8,7 +8,6 @@ import { formatDate } from '@/lib/formatters'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useNavigationStore } from '@/data/store/navigation-store'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -26,8 +25,7 @@ import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
 
-  const setLastPath = useNavigationStore(state => state.setLastPath)
-  const { pathname, state } = useLocation()
+  const { state } = useLocation()
 
   if (arrivalNumber === undefined) throw new Error('Missing collectionId/arrivalNumber parameter')
 
@@ -73,10 +71,6 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   useEffect(() => {
     if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
   }, [])
-
-  useEffect(() => {
-    setLastPath('arrivals', pathname)
-  }, [arrivalNumber])
 
   useEffect(() => {
     return () => mutations.flushPending(arrivalNumber)

@@ -15,9 +15,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail
 } from "@/components/shadcn/sidebar"
-import { useNavigationStore } from '@/data/store/navigation-store'
 import { useCan } from '@/hooks/use-can'
-import { isNavigationSection, type NavigationSection } from "@/ui-types/navigation-context"
 import {
   CaretDownIcon,
   ChartLineUpIcon,
@@ -75,8 +73,6 @@ const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-p
 
 export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
-  const lastPaths = useNavigationStore(state => state.lastPaths)
-  const clearLastPath = useNavigationStore(state => state.clearLastPath)
 
   const canManageSettings = useCan('manage_settings')
   const canManageUsers = useCan('manage_users')
@@ -84,12 +80,6 @@ export function AppSidebar(): React.JSX.Element {
 
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
-
-  useEffect(() => {
-    if (isNavigationSection(location.pathname.slice(1))) {
-      clearLastPath(location.pathname.slice(1) as NavigationSection)
-    }
-  }, [location.pathname])
 
   useEffect(() => {
     if (isSettingsActive) setSettingsOpen(true)
@@ -118,15 +108,11 @@ export function AppSidebar(): React.JSX.Element {
           <SidebarGroupContent>
             <SidebarMenu>
               {sidebarItems.map((item) => {
-                const section = item.url.slice(1)
-                const resolvedUrl = isNavigationSection(section)
-                  ? (lastPaths[section as NavigationSection] ?? item.url)
-                  : item.url
                 const isActive = location.pathname.startsWith(item.url)
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
-                      <Link to={resolvedUrl}>
+                      <Link to={item.url}>
                         {item.icon}
                         <span>{item.title}</span>
                       </Link>
