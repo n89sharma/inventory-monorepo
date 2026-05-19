@@ -1,4 +1,4 @@
-import { invalidateAssetDetails } from '@/data/cache/asset-cache'
+import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import type { AssetDelta, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'

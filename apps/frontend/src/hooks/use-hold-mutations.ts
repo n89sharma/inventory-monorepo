@@ -1,5 +1,5 @@
 import { createHold, getHoldDetail, patchHoldAssets, updateHoldMetadata } from '@/data/api/hold-api'
-import { invalidateAssetDetails } from '@/data/cache/asset-cache'
+import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { holdDetailKey, invalidateHoldLists } from '@/hooks/use-hold'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'

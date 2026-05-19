@@ -1,5 +1,5 @@
 import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, patchArrivalAssets, updateArrivalAsset, updateArrivalMetadata } from '@/data/api/arrival-api'
-import { invalidateAssetDetails } from '@/data/cache/asset-cache'
+import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { arrivalDetailKey, invalidateArrivalLists } from '@/hooks/use-arrival'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
