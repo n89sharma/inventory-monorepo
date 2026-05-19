@@ -571,10 +571,6 @@ export type TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TechnicalSpecificationUpdateToOneWithWhereWithoutAssetInput, Prisma.TechnicalSpecificationUpdateWithoutAssetInput>, Prisma.TechnicalSpecificationUncheckedUpdateWithoutAssetInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type TechnicalSpecificationCreateWithoutAssetInput = {
   cassettes?: number | null
   internal_finisher?: string | null

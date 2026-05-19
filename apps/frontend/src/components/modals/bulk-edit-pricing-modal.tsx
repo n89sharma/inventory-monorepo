@@ -30,6 +30,7 @@ interface BulkEditPricingModalProps {
 
 type PricingRow = {
   barcode: string
+  serial_number: string
   brand: string
   model: string
   meter_total: number | null
@@ -103,6 +104,12 @@ const columns: ColumnDef<PricingRow>[] = [
     size: 120,
   },
   {
+    accessorKey: 'serial_number',
+    header: () => <div className="text-center">Serial #</div>,
+    cell: ({ getValue }) => <div className="text-center font-mono">{getValue() as string}</div>,
+    size: 120,
+  },
+  {
     id: 'meter',
     header: () => <div className="text-center">Meter</div>,
     cell: ({ row }) => <div className="text-center">{formatThousandsK(row.original.meter_total)}</div>,
@@ -144,6 +151,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
           const { cost } = r.value
           return {
             barcode: asset.barcode,
+            serial_number: asset.serial_number,
             brand: asset.brand,
             model: asset.model,
             meter_total: asset.meter_total,
@@ -157,6 +165,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
         }
         return {
           barcode: asset.barcode,
+          serial_number: asset.serial_number,
           brand: asset.brand,
           model: asset.model,
           meter_total: asset.meter_total,
@@ -224,7 +233,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[min(80vw,1100px)] max-h-[min(80vh,800px)] flex flex-col">
+        <DialogContent className="sm:max-w-[min(90vw,1300px)] max-h-[min(80vh,800px)] flex flex-col">
           <DialogHeader>
             <DialogTitle>Bulk Edit Pricing</DialogTitle>
           </DialogHeader>

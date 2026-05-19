@@ -114,7 +114,9 @@ export const AssetScalarFieldEnum = {
   hold_id: 'hold_id',
   created_at: 'created_at',
   is_held: 'is_held',
-  location_id: 'location_id'
+  location_id: 'location_id',
+  barcode_normalized: 'barcode_normalized',
+  serial_normalized: 'serial_normalized'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]

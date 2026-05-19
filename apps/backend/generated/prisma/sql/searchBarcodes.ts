@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param q
  */
-export const searchBarcodes = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\na.serial_number as serial_number,\nat.asset_type as asset_type,\nm.name as model\nfrom \"Asset\" a\njoin \"Model\" m on m.id = a.model_id\njoin \"AssetType\" at on at.id = m.asset_type_id\nwhere a.barcode like $1 || '%'\nor a.serial_number like '%' || $1 || '%'\norder by a.barcode\nlimit 5") as (q: string) => $runtime.TypedSql<searchBarcodes.Parameters, searchBarcodes.Result>
+export const searchBarcodes = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\na.serial_number as serial_number,\nat.asset_type as asset_type,\nm.name as model\nfrom \"Asset\" a\njoin \"Model\" m on m.id = a.model_id\njoin \"AssetType\" at on at.id = m.asset_type_id\nwhere a.barcode_normalized like '%' || $1 || '%'\nor a.serial_normalized  like '%' || $1 || '%'\nor a.barcode_normalized % $1\nor a.serial_normalized  % $1\norder by\n(a.barcode_normalized = $1) desc,\n(a.barcode_normalized like $1 || '%') desc,\ngreatest(\nsimilarity(a.barcode_normalized, $1),\nsimilarity(a.serial_normalized,  $1)\n) desc,\na.barcode\nlimit 5") as (q: string) => $runtime.TypedSql<searchBarcodes.Parameters, searchBarcodes.Result>
 
 export namespace searchBarcodes {
   export type Parameters = [q: string]

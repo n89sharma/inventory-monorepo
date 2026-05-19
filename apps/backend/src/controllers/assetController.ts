@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
+import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import {
   getAssets as getAssetsSer,
@@ -26,7 +27,7 @@ import {
 } from '../services/assetService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
-  q: z.string().min(1)
+  q: z.string().min(1).max(50).regex(/^[a-zA-Z0-9\s\-_.]*$/)
 })
 
 export const LocationsByWarehouseQuerySchema = z.object({
@@ -178,6 +179,11 @@ export const exportAssets = asyncHandler(async (req, res) => {
 
 export const getBarcodeSuggestions = asyncHandler(async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {
   const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
-  const results = await prisma.$queryRawTyped(searchBarcodes(q.toUpperCase()))
+  const normalized = normalizeForSearch(q)
+  if (!normalized) {
+    res.json(successResponse([]))
+    return
+  }
+  const results = await prisma.$queryRawTyped(searchBarcodes(normalized))
   res.json(successResponse(results))
 })
