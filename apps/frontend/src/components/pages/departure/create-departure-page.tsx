@@ -33,7 +33,7 @@ export function CreateDeparturePage(): React.JSX.Element {
     try {
       const { departureNumber } = await mutations.create(data)
       const destination = returnTo ?? `/departures/${departureNumber}`
-      navigate(destination, { state: { successMessage: `Departure ${departureNumber} created!` } })
+      navigate(destination, { state: { successToast: { entity: 'departure', id: departureNumber } } })
     } catch {
       // interceptor already showed the error toast
     }

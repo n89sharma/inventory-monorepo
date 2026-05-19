@@ -33,7 +33,7 @@ export function CreateTransferPage(): React.JSX.Element {
     try {
       const { transferNumber } = await mutations.create(data)
       const destination = returnTo ?? `/transfers/${transferNumber}`
-      navigate(destination, { state: { successMessage: `Transfer ${transferNumber} created!` } })
+      navigate(destination, { state: { successToast: { entity: 'transfer', id: transferNumber } } })
     } catch {
       // interceptor already showed the error toast
     }

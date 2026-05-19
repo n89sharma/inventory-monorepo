@@ -11,7 +11,7 @@ import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
+import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
@@ -40,7 +40,8 @@ export function HoldDetailsPage(): React.JSX.Element {
   const { data: hold, error: detailError, isLoading: detailLoading } = useHoldDetail(holdNumber)
 
   useEffect(() => {
-    if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
+    const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
+    if (payload) showEntityCreatedToast(payload)
   }, [])
 
   useEffect(() => {

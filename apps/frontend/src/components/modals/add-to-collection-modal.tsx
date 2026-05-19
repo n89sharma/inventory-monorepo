@@ -8,17 +8,23 @@ import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
+import { EntityLink, entityLabel, type LinkableEntity } from '@/lib/success-toast'
 import { mutate } from 'swr'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { DetailGrid, emptyResults, SearchView, type CollectionResults, type SelectedCollection } from './collection-search'
 
 function collectionLabel(s: SelectedCollection): string {
+  const { entity, id } = collectionRef(s)
+  return `${entityLabel(entity)} ${id}`
+}
+
+function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: string } {
   switch (s.kind) {
-    case 'departure': return `Departure ${s.data.departure_number}`
-    case 'transfer': return `Transfer ${s.data.transfer_number}`
-    case 'hold': return `Hold ${s.data.hold_number}`
-    case 'invoice': return `Invoice ${s.data.invoice_number}`
+    case 'departure': return { entity: 'departure', id: s.data.departure_number }
+    case 'transfer': return { entity: 'transfer', id: s.data.transfer_number }
+    case 'hold': return { entity: 'hold', id: s.data.hold_number }
+    case 'invoice': return { entity: 'invoice', id: s.data.invoice_number }
   }
 }
 
@@ -189,9 +195,11 @@ export function AddToCollectionModal({
           break
         }
       }
+      const assetNoun = `asset${added! !== 1 ? 's' : ''}`
+      const ref = collectionRef(selected)
       const msg = skipped > 0
-        ? `${added!} asset${added! !== 1 ? 's' : ''} added. ${skipped} already present and skipped.`
-        : `${added!} asset${added! !== 1 ? 's' : ''} added to ${collectionLabel(selected)}.`
+        ? <>{added!} {assetNoun} added. {skipped} already present and skipped.</>
+        : <>{added!} {assetNoun} added to {entityLabel(ref.entity)} <EntityLink entity={ref.entity} id={ref.id} />.</>
       toast.success(msg, { position: 'top-center' })
       if (refreshKey) mutate(refreshKey)
       onConfirmSuccess()

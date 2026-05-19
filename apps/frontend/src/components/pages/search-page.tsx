@@ -7,6 +7,7 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchResults } from '@/hooks/use-search-results'
 import {
   filtersToParams,
+  MIN_QUERY_LENGTH,
   paramsToFilters,
   type SearchFilters,
 } from '@/lib/search-url-params'
@@ -18,8 +19,8 @@ import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
 import { InputWithClearInline } from '../custom/input-with-clear'
+import { ModelSearchInput } from '../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../custom/multi-select-options'
-import { PopoverSearchInline } from '../custom/popover-search'
 import { DataTable } from "../shadcn/data-table"
 import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
 
@@ -138,7 +139,9 @@ export function QueryPage(): React.JSX.Element {
   }
 
   const exportDisabled = assets.length === 0 || exportLoading
-  const searchDisabled = !draft.model || isLoading || exportLoading
+  const hasSearchTarget = draft.model !== null
+    || (draft.modelQuery !== null && draft.modelQuery.length >= MIN_QUERY_LENGTH)
+  const searchDisabled = !hasSearchTarget || isLoading || exportLoading
 
   return (
     <>
@@ -162,15 +165,20 @@ export function QueryPage(): React.JSX.Element {
           onSubmit={e => { e.preventDefault(); submitQuery() }}
         >
           <fieldset disabled={exportLoading} className="contents">
-            <PopoverSearchInline
+            <ModelSearchInput
               selection={draft.model}
-              onSelectionChange={m => setDraft({ ...draft, model: m })}
-              onClear={() => setDraft({ ...draft, model: null })}
+              query={draft.modelQuery ?? ''}
+              onSelectionChange={m => setDraft({ ...draft, model: m, modelQuery: null })}
+              onQueryChange={text => setDraft({
+                ...draft,
+                modelQuery: text.length > 0 ? text : null,
+                model: null,
+              })}
+              onClear={() => setDraft({ ...draft, model: null, modelQuery: null })}
               options={models}
               searchKey='model_name'
               getLabel={m => `${m.brand_name} ${m.model_name}`}
-              fieldLabel='Model'
-              fieldRequired={true}
+              placeholder='Model *'
               className='w-45'
             />
 

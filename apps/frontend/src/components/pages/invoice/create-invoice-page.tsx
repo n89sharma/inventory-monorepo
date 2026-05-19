@@ -33,7 +33,7 @@ export function CreateInvoicePage(): React.JSX.Element {
     try {
       const { invoiceNumber } = await mutations.create(data)
       const destination = returnTo ?? `/invoices/${invoiceNumber}`
-      navigate(destination, { state: { successMessage: `Invoice ${invoiceNumber} created!` } })
+      navigate(destination, { state: { successToast: { entity: 'invoice', id: invoiceNumber } } })
     } catch {
       // interceptor already showed the error toast
     }

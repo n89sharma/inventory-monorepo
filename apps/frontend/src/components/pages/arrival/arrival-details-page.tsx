@@ -11,7 +11,7 @@ import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
+import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { AddAssetBarForArrival } from '../../custom/add-asset-bar-for-arrival'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
@@ -69,7 +69,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const { data: arrival, error: detailError, isLoading: detailLoading } = useArrivalDetail(arrivalNumber)
 
   useEffect(() => {
-    if (state?.successMessage) toast.success(state.successMessage, { position: 'top-center' })
+    const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
+    if (payload) showEntityCreatedToast(payload)
   }, [])
 
   useEffect(() => {

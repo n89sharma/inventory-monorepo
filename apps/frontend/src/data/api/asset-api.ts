@@ -11,7 +11,6 @@ import type {
   Comment,
   CreateComment,
   CreatePartTransfer,
-  ModelSummary,
   PartTransfer,
   Status,
   UpdateAssetErrors,
@@ -177,7 +176,7 @@ export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
 }
 
 export async function getAssetsForQuery(
-  model: ModelSummary,
+  modelName: string,
   meter: number | null,
   trackingStatuses: Status[],
   availabilityStatuses: Status[],
@@ -186,7 +185,7 @@ export async function getAssetsForQuery(
 
   const { data } = await api.get<AssetSummary[]>(`/assets`, {
     params: {
-      model: model.model_name,
+      model: modelName,
       meter: meter ?? undefined,
       trackingStatusIds: trackingStatuses.map(s => s.id),
       availabilityStatusIds: availabilityStatuses.map(s => s.id),

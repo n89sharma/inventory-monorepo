@@ -33,7 +33,7 @@ export function CreateHoldPage(): React.JSX.Element {
     try {
       const { holdNumber } = await mutations.create(data)
       const destination = returnTo ?? `/holds/${holdNumber}`
-      navigate(destination, { state: { successMessage: `Hold ${holdNumber} created!` } })
+      navigate(destination, { state: { successToast: { entity: 'hold', id: holdNumber } } })
     } catch {
       // interceptor already showed the error toast
     }

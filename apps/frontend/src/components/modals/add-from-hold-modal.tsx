@@ -4,6 +4,7 @@ import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
 import type { AssetSummary, HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
+import { EntityLink } from '@/lib/success-toast'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { DetailGrid, emptyResults, SearchView, type CollectionResults } from './collection-search'
@@ -66,9 +67,10 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, on
         toAdd.forEach(asset => onAddAsset(asset))
       }
       const skipped = holdAssets.length - toAdd.length
+      const assetNoun = `asset${toAdd.length !== 1 ? 's' : ''}`
       const msg = skipped > 0
-        ? `${toAdd.length} asset${toAdd.length !== 1 ? 's' : ''} added. ${skipped} duplicate${skipped !== 1 ? 's' : ''} skipped.`
-        : `${toAdd.length} asset${toAdd.length !== 1 ? 's' : ''} added from Hold ${selected.hold_number}.`
+        ? <>{toAdd.length} {assetNoun} added. {skipped} duplicate{skipped !== 1 ? 's' : ''} skipped.</>
+        : <>{toAdd.length} {assetNoun} added from Hold <EntityLink entity="hold" id={selected.hold_number} />.</>
       toast.success(msg, { position: 'top-center' })
       handleOpenChange(false)
     } catch {

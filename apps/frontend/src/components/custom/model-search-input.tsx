@@ -1,0 +1,215 @@
+import { useState, useMemo, useRef, useEffect } from 'react'
+import Fuse from 'fuse.js'
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
+import { ScrollArea } from '../shadcn/scroll-area'
+import { XIcon } from '@phosphor-icons/react'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '../shadcn/input-group'
+import { Field } from '../shadcn/field'
+import { Badge } from '../shadcn/badge'
+import { cn } from '@/lib/utils'
+
+const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
+const SUGGESTION_LIMIT = 6
+const FUSE_THRESHOLD = 0.5
+
+export type ModelSearchInputProps<T> = {
+  selection: T | null
+  query: string
+  onSelectionChange: (item: T) => void
+  onQueryChange: (text: string) => void
+  onClear: () => void
+  options: T[]
+  searchKey: string
+  getLabel: (item: T) => string
+  placeholder: string
+  className?: string
+}
+
+export function ModelSearchInput<T>({
+  selection,
+  query,
+  onSelectionChange,
+  onQueryChange,
+  onClear,
+  options,
+  searchKey,
+  getLabel,
+  placeholder,
+  className,
+}: ModelSearchInputProps<T>): React.JSX.Element {
+  const [matches, setMatches] = useState<T[]>([])
+  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [pendingFocus, setPendingFocus] = useState(false)
+
+  useEffect(() => {
+    if (pendingFocus && !selection && inputRef.current) {
+      inputRef.current.focus()
+      setPendingFocus(false)
+    }
+  }, [pendingFocus, selection])
+
+  const fuse = useMemo(
+    () => new Fuse(options, {
+      keys: [searchKey],
+      threshold: FUSE_THRESHOLD,
+      shouldSort: true,
+    }),
+    [options, searchKey],
+  )
+
+  function updateSearch(rawInput: string) {
+    const clean = rawInput.replace(DISALLOWED_CHARS_PATTERN, '')
+    onQueryChange(clean)
+    if (!clean.trim()) {
+      setMatches([])
+      setPopoverOpen(false)
+      setHighlightedIndex(-1)
+      return
+    }
+    setMatches(fuse.search(clean, { limit: SUGGESTION_LIMIT }).map(r => r.item))
+    setPopoverOpen(true)
+  }
+
+  function handleSelect(item: T) {
+    onSelectionChange(item)
+    setPopoverOpen(false)
+    setMatches([])
+    setHighlightedIndex(-1)
+  }
+
+  function handleClear() {
+    onClear()
+    setPopoverOpen(false)
+    setMatches([])
+    setHighlightedIndex(-1)
+    setPendingFocus(true)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setHighlightedIndex(prev => (prev < matches.length - 1 ? prev + 1 : prev))
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1))
+        break
+      case 'Enter':
+        if (highlightedIndex >= 0 && highlightedIndex < matches.length) {
+          e.preventDefault()
+          handleSelect(matches[highlightedIndex])
+        }
+        break
+      case 'Escape':
+        setPopoverOpen(false)
+        setHighlightedIndex(-1)
+        break
+      case 'Tab':
+        setPopoverOpen(false)
+        setHighlightedIndex(-1)
+        break
+    }
+  }
+
+  if (selection) {
+    return (
+      <div className={className}>
+        <Field>
+          <div className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5">
+            <Badge variant="secondary" className="min-w-0 max-w-full gap-1 pr-0.5">
+              <span className="truncate">{getLabel(selection)}</span>
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Clear model"
+                className={cn(
+                  "ml-0.5 inline-flex size-4 shrink-0 items-center justify-center",
+                  "rounded-full hover:bg-foreground/10",
+                )}
+              >
+                <XIcon aria-hidden="true" />
+              </button>
+            </Badge>
+          </div>
+        </Field>
+      </div>
+    )
+  }
+
+  return (
+    <div className={className}>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <div />
+        </PopoverTrigger>
+        <PopoverAnchor asChild>
+          <Field>
+            <InputGroup>
+              <InputGroupInput
+                value={query}
+                onChange={e => updateSearch(e.target.value)}
+                onKeyDown={handleKeyDown}
+                ref={inputRef}
+                placeholder={placeholder}
+                autoComplete="off"
+                role="combobox"
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  size="icon-sm"
+                  onClick={handleClear}
+                  hidden={!query.length}
+                  type="button"
+                  aria-label="Clear"
+                >
+                  <XIcon aria-hidden="true" />
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+        </PopoverAnchor>
+        <PopoverContent
+          align="start"
+          onOpenAutoFocus={e => { e.preventDefault() }}
+          onCloseAutoFocus={e => { e.preventDefault() }}
+          className="w-[var(--radix-popover-trigger-width)]"
+        >
+          <ScrollArea>
+            {matches.map((m, i) => (
+              <button
+                key={`${getLabel(m)}-${i}`}
+                type="button"
+                role="option"
+                aria-selected={highlightedIndex === i}
+                onClick={() => handleSelect(m)}
+                onMouseDown={e => { e.preventDefault() }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleSelect(m)
+                  }
+                }}
+                className={cn(
+                  "w-full text-left p-2 cursor-pointer rounded-sm",
+                  highlightedIndex === i
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent/50",
+                )}
+              >
+                {getLabel(m)}
+              </button>
+            ))}
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}

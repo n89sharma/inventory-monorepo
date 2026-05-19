@@ -19,7 +19,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(Get-ChildItem *)",
       "Bash(Select-Object Name)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "PowerShell(npm run *)"
     ]
   },
   "enabledMcpjsonServers": [
