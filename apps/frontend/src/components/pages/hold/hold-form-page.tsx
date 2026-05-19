@@ -48,6 +48,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
     }
   })
   const users = useUserStore(state => state.users)
+  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState
@@ -90,7 +91,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                   <SelectOptions
                     selection={value}
                     onSelectionChange={onChange}
-                    options={users}
+                    options={activeUsers}
                     getLabel={u => u.name}
                     getKey={u => u.name}
                     fieldLabel='Created For'
