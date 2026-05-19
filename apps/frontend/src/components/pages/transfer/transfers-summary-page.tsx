@@ -3,9 +3,9 @@ import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useTransferStore } from "@/data/store/transfer-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
+import { useTransfersList } from "@/hooks/use-transfers-list"
 import { preloadTransferDetail } from "@/hooks/use-transfer-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
@@ -15,8 +15,6 @@ import { CollectionPage } from "../collection-page"
 import { transferTableColumns } from "../column-defs/transfer-columns"
 
 export function TransferSummaryPage(): React.JSX.Element {
-  const transfers = useTransferStore(state => state.transfers)
-  const getTransfers = useTransferStore(state => state.getTransfers)
   const fromDate = useTransferStore(state => state.fromDate)
   const toDate = useTransferStore(state => state.toDate)
   const origin = useTransferStore(state => state.origin)
@@ -26,11 +24,14 @@ export function TransferSummaryPage(): React.JSX.Element {
   const setOrigin = useTransferStore(state => state.setOrigin)
   const setDestination = useTransferStore(state => state.setDestination)
   const hasSearched = useTransferStore(state => state.hasSearched)
+  const setHasSearched = useTransferStore(state => state.setHasSearched)
   const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
-  async function onTransferSearch({ fromDate, toDate, origin, destination }: SearchOptions) {
-    await getTransfers(fromDate, toDate, origin ?? ANY_OPTION, destination ?? ANY_OPTION)
+  const { data: transfers = [] } = useTransfersList(fromDate, toDate, origin, destination)
+
+  async function onTransferSearch(_: SearchOptions) {
+    setHasSearched(true)
   }
 
   useAutoSearch(hasSearched, onTransferSearch, { setFromDate, setToDate, setOrigin, setDestination })

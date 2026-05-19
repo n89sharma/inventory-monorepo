@@ -2,9 +2,9 @@ import { useHoldStore } from "@/data/store/hold-store"
 import { useUserStore } from "@/data/store/user-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
+import { useHoldsList } from "@/hooks/use-holds-list"
 import { preloadHoldDetail } from "@/hooks/use-hold-detail"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
@@ -14,8 +14,6 @@ import { CollectionPage } from "../collection-page"
 import { holdTableColumns } from "../column-defs/hold-columns"
 
 export function HoldSummaryPage(): React.JSX.Element {
-  const holds = useHoldStore(state => state.holds)
-  const getHolds = useHoldStore(state => state.getHolds)
   const fromDate = useHoldStore(state => state.fromDate)
   const toDate = useHoldStore(state => state.toDate)
   const setFromDate = useHoldStore(state => state.setFromDate)
@@ -25,10 +23,13 @@ export function HoldSummaryPage(): React.JSX.Element {
   const setHoldBy = useHoldStore(state => state.setHoldBy)
   const setHoldFor = useHoldStore(state => state.setHoldFor)
   const hasSearched = useHoldStore(state => state.hasSearched)
+  const setHasSearched = useHoldStore(state => state.setHasSearched)
   const activeUsers = useUserStore(state => state.users)
 
-  async function onHoldSearch({ fromDate, toDate, holdBy, holdFor }: SearchOptions) {
-    await getHolds(fromDate, toDate, holdBy ?? ANY_OPTION, holdFor ?? ANY_OPTION)
+  const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor)
+
+  async function onHoldSearch(_: SearchOptions) {
+    setHasSearched(true)
   }
 
   useAutoSearch(hasSearched, onHoldSearch, { setFromDate, setToDate, setHoldBy, setHoldFor })

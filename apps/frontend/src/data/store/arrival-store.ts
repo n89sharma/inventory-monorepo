@@ -1,10 +1,11 @@
-import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, getArrivals, patchArrivalAssets, updateArrivalAsset as updateArrivalAssetApi, updateArrivalMetadata as updateArrivalMetadataApi } from '@/data/api/arrival-api'
+import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, patchArrivalAssets, updateArrivalAsset as updateArrivalAssetApi, updateArrivalMetadata as updateArrivalMetadataApi } from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import type { ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetSummary, Warehouse } from 'shared-types'
+import type { ArrivalDetail, AssetSummary, Warehouse } from 'shared-types'
 import { arrivalDetailKey } from '@/hooks/use-arrival-detail'
+import { invalidateArrivalLists } from '@/hooks/use-arrivals-list'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -17,23 +18,15 @@ function pendingKey(arrivalNumber: string, assetId: number): string {
 }
 
 interface ArrivalStore {
-  arrivals: ArrivalSummary[]
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   destination: SelectOption<Warehouse>
-  loading: boolean
   hasSearched: boolean
 
-  setArrivals: (arrivals: ArrivalSummary[]) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setDestination: (warehouse: SelectOption<Warehouse>) => void
-  setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
-  getArrivals: (
-    fromDate: SelectOption<Date>,
-    toDate: SelectOption<Date>,
-    destination: SelectOption<Warehouse>) => Promise<void>
   submitCreateArrival: (data: ArrivalForm) => Promise<{ arrivalNumber: string }>
   updateArrivalMetadata: (arrivalNumber: string, metadata: ArrivalMetadataForm) => Promise<void>
   createArrivalAsset: (arrivalNumber: string, asset: AssetForm) => Promise<void>
@@ -42,35 +35,28 @@ interface ArrivalStore {
   removeAssetFromArrival: (arrivalNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromArrival: (arrivalNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (arrivalNumber: string) => void
-  clearArrivals: () => void
 }
 
 export const useArrivalStore = create<ArrivalStore>((set) => ({
-  arrivals: [],
-  loading: false,
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   destination: ANY_OPTION,
   hasSearched: false,
 
-  setArrivals: (arrivals) => set({ arrivals }),
-  setLoading: (loading) => set({ loading }),
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
   setDestination: (warehouse) => set({ destination: warehouse }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
 
-  getArrivals: async (fromDate, toDate, destination) => {
-    set({ hasSearched: true, arrivals: await getArrivals(fromDate, toDate, destination) })
-  },
   submitCreateArrival: async (data: ArrivalForm) => {
     const result = await createArrival(data)
-    set({ hasSearched: false })
+    invalidateArrivalLists()
     return result
   },
   updateArrivalMetadata: async (arrivalNumber, metadata) => {
     await updateArrivalMetadataApi(arrivalNumber, metadata)
     mutate(arrivalDetailKey(arrivalNumber))
+    invalidateArrivalLists()
   },
   createArrivalAsset: async (arrivalNumber, asset) => {
     const cacheKey = arrivalDetailKey(arrivalNumber)
@@ -81,6 +67,7 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
       { revalidate: false }
     )
     invalidateAssetDetails([created.barcode])
+    invalidateArrivalLists()
     mutate(cacheKey)
   },
   getArrivalAssetForEdit: async (arrivalNumber, assetId) => {
@@ -114,6 +101,7 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
       try {
         await patchArrivalAssets(arrivalNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
         invalidateAssetDetails([asset.barcode])
+        invalidateArrivalLists()
       } finally {
         mutate(cacheKey)
       }
@@ -155,6 +143,7 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
       try {
         await patchArrivalAssets(arrivalNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
         invalidateAssetDetails(barcodes)
+        invalidateArrivalLists()
       } finally {
         mutate(cacheKey)
       }
@@ -186,6 +175,4 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
       void pending.commit()
     }
   },
-
-  clearArrivals: () => set({ arrivals: [] })
 }))

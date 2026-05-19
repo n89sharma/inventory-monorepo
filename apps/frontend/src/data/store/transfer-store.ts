@@ -1,9 +1,10 @@
-import { createTransfer, getTransferDetail, getTransfers as getTransfersApi, patchTransferAssets, updateTransferMetadata as updateTransferMetadataApi } from '@/data/api/transfer-api'
+import { createTransfer, getTransferDetail, patchTransferAssets, updateTransferMetadata as updateTransferMetadataApi } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { transferDetailKey } from '@/hooks/use-transfer-detail'
+import { invalidateTransferLists } from '@/hooks/use-transfers-list'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
-import type { AssetSummary, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
+import type { AssetSummary, TransferDetail, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -16,7 +17,6 @@ function pendingKey(transferNumber: string, assetId: number): string {
 }
 
 interface TransferStore {
-  transfers: TransferSummary[]
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   origin: SelectOption<Warehouse>
@@ -27,11 +27,7 @@ interface TransferStore {
   setToDate: (d: SelectOption<Date>) => void
   setOrigin: (o: SelectOption<Warehouse>) => void
   setDestination: (d: SelectOption<Warehouse>) => void
-  getTransfers: (
-    fromDate: SelectOption<Date>,
-    toDate: SelectOption<Date>,
-    origin: SelectOption<Warehouse>,
-    destination: SelectOption<Warehouse>) => Promise<void>
+  setHasSearched: (hasSearched: boolean) => void
   submitCreateTransfer: (data: TransferForm) => Promise<{ transferNumber: string }>
   getAssets: (transferNumber: string) => Promise<AssetSummary[]>
   addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
@@ -41,11 +37,9 @@ interface TransferStore {
   removeAssetFromTransfer: (transferNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromTransfer: (transferNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (transferNumber: string) => void
-  clearTransfers: () => void
 }
 
 export const useTransferStore = create<TransferStore>((set) => ({
-  transfers: [],
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   origin: ANY_OPTION,
@@ -56,13 +50,11 @@ export const useTransferStore = create<TransferStore>((set) => ({
   setToDate: (toDate) => set({ toDate }),
   setOrigin: (origin) => set({ origin }),
   setDestination: (destination) => set({ destination }),
-  getTransfers: async (fromDate, toDate, origin, destination) => {
-    set({ hasSearched: true, transfers: await getTransfersApi(fromDate, toDate, origin, destination) })
-  },
+  setHasSearched: (hasSearched) => set({ hasSearched }),
   submitCreateTransfer: async (data) => {
     const result = await createTransfer(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
-    set({ hasSearched: false })
+    invalidateTransferLists()
     return result
   },
   getAssets: async (transferNumber) => {
@@ -78,12 +70,14 @@ export const useTransferStore = create<TransferStore>((set) => ({
       await patchTransferAssets(transferNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
       mutate(transferDetailKey(transferNumber))
       invalidateAssetDetails(newOnly.map(a => a.barcode))
+      invalidateTransferLists()
     }
     return { added, skipped }
   },
   updateTransferMetadata: async (transferNumber, metadata) => {
     await updateTransferMetadataApi(transferNumber, metadata)
     mutate(transferDetailKey(transferNumber))
+    invalidateTransferLists()
   },
   addAssetToTransfer: async (transferNumber, asset) => {
     const cacheKey = transferDetailKey(transferNumber)
@@ -95,6 +89,7 @@ export const useTransferStore = create<TransferStore>((set) => ({
     try {
       await patchTransferAssets(transferNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
       invalidateAssetDetails([asset.barcode])
+      invalidateTransferLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -115,6 +110,7 @@ export const useTransferStore = create<TransferStore>((set) => ({
     try {
       await patchTransferAssets(transferNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
       invalidateAssetDetails(barcodes)
+      invalidateTransferLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -137,6 +133,7 @@ export const useTransferStore = create<TransferStore>((set) => ({
       try {
         await patchTransferAssets(transferNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
         invalidateAssetDetails([asset.barcode])
+        invalidateTransferLists()
       } finally {
         mutate(cacheKey)
       }
@@ -178,6 +175,7 @@ export const useTransferStore = create<TransferStore>((set) => ({
       try {
         await patchTransferAssets(transferNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
         invalidateAssetDetails(barcodes)
+        invalidateTransferLists()
       } finally {
         mutate(cacheKey)
       }
@@ -209,5 +207,4 @@ export const useTransferStore = create<TransferStore>((set) => ({
       void pending.commit()
     }
   },
-  clearTransfers: () => set({ transfers: [] })
 }))

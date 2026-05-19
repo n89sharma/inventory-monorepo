@@ -1,9 +1,9 @@
 import { useArrivalStore } from "@/data/store/arrival-store"
 import { preloadArrivalDetail } from "@/hooks/use-arrival-detail"
+import { useArrivalsList } from "@/hooks/use-arrivals-list"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION } from "@/ui-types/select-option-types"
 import { useCan } from "@/hooks/use-can"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
@@ -15,8 +15,6 @@ import { CollectionPage } from "../collection-page"
 import { arrivalTableColumns } from "../column-defs/arrival-columns"
 
 export function ArrivalsSummaryPage(): React.JSX.Element {
-  const arrivals = useArrivalStore(state => state.arrivals)
-  const getArrivals = useArrivalStore(state => state.getArrivals)
   const fromDate = useArrivalStore(state => state.fromDate)
   const setFromDate = useArrivalStore(state => state.setFromDate)
   const toDate = useArrivalStore(state => state.toDate)
@@ -24,11 +22,14 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
   const destination = useArrivalStore(state => state.destination)
   const setDestination = useArrivalStore(state => state.setDestination)
   const hasSearched = useArrivalStore(state => state.hasSearched)
+  const setHasSearched = useArrivalStore(state => state.setHasSearched)
   const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
 
-  async function onArrivalSearch({ fromDate, toDate, destination }: SearchOptions) {
-    await getArrivals(fromDate, toDate, destination ?? ANY_OPTION)
+  const { data: arrivals = [] } = useArrivalsList(fromDate, toDate, destination)
+
+  async function onArrivalSearch(_: SearchOptions) {
+    setHasSearched(true)
   }
 
   useAutoSearch(hasSearched, onArrivalSearch, { setFromDate, setToDate, setDestination })

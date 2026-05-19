@@ -1,9 +1,10 @@
-import { createInvoice, getInvoiceDetail, getInvoices, patchInvoiceAssets, updateInvoiceMetadata as updateInvoiceMetadataApi } from '@/data/api/invoice-api'
+import { createInvoice, getInvoiceDetail, patchInvoiceAssets, updateInvoiceMetadata as updateInvoiceMetadataApi } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
+import { invalidateInvoiceLists } from '@/hooks/use-invoices-list'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { AssetSummary, InvoiceDetail, InvoiceSummary } from 'shared-types'
+import type { AssetSummary, InvoiceDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -16,18 +17,13 @@ function pendingKey(invoiceNumber: string, assetId: number): string {
 }
 
 interface InvoiceStore {
-  invoices: InvoiceSummary[]
-  loading: boolean
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   hasSearched: boolean
 
-  setInvoices: (invoices: InvoiceSummary[]) => void
-  setLoading: (loading: boolean) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setHasSearched: (hasSearched: boolean) => void
-  getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
   submitCreateInvoice: (data: InvoiceForm) => Promise<{ invoiceNumber: string }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
@@ -36,28 +32,20 @@ interface InvoiceStore {
   removeAssetFromInvoice: (invoiceNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromInvoice: (invoiceNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (invoiceNumber: string) => void
-  clearInvoices: () => void
 }
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
-  invoices: [],
-  loading: false,
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   hasSearched: false,
 
-  setInvoices: (invoices) => set({ invoices }),
-  setLoading: (loading) => set({ loading }),
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-  getInvoices: async (fromDate, toDate) => {
-    set({ hasSearched: true, invoices: await getInvoices(fromDate, toDate) })
-  },
   submitCreateInvoice: async (data) => {
     const result = await createInvoice(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
-    set({ hasSearched: false })
+    invalidateInvoiceLists()
     return result
   },
   getAssets: async (invoiceNumber) => {
@@ -73,12 +61,14 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
       mutate(invoiceDetailKey(invoiceNumber))
       invalidateAssetDetails(newOnly.map(a => a.barcode))
+      invalidateInvoiceLists()
     }
     return { added, skipped }
   },
   updateInvoiceMetadata: async (invoiceNumber, metadata) => {
     await updateInvoiceMetadataApi(invoiceNumber, metadata)
     mutate(invoiceDetailKey(invoiceNumber))
+    invalidateInvoiceLists()
   },
   addAssetToInvoice: async (invoiceNumber, asset) => {
     const cacheKey = invoiceDetailKey(invoiceNumber)
@@ -90,6 +80,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     try {
       await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
       invalidateAssetDetails([asset.barcode])
+      invalidateInvoiceLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -112,6 +103,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       try {
         await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
         invalidateAssetDetails([asset.barcode])
+        invalidateInvoiceLists()
       } finally {
         mutate(cacheKey)
       }
@@ -153,6 +145,7 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       try {
         await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
         invalidateAssetDetails(barcodes)
+        invalidateInvoiceLists()
       } finally {
         mutate(cacheKey)
       }
@@ -184,5 +177,4 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
       void pending.commit()
     }
   },
-  clearInvoices: () => set({ invoices: [] })
 }))

@@ -1,9 +1,10 @@
-import { createHold, getHoldDetail, getHolds, patchHoldAssets, updateHoldMetadata as updateHoldMetadataApi } from '@/data/api/hold-api'
+import { createHold, getHoldDetail, patchHoldAssets, updateHoldMetadata as updateHoldMetadataApi } from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { holdDetailKey } from '@/hooks/use-hold-detail'
+import { invalidateHoldLists } from '@/hooks/use-holds-list'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { AssetSummary, HoldDetail, HoldSummary, User } from 'shared-types'
+import type { AssetSummary, HoldDetail, User } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -16,26 +17,17 @@ function pendingKey(holdNumber: string, assetId: number): string {
 }
 
 interface HoldStore {
-  holds: HoldSummary[]
-  loading: boolean
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   holdBy: SelectOption<User>
   holdFor: SelectOption<User>
   hasSearched: boolean
 
-  setHolds: (holds: HoldSummary[]) => void
-  setLoading: (loading: boolean) => void
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setHoldBy: (v: SelectOption<User>) => void
   setHoldFor: (v: SelectOption<User>) => void
   setHasSearched: (hasSearched: boolean) => void
-  getHolds: (
-    fromDate: SelectOption<Date>,
-    toDate: SelectOption<Date>,
-    holdBy: SelectOption<User>,
-    holdFor: SelectOption<User>) => Promise<void>
   submitCreateHold: (data: HoldForm) => Promise<{ holdNumber: string }>
   getAssets: (holdNumber: string) => Promise<AssetSummary[]>
   addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
@@ -44,37 +36,30 @@ interface HoldStore {
   removeAssetFromHold: (holdNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromHold: (holdNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (holdNumber: string) => void
-  clearHolds: () => void
 }
 
 export const useHoldStore = create<HoldStore>((set) => ({
-  holds: [],
-  loading: false,
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   holdBy: ANY_OPTION,
   holdFor: ANY_OPTION,
   hasSearched: false,
 
-  setHolds: (holds) => set({ holds }),
-  setLoading: (loading) => set({ loading }),
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
   setHoldBy: (holdBy) => set({ holdBy }),
   setHoldFor: (holdFor) => set({ holdFor }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-  getHolds: async (fromDate, toDate, holdBy, holdFor) => {
-    set({ hasSearched: true, holds: await getHolds(fromDate, toDate, holdBy, holdFor) })
-  },
   submitCreateHold: async (data) => {
     const result = await createHold(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
-    set({ hasSearched: false })
+    invalidateHoldLists()
     return result
   },
   updateHoldMetadata: async (holdNumber, metadata) => {
     await updateHoldMetadataApi(holdNumber, metadata)
     mutate(holdDetailKey(holdNumber))
+    invalidateHoldLists()
   },
   getAssets: async (holdNumber) => {
     return (await getHoldDetail(holdNumber)).assets
@@ -89,6 +74,7 @@ export const useHoldStore = create<HoldStore>((set) => ({
       await patchHoldAssets(holdNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
       mutate(holdDetailKey(holdNumber))
       invalidateAssetDetails(newOnly.map(a => a.barcode))
+      invalidateHoldLists()
     }
     return { added, skipped }
   },
@@ -102,6 +88,7 @@ export const useHoldStore = create<HoldStore>((set) => ({
     try {
       await patchHoldAssets(holdNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
       invalidateAssetDetails([asset.barcode])
+      invalidateHoldLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -124,6 +111,7 @@ export const useHoldStore = create<HoldStore>((set) => ({
       try {
         await patchHoldAssets(holdNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
         invalidateAssetDetails([asset.barcode])
+        invalidateHoldLists()
       } finally {
         mutate(cacheKey)
       }
@@ -165,6 +153,7 @@ export const useHoldStore = create<HoldStore>((set) => ({
       try {
         await patchHoldAssets(holdNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
         invalidateAssetDetails(barcodes)
+        invalidateHoldLists()
       } finally {
         mutate(cacheKey)
       }
@@ -196,5 +185,4 @@ export const useHoldStore = create<HoldStore>((set) => ({
       void pending.commit()
     }
   },
-  clearHolds: () => set({ holds: [] })
 }))

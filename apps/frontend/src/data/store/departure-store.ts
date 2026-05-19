@@ -1,9 +1,10 @@
-import { createDeparture, getDepartureDetail, getDepartures, patchDepartureAssets, updateDepartureMetadata as updateDepartureMetadataApi } from '@/data/api/departure-api'
+import { createDeparture, getDepartureDetail, patchDepartureAssets, updateDepartureMetadata as updateDepartureMetadataApi } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
+import { invalidateDepartureLists } from '@/hooks/use-departures-list'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import type { AssetSummary, DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
+import type { AssetSummary, DepartureDetail, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { create } from 'zustand'
@@ -16,22 +17,15 @@ function pendingKey(departureNumber: string, assetId: number): string {
 }
 
 interface DepartureStore {
-  departures: DepartureSummary[]
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   origin: SelectOption<Warehouse>
-  loading: boolean
   hasSearched: boolean
 
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
   setOrigin: (warehouse: SelectOption<Warehouse>) => void
-  setLoading: (loading: boolean) => void
   setHasSearched: (hasSearched: boolean) => void
-  getDepartures: (
-    fromDate: SelectOption<Date>,
-    toDate: SelectOption<Date>,
-    origin: SelectOption<Warehouse>) => Promise<void>
   submitCreateDeparture: (data: DepartureForm) => Promise<{ departureNumber: string }>
   getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
@@ -41,29 +35,22 @@ interface DepartureStore {
   removeAssetFromDeparture: (departureNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromDeparture: (departureNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (departureNumber: string) => void
-  clearDepartures: () => void
 }
 
 export const useDepartureStore = create<DepartureStore>((set) => ({
-  departures: [],
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   origin: ANY_OPTION,
-  loading: false,
   hasSearched: false,
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
   setOrigin: (origin) => set({ origin }),
-  setLoading: (loading) => set({ loading }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-  getDepartures: async (fromDate, toDate, origin) => {
-    set({ hasSearched: true, departures: await getDepartures(fromDate, toDate, origin) })
-  },
   submitCreateDeparture: async (data) => {
     const result = await createDeparture(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
-    set({ hasSearched: false })
+    invalidateDepartureLists()
     return result
   },
   getAssets: async (departureNumber) => {
@@ -79,6 +66,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
       await patchDepartureAssets(departureNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
       mutate(departureDetailKey(departureNumber))
       invalidateAssetDetails(newOnly.map(a => a.barcode))
+      invalidateDepartureLists()
     }
     return { added, skipped }
   },
@@ -92,6 +80,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     try {
       await patchDepartureAssets(departureNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
       invalidateAssetDetails([asset.barcode])
+      invalidateDepartureLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -102,6 +91,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   updateDepartureMetadata: async (departureNumber, metadata) => {
     await updateDepartureMetadataApi(departureNumber, metadata)
     mutate(departureDetailKey(departureNumber))
+    invalidateDepartureLists()
   },
   addAssetsToDeparture: async (departureNumber, assets) => {
     if (assets.length === 0) return
@@ -116,6 +106,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     try {
       await patchDepartureAssets(departureNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
       invalidateAssetDetails(barcodes)
+      invalidateDepartureLists()
     } catch (err) {
       mutate(cacheKey)
       throw err
@@ -138,6 +129,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
       try {
         await patchDepartureAssets(departureNumber, { assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
         invalidateAssetDetails([asset.barcode])
+        invalidateDepartureLists()
       } finally {
         mutate(cacheKey)
       }
@@ -179,6 +171,7 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
       try {
         await patchDepartureAssets(departureNumber, { assetIdsToAdd: [], assetIdsToRemove: ids })
         invalidateAssetDetails(barcodes)
+        invalidateDepartureLists()
       } finally {
         mutate(cacheKey)
       }
@@ -210,5 +203,4 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
       void pending.commit()
     }
   },
-  clearDepartures: () => set({ departures: [] })
 }))
