@@ -1,4 +1,4 @@
-import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHold, UpdateHoldMetadata } from 'shared-types'
+import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -78,106 +78,6 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
 async function getNewHoldNumber(): Promise<string> {
   const sequence = await getNextSequence('hold')
   return `H-${String(sequence).padStart(7, '0')}`
-}
-
-export async function getHoldForUpdate(holdNumber: string): Promise<UpdateHold> {
-  const [hold, assets] = await Promise.all([
-    prisma.hold.findUnique({
-      where: { hold_number: holdNumber },
-      include: {
-        created_for: true,
-        customer: true
-      }
-    }),
-    prisma.$queryRawTyped(getAssetsForHold(holdNumber))
-  ])
-  if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
-  return {
-    id: hold.id,
-    created_for: {
-      id: hold.created_for.id,
-      name: hold.created_for.name,
-      email: hold.created_for.email,
-      is_active: hold.created_for.is_active,
-      role: hold.created_for.role as AppRole | null,
-      clerk_id: hold.created_for.clerk_id,
-    },
-    customer: {
-      id: hold.customer.id,
-      account_number: hold.customer.account_number,
-      name: hold.customer.name
-    },
-    notes: hold.notes,
-    assets
-  }
-}
-
-export async function updateHold(data: UpdateHold, userId: number): Promise<void> {
-  const [heldStatus, availableStatus] = await Promise.all([
-    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
-    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'AVAILABLE' }, select: { id: true } })
-  ])
-
-  const { holdRecord, assetIdsToRemove, assetIdsToAdd } = await prisma.$transaction(async (tx) => {
-    const holdRecord = await tx.hold.findUnique({
-      where: { id: data.id },
-      include: { assets: { select: { id: true } } }
-    })
-    if (!holdRecord) throw new NotFoundError('Hold not found')
-
-    const existingAssetIds = holdRecord.assets.map(a => a.id)
-    const incomingAssetIds = new Set(data.assets.map(a => a.id))
-    const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-    const assetIdsToAdd = data.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
-
-    if (assetIdsToAdd.length > 0) {
-      const conflicts = await tx.asset.findMany({
-        where: { id: { in: assetIdsToAdd }, is_held: true },
-        select: { barcode: true }
-      })
-      if (conflicts.length > 0) {
-        throw new ConflictError(
-          `The following assets already have an active hold: ${conflicts.map(a => a.barcode).join(', ')}`
-        )
-      }
-    }
-
-    await tx.hold.update({
-      where: { id: data.id },
-      data: {
-        created_for_id: data.created_for.id,
-        customer_id: data.customer.id,
-        notes: data.notes ?? null,
-        assets: {
-          disconnect: assetIdsToRemove.map(id => ({ id })),
-          connect: assetIdsToAdd.map(id => ({ id }))
-        }
-      }
-    })
-
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToRemove } },
-      data: { is_held: false, availability_status_id: availableStatus.id }
-    })
-
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToAdd } },
-      data: { is_held: true, availability_status_id: heldStatus.id }
-    })
-
-    return { holdRecord, assetIdsToRemove, assetIdsToAdd }
-  })
-
-  await recordHoldUpdate(data.id, {
-    created_for_id: holdRecord.created_for_id,
-    customer_id: holdRecord.customer_id
-  }, {
-    created_for_id: data.created_for.id,
-    customer_id: data.customer.id
-  }, userId)
-
-  await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'hold_id', data.id, userId)
-  await recordAssetUpdateOnCollection('Hold', data.id, assetIdsToAdd, assetIdsToRemove, userId)
 }
 
 export async function patchHoldMetadata(

@@ -1,4 +1,4 @@
-import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDeparture, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDepartureMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -25,33 +25,6 @@ export async function getDeparture(departureNumber: string): Promise<DepartureDe
     notes: departure.notes,
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
-    assets
-  }
-}
-
-export async function getDepartureForUpdate(departureNumber: string): Promise<UpdateDeparture> {
-  const [departure, assets] = await Promise.all([
-    prisma.departure.findUnique({
-      where: { departure_number: departureNumber },
-      include: { origin: true, destination: true, transporter: true }
-    }),
-    prisma.$queryRawTyped(getAssetsForDepartures(departureNumber))
-  ])
-  if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
-  return {
-    id: departure.id,
-    origin: departure.origin,
-    customer: {
-      id: departure.destination.id,
-      account_number: departure.destination.account_number,
-      name: departure.destination.name
-    },
-    transporter: {
-      id: departure.transporter.id,
-      account_number: departure.transporter.account_number,
-      name: departure.transporter.name
-    },
-    comment: departure.notes,
     assets
   }
 }
@@ -104,50 +77,6 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   await recordAssetUpdateOnCollection('Departure', newDeparture.id, assetIds, [], userId)
 
   return departureNumber
-}
-
-export async function updateDeparture(departure: UpdateDeparture, userId: number): Promise<void> {
-  const { currentDeparture, assetIdsToRemove, assetIdsToAdd } = await prisma.$transaction(async (tx) => {
-    const [currentDeparture, existingAssets] = await Promise.all([
-      tx.departure.findUnique({
-        where: { id: departure.id },
-        select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
-      }),
-      tx.asset.findMany({ where: { departure_id: departure.id }, select: { id: true } })
-    ])
-
-    const existingAssetIds = existingAssets.map(a => a.id)
-    const incomingAssetIds = new Set(departure.assets.map(a => a.id))
-    const assetIdsToRemove = existingAssetIds.filter(id => !incomingAssetIds.has(id))
-    const assetIdsToAdd = departure.assets.map(a => a.id).filter(id => !existingAssetIds.includes(id))
-
-    await tx.departure.update({
-      where: { id: departure.id },
-      data: {
-        origin_id: departure.origin.id,
-        destination_id: departure.customer.id,
-        transporter_id: departure.transporter.id,
-        notes: departure.comment
-      }
-    })
-
-    await applyAssetDelta(tx, departure.id, assetIdsToAdd, assetIdsToRemove)
-
-    return { currentDeparture, assetIdsToRemove, assetIdsToAdd }
-  })
-
-  await recordDepartureUpdate(departure.id, {
-    origin_id: currentDeparture?.origin_id,
-    destination_id: currentDeparture?.destination_id,
-    transporter_id: currentDeparture?.transporter_id
-  }, {
-    origin_id: departure.origin.id,
-    destination_id: departure.customer.id,
-    transporter_id: departure.transporter.id
-  }, userId)
-
-  await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'departure_id', departure.id, userId)
-  await recordAssetUpdateOnCollection('Departure', departure.id, assetIdsToAdd, assetIdsToRemove, userId)
 }
 
 export async function patchDepartureMetadata(

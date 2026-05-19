@@ -1,14 +1,12 @@
 import { api } from '@/data/api/axios-client'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
-import { getIdOrNullFromSelection, getSelectOption, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHold, UpdateHoldMetadata, User } from 'shared-types'
-import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, SubmitUpdateHoldSchema, UpdateHoldMetadataSchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
+import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
+import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHoldMetadata, User } from 'shared-types'
+import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, UpdateHoldMetadataSchema, type HoldSummary } from 'shared-types'
 import { z } from 'zod'
 
 const CreateHoldResponseSchema = z.object({ holdNumber: z.string() })
 type CreateHoldResponse = z.infer<typeof CreateHoldResponseSchema>
-
-const UpdateHoldResponseSchema = z.object({ holdNumber: z.string() })
 
 export async function getHolds(
   fromDate: SelectOption<Date>,
@@ -36,36 +34,6 @@ export async function createHold(d: HoldForm): Promise<CreateHoldResponse> {
   } satisfies CreateHold)
   const { data } = await api.post<CreateHoldResponse>('/holds', createHoldBody)
   return CreateHoldResponseSchema.parse(data)
-}
-
-export async function getHoldForUpdate(holdNumber: string): Promise<HoldForm> {
-  const { data } = await api.get<UpdateHold>(`/holds/${holdNumber}/edit`)
-  return mapUpdateHoldToHoldForm(UpdateHoldSchema.parse(data))
-}
-
-export function mapUpdateHoldToHoldForm(hold: UpdateHold): HoldForm {
-  return {
-    id: hold.id,
-    created_for: getSelectOption(hold.created_for),
-    customer: hold.customer,
-    notes: hold.notes ?? '',
-    assets: hold.assets
-  }
-}
-
-export async function updateHold(
-  holdNumber: string,
-  d: HoldForm
-): Promise<{ holdNumber: string }> {
-  const updateHoldBody = SubmitUpdateHoldSchema.parse({
-    id: d.id!,
-    created_for: getSelectedOrNull(d.created_for)!,
-    customer: d.customer!,
-    notes: d.notes || null,
-    assets: d.assets
-  } satisfies UpdateHold)
-  const { data } = await api.put<{ holdNumber: string }>(`/holds/${holdNumber}`, updateHoldBody)
-  return UpdateHoldResponseSchema.parse(data)
 }
 
 export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {

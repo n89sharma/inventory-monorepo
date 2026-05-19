@@ -5,7 +5,7 @@ import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { InvoiceSummary } from 'shared-types'
-import { assetCountColumn, createdAtColumn, createdByColumn, makeEditColumn } from './shared-columns'
+import { assetCountColumn, createdAtColumn, createdByColumn } from './shared-columns'
 
 export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   {
@@ -44,5 +44,4 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   },
   { accessorKey: "invoice_type", header: "Invoice Type" },
   assetCountColumn as ColumnDef<InvoiceSummary>,
-  makeEditColumn<InvoiceSummary>(row => `/invoices/${row.invoice_number}/edit`),
 ]

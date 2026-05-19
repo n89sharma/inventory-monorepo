@@ -1,8 +1,7 @@
 import { Button } from "@/components/shadcn/button"
 import { formatDate } from "@/lib/formatters"
-import { ArrowsDownUpIcon, PencilSimpleIcon } from "@phosphor-icons/react"
+import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { Link } from "react-router-dom"
 import type { CollectionSummarySchema } from 'shared-types'
 
 export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
@@ -34,15 +33,3 @@ export const assetCountColumn: ColumnDef<CollectionSummarySchema> = {
   header: "Assets",
   size: 50,
 }
-
-export const makeEditColumn = <T,>(getHref: (original: T) => string): ColumnDef<T> => ({
-  header: "Edit",
-  cell: ({ row }) => (
-    <Button asChild variant="outline" size="icon" aria-label="Edit">
-      <Link to={getHref(row.original)}>
-        <PencilSimpleIcon />
-      </Link>
-    </Button>
-  ),
-  size: 50
-})

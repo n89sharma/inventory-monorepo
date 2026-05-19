@@ -1,8 +1,7 @@
-import { createInvoice, getInvoiceForUpdate, getInvoices, patchInvoiceAssets, updateInvoice, updateInvoiceMetadata as updateInvoiceMetadataApi } from '@/data/api/invoice-api'
+import { createInvoice, getInvoiceDetail, getInvoices, patchInvoiceAssets, updateInvoiceMetadata as updateInvoiceMetadataApi } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
-import { mergeAssets } from '@/lib/collection-utils'
-import type { InvoiceEditForm, InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
+import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { AssetSummary, InvoiceDetail, InvoiceSummary } from 'shared-types'
 import { toast } from 'sonner'
@@ -22,7 +21,6 @@ interface InvoiceStore {
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   hasSearched: boolean
-  invoiceEditFormData: InvoiceEditForm | null
 
   setInvoices: (invoices: InvoiceSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -31,10 +29,8 @@ interface InvoiceStore {
   setHasSearched: (hasSearched: boolean) => void
   getInvoices: (fromDate: SelectOption<Date>, toDate: SelectOption<Date>) => Promise<void>
   submitCreateInvoice: (data: InvoiceForm) => Promise<{ invoiceNumber: string }>
-  getInvoiceForUpdate: (invoiceNumber: string) => Promise<void>
-  submitUpdateInvoice: (invoiceNumber: string, data: InvoiceEditForm) => Promise<{ invoiceNumber: string }>
-  addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
+  addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   addAssetToInvoice: (invoiceNumber: string, asset: AssetSummary) => Promise<void>
   updateInvoiceMetadata: (invoiceNumber: string, metadata: InvoiceMetadataForm) => Promise<void>
   removeAssetFromInvoice: (invoiceNumber: string, asset: AssetSummary) => void
@@ -49,7 +45,6 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   fromDate: UNSELECTED,
   toDate: ANY_OPTION,
   hasSearched: false,
-  invoiceEditFormData: null,
 
   setInvoices: (invoices) => set({ invoices }),
   setLoading: (loading) => set({ loading }),
@@ -65,31 +60,21 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
     set({ hasSearched: false })
     return result
   },
-  getInvoiceForUpdate: async (invoiceNumber) => {
-    set({ invoiceEditFormData: null })
-    set({ invoiceEditFormData: await getInvoiceForUpdate(invoiceNumber) })
-  },
-  submitUpdateInvoice: async (invoiceNumber, data) => {
-    const previousAssets = useInvoiceStore.getState().invoiceEditFormData?.assets ?? []
-    const affected = new Set<string>()
-    for (const a of previousAssets) affected.add(a.barcode)
-    for (const a of data.assets) affected.add(a.barcode)
-    const result = await updateInvoice(invoiceNumber, data)
-    mutate(invoiceDetailKey(invoiceNumber))
-    invalidateAssetDetails([...affected])
-    return result
+  getAssets: async (invoiceNumber) => {
+    return (await getInvoiceDetail(invoiceNumber)).assets
   },
   addAssets: async (invoiceNumber, assets) => {
-    const form = await getInvoiceForUpdate(invoiceNumber)
-    const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    await updateInvoice(invoiceNumber, { ...form, assets: merged })
-    mutate(invoiceDetailKey(invoiceNumber))
-    invalidateAssetDetails(assets.map(a => a.barcode))
+    const existing = (await getInvoiceDetail(invoiceNumber)).assets
+    const existingIds = new Set(existing.map(a => a.id))
+    const newOnly = assets.filter(a => !existingIds.has(a.id))
+    const added = newOnly.length
+    const skipped = assets.length - added
+    if (added > 0) {
+      await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
+      mutate(invoiceDetailKey(invoiceNumber))
+      invalidateAssetDetails(newOnly.map(a => a.barcode))
+    }
     return { added, skipped }
-  },
-  getAssets: async (invoiceNumber) => {
-    const form = await getInvoiceForUpdate(invoiceNumber)
-    return form?.assets ?? []
   },
   updateInvoiceMetadata: async (invoiceNumber, metadata) => {
     await updateInvoiceMetadataApi(invoiceNumber, metadata)

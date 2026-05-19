@@ -22,17 +22,6 @@ export type InvoiceForm = {
   assets: AssetSummary[]
 }
 
-export const InvoiceEditFormSchema = z.object({
-  id: z.number(),
-  invoice_number: z.string(),
-  organization: OrgSummarySchema,
-  invoice_type: z.object({ id: z.number(), type: z.string() }),
-  is_cleared: z.boolean(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
-})
-
-export type InvoiceEditForm = z.infer<typeof InvoiceEditFormSchema>
-
 export const InvoiceMetadataFormSchema = z.object({
   organization: OrgSummarySchema.nullable().refine(val => !!val, 'Organization is required'),
   invoice_type: InvoiceTypeSelectOptionSchema.refine(val => isSelected(val), 'Invoice type is required'),

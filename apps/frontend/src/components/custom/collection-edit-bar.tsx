@@ -2,7 +2,6 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
 import { type AssetSummary, type CollectionHistory, type Permission } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
@@ -26,7 +25,7 @@ type CollectionEditBarProps = {
   assets?: AssetSummary[]
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
-  onEdit?: () => void
+  onEdit: () => void
 }
 
 export function CollectionEditBar({
@@ -85,9 +84,7 @@ export function CollectionEditBar({
         </Button>
       )}
       {canEdit && (
-        onEdit
-          ? <Button onClick={onEdit}><PencilSimpleIcon />Edit</Button>
-          : <Button asChild><Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link></Button>
+        <Button onClick={onEdit}><PencilSimpleIcon />Edit</Button>
       )}
       {canDelete && (
         <DropdownMenu>

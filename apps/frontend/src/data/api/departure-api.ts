@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, UpdateDepartureMetadata, Warehouse } from 'shared-types'
-import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureMetadataSchema, UpdateDepartureSchema } from 'shared-types'
+import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
+import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDepartureMetadata, Warehouse } from 'shared-types'
+import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, UpdateDepartureMetadataSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateDepartureResponseSchema = z.object({ departureNumber: z.string() })
@@ -33,22 +33,6 @@ export async function getDepartureHistory(departureNumber: string): Promise<Coll
   return CollectionHistorySchema.parse(data)
 }
 
-export async function getDepartureForUpdate(departureNumber: string): Promise<DepartureForm> {
-  const { data } = await api.get<UpdateDeparture>(`/departures/${departureNumber}/edit`)
-  return mapUpdateDepartureToDepartureForm(UpdateDepartureSchema.parse(data))
-}
-
-export function mapUpdateDepartureToDepartureForm(departure: UpdateDeparture): DepartureForm {
-  return {
-    id: departure.id,
-    origin: getSelectOption(departure.origin),
-    customer: departure.customer,
-    transporter: departure.transporter,
-    comment: departure.comment ?? '',
-    assets: departure.assets
-  }
-}
-
 export async function createDeparture(d: DepartureForm): Promise<CreateDepartureResponse> {
   const createDepartureBody = CreateDepartureSchema.parse({
     origin: getSelectedOrNull(d.origin)!,
@@ -59,21 +43,6 @@ export async function createDeparture(d: DepartureForm): Promise<CreateDeparture
   } satisfies CreateDeparture)
   const { data } = await api.post<CreateDepartureResponse>('/departures', createDepartureBody)
   return CreateDepartureResponseSchema.parse(data)
-}
-
-export async function updateDeparture(
-  departureNumber: string,
-  d: DepartureForm
-): Promise<void> {
-  const updateDepartureBody = SubmitUpdateDepartureSchema.parse({
-    id: d.id!,
-    origin: getSelectedOrNull(d.origin)!,
-    customer: d.customer!,
-    transporter: d.transporter!,
-    comment: d.comment,
-    assets: d.assets
-  } satisfies UpdateDeparture)
-  await api.put(`/departures/${departureNumber}`, updateDepartureBody)
 }
 
 export async function patchDepartureAssets(

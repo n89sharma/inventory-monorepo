@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrival, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalMetadataSchema, UpdateArrivalSchema, UpdateAssetSchema } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateArrivalResponseSchema = z.object({ arrivalNumber: z.string() })
@@ -26,57 +26,6 @@ export async function getArrivals(
 export async function getArrivalDetail(arrivalNumber: string): Promise<ArrivalDetail> {
   const { data } = await api.get<ArrivalDetail>(`/arrivals/${arrivalNumber}`)
   return ArrivalDetailSchema.parse(data)
-}
-
-export async function getArrivalForUpdate(arrivalNumber: string): Promise<ArrivalForm> {
-  const { data } = await api.get<UpdateArrival>(`/arrivals/${arrivalNumber}/edit`)
-  return mapUpdateArrivalToUiArrivalForm(UpdateArrivalSchema.parse(data))
-}
-
-export function mapUpdateArrivalToUiArrivalForm(arrival: UpdateArrival): ArrivalForm {
-  return {
-    id: arrival.id,
-    vendor: arrival.vendor,
-    transporter: arrival.transporter,
-    warehouse: getSelectOption(arrival.warehouse),
-    comment: arrival.comment ?? '',
-    assets: arrival.assets.map(asset => ({
-      id: asset.id,
-      model: asset.model,
-      serialNumber: asset.serialNumber,
-      meterBlack: asset.meterBlack,
-      meterColour: asset.meterColour,
-      cassettes: asset.cassettes,
-      technicalStatus: getSelectOption(asset.technicalStatus),
-      internalFinisher: asset.internalFinisher,
-      coreFunctions: asset.coreFunctions
-    }))
-  }
-}
-
-export async function updateArrival(
-  arrivalNumber: string,
-  a: ArrivalForm
-): Promise<void> {
-  const updateArrivalBody = SubmitUpdateArrivalSchema.parse({
-    id: a.id,
-    vendor: a.vendor,
-    transporter: a.transporter,
-    warehouse: getSelectedOrNull(a.warehouse),
-    comment: a.comment,
-    assets: a.assets.map(s => ({
-      id: s.id,
-      model: s.model,
-      serialNumber: s.serialNumber,
-      meterBlack: s.meterBlack,
-      meterColour: s.meterColour,
-      cassettes: s.cassettes,
-      technicalStatus: getSelectedOrNull(s.technicalStatus),
-      internalFinisher: s.internalFinisher,
-      coreFunctions: s.coreFunctions
-    }))
-  })
-  await api.put(`/arrivals/${arrivalNumber}`, updateArrivalBody)
 }
 
 export async function createArrival(a: ArrivalForm): Promise<CreateArrivalResponse> {

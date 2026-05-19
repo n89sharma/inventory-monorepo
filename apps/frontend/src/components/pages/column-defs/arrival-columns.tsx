@@ -4,7 +4,7 @@ import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { ArrivalSummary } from 'shared-types'
-import { assetCountColumn, createdAtColumn, createdByColumn, makeEditColumn } from './shared-columns'
+import { assetCountColumn, createdAtColumn, createdByColumn } from './shared-columns'
 
 export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   {
@@ -34,5 +34,4 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   { accessorKey: "transporter", header: "Transporter" },
   { accessorKey: "vendor", header: "Vendor" },
   assetCountColumn as ColumnDef<ArrivalSummary>,
-  makeEditColumn<ArrivalSummary>(row => `/arrivals/${row.arrival_number}/edit`),
 ]

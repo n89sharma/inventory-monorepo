@@ -41,25 +41,6 @@ export const CreateTransferSchema = z.object({
 })
 export type CreateTransfer = z.infer<typeof CreateTransferSchema>
 
-// GET /transfers/:transferNumber/edit
-export const UpdateTransferSchema = z.object({
-  id: z.number(),
-  origin: WarehouseSchema,
-  destination: WarehouseSchema,
-  transporter: OrgSummarySchema,
-  comment: z.string().nullable(),
-  assets: z.array(AssetSummarySchema)
-})
-export type UpdateTransfer = z.infer<typeof UpdateTransferSchema>
-
-// PUT /transfers/:transferNumber
-export const SubmitUpdateTransferSchema = UpdateTransferSchema.extend({
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the transfer").max(2000)
-}).refine(data => data.origin.id !== data.destination.id, {
-  message: "Origin and destination cannot be the same",
-  path: ["destination"]
-})
-
 // PATCH /transfers/:transferNumber/metadata
 export const UpdateTransferMetadataSchema = z.object({
   origin: WarehouseSchema,

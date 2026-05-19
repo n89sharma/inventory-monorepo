@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, UpdateTransferMetadataSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateTransferSchema, TransferDetail, TransferSummary, UpdateTransferMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -9,10 +9,8 @@ import { prisma } from '../prisma.js'
 import {
   createTransfer as createTransferSer,
   getTransfer as getTransferSer,
-  getTransferForUpdate as getTransferForUpdateSer,
   patchTransferAssets as patchTransferAssetsSer,
-  patchTransferMetadata as patchTransferMetadataSer,
-  updateTransfer as updateTransferSer
+  patchTransferMetadata as patchTransferMetadataSer
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
@@ -42,23 +40,10 @@ export const getTransferDetail = asyncHandler(async (req: Request, res: Response
   res.json(successResponse(data))
 })
 
-export const getTransferForUpdate = asyncHandler(async (req: Request, res: Response<ApiResponse<UpdateTransfer>>) => {
-  const { transferNumber } = req.params
-  const data = await getTransferForUpdateSer(transferNumber)
-  res.json(successResponse(data))
-})
-
 export const createTransfer = asyncHandler(async (req, res) => {
   const validated = CreateTransferSchema.parse(req.body)
   const transferNumber = await createTransferSer(validated, res.locals.dbUserId)
   res.status(201).json({ transferNumber })
-})
-
-export const updateTransfer = asyncHandler(async (req, res) => {
-  const { transferNumber } = req.params
-  const validated = SubmitUpdateTransferSchema.parse(req.body)
-  await updateTransferSer(validated, res.locals.dbUserId)
-  res.json({ transferNumber })
 })
 
 export const patchTransferMetadata = asyncHandler(async (req, res) => {

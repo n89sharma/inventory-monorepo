@@ -14,27 +14,22 @@ const LoginPage                 = lazy(() => import('./components/pages/login-pa
 
 const ArrivalsSummaryPage       = lazy(() => import('./components/pages/arrival/arrivals-summary-page').then(m => ({ default: m.ArrivalsSummaryPage })))
 const CreateArrivalPage         = lazy(() => import('./components/pages/arrival/create-arrival-page').then(m => ({ default: m.CreateArrivalPage })))
-const UpdateArrivalPage         = lazy(() => import('./components/pages/arrival/update-arrival-page').then(m => ({ default: m.UpdateArrivalPage })))
 const ArrivalDetailsPage        = lazy(() => import('./components/pages/arrival/arrival-details-page').then(m => ({ default: m.ArrivalDetailsPage })))
 
 const TransferSummaryPage       = lazy(() => import('./components/pages/transfer/transfers-summary-page').then(m => ({ default: m.TransferSummaryPage })))
 const CreateTransferPage        = lazy(() => import('./components/pages/transfer/create-transfer-page').then(m => ({ default: m.CreateTransferPage })))
-const UpdateTransferPage        = lazy(() => import('./components/pages/transfer/update-transfer-page').then(m => ({ default: m.UpdateTransferPage })))
 const TransferDetailsPage       = lazy(() => import('./components/pages/transfer/transfer-details-page').then(m => ({ default: m.TransferDetailsPage })))
 
 const DepartureSummaryPage      = lazy(() => import('./components/pages/departure/departures-summary-page').then(m => ({ default: m.DepartureSummaryPage })))
 const CreateDeparturePage       = lazy(() => import('./components/pages/departure/create-departure-page').then(m => ({ default: m.CreateDeparturePage })))
-const UpdateDeparturePage       = lazy(() => import('./components/pages/departure/update-departure-page').then(m => ({ default: m.UpdateDeparturePage })))
 const DepartureDetailsPage      = lazy(() => import('./components/pages/departure/departure-details-page').then(m => ({ default: m.DepartureDetailsPage })))
 
 const HoldSummaryPage           = lazy(() => import('./components/pages/hold/holds-summary-page').then(m => ({ default: m.HoldSummaryPage })))
 const CreateHoldPage            = lazy(() => import('./components/pages/hold/create-hold-page').then(m => ({ default: m.CreateHoldPage })))
-const UpdateHoldPage            = lazy(() => import('./components/pages/hold/update-hold-page').then(m => ({ default: m.UpdateHoldPage })))
 const HoldDetailsPage           = lazy(() => import('./components/pages/hold/hold-details-page').then(m => ({ default: m.HoldDetailsPage })))
 
 const InvoicesSummaryPage       = lazy(() => import('./components/pages/invoice/invoices-summary-page').then(m => ({ default: m.InvoicesSummaryPage })))
 const CreateInvoicePage         = lazy(() => import('./components/pages/invoice/create-invoice-page').then(m => ({ default: m.CreateInvoicePage })))
-const UpdateInvoicePage         = lazy(() => import('./components/pages/invoice/update-invoice-page').then(m => ({ default: m.UpdateInvoicePage })))
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
@@ -66,14 +61,6 @@ function AppRoutes() {
                       </PermissionRoute>
                     }
                   />
-                  <Route
-                    path="/arrivals/:collectionId/edit"
-                    element={
-                      <PermissionRoute permission="create_update_arrival">
-                        <UpdateArrivalPage />
-                      </PermissionRoute>
-                    }
-                  />
                   <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
 
                   <Route path="/transfers" element={<TransferSummaryPage />} />
@@ -82,14 +69,6 @@ function AppRoutes() {
                     element={
                       <PermissionRoute permission="create_update_transfer">
                         <CreateTransferPage />
-                      </PermissionRoute>
-                    }
-                  />
-                  <Route
-                    path="/transfers/:collectionId/edit"
-                    element={
-                      <PermissionRoute permission="create_update_transfer">
-                        <UpdateTransferPage />
                       </PermissionRoute>
                     }
                   />
@@ -104,14 +83,6 @@ function AppRoutes() {
                       </PermissionRoute>
                     }
                   />
-                  <Route
-                    path="/departures/:collectionId/edit"
-                    element={
-                      <PermissionRoute permission="create_update_departure">
-                        <UpdateDeparturePage />
-                      </PermissionRoute>
-                    }
-                  />
                   <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
 
                   <Route path="/holds" element={<HoldSummaryPage />} />
@@ -123,14 +94,6 @@ function AppRoutes() {
                       </PermissionRoute>
                     }
                   />
-                  <Route
-                    path="/holds/:collectionId/edit"
-                    element={
-                      <PermissionRoute permission="create_update_hold">
-                        <UpdateHoldPage />
-                      </PermissionRoute>
-                    }
-                  />
                   <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
 
                   <Route path="/invoices" element={<InvoicesSummaryPage />} />
@@ -139,14 +102,6 @@ function AppRoutes() {
                     element={
                       <PermissionRoute permission="create_update_invoice">
                         <CreateInvoicePage />
-                      </PermissionRoute>
-                    }
-                  />
-                  <Route
-                    path="/invoices/:collectionId/edit"
-                    element={
-                      <PermissionRoute permission="create_update_invoice">
-                        <UpdateInvoicePage />
                       </PermissionRoute>
                     }
                   />

@@ -1,7 +1,6 @@
-import { createDeparture, getDepartureForUpdate, getDepartures, patchDepartureAssets, updateDeparture, updateDepartureMetadata as updateDepartureMetadataApi } from '@/data/api/departure-api'
+import { createDeparture, getDepartureDetail, getDepartures, patchDepartureAssets, updateDepartureMetadata as updateDepartureMetadataApi } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
-import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import type { AssetSummary, DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
@@ -23,7 +22,6 @@ interface DepartureStore {
   origin: SelectOption<Warehouse>
   loading: boolean
   hasSearched: boolean
-  departureFormData: DepartureForm | null
 
   setFromDate: (date: SelectOption<Date>) => void
   setToDate: (date: SelectOption<Date>) => void
@@ -34,14 +32,12 @@ interface DepartureStore {
     fromDate: SelectOption<Date>,
     toDate: SelectOption<Date>,
     origin: SelectOption<Warehouse>) => Promise<void>
-  getDepartureForUpdate: (departureNumber: string) => Promise<void>
   submitCreateDeparture: (data: DepartureForm) => Promise<{ departureNumber: string }>
-  submitUpdateDeparture: (departureNumber: string, data: DepartureForm) => Promise<void>
+  getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   addAssetToDeparture: (departureNumber: string, asset: AssetSummary) => Promise<void>
   addAssetsToDeparture: (departureNumber: string, assets: AssetSummary[]) => Promise<void>
   updateDepartureMetadata: (departureNumber: string, metadata: DepartureMetadataForm) => Promise<void>
-  getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   removeAssetFromDeparture: (departureNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromDeparture: (departureNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (departureNumber: string) => void
@@ -55,7 +51,6 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   origin: ANY_OPTION,
   loading: false,
   hasSearched: false,
-  departureFormData: null,
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -65,36 +60,27 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
   getDepartures: async (fromDate, toDate, origin) => {
     set({ hasSearched: true, departures: await getDepartures(fromDate, toDate, origin) })
   },
-  getDepartureForUpdate: async (departureNumber) => {
-    set({ departureFormData: null })
-    set({ departureFormData: await getDepartureForUpdate(departureNumber) })
-  },
   submitCreateDeparture: async (data) => {
     const result = await createDeparture(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
-  submitUpdateDeparture: async (departureNumber, data) => {
-    const previousAssets = useDepartureStore.getState().departureFormData?.assets ?? []
-    const affected = new Set<string>()
-    for (const a of previousAssets) affected.add(a.barcode)
-    for (const a of data.assets) affected.add(a.barcode)
-    await updateDeparture(departureNumber, data)
-    mutate(departureDetailKey(departureNumber))
-    invalidateAssetDetails([...affected])
+  getAssets: async (departureNumber) => {
+    return (await getDepartureDetail(departureNumber)).assets
   },
   addAssets: async (departureNumber, assets) => {
-    const form = await getDepartureForUpdate(departureNumber)
-    const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    await updateDeparture(departureNumber, { ...form, assets: merged })
-    mutate(departureDetailKey(departureNumber))
-    invalidateAssetDetails(assets.map(a => a.barcode))
+    const existing = (await getDepartureDetail(departureNumber)).assets
+    const existingIds = new Set(existing.map(a => a.id))
+    const newOnly = assets.filter(a => !existingIds.has(a.id))
+    const added = newOnly.length
+    const skipped = assets.length - added
+    if (added > 0) {
+      await patchDepartureAssets(departureNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
+      mutate(departureDetailKey(departureNumber))
+      invalidateAssetDetails(newOnly.map(a => a.barcode))
+    }
     return { added, skipped }
-  },
-  getAssets: async (departureNumber) => {
-    const form = await getDepartureForUpdate(departureNumber)
-    return form?.assets ?? []
   },
   addAssetToDeparture: async (departureNumber, asset) => {
     const cacheKey = departureDetailKey(departureNumber)

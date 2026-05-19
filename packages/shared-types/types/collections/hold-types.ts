@@ -37,21 +37,6 @@ export const CreateHoldSchema = z.object({
 })
 export type CreateHold = z.infer<typeof CreateHoldSchema>
 
-// GET /holds/:holdNumber/edit
-export const UpdateHoldSchema = z.object({
-  id: z.number().int(),
-  created_for: UserSchema,
-  customer: OrgSummarySchema,
-  notes: z.string().nullable(),
-  assets: z.array(AssetSummarySchema)
-})
-export type UpdateHold = z.infer<typeof UpdateHoldSchema>
-
-// PUT /holds/:holdNumber
-export const SubmitUpdateHoldSchema = UpdateHoldSchema.extend({
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold').max(2000)
-})
-
 // PATCH /holds/:holdNumber/metadata
 export const UpdateHoldMetadataSchema = z.object({
   created_for: UserSchema,

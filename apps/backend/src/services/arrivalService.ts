@@ -1,7 +1,6 @@
-import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrival, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
+import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import type { Prisma } from '../../generated/prisma/client.js'
-import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
@@ -29,16 +28,6 @@ const assetIncludeArgs = {
   }
 } satisfies AssetDefaultArgs
 
-const arrivalIncludeArgs = {
-  include: {
-    origin: true,
-    destination: true,
-    transporter: true,
-    assets: assetIncludeArgs
-  }
-} satisfies ArrivalDefaultArgs
-
-type UpdateArrivalDb = ArrivalGetPayload<typeof arrivalIncludeArgs>
 type UpdateArrivalAssetDb = AssetGetPayload<typeof assetIncludeArgs>
 
 export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> {
@@ -62,29 +51,6 @@ export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> 
   }
 }
 
-
-export async function getArrivalForUpdate(arrivalNumber: string): Promise<UpdateArrival> {
-  const dbArrival = await prisma.arrival.findUnique({
-    where: { arrival_number: arrivalNumber },
-    ...arrivalIncludeArgs
-  })
-  if (!dbArrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
-  return mapDbToGetUpdateArrival(dbArrival)
-}
-
-async function mapDbToGetUpdateArrival(dbArrival: UpdateArrivalDb): Promise<UpdateArrival> {
-  const { origin, destination, transporter, notes, assets } = dbArrival
-  const models = await Promise.all(assets.map(a => mapDbModelToSummaryModel(a.model_id)))
-
-  return {
-    id: dbArrival.id,
-    vendor: origin,
-    warehouse: destination,
-    transporter: transporter,
-    comment: notes,
-    assets: assets.map((a, i) => mapDbAssetToUpdateAsset(a, models[i]))
-  }
-}
 
 function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSummary): UpdateAsset {
   return {
@@ -184,141 +150,6 @@ function mapInputAssetToPrismaCreateAsset(
   }
 }
 
-
-export async function updateArrival(arrival: UpdateArrival, userId: number) {
-  const assetsToUpdate = arrival.assets.filter(a => !!a.id)
-  const assetsToCreate = arrival.assets.filter(a => a.id === undefined || a.id === null)
-
-  // Generate barcodes for new assets outside the transaction (sequence function is atomic)
-  let newAssetBarcodes: Record<string, string> = {}
-  if (assetsToCreate.length > 0) {
-    newAssetBarcodes = await generateBarcodes(assetsToCreate, arrival.warehouse.city_code)
-  }
-
-  const { currentArrival, existingAssets, existingAssetIds, assetIdsToBeDeleted, newAssets } =
-    await prisma.$transaction(async (tx) => {
-      const [currentArrival, existingAssets] = await Promise.all([
-        tx.arrival.findUnique({
-          where: { id: arrival.id },
-          select: { origin_id: true, destination_id: true, transporter_id: true, notes: true }
-        }),
-        tx.asset.findMany({
-          where: { arrival_id: arrival.id },
-          select: {
-            id: true,
-            model_id: true,
-            serial_number: true,
-            technical_status_id: true,
-            technical_specification: {
-              select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
-            }
-          }
-        })
-      ])
-
-      const existingAssetIds = existingAssets.map(a => a.id)
-      const receivedAssetIds = new Set(arrival.assets.map(a => a.id).filter(id => id != null))
-      const assetIdsToBeDeleted = existingAssetIds.filter(id => !receivedAssetIds.has(id))
-
-      await tx.asset.updateMany({
-        where: { id: { in: assetIdsToBeDeleted } },
-        data: { arrival_id: null }
-      })
-
-      await tx.arrival.update({
-        where: { id: arrival.id },
-        data: {
-          origin_id: arrival.vendor.id,
-          transporter_id: arrival.transporter.id,
-          destination_id: arrival.warehouse.id,
-          notes: arrival.comment
-        }
-      })
-
-      if (assetsToUpdate.length > 0) {
-        await tx.assetAccessory.deleteMany({
-          where: { asset_id: { in: assetsToUpdate.map(a => a.id!) } }
-        })
-      }
-
-      const allNewAccessories: { asset_id: number; accessory_id: number }[] = []
-      for (const asset of assetsToUpdate) {
-        await updateArrivalAssetCoreFields(tx, asset)
-        for (const cf of asset.coreFunctions) {
-          allNewAccessories.push({ asset_id: asset.id!, accessory_id: cf.id })
-        }
-      }
-
-      if (allNewAccessories.length > 0) {
-        await tx.assetAccessory.createMany({ data: allNewAccessories })
-      }
-
-      for (const asset of assetsToCreate) {
-        await createArrivalAssetInTx(
-          tx, arrival.id, asset, newAssetBarcodes[asset.serialNumber], arrival.warehouse.id, new Date()
-        )
-      }
-
-      const newAssets = assetsToCreate.length > 0
-        ? await tx.asset.findMany({
-            where: { arrival_id: arrival.id, id: { notIn: existingAssetIds } },
-            select: {
-              id: true, barcode: true, serial_number: true, model_id: true,
-              tracking_status_id: true, availability_status_id: true, technical_status_id: true
-            }
-          })
-        : []
-
-      return { currentArrival, existingAssets, existingAssetIds, assetIdsToBeDeleted, newAssets }
-    })
-
-  await recordArrivalUpdate(arrival.id, {
-    origin_id: currentArrival?.origin_id,
-    destination_id: currentArrival?.destination_id,
-    transporter_id: currentArrival?.transporter_id
-  }, {
-    origin_id: arrival.vendor.id,
-    destination_id: arrival.warehouse.id,
-    transporter_id: arrival.transporter.id
-  }, userId)
-
-  await recordCollectionUpdateOnAssets(assetIdsToBeDeleted, [], 'arrival_id', arrival.id, userId)
-
-  await recordBatchAssetCreate(
-    newAssets.map(a => ({
-      id: a.id,
-      barcode: a.barcode,
-      serial_number: a.serial_number,
-      model_id: a.model_id,
-      arrival_id: arrival.id
-    })),
-    userId
-  )
-
-  await recordAssetUpdateOnCollection('Arrival', arrival.id, newAssets.map(a => a.id), assetIdsToBeDeleted, userId)
-
-  for (const asset of assetsToUpdate) {
-    const existing = existingAssets.find(a => a.id === asset.id)
-    if (!existing) continue
-    await recordAssetUpdate(asset.id!, {
-      model_id: existing.model_id,
-      serial_number: existing.serial_number,
-      technical_status_id: existing.technical_status_id,
-      meter_black: existing.technical_specification?.meter_black,
-      meter_colour: existing.technical_specification?.meter_colour,
-      cassettes: existing.technical_specification?.cassettes,
-      internal_finisher: existing.technical_specification?.internal_finisher
-    }, {
-      model_id: asset.model.id,
-      serial_number: asset.serialNumber,
-      technical_status_id: asset.technicalStatus.id,
-      meter_black: asset.meterBlack,
-      meter_colour: asset.meterColour,
-      cassettes: asset.cassettes,
-      internal_finisher: asset.internalFinisher
-    }, userId)
-  }
-}
 
 export async function patchArrivalMetadata(
   arrivalNumber: string,

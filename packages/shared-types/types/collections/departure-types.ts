@@ -36,18 +36,6 @@ export const CreateDepartureSchema = z.object({
 })
 export type CreateDeparture = z.infer<typeof CreateDepartureSchema>
 
-// GET /departures/:departureNumber/edit
-export const UpdateDepartureSchema = CreateDepartureSchema.extend({
-  id: z.number(),
-  assets: z.array(AssetSummarySchema)
-})
-export type UpdateDeparture = z.infer<typeof UpdateDepartureSchema>
-
-// PUT /departures/:departureNumber
-export const SubmitUpdateDepartureSchema = UpdateDepartureSchema.extend({
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure").max(2000)
-})
-
 // PATCH /departures/:departureNumber/metadata
 export const UpdateDepartureMetadataSchema = z.object({
   origin: WarehouseSchema,

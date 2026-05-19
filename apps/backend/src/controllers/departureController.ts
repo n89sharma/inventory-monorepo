@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, SubmitUpdateDepartureSchema, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -8,11 +8,9 @@ import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createDeparture as createDepartureSer,
-  getDepartureForUpdate as getDepartureForUpdateSer,
   getDeparture as getDepartureSer,
   patchDepartureAssets as patchDepartureAssetsSer,
-  patchDepartureMetadata as patchDepartureMetadataSer,
-  updateDeparture as updateDepartureSer
+  patchDepartureMetadata as patchDepartureMetadataSer
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
@@ -28,22 +26,10 @@ export const getDepartureDetail = asyncHandler(async (req: Request, res: Respons
   res.json(successResponse(data))
 })
 
-export const getDepartureForUpdate = asyncHandler(async (req, res) => {
-  const { departureNumber } = req.params
-  const data = await getDepartureForUpdateSer(departureNumber)
-  res.json(successResponse(data))
-})
-
 export const createDeparture = asyncHandler(async (req, res) => {
   const departure = CreateDepartureSchema.parse(req.body)
   const departureNumber = await createDepartureSer(departure, res.locals.dbUserId)
   res.status(201).json({ departureNumber })
-})
-
-export const updateDeparture = asyncHandler(async (req, res) => {
-  const departure = SubmitUpdateDepartureSchema.parse(req.body)
-  await updateDepartureSer(departure, res.locals.dbUserId)
-  res.json({ departureNumber: req.params.departureNumber })
 })
 
 export const patchDepartureAssets = asyncHandler(async (req, res) => {

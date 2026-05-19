@@ -1,7 +1,6 @@
-import { createTransfer, getTransferForUpdate, getTransfers as getTransfersApi, patchTransferAssets, updateTransfer, updateTransferMetadata as updateTransferMetadataApi } from '@/data/api/transfer-api'
+import { createTransfer, getTransferDetail, getTransfers as getTransfersApi, patchTransferAssets, updateTransferMetadata as updateTransferMetadataApi } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { transferDetailKey } from '@/hooks/use-transfer-detail'
-import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import type { AssetSummary, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
@@ -23,7 +22,6 @@ interface TransferStore {
   origin: SelectOption<Warehouse>
   destination: SelectOption<Warehouse>
   hasSearched: boolean
-  transferFormData: TransferForm | null
 
   setFromDate: (d: SelectOption<Date>) => void
   setToDate: (d: SelectOption<Date>) => void
@@ -34,11 +32,9 @@ interface TransferStore {
     toDate: SelectOption<Date>,
     origin: SelectOption<Warehouse>,
     destination: SelectOption<Warehouse>) => Promise<void>
-  getTransferForUpdate: (transferNumber: string) => Promise<void>
   submitCreateTransfer: (data: TransferForm) => Promise<{ transferNumber: string }>
-  submitUpdateTransfer: (transferNumber: string, data: TransferForm) => Promise<void>
-  addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (transferNumber: string) => Promise<AssetSummary[]>
+  addAssets: (transferNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   addAssetToTransfer: (transferNumber: string, asset: AssetSummary) => Promise<void>
   addAssetsToTransfer: (transferNumber: string, assets: AssetSummary[]) => Promise<void>
   updateTransferMetadata: (transferNumber: string, metadata: TransferMetadataForm) => Promise<void>
@@ -55,7 +51,6 @@ export const useTransferStore = create<TransferStore>((set) => ({
   origin: ANY_OPTION,
   destination: ANY_OPTION,
   hasSearched: false,
-  transferFormData: null,
 
   setFromDate: (fromDate) => set({ fromDate }),
   setToDate: (toDate) => set({ toDate }),
@@ -64,36 +59,27 @@ export const useTransferStore = create<TransferStore>((set) => ({
   getTransfers: async (fromDate, toDate, origin, destination) => {
     set({ hasSearched: true, transfers: await getTransfersApi(fromDate, toDate, origin, destination) })
   },
-  getTransferForUpdate: async (transferNumber) => {
-    set({ transferFormData: null })
-    set({ transferFormData: await getTransferForUpdate(transferNumber) })
-  },
   submitCreateTransfer: async (data) => {
     const result = await createTransfer(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
-  submitUpdateTransfer: async (transferNumber, data) => {
-    const previousAssets = useTransferStore.getState().transferFormData?.assets ?? []
-    const affected = new Set<string>()
-    for (const a of previousAssets) affected.add(a.barcode)
-    for (const a of data.assets) affected.add(a.barcode)
-    await updateTransfer(transferNumber, data)
-    mutate(transferDetailKey(transferNumber))
-    invalidateAssetDetails([...affected])
+  getAssets: async (transferNumber) => {
+    return (await getTransferDetail(transferNumber)).assets
   },
   addAssets: async (transferNumber, assets) => {
-    const form = await getTransferForUpdate(transferNumber)
-    const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    await updateTransfer(transferNumber, { ...form, assets: merged })
-    mutate(transferDetailKey(transferNumber))
-    invalidateAssetDetails(assets.map(a => a.barcode))
+    const existing = (await getTransferDetail(transferNumber)).assets
+    const existingIds = new Set(existing.map(a => a.id))
+    const newOnly = assets.filter(a => !existingIds.has(a.id))
+    const added = newOnly.length
+    const skipped = assets.length - added
+    if (added > 0) {
+      await patchTransferAssets(transferNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
+      mutate(transferDetailKey(transferNumber))
+      invalidateAssetDetails(newOnly.map(a => a.barcode))
+    }
     return { added, skipped }
-  },
-  getAssets: async (transferNumber) => {
-    const form = await getTransferForUpdate(transferNumber)
-    return form?.assets ?? []
   },
   updateTransferMetadata: async (transferNumber, metadata) => {
     await updateTransferMetadataApi(transferNumber, metadata)

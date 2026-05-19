@@ -1,7 +1,6 @@
-import { createHold, getHoldForUpdate, getHolds, patchHoldAssets, updateHold, updateHoldMetadata as updateHoldMetadataApi } from '@/data/api/hold-api'
+import { createHold, getHoldDetail, getHolds, patchHoldAssets, updateHoldMetadata as updateHoldMetadataApi } from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { holdDetailKey } from '@/hooks/use-hold-detail'
-import { mergeAssets } from '@/lib/collection-utils'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { AssetSummary, HoldDetail, HoldSummary, User } from 'shared-types'
@@ -24,7 +23,6 @@ interface HoldStore {
   holdBy: SelectOption<User>
   holdFor: SelectOption<User>
   hasSearched: boolean
-  holdFormData: HoldForm | null
 
   setHolds: (holds: HoldSummary[]) => void
   setLoading: (loading: boolean) => void
@@ -38,11 +36,9 @@ interface HoldStore {
     toDate: SelectOption<Date>,
     holdBy: SelectOption<User>,
     holdFor: SelectOption<User>) => Promise<void>
-  getHoldForUpdate: (holdNumber: string) => Promise<void>
   submitCreateHold: (data: HoldForm) => Promise<{ holdNumber: string }>
-  submitUpdateHold: (holdNumber: string, data: HoldForm) => Promise<{ holdNumber: string }>
-  addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (holdNumber: string) => Promise<AssetSummary[]>
+  addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   addAssetToHold: (holdNumber: string, asset: AssetSummary) => Promise<void>
   updateHoldMetadata: (holdNumber: string, metadata: HoldMetadataForm) => Promise<void>
   removeAssetFromHold: (holdNumber: string, asset: AssetSummary) => void
@@ -59,7 +55,6 @@ export const useHoldStore = create<HoldStore>((set) => ({
   holdBy: ANY_OPTION,
   holdFor: ANY_OPTION,
   hasSearched: false,
-  holdFormData: null,
 
   setHolds: (holds) => set({ holds }),
   setLoading: (loading) => set({ loading }),
@@ -71,41 +66,31 @@ export const useHoldStore = create<HoldStore>((set) => ({
   getHolds: async (fromDate, toDate, holdBy, holdFor) => {
     set({ hasSearched: true, holds: await getHolds(fromDate, toDate, holdBy, holdFor) })
   },
-  getHoldForUpdate: async (holdNumber) => {
-    set({ holdFormData: null })
-    set({ holdFormData: await getHoldForUpdate(holdNumber) })
-  },
   submitCreateHold: async (data) => {
     const result = await createHold(data)
     invalidateAssetDetails(data.assets.map(a => a.barcode))
     set({ hasSearched: false })
     return result
   },
-  submitUpdateHold: async (holdNumber, data) => {
-    const previousAssets = useHoldStore.getState().holdFormData?.assets ?? []
-    const affected = new Set<string>()
-    for (const a of previousAssets) affected.add(a.barcode)
-    for (const a of data.assets) affected.add(a.barcode)
-    const result = await updateHold(holdNumber, data)
-    mutate(holdDetailKey(holdNumber))
-    invalidateAssetDetails([...affected])
-    return result
-  },
-  addAssets: async (holdNumber, assets) => {
-    const form = await getHoldForUpdate(holdNumber)
-    const { merged, added, skipped } = mergeAssets(form.assets, assets)
-    await updateHold(holdNumber, { ...form, assets: merged })
-    mutate(holdDetailKey(holdNumber))
-    invalidateAssetDetails(assets.map(a => a.barcode))
-    return { added, skipped }
-  },
-  getAssets: async (holdNumber) => {
-    const form = await getHoldForUpdate(holdNumber)
-    return form?.assets ?? []
-  },
   updateHoldMetadata: async (holdNumber, metadata) => {
     await updateHoldMetadataApi(holdNumber, metadata)
     mutate(holdDetailKey(holdNumber))
+  },
+  getAssets: async (holdNumber) => {
+    return (await getHoldDetail(holdNumber)).assets
+  },
+  addAssets: async (holdNumber, assets) => {
+    const existing = (await getHoldDetail(holdNumber)).assets
+    const existingIds = new Set(existing.map(a => a.id))
+    const newOnly = assets.filter(a => !existingIds.has(a.id))
+    const added = newOnly.length
+    const skipped = assets.length - added
+    if (added > 0) {
+      await patchHoldAssets(holdNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
+      mutate(holdDetailKey(holdNumber))
+      invalidateAssetDetails(newOnly.map(a => a.barcode))
+    }
+    return { added, skipped }
   },
   addAssetToHold: async (holdNumber, asset) => {
     const cacheKey = holdDetailKey(holdNumber)

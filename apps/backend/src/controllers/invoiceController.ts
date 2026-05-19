@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, SubmitUpdateInvoiceSchema, UpdateInvoice, UpdateInvoiceMetadataSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateInvoiceSchema, InvoiceDetail, InvoiceSummary, UpdateInvoiceMetadataSchema, successResponse } from 'shared-types'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -7,10 +7,8 @@ import { prisma } from '../prisma.js'
 import {
   createInvoice as createInvoiceSer,
   getInvoice as getInvoiceSer,
-  getInvoiceForUpdate as getInvoiceForUpdateSer,
   patchInvoiceAssets as patchInvoiceAssetsSer,
-  patchInvoiceMetadata as patchInvoiceMetadataSer,
-  updateInvoice as updateInvoiceSer
+  patchInvoiceMetadata as patchInvoiceMetadataSer
 } from '../services/invoiceService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
@@ -24,19 +22,6 @@ export const getInvoices = asyncHandler(async (req: Request, res: Response<ApiRe
   const { fromDate, toDate } = res.locals.parsedDates
   const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
   res.json(successResponse(invoices))
-})
-
-export const getInvoiceForUpdate = asyncHandler(async (req: Request, res: Response<ApiResponse<UpdateInvoice>>) => {
-  const { invoiceNumber } = req.params
-  const data = await getInvoiceForUpdateSer(invoiceNumber)
-  res.json(successResponse(data))
-})
-
-export const updateInvoice = asyncHandler(async (req, res) => {
-  const { invoiceNumber } = req.params
-  const data = SubmitUpdateInvoiceSchema.parse(req.body)
-  const result = await updateInvoiceSer(invoiceNumber, data, res.locals.dbUserId)
-  res.json(successResponse(result))
 })
 
 export const patchInvoiceMetadata = asyncHandler(async (req, res) => {

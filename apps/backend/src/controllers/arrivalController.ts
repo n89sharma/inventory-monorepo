@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -10,11 +10,9 @@ import {
   createArrival as createArrivalSer,
   createSingleArrivalAsset as createSingleArrivalAssetSer,
   getArrivalAssetForUpdate as getArrivalAssetForUpdateSer,
-  getArrivalForUpdate as getArrivalForEditSer,
   getArrival as getArrivalSer,
   patchArrivalAssets as patchArrivalAssetsSer,
   patchArrivalMetadata as patchArrivalMetadataSer,
-  updateArrival as updateArrivalSer,
   updateArrivalAsset as updateArrivalAssetSer
 } from '../services/arrivalService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -35,19 +33,6 @@ export const createArrival = asyncHandler(async (req, res) => {
   const validatedArrival = CreateArrivalSchema.parse(req.body)
   const arrivalNumber = await createArrivalSer(validatedArrival, res.locals.dbUserId)
   res.status(201).json({ arrivalNumber })
-})
-
-export const getArrivalForUpdate = asyncHandler(async (req, res) => {
-  const { arrivalNumber } = req.params
-  const data = await getArrivalForEditSer(arrivalNumber)
-  res.json(successResponse(data))
-})
-
-export const updateArrival = asyncHandler(async (req, res) => {
-  const { arrivalNumber } = req.params
-  const validated = SubmitUpdateArrivalSchema.parse(req.body)
-  await updateArrivalSer(validated, res.locals.dbUserId)
-  res.json({ arrivalNumber })
 })
 
 export const patchArrivalMetadata = asyncHandler(async (req, res) => {
