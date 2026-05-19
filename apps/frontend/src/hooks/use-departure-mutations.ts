@@ -1,7 +1,6 @@
 import { createDeparture, getDepartureDetail, patchDepartureAssets, updateDepartureMetadata } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
-import { departureDetailKey } from '@/hooks/use-departure-detail'
-import { invalidateDepartureLists } from '@/hooks/use-departures-list'
+import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import type { AssetSummary, DepartureDetail } from 'shared-types'

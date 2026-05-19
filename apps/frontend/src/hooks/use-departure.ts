@@ -1,8 +1,18 @@
-import { getDepartures } from '@/data/api/departure-api'
+import { getDepartureDetail, getDepartures } from '@/data/api/departure-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { Warehouse } from 'shared-types'
-import useSWR, { mutate } from 'swr'
+import useSWR, { mutate, preload } from 'swr'
+
+export const departureDetailKey = (departureNumber: string) => `departure:${departureNumber}`
+
+export function useDepartureDetail(departureNumber: string) {
+  return useSWR(departureDetailKey(departureNumber), () => getDepartureDetail(departureNumber))
+}
+
+export function preloadDepartureDetail(departureNumber: string) {
+  preload(departureDetailKey(departureNumber), () => getDepartureDetail(departureNumber))
+}
 
 const DEPARTURE_LIST_KEY_PREFIX = 'departures:list'
 

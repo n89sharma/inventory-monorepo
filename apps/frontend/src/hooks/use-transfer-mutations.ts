@@ -1,7 +1,6 @@
 import { createTransfer, getTransferDetail, patchTransferAssets, updateTransferMetadata } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
-import { transferDetailKey } from '@/hooks/use-transfer-detail'
-import { invalidateTransferLists } from '@/hooks/use-transfers-list'
+import { transferDetailKey, invalidateTransferLists } from '@/hooks/use-transfer'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import type { AssetSummary, TransferDetail } from 'shared-types'

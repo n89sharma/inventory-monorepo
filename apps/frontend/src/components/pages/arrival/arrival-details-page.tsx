@@ -5,7 +5,7 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
-import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
+import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useNavigationStore } from '@/data/store/navigation-store'

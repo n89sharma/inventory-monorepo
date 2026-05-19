@@ -159,7 +159,7 @@ Path alias `@/` maps to `src/`.
 | **Form types** | `ui-types/entityFormTypes.ts` | `entityFormTypes.ts` | Zod schema + inferred TS type for react-hook-form; maps UI shape (e.g. `SelectOption<User>`) to what the form controls |
 | **API** | `data/api/entity-api.ts` | `entity-api.ts` | Axios calls — maps form payload to request body, parses responses. No SWR, no cache logic. |
 | **Store** | `data/store/entity-store.ts` | `entity-store.ts` | **Zustand — client state only.** Filter selections, `hasSearched`, UI flags. No API calls, no SWR `mutate` calls. ~30 lines per entity. |
-| **List/detail hooks** | `hooks/use-entities-list.ts`, `hooks/use-entity-detail.ts` | `use-entities-list.ts`, `use-entity-detail.ts` | SWR hooks that own server state — list queries, detail queries, and their cache keys. Export an `invalidateEntityLists()` matcher for mutations to call. |
+| **Query hooks** | `hooks/use-entity.ts` | `use-entity.ts` | SWR hooks that own server state — the detail hook, the list hook, their cache keys, and `invalidateEntityLists()`. One file per entity: detail and list share a key namespace and always move together. |
 | **Mutation hooks** | `hooks/use-entity-mutations.ts` | `use-entity-mutations.ts` | All server mutations for an entity: `create`, `addAsset`, `removeAsset`, `updateMetadata`, etc. Each calls the API then invalidates the affected SWR caches (`mutate(detailKey)` + `invalidateEntityLists()`). |
 | **Pages** | `components/pages/entity/` | `entity-form-page.tsx`, `create-entity-page.tsx`, `entity-details-page.tsx` | Form page holds all form UI and field wiring; create/update pages are thin wrappers that supply config and handle navigation |
 | **Column definitions** | `components/pages/column-defs/` | `entity-columns.tsx` | TanStack column definitions for summary list tables and form asset tables; kept separate from page components to avoid clutter |
@@ -186,9 +186,8 @@ Path alias `@/` maps to `src/`.
 - `useGlobalData` — fetches users, orgs, models, and reference data once at app start (`App.tsx`); results available via `useUserStore`, `useOrgStore`, `useModelStore`, `useReferenceDataStore` — never re-fetch these in a form or page
 - `useAutoSearch` — pre-populates list pages on first visit; used on every summary/list page
 - `useLocalStorage` — persists a value to `localStorage` with a versioned key
-- `use<Entity>Detail` — SWR hook for a single entity detail; exports `<entity>DetailKey(id)` for invalidation and `preload<Entity>Detail(id)` for row hover preloads
-- `use<Entity>List` — SWR hook for the entity summary list; key is derived from filter state, returns `undefined` (skips fetch) until `fromDate` is set. Exports `invalidate<Entity>Lists()` matcher that revalidates every cached filter variant
-- `use<Entity>Mutations` — returns a stable object of mutation methods (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`, etc.); each calls the API and invalidates the affected SWR caches
+- `hooks/use-<entity>.ts` — all SWR for one entity in one file: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` (skips fetch) until `fromDate` is set; `invalidateXLists()` is a matcher that revalidates every cached filter variant
+- `hooks/use-<entity>-mutations.ts` — returns a stable object of mutation methods (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`, etc.); each calls the API and invalidates the affected SWR caches. Imports keys/invalidators from `use-<entity>.ts` only — no cross-sibling imports
 
 **Asset removal undo pattern** (`lib/asset-removal-undo.ts`) — shared across all 5 collection entities. Provides `scheduleAssetRemoval`, `scheduleBulkAssetRemoval`, `flushPendingRemovals`. Owns a module-level `Map<string, Pending>` so the 5-second undo timer survives re-renders. Detail pages call `mutations.flushPending(collectionId)` in their unmount effect to commit any pending removals immediately.
 
@@ -206,4 +205,4 @@ Path alias `@/` maps to `src/`.
 <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
 ```
 
-For any given feature, reading one file per layer for an existing entity gives you the complete pattern — roughly 10 files covers the full stack end to end (form types, API, store, list hook, detail hook, mutations hook, form page, create page, details page, columns).
+For any given feature, reading one file per layer for an existing entity gives you the complete pattern — roughly 9 files covers the full stack end to end (form types, API, store, query hook, mutations hook, form page, create page, details page, columns).

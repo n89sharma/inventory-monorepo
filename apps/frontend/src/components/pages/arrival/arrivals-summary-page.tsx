@@ -1,6 +1,5 @@
 import { useArrivalStore } from "@/data/store/arrival-store"
-import { preloadArrivalDetail } from "@/hooks/use-arrival-detail"
-import { useArrivalsList } from "@/hooks/use-arrivals-list"
+import { preloadArrivalDetail, useArrivalsList } from "@/hooks/use-arrival"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"

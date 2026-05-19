@@ -1,8 +1,18 @@
-import { getArrivals } from '@/data/api/arrival-api'
+import { getArrivalDetail, getArrivals } from '@/data/api/arrival-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { Warehouse } from 'shared-types'
-import useSWR, { mutate } from 'swr'
+import useSWR, { mutate, preload } from 'swr'
+
+export const arrivalDetailKey = (arrivalNumber: string) => `arrival:${arrivalNumber}`
+
+export function useArrivalDetail(arrivalNumber: string) {
+  return useSWR(arrivalDetailKey(arrivalNumber), () => getArrivalDetail(arrivalNumber))
+}
+
+export function preloadArrivalDetail(arrivalNumber: string) {
+  preload(arrivalDetailKey(arrivalNumber), () => getArrivalDetail(arrivalNumber))
+}
 
 const ARRIVAL_LIST_KEY_PREFIX = 'arrivals:list'
 

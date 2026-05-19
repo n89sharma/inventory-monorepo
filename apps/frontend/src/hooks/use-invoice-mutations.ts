@@ -1,7 +1,6 @@
 import { createInvoice, getInvoiceDetail, patchInvoiceAssets, updateInvoiceMetadata } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
-import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
-import { invalidateInvoiceLists } from '@/hooks/use-invoices-list'
+import { invoiceDetailKey, invalidateInvoiceLists } from '@/hooks/use-invoice'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import type { AssetSummary, InvoiceDetail } from 'shared-types'

@@ -1,7 +1,17 @@
-import { getInvoices } from '@/data/api/invoice-api'
+import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'
-import useSWR, { mutate } from 'swr'
+import useSWR, { mutate, preload } from 'swr'
+
+export const invoiceDetailKey = (invoiceNumber: string) => `invoice:${invoiceNumber}`
+
+export function useInvoiceDetail(invoiceNumber: string) {
+  return useSWR(invoiceDetailKey(invoiceNumber), () => getInvoiceDetail(invoiceNumber))
+}
+
+export function preloadInvoiceDetail(invoiceNumber: string) {
+  preload(invoiceDetailKey(invoiceNumber), () => getInvoiceDetail(invoiceNumber))
+}
 
 const INVOICE_LIST_KEY_PREFIX = 'invoices:list'
 
