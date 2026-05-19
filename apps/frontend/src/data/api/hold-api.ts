@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { HoldForm } from '@/ui-types/hold-form-types'
+import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { getIdOrNullFromSelection, getSelectOption, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHold, User } from 'shared-types'
-import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, SubmitUpdateHoldSchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHold, UpdateHoldMetadata, User } from 'shared-types'
+import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, SubmitUpdateHoldSchema, UpdateHoldMetadataSchema, UpdateHoldSchema, type HoldSummary } from 'shared-types'
 import { z } from 'zod'
 
 const CreateHoldResponseSchema = z.object({ holdNumber: z.string() })
@@ -76,6 +76,18 @@ export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
 export async function getHoldHistory(holdNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/holds/${holdNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function updateHoldMetadata(
+  holdNumber: string,
+  metadata: HoldMetadataForm
+): Promise<void> {
+  const updateHoldMetadataBody = UpdateHoldMetadataSchema.parse({
+    created_for: getSelectedOrNull(metadata.created_for)!,
+    customer: metadata.customer!,
+    notes: metadata.notes === '' ? null : metadata.notes
+  } satisfies UpdateHoldMetadata)
+  await api.patch(`/holds/${holdNumber}/metadata`, updateHoldMetadataBody)
 }
 
 export async function patchHoldAssets(

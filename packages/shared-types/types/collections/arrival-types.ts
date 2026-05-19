@@ -67,3 +67,12 @@ export type UpdateArrival = z.infer<typeof UpdateArrivalSchema>
 export const SubmitUpdateArrivalSchema = UpdateArrivalSchema.extend({
   assets: z.array(UpdateAssetSchema).nonempty("No assets in the arrival").max(2000)
 })
+
+// PATCH /arrivals/:arrivalNumber/metadata
+export const UpdateArrivalMetadataSchema = z.object({
+  vendor: OrgSummarySchema,
+  transporter: OrgSummarySchema,
+  warehouse: WarehouseSchema,
+  comment: z.string().nullable()
+})
+export type UpdateArrivalMetadata = z.infer<typeof UpdateArrivalMetadataSchema>

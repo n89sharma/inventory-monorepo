@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { EditHoldMetadataModal } from '../../modals/edit-hold-metadata-modal'
 import { DataTable } from '../../shadcn/data-table'
 import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -31,8 +32,10 @@ export function HoldDetailsPage(): React.JSX.Element {
   const removeAssetFromHold = useHoldStore(state => state.removeAssetFromHold)
   const bulkRemoveAssetsFromHold = useHoldStore(state => state.bulkRemoveAssetsFromHold)
   const addAssetToHold = useHoldStore(state => state.addAssetToHold)
+  const updateHoldMetadata = useHoldStore(state => state.updateHoldMetadata)
   const flushPendingRemovals = useHoldStore(state => state.flushPendingRemovals)
   const canEditHold = useCan('create_update_hold')
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -77,6 +80,7 @@ export function HoldDetailsPage(): React.JSX.Element {
             assets={hold.assets}
             historyCacheKey={`hold-history:${holdNumber}`}
             historyFetcher={() => getHoldHistory(holdNumber)}
+            onEdit={() => setIsMetadataModalOpen(true)}
           />
         }
         subtitle={
@@ -89,6 +93,12 @@ export function HoldDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <HoldSummaryStrip hold={hold} />
+      <EditHoldMetadataModal
+        open={isMetadataModalOpen}
+        onOpenChange={setIsMetadataModalOpen}
+        hold={hold}
+        onSave={metadata => updateHoldMetadata(holdNumber, metadata)}
+      />
       {canEditHold && (
         <AddAssetBar
           existingAssets={hold.assets}

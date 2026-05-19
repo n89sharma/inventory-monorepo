@@ -46,3 +46,17 @@ export type ArrivalForm = {
   comment: string
   assets: AssetForm[]
 }
+
+export const ArrivalMetadataFormSchema = z.object({
+  vendor: OrgSummarySchema.nullable().refine(val => !!val, "Vendor required"),
+  transporter: OrgSummarySchema.nullable().refine(val => !!val, "Transporter required"),
+  warehouse: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Warehouse required"),
+  comment: z.string()
+})
+
+export type ArrivalMetadataForm = {
+  vendor: OrgSummary | null
+  transporter: OrgSummary | null
+  warehouse: SelectOption<Warehouse>
+  comment: string
+}

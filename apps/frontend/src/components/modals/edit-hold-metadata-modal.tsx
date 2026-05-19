@@ -1,0 +1,133 @@
+import { useOrgStore } from '@/data/store/org-store'
+import { useUserStore } from '@/data/store/user-store'
+import { HoldMetadataFormSchema, type HoldMetadataForm } from '@/ui-types/hold-form-types'
+import { getSelectOption } from '@/ui-types/select-option-types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { Controller, useForm, type FieldErrors } from 'react-hook-form'
+import { toast } from 'sonner'
+import type { HoldDetail } from 'shared-types'
+import { flattenFieldErrors } from '@/lib/utils'
+import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { SelectOptions } from '../custom/select-options'
+import { Button } from '../shadcn/button'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
+import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
+import { Textarea } from '../shadcn/textarea'
+
+interface EditHoldMetadataModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  hold: HoldDetail
+  onSave: (metadata: HoldMetadataForm) => Promise<void>
+}
+
+export function EditHoldMetadataModal({
+  open,
+  onOpenChange,
+  hold,
+  onSave,
+}: EditHoldMetadataModalProps): React.JSX.Element {
+  const users = useUserStore(state => state.users)
+  const orgs = useOrgStore(state => state.organizations)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const form = useForm<HoldMetadataForm>({
+    resolver: zodResolver(HoldMetadataFormSchema),
+    defaultValues: toFormValues(hold)
+  })
+
+  useEffect(() => {
+    if (open) form.reset(toFormValues(hold))
+  }, [open, hold])
+
+  async function onValid(values: HoldMetadataForm) {
+    setIsSubmitting(true)
+    try {
+      await onSave(values)
+      onOpenChange(false)
+    } catch {
+      // interceptor surfaced the error toast — keep modal open
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  function onInvalid(errors: FieldErrors<HoldMetadataForm>) {
+    toast.error(flattenFieldErrors(errors, []), { position: 'top-center' })
+  }
+
+  function submit() {
+    form.handleSubmit(onValid, onInvalid)()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
+      <DialogContent className='sm:max-w-2xl'>
+        <DialogHeader>
+          <DialogTitle>Edit Hold</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={e => e.preventDefault()}>
+          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+            <Controller
+              control={form.control}
+              name='created_for'
+              render={({ field: { onChange, value }, fieldState }) => (
+                <SelectOptions
+                  selection={value}
+                  onSelectionChange={onChange}
+                  options={users}
+                  getLabel={u => u.name}
+                  getKey={u => u.name}
+                  fieldLabel='Created For'
+                  anyAllowed={false}
+                  fieldRequired={true}
+                  error={fieldState.invalid}
+                />
+              )}
+            />
+            <ControlledPopoverSearch
+              control={form.control}
+              name='customer'
+              options={orgs}
+              searchKey='name'
+              getLabel={o => o.name}
+              fieldLabel='Customer'
+              fieldRequired={true}
+            />
+            <Controller
+              control={form.control}
+              name='notes'
+              render={({ field }) => (
+                <Field className='col-span-2'>
+                  <FieldLabel>Notes</FieldLabel>
+                  <Textarea
+                    placeholder='Hold notes…'
+                    className='resize-none'
+                    {...field}
+                  />
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+        <DialogFooter>
+          <Button variant='outline' onClick={() => onOpenChange(false)} type='button' disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={submit} type='button' disabled={isSubmitting}>
+            {isSubmitting ? 'Saving…' : 'Save Changes'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function toFormValues(h: HoldDetail): HoldMetadataForm {
+  return {
+    created_for: getSelectOption(h.created_for),
+    customer: { id: h.customer.id, account_number: h.customer.account_number, name: h.customer.name },
+    notes: h.notes ?? ''
+  }
+}

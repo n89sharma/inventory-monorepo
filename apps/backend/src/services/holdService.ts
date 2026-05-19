@@ -1,4 +1,4 @@
-import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHold } from 'shared-types'
+import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHold, UpdateHoldMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -178,6 +178,35 @@ export async function updateHold(data: UpdateHold, userId: number): Promise<void
 
   await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'hold_id', data.id, userId)
   await recordAssetUpdateOnCollection('Hold', data.id, assetIdsToAdd, assetIdsToRemove, userId)
+}
+
+export async function patchHoldMetadata(
+  holdNumber: string,
+  metadata: UpdateHoldMetadata,
+  userId: number
+): Promise<void> {
+  const current = await prisma.hold.findUnique({
+    where: { hold_number: holdNumber },
+    select: { id: true, created_for_id: true, customer_id: true, notes: true }
+  })
+  if (!current) throw new NotFoundError(`Hold ${holdNumber} not found`)
+
+  await prisma.hold.update({
+    where: { id: current.id },
+    data: {
+      created_for_id: metadata.created_for.id,
+      customer_id: metadata.customer.id,
+      notes: metadata.notes
+    }
+  })
+
+  await recordHoldUpdate(current.id, {
+    created_for_id: current.created_for_id,
+    customer_id: current.customer_id
+  }, {
+    created_for_id: metadata.created_for.id,
+    customer_id: metadata.customer.id
+  }, userId)
 }
 
 export async function patchHoldAssets(

@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { TransferForm } from '@/ui-types/transfer-form-types'
+import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, AssetSummary, CollectionHistory, CreateTransfer, TransferDetail, TransferSummary, UpdateTransfer, Warehouse } from 'shared-types'
-import { AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferSchema } from 'shared-types'
+import type { AssetDelta, AssetSummary, CollectionHistory, CreateTransfer, TransferDetail, TransferSummary, UpdateTransfer, UpdateTransferMetadata, Warehouse } from 'shared-types'
+import { AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferMetadataSchema, UpdateTransferSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateTransferResponseSchema = z.object({ transferNumber: z.string() })
@@ -80,6 +80,19 @@ export async function updateTransfer(
 export async function getAssetByBarcode(barcode: string): Promise<AssetSummary> {
   const { data } = await api.get<AssetSummary>(`/assets/${barcode}/summary`)
   return AssetSummarySchema.parse(data)
+}
+
+export async function updateTransferMetadata(
+  transferNumber: string,
+  metadata: TransferMetadataForm
+): Promise<void> {
+  const updateTransferMetadataBody = UpdateTransferMetadataSchema.parse({
+    origin: getSelectedOrNull(metadata.origin)!,
+    destination: getSelectedOrNull(metadata.destination)!,
+    transporter: metadata.transporter!,
+    comment: metadata.comment === '' ? null : metadata.comment
+  } satisfies UpdateTransferMetadata)
+  await api.patch(`/transfers/${transferNumber}/metadata`, updateTransferMetadataBody)
 }
 
 export async function patchTransferAssets(

@@ -15,7 +15,7 @@ export type InvoiceSummary = z.infer<typeof InvoiceSummarySchema>;
 // GET /invoices/:invoiceNumber
 export const InvoiceDetailSchema = z.object({
   invoice_number: z.string(),
-  invoice_type: z.string(),
+  invoice_type: z.object({ id: z.number().int(), type: z.string() }),
   is_cleared: z.boolean(),
   created_at: z.coerce.date(),
   created_by: UserSchema,
@@ -48,3 +48,11 @@ export type UpdateInvoice = z.infer<typeof UpdateInvoiceSchema>
 export const SubmitUpdateInvoiceSchema = UpdateInvoiceSchema.extend({
   assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice').max(2000)
 })
+
+// PATCH /invoices/:invoiceNumber/metadata
+export const UpdateInvoiceMetadataSchema = z.object({
+  organization: OrgSummarySchema,
+  invoice_type: z.object({ id: z.number().int(), type: z.string() }),
+  is_cleared: z.boolean()
+})
+export type UpdateInvoiceMetadata = z.infer<typeof UpdateInvoiceMetadataSchema>

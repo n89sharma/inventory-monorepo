@@ -20,3 +20,15 @@ export type HoldForm = {
   notes: string
   assets: AssetSummary[]
 }
+
+export const HoldMetadataFormSchema = z.object({
+  created_for: UserSelectOptionSchema.refine(val => isSelected(val), 'Created For is required'),
+  customer: OrgSummarySchema.nullable().refine(val => !!val, 'Customer is required'),
+  notes: z.string()
+})
+
+export type HoldMetadataForm = {
+  created_for: SelectOption<User>
+  customer: OrgSummary | null
+  notes: string
+}

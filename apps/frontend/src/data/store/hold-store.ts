@@ -1,8 +1,8 @@
-import { createHold, getHoldForUpdate, getHolds, patchHoldAssets, updateHold } from '@/data/api/hold-api'
+import { createHold, getHoldForUpdate, getHolds, patchHoldAssets, updateHold, updateHoldMetadata as updateHoldMetadataApi } from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { holdDetailKey } from '@/hooks/use-hold-detail'
 import { mergeAssets } from '@/lib/collection-utils'
-import type { HoldForm } from '@/ui-types/hold-form-types'
+import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { AssetSummary, HoldDetail, HoldSummary, User } from 'shared-types'
 import { toast } from 'sonner'
@@ -44,6 +44,7 @@ interface HoldStore {
   addAssets: (holdNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (holdNumber: string) => Promise<AssetSummary[]>
   addAssetToHold: (holdNumber: string, asset: AssetSummary) => Promise<void>
+  updateHoldMetadata: (holdNumber: string, metadata: HoldMetadataForm) => Promise<void>
   removeAssetFromHold: (holdNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromHold: (holdNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (holdNumber: string) => void
@@ -101,6 +102,10 @@ export const useHoldStore = create<HoldStore>((set) => ({
   getAssets: async (holdNumber) => {
     const form = await getHoldForUpdate(holdNumber)
     return form?.assets ?? []
+  },
+  updateHoldMetadata: async (holdNumber, metadata) => {
+    await updateHoldMetadataApi(holdNumber, metadata)
+    mutate(holdDetailKey(holdNumber))
   },
   addAssetToHold: async (holdNumber, asset) => {
     const cacheKey = holdDetailKey(holdNumber)

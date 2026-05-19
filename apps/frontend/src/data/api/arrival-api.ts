@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { ArrivalForm, AssetForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrival, UpdateAsset, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalSchema, UpdateAssetSchema } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrival, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
+import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalMetadataSchema, UpdateArrivalSchema, UpdateAssetSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateArrivalResponseSchema = z.object({ arrivalNumber: z.string() })
@@ -103,6 +103,19 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
 export async function getArrivalHistory(arrivalNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/arrivals/${arrivalNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function updateArrivalMetadata(
+  arrivalNumber: string,
+  metadata: ArrivalMetadataForm
+): Promise<void> {
+  const updateArrivalMetadataBody = UpdateArrivalMetadataSchema.parse({
+    vendor: metadata.vendor!,
+    transporter: metadata.transporter!,
+    warehouse: getSelectedOrNull(metadata.warehouse)!,
+    comment: metadata.comment === '' ? null : metadata.comment
+  } satisfies UpdateArrivalMetadata)
+  await api.patch(`/arrivals/${arrivalNumber}/metadata`, updateArrivalMetadataBody)
 }
 
 export async function patchArrivalAssets(

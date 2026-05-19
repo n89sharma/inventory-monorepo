@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { EditInvoiceMetadataModal } from '../../modals/edit-invoice-metadata-modal'
 import { DataTable } from '../../shadcn/data-table'
 import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -31,8 +32,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const removeAssetFromInvoice = useInvoiceStore(state => state.removeAssetFromInvoice)
   const bulkRemoveAssetsFromInvoice = useInvoiceStore(state => state.bulkRemoveAssetsFromInvoice)
   const addAssetToInvoice = useInvoiceStore(state => state.addAssetToInvoice)
+  const updateInvoiceMetadata = useInvoiceStore(state => state.updateInvoiceMetadata)
   const flushPendingRemovals = useInvoiceStore(state => state.flushPendingRemovals)
   const canEditInvoice = useCan('create_update_invoice')
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -77,18 +80,25 @@ export function InvoiceDetailsPage(): React.JSX.Element {
             assets={invoice.assets}
             historyCacheKey={`invoice-history:${invoiceNumber}`}
             historyFetcher={() => getInvoiceHistory(invoiceNumber)}
+            onEdit={() => setIsMetadataModalOpen(true)}
           />
         }
         subtitle={
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
             <SummaryField label="Customer" value={invoice.customer.name} />
             <SummaryField label="Date" value={formatDate(invoice.created_at)} />
-            <SummaryField label="Type" value={invoice.invoice_type} />
+            <SummaryField label="Type" value={invoice.invoice_type.type} />
           </div>
         }
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <InvoiceSummaryStrip invoice={invoice} />
+      <EditInvoiceMetadataModal
+        open={isMetadataModalOpen}
+        onOpenChange={setIsMetadataModalOpen}
+        invoice={invoice}
+        onSave={metadata => updateInvoiceMetadata(invoiceNumber, metadata)}
+      />
       {canEditInvoice && (
         <AddAssetBar
           existingAssets={invoice.assets}

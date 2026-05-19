@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
+import type { InvoiceEditForm, InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
-import { AssetDeltaSchema, CollectionHistorySchema, CreateInvoiceSchema, InvoiceDetailSchema, InvoiceSummarySchema, SubmitUpdateInvoiceSchema, UpdateInvoiceSchema, type InvoiceSummary } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateInvoice, InvoiceDetail, UpdateInvoice, UpdateInvoiceMetadata } from 'shared-types'
+import { AssetDeltaSchema, CollectionHistorySchema, CreateInvoiceSchema, InvoiceDetailSchema, InvoiceSummarySchema, SubmitUpdateInvoiceSchema, UpdateInvoiceMetadataSchema, UpdateInvoiceSchema, type InvoiceSummary } from 'shared-types'
 import { z } from 'zod'
 
 const CreateInvoiceResponseSchema = z.object({ invoiceNumber: z.string() })
@@ -75,6 +75,18 @@ export async function getInvoiceDetail(invoiceNumber: string): Promise<InvoiceDe
 export async function getInvoiceHistory(invoiceNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/invoices/${invoiceNumber}/history`)
   return CollectionHistorySchema.parse(data)
+}
+
+export async function updateInvoiceMetadata(
+  invoiceNumber: string,
+  metadata: InvoiceMetadataForm
+): Promise<void> {
+  const updateInvoiceMetadataBody = UpdateInvoiceMetadataSchema.parse({
+    organization: metadata.organization!,
+    invoice_type: getSelectedOrNull(metadata.invoice_type)!,
+    is_cleared: metadata.is_cleared
+  } satisfies UpdateInvoiceMetadata)
+  await api.patch(`/invoices/${invoiceNumber}/metadata`, updateInvoiceMetadataBody)
 }
 
 export async function patchInvoiceAssets(

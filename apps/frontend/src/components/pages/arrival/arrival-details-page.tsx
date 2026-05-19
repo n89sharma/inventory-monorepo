@@ -18,6 +18,7 @@ import { AddAssetBarForArrival } from '../../custom/add-asset-bar-for-arrival'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { AssetModal } from '../../modals/create-asset-modal'
+import { EditArrivalMetadataModal } from '../../modals/edit-arrival-metadata-modal'
 import { DataTable } from '../../shadcn/data-table'
 import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -35,9 +36,11 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const createArrivalAsset = useArrivalStore(state => state.createArrivalAsset)
   const getArrivalAssetForEdit = useArrivalStore(state => state.getArrivalAssetForEdit)
   const updateArrivalAsset = useArrivalStore(state => state.updateArrivalAsset)
+  const updateArrivalMetadata = useArrivalStore(state => state.updateArrivalMetadata)
   const flushPendingRemovals = useArrivalStore(state => state.flushPendingRemovals)
   const canEditArrival = useCan('create_update_arrival')
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
   const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
 
@@ -106,6 +109,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             assets={arrival.assets}
             historyCacheKey={`arrival-history:${arrivalNumber}`}
             historyFetcher={() => getArrivalHistory(arrivalNumber)}
+            onEdit={() => setIsMetadataModalOpen(true)}
           />
         }
         subtitle={
@@ -117,6 +121,12 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <ArrivalSummaryStrip arrival={arrival} />
+      <EditArrivalMetadataModal
+        open={isMetadataModalOpen}
+        onOpenChange={setIsMetadataModalOpen}
+        arrival={arrival}
+        onSave={metadata => updateArrivalMetadata(arrivalNumber, metadata)}
+      />
       {canEditArrival && (
         <AddAssetBarForArrival onCreate={() => setIsAssetModalOpen(true)} />
       )}

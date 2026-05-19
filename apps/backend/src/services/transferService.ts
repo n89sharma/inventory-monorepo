@@ -1,4 +1,4 @@
-import { AssetDelta, CreateTransfer, TransferDetail, UpdateTransfer } from 'shared-types'
+import { AssetDelta, CreateTransfer, TransferDetail, UpdateTransfer, UpdateTransferMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -133,6 +133,38 @@ export async function updateTransfer(transfer: UpdateTransfer, userId: number): 
   }, userId)
 
   await recordAssetUpdateOnCollection('Transfer', transfer.id, assetIdsToAdd, assetIdsToDelete, userId)
+}
+
+export async function patchTransferMetadata(
+  transferNumber: string,
+  metadata: UpdateTransferMetadata,
+  userId: number
+): Promise<void> {
+  const current = await prisma.transfer.findUnique({
+    where: { transfer_number: transferNumber },
+    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true }
+  })
+  if (!current) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+
+  await prisma.transfer.update({
+    where: { id: current.id },
+    data: {
+      origin_id: metadata.origin.id,
+      destination_id: metadata.destination.id,
+      transporter_id: metadata.transporter.id,
+      notes: metadata.comment
+    }
+  })
+
+  await recordTransferUpdate(current.id, {
+    origin_id: current.origin_id,
+    destination_id: current.destination_id,
+    transporter_id: current.transporter_id
+  }, {
+    origin_id: metadata.origin.id,
+    destination_id: metadata.destination.id,
+    transporter_id: metadata.transporter.id
+  }, userId)
 }
 
 export async function patchTransferAssets(

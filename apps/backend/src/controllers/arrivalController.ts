@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateAssetSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, CreateAssetSchema, SubmitUpdateArrivalSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -13,6 +13,7 @@ import {
   getArrivalForUpdate as getArrivalForEditSer,
   getArrival as getArrivalSer,
   patchArrivalAssets as patchArrivalAssetsSer,
+  patchArrivalMetadata as patchArrivalMetadataSer,
   updateArrival as updateArrivalSer,
   updateArrivalAsset as updateArrivalAssetSer
 } from '../services/arrivalService.js'
@@ -47,6 +48,12 @@ export const updateArrival = asyncHandler(async (req, res) => {
   const validated = SubmitUpdateArrivalSchema.parse(req.body)
   await updateArrivalSer(validated, res.locals.dbUserId)
   res.json({ arrivalNumber })
+})
+
+export const patchArrivalMetadata = asyncHandler(async (req, res) => {
+  const metadata = UpdateArrivalMetadataSchema.parse(req.body)
+  await patchArrivalMetadataSer(req.params.arrivalNumber, metadata, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const patchArrivalAssets = asyncHandler(async (req, res) => {

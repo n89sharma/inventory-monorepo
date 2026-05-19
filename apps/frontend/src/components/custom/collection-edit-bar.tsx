@@ -26,6 +26,7 @@ type CollectionEditBarProps = {
   assets?: AssetSummary[]
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
+  onEdit?: () => void
 }
 
 export function CollectionEditBar({
@@ -34,6 +35,7 @@ export function CollectionEditBar({
   assets,
   historyCacheKey,
   historyFetcher,
+  onEdit,
 }: CollectionEditBarProps): React.JSX.Element {
 
   const canEdit = useCan(SECTION_EDIT_PERMISSION[section])
@@ -83,9 +85,9 @@ export function CollectionEditBar({
         </Button>
       )}
       {canEdit && (
-        <Button asChild>
-          <Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link>
-        </Button>
+        onEdit
+          ? <Button onClick={onEdit}><PencilSimpleIcon />Edit</Button>
+          : <Button asChild><Link to={`/${section}/${collectionId}/edit`}><PencilSimpleIcon />Edit</Link></Button>
       )}
       {canDelete && (
         <DropdownMenu>

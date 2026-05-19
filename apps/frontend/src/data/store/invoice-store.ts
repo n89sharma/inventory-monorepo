@@ -1,8 +1,8 @@
-import { createInvoice, getInvoiceForUpdate, getInvoices, patchInvoiceAssets, updateInvoice } from '@/data/api/invoice-api'
+import { createInvoice, getInvoiceForUpdate, getInvoices, patchInvoiceAssets, updateInvoice, updateInvoiceMetadata as updateInvoiceMetadataApi } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { invoiceDetailKey } from '@/hooks/use-invoice-detail'
 import { mergeAssets } from '@/lib/collection-utils'
-import type { InvoiceEditForm, InvoiceForm } from '@/ui-types/invoice-form-types'
+import type { InvoiceEditForm, InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { AssetSummary, InvoiceDetail, InvoiceSummary } from 'shared-types'
 import { toast } from 'sonner'
@@ -36,6 +36,7 @@ interface InvoiceStore {
   addAssets: (invoiceNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   getAssets: (invoiceNumber: string) => Promise<AssetSummary[]>
   addAssetToInvoice: (invoiceNumber: string, asset: AssetSummary) => Promise<void>
+  updateInvoiceMetadata: (invoiceNumber: string, metadata: InvoiceMetadataForm) => Promise<void>
   removeAssetFromInvoice: (invoiceNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromInvoice: (invoiceNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (invoiceNumber: string) => void
@@ -89,6 +90,10 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
   getAssets: async (invoiceNumber) => {
     const form = await getInvoiceForUpdate(invoiceNumber)
     return form?.assets ?? []
+  },
+  updateInvoiceMetadata: async (invoiceNumber, metadata) => {
+    await updateInvoiceMetadataApi(invoiceNumber, metadata)
+    mutate(invoiceDetailKey(invoiceNumber))
   },
   addAssetToInvoice: async (invoiceNumber, asset) => {
     const cacheKey = invoiceDetailKey(invoiceNumber)

@@ -1,6 +1,6 @@
-import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, getArrivalForUpdate, getArrivals, patchArrivalAssets, updateArrival, updateArrivalAsset as updateArrivalAssetApi } from '@/data/api/arrival-api'
+import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, getArrivalForUpdate, getArrivals, patchArrivalAssets, updateArrival, updateArrivalAsset as updateArrivalAssetApi, updateArrivalMetadata as updateArrivalMetadataApi } from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
-import type { ArrivalForm, AssetForm } from '@/ui-types/arrival-form-types'
+import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { ArrivalDetail, ArrivalSummary, AssetSummary, Warehouse } from 'shared-types'
 import { arrivalDetailKey } from '@/hooks/use-arrival-detail'
@@ -37,6 +37,7 @@ interface ArrivalStore {
   getArrivalForUpdate: (arrivalNumber: string) => Promise<void>
   submitCreateArrival: (data: ArrivalForm) => Promise<{ arrivalNumber: string }>
   submitUpdateArrival: (arrivalNumber: string, data: ArrivalForm) => Promise<void>
+  updateArrivalMetadata: (arrivalNumber: string, metadata: ArrivalMetadataForm) => Promise<void>
   createArrivalAsset: (arrivalNumber: string, asset: AssetForm) => Promise<void>
   getArrivalAssetForEdit: (arrivalNumber: string, assetId: number) => Promise<AssetForm>
   updateArrivalAsset: (arrivalNumber: string, assetId: number, asset: AssetForm) => Promise<void>
@@ -76,6 +77,10 @@ export const useArrivalStore = create<ArrivalStore>((set) => ({
   },
   submitUpdateArrival: async (arrivalNumber, data) => {
     await updateArrival(arrivalNumber, data)
+    mutate(arrivalDetailKey(arrivalNumber))
+  },
+  updateArrivalMetadata: async (arrivalNumber, metadata) => {
+    await updateArrivalMetadataApi(arrivalNumber, metadata)
     mutate(arrivalDetailKey(arrivalNumber))
   },
   createArrivalAsset: async (arrivalNumber, asset) => {

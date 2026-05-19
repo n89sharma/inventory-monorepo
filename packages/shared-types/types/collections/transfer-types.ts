@@ -59,3 +59,15 @@ export const SubmitUpdateTransferSchema = UpdateTransferSchema.extend({
   message: "Origin and destination cannot be the same",
   path: ["destination"]
 })
+
+// PATCH /transfers/:transferNumber/metadata
+export const UpdateTransferMetadataSchema = z.object({
+  origin: WarehouseSchema,
+  destination: WarehouseSchema,
+  transporter: OrgSummarySchema,
+  comment: z.string().nullable()
+}).refine(data => data.origin.id !== data.destination.id, {
+  message: "Origin and destination cannot be the same",
+  path: ["destination"]
+})
+export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema>

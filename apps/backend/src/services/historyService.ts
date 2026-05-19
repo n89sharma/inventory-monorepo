@@ -114,6 +114,8 @@ type HoldUpdateFields = Partial<{
 }>
 
 type InvoiceUpdateFields = Partial<{
+  organization_id: number
+  invoice_type_id: number
   is_cleared: boolean
 }>
 
@@ -187,6 +189,17 @@ async function resolveUserDiff(
     prisma.user.findUnique({ where: { id: afterId }, select: { name: true } })
   ])
   return { before: beforeUser?.name, after: afterUser?.name }
+}
+
+async function resolveInvoiceTypeDiff(
+  beforeId: number,
+  afterId: number
+): Promise<{ before: string | undefined; after: string | undefined }> {
+  const [b, a] = await Promise.all([
+    prisma.invoiceType.findUnique({ where: { id: beforeId }, select: { type: true } }),
+    prisma.invoiceType.findUnique({ where: { id: afterId }, select: { type: true } })
+  ])
+  return { before: b?.type, after: a?.type }
 }
 
 async function resolveOrgDiff(
@@ -617,6 +630,18 @@ export async function recordInvoiceUpdate(
   try {
     const diffBefore: Record<string, unknown> = {}
     const diffAfter: Record<string, unknown> = {}
+
+    if (before.organization_id !== after.organization_id && before.organization_id && after.organization_id) {
+      const org = await resolveOrgDiff(before.organization_id, after.organization_id)
+      diffBefore.organization_name = org.before
+      diffAfter.organization_name = org.after
+    }
+
+    if (before.invoice_type_id !== after.invoice_type_id && before.invoice_type_id && after.invoice_type_id) {
+      const t = await resolveInvoiceTypeDiff(before.invoice_type_id, after.invoice_type_id)
+      diffBefore.invoice_type = t.before
+      diffAfter.invoice_type = t.after
+    }
 
     if (before.is_cleared !== after.is_cleared) {
       diffBefore.is_cleared = before.is_cleared

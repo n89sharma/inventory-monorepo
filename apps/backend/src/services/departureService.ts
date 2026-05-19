@@ -1,4 +1,4 @@
-import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDeparture } from 'shared-types'
+import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDeparture, UpdateDepartureMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -148,6 +148,38 @@ export async function updateDeparture(departure: UpdateDeparture, userId: number
 
   await recordCollectionUpdateOnAssets(assetIdsToRemove, assetIdsToAdd, 'departure_id', departure.id, userId)
   await recordAssetUpdateOnCollection('Departure', departure.id, assetIdsToAdd, assetIdsToRemove, userId)
+}
+
+export async function patchDepartureMetadata(
+  departureNumber: string,
+  metadata: UpdateDepartureMetadata,
+  userId: number
+): Promise<void> {
+  const current = await prisma.departure.findUnique({
+    where: { departure_number: departureNumber },
+    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true }
+  })
+  if (!current) throw new NotFoundError(`Departure ${departureNumber} not found`)
+
+  await prisma.departure.update({
+    where: { id: current.id },
+    data: {
+      origin_id: metadata.origin.id,
+      destination_id: metadata.customer.id,
+      transporter_id: metadata.transporter.id,
+      notes: metadata.comment
+    }
+  })
+
+  await recordDepartureUpdate(current.id, {
+    origin_id: current.origin_id,
+    destination_id: current.destination_id,
+    transporter_id: current.transporter_id
+  }, {
+    origin_id: metadata.origin.id,
+    destination_id: metadata.customer.id,
+    transporter_id: metadata.transporter.id
+  }, userId)
 }
 
 export async function patchDepartureAssets(

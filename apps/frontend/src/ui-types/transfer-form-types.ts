@@ -25,3 +25,22 @@ export type TransferForm = {
   comment: string
   assets: AssetSummary[]
 }
+
+export const TransferMetadataFormSchema = z.object({
+  origin: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Origin required"),
+  destination: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Destination required"),
+  transporter: OrgSummarySchema.nullable().refine(val => !!val, "Transporter required"),
+  comment: z.string()
+}).refine(data => {
+  if (isSelected(data.origin) && isSelected(data.destination)) {
+    return data.origin.selected.id !== data.destination.selected.id
+  }
+  return true
+}, { message: "Origin and destination cannot be the same", path: ["destination"] })
+
+export type TransferMetadataForm = {
+  origin: SelectOption<Warehouse>
+  destination: SelectOption<Warehouse>
+  transporter: OrgSummary | null
+  comment: string
+}

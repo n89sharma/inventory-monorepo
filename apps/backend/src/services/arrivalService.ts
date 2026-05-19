@@ -1,4 +1,4 @@
-import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrival, UpdateAsset } from 'shared-types'
+import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrival, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { ArrivalDefaultArgs, ArrivalGetPayload } from '../../generated/prisma/models/Arrival.js'
@@ -318,6 +318,38 @@ export async function updateArrival(arrival: UpdateArrival, userId: number) {
       internal_finisher: asset.internalFinisher
     }, userId)
   }
+}
+
+export async function patchArrivalMetadata(
+  arrivalNumber: string,
+  metadata: UpdateArrivalMetadata,
+  userId: number
+): Promise<void> {
+  const current = await prisma.arrival.findUnique({
+    where: { arrival_number: arrivalNumber },
+    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true }
+  })
+  if (!current) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+
+  await prisma.arrival.update({
+    where: { id: current.id },
+    data: {
+      origin_id: metadata.vendor.id,
+      destination_id: metadata.warehouse.id,
+      transporter_id: metadata.transporter.id,
+      notes: metadata.comment
+    }
+  })
+
+  await recordArrivalUpdate(current.id, {
+    origin_id: current.origin_id,
+    destination_id: current.destination_id,
+    transporter_id: current.transporter_id
+  }, {
+    origin_id: metadata.vendor.id,
+    destination_id: metadata.warehouse.id,
+    transporter_id: metadata.transporter.id
+  }, userId)
 }
 
 export async function patchArrivalAssets(

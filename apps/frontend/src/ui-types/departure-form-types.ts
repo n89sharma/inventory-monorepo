@@ -20,3 +20,17 @@ export type DepartureForm = {
   comment: string
   assets: AssetSummary[]
 }
+
+export const DepartureMetadataFormSchema = z.object({
+  origin: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Origin required"),
+  customer: OrgSummarySchema.nullable().refine(val => !!val, "Customer required"),
+  transporter: OrgSummarySchema.nullable().refine(val => !!val, "Transporter required"),
+  comment: z.string()
+})
+
+export type DepartureMetadataForm = {
+  origin: SelectOption<Warehouse>
+  customer: OrgSummary | null
+  transporter: OrgSummary | null
+  comment: string
+}

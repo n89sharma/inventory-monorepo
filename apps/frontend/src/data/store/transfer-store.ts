@@ -1,9 +1,9 @@
-import { createTransfer, getTransferForUpdate, getTransfers as getTransfersApi, patchTransferAssets, updateTransfer } from '@/data/api/transfer-api'
+import { createTransfer, getTransferForUpdate, getTransfers as getTransfersApi, patchTransferAssets, updateTransfer, updateTransferMetadata as updateTransferMetadataApi } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { transferDetailKey } from '@/hooks/use-transfer-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { TransferForm } from '@/ui-types/transfer-form-types'
+import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import type { AssetSummary, TransferDetail, TransferSummary, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
@@ -41,6 +41,7 @@ interface TransferStore {
   getAssets: (transferNumber: string) => Promise<AssetSummary[]>
   addAssetToTransfer: (transferNumber: string, asset: AssetSummary) => Promise<void>
   addAssetsToTransfer: (transferNumber: string, assets: AssetSummary[]) => Promise<void>
+  updateTransferMetadata: (transferNumber: string, metadata: TransferMetadataForm) => Promise<void>
   removeAssetFromTransfer: (transferNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromTransfer: (transferNumber: string, assets: AssetSummary[]) => void
   flushPendingRemovals: (transferNumber: string) => void
@@ -93,6 +94,10 @@ export const useTransferStore = create<TransferStore>((set) => ({
   getAssets: async (transferNumber) => {
     const form = await getTransferForUpdate(transferNumber)
     return form?.assets ?? []
+  },
+  updateTransferMetadata: async (transferNumber, metadata) => {
+    await updateTransferMetadataApi(transferNumber, metadata)
+    mutate(transferDetailKey(transferNumber))
   },
   addAssetToTransfer: async (transferNumber, asset) => {
     const cacheKey = transferDetailKey(transferNumber)

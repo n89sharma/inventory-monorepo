@@ -47,3 +47,12 @@ export type UpdateDeparture = z.infer<typeof UpdateDepartureSchema>
 export const SubmitUpdateDepartureSchema = UpdateDepartureSchema.extend({
   assets: z.array(AssetSummarySchema).nonempty("No assets in the departure").max(2000)
 })
+
+// PATCH /departures/:departureNumber/metadata
+export const UpdateDepartureMetadataSchema = z.object({
+  origin: WarehouseSchema,
+  customer: OrgSummarySchema,
+  transporter: OrgSummarySchema,
+  comment: z.string().nullable()
+})
+export type UpdateDepartureMetadata = z.infer<typeof UpdateDepartureMetadataSchema>

@@ -51,3 +51,11 @@ export type UpdateHold = z.infer<typeof UpdateHoldSchema>
 export const SubmitUpdateHoldSchema = UpdateHoldSchema.extend({
   assets: z.array(AssetSummarySchema).nonempty('No assets in the hold').max(2000)
 })
+
+// PATCH /holds/:holdNumber/metadata
+export const UpdateHoldMetadataSchema = z.object({
+  created_for: UserSchema,
+  customer: OrgSummarySchema,
+  notes: z.string().nullable()
+})
+export type UpdateHoldMetadata = z.infer<typeof UpdateHoldMetadataSchema>

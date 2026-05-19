@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, SubmitUpdateDepartureSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, SubmitUpdateDepartureSchema, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
@@ -11,6 +11,7 @@ import {
   getDepartureForUpdate as getDepartureForUpdateSer,
   getDeparture as getDepartureSer,
   patchDepartureAssets as patchDepartureAssetsSer,
+  patchDepartureMetadata as patchDepartureMetadataSer,
   updateDeparture as updateDepartureSer
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -48,6 +49,12 @@ export const updateDeparture = asyncHandler(async (req, res) => {
 export const patchDepartureAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchDepartureAssetsSer(req.params.departureNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const patchDepartureMetadata = asyncHandler(async (req, res) => {
+  const metadata = UpdateDepartureMetadataSchema.parse(req.body)
+  await patchDepartureMetadataSer(req.params.departureNumber, metadata, res.locals.dbUserId)
   res.status(204).send()
 })
 

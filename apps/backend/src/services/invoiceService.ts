@@ -1,4 +1,4 @@
-import { AppRole, AssetDelta, CreateInvoice, InvoiceDetail, UpdateInvoice } from 'shared-types'
+import { AppRole, AssetDelta, CreateInvoice, InvoiceDetail, UpdateInvoice, UpdateInvoiceMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -133,6 +133,37 @@ export async function updateInvoice(
   return { invoiceNumber }
 }
 
+export async function patchInvoiceMetadata(
+  invoiceNumber: string,
+  metadata: UpdateInvoiceMetadata,
+  userId: number
+): Promise<void> {
+  const current = await prisma.invoice.findFirst({
+    where: { invoice_number: invoiceNumber },
+    select: { id: true, organization_id: true, invoice_type_id: true, is_cleared: true }
+  })
+  if (!current) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
+
+  await prisma.invoice.update({
+    where: { id: current.id },
+    data: {
+      organization_id: metadata.organization.id,
+      invoice_type_id: metadata.invoice_type.id,
+      is_cleared: metadata.is_cleared
+    }
+  })
+
+  await recordInvoiceUpdate(current.id, {
+    organization_id: current.organization_id,
+    invoice_type_id: current.invoice_type_id,
+    is_cleared: current.is_cleared
+  }, {
+    organization_id: metadata.organization.id,
+    invoice_type_id: metadata.invoice_type.id,
+    is_cleared: metadata.is_cleared
+  }, userId)
+}
+
 export async function patchInvoiceAssets(
   invoiceNumber: string,
   delta: AssetDelta,
@@ -212,7 +243,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
   return {
     invoice_number: invoice.invoice_number,
-    invoice_type: invoice.InvoiceType.type,
+    invoice_type: { id: invoice.InvoiceType.id, type: invoice.InvoiceType.type },
     is_cleared: invoice.is_cleared,
     created_at: invoice.created_at,
     created_by: {

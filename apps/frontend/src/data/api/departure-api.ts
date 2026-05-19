@@ -1,8 +1,8 @@
 import { api } from '@/data/api/axios-client'
-import type { DepartureForm } from '@/ui-types/departure-form-types'
+import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, Warehouse } from 'shared-types'
-import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureSchema } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDeparture, UpdateDepartureMetadata, Warehouse } from 'shared-types'
+import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SubmitUpdateDepartureSchema, UpdateDepartureMetadataSchema, UpdateDepartureSchema } from 'shared-types'
 import { z } from 'zod'
 
 const CreateDepartureResponseSchema = z.object({ departureNumber: z.string() })
@@ -82,4 +82,17 @@ export async function patchDepartureAssets(
 ): Promise<void> {
   const patchDepartureAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/departures/${departureNumber}/assets`, patchDepartureAssetsBody)
+}
+
+export async function updateDepartureMetadata(
+  departureNumber: string,
+  metadata: DepartureMetadataForm
+): Promise<void> {
+  const updateDepartureMetadataBody = UpdateDepartureMetadataSchema.parse({
+    origin: getSelectedOrNull(metadata.origin)!,
+    customer: metadata.customer!,
+    transporter: metadata.transporter!,
+    comment: metadata.comment === '' ? null : metadata.comment
+  } satisfies UpdateDepartureMetadata)
+  await api.patch(`/departures/${departureNumber}/metadata`, updateDepartureMetadataBody)
 }

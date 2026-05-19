@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateTransferSchema, SubmitUpdateTransferSchema, TransferDetail, TransferSummary, UpdateTransfer, UpdateTransferMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -11,6 +11,7 @@ import {
   getTransfer as getTransferSer,
   getTransferForUpdate as getTransferForUpdateSer,
   patchTransferAssets as patchTransferAssetsSer,
+  patchTransferMetadata as patchTransferMetadataSer,
   updateTransfer as updateTransferSer
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -58,6 +59,12 @@ export const updateTransfer = asyncHandler(async (req, res) => {
   const validated = SubmitUpdateTransferSchema.parse(req.body)
   await updateTransferSer(validated, res.locals.dbUserId)
   res.json({ transferNumber })
+})
+
+export const patchTransferMetadata = asyncHandler(async (req, res) => {
+  const metadata = UpdateTransferMetadataSchema.parse(req.body)
+  await patchTransferMetadataSer(req.params.transferNumber, metadata, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const patchTransferAssets = asyncHandler(async (req, res) => {

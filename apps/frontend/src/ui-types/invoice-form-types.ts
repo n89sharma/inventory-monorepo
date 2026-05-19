@@ -32,3 +32,15 @@ export const InvoiceEditFormSchema = z.object({
 })
 
 export type InvoiceEditForm = z.infer<typeof InvoiceEditFormSchema>
+
+export const InvoiceMetadataFormSchema = z.object({
+  organization: OrgSummarySchema.nullable().refine(val => !!val, 'Organization is required'),
+  invoice_type: InvoiceTypeSelectOptionSchema.refine(val => isSelected(val), 'Invoice type is required'),
+  is_cleared: z.boolean()
+})
+
+export type InvoiceMetadataForm = {
+  organization: OrgSummary | null
+  invoice_type: SelectOption<InvoiceType>
+  is_cleared: boolean
+}

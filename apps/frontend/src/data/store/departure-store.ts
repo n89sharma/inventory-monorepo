@@ -1,9 +1,9 @@
-import { createDeparture, getDepartureForUpdate, getDepartures, patchDepartureAssets, updateDeparture } from '@/data/api/departure-api'
+import { createDeparture, getDepartureForUpdate, getDepartures, patchDepartureAssets, updateDeparture, updateDepartureMetadata as updateDepartureMetadataApi } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/data/cache/asset-cache'
 import { departureDetailKey } from '@/hooks/use-departure-detail'
 import { mergeAssets } from '@/lib/collection-utils'
 import { ANY_OPTION, type SelectOption, UNSELECTED } from '@/ui-types/select-option-types'
-import type { DepartureForm } from '@/ui-types/departure-form-types'
+import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import type { AssetSummary, DepartureDetail, DepartureSummary, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
@@ -40,6 +40,7 @@ interface DepartureStore {
   addAssets: (departureNumber: string, assets: AssetSummary[]) => Promise<{ added: number; skipped: number }>
   addAssetToDeparture: (departureNumber: string, asset: AssetSummary) => Promise<void>
   addAssetsToDeparture: (departureNumber: string, assets: AssetSummary[]) => Promise<void>
+  updateDepartureMetadata: (departureNumber: string, metadata: DepartureMetadataForm) => Promise<void>
   getAssets: (departureNumber: string) => Promise<AssetSummary[]>
   removeAssetFromDeparture: (departureNumber: string, asset: AssetSummary) => void
   bulkRemoveAssetsFromDeparture: (departureNumber: string, assets: AssetSummary[]) => void
@@ -111,6 +112,10 @@ export const useDepartureStore = create<DepartureStore>((set) => ({
     } finally {
       mutate(cacheKey)
     }
+  },
+  updateDepartureMetadata: async (departureNumber, metadata) => {
+    await updateDepartureMetadataApi(departureNumber, metadata)
+    mutate(departureDetailKey(departureNumber))
   },
   addAssetsToDeparture: async (departureNumber, assets) => {
     if (assets.length === 0) return

@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { CollectionEditBar } from '../../custom/collection-edit-bar'
+import { EditTransferMetadataModal } from '../../modals/edit-transfer-metadata-modal'
 import { DataTable } from '../../shadcn/data-table'
 import { useCan } from '@/hooks/use-can'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -32,8 +33,10 @@ export function TransferDetailsPage(): React.JSX.Element {
   const bulkRemoveAssetsFromTransfer = useTransferStore(state => state.bulkRemoveAssetsFromTransfer)
   const addAssetToTransfer = useTransferStore(state => state.addAssetToTransfer)
   const addAssetsToTransfer = useTransferStore(state => state.addAssetsToTransfer)
+  const updateTransferMetadata = useTransferStore(state => state.updateTransferMetadata)
   const flushPendingRemovals = useTransferStore(state => state.flushPendingRemovals)
   const canEditTransfer = useCan('create_update_transfer')
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
   const columns = useMemo(
     () => createAssetSummaryColumns(
@@ -78,6 +81,7 @@ export function TransferDetailsPage(): React.JSX.Element {
             assets={transfer.assets}
             historyCacheKey={`transfer-history:${transferNumber}`}
             historyFetcher={() => getTransferHistory(transferNumber)}
+            onEdit={() => setIsMetadataModalOpen(true)}
           />
         }
         subtitle={
@@ -90,6 +94,12 @@ export function TransferDetailsPage(): React.JSX.Element {
       />
       <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
       <TransferSummaryStrip transfer={transfer} />
+      <EditTransferMetadataModal
+        open={isMetadataModalOpen}
+        onOpenChange={setIsMetadataModalOpen}
+        transfer={transfer}
+        onSave={metadata => updateTransferMetadata(transferNumber, metadata)}
+      />
       {canEditTransfer && (
         <AddAssetBar
           existingAssets={transfer.assets}

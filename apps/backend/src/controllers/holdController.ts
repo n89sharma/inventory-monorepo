@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateHoldSchema, HoldDetail, HoldSummary, SubmitUpdateHoldSchema, UpdateHoldMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -11,6 +11,7 @@ import {
   getHold as getHoldSer,
   getHoldForUpdate as getHoldForUpdateSer,
   patchHoldAssets as patchHoldAssetsSer,
+  patchHoldMetadata as patchHoldMetadataSer,
   updateHold as updateHoldSer
 } from '../services/holdService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -51,6 +52,12 @@ export const updateHold = asyncHandler(async (req, res) => {
   const validated = SubmitUpdateHoldSchema.parse(req.body)
   await updateHoldSer(validated, res.locals.dbUserId)
   res.json({ holdNumber: req.params.holdNumber })
+})
+
+export const patchHoldMetadata = asyncHandler(async (req, res) => {
+  const metadata = UpdateHoldMetadataSchema.parse(req.body)
+  await patchHoldMetadataSer(req.params.holdNumber, metadata, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const patchHoldAssets = asyncHandler(async (req, res) => {
