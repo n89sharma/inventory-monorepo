@@ -1,4 +1,4 @@
-import { useDepartureStore } from '@/data/store/departure-store'
+import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -11,7 +11,7 @@ export function CreateDeparturePage(): React.JSX.Element {
   const { preloadedAssets, returnTo } =
     (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
 
-  const submitCreateDeparture = useDepartureStore(s => s.submitCreateDeparture)
+  const mutations = useDepartureMutations()
 
   const pageConfig = {
     pageHeading: 'Create Departure',
@@ -31,7 +31,7 @@ export function CreateDeparturePage(): React.JSX.Element {
 
   async function onValidDepartureCreateSubmit(data: DepartureForm) {
     try {
-      const { departureNumber } = await submitCreateDeparture(data)
+      const { departureNumber } = await mutations.create(data)
       const destination = returnTo ?? `/departures/${departureNumber}`
       navigate(destination, { state: { successMessage: `Departure ${departureNumber} created!` } })
     } catch {

@@ -5,10 +5,10 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
-import { useHoldStore } from '@/data/store/hold-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold-detail'
+import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -29,11 +29,7 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   if (holdNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const removeAssetFromHold = useHoldStore(state => state.removeAssetFromHold)
-  const bulkRemoveAssetsFromHold = useHoldStore(state => state.bulkRemoveAssetsFromHold)
-  const addAssetToHold = useHoldStore(state => state.addAssetToHold)
-  const updateHoldMetadata = useHoldStore(state => state.updateHoldMetadata)
-  const flushPendingRemovals = useHoldStore(state => state.flushPendingRemovals)
+  const mutations = useHoldMutations()
   const canEditHold = useCan('create_update_hold')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
@@ -41,9 +37,9 @@ export function HoldDetailsPage(): React.JSX.Element {
     () => createAssetSummaryColumns(
       'holds',
       holdNumber,
-      asset => removeAssetFromHold(holdNumber, asset)
+      asset => mutations.removeAsset(holdNumber, asset)
     ),
-    [holdNumber, removeAssetFromHold]
+    [holdNumber, mutations]
   )
   const { data: hold, error: detailError, isLoading: detailLoading } = useHoldDetail(holdNumber)
 
@@ -56,8 +52,8 @@ export function HoldDetailsPage(): React.JSX.Element {
   }, [holdNumber])
 
   useEffect(() => {
-    return () => flushPendingRemovals(holdNumber)
-  }, [holdNumber, flushPendingRemovals])
+    return () => mutations.flushPending(holdNumber)
+  }, [holdNumber, mutations])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -97,13 +93,13 @@ export function HoldDetailsPage(): React.JSX.Element {
         open={isMetadataModalOpen}
         onOpenChange={setIsMetadataModalOpen}
         hold={hold}
-        onSave={metadata => updateHoldMetadata(holdNumber, metadata)}
+        onSave={metadata => mutations.updateMetadata(holdNumber, metadata)}
       />
       {canEditHold && (
         <AddAssetBar
           existingAssets={hold.assets}
           entityName='hold'
-          onAddSingle={asset => addAssetToHold(holdNumber, asset)}
+          onAddSingle={asset => mutations.addAsset(holdNumber, asset)}
           validateAsset={asset => asset.is_held ? `Asset ${asset.barcode} is already on a hold.` : null}
         />
       )}
@@ -113,7 +109,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         refreshKey={holdDetailKey(holdNumber)}
         currentCollectionType="holds"
         returnTo={`/holds/${holdNumber}`}
-        onBulkRemove={assets => bulkRemoveAssetsFromHold(holdNumber, assets)}
+        onBulkRemove={assets => mutations.bulkRemoveAssets(holdNumber, assets)}
         totalCount={hold.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(hold.assets.map(a => [a.barcode, true])))}
       />

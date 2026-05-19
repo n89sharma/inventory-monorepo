@@ -6,9 +6,9 @@ import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { useNavigationStore } from '@/data/store/navigation-store'
-import { useTransferStore } from '@/data/store/transfer-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer-detail'
+import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -29,12 +29,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   if (transferNumber === undefined) throw new Error('Missing collectionId/transferNumber parameter')
 
-  const removeAssetFromTransfer = useTransferStore(state => state.removeAssetFromTransfer)
-  const bulkRemoveAssetsFromTransfer = useTransferStore(state => state.bulkRemoveAssetsFromTransfer)
-  const addAssetToTransfer = useTransferStore(state => state.addAssetToTransfer)
-  const addAssetsToTransfer = useTransferStore(state => state.addAssetsToTransfer)
-  const updateTransferMetadata = useTransferStore(state => state.updateTransferMetadata)
-  const flushPendingRemovals = useTransferStore(state => state.flushPendingRemovals)
+  const mutations = useTransferMutations()
   const canEditTransfer = useCan('create_update_transfer')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
@@ -42,9 +37,9 @@ export function TransferDetailsPage(): React.JSX.Element {
     () => createAssetSummaryColumns(
       'transfers',
       transferNumber,
-      asset => removeAssetFromTransfer(transferNumber, asset)
+      asset => mutations.removeAsset(transferNumber, asset)
     ),
-    [transferNumber, removeAssetFromTransfer]
+    [transferNumber, mutations]
   )
   const { data: transfer, error: detailError, isLoading: detailLoading } = useTransferDetail(transferNumber)
 
@@ -57,8 +52,8 @@ export function TransferDetailsPage(): React.JSX.Element {
   }, [transferNumber])
 
   useEffect(() => {
-    return () => flushPendingRemovals(transferNumber)
-  }, [transferNumber, flushPendingRemovals])
+    return () => mutations.flushPending(transferNumber)
+  }, [transferNumber, mutations])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -98,14 +93,14 @@ export function TransferDetailsPage(): React.JSX.Element {
         open={isMetadataModalOpen}
         onOpenChange={setIsMetadataModalOpen}
         transfer={transfer}
-        onSave={metadata => updateTransferMetadata(transferNumber, metadata)}
+        onSave={metadata => mutations.updateMetadata(transferNumber, metadata)}
       />
       {canEditTransfer && (
         <AddAssetBar
           existingAssets={transfer.assets}
           entityName='transfer'
-          onAddSingle={asset => addAssetToTransfer(transferNumber, asset)}
-          onAddBatchFromHold={assets => addAssetsToTransfer(transferNumber, assets)}
+          onAddSingle={asset => mutations.addAsset(transferNumber, asset)}
+          onAddBatchFromHold={assets => mutations.addAssetBatch(transferNumber, assets)}
         />
       )}
       <BulkEditBar
@@ -114,7 +109,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         refreshKey={transferDetailKey(transferNumber)}
         currentCollectionType="transfers"
         returnTo={`/transfers/${transferNumber}`}
-        onBulkRemove={assets => bulkRemoveAssetsFromTransfer(transferNumber, assets)}
+        onBulkRemove={assets => mutations.bulkRemoveAssets(transferNumber, assets)}
         totalCount={transfer.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(transfer.assets.map(a => [a.barcode, true])))}
       />

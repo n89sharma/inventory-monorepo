@@ -5,10 +5,10 @@ import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { getDepartureHistory } from '@/data/api/departure-api'
-import { useDepartureStore } from '@/data/store/departure-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure-detail'
+import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -29,12 +29,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   if (departureNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const removeAssetFromDeparture = useDepartureStore(state => state.removeAssetFromDeparture)
-  const bulkRemoveAssetsFromDeparture = useDepartureStore(state => state.bulkRemoveAssetsFromDeparture)
-  const addAssetToDeparture = useDepartureStore(state => state.addAssetToDeparture)
-  const addAssetsToDeparture = useDepartureStore(state => state.addAssetsToDeparture)
-  const updateDepartureMetadata = useDepartureStore(state => state.updateDepartureMetadata)
-  const flushPendingRemovals = useDepartureStore(state => state.flushPendingRemovals)
+  const mutations = useDepartureMutations()
   const canEditDeparture = useCan('create_update_departure')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
@@ -42,9 +37,9 @@ export function DepartureDetailsPage(): React.JSX.Element {
     () => createAssetSummaryColumns(
       'departures',
       departureNumber,
-      asset => removeAssetFromDeparture(departureNumber, asset)
+      asset => mutations.removeAsset(departureNumber, asset)
     ),
-    [departureNumber, removeAssetFromDeparture]
+    [departureNumber, mutations]
   )
   const { data: departure, error: detailError, isLoading: detailLoading } = useDepartureDetail(departureNumber)
 
@@ -57,8 +52,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
   }, [departureNumber])
 
   useEffect(() => {
-    return () => flushPendingRemovals(departureNumber)
-  }, [departureNumber, flushPendingRemovals])
+    return () => mutations.flushPending(departureNumber)
+  }, [departureNumber, mutations])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -97,14 +92,14 @@ export function DepartureDetailsPage(): React.JSX.Element {
         open={isMetadataModalOpen}
         onOpenChange={setIsMetadataModalOpen}
         departure={departure}
-        onSave={metadata => updateDepartureMetadata(departureNumber, metadata)}
+        onSave={metadata => mutations.updateMetadata(departureNumber, metadata)}
       />
       {canEditDeparture && (
         <AddAssetBar
           existingAssets={departure.assets}
           entityName='departure'
-          onAddSingle={asset => addAssetToDeparture(departureNumber, asset)}
-          onAddBatchFromHold={assets => addAssetsToDeparture(departureNumber, assets)}
+          onAddSingle={asset => mutations.addAsset(departureNumber, asset)}
+          onAddBatchFromHold={assets => mutations.addAssetBatch(departureNumber, assets)}
         />
       )}
       <BulkEditBar
@@ -113,7 +108,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         refreshKey={departureDetailKey(departureNumber)}
         currentCollectionType="departures"
         returnTo={`/departures/${departureNumber}`}
-        onBulkRemove={assets => bulkRemoveAssetsFromDeparture(departureNumber, assets)}
+        onBulkRemove={assets => mutations.bulkRemoveAssets(departureNumber, assets)}
         totalCount={departure.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(departure.assets.map(a => [a.barcode, true])))}
       />

@@ -1,4 +1,4 @@
-import { useTransferStore } from '@/data/store/transfer-store'
+import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -11,7 +11,7 @@ export function CreateTransferPage(): React.JSX.Element {
   const { preloadedAssets, returnTo } =
     (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
 
-  const submitCreateTransfer = useTransferStore(s => s.submitCreateTransfer)
+  const mutations = useTransferMutations()
 
   const pageConfig = {
     pageHeading: 'Create Transfer',
@@ -31,7 +31,7 @@ export function CreateTransferPage(): React.JSX.Element {
 
   async function onValidTransferCreateSubmit(data: TransferForm) {
     try {
-      const { transferNumber } = await submitCreateTransfer(data)
+      const { transferNumber } = await mutations.create(data)
       const destination = returnTo ?? `/transfers/${transferNumber}`
       navigate(destination, { state: { successMessage: `Transfer ${transferNumber} created!` } })
     } catch {

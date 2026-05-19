@@ -5,10 +5,10 @@ import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrum
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
-import { useInvoiceStore } from '@/data/store/invoice-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice-detail'
+import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -29,11 +29,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   if (invoiceNumber === undefined) throw new Error('Missing collectionId parameter')
 
-  const removeAssetFromInvoice = useInvoiceStore(state => state.removeAssetFromInvoice)
-  const bulkRemoveAssetsFromInvoice = useInvoiceStore(state => state.bulkRemoveAssetsFromInvoice)
-  const addAssetToInvoice = useInvoiceStore(state => state.addAssetToInvoice)
-  const updateInvoiceMetadata = useInvoiceStore(state => state.updateInvoiceMetadata)
-  const flushPendingRemovals = useInvoiceStore(state => state.flushPendingRemovals)
+  const mutations = useInvoiceMutations()
   const canEditInvoice = useCan('create_update_invoice')
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
 
@@ -41,9 +37,9 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     () => createAssetSummaryColumns(
       'invoices',
       invoiceNumber,
-      asset => removeAssetFromInvoice(invoiceNumber, asset)
+      asset => mutations.removeAsset(invoiceNumber, asset)
     ),
-    [invoiceNumber, removeAssetFromInvoice]
+    [invoiceNumber, mutations]
   )
   const { data: invoice, error: detailError, isLoading: detailLoading } = useInvoiceDetail(invoiceNumber)
 
@@ -56,8 +52,8 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   }, [invoiceNumber])
 
   useEffect(() => {
-    return () => flushPendingRemovals(invoiceNumber)
-  }, [invoiceNumber, flushPendingRemovals])
+    return () => mutations.flushPending(invoiceNumber)
+  }, [invoiceNumber, mutations])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -97,13 +93,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         open={isMetadataModalOpen}
         onOpenChange={setIsMetadataModalOpen}
         invoice={invoice}
-        onSave={metadata => updateInvoiceMetadata(invoiceNumber, metadata)}
+        onSave={metadata => mutations.updateMetadata(invoiceNumber, metadata)}
       />
       {canEditInvoice && (
         <AddAssetBar
           existingAssets={invoice.assets}
           entityName='invoice'
-          onAddSingle={asset => addAssetToInvoice(invoiceNumber, asset)}
+          onAddSingle={asset => mutations.addAsset(invoiceNumber, asset)}
         />
       )}
       <BulkEditBar
@@ -112,7 +108,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         refreshKey={invoiceDetailKey(invoiceNumber)}
         currentCollectionType="invoices"
         returnTo={`/invoices/${invoiceNumber}`}
-        onBulkRemove={assets => bulkRemoveAssetsFromInvoice(invoiceNumber, assets)}
+        onBulkRemove={assets => mutations.bulkRemoveAssets(invoiceNumber, assets)}
         totalCount={invoice.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(invoice.assets.map(a => [a.barcode, true])))}
       />

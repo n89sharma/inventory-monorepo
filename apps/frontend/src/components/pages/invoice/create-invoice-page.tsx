@@ -1,4 +1,4 @@
-import { useInvoiceStore } from '@/data/store/invoice-store'
+import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import type { InvoiceForm } from '@/ui-types/invoice-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -11,7 +11,7 @@ export function CreateInvoicePage(): React.JSX.Element {
   const { preloadedAssets, returnTo } =
     (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
 
-  const submitCreateInvoice = useInvoiceStore(s => s.submitCreateInvoice)
+  const mutations = useInvoiceMutations()
 
   const pageConfig = {
     pageHeading: 'Create Invoice',
@@ -31,7 +31,7 @@ export function CreateInvoicePage(): React.JSX.Element {
 
   async function onValidInvoiceCreateSubmit(data: InvoiceForm) {
     try {
-      const { invoiceNumber } = await submitCreateInvoice(data)
+      const { invoiceNumber } = await mutations.create(data)
       const destination = returnTo ?? `/invoices/${invoiceNumber}`
       navigate(destination, { state: { successMessage: `Invoice ${invoiceNumber} created!` } })
     } catch {

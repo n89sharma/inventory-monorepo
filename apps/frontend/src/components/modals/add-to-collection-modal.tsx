@@ -1,9 +1,9 @@
 import { getGlobalSearchResults } from '@/data/api/search-api'
-import { useDepartureStore } from '@/data/store/departure-store'
-import { useHoldStore } from '@/data/store/hold-store'
-import { useInvoiceStore } from '@/data/store/invoice-store'
-import { useTransferStore } from '@/data/store/transfer-store'
 import { useCan } from '@/hooks/use-can'
+import { useDepartureMutations } from '@/hooks/use-departure-mutations'
+import { useHoldMutations } from '@/hooks/use-hold-mutations'
+import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
+import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
@@ -111,14 +111,10 @@ export function AddToCollectionModal({
   const canCreateHold = useCan('create_update_hold')
   const canCreateInvoice = useCan('create_update_invoice')
 
-  const addAssetsToHold = useHoldStore(s => s.addAssets)
-  const getHoldAssets = useHoldStore(s => s.getAssets)
-  const addAssetsToDeparture = useDepartureStore(s => s.addAssets)
-  const getDepartureAssets = useDepartureStore(s => s.getAssets)
-  const addAssetsToTransfer = useTransferStore(s => s.addAssets)
-  const getTransferAssets = useTransferStore(s => s.getAssets)
-  const addAssetsToInvoice = useInvoiceStore(s => s.addAssets)
-  const getInvoiceAssets = useInvoiceStore(s => s.getAssets)
+  const holdMutations = useHoldMutations()
+  const departureMutations = useDepartureMutations()
+  const transferMutations = useTransferMutations()
+  const invoiceMutations = useInvoiceMutations()
 
   const assetCount = selectedAssets.length
 
@@ -154,10 +150,10 @@ export function AddToCollectionModal({
     try {
       let existing: AssetSummary[]
       switch (collection.kind) {
-        case 'hold': existing = await getHoldAssets(collection.data.hold_number); break
-        case 'departure': existing = await getDepartureAssets(collection.data.departure_number); break
-        case 'transfer': existing = await getTransferAssets(collection.data.transfer_number); break
-        case 'invoice': existing = await getInvoiceAssets(collection.data.invoice_number); break
+        case 'hold': existing = await holdMutations.getAssets(collection.data.hold_number); break
+        case 'departure': existing = await departureMutations.getAssets(collection.data.departure_number); break
+        case 'transfer': existing = await transferMutations.getAssets(collection.data.transfer_number); break
+        case 'invoice': existing = await invoiceMutations.getAssets(collection.data.invoice_number); break
       }
       const existingIds = new Set(existing.map(a => a.id))
       setDuplicateCount(selectedAssets.filter(a => existingIds.has(a.id)).length)
@@ -177,19 +173,19 @@ export function AddToCollectionModal({
       let skipped: number
       switch (selected.kind) {
         case 'hold': {
-          ({ added, skipped } = await addAssetsToHold(selected.data.hold_number, selectedAssets))
+          ({ added, skipped } = await holdMutations.addAssets(selected.data.hold_number, selectedAssets))
           break
         }
         case 'departure': {
-          ({ added, skipped } = await addAssetsToDeparture(selected.data.departure_number, selectedAssets))
+          ({ added, skipped } = await departureMutations.addAssets(selected.data.departure_number, selectedAssets))
           break
         }
         case 'transfer': {
-          ({ added, skipped } = await addAssetsToTransfer(selected.data.transfer_number, selectedAssets))
+          ({ added, skipped } = await transferMutations.addAssets(selected.data.transfer_number, selectedAssets))
           break
         }
         case 'invoice': {
-          ({ added, skipped } = await addAssetsToInvoice(selected.data.invoice_number, selectedAssets))
+          ({ added, skipped } = await invoiceMutations.addAssets(selected.data.invoice_number, selectedAssets))
           break
         }
       }

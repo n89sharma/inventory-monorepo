@@ -6,8 +6,8 @@ import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page
 import { PageContent } from '@/components/layout/page-content'
 import { formatDate } from '@/lib/formatters'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival-detail'
+import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useArrivalStore } from '@/data/store/arrival-store'
 import { useNavigationStore } from '@/data/store/navigation-store'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -31,13 +31,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   if (arrivalNumber === undefined) throw new Error('Missing collectionId/arrivalNumber parameter')
 
-  const removeAssetFromArrival = useArrivalStore(state => state.removeAssetFromArrival)
-  const bulkRemoveAssetsFromArrival = useArrivalStore(state => state.bulkRemoveAssetsFromArrival)
-  const createArrivalAsset = useArrivalStore(state => state.createArrivalAsset)
-  const getArrivalAssetForEdit = useArrivalStore(state => state.getArrivalAssetForEdit)
-  const updateArrivalAsset = useArrivalStore(state => state.updateArrivalAsset)
-  const updateArrivalMetadata = useArrivalStore(state => state.updateArrivalMetadata)
-  const flushPendingRemovals = useArrivalStore(state => state.flushPendingRemovals)
+  const mutations = useArrivalMutations()
   const canEditArrival = useCan('create_update_arrival')
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
@@ -47,7 +41,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   async function handleEditAsset(assetId: number) {
     setEditingAssetId(assetId)
     try {
-      const form = await getArrivalAssetForEdit(arrivalNumber!, assetId)
+      const form = await mutations.getAssetForEdit(arrivalNumber!, assetId)
       setEditingAssetForm(form)
       setIsAssetModalOpen(true)
     } catch {
@@ -67,11 +61,11 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     () => createAssetSummaryColumns(
       'arrivals',
       arrivalNumber,
-      asset => removeAssetFromArrival(arrivalNumber, asset),
+      asset => mutations.removeAsset(arrivalNumber, asset),
       canEditArrival ? asset => handleEditAsset(asset.id) : undefined,
       editingAssetId
     ),
-    [arrivalNumber, removeAssetFromArrival, canEditArrival, editingAssetId]
+    [arrivalNumber, mutations, canEditArrival, editingAssetId]
   )
 
   const { data: arrival, error: detailError, isLoading: detailLoading } = useArrivalDetail(arrivalNumber)
@@ -85,8 +79,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   }, [arrivalNumber])
 
   useEffect(() => {
-    return () => flushPendingRemovals(arrivalNumber)
-  }, [arrivalNumber, flushPendingRemovals])
+    return () => mutations.flushPending(arrivalNumber)
+  }, [arrivalNumber, mutations])
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -125,7 +119,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         open={isMetadataModalOpen}
         onOpenChange={setIsMetadataModalOpen}
         arrival={arrival}
-        onSave={metadata => updateArrivalMetadata(arrivalNumber, metadata)}
+        onSave={metadata => mutations.updateMetadata(arrivalNumber, metadata)}
       />
       {canEditArrival && (
         <AddAssetBarForArrival onCreate={() => setIsAssetModalOpen(true)} />
@@ -134,8 +128,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         open={isAssetModalOpen}
         onOpenChange={handleModalOpenChange}
         editingAsset={editingAssetForm}
-        onCreateAsset={asset => createArrivalAsset(arrivalNumber, asset)}
-        onUpdateAsset={asset => updateArrivalAsset(arrivalNumber!, editingAssetId!, asset)}
+        onCreateAsset={asset => mutations.createAsset(arrivalNumber, asset)}
+        onUpdateAsset={asset => mutations.updateAsset(arrivalNumber!, editingAssetId!, asset)}
       />
       <BulkEditBar
         selectedAssets={selectedAssets}
@@ -143,7 +137,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         refreshKey={arrivalDetailKey(arrivalNumber)}
         currentCollectionType="arrivals"
         returnTo={`/arrivals/${arrivalNumber}`}
-        onBulkRemove={assets => bulkRemoveAssetsFromArrival(arrivalNumber, assets)}
+        onBulkRemove={assets => mutations.bulkRemoveAssets(arrivalNumber, assets)}
         totalCount={arrival.assets.length}
         onSelectAll={() => setRowSelection(Object.fromEntries(arrival.assets.map(a => [a.barcode, true])))}
       />

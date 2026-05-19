@@ -1,5 +1,5 @@
 import { useGlobalSearchStore } from '@/data/store/global-search-store'
-import { useHoldStore } from '@/data/store/hold-store'
+import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
 import type { AssetSummary, HoldSuggestion } from 'shared-types'
@@ -27,7 +27,7 @@ interface AddFromHoldModalProps {
 
 export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, onCommitBatch }: AddFromHoldModalProps) {
   const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
-  const getHoldAssets = useHoldStore(state => state.getAssets)
+  const holdMutations = useHoldMutations()
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<CollectionResults>(emptyResults)
@@ -57,7 +57,7 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, on
     if (!selected) return
     setIsConfirming(true)
     try {
-      const holdAssets = await getHoldAssets(selected.hold_number)
+      const holdAssets = await holdMutations.getAssets(selected.hold_number)
       const currentIds = new Set(getAssets().map(a => a.id))
       const toAdd = holdAssets.filter(a => !currentIds.has(a.id))
       if (onCommitBatch) {

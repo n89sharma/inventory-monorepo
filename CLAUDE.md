@@ -157,14 +157,22 @@ Path alias `@/` maps to `src/`.
 | Layer | Path | Naming | Responsibility |
 |---|---|---|---|
 | **Form types** | `ui-types/entityFormTypes.ts` | `entityFormTypes.ts` | Zod schema + inferred TS type for react-hook-form; maps UI shape (e.g. `SelectOption<User>`) to what the form controls |
-| **API** | `data/api/entity-api.ts` | `entity-api.ts` | Axios calls — maps form payload to request body, handles response parsing; `apiErrorHandler` in catch extracts the backend error message and calls `toast.error()` |
-| **Store** | `data/store/entity-store.ts` | `entity-store.ts` | Zustand — owns list state, detail state, search filter state; exposes action methods that call the API layer. **The only layer components may call — never import from `data/api/` in a component, page, or modal.** |
+| **API** | `data/api/entity-api.ts` | `entity-api.ts` | Axios calls — maps form payload to request body, parses responses. No SWR, no cache logic. |
+| **Store** | `data/store/entity-store.ts` | `entity-store.ts` | **Zustand — client state only.** Filter selections, `hasSearched`, UI flags. No API calls, no SWR `mutate` calls. ~30 lines per entity. |
+| **List/detail hooks** | `hooks/use-entities-list.ts`, `hooks/use-entity-detail.ts` | `use-entities-list.ts`, `use-entity-detail.ts` | SWR hooks that own server state — list queries, detail queries, and their cache keys. Export an `invalidateEntityLists()` matcher for mutations to call. |
+| **Mutation hooks** | `hooks/use-entity-mutations.ts` | `use-entity-mutations.ts` | All server mutations for an entity: `create`, `addAsset`, `removeAsset`, `updateMetadata`, etc. Each calls the API then invalidates the affected SWR caches (`mutate(detailKey)` + `invalidateEntityLists()`). |
 | **Pages** | `components/pages/entity/` | `entity-form-page.tsx`, `create-entity-page.tsx`, `entity-details-page.tsx` | Form page holds all form UI and field wiring; create/update pages are thin wrappers that supply config and handle navigation |
 | **Column definitions** | `components/pages/column-defs/` | `entity-columns.tsx` | TanStack column definitions for summary list tables and form asset tables; kept separate from page components to avoid clutter |
 | **Components** | `components/custom/` | `descriptive-name.tsx` | Reusable UI not tied to a specific entity — `add-assets-to-create-form.tsx`, `collection-edit-bar.tsx`, `controlled-popover-search.tsx`, etc. |
 | **Hooks** | `hooks/use-kebab-case.ts` | `use-kebab-case.ts` | Custom React hooks — see descriptions below |
+| **Lib** | `lib/*.ts` | descriptive | Pure utilities and cross-cutting helpers (formatters, `asset-removal-undo.ts`, etc.) |
 
-**Store-first rule:** Components, pages, and modals must never import from `data/api/` directly. All data fetching and mutations go through a store action. The only legitimate exception is custom hooks that wrap `useSWR` (e.g. `use-hold-detail.ts`) — these exist specifically to integrate with SWR caching and live in `hooks/`.
+**Server state vs client state — strict separation:**
+- **Server state lives in SWR.** Anything that comes from the network (lists, details, etc.) is owned by an SWR hook. Cache keys are colocated with the hook. Never copy server data into Zustand — that creates two sources of truth.
+- **Client state lives in Zustand.** Filter selections, UI toggles, `hasSearched`, things only the browser knows. Stores never call APIs and never call `mutate()`.
+- **Components must not import from `data/api/*` directly.** The permitted entry points are: a Zustand store (for client state), a `useEntitiesList`/`useEntityDetail` SWR hook (for reads), or a `useEntityMutations` hook (for writes).
+
+**Mutation invalidation rule:** Every server mutation must invalidate the SWR caches it affects — typically `mutate(entityDetailKey(id))` for the detail and `invalidateEntityLists()` for every cached list-filter variant. Optimistic updates use `mutate(key, updater, { revalidate: false })` followed by a final `mutate(key)` in `finally` to reconcile with the server.
 
 **API layer parsing & typing rule:** Every `*-api.ts` function must (1) construct outgoing bodies with `const <fn>Body = <Schema>.parse({...} satisfies <Type>)` — `satisfies` gives compile-time field enforcement, `.parse()` gives runtime validation; and (2) parse every server response with `<Schema>.parse(data.data)` before returning. No bare `return data.data` and no inline object literals passed directly to `api.post`/`api.put`. If a response type has no schema in `shared-types`, add one (or a local `z.object({...})` for endpoint-specific wrappers like `{ id: number }`).
 
@@ -178,6 +186,11 @@ Path alias `@/` maps to `src/`.
 - `useGlobalData` — fetches users, orgs, models, and reference data once at app start (`App.tsx`); results available via `useUserStore`, `useOrgStore`, `useModelStore`, `useReferenceDataStore` — never re-fetch these in a form or page
 - `useAutoSearch` — pre-populates list pages on first visit; used on every summary/list page
 - `useLocalStorage` — persists a value to `localStorage` with a versioned key
+- `use<Entity>Detail` — SWR hook for a single entity detail; exports `<entity>DetailKey(id)` for invalidation and `preload<Entity>Detail(id)` for row hover preloads
+- `use<Entity>List` — SWR hook for the entity summary list; key is derived from filter state, returns `undefined` (skips fetch) until `fromDate` is set. Exports `invalidate<Entity>Lists()` matcher that revalidates every cached filter variant
+- `use<Entity>Mutations` — returns a stable object of mutation methods (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`, etc.); each calls the API and invalidates the affected SWR caches
+
+**Asset removal undo pattern** (`lib/asset-removal-undo.ts`) — shared across all 5 collection entities. Provides `scheduleAssetRemoval`, `scheduleBulkAssetRemoval`, `flushPendingRemovals`. Owns a module-level `Map<string, Pending>` so the 5-second undo timer survives re-renders. Detail pages call `mutations.flushPending(collectionId)` in their unmount effect to commit any pending removals immediately.
 
 **`SelectOption<T>` pattern** — typed wrapper for dropdown state, defined in `ui-types/select-option-types.ts`:
 - Three states: `SELECTED { selected: T }`, `UNSELECTED`, `ANY`
@@ -193,4 +206,4 @@ Path alias `@/` maps to `src/`.
 <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
 ```
 
-For any given feature, reading one file per layer for an existing entity gives you the complete pattern — roughly 8 files covers the full stack end to end.
+For any given feature, reading one file per layer for an existing entity gives you the complete pattern — roughly 10 files covers the full stack end to end (form types, API, store, list hook, detail hook, mutations hook, form page, create page, details page, columns).
