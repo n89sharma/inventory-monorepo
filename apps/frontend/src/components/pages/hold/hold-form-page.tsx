@@ -2,8 +2,8 @@ import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form
 import { ControlledPopoverSearch } from '@/components/custom/controlled-popover-search'
 import { SelectOptions } from '@/components/custom/select-options'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
-import { PageContent } from '@/components/layout/page-content'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
+import { PageContent } from '@/components/layout/page-content'
 import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
@@ -16,8 +16,8 @@ import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
-import { toast } from 'sonner'
 import type { AssetSummary } from 'shared-types'
+import { toast } from 'sonner'
 import { getFormAssetColumns } from '../column-defs/form-asset-columns'
 
 interface HoldFormPageProps {
@@ -33,7 +33,7 @@ interface HoldFormPageProps {
 }
 
 function validateHoldAsset(asset: AssetSummary): string | null {
-  if (asset.is_held === true) return `${asset.barcode} already has an active hold`
+  if (!!asset.hold_number) return `${asset.barcode} already has an active hold`
   return null
 }
 
@@ -78,94 +78,94 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
         onSave={submitHold}
       />
       <PageContent className='flex flex-col gap-2'>
-      <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
-        <fieldset disabled={isSubmitting} className='contents'>
-          <FieldSet>
-            <FieldLegend>General Hold Information</FieldLegend>
-            <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
+        <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
+          <fieldset disabled={isSubmitting} className='contents'>
+            <FieldSet>
+              <FieldLegend>General Hold Information</FieldLegend>
+              <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
+
+                <Controller
+                  control={form.control}
+                  name='created_for'
+                  render={({ field: { onChange, value }, fieldState }) => (
+                    <SelectOptions
+                      selection={value}
+                      onSelectionChange={onChange}
+                      options={activeUsers}
+                      getLabel={u => u.name}
+                      getKey={u => u.name}
+                      fieldLabel='Created For'
+                      anyAllowed={false}
+                      fieldRequired={true}
+                      error={fieldState.invalid}
+                      className='max-w-60'
+                    />
+                  )}
+                />
+
+                <ControlledPopoverSearch
+                  control={form.control}
+                  name='customer'
+                  options={orgs}
+                  searchKey='name'
+                  getLabel={o => o.name}
+                  fieldLabel='Customer'
+                  fieldRequired={true}
+                  className='max-w-60'
+                />
+
+              </FieldGroup>
 
               <Controller
                 control={form.control}
-                name='created_for'
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <SelectOptions
-                    selection={value}
-                    onSelectionChange={onChange}
-                    options={activeUsers}
-                    getLabel={u => u.name}
-                    getKey={u => u.name}
-                    fieldLabel='Created For'
-                    anyAllowed={false}
-                    fieldRequired={true}
-                    error={fieldState.invalid}
-                    className='max-w-60'
-                  />
+                name='notes'
+                render={({ field }) => (
+                  <Field className='max-w-xl'>
+                    <FieldLabel>Notes</FieldLabel>
+                    <Textarea
+                      placeholder='Hold notes…'
+                      className='resize-none'
+                      {...field}
+                    />
+                  </Field>
                 )}
               />
 
-              <ControlledPopoverSearch
+              <Controller
                 control={form.control}
-                name='customer'
-                options={orgs}
-                searchKey='name'
-                getLabel={o => o.name}
-                fieldLabel='Customer'
-                fieldRequired={true}
-                className='max-w-60'
+                name='assets'
+                render={({ fieldState }) => (
+                  <div aria-live='polite'>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </div>
+                )}
               />
+            </FieldSet>
+          </fieldset>
+        </form>
 
-            </FieldGroup>
-
-            <Controller
-              control={form.control}
-              name='notes'
-              render={({ field }) => (
-                <Field className='max-w-xl'>
-                  <FieldLabel>Notes</FieldLabel>
-                  <Textarea
-                    placeholder='Hold notes…'
-                    className='resize-none'
-                    {...field}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              control={form.control}
-              name='assets'
-              render={({ fieldState }) => (
-                <div aria-live='polite'>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </div>
-              )}
-            />
-          </FieldSet>
-        </fieldset>
-      </form>
-
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center justify-between'>
-          <h2 className='text-lg font-semibold'>Assets</h2>
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-lg font-semibold'>Assets</h2>
+          </div>
+          <AddAssetByBarcode
+            getAssets={() => form.getValues('assets')}
+            onAddAsset={addAsset}
+            entityName='hold'
+            validateAsset={validateHoldAsset}
+            disabled={isSubmitting}
+            className='max-w-xl'
+          />
+          <DataTable columns={assetTableColumns} data={assets} />
         </div>
-        <AddAssetByBarcode
-          getAssets={() => form.getValues('assets')}
-          onAddAsset={addAsset}
-          entityName='hold'
-          validateAsset={validateHoldAsset}
-          disabled={isSubmitting}
-          className='max-w-xl'
-        />
-        <DataTable columns={assetTableColumns} data={assets} />
-      </div>
 
-      <UnsavedChangesDialog
-        open={guard.isBlocked}
-        onOpenChange={guard.onOpenChange}
-        onDiscard={guard.onDiscard}
-      />
+        <UnsavedChangesDialog
+          open={guard.isBlocked}
+          onOpenChange={guard.onOpenChange}
+          onDiscard={guard.onDiscard}
+        />
       </PageContent>
     </>
   )

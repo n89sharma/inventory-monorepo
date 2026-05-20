@@ -20,7 +20,10 @@
       "Bash(Get-ChildItem *)",
       "Bash(Select-Object Name)",
       "Bash(Remove-Item *)",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "WebFetch(domain:community.sap.com)",
+      "WebFetch(domain:gtracademy.org)",
+      "WebFetch(domain:www.erpfixers.com)"
     ]
   },
   "enabledMcpjsonServers": [

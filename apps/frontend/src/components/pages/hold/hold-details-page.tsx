@@ -93,7 +93,7 @@ export function HoldDetailsPage(): React.JSX.Element {
           existingAssets={hold.assets}
           entityName='hold'
           onAddSingle={asset => mutations.addAsset(holdNumber, asset)}
-          validateAsset={asset => asset.is_held ? `Asset ${asset.barcode} is already on a hold.` : null}
+          validateAsset={asset => asset.hold_number ? `Asset ${asset.barcode} is already on a hold.` : null}
         />
       )}
       <BulkEditBar

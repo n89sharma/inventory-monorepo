@@ -1,18 +1,18 @@
 import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
 import {
-  getAssets as getAssetsQuery,
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
-  getAssetDetails as getAssetDetailsQuery,
   getAssetDetailsBatch as getAssetDetailsBatchQuery,
+  getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
   getAssetPartTransfer as getAssetPartTransferQuery,
+  getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
   getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
-import { recordAssetUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
+import { recordAssetUpdate } from './historyService.js'
 
 export async function getAssets(
   model: string,
@@ -117,7 +117,6 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
       drum_life_k: r.drum_life_k,
     },
     created_at: r.created_at,
-    is_held: r.is_held,
     hold: mapHold(r),
     arrival: mapArrival(r),
     departure: mapDeparture(r),
@@ -199,7 +198,7 @@ function escapeCSV(val: unknown): string {
 const CSV_HEADERS = [
   'barcode', 'serial_number', 'model', 'brand', 'asset_type',
   'tracking_status', 'availability_status', 'technical_status',
-  'location', 'warehouse_code', 'warehouse_street', 'created_at', 'is_held',
+  'location', 'warehouse_code', 'warehouse_street', 'created_at',
   'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
   'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
   'specs_cassettes', 'specs_internal_finisher', 'specs_meter_black',
@@ -219,7 +218,7 @@ function generateCsv(assets: AssetDetails[]): string {
   const rows = assets.map(a => [
     a.barcode, a.serial_number, a.model, a.brand, a.asset_type,
     a.tracking_status, a.availability_status, a.technical_status,
-    a.location, a.warehouse_code, a.warehouse_street, a.created_at, a.is_held,
+    a.location, a.warehouse_code, a.warehouse_street, a.created_at,
     a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
     a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,
     a.specs.cassettes, a.specs.internal_finisher, a.specs.meter_black,

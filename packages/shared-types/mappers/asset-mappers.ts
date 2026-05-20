@@ -14,7 +14,7 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     technical_status: assetDetails.technical_status,
     warehouse_city_code: assetDetails.warehouse_code,
     warehouse_street: assetDetails.warehouse_street,
-    is_held: assetDetails.is_held,
+    hold_number: assetDetails.hold?.hold_number,
     purchase_invoice_id: null,
   }
 }

@@ -12,7 +12,6 @@ select
   w.street as location_street,
   l.location as location,
   a.created_at as created_at,
-  a.is_held as is_held,
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,

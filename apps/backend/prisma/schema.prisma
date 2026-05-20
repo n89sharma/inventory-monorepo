@@ -22,7 +22,6 @@ model Asset {
   departure_id                                        Int?
   hold_id                                             Int?
   created_at                                          DateTime
-  is_held                                             Boolean
   location_id                                         Int?
   barcode_normalized                                  String?                 @default(dbgenerated("lower(regexp_replace((barcode)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
   serial_normalized                                   String?                 @default(dbgenerated("lower(regexp_replace((serial_number)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))

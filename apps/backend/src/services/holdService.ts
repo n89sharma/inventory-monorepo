@@ -20,7 +20,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
 
   const { hold, assetStateMap } = await prisma.$transaction(async (tx) => {
     const conflicting = await tx.asset.findMany({
-      where: { id: { in: assetIds }, is_held: true },
+      where: { id: { in: assetIds }, hold_id: { not: null } },
       select: { barcode: true }
     })
     if (conflicting.length > 0) {
@@ -31,9 +31,9 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
 
     const currentAssets = await tx.asset.findMany({
       where: { id: { in: assetIds } },
-      select: { id: true, hold_id: true, is_held: true }
+      select: { id: true, hold_id: true }
     })
-    const assetStateMap = new Map(currentAssets.map(a => [a.id, { hold_id: a.hold_id, is_held: a.is_held }]))
+    const assetStateMap = new Map(currentAssets.map(a => [a.id, { hold_id: a.hold_id }]))
 
     const hold = await tx.hold.create({
       data: {
@@ -52,7 +52,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
 
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
-      data: { is_held: true, availability_status_id: heldStatus.id }
+      data: { availability_status_id: heldStatus.id }
     })
 
     return { hold, assetStateMap }
@@ -158,7 +158,7 @@ async function applyHoldAssetDelta(
 ): Promise<void> {
   if (assetIdsToAdd.length > 0) {
     const conflicts = await tx.asset.findMany({
-      where: { id: { in: assetIdsToAdd }, is_held: true },
+      where: { id: { in: assetIdsToAdd }, hold_id: { not: null } },
       select: { barcode: true }
     })
     if (conflicts.length > 0) {
@@ -183,14 +183,14 @@ async function applyHoldAssetDelta(
   if (assetIdsToRemove.length > 0) {
     await tx.asset.updateMany({
       where: { id: { in: assetIdsToRemove } },
-      data: { is_held: false, availability_status_id: availableStatusId }
+      data: { availability_status_id: availableStatusId }
     })
   }
 
   if (assetIdsToAdd.length > 0) {
     await tx.asset.updateMany({
       where: { id: { in: assetIdsToAdd } },
-      data: { is_held: true, availability_status_id: heldStatusId }
+      data: { availability_status_id: heldStatusId }
     })
   }
 }

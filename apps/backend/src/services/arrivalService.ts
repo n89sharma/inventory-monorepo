@@ -1,13 +1,13 @@
 import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
-import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import type { Prisma } from '../../generated/prisma/client.js'
+import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 import { prisma } from "../prisma.js"
+import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 
 
 const arrivalLocation = 'ARRIVAL'
@@ -130,7 +130,6 @@ function mapInputAssetToPrismaCreateAsset(
     model: { connect: { id: asset.model.id } },
     Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
     created_at: currentDateTime,
-    is_held: false,
     TrackingStatus: { connect: { status: arrivalTrackingStatus } },
     AvailabilityStatus: { connect: { status: arrivalAvailabilityStatus } },
     TechnicalStatus: { connect: { id: asset.technicalStatus.id } },

@@ -14,7 +14,7 @@ export const AssetSummarySchema = z.object({
   technical_status: z.string(),
   warehouse_city_code: z.string().nullable(),
   warehouse_street: z.string().nullable(),
-  is_held: z.boolean().optional(),
+  hold_number: z.string().nullable().optional(),
   purchase_invoice_id: z.number().nullable().optional()
 })
 
@@ -64,7 +64,6 @@ export const AssetDetailsSchema = z.object({
     hold_number: z.string()
   }).nullable(),
   created_at: z.coerce.date(),
-  is_held: z.boolean(),
   arrival: z.object({
     arrival_number: z.string(),
     origin: z.string(),

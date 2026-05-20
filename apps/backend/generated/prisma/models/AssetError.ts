@@ -519,6 +519,10 @@ export type AssetErrorUncheckedUpdateManyWithoutErrorNestedInput = {
   deleteMany?: Prisma.AssetErrorScalarWhereInput | Prisma.AssetErrorScalarWhereInput[]
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
