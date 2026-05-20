@@ -84,7 +84,7 @@ export function QueryPage(): React.JSX.Element {
 
   const models = useModelStore(state => state.models)
   const allAvailabilityStatuses = useReferenceDataStore(state => state.availabilityStatuses)
-  const allTechnicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
+  const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(
     () => allWarehouses.filter(w => w.is_active),
@@ -95,10 +95,10 @@ export function QueryPage(): React.JSX.Element {
     () => paramsToFilters(searchParams, {
       models,
       availabilityStatuses: allAvailabilityStatuses,
-      technicalStatuses: allTechnicalStatuses,
+      readinesses: allReadinesses,
       warehouses: allWarehouses,
     }),
-    [searchParams, models, allAvailabilityStatuses, allTechnicalStatuses, allWarehouses],
+    [searchParams, models, allAvailabilityStatuses, allReadinesses, allWarehouses],
   )
 
   const [draft, setDraft] = useState<SearchFilters>(urlFilters)
@@ -190,11 +190,11 @@ export function QueryPage(): React.JSX.Element {
             />
 
             <MultiSelectOptionsInline
-              selection={draft.technicalStatuses}
-              onSelectionChange={s => setDraft({ ...draft, technicalStatuses: s })}
-              options={allTechnicalStatuses}
+              selection={draft.readinesses}
+              onSelectionChange={s => setDraft({ ...draft, readinesses: s })}
+              options={allReadinesses}
               getLabel={s => s.status}
-              fieldLabel='Testing Status'
+              fieldLabel='Readiness'
               className='w-45'
             />
 

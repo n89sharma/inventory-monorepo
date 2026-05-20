@@ -15,7 +15,7 @@ export const AssetUpdateDiffSchema = z.object({
   invoice_number: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
   model_name: z.string().optional(),
-  technical_status: z.string().optional(),
+  readiness: z.string().nullable().optional(),
   serial_number: z.string().optional(),
   meter_black: z.number().nullable().optional(),
   meter_colour: z.number().nullable().optional(),

@@ -4,7 +4,7 @@ import { CheckCircleIcon, QuestionIcon, WarningIcon, WrenchIcon } from '@phospho
 
 type IconConfig = { Icon: React.ElementType; className: string }
 
-function getIconConfig(status: string): IconConfig {
+function getIconConfig(status: string | null): IconConfig {
   switch (status) {
     case 'OK':       return { Icon: CheckCircleIcon, className: 'text-green-600' }
     case 'ERROR':    return { Icon: WarningIcon,     className: 'text-red-500' }
@@ -13,7 +13,7 @@ function getIconConfig(status: string): IconConfig {
   }
 }
 
-export function TechnicalStatusIcon({ status }: { status: string }) {
+export function ReadinessIcon({ status }: { status: string | null }) {
   const { Icon, className } = getIconConfig(status)
   return (
     <Tooltip>
@@ -22,7 +22,7 @@ export function TechnicalStatusIcon({ status }: { status: string }) {
           <Icon size={18} className={className} />
         </span>
       </TooltipTrigger>
-      <TooltipContent>{formatSentenceCase(status)}</TooltipContent>
+      <TooltipContent>{status ? formatSentenceCase(status) : 'Unknown'}</TooltipContent>
     </Tooltip>
   )
 }

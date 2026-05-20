@@ -1,5 +1,5 @@
 import { AvailabilityStatusBadge } from "@/components/custom/availability-status-badge"
-import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
+import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
 import { TrashIcon } from "@phosphor-icons/react"
@@ -41,9 +41,9 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
       size: 80
     },
     {
-      accessorKey: "technical_status",
-      header: "Technical Status",
-      cell: ({ row }) => <TechnicalStatusIcon status={row.original.technical_status} />,
+      accessorKey: "readiness",
+      header: "Readiness",
+      cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
       size: 80
     },
     {

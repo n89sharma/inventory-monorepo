@@ -179,7 +179,7 @@ export async function getAssetsForQuery(
   modelName: string,
   meter: number | null,
   availabilityStatuses: Status[],
-  technicalStatuses: Status[],
+  readinesses: Status[],
   warehouses: Warehouse[]): Promise<AssetSummary[]> {
 
   const { data } = await api.get<AssetSummary[]>(`/assets`, {
@@ -187,7 +187,7 @@ export async function getAssetsForQuery(
       model: modelName,
       meter: meter ?? undefined,
       availabilityStatusIds: availabilityStatuses.map(s => s.id),
-      technicalStatusIds: technicalStatuses.map(s => s.id),
+      readinessIds: readinesses.map(s => s.id),
       warehouseIds: warehouses.map(w => w.id),
     }
   })

@@ -16,7 +16,7 @@ const UPDATE_FIELDS: { key: keyof AssetUpdateDiff; label: string }[] = [
   { key: 'invoice_number', label: 'Invoice' },
   { key: 'location', label: 'Location' },
   { key: 'model_name', label: 'Model' },
-  { key: 'technical_status', label: 'Technical Status' },
+  { key: 'readiness', label: 'Readiness' },
   { key: 'meter_black', label: 'Meter Black' },
   { key: 'meter_colour', label: 'Meter Colour' },
   { key: 'cassettes', label: 'Cassettes' },

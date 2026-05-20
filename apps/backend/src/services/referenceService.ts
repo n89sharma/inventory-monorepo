@@ -7,7 +7,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     assetTypes,
     brands,
     availabilityStatuses,
-    technicalStatuses,
+    readinesses,
     invoiceTypes,
     warehouses,
     errors
@@ -16,7 +16,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     prisma.assetType.findMany(),
     prisma.brand.findMany(),
     prisma.availabilityStatus.findMany(),
-    prisma.technicalStatus.findMany(),
+    prisma.readiness.findMany(),
     prisma.invoiceType.findMany(),
     prisma.warehouse.findMany(),
     prisma.error.findMany()
@@ -27,7 +27,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     assetTypes,
     brands,
     availabilityStatuses,
-    technicalStatuses,
+    readinesses,
     invoiceTypes,
     warehouses,
     errors

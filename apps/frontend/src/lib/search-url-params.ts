@@ -14,14 +14,14 @@ export type SearchFilters = {
   modelQuery: string | null
   meter: number | null
   availabilityStatuses: Status[]
-  technicalStatuses: Status[]
+  readinesses: Status[]
   selectedWarehouses: Warehouse[]
 }
 
 export type SearchReferenceData = {
   models: ModelSummary[]
   availabilityStatuses: Status[]
-  technicalStatuses: Status[]
+  readinesses: Status[]
   warehouses: Warehouse[]
 }
 
@@ -30,7 +30,7 @@ export const EMPTY_FILTERS: SearchFilters = {
   modelQuery: null,
   meter: null,
   availabilityStatuses: [],
-  technicalStatuses: [],
+  readinesses: [],
   selectedWarehouses: [],
 }
 
@@ -59,8 +59,8 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.availabilityStatuses.length > 0) {
     params.set(PARAM_AVAIL, encodeIds(filters.availabilityStatuses))
   }
-  if (filters.technicalStatuses.length > 0) {
-    params.set(PARAM_TECH, encodeIds(filters.technicalStatuses))
+  if (filters.readinesses.length > 0) {
+    params.set(PARAM_TECH, encodeIds(filters.readinesses))
   }
   if (filters.selectedWarehouses.length > 0) {
     params.set(PARAM_WH, encodeIds(filters.selectedWarehouses))
@@ -88,7 +88,7 @@ export function paramsToFilters(
     modelQuery,
     meter: meter === null || Number.isNaN(meter) ? null : meter,
     availabilityStatuses: decodeIds(params.get(PARAM_AVAIL), ref.availabilityStatuses),
-    technicalStatuses: decodeIds(params.get(PARAM_TECH), ref.technicalStatuses),
+    readinesses: decodeIds(params.get(PARAM_TECH), ref.readinesses),
     selectedWarehouses: decodeIds(params.get(PARAM_WH), ref.warehouses),
   }
 }

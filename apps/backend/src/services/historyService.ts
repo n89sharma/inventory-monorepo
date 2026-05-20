@@ -73,7 +73,7 @@ type AssetUpdateFields = Partial<{
   location_id: number | null
   model_id: number
   serial_number: string
-  technical_status_id: number
+  readiness_id: number | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -388,23 +388,23 @@ export async function recordAssetUpdate(
       diffAfter.model_name = afterModel?.name
     }
 
-    if (
-      before.technical_status_id !== after.technical_status_id &&
-      before.technical_status_id &&
-      after.technical_status_id
-    ) {
+    if (before.readiness_id !== after.readiness_id) {
       const [beforeStatus, afterStatus] = await Promise.all([
-        prisma.technicalStatus.findUnique({
-          where: { id: before.technical_status_id },
-          select: { status: true }
-        }),
-        prisma.technicalStatus.findUnique({
-          where: { id: after.technical_status_id },
-          select: { status: true }
-        })
+        before.readiness_id
+          ? prisma.readiness.findUnique({
+              where: { id: before.readiness_id },
+              select: { status: true }
+            })
+          : null,
+        after.readiness_id
+          ? prisma.readiness.findUnique({
+              where: { id: after.readiness_id },
+              select: { status: true }
+            })
+          : null
       ])
-      diffBefore.technical_status = beforeStatus?.status
-      diffAfter.technical_status = afterStatus?.status
+      diffBefore.readiness = beforeStatus?.status ?? null
+      diffAfter.readiness = afterStatus?.status ?? null
     }
 
     const plainFields = [

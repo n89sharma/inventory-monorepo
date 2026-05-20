@@ -1,6 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
+import { type SelectOption, UNSELECTED, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
 import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema } from 'shared-types'
 import { z } from 'zod'
@@ -40,7 +40,7 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       meterBlack: s.meterBlack!,
       meterColour: s.meterColour!,
       cassettes: s.cassettes!,
-      technicalStatus: getSelectedOrNull(s.technicalStatus)!,
+      readiness: getSelectedOrNull(s.readiness),
       internalFinisher: s.internalFinisher,
       coreFunctions: s.coreFunctions
     })) as CreateArrival['assets']
@@ -85,7 +85,7 @@ export async function createSingleArrivalAsset(
     meterBlack: asset.meterBlack!,
     meterColour: asset.meterColour!,
     cassettes: asset.cassettes!,
-    technicalStatus: getSelectedOrNull(asset.technicalStatus)!,
+    readiness: getSelectedOrNull(asset.readiness),
     internalFinisher: asset.internalFinisher,
     coreFunctions: asset.coreFunctions
   } satisfies CreateAsset)
@@ -109,7 +109,7 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     meterBlack: asset.meterBlack,
     meterColour: asset.meterColour,
     cassettes: asset.cassettes,
-    technicalStatus: getSelectOption(asset.technicalStatus),
+    readiness: asset.readiness ? getSelectOption(asset.readiness) : UNSELECTED,
     internalFinisher: asset.internalFinisher,
     coreFunctions: asset.coreFunctions
   }
@@ -127,7 +127,7 @@ export async function updateArrivalAsset(
     meterBlack: asset.meterBlack!,
     meterColour: asset.meterColour!,
     cassettes: asset.cassettes!,
-    technicalStatus: getSelectedOrNull(asset.technicalStatus)!,
+    readiness: getSelectedOrNull(asset.readiness),
     internalFinisher: asset.internalFinisher,
     coreFunctions: asset.coreFunctions
   } satisfies UpdateAsset)

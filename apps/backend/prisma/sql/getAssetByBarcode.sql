@@ -9,7 +9,7 @@ select
   w.city_code as warehouse_city_code,
   w.street as warehouse_street,
   av.status as availability_status,
-  te.status as technical_status,
+  r.status as readiness,
   a.purchase_invoice_id as purchase_invoice_id
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
@@ -17,7 +17,7 @@ from "Asset" a
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
   join "AvailabilityStatus" av on av.id = a.availability_status_id
-  join "TechnicalStatus" te on te.id = a.technical_status_id
+  left join "Readiness" r on r.id = a.readiness_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
 where a.barcode = $1

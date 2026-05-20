@@ -41,7 +41,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
   })
   const isDirty = newAssetForm.formState.isDirty
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
-  const technicalStatuses = useReferenceDataStore(state => state.technicalStatuses)
+  const readinesses = useReferenceDataStore(state => state.readinesses)
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const models = useModelStore(state => state.models)
 
@@ -61,7 +61,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
     return {
       serialNumber: '',
       model: null,
-      technicalStatus: UNSELECTED,
+      readiness: UNSELECTED,
       meterBlack: null,
       meterColour: null,
       cassettes: null,
@@ -170,15 +170,15 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
 
             <Controller
               control={newAssetForm.control}
-              name='technicalStatus'
-              render={({ field: { onChange, value: technicalStatus }, fieldState }) => (
+              name='readiness'
+              render={({ field: { onChange, value: readiness }, fieldState }) => (
                 <SelectOptions
-                  selection={technicalStatus}
+                  selection={readiness}
                   onSelectionChange={onChange}
-                  options={technicalStatuses}
+                  options={readinesses}
                   getLabel={t => t.status}
-                  fieldLabel='Testing Status'
-                  fieldRequired={true}
+                  fieldLabel='Readiness'
+                  fieldRequired={false}
                   error={fieldState.invalid}
                 />
               )}

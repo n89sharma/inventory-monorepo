@@ -1,5 +1,5 @@
 import { AvailabilityStatusBadge } from "@/components/custom/availability-status-badge"
-import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
+import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
@@ -94,9 +94,9 @@ export function createAssetSummaryColumns(
       size: 80
     },
     {
-      accessorKey: "technical_status",
-      header: "Technical Status",
-      cell: ({ row }) => <TechnicalStatusIcon status={row.original.technical_status} />,
+      accessorKey: "readiness",
+      header: "Readiness",
+      cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
       size: 80
     },
     {

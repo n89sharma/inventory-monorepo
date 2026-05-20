@@ -17,7 +17,7 @@ const arrivalAvailabilityStatus = 'AVAILABLE'
 const assetIncludeArgs = {
   include: {
     model: true,
-    TechnicalStatus: true,
+    Readiness: true,
     technical_specification: true,
     asset_accessories: {
       include: {
@@ -59,7 +59,7 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     meterBlack: dbAsset.technical_specification?.meter_black ?? 0,
     meterColour: dbAsset.technical_specification?.meter_colour ?? 0,
     cassettes: dbAsset.technical_specification?.cassettes ?? 0,
-    technicalStatus: dbAsset.TechnicalStatus,
+    readiness: dbAsset.Readiness,
     internalFinisher: dbAsset.technical_specification?.internal_finisher ?? '',
     coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory)
   }
@@ -88,7 +88,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       assets: {
         select: {
           id: true, barcode: true, serial_number: true, model_id: true,
-          availability_status_id: true, technical_status_id: true
+          availability_status_id: true, readiness_id: true
         }
       }
     }
@@ -130,7 +130,7 @@ function mapInputAssetToPrismaCreateAsset(
     Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
     created_at: currentDateTime,
     AvailabilityStatus: { connect: { status: arrivalAvailabilityStatus } },
-    TechnicalStatus: { connect: { id: asset.technicalStatus.id } },
+    Readiness: asset.readiness ? { connect: { id: asset.readiness.id } } : undefined,
     asset_accessories: {
       create: asset.coreFunctions.map(c => ({ accessory_id: c.id }))
     },
@@ -253,7 +253,7 @@ async function updateArrivalAssetCoreFields(
     data: {
       model_id: asset.model.id,
       serial_number: asset.serialNumber,
-      technical_status_id: asset.technicalStatus.id,
+      readiness_id: asset.readiness?.id ?? null,
       technical_specification: {
         update: {
           meter_black: asset.meterBlack,
@@ -289,7 +289,7 @@ export async function updateArrivalAsset(
   const existing = await prisma.asset.findFirst({
     where: { id: assetId, arrival: { arrival_number: arrivalNumber } },
     select: {
-      id: true, barcode: true, model_id: true, serial_number: true, technical_status_id: true,
+      id: true, barcode: true, model_id: true, serial_number: true, readiness_id: true,
       technical_specification: {
         select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
       }
@@ -312,7 +312,7 @@ export async function updateArrivalAsset(
   await recordAssetUpdate(assetId, {
     model_id: existing.model_id,
     serial_number: existing.serial_number,
-    technical_status_id: existing.technical_status_id,
+    readiness_id: existing.readiness_id,
     meter_black: existing.technical_specification?.meter_black,
     meter_colour: existing.technical_specification?.meter_colour,
     cassettes: existing.technical_specification?.cassettes,
@@ -320,7 +320,7 @@ export async function updateArrivalAsset(
   }, {
     model_id: asset.model.id,
     serial_number: asset.serialNumber,
-    technical_status_id: asset.technicalStatus.id,
+    readiness_id: asset.readiness?.id ?? null,
     meter_black: asset.meterBlack,
     meter_colour: asset.meterColour,
     cassettes: asset.cassettes,
@@ -347,7 +347,7 @@ async function createArrivalAssetInTx(
     },
     select: {
       id: true, barcode: true, serial_number: true, model_id: true,
-      availability_status_id: true, technical_status_id: true
+      availability_status_id: true, readiness_id: true
     }
   })
 }

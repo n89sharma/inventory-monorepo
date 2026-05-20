@@ -50,8 +50,8 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
       size: 70
     },
     {
-      accessorKey: "technicalStatus.selected.status",
-      header: "Technical Status",
+      accessorKey: "readiness.selected.status",
+      header: "Readiness",
       size: 100
     },
     {

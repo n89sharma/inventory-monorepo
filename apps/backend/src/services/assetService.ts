@@ -17,12 +17,12 @@ import { recordAssetUpdate } from './historyService.js'
 export async function getAssets(
   model: string,
   availabilityStatusIds: number[],
-  technicalStatusIds: number[],
+  readinessIds: number[],
   warehouseIds: number[],
   meterParam: number
 ): Promise<AssetSummary[]> {
   return prisma.$queryRawTyped(
-    getAssetsQuery(model, availabilityStatusIds, technicalStatusIds, warehouseIds, meterParam)
+    getAssetsQuery(model, availabilityStatusIds, readinessIds, warehouseIds, meterParam)
   )
 }
 
@@ -90,7 +90,7 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
     brand: r.brand,
     asset_type: r.asset_type,
     availability_status: r.availability_status,
-    technical_status: r.technical_status,
+    readiness: r.readiness,
     location: r.location,
     warehouse_code: r.location_city_code,
     warehouse_street: r.location_street,
@@ -195,7 +195,7 @@ function escapeCSV(val: unknown): string {
 
 const CSV_HEADERS = [
   'barcode', 'serial_number', 'model', 'brand', 'asset_type',
-  'availability_status', 'technical_status',
+  'availability_status', 'readiness',
   'location', 'warehouse_code', 'warehouse_street', 'created_at',
   'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
   'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
@@ -215,7 +215,7 @@ const CSV_HEADERS = [
 function generateCsv(assets: AssetDetails[]): string {
   const rows = assets.map(a => [
     a.barcode, a.serial_number, a.model, a.brand, a.asset_type,
-    a.availability_status, a.technical_status,
+    a.availability_status, a.readiness,
     a.location, a.warehouse_code, a.warehouse_street, a.created_at,
     a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
     a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,

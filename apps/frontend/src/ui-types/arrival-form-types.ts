@@ -11,7 +11,7 @@ export const AssetFormSchema = z.object({
   meterBlack: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Black meter is required"),
   meterColour: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Colour meter is required"),
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
-  technicalStatus: StatusSelectOptionSchema.refine(val => isSelected(val), "Technical status is required"),
+  readiness: StatusSelectOptionSchema,
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema)
 })
@@ -33,7 +33,7 @@ export type AssetForm = {
   meterBlack: number | null,
   meterColour: number | null,
   cassettes: number | null,
-  technicalStatus: SelectOption<Status>,
+  readiness: SelectOption<Status>,
   internalFinisher: string,
   coreFunctions: CoreFunction[]
 }

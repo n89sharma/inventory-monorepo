@@ -76,10 +76,10 @@ export const ModelName = {
   AvailabilityStatus: 'AvailabilityStatus',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
-  TechnicalStatus: 'TechnicalStatus',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
-  History: 'History'
+  History: 'History',
+  Readiness: 'Readiness'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -104,7 +104,6 @@ export const AssetScalarFieldEnum = {
   serial_number: 'serial_number',
   model_id: 'model_id',
   availability_status_id: 'availability_status_id',
-  technical_status_id: 'technical_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
   sales_invoice_id: 'sales_invoice_id',
   arrival_id: 'arrival_id',
@@ -113,7 +112,8 @@ export const AssetScalarFieldEnum = {
   created_at: 'created_at',
   location_id: 'location_id',
   barcode_normalized: 'barcode_normalized',
-  serial_normalized: 'serial_normalized'
+  serial_normalized: 'serial_normalized',
+  readiness_id: 'readiness_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -408,14 +408,6 @@ export const InvoiceTypeScalarFieldEnum = {
 export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
 
 
-export const TechnicalStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type TechnicalStatusScalarFieldEnum = (typeof TechnicalStatusScalarFieldEnum)[keyof typeof TechnicalStatusScalarFieldEnum]
-
-
 export const StorePartScalarFieldEnum = {
   id: 'id',
   part_number: 'part_number',
@@ -453,6 +445,14 @@ export const HistoryScalarFieldEnum = {
 } as const
 
 export type HistoryScalarFieldEnum = (typeof HistoryScalarFieldEnum)[keyof typeof HistoryScalarFieldEnum]
+
+
+export const ReadinessScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
 
 
 export const SortOrder = {

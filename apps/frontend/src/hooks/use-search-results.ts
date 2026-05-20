@@ -19,7 +19,7 @@ export function useSearchResults(filters: SearchFilters) {
         modelName,
         f.meter,
         f.availabilityStatuses,
-        f.technicalStatuses,
+        f.readinesses,
         f.selectedWarehouses,
       )
     },

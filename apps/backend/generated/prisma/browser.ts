@@ -143,11 +143,6 @@ export type FileType = Prisma.FileTypeModel
  */
 export type InvoiceType = Prisma.InvoiceTypeModel
 /**
- * Model TechnicalStatus
- * 
- */
-export type TechnicalStatus = Prisma.TechnicalStatusModel
-/**
  * Model StorePart
  * 
  */
@@ -162,3 +157,8 @@ export type PartTransfer = Prisma.PartTransferModel
  * 
  */
 export type History = Prisma.HistoryModel
+/**
+ * Model Readiness
+ * 
+ */
+export type Readiness = Prisma.ReadinessModel

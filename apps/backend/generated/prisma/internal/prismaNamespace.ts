@@ -409,10 +409,10 @@ export const ModelName = {
   AvailabilityStatus: 'AvailabilityStatus',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
-  TechnicalStatus: 'TechnicalStatus',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
-  History: 'History'
+  History: 'History',
+  Readiness: 'Readiness'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -428,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "technicalStatus" | "storePart" | "partTransfer" | "history"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "storePart" | "partTransfer" | "history" | "readiness"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2282,80 +2282,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    TechnicalStatus: {
-      payload: Prisma.$TechnicalStatusPayload<ExtArgs>
-      fields: Prisma.TechnicalStatusFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.TechnicalStatusFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.TechnicalStatusFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        findFirst: {
-          args: Prisma.TechnicalStatusFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.TechnicalStatusFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        findMany: {
-          args: Prisma.TechnicalStatusFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>[]
-        }
-        create: {
-          args: Prisma.TechnicalStatusCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        createMany: {
-          args: Prisma.TechnicalStatusCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.TechnicalStatusCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>[]
-        }
-        delete: {
-          args: Prisma.TechnicalStatusDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        update: {
-          args: Prisma.TechnicalStatusUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        deleteMany: {
-          args: Prisma.TechnicalStatusDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.TechnicalStatusUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.TechnicalStatusUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>[]
-        }
-        upsert: {
-          args: Prisma.TechnicalStatusUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TechnicalStatusPayload>
-        }
-        aggregate: {
-          args: Prisma.TechnicalStatusAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTechnicalStatus>
-        }
-        groupBy: {
-          args: Prisma.TechnicalStatusGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TechnicalStatusGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.TechnicalStatusCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TechnicalStatusCountAggregateOutputType> | number
-        }
-      }
-    }
     StorePart: {
       payload: Prisma.$StorePartPayload<ExtArgs>
       fields: Prisma.StorePartFieldRefs
@@ -2578,6 +2504,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Readiness: {
+      payload: Prisma.$ReadinessPayload<ExtArgs>
+      fields: Prisma.ReadinessFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReadinessFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReadinessFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        findFirst: {
+          args: Prisma.ReadinessFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReadinessFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        findMany: {
+          args: Prisma.ReadinessFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>[]
+        }
+        create: {
+          args: Prisma.ReadinessCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        createMany: {
+          args: Prisma.ReadinessCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReadinessCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>[]
+        }
+        delete: {
+          args: Prisma.ReadinessDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        update: {
+          args: Prisma.ReadinessUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReadinessDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReadinessUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReadinessUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReadinessUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReadinessPayload>
+        }
+        aggregate: {
+          args: Prisma.ReadinessAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReadiness>
+        }
+        groupBy: {
+          args: Prisma.ReadinessGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadinessGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReadinessCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReadinessCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2627,7 +2627,6 @@ export const AssetScalarFieldEnum = {
   serial_number: 'serial_number',
   model_id: 'model_id',
   availability_status_id: 'availability_status_id',
-  technical_status_id: 'technical_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
   sales_invoice_id: 'sales_invoice_id',
   arrival_id: 'arrival_id',
@@ -2636,7 +2635,8 @@ export const AssetScalarFieldEnum = {
   created_at: 'created_at',
   location_id: 'location_id',
   barcode_normalized: 'barcode_normalized',
-  serial_normalized: 'serial_normalized'
+  serial_normalized: 'serial_normalized',
+  readiness_id: 'readiness_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -2931,14 +2931,6 @@ export const InvoiceTypeScalarFieldEnum = {
 export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
 
 
-export const TechnicalStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type TechnicalStatusScalarFieldEnum = (typeof TechnicalStatusScalarFieldEnum)[keyof typeof TechnicalStatusScalarFieldEnum]
-
-
 export const StorePartScalarFieldEnum = {
   id: 'id',
   part_number: 'part_number',
@@ -2976,6 +2968,14 @@ export const HistoryScalarFieldEnum = {
 } as const
 
 export type HistoryScalarFieldEnum = (typeof HistoryScalarFieldEnum)[keyof typeof HistoryScalarFieldEnum]
+
+
+export const ReadinessScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3263,10 +3263,10 @@ export type GlobalOmitConfig = {
   availabilityStatus?: Prisma.AvailabilityStatusOmit
   fileType?: Prisma.FileTypeOmit
   invoiceType?: Prisma.InvoiceTypeOmit
-  technicalStatus?: Prisma.TechnicalStatusOmit
   storePart?: Prisma.StorePartOmit
   partTransfer?: Prisma.PartTransferOmit
   history?: Prisma.HistoryOmit
+  readiness?: Prisma.ReadinessOmit
 }
 
 /* Types for Logging */
