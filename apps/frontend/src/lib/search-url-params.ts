@@ -3,7 +3,7 @@ import type { ModelSummary, Status, Warehouse } from 'shared-types'
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
 const PARAM_METER = 'meter'
-const PARAM_AVAIL = 'avail'
+const PARAM_STATUS = 'status'
 const PARAM_TECH = 'tech'
 const PARAM_WH = 'wh'
 
@@ -13,14 +13,14 @@ export type SearchFilters = {
   model: ModelSummary | null
   modelQuery: string | null
   meter: number | null
-  availabilityStatuses: Status[]
+  statuses: Status[]
   readinesses: Status[]
   selectedWarehouses: Warehouse[]
 }
 
 export type SearchReferenceData = {
   models: ModelSummary[]
-  availabilityStatuses: Status[]
+  statuses: Status[]
   readinesses: Status[]
   warehouses: Warehouse[]
 }
@@ -29,7 +29,7 @@ export const EMPTY_FILTERS: SearchFilters = {
   model: null,
   modelQuery: null,
   meter: null,
-  availabilityStatuses: [],
+  statuses: [],
   readinesses: [],
   selectedWarehouses: [],
 }
@@ -56,8 +56,8 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
     params.set(PARAM_Q, filters.modelQuery)
   }
   if (filters.meter !== null) params.set(PARAM_METER, String(filters.meter))
-  if (filters.availabilityStatuses.length > 0) {
-    params.set(PARAM_AVAIL, encodeIds(filters.availabilityStatuses))
+  if (filters.statuses.length > 0) {
+    params.set(PARAM_STATUS, encodeIds(filters.statuses))
   }
   if (filters.readinesses.length > 0) {
     params.set(PARAM_TECH, encodeIds(filters.readinesses))
@@ -87,7 +87,7 @@ export function paramsToFilters(
     model,
     modelQuery,
     meter: meter === null || Number.isNaN(meter) ? null : meter,
-    availabilityStatuses: decodeIds(params.get(PARAM_AVAIL), ref.availabilityStatuses),
+    statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),
     readinesses: decodeIds(params.get(PARAM_TECH), ref.readinesses),
     selectedWarehouses: decodeIds(params.get(PARAM_WH), ref.warehouses),
   }

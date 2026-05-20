@@ -8,7 +8,7 @@ select
   t.meter_total as meter_total,
   w.city_code as warehouse_city_code,
   w.street as warehouse_street,
-  av.status as availability_status,
+  s.status as status,
   rd.status as readiness
 from "Hold" h
   join "Asset" a on h.id = a.hold_id
@@ -16,8 +16,8 @@ from "Hold" h
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
-  join "AvailabilityStatus" av on av.id = a.availability_status_id
-  left join "Readiness" rd on rd.id = a.readiness_id
+  join "Status" s on s.id = a.status_id
+  join "Readiness" rd on rd.id = a.readiness_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
 where h.hold_number = $1

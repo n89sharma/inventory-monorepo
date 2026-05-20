@@ -10,7 +10,7 @@ import { prisma } from '../prisma.js'
 export async function createHold(data: CreateHold, userId: number): Promise<string> {
   const assetIds = data.assets.map(a => a.id)
 
-  const heldStatus = await prisma.availabilityStatus.findUniqueOrThrow({
+  const heldStatus = await prisma.status.findUniqueOrThrow({
     where: { status: 'HELD' },
     select: { id: true }
   })
@@ -52,7 +52,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
 
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
-      data: { availability_status_id: heldStatus.id }
+      data: { status_id: heldStatus.id }
     })
 
     return { hold, assetStateMap }
@@ -114,9 +114,9 @@ export async function patchHoldAssets(
   delta: AssetDelta,
   userId: number
 ): Promise<void> {
-  const [heldStatus, availableStatus, hold] = await Promise.all([
-    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
-    prisma.availabilityStatus.findUniqueOrThrow({ where: { status: 'AVAILABLE' }, select: { id: true } }),
+  const [heldStatus, inStockStatus, hold] = await Promise.all([
+    prisma.status.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
+    prisma.status.findUniqueOrThrow({ where: { status: 'IN_STOCK' }, select: { id: true } }),
     prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true } })
   ])
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
@@ -128,7 +128,7 @@ export async function patchHoldAssets(
       delta.assetIdsToAdd,
       delta.assetIdsToRemove,
       heldStatus.id,
-      availableStatus.id
+      inStockStatus.id
     )
   })
 
@@ -154,7 +154,7 @@ async function applyHoldAssetDelta(
   assetIdsToAdd: number[],
   assetIdsToRemove: number[],
   heldStatusId: number,
-  availableStatusId: number
+  inStockStatusId: number
 ): Promise<void> {
   if (assetIdsToAdd.length > 0) {
     const conflicts = await tx.asset.findMany({
@@ -183,14 +183,14 @@ async function applyHoldAssetDelta(
   if (assetIdsToRemove.length > 0) {
     await tx.asset.updateMany({
       where: { id: { in: assetIdsToRemove } },
-      data: { availability_status_id: availableStatusId }
+      data: { status_id: inStockStatusId }
     })
   }
 
   if (assetIdsToAdd.length > 0) {
     await tx.asset.updateMany({
       where: { id: { in: assetIdsToAdd } },
-      data: { availability_status_id: heldStatusId }
+      data: { status_id: heldStatusId }
     })
   }
 }

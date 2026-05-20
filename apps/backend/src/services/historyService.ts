@@ -73,7 +73,7 @@ type AssetUpdateFields = Partial<{
   location_id: number | null
   model_id: number
   serial_number: string
-  readiness_id: number | null
+  readiness_id: number
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null

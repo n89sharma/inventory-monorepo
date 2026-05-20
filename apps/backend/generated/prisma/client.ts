@@ -152,11 +152,6 @@ export type Accessory = Prisma.AccessoryModel
  */
 export type AssetType = Prisma.AssetTypeModel
 /**
- * Model AvailabilityStatus
- * 
- */
-export type AvailabilityStatus = Prisma.AvailabilityStatusModel
-/**
  * Model FileType
  * 
  */
@@ -186,3 +181,8 @@ export type History = Prisma.HistoryModel
  * 
  */
 export type Readiness = Prisma.ReadinessModel
+/**
+ * Model Status
+ * 
+ */
+export type Status = Prisma.StatusModel

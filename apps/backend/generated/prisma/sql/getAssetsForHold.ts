@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetsForHold = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\nav.status as availability_status,\nrd.status as readiness\nfrom \"Hold\" h\njoin \"Asset\" a on h.id = a.hold_id\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"AvailabilityStatus\" av on av.id = a.availability_status_id\nleft join \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere h.hold_number = $1") as (text: string) => $runtime.TypedSql<getAssetsForHold.Parameters, getAssetsForHold.Result>
+export const getAssetsForHold = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_city_code,\nw.street as warehouse_street,\ns.status as status,\nrd.status as readiness\nfrom \"Hold\" h\njoin \"Asset\" a on h.id = a.hold_id\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"Status\" s on s.id = a.status_id\njoin \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nwhere h.hold_number = $1") as (text: string) => $runtime.TypedSql<getAssetsForHold.Parameters, getAssetsForHold.Result>
 
 export namespace getAssetsForHold {
   export type Parameters = [text: string]
@@ -22,7 +22,7 @@ export namespace getAssetsForHold {
     meter_total: number | null
     warehouse_city_code: string
     warehouse_street: string
-    availability_status: string
+    status: string
     readiness: string
   }
 }

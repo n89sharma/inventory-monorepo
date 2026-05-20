@@ -8,7 +8,7 @@ select
   s.meter_total as meter_total,
   w.city_code as warehouse_city_code,
   w.street as warehouse_street,
-  av.status as availability_status,
+  st.status as status,
   rd.status as readiness
 from "AssetTransfer" tt
   join "Transfer" t on t.id = tt.transfer_id
@@ -17,8 +17,8 @@ from "AssetTransfer" tt
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
-  join "AvailabilityStatus" av on av.id = a.availability_status_id
-  left join "Readiness" rd on rd.id = a.readiness_id
+  join "Status" st on st.id = a.status_id
+  join "Readiness" rd on rd.id = a.readiness_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
 where t.transfer_number = $1

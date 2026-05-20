@@ -83,7 +83,7 @@ export function QueryPage(): React.JSX.Element {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const models = useModelStore(state => state.models)
-  const allAvailabilityStatuses = useReferenceDataStore(state => state.availabilityStatuses)
+  const allStatuses = useReferenceDataStore(state => state.statuses)
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(
@@ -94,11 +94,11 @@ export function QueryPage(): React.JSX.Element {
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
       models,
-      availabilityStatuses: allAvailabilityStatuses,
+      statuses: allStatuses,
       readinesses: allReadinesses,
       warehouses: allWarehouses,
     }),
-    [searchParams, models, allAvailabilityStatuses, allReadinesses, allWarehouses],
+    [searchParams, models, allStatuses, allReadinesses, allWarehouses],
   )
 
   const [draft, setDraft] = useState<SearchFilters>(urlFilters)
@@ -181,11 +181,11 @@ export function QueryPage(): React.JSX.Element {
             />
 
             <MultiSelectOptionsInline
-              selection={draft.availabilityStatuses}
-              onSelectionChange={s => setDraft({ ...draft, availabilityStatuses: s })}
-              options={allAvailabilityStatuses}
+              selection={draft.statuses}
+              onSelectionChange={s => setDraft({ ...draft, statuses: s })}
+              options={allStatuses}
               getLabel={s => s.status}
-              fieldLabel='Availability'
+              fieldLabel='Status'
               className='w-45'
             />
 

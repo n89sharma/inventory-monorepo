@@ -11,7 +11,7 @@ export const AssetFormSchema = z.object({
   meterBlack: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Black meter is required"),
   meterColour: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Colour meter is required"),
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
-  readiness: StatusSelectOptionSchema,
+  readiness: StatusSelectOptionSchema.refine(val => isSelected(val), "Readiness required"),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema)
 })

@@ -1,4 +1,4 @@
-import { AvailabilityStatusBadge } from "@/components/custom/availability-status-badge"
+import { StatusBadge } from "@/components/custom/status-badge"
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
@@ -35,9 +35,9 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
       size: 60
     },
     {
-      accessorKey: "availability_status",
-      header: "Availability Status",
-      cell: ({ row }) => <AvailabilityStatusBadge status={row.original.availability_status} />,
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <StatusBadge status={row.original.status} />,
       size: 80
     },
     {

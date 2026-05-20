@@ -406,13 +406,13 @@ export const ModelName = {
   Organization: 'Organization',
   Accessory: 'Accessory',
   AssetType: 'AssetType',
-  AvailabilityStatus: 'AvailabilityStatus',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History',
-  Readiness: 'Readiness'
+  Readiness: 'Readiness',
+  Status: 'Status'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -428,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "storePart" | "partTransfer" | "history" | "readiness"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "fileType" | "invoiceType" | "storePart" | "partTransfer" | "history" | "readiness" | "status"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2060,80 +2060,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    AvailabilityStatus: {
-      payload: Prisma.$AvailabilityStatusPayload<ExtArgs>
-      fields: Prisma.AvailabilityStatusFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AvailabilityStatusFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AvailabilityStatusFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        findFirst: {
-          args: Prisma.AvailabilityStatusFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AvailabilityStatusFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        findMany: {
-          args: Prisma.AvailabilityStatusFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>[]
-        }
-        create: {
-          args: Prisma.AvailabilityStatusCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        createMany: {
-          args: Prisma.AvailabilityStatusCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AvailabilityStatusCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>[]
-        }
-        delete: {
-          args: Prisma.AvailabilityStatusDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        update: {
-          args: Prisma.AvailabilityStatusUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        deleteMany: {
-          args: Prisma.AvailabilityStatusDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AvailabilityStatusUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AvailabilityStatusUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>[]
-        }
-        upsert: {
-          args: Prisma.AvailabilityStatusUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AvailabilityStatusPayload>
-        }
-        aggregate: {
-          args: Prisma.AvailabilityStatusAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAvailabilityStatus>
-        }
-        groupBy: {
-          args: Prisma.AvailabilityStatusGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AvailabilityStatusGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AvailabilityStatusCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AvailabilityStatusCountAggregateOutputType> | number
-        }
-      }
-    }
     FileType: {
       payload: Prisma.$FileTypePayload<ExtArgs>
       fields: Prisma.FileTypeFieldRefs
@@ -2578,6 +2504,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Status: {
+      payload: Prisma.$StatusPayload<ExtArgs>
+      fields: Prisma.StatusFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StatusFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StatusFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        findFirst: {
+          args: Prisma.StatusFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StatusFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        findMany: {
+          args: Prisma.StatusFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>[]
+        }
+        create: {
+          args: Prisma.StatusCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        createMany: {
+          args: Prisma.StatusCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StatusCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>[]
+        }
+        delete: {
+          args: Prisma.StatusDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        update: {
+          args: Prisma.StatusUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        deleteMany: {
+          args: Prisma.StatusDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StatusUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StatusUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>[]
+        }
+        upsert: {
+          args: Prisma.StatusUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StatusPayload>
+        }
+        aggregate: {
+          args: Prisma.StatusAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStatus>
+        }
+        groupBy: {
+          args: Prisma.StatusGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StatusGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StatusCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StatusCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2626,7 +2626,6 @@ export const AssetScalarFieldEnum = {
   barcode: 'barcode',
   serial_number: 'serial_number',
   model_id: 'model_id',
-  availability_status_id: 'availability_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
   sales_invoice_id: 'sales_invoice_id',
   arrival_id: 'arrival_id',
@@ -2636,7 +2635,8 @@ export const AssetScalarFieldEnum = {
   location_id: 'location_id',
   barcode_normalized: 'barcode_normalized',
   serial_normalized: 'serial_normalized',
-  readiness_id: 'readiness_id'
+  readiness_id: 'readiness_id',
+  status_id: 'status_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -2907,14 +2907,6 @@ export const AssetTypeScalarFieldEnum = {
 export type AssetTypeScalarFieldEnum = (typeof AssetTypeScalarFieldEnum)[keyof typeof AssetTypeScalarFieldEnum]
 
 
-export const AvailabilityStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type AvailabilityStatusScalarFieldEnum = (typeof AvailabilityStatusScalarFieldEnum)[keyof typeof AvailabilityStatusScalarFieldEnum]
-
-
 export const FileTypeScalarFieldEnum = {
   id: 'id',
   type: 'type'
@@ -2976,6 +2968,14 @@ export const ReadinessScalarFieldEnum = {
 } as const
 
 export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
+
+
+export const StatusScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3260,13 +3260,13 @@ export type GlobalOmitConfig = {
   organization?: Prisma.OrganizationOmit
   accessory?: Prisma.AccessoryOmit
   assetType?: Prisma.AssetTypeOmit
-  availabilityStatus?: Prisma.AvailabilityStatusOmit
   fileType?: Prisma.FileTypeOmit
   invoiceType?: Prisma.InvoiceTypeOmit
   storePart?: Prisma.StorePartOmit
   partTransfer?: Prisma.PartTransferOmit
   history?: Prisma.HistoryOmit
   readiness?: Prisma.ReadinessOmit
+  status?: Prisma.StatusOmit
 }
 
 /* Types for Logging */

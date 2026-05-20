@@ -48,7 +48,7 @@ export const ReferenceDataSchema = z.object({
   coreFunctions: z.array(CoreFunctionsSchema),
   assetTypes: z.array(AssetTypeSchema),
   brands: z.array(BrandSchema),
-  availabilityStatuses: z.array(StatusSchema),
+  statuses: z.array(StatusSchema),
   readinesses: z.array(StatusSchema),
   invoiceTypes: z.array(InvoiceTypeSchema),
   warehouses: z.array(WarehouseSchema),

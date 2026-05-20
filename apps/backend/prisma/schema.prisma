@@ -13,7 +13,6 @@ model Asset {
   barcode                                             String                  @unique @db.VarChar(50)
   serial_number                                       String                  @db.VarChar(50)
   model_id                                            Int
-  availability_status_id                              Int
   purchase_invoice_id                                 Int?
   sales_invoice_id                                    Int?
   arrival_id                                          Int?
@@ -23,16 +22,17 @@ model Asset {
   location_id                                         Int?
   barcode_normalized                                  String?                 @default(dbgenerated("lower(regexp_replace((barcode)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
   serial_normalized                                   String?                 @default(dbgenerated("lower(regexp_replace((serial_number)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
-  readiness_id                                        Int?
+  readiness_id                                        Int
+  status_id                                           Int
   arrival                                             Arrival?                @relation(fields: [arrival_id], references: [id])
-  AvailabilityStatus                                  AvailabilityStatus      @relation(fields: [availability_status_id], references: [id])
   departure                                           Departure?              @relation(fields: [departure_id], references: [id])
   hold                                                Hold?                   @relation(fields: [hold_id], references: [id])
   Location                                            Location?               @relation(fields: [location_id], references: [id])
   model                                               Model                   @relation(fields: [model_id], references: [id])
   purchase_invoice                                    Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
-  Readiness                                           Readiness?              @relation(fields: [readiness_id], references: [id])
+  Readiness                                           Readiness               @relation(fields: [readiness_id], references: [id])
   sales_invoice                                       Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
+  Status                                              Status                  @relation(fields: [status_id], references: [id])
   asset_accessories                                   AssetAccessory[]
   asset_errors                                        AssetError[]
   asset_transfers                                     AssetTransfer[]
@@ -51,11 +51,11 @@ model Asset {
   @@index([purchase_invoice_id])
   @@index([sales_invoice_id])
   @@index([created_at(sort: Desc)])
-  @@index([availability_status_id])
   @@index([location_id])
   @@index([barcode_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([serial_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([readiness_id])
+  @@index([status_id])
 }
 
 model TechnicalSpecification {
@@ -395,12 +395,6 @@ model AssetType {
   Model      Model[]
 }
 
-model AvailabilityStatus {
-  id     Int     @id @default(autoincrement())
-  status String  @unique
-  Asset  Asset[]
-}
-
 model FileType {
   id   Int    @id @default(autoincrement())
   type String @unique
@@ -454,6 +448,12 @@ model History {
 }
 
 model Readiness {
+  id     Int     @id @default(autoincrement())
+  status String  @unique
+  Asset  Asset[]
+}
+
+model Status {
   id     Int     @id @default(autoincrement())
   status String  @unique
   Asset  Asset[]

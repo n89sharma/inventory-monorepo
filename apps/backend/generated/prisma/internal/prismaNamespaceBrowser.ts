@@ -73,13 +73,13 @@ export const ModelName = {
   Organization: 'Organization',
   Accessory: 'Accessory',
   AssetType: 'AssetType',
-  AvailabilityStatus: 'AvailabilityStatus',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History',
-  Readiness: 'Readiness'
+  Readiness: 'Readiness',
+  Status: 'Status'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -103,7 +103,6 @@ export const AssetScalarFieldEnum = {
   barcode: 'barcode',
   serial_number: 'serial_number',
   model_id: 'model_id',
-  availability_status_id: 'availability_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
   sales_invoice_id: 'sales_invoice_id',
   arrival_id: 'arrival_id',
@@ -113,7 +112,8 @@ export const AssetScalarFieldEnum = {
   location_id: 'location_id',
   barcode_normalized: 'barcode_normalized',
   serial_normalized: 'serial_normalized',
-  readiness_id: 'readiness_id'
+  readiness_id: 'readiness_id',
+  status_id: 'status_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -384,14 +384,6 @@ export const AssetTypeScalarFieldEnum = {
 export type AssetTypeScalarFieldEnum = (typeof AssetTypeScalarFieldEnum)[keyof typeof AssetTypeScalarFieldEnum]
 
 
-export const AvailabilityStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type AvailabilityStatusScalarFieldEnum = (typeof AvailabilityStatusScalarFieldEnum)[keyof typeof AvailabilityStatusScalarFieldEnum]
-
-
 export const FileTypeScalarFieldEnum = {
   id: 'id',
   type: 'type'
@@ -453,6 +445,14 @@ export const ReadinessScalarFieldEnum = {
 } as const
 
 export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
+
+
+export const StatusScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
 
 
 export const SortOrder = {

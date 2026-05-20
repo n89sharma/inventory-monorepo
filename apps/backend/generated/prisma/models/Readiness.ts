@@ -264,9 +264,9 @@ export type ReadinessUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ReadinessNullableScalarRelationFilter = {
-  is?: Prisma.ReadinessWhereInput | null
-  isNot?: Prisma.ReadinessWhereInput | null
+export type ReadinessScalarRelationFilter = {
+  is?: Prisma.ReadinessWhereInput
+  isNot?: Prisma.ReadinessWhereInput
 }
 
 export type ReadinessCountOrderByAggregateInput = {
@@ -298,12 +298,10 @@ export type ReadinessCreateNestedOneWithoutAssetInput = {
   connect?: Prisma.ReadinessWhereUniqueInput
 }
 
-export type ReadinessUpdateOneWithoutAssetNestedInput = {
+export type ReadinessUpdateOneRequiredWithoutAssetNestedInput = {
   create?: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetInput, Prisma.ReadinessUncheckedCreateWithoutAssetInput>
   connectOrCreate?: Prisma.ReadinessCreateOrConnectWithoutAssetInput
   upsert?: Prisma.ReadinessUpsertWithoutAssetInput
-  disconnect?: Prisma.ReadinessWhereInput | boolean
-  delete?: Prisma.ReadinessWhereInput | boolean
   connect?: Prisma.ReadinessWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReadinessUpdateToOneWithWhereWithoutAssetInput, Prisma.ReadinessUpdateWithoutAssetInput>, Prisma.ReadinessUncheckedUpdateWithoutAssetInput>
 }

@@ -5,7 +5,7 @@ select
   m."name" as model,
   b."name" as brand,
   at.asset_type as asset_type,
-  av.status  as availability_status,
+  s.status  as status,
   rd.status  as readiness,
   w.city_code as location_city_code,
   w.street as location_street,
@@ -66,8 +66,8 @@ from "Asset" a
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
-  join "AvailabilityStatus" av on av.id = a.availability_status_id
-  left join "Readiness" rd on rd.id = a.readiness_id
+  join "Status" s on s.id = a.status_id
+  join "Readiness" rd on rd.id = a.readiness_id
   left join "Cost" c on c.asset_id = a.id
   left join "TechnicalSpecification" ts on ts.asset_id = a.id
   left join "Location" l on l.id = a.location_id

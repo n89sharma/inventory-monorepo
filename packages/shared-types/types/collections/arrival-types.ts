@@ -36,7 +36,7 @@ export const CreateAssetSchema = z.object({
   meterBlack: z.number().min(0, "Meter must be positive"),
   meterColour: z.number().min(0, "Meter must be positive"),
   cassettes: z.number().min(0, "Cassettes are required"),
-  readiness: StatusSchema.nullable(),
+  readiness: StatusSchema,
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema)
 })

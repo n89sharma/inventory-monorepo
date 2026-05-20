@@ -11,7 +11,7 @@ import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAsse
 
 
 const arrivalLocation = 'ARRIVAL'
-const arrivalAvailabilityStatus = 'AVAILABLE'
+const arrivalStatus = 'IN_STOCK'
 
 
 const assetIncludeArgs = {
@@ -88,7 +88,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       assets: {
         select: {
           id: true, barcode: true, serial_number: true, model_id: true,
-          availability_status_id: true, readiness_id: true
+          status_id: true, readiness_id: true
         }
       }
     }
@@ -129,8 +129,8 @@ function mapInputAssetToPrismaCreateAsset(
     model: { connect: { id: asset.model.id } },
     Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
     created_at: currentDateTime,
-    AvailabilityStatus: { connect: { status: arrivalAvailabilityStatus } },
-    Readiness: asset.readiness ? { connect: { id: asset.readiness.id } } : undefined,
+    Status: { connect: { status: arrivalStatus } },
+    Readiness: { connect: { id: asset.readiness.id } },
     asset_accessories: {
       create: asset.coreFunctions.map(c => ({ accessory_id: c.id }))
     },
@@ -253,7 +253,7 @@ async function updateArrivalAssetCoreFields(
     data: {
       model_id: asset.model.id,
       serial_number: asset.serialNumber,
-      readiness_id: asset.readiness?.id ?? null,
+      readiness_id: asset.readiness.id,
       technical_specification: {
         update: {
           meter_black: asset.meterBlack,
@@ -320,7 +320,7 @@ export async function updateArrivalAsset(
   }, {
     model_id: asset.model.id,
     serial_number: asset.serialNumber,
-    readiness_id: asset.readiness?.id ?? null,
+    readiness_id: asset.readiness.id,
     meter_black: asset.meterBlack,
     meter_colour: asset.meterColour,
     cassettes: asset.cassettes,
@@ -347,7 +347,7 @@ async function createArrivalAssetInTx(
     },
     select: {
       id: true, barcode: true, serial_number: true, model_id: true,
-      availability_status_id: true, readiness_id: true
+      status_id: true, readiness_id: true
     }
   })
 }

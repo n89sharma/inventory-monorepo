@@ -29,7 +29,6 @@ export type AggregateAsset = {
 export type AssetAvgAggregateOutputType = {
   id: number | null
   model_id: number | null
-  availability_status_id: number | null
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
   arrival_id: number | null
@@ -37,12 +36,12 @@ export type AssetAvgAggregateOutputType = {
   hold_id: number | null
   location_id: number | null
   readiness_id: number | null
+  status_id: number | null
 }
 
 export type AssetSumAggregateOutputType = {
   id: number | null
   model_id: number | null
-  availability_status_id: number | null
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
   arrival_id: number | null
@@ -50,6 +49,7 @@ export type AssetSumAggregateOutputType = {
   hold_id: number | null
   location_id: number | null
   readiness_id: number | null
+  status_id: number | null
 }
 
 export type AssetMinAggregateOutputType = {
@@ -57,7 +57,6 @@ export type AssetMinAggregateOutputType = {
   barcode: string | null
   serial_number: string | null
   model_id: number | null
-  availability_status_id: number | null
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
   arrival_id: number | null
@@ -68,6 +67,7 @@ export type AssetMinAggregateOutputType = {
   barcode_normalized: string | null
   serial_normalized: string | null
   readiness_id: number | null
+  status_id: number | null
 }
 
 export type AssetMaxAggregateOutputType = {
@@ -75,7 +75,6 @@ export type AssetMaxAggregateOutputType = {
   barcode: string | null
   serial_number: string | null
   model_id: number | null
-  availability_status_id: number | null
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
   arrival_id: number | null
@@ -86,6 +85,7 @@ export type AssetMaxAggregateOutputType = {
   barcode_normalized: string | null
   serial_normalized: string | null
   readiness_id: number | null
+  status_id: number | null
 }
 
 export type AssetCountAggregateOutputType = {
@@ -93,7 +93,6 @@ export type AssetCountAggregateOutputType = {
   barcode: number
   serial_number: number
   model_id: number
-  availability_status_id: number
   purchase_invoice_id: number
   sales_invoice_id: number
   arrival_id: number
@@ -104,6 +103,7 @@ export type AssetCountAggregateOutputType = {
   barcode_normalized: number
   serial_normalized: number
   readiness_id: number
+  status_id: number
   _all: number
 }
 
@@ -111,7 +111,6 @@ export type AssetCountAggregateOutputType = {
 export type AssetAvgAggregateInputType = {
   id?: true
   model_id?: true
-  availability_status_id?: true
   purchase_invoice_id?: true
   sales_invoice_id?: true
   arrival_id?: true
@@ -119,12 +118,12 @@ export type AssetAvgAggregateInputType = {
   hold_id?: true
   location_id?: true
   readiness_id?: true
+  status_id?: true
 }
 
 export type AssetSumAggregateInputType = {
   id?: true
   model_id?: true
-  availability_status_id?: true
   purchase_invoice_id?: true
   sales_invoice_id?: true
   arrival_id?: true
@@ -132,6 +131,7 @@ export type AssetSumAggregateInputType = {
   hold_id?: true
   location_id?: true
   readiness_id?: true
+  status_id?: true
 }
 
 export type AssetMinAggregateInputType = {
@@ -139,7 +139,6 @@ export type AssetMinAggregateInputType = {
   barcode?: true
   serial_number?: true
   model_id?: true
-  availability_status_id?: true
   purchase_invoice_id?: true
   sales_invoice_id?: true
   arrival_id?: true
@@ -150,6 +149,7 @@ export type AssetMinAggregateInputType = {
   barcode_normalized?: true
   serial_normalized?: true
   readiness_id?: true
+  status_id?: true
 }
 
 export type AssetMaxAggregateInputType = {
@@ -157,7 +157,6 @@ export type AssetMaxAggregateInputType = {
   barcode?: true
   serial_number?: true
   model_id?: true
-  availability_status_id?: true
   purchase_invoice_id?: true
   sales_invoice_id?: true
   arrival_id?: true
@@ -168,6 +167,7 @@ export type AssetMaxAggregateInputType = {
   barcode_normalized?: true
   serial_normalized?: true
   readiness_id?: true
+  status_id?: true
 }
 
 export type AssetCountAggregateInputType = {
@@ -175,7 +175,6 @@ export type AssetCountAggregateInputType = {
   barcode?: true
   serial_number?: true
   model_id?: true
-  availability_status_id?: true
   purchase_invoice_id?: true
   sales_invoice_id?: true
   arrival_id?: true
@@ -186,6 +185,7 @@ export type AssetCountAggregateInputType = {
   barcode_normalized?: true
   serial_normalized?: true
   readiness_id?: true
+  status_id?: true
   _all?: true
 }
 
@@ -280,7 +280,6 @@ export type AssetGroupByOutputType = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
   arrival_id: number | null
@@ -290,7 +289,8 @@ export type AssetGroupByOutputType = {
   location_id: number | null
   barcode_normalized: string | null
   serial_normalized: string | null
-  readiness_id: number | null
+  readiness_id: number
+  status_id: number
   _count: AssetCountAggregateOutputType | null
   _avg: AssetAvgAggregateOutputType | null
   _sum: AssetSumAggregateOutputType | null
@@ -321,7 +321,6 @@ export type AssetWhereInput = {
   barcode?: Prisma.StringFilter<"Asset"> | string
   serial_number?: Prisma.StringFilter<"Asset"> | string
   model_id?: Prisma.IntFilter<"Asset"> | number
-  availability_status_id?: Prisma.IntFilter<"Asset"> | number
   purchase_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   sales_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   arrival_id?: Prisma.IntNullableFilter<"Asset"> | number | null
@@ -331,16 +330,17 @@ export type AssetWhereInput = {
   location_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
-  readiness_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  readiness_id?: Prisma.IntFilter<"Asset"> | number
+  status_id?: Prisma.IntFilter<"Asset"> | number
   arrival?: Prisma.XOR<Prisma.ArrivalNullableScalarRelationFilter, Prisma.ArrivalWhereInput> | null
-  AvailabilityStatus?: Prisma.XOR<Prisma.AvailabilityStatusScalarRelationFilter, Prisma.AvailabilityStatusWhereInput>
   departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
   hold?: Prisma.XOR<Prisma.HoldNullableScalarRelationFilter, Prisma.HoldWhereInput> | null
   Location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   model?: Prisma.XOR<Prisma.ModelScalarRelationFilter, Prisma.ModelWhereInput>
   purchase_invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
-  Readiness?: Prisma.XOR<Prisma.ReadinessNullableScalarRelationFilter, Prisma.ReadinessWhereInput> | null
+  Readiness?: Prisma.XOR<Prisma.ReadinessScalarRelationFilter, Prisma.ReadinessWhereInput>
   sales_invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
+  Status?: Prisma.XOR<Prisma.StatusScalarRelationFilter, Prisma.StatusWhereInput>
   asset_accessories?: Prisma.AssetAccessoryListRelationFilter
   asset_errors?: Prisma.AssetErrorListRelationFilter
   asset_transfers?: Prisma.AssetTransferListRelationFilter
@@ -357,7 +357,6 @@ export type AssetOrderByWithRelationInput = {
   barcode?: Prisma.SortOrder
   serial_number?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrderInput | Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrderInput | Prisma.SortOrder
   arrival_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -367,9 +366,9 @@ export type AssetOrderByWithRelationInput = {
   location_id?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   serial_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
-  readiness_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
   arrival?: Prisma.ArrivalOrderByWithRelationInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusOrderByWithRelationInput
   departure?: Prisma.DepartureOrderByWithRelationInput
   hold?: Prisma.HoldOrderByWithRelationInput
   Location?: Prisma.LocationOrderByWithRelationInput
@@ -377,6 +376,7 @@ export type AssetOrderByWithRelationInput = {
   purchase_invoice?: Prisma.InvoiceOrderByWithRelationInput
   Readiness?: Prisma.ReadinessOrderByWithRelationInput
   sales_invoice?: Prisma.InvoiceOrderByWithRelationInput
+  Status?: Prisma.StatusOrderByWithRelationInput
   asset_accessories?: Prisma.AssetAccessoryOrderByRelationAggregateInput
   asset_errors?: Prisma.AssetErrorOrderByRelationAggregateInput
   asset_transfers?: Prisma.AssetTransferOrderByRelationAggregateInput
@@ -396,7 +396,6 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AssetWhereInput | Prisma.AssetWhereInput[]
   serial_number?: Prisma.StringFilter<"Asset"> | string
   model_id?: Prisma.IntFilter<"Asset"> | number
-  availability_status_id?: Prisma.IntFilter<"Asset"> | number
   purchase_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   sales_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   arrival_id?: Prisma.IntNullableFilter<"Asset"> | number | null
@@ -406,16 +405,17 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   location_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
-  readiness_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  readiness_id?: Prisma.IntFilter<"Asset"> | number
+  status_id?: Prisma.IntFilter<"Asset"> | number
   arrival?: Prisma.XOR<Prisma.ArrivalNullableScalarRelationFilter, Prisma.ArrivalWhereInput> | null
-  AvailabilityStatus?: Prisma.XOR<Prisma.AvailabilityStatusScalarRelationFilter, Prisma.AvailabilityStatusWhereInput>
   departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
   hold?: Prisma.XOR<Prisma.HoldNullableScalarRelationFilter, Prisma.HoldWhereInput> | null
   Location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   model?: Prisma.XOR<Prisma.ModelScalarRelationFilter, Prisma.ModelWhereInput>
   purchase_invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
-  Readiness?: Prisma.XOR<Prisma.ReadinessNullableScalarRelationFilter, Prisma.ReadinessWhereInput> | null
+  Readiness?: Prisma.XOR<Prisma.ReadinessScalarRelationFilter, Prisma.ReadinessWhereInput>
   sales_invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
+  Status?: Prisma.XOR<Prisma.StatusScalarRelationFilter, Prisma.StatusWhereInput>
   asset_accessories?: Prisma.AssetAccessoryListRelationFilter
   asset_errors?: Prisma.AssetErrorListRelationFilter
   asset_transfers?: Prisma.AssetTransferListRelationFilter
@@ -432,7 +432,6 @@ export type AssetOrderByWithAggregationInput = {
   barcode?: Prisma.SortOrder
   serial_number?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrderInput | Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrderInput | Prisma.SortOrder
   arrival_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -442,7 +441,8 @@ export type AssetOrderByWithAggregationInput = {
   location_id?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   serial_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
-  readiness_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
   _count?: Prisma.AssetCountOrderByAggregateInput
   _avg?: Prisma.AssetAvgOrderByAggregateInput
   _max?: Prisma.AssetMaxOrderByAggregateInput
@@ -458,7 +458,6 @@ export type AssetScalarWhereWithAggregatesInput = {
   barcode?: Prisma.StringWithAggregatesFilter<"Asset"> | string
   serial_number?: Prisma.StringWithAggregatesFilter<"Asset"> | string
   model_id?: Prisma.IntWithAggregatesFilter<"Asset"> | number
-  availability_status_id?: Prisma.IntWithAggregatesFilter<"Asset"> | number
   purchase_invoice_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
   sales_invoice_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
   arrival_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
@@ -468,7 +467,8 @@ export type AssetScalarWhereWithAggregatesInput = {
   location_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
   barcode_normalized?: Prisma.StringNullableWithAggregatesFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableWithAggregatesFilter<"Asset"> | string | null
-  readiness_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
+  readiness_id?: Prisma.IntWithAggregatesFilter<"Asset"> | number
+  status_id?: Prisma.IntWithAggregatesFilter<"Asset"> | number
 }
 
 export type AssetCreateInput = {
@@ -478,14 +478,14 @@ export type AssetCreateInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -502,7 +502,6 @@ export type AssetUncheckedCreateInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -512,7 +511,8 @@ export type AssetUncheckedCreateInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -531,14 +531,14 @@ export type AssetUpdateInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -555,7 +555,6 @@ export type AssetUncheckedUpdateInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -565,7 +564,8 @@ export type AssetUncheckedUpdateInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -582,7 +582,6 @@ export type AssetCreateManyInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -592,7 +591,8 @@ export type AssetCreateManyInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateManyMutationInput = {
@@ -608,7 +608,6 @@ export type AssetUncheckedUpdateManyInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -618,7 +617,8 @@ export type AssetUncheckedUpdateManyInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCountOrderByAggregateInput = {
@@ -626,7 +626,6 @@ export type AssetCountOrderByAggregateInput = {
   barcode?: Prisma.SortOrder
   serial_number?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrder
   arrival_id?: Prisma.SortOrder
@@ -637,12 +636,12 @@ export type AssetCountOrderByAggregateInput = {
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
   readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
 }
 
 export type AssetAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrder
   arrival_id?: Prisma.SortOrder
@@ -650,6 +649,7 @@ export type AssetAvgOrderByAggregateInput = {
   hold_id?: Prisma.SortOrder
   location_id?: Prisma.SortOrder
   readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
 }
 
 export type AssetMaxOrderByAggregateInput = {
@@ -657,7 +657,6 @@ export type AssetMaxOrderByAggregateInput = {
   barcode?: Prisma.SortOrder
   serial_number?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrder
   arrival_id?: Prisma.SortOrder
@@ -668,6 +667,7 @@ export type AssetMaxOrderByAggregateInput = {
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
   readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
 }
 
 export type AssetMinOrderByAggregateInput = {
@@ -675,7 +675,6 @@ export type AssetMinOrderByAggregateInput = {
   barcode?: Prisma.SortOrder
   serial_number?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrder
   arrival_id?: Prisma.SortOrder
@@ -686,12 +685,12 @@ export type AssetMinOrderByAggregateInput = {
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
   readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
 }
 
 export type AssetSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   model_id?: Prisma.SortOrder
-  availability_status_id?: Prisma.SortOrder
   purchase_invoice_id?: Prisma.SortOrder
   sales_invoice_id?: Prisma.SortOrder
   arrival_id?: Prisma.SortOrder
@@ -699,6 +698,7 @@ export type AssetSumOrderByAggregateInput = {
   hold_id?: Prisma.SortOrder
   location_id?: Prisma.SortOrder
   readiness_id?: Prisma.SortOrder
+  status_id?: Prisma.SortOrder
 }
 
 export type AssetScalarRelationFilter = {
@@ -1136,48 +1136,6 @@ export type AssetUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AssetUpdateToOneWithWhereWithoutCommentsInput, Prisma.AssetUpdateWithoutCommentsInput>, Prisma.AssetUncheckedUpdateWithoutCommentsInput>
 }
 
-export type AssetCreateNestedManyWithoutAvailabilityStatusInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput> | Prisma.AssetCreateWithoutAvailabilityStatusInput[] | Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput[]
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput | Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput[]
-  createMany?: Prisma.AssetCreateManyAvailabilityStatusInputEnvelope
-  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-}
-
-export type AssetUncheckedCreateNestedManyWithoutAvailabilityStatusInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput> | Prisma.AssetCreateWithoutAvailabilityStatusInput[] | Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput[]
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput | Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput[]
-  createMany?: Prisma.AssetCreateManyAvailabilityStatusInputEnvelope
-  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-}
-
-export type AssetUpdateManyWithoutAvailabilityStatusNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput> | Prisma.AssetCreateWithoutAvailabilityStatusInput[] | Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput[]
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput | Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput[]
-  upsert?: Prisma.AssetUpsertWithWhereUniqueWithoutAvailabilityStatusInput | Prisma.AssetUpsertWithWhereUniqueWithoutAvailabilityStatusInput[]
-  createMany?: Prisma.AssetCreateManyAvailabilityStatusInputEnvelope
-  set?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  disconnect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  delete?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  update?: Prisma.AssetUpdateWithWhereUniqueWithoutAvailabilityStatusInput | Prisma.AssetUpdateWithWhereUniqueWithoutAvailabilityStatusInput[]
-  updateMany?: Prisma.AssetUpdateManyWithWhereWithoutAvailabilityStatusInput | Prisma.AssetUpdateManyWithWhereWithoutAvailabilityStatusInput[]
-  deleteMany?: Prisma.AssetScalarWhereInput | Prisma.AssetScalarWhereInput[]
-}
-
-export type AssetUncheckedUpdateManyWithoutAvailabilityStatusNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput> | Prisma.AssetCreateWithoutAvailabilityStatusInput[] | Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput[]
-  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput | Prisma.AssetCreateOrConnectWithoutAvailabilityStatusInput[]
-  upsert?: Prisma.AssetUpsertWithWhereUniqueWithoutAvailabilityStatusInput | Prisma.AssetUpsertWithWhereUniqueWithoutAvailabilityStatusInput[]
-  createMany?: Prisma.AssetCreateManyAvailabilityStatusInputEnvelope
-  set?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  disconnect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  delete?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
-  update?: Prisma.AssetUpdateWithWhereUniqueWithoutAvailabilityStatusInput | Prisma.AssetUpdateWithWhereUniqueWithoutAvailabilityStatusInput[]
-  updateMany?: Prisma.AssetUpdateManyWithWhereWithoutAvailabilityStatusInput | Prisma.AssetUpdateManyWithWhereWithoutAvailabilityStatusInput[]
-  deleteMany?: Prisma.AssetScalarWhereInput | Prisma.AssetScalarWhereInput[]
-}
-
 export type AssetCreateNestedOneWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInput = {
   create?: Prisma.XOR<Prisma.AssetCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInput, Prisma.AssetUncheckedCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInput>
   connectOrCreate?: Prisma.AssetCreateOrConnectWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInput
@@ -1248,6 +1206,48 @@ export type AssetUncheckedUpdateManyWithoutReadinessNestedInput = {
   deleteMany?: Prisma.AssetScalarWhereInput | Prisma.AssetScalarWhereInput[]
 }
 
+export type AssetCreateNestedManyWithoutStatusInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput> | Prisma.AssetCreateWithoutStatusInput[] | Prisma.AssetUncheckedCreateWithoutStatusInput[]
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutStatusInput | Prisma.AssetCreateOrConnectWithoutStatusInput[]
+  createMany?: Prisma.AssetCreateManyStatusInputEnvelope
+  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+}
+
+export type AssetUncheckedCreateNestedManyWithoutStatusInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput> | Prisma.AssetCreateWithoutStatusInput[] | Prisma.AssetUncheckedCreateWithoutStatusInput[]
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutStatusInput | Prisma.AssetCreateOrConnectWithoutStatusInput[]
+  createMany?: Prisma.AssetCreateManyStatusInputEnvelope
+  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+}
+
+export type AssetUpdateManyWithoutStatusNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput> | Prisma.AssetCreateWithoutStatusInput[] | Prisma.AssetUncheckedCreateWithoutStatusInput[]
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutStatusInput | Prisma.AssetCreateOrConnectWithoutStatusInput[]
+  upsert?: Prisma.AssetUpsertWithWhereUniqueWithoutStatusInput | Prisma.AssetUpsertWithWhereUniqueWithoutStatusInput[]
+  createMany?: Prisma.AssetCreateManyStatusInputEnvelope
+  set?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  disconnect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  delete?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  update?: Prisma.AssetUpdateWithWhereUniqueWithoutStatusInput | Prisma.AssetUpdateWithWhereUniqueWithoutStatusInput[]
+  updateMany?: Prisma.AssetUpdateManyWithWhereWithoutStatusInput | Prisma.AssetUpdateManyWithWhereWithoutStatusInput[]
+  deleteMany?: Prisma.AssetScalarWhereInput | Prisma.AssetScalarWhereInput[]
+}
+
+export type AssetUncheckedUpdateManyWithoutStatusNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput> | Prisma.AssetCreateWithoutStatusInput[] | Prisma.AssetUncheckedCreateWithoutStatusInput[]
+  connectOrCreate?: Prisma.AssetCreateOrConnectWithoutStatusInput | Prisma.AssetCreateOrConnectWithoutStatusInput[]
+  upsert?: Prisma.AssetUpsertWithWhereUniqueWithoutStatusInput | Prisma.AssetUpsertWithWhereUniqueWithoutStatusInput[]
+  createMany?: Prisma.AssetCreateManyStatusInputEnvelope
+  set?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  disconnect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  delete?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  connect?: Prisma.AssetWhereUniqueInput | Prisma.AssetWhereUniqueInput[]
+  update?: Prisma.AssetUpdateWithWhereUniqueWithoutStatusInput | Prisma.AssetUpdateWithWhereUniqueWithoutStatusInput[]
+  updateMany?: Prisma.AssetUpdateManyWithWhereWithoutStatusInput | Prisma.AssetUpdateManyWithWhereWithoutStatusInput[]
+  deleteMany?: Prisma.AssetScalarWhereInput | Prisma.AssetScalarWhereInput[]
+}
+
 export type AssetCreateWithoutTechnical_specificationInput = {
   barcode: string
   serial_number: string
@@ -1255,14 +1255,14 @@ export type AssetCreateWithoutTechnical_specificationInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -1278,7 +1278,6 @@ export type AssetUncheckedCreateWithoutTechnical_specificationInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1288,7 +1287,8 @@ export type AssetUncheckedCreateWithoutTechnical_specificationInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -1322,14 +1322,14 @@ export type AssetUpdateWithoutTechnical_specificationInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -1345,7 +1345,6 @@ export type AssetUncheckedUpdateWithoutTechnical_specificationInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1355,7 +1354,8 @@ export type AssetUncheckedUpdateWithoutTechnical_specificationInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -1373,14 +1373,14 @@ export type AssetCreateWithoutCostInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -1396,7 +1396,6 @@ export type AssetUncheckedCreateWithoutCostInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1406,7 +1405,8 @@ export type AssetUncheckedCreateWithoutCostInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -1440,14 +1440,14 @@ export type AssetUpdateWithoutCostInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -1463,7 +1463,6 @@ export type AssetUncheckedUpdateWithoutCostInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1473,7 +1472,8 @@ export type AssetUncheckedUpdateWithoutCostInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -1491,14 +1491,14 @@ export type AssetCreateWithoutAsset_accessoriesInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
@@ -1514,7 +1514,6 @@ export type AssetUncheckedCreateWithoutAsset_accessoriesInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1524,7 +1523,8 @@ export type AssetUncheckedCreateWithoutAsset_accessoriesInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1558,14 +1558,14 @@ export type AssetUpdateWithoutAsset_accessoriesInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
@@ -1581,7 +1581,6 @@ export type AssetUncheckedUpdateWithoutAsset_accessoriesInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1591,7 +1590,8 @@ export type AssetUncheckedUpdateWithoutAsset_accessoriesInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1609,14 +1609,14 @@ export type AssetCreateWithoutAsset_errorsInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
@@ -1632,7 +1632,6 @@ export type AssetUncheckedCreateWithoutAsset_errorsInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1642,7 +1641,8 @@ export type AssetUncheckedCreateWithoutAsset_errorsInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1676,14 +1676,14 @@ export type AssetUpdateWithoutAsset_errorsInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
@@ -1699,7 +1699,6 @@ export type AssetUncheckedUpdateWithoutAsset_errorsInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1709,7 +1708,8 @@ export type AssetUncheckedUpdateWithoutAsset_errorsInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1727,14 +1727,14 @@ export type AssetCreateWithoutAsset_transfersInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
@@ -1750,7 +1750,6 @@ export type AssetUncheckedCreateWithoutAsset_transfersInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1760,7 +1759,8 @@ export type AssetUncheckedCreateWithoutAsset_transfersInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1794,14 +1794,14 @@ export type AssetUpdateWithoutAsset_transfersInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
@@ -1817,7 +1817,6 @@ export type AssetUncheckedUpdateWithoutAsset_transfersInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1827,7 +1826,8 @@ export type AssetUncheckedUpdateWithoutAsset_transfersInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1844,14 +1844,14 @@ export type AssetCreateWithoutArrivalInput = {
   created_at: Date | string
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -1868,7 +1868,6 @@ export type AssetUncheckedCreateWithoutArrivalInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   departure_id?: number | null
@@ -1877,7 +1876,8 @@ export type AssetUncheckedCreateWithoutArrivalInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -1923,7 +1923,6 @@ export type AssetScalarWhereInput = {
   barcode?: Prisma.StringFilter<"Asset"> | string
   serial_number?: Prisma.StringFilter<"Asset"> | string
   model_id?: Prisma.IntFilter<"Asset"> | number
-  availability_status_id?: Prisma.IntFilter<"Asset"> | number
   purchase_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   sales_invoice_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   arrival_id?: Prisma.IntNullableFilter<"Asset"> | number | null
@@ -1933,7 +1932,8 @@ export type AssetScalarWhereInput = {
   location_id?: Prisma.IntNullableFilter<"Asset"> | number | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
-  readiness_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  readiness_id?: Prisma.IntFilter<"Asset"> | number
+  status_id?: Prisma.IntFilter<"Asset"> | number
 }
 
 export type AssetCreateWithoutDepartureInput = {
@@ -1943,13 +1943,13 @@ export type AssetCreateWithoutDepartureInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -1966,7 +1966,6 @@ export type AssetUncheckedCreateWithoutDepartureInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -1975,7 +1974,8 @@ export type AssetUncheckedCreateWithoutDepartureInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2020,13 +2020,13 @@ export type AssetCreateWithoutHoldInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2043,7 +2043,6 @@ export type AssetUncheckedCreateWithoutHoldInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2052,7 +2051,8 @@ export type AssetUncheckedCreateWithoutHoldInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2097,13 +2097,13 @@ export type AssetCreateWithoutPurchase_invoiceInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2120,7 +2120,6 @@ export type AssetUncheckedCreateWithoutPurchase_invoiceInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   sales_invoice_id?: number | null
   arrival_id?: number | null
   departure_id?: number | null
@@ -2129,7 +2128,8 @@ export type AssetUncheckedCreateWithoutPurchase_invoiceInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2158,13 +2158,13 @@ export type AssetCreateWithoutSales_invoiceInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2181,7 +2181,6 @@ export type AssetUncheckedCreateWithoutSales_invoiceInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   arrival_id?: number | null
   departure_id?: number | null
@@ -2190,7 +2189,8 @@ export type AssetUncheckedCreateWithoutSales_invoiceInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2251,13 +2251,13 @@ export type AssetCreateWithoutLocationInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2274,7 +2274,6 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2283,7 +2282,8 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   created_at: Date | string
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2328,13 +2328,13 @@ export type AssetCreateWithoutModelInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2350,7 +2350,6 @@ export type AssetUncheckedCreateWithoutModelInput = {
   id?: number
   barcode: string
   serial_number: string
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2360,7 +2359,8 @@ export type AssetUncheckedCreateWithoutModelInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2405,14 +2405,14 @@ export type AssetCreateWithoutFilesInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2428,7 +2428,6 @@ export type AssetUncheckedCreateWithoutFilesInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2438,7 +2437,8 @@ export type AssetUncheckedCreateWithoutFilesInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2472,14 +2472,14 @@ export type AssetUpdateWithoutFilesInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -2495,7 +2495,6 @@ export type AssetUncheckedUpdateWithoutFilesInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2505,7 +2504,8 @@ export type AssetUncheckedUpdateWithoutFilesInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2523,14 +2523,14 @@ export type AssetCreateWithoutCommentsInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2546,7 +2546,6 @@ export type AssetUncheckedCreateWithoutCommentsInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2556,7 +2555,8 @@ export type AssetUncheckedCreateWithoutCommentsInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2590,14 +2590,14 @@ export type AssetUpdateWithoutCommentsInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -2613,7 +2613,6 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2623,7 +2622,8 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2634,83 +2634,6 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   technical_specification?: Prisma.TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput
 }
 
-export type AssetCreateWithoutAvailabilityStatusInput = {
-  barcode: string
-  serial_number: string
-  created_at: Date | string
-  barcode_normalized?: string | null
-  serial_normalized?: string | null
-  arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
-  hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
-  Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
-  model: Prisma.ModelCreateNestedOneWithoutAssetsInput
-  purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
-  sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
-  asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
-  asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
-  asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
-  comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
-  cost?: Prisma.CostCreateNestedOneWithoutAssetInput
-  files?: Prisma.FileCreateNestedManyWithoutAssetInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
-  technical_specification?: Prisma.TechnicalSpecificationCreateNestedOneWithoutAssetInput
-}
-
-export type AssetUncheckedCreateWithoutAvailabilityStatusInput = {
-  id?: number
-  barcode: string
-  serial_number: string
-  model_id: number
-  purchase_invoice_id?: number | null
-  sales_invoice_id?: number | null
-  arrival_id?: number | null
-  departure_id?: number | null
-  hold_id?: number | null
-  created_at: Date | string
-  location_id?: number | null
-  barcode_normalized?: string | null
-  serial_normalized?: string | null
-  readiness_id?: number | null
-  asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
-  asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
-  asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
-  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
-  cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
-  files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
-  technical_specification?: Prisma.TechnicalSpecificationUncheckedCreateNestedOneWithoutAssetInput
-}
-
-export type AssetCreateOrConnectWithoutAvailabilityStatusInput = {
-  where: Prisma.AssetWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput>
-}
-
-export type AssetCreateManyAvailabilityStatusInputEnvelope = {
-  data: Prisma.AssetCreateManyAvailabilityStatusInput | Prisma.AssetCreateManyAvailabilityStatusInput[]
-  skipDuplicates?: boolean
-}
-
-export type AssetUpsertWithWhereUniqueWithoutAvailabilityStatusInput = {
-  where: Prisma.AssetWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetUpdateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedUpdateWithoutAvailabilityStatusInput>
-  create: Prisma.XOR<Prisma.AssetCreateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedCreateWithoutAvailabilityStatusInput>
-}
-
-export type AssetUpdateWithWhereUniqueWithoutAvailabilityStatusInput = {
-  where: Prisma.AssetWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetUpdateWithoutAvailabilityStatusInput, Prisma.AssetUncheckedUpdateWithoutAvailabilityStatusInput>
-}
-
-export type AssetUpdateManyWithWhereWithoutAvailabilityStatusInput = {
-  where: Prisma.AssetScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetUpdateManyMutationInput, Prisma.AssetUncheckedUpdateManyWithoutAvailabilityStatusInput>
-}
-
 export type AssetCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInput = {
   barcode: string
   serial_number: string
@@ -2718,14 +2641,14 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2741,7 +2664,6 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_donor_asset_idT
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2751,7 +2673,8 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_donor_asset_idT
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2774,14 +2697,14 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
-  Readiness?: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2797,7 +2720,6 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_recipient_asset
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2807,7 +2729,8 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_recipient_asset
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2841,14 +2764,14 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -2864,7 +2787,6 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_donor_asset_idT
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2874,7 +2796,8 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_donor_asset_idT
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2903,14 +2826,14 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -2926,7 +2849,6 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_recipient_asset
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2936,7 +2858,8 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_recipient_asset
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2954,13 +2877,13 @@ export type AssetCreateWithoutReadinessInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
-  AvailabilityStatus: Prisma.AvailabilityStatusCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
   Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
   model: Prisma.ModelCreateNestedOneWithoutAssetsInput
   purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
   sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  Status: Prisma.StatusCreateNestedOneWithoutAssetInput
   asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
@@ -2977,7 +2900,6 @@ export type AssetUncheckedCreateWithoutReadinessInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -2987,6 +2909,7 @@ export type AssetUncheckedCreateWithoutReadinessInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
+  status_id: number
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -3024,12 +2947,88 @@ export type AssetUpdateManyWithWhereWithoutReadinessInput = {
   data: Prisma.XOR<Prisma.AssetUpdateManyMutationInput, Prisma.AssetUncheckedUpdateManyWithoutReadinessInput>
 }
 
+export type AssetCreateWithoutStatusInput = {
+  barcode: string
+  serial_number: string
+  created_at: Date | string
+  barcode_normalized?: string | null
+  serial_normalized?: string | null
+  arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
+  hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
+  Location?: Prisma.LocationCreateNestedOneWithoutAssetInput
+  model: Prisma.ModelCreateNestedOneWithoutAssetsInput
+  purchase_invoice?: Prisma.InvoiceCreateNestedOneWithoutPurchase_assetsInput
+  Readiness: Prisma.ReadinessCreateNestedOneWithoutAssetInput
+  sales_invoice?: Prisma.InvoiceCreateNestedOneWithoutSales_assetsInput
+  asset_accessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAssetInput
+  asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutAssetInput
+  asset_transfers?: Prisma.AssetTransferCreateNestedManyWithoutAssetInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAssetInput
+  cost?: Prisma.CostCreateNestedOneWithoutAssetInput
+  files?: Prisma.FileCreateNestedManyWithoutAssetInput
+  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
+  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
+  technical_specification?: Prisma.TechnicalSpecificationCreateNestedOneWithoutAssetInput
+}
+
+export type AssetUncheckedCreateWithoutStatusInput = {
+  id?: number
+  barcode: string
+  serial_number: string
+  model_id: number
+  purchase_invoice_id?: number | null
+  sales_invoice_id?: number | null
+  arrival_id?: number | null
+  departure_id?: number | null
+  hold_id?: number | null
+  created_at: Date | string
+  location_id?: number | null
+  barcode_normalized?: string | null
+  serial_normalized?: string | null
+  readiness_id: number
+  asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
+  asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
+  asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
+  cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutAssetInput
+  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_donor_asset_idToAssetInput
+  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedCreateNestedManyWithoutAsset_PartTransfer_recipient_asset_idToAssetInput
+  technical_specification?: Prisma.TechnicalSpecificationUncheckedCreateNestedOneWithoutAssetInput
+}
+
+export type AssetCreateOrConnectWithoutStatusInput = {
+  where: Prisma.AssetWhereUniqueInput
+  create: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput>
+}
+
+export type AssetCreateManyStatusInputEnvelope = {
+  data: Prisma.AssetCreateManyStatusInput | Prisma.AssetCreateManyStatusInput[]
+  skipDuplicates?: boolean
+}
+
+export type AssetUpsertWithWhereUniqueWithoutStatusInput = {
+  where: Prisma.AssetWhereUniqueInput
+  update: Prisma.XOR<Prisma.AssetUpdateWithoutStatusInput, Prisma.AssetUncheckedUpdateWithoutStatusInput>
+  create: Prisma.XOR<Prisma.AssetCreateWithoutStatusInput, Prisma.AssetUncheckedCreateWithoutStatusInput>
+}
+
+export type AssetUpdateWithWhereUniqueWithoutStatusInput = {
+  where: Prisma.AssetWhereUniqueInput
+  data: Prisma.XOR<Prisma.AssetUpdateWithoutStatusInput, Prisma.AssetUncheckedUpdateWithoutStatusInput>
+}
+
+export type AssetUpdateManyWithWhereWithoutStatusInput = {
+  where: Prisma.AssetScalarWhereInput
+  data: Prisma.XOR<Prisma.AssetUpdateManyMutationInput, Prisma.AssetUncheckedUpdateManyWithoutStatusInput>
+}
+
 export type AssetCreateManyArrivalInput = {
   id?: number
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   departure_id?: number | null
@@ -3038,7 +3037,8 @@ export type AssetCreateManyArrivalInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutArrivalInput = {
@@ -3047,14 +3047,14 @@ export type AssetUpdateWithoutArrivalInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3071,7 +3071,6 @@ export type AssetUncheckedUpdateWithoutArrivalInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3080,7 +3079,8 @@ export type AssetUncheckedUpdateWithoutArrivalInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3097,7 +3097,6 @@ export type AssetUncheckedUpdateManyWithoutArrivalInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3106,7 +3105,8 @@ export type AssetUncheckedUpdateManyWithoutArrivalInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyDepartureInput = {
@@ -3114,7 +3114,6 @@ export type AssetCreateManyDepartureInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -3123,7 +3122,8 @@ export type AssetCreateManyDepartureInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutDepartureInput = {
@@ -3133,13 +3133,13 @@ export type AssetUpdateWithoutDepartureInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3156,7 +3156,6 @@ export type AssetUncheckedUpdateWithoutDepartureInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3165,7 +3164,8 @@ export type AssetUncheckedUpdateWithoutDepartureInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3182,7 +3182,6 @@ export type AssetUncheckedUpdateManyWithoutDepartureInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3191,7 +3190,8 @@ export type AssetUncheckedUpdateManyWithoutDepartureInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyHoldInput = {
@@ -3199,7 +3199,6 @@ export type AssetCreateManyHoldInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -3208,7 +3207,8 @@ export type AssetCreateManyHoldInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutHoldInput = {
@@ -3218,13 +3218,13 @@ export type AssetUpdateWithoutHoldInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3241,7 +3241,6 @@ export type AssetUncheckedUpdateWithoutHoldInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3250,7 +3249,8 @@ export type AssetUncheckedUpdateWithoutHoldInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3267,7 +3267,6 @@ export type AssetUncheckedUpdateManyWithoutHoldInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3276,7 +3275,8 @@ export type AssetUncheckedUpdateManyWithoutHoldInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyPurchase_invoiceInput = {
@@ -3284,7 +3284,6 @@ export type AssetCreateManyPurchase_invoiceInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   sales_invoice_id?: number | null
   arrival_id?: number | null
   departure_id?: number | null
@@ -3293,7 +3292,8 @@ export type AssetCreateManyPurchase_invoiceInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetCreateManySales_invoiceInput = {
@@ -3301,7 +3301,6 @@ export type AssetCreateManySales_invoiceInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   arrival_id?: number | null
   departure_id?: number | null
@@ -3310,7 +3309,8 @@ export type AssetCreateManySales_invoiceInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutPurchase_invoiceInput = {
@@ -3320,13 +3320,13 @@ export type AssetUpdateWithoutPurchase_invoiceInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3343,7 +3343,6 @@ export type AssetUncheckedUpdateWithoutPurchase_invoiceInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3352,7 +3351,8 @@ export type AssetUncheckedUpdateWithoutPurchase_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3369,7 +3369,6 @@ export type AssetUncheckedUpdateManyWithoutPurchase_invoiceInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3378,7 +3377,8 @@ export type AssetUncheckedUpdateManyWithoutPurchase_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetUpdateWithoutSales_invoiceInput = {
@@ -3388,13 +3388,13 @@ export type AssetUpdateWithoutSales_invoiceInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3411,7 +3411,6 @@ export type AssetUncheckedUpdateWithoutSales_invoiceInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3420,7 +3419,8 @@ export type AssetUncheckedUpdateWithoutSales_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3437,7 +3437,6 @@ export type AssetUncheckedUpdateManyWithoutSales_invoiceInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3446,7 +3445,8 @@ export type AssetUncheckedUpdateManyWithoutSales_invoiceInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyLocationInput = {
@@ -3454,7 +3454,6 @@ export type AssetCreateManyLocationInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -3463,7 +3462,8 @@ export type AssetCreateManyLocationInput = {
   created_at: Date | string
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutLocationInput = {
@@ -3473,13 +3473,13 @@ export type AssetUpdateWithoutLocationInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3496,7 +3496,6 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3505,7 +3504,8 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3522,7 +3522,6 @@ export type AssetUncheckedUpdateManyWithoutLocationInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3531,14 +3530,14 @@ export type AssetUncheckedUpdateManyWithoutLocationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyModelInput = {
   id?: number
   barcode: string
   serial_number: string
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -3548,7 +3547,8 @@ export type AssetCreateManyModelInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
-  readiness_id?: number | null
+  readiness_id: number
+  status_id: number
 }
 
 export type AssetUpdateWithoutModelInput = {
@@ -3558,13 +3558,13 @@ export type AssetUpdateWithoutModelInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3580,7 +3580,6 @@ export type AssetUncheckedUpdateWithoutModelInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3590,7 +3589,8 @@ export type AssetUncheckedUpdateWithoutModelInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3606,7 +3606,6 @@ export type AssetUncheckedUpdateManyWithoutModelInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3616,92 +3615,8 @@ export type AssetUncheckedUpdateManyWithoutModelInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-}
-
-export type AssetCreateManyAvailabilityStatusInput = {
-  id?: number
-  barcode: string
-  serial_number: string
-  model_id: number
-  purchase_invoice_id?: number | null
-  sales_invoice_id?: number | null
-  arrival_id?: number | null
-  departure_id?: number | null
-  hold_id?: number | null
-  created_at: Date | string
-  location_id?: number | null
-  barcode_normalized?: string | null
-  serial_normalized?: string | null
-  readiness_id?: number | null
-}
-
-export type AssetUpdateWithoutAvailabilityStatusInput = {
-  barcode?: Prisma.StringFieldUpdateOperationsInput | string
-  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
-  hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
-  Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
-  model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
-  purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
-  Readiness?: Prisma.ReadinessUpdateOneWithoutAssetNestedInput
-  sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
-  asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
-  asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
-  asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
-  comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
-  cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
-  files?: Prisma.FileUpdateManyWithoutAssetNestedInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
-  technical_specification?: Prisma.TechnicalSpecificationUpdateOneWithoutAssetNestedInput
-}
-
-export type AssetUncheckedUpdateWithoutAvailabilityStatusInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  barcode?: Prisma.StringFieldUpdateOperationsInput | string
-  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hold_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
-  asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
-  asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
-  comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
-  cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
-  files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
-  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
-  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
-  technical_specification?: Prisma.TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput
-}
-
-export type AssetUncheckedUpdateManyWithoutAvailabilityStatusInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  barcode?: Prisma.StringFieldUpdateOperationsInput | string
-  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
-  model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  hold_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  readiness_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type AssetCreateManyReadinessInput = {
@@ -3709,7 +3624,6 @@ export type AssetCreateManyReadinessInput = {
   barcode: string
   serial_number: string
   model_id: number
-  availability_status_id: number
   purchase_invoice_id?: number | null
   sales_invoice_id?: number | null
   arrival_id?: number | null
@@ -3719,6 +3633,7 @@ export type AssetCreateManyReadinessInput = {
   location_id?: number | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
+  status_id: number
 }
 
 export type AssetUpdateWithoutReadinessInput = {
@@ -3728,13 +3643,13 @@ export type AssetUpdateWithoutReadinessInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
-  AvailabilityStatus?: Prisma.AvailabilityStatusUpdateOneRequiredWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
   Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
   model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
   purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
   sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  Status?: Prisma.StatusUpdateOneRequiredWithoutAssetNestedInput
   asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
@@ -3751,7 +3666,6 @@ export type AssetUncheckedUpdateWithoutReadinessInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3761,6 +3675,7 @@ export type AssetUncheckedUpdateWithoutReadinessInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3777,7 +3692,6 @@ export type AssetUncheckedUpdateManyWithoutReadinessInput = {
   barcode?: Prisma.StringFieldUpdateOperationsInput | string
   serial_number?: Prisma.StringFieldUpdateOperationsInput | string
   model_id?: Prisma.IntFieldUpdateOperationsInput | number
-  availability_status_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3787,6 +3701,92 @@ export type AssetUncheckedUpdateManyWithoutReadinessInput = {
   location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_id?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type AssetCreateManyStatusInput = {
+  id?: number
+  barcode: string
+  serial_number: string
+  model_id: number
+  purchase_invoice_id?: number | null
+  sales_invoice_id?: number | null
+  arrival_id?: number | null
+  departure_id?: number | null
+  hold_id?: number | null
+  created_at: Date | string
+  location_id?: number | null
+  barcode_normalized?: string | null
+  serial_normalized?: string | null
+  readiness_id: number
+}
+
+export type AssetUpdateWithoutStatusInput = {
+  barcode?: Prisma.StringFieldUpdateOperationsInput | string
+  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
+  hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
+  Location?: Prisma.LocationUpdateOneWithoutAssetNestedInput
+  model?: Prisma.ModelUpdateOneRequiredWithoutAssetsNestedInput
+  purchase_invoice?: Prisma.InvoiceUpdateOneWithoutPurchase_assetsNestedInput
+  Readiness?: Prisma.ReadinessUpdateOneRequiredWithoutAssetNestedInput
+  sales_invoice?: Prisma.InvoiceUpdateOneWithoutSales_assetsNestedInput
+  asset_accessories?: Prisma.AssetAccessoryUpdateManyWithoutAssetNestedInput
+  asset_errors?: Prisma.AssetErrorUpdateManyWithoutAssetNestedInput
+  asset_transfers?: Prisma.AssetTransferUpdateManyWithoutAssetNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAssetNestedInput
+  cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
+  files?: Prisma.FileUpdateManyWithoutAssetNestedInput
+  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
+  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
+  technical_specification?: Prisma.TechnicalSpecificationUpdateOneWithoutAssetNestedInput
+}
+
+export type AssetUncheckedUpdateWithoutStatusInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  barcode?: Prisma.StringFieldUpdateOperationsInput | string
+  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
+  model_id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hold_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
+  asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
+  asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
+  asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
+  cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutAssetNestedInput
+  PartTransfer_PartTransfer_donor_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_donor_asset_idToAssetNestedInput
+  PartTransfer_PartTransfer_recipient_asset_idToAsset?: Prisma.PartTransferUncheckedUpdateManyWithoutAsset_PartTransfer_recipient_asset_idToAssetNestedInput
+  technical_specification?: Prisma.TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput
+}
+
+export type AssetUncheckedUpdateManyWithoutStatusInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  barcode?: Prisma.StringFieldUpdateOperationsInput | string
+  serial_number?: Prisma.StringFieldUpdateOperationsInput | string
+  model_id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sales_invoice_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrival_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hold_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  location_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -3879,7 +3879,6 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   barcode?: boolean
   serial_number?: boolean
   model_id?: boolean
-  availability_status_id?: boolean
   purchase_invoice_id?: boolean
   sales_invoice_id?: boolean
   arrival_id?: boolean
@@ -3890,15 +3889,16 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   barcode_normalized?: boolean
   serial_normalized?: boolean
   readiness_id?: boolean
+  status_id?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
   asset_accessories?: boolean | Prisma.Asset$asset_accessoriesArgs<ExtArgs>
   asset_errors?: boolean | Prisma.Asset$asset_errorsArgs<ExtArgs>
   asset_transfers?: boolean | Prisma.Asset$asset_transfersArgs<ExtArgs>
@@ -3916,7 +3916,6 @@ export type AssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   barcode?: boolean
   serial_number?: boolean
   model_id?: boolean
-  availability_status_id?: boolean
   purchase_invoice_id?: boolean
   sales_invoice_id?: boolean
   arrival_id?: boolean
@@ -3927,15 +3926,16 @@ export type AssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   barcode_normalized?: boolean
   serial_normalized?: boolean
   readiness_id?: boolean
+  status_id?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["asset"]>
 
 export type AssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3943,7 +3943,6 @@ export type AssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   barcode?: boolean
   serial_number?: boolean
   model_id?: boolean
-  availability_status_id?: boolean
   purchase_invoice_id?: boolean
   sales_invoice_id?: boolean
   arrival_id?: boolean
@@ -3954,15 +3953,16 @@ export type AssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   barcode_normalized?: boolean
   serial_normalized?: boolean
   readiness_id?: boolean
+  status_id?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["asset"]>
 
 export type AssetSelectScalar = {
@@ -3970,7 +3970,6 @@ export type AssetSelectScalar = {
   barcode?: boolean
   serial_number?: boolean
   model_id?: boolean
-  availability_status_id?: boolean
   purchase_invoice_id?: boolean
   sales_invoice_id?: boolean
   arrival_id?: boolean
@@ -3981,19 +3980,20 @@ export type AssetSelectScalar = {
   barcode_normalized?: boolean
   serial_normalized?: boolean
   readiness_id?: boolean
+  status_id?: boolean
 }
 
-export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "availability_status_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "created_at" | "location_id" | "barcode_normalized" | "serial_normalized" | "readiness_id", ExtArgs["result"]["asset"]>
+export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "created_at" | "location_id" | "barcode_normalized" | "serial_normalized" | "readiness_id" | "status_id", ExtArgs["result"]["asset"]>
 export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
   asset_accessories?: boolean | Prisma.Asset$asset_accessoriesArgs<ExtArgs>
   asset_errors?: boolean | Prisma.Asset$asset_errorsArgs<ExtArgs>
   asset_transfers?: boolean | Prisma.Asset$asset_transfersArgs<ExtArgs>
@@ -4007,39 +4007,39 @@ export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 }
 export type AssetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
 }
 export type AssetIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
-  AvailabilityStatus?: boolean | Prisma.AvailabilityStatusDefaultArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
   hold?: boolean | Prisma.Asset$holdArgs<ExtArgs>
   Location?: boolean | Prisma.Asset$LocationArgs<ExtArgs>
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
   purchase_invoice?: boolean | Prisma.Asset$purchase_invoiceArgs<ExtArgs>
-  Readiness?: boolean | Prisma.Asset$ReadinessArgs<ExtArgs>
+  Readiness?: boolean | Prisma.ReadinessDefaultArgs<ExtArgs>
   sales_invoice?: boolean | Prisma.Asset$sales_invoiceArgs<ExtArgs>
+  Status?: boolean | Prisma.StatusDefaultArgs<ExtArgs>
 }
 
 export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Asset"
   objects: {
     arrival: Prisma.$ArrivalPayload<ExtArgs> | null
-    AvailabilityStatus: Prisma.$AvailabilityStatusPayload<ExtArgs>
     departure: Prisma.$DeparturePayload<ExtArgs> | null
     hold: Prisma.$HoldPayload<ExtArgs> | null
     Location: Prisma.$LocationPayload<ExtArgs> | null
     model: Prisma.$ModelPayload<ExtArgs>
     purchase_invoice: Prisma.$InvoicePayload<ExtArgs> | null
-    Readiness: Prisma.$ReadinessPayload<ExtArgs> | null
+    Readiness: Prisma.$ReadinessPayload<ExtArgs>
     sales_invoice: Prisma.$InvoicePayload<ExtArgs> | null
+    Status: Prisma.$StatusPayload<ExtArgs>
     asset_accessories: Prisma.$AssetAccessoryPayload<ExtArgs>[]
     asset_errors: Prisma.$AssetErrorPayload<ExtArgs>[]
     asset_transfers: Prisma.$AssetTransferPayload<ExtArgs>[]
@@ -4055,7 +4055,6 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     barcode: string
     serial_number: string
     model_id: number
-    availability_status_id: number
     purchase_invoice_id: number | null
     sales_invoice_id: number | null
     arrival_id: number | null
@@ -4065,7 +4064,8 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     location_id: number | null
     barcode_normalized: string | null
     serial_normalized: string | null
-    readiness_id: number | null
+    readiness_id: number
+    status_id: number
   }, ExtArgs["result"]["asset"]>
   composites: {}
 }
@@ -4461,14 +4461,14 @@ readonly fields: AssetFieldRefs;
 export interface Prisma__AssetClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   arrival<T extends Prisma.Asset$arrivalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$arrivalArgs<ExtArgs>>): Prisma.Prisma__ArrivalClient<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  AvailabilityStatus<T extends Prisma.AvailabilityStatusDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AvailabilityStatusDefaultArgs<ExtArgs>>): Prisma.Prisma__AvailabilityStatusClient<runtime.Types.Result.GetResult<Prisma.$AvailabilityStatusPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   departure<T extends Prisma.Asset$departureArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$departureArgs<ExtArgs>>): Prisma.Prisma__DepartureClient<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   hold<T extends Prisma.Asset$holdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$holdArgs<ExtArgs>>): Prisma.Prisma__HoldClient<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   Location<T extends Prisma.Asset$LocationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$LocationArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   model<T extends Prisma.ModelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ModelDefaultArgs<ExtArgs>>): Prisma.Prisma__ModelClient<runtime.Types.Result.GetResult<Prisma.$ModelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   purchase_invoice<T extends Prisma.Asset$purchase_invoiceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$purchase_invoiceArgs<ExtArgs>>): Prisma.Prisma__InvoiceClient<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  Readiness<T extends Prisma.Asset$ReadinessArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$ReadinessArgs<ExtArgs>>): Prisma.Prisma__ReadinessClient<runtime.Types.Result.GetResult<Prisma.$ReadinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  Readiness<T extends Prisma.ReadinessDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReadinessDefaultArgs<ExtArgs>>): Prisma.Prisma__ReadinessClient<runtime.Types.Result.GetResult<Prisma.$ReadinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sales_invoice<T extends Prisma.Asset$sales_invoiceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$sales_invoiceArgs<ExtArgs>>): Prisma.Prisma__InvoiceClient<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  Status<T extends Prisma.StatusDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StatusDefaultArgs<ExtArgs>>): Prisma.Prisma__StatusClient<runtime.Types.Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   asset_accessories<T extends Prisma.Asset$asset_accessoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_accessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors<T extends Prisma.Asset$asset_errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_transfers<T extends Prisma.Asset$asset_transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Asset$asset_transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4511,7 +4511,6 @@ export interface AssetFieldRefs {
   readonly barcode: Prisma.FieldRef<"Asset", 'String'>
   readonly serial_number: Prisma.FieldRef<"Asset", 'String'>
   readonly model_id: Prisma.FieldRef<"Asset", 'Int'>
-  readonly availability_status_id: Prisma.FieldRef<"Asset", 'Int'>
   readonly purchase_invoice_id: Prisma.FieldRef<"Asset", 'Int'>
   readonly sales_invoice_id: Prisma.FieldRef<"Asset", 'Int'>
   readonly arrival_id: Prisma.FieldRef<"Asset", 'Int'>
@@ -4522,6 +4521,7 @@ export interface AssetFieldRefs {
   readonly barcode_normalized: Prisma.FieldRef<"Asset", 'String'>
   readonly serial_normalized: Prisma.FieldRef<"Asset", 'String'>
   readonly readiness_id: Prisma.FieldRef<"Asset", 'Int'>
+  readonly status_id: Prisma.FieldRef<"Asset", 'Int'>
 }
     
 
@@ -5024,25 +5024,6 @@ export type Asset$purchase_invoiceArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.InvoiceInclude<ExtArgs> | null
   where?: Prisma.InvoiceWhereInput
-}
-
-/**
- * Asset.Readiness
- */
-export type Asset$ReadinessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Readiness
-   */
-  select?: Prisma.ReadinessSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Readiness
-   */
-  omit?: Prisma.ReadinessOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ReadinessInclude<ExtArgs> | null
-  where?: Prisma.ReadinessWhereInput
 }
 
 /**
