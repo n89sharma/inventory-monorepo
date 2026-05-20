@@ -13,7 +13,6 @@ model Asset {
   barcode                                             String                  @unique @db.VarChar(50)
   serial_number                                       String                  @db.VarChar(50)
   model_id                                            Int
-  tracking_status_id                                  Int
   availability_status_id                              Int
   technical_status_id                                 Int
   purchase_invoice_id                                 Int?
@@ -34,7 +33,6 @@ model Asset {
   purchase_invoice                                    Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
   sales_invoice                                       Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
   TechnicalStatus                                     TechnicalStatus         @relation(fields: [technical_status_id], references: [id])
-  TrackingStatus                                      TrackingStatus          @relation(fields: [tracking_status_id], references: [id])
   asset_accessories                                   AssetAccessory[]
   asset_errors                                        AssetError[]
   asset_transfers                                     AssetTransfer[]
@@ -55,7 +53,6 @@ model Asset {
   @@index([created_at(sort: Desc)])
   @@index([availability_status_id])
   @@index([technical_status_id])
-  @@index([tracking_status_id])
   @@index([location_id])
   @@index([barcode_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([serial_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
@@ -417,12 +414,6 @@ model InvoiceType {
 }
 
 model TechnicalStatus {
-  id     Int     @id @default(autoincrement())
-  status String  @unique
-  Asset  Asset[]
-}
-
-model TrackingStatus {
   id     Int     @id @default(autoincrement())
   status String  @unique
   Asset  Asset[]

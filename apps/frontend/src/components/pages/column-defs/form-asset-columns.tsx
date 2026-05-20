@@ -1,6 +1,5 @@
 import { AvailabilityStatusBadge } from "@/components/custom/availability-status-badge"
 import { TechnicalStatusIcon } from "@/components/custom/technical-status-icon"
-import { TrackingStatusBadge } from "@/components/custom/tracking-status-badge"
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
 import { TrashIcon } from "@phosphor-icons/react"
@@ -39,12 +38,6 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
       accessorKey: "availability_status",
       header: "Availability Status",
       cell: ({ row }) => <AvailabilityStatusBadge status={row.original.availability_status} />,
-      size: 80
-    },
-    {
-      accessorKey: "tracking_status",
-      header: "Tracking Status",
-      cell: ({ row }) => <TrackingStatusBadge status={row.original.tracking_status} />,
       size: 80
     },
     {

@@ -172,11 +172,6 @@ export type InvoiceType = Prisma.InvoiceTypeModel
  */
 export type TechnicalStatus = Prisma.TechnicalStatusModel
 /**
- * Model TrackingStatus
- * 
- */
-export type TrackingStatus = Prisma.TrackingStatusModel
-/**
  * Model StorePart
  * 
  */

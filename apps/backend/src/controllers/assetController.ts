@@ -39,7 +39,6 @@ const toNumberArray = (val: unknown) =>
 
 export const AssetQuerySchema = z.object({
   model: z.string().min(3).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/),
-  trackingStatusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   availabilityStatusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   technicalStatusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -48,11 +47,10 @@ export const AssetQuerySchema = z.object({
 
 export const getAssets = asyncHandler(async (req, res) => {
   const {
-    model, trackingStatusIds, availabilityStatusIds, technicalStatusIds, warehouseIds, meter
+    model, availabilityStatusIds, technicalStatusIds, warehouseIds, meter
   } = res.locals.query as z.infer<typeof AssetQuerySchema>
   const data = await getAssetsSer(
     model,
-    trackingStatusIds,
     availabilityStatusIds,
     technicalStatusIds,
     warehouseIds,

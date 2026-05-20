@@ -6,7 +6,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
     "start": "node dist/src/index.js",
-    "prisma": "npx prisma generate --sql"
+    "pgen": "npx prisma generate --sql",
+    "ppull": "npx prisma db pull"
   },
   "dependencies": {
     "@clerk/express": "^2.1.5",

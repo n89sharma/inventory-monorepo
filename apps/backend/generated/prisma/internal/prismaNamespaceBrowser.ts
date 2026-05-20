@@ -77,7 +77,6 @@ export const ModelName = {
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   TechnicalStatus: 'TechnicalStatus',
-  TrackingStatus: 'TrackingStatus',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History'
@@ -104,7 +103,6 @@ export const AssetScalarFieldEnum = {
   barcode: 'barcode',
   serial_number: 'serial_number',
   model_id: 'model_id',
-  tracking_status_id: 'tracking_status_id',
   availability_status_id: 'availability_status_id',
   technical_status_id: 'technical_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
@@ -416,14 +414,6 @@ export const TechnicalStatusScalarFieldEnum = {
 } as const
 
 export type TechnicalStatusScalarFieldEnum = (typeof TechnicalStatusScalarFieldEnum)[keyof typeof TechnicalStatusScalarFieldEnum]
-
-
-export const TrackingStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type TrackingStatusScalarFieldEnum = (typeof TrackingStatusScalarFieldEnum)[keyof typeof TrackingStatusScalarFieldEnum]
 
 
 export const StorePartScalarFieldEnum = {

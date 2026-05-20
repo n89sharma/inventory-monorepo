@@ -10,7 +10,6 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     serial_number: assetDetails.serial_number,
     meter_total: assetDetails.specs.meter_total,
     availability_status: assetDetails.availability_status,
-    tracking_status: assetDetails.tracking_status,
     technical_status: assetDetails.technical_status,
     warehouse_city_code: assetDetails.warehouse_code,
     warehouse_street: assetDetails.warehouse_street,

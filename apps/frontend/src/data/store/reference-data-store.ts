@@ -7,7 +7,6 @@ interface ReferenceDataStore {
   coreFunctions: CoreFunction[]
   assetTypes: AssetType[]
   brands: Brand[]
-  trackingStatuses: Status[]
   availabilityStatuses: Status[]
   technicalStatuses: Status[]
   invoiceTypes: InvoiceType[]
@@ -27,7 +26,6 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   coreFunctions: [],
   assetTypes: [],
   brands: [],
-  trackingStatuses: [],
   availabilityStatuses: [],
   technicalStatuses: [],
   invoiceTypes: [],
@@ -39,7 +37,6 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
     coreFunctions: referenceData.coreFunctions,
     assetTypes: referenceData.assetTypes,
     brands: referenceData.brands,
-    trackingStatuses: referenceData.trackingStatuses,
     availabilityStatuses: referenceData.availabilityStatuses,
     technicalStatuses: referenceData.technicalStatuses,
     invoiceTypes: referenceData.invoiceTypes,
@@ -58,7 +55,6 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
     coreFunctions: [],
     assetTypes: [],
     brands: [],
-    trackingStatuses: [],
     availabilityStatuses: [],
     technicalStatuses: [],
     invoiceTypes: [],

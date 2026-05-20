@@ -5,7 +5,6 @@ select
   m."name" as model,
   b."name" as brand,
   at.asset_type as asset_type,
-  tr.status  as tracking_status,
   av.status  as availability_status,
   te.status  as technical_status,
   w.city_code as location_city_code,
@@ -67,7 +66,6 @@ from "Asset" a
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
-  join "TrackingStatus" tr on tr.id = a.tracking_status_id
   join "AvailabilityStatus" av on av.id = a.availability_status_id
   join "TechnicalStatus" te on te.id = a.technical_status_id
   left join "Cost" c on c.asset_id = a.id

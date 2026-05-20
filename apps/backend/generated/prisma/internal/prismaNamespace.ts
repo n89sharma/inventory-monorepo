@@ -410,7 +410,6 @@ export const ModelName = {
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   TechnicalStatus: 'TechnicalStatus',
-  TrackingStatus: 'TrackingStatus',
   StorePart: 'StorePart',
   PartTransfer: 'PartTransfer',
   History: 'History'
@@ -429,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "technicalStatus" | "trackingStatus" | "storePart" | "partTransfer" | "history"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "availabilityStatus" | "fileType" | "invoiceType" | "technicalStatus" | "storePart" | "partTransfer" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2357,80 +2356,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    TrackingStatus: {
-      payload: Prisma.$TrackingStatusPayload<ExtArgs>
-      fields: Prisma.TrackingStatusFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.TrackingStatusFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.TrackingStatusFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        findFirst: {
-          args: Prisma.TrackingStatusFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.TrackingStatusFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        findMany: {
-          args: Prisma.TrackingStatusFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>[]
-        }
-        create: {
-          args: Prisma.TrackingStatusCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        createMany: {
-          args: Prisma.TrackingStatusCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.TrackingStatusCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>[]
-        }
-        delete: {
-          args: Prisma.TrackingStatusDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        update: {
-          args: Prisma.TrackingStatusUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        deleteMany: {
-          args: Prisma.TrackingStatusDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.TrackingStatusUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.TrackingStatusUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>[]
-        }
-        upsert: {
-          args: Prisma.TrackingStatusUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingStatusPayload>
-        }
-        aggregate: {
-          args: Prisma.TrackingStatusAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTrackingStatus>
-        }
-        groupBy: {
-          args: Prisma.TrackingStatusGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TrackingStatusGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.TrackingStatusCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TrackingStatusCountAggregateOutputType> | number
-        }
-      }
-    }
     StorePart: {
       payload: Prisma.$StorePartPayload<ExtArgs>
       fields: Prisma.StorePartFieldRefs
@@ -2701,7 +2626,6 @@ export const AssetScalarFieldEnum = {
   barcode: 'barcode',
   serial_number: 'serial_number',
   model_id: 'model_id',
-  tracking_status_id: 'tracking_status_id',
   availability_status_id: 'availability_status_id',
   technical_status_id: 'technical_status_id',
   purchase_invoice_id: 'purchase_invoice_id',
@@ -3013,14 +2937,6 @@ export const TechnicalStatusScalarFieldEnum = {
 } as const
 
 export type TechnicalStatusScalarFieldEnum = (typeof TechnicalStatusScalarFieldEnum)[keyof typeof TechnicalStatusScalarFieldEnum]
-
-
-export const TrackingStatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type TrackingStatusScalarFieldEnum = (typeof TrackingStatusScalarFieldEnum)[keyof typeof TrackingStatusScalarFieldEnum]
 
 
 export const StorePartScalarFieldEnum = {
@@ -3348,7 +3264,6 @@ export type GlobalOmitConfig = {
   fileType?: Prisma.FileTypeOmit
   invoiceType?: Prisma.InvoiceTypeOmit
   technicalStatus?: Prisma.TechnicalStatusOmit
-  trackingStatus?: Prisma.TrackingStatusOmit
   storePart?: Prisma.StorePartOmit
   partTransfer?: Prisma.PartTransferOmit
   history?: Prisma.HistoryOmit

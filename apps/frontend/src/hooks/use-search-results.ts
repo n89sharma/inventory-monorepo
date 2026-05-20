@@ -18,7 +18,6 @@ export function useSearchResults(filters: SearchFilters) {
       return getAssetsForQuery(
         modelName,
         f.meter,
-        f.trackingStatuses,
         f.availabilityStatuses,
         f.technicalStatuses,
         f.selectedWarehouses,

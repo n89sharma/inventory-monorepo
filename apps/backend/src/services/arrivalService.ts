@@ -11,7 +11,6 @@ import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAsse
 
 
 const arrivalLocation = 'ARRIVAL'
-const arrivalTrackingStatus = 'RECEIVING'
 const arrivalAvailabilityStatus = 'AVAILABLE'
 
 
@@ -89,7 +88,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
       assets: {
         select: {
           id: true, barcode: true, serial_number: true, model_id: true,
-          tracking_status_id: true, availability_status_id: true, technical_status_id: true
+          availability_status_id: true, technical_status_id: true
         }
       }
     }
@@ -130,7 +129,6 @@ function mapInputAssetToPrismaCreateAsset(
     model: { connect: { id: asset.model.id } },
     Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
     created_at: currentDateTime,
-    TrackingStatus: { connect: { status: arrivalTrackingStatus } },
     AvailabilityStatus: { connect: { status: arrivalAvailabilityStatus } },
     TechnicalStatus: { connect: { id: asset.technicalStatus.id } },
     asset_accessories: {
@@ -349,7 +347,7 @@ async function createArrivalAssetInTx(
     },
     select: {
       id: true, barcode: true, serial_number: true, model_id: true,
-      tracking_status_id: true, availability_status_id: true, technical_status_id: true
+      availability_status_id: true, technical_status_id: true
     }
   })
 }

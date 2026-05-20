@@ -86,7 +86,6 @@ export const AssetDetailsPage = () => {
                 </div>
               </DataRow>
               <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
-              <DataValueRow label="Tracking Status" value={assetDetails.tracking_status} />
               <DataValueRow label="Availability" value={assetDetails.availability_status} />
               <DataValueRow label="Technical Status" value={assetDetails.technical_status} />
               <DataValueRow label="Warehouse" value={assetDetails.warehouse_code} />
