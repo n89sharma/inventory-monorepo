@@ -104,9 +104,9 @@ export const AssetErrorSchema = z.object({
   category: z.string(),
   is_fixed: z.boolean(),
   added_at: z.coerce.date().nullable(),
-  added_by: z.string(),
+  added_by: z.string().nullable(),
   fixed_at: z.coerce.date().nullable(),
-  fixed_by: z.string()
+  fixed_by: z.string().nullable()
 })
 
 export type AssetError = z.infer<typeof AssetErrorSchema>
