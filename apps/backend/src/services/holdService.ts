@@ -3,6 +3,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { mapAssetSummary } from './assetService.js'
 import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordHoldCreate, recordHoldUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
@@ -231,6 +232,6 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
     created_at: hold.created_at,
     from_dt: hold.from_dt,
     to_dt: hold.to_dt,
-    assets
+    assets: assets.map(mapAssetSummary)
   }
 }

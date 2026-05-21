@@ -174,10 +174,24 @@ async function resolveInvoiceNumber(id: number | null | undefined): Promise<stri
   return r?.invoice_number ?? null
 }
 
-async function resolveLocationString(id: number | null | undefined): Promise<string | null> {
-  if (!id) return null
-  const r = await prisma.location.findUnique({ where: { id }, select: { location: true } })
-  return r?.location ?? null
+type LocationParts = { warehouse: string | null; zone: string | null; bin: string | null }
+
+async function resolveLocationParts(id: number | null | undefined): Promise<LocationParts> {
+  if (!id) return { warehouse: null, zone: null, bin: null }
+  const r = await prisma.location.findUnique({
+    where: { id },
+    select: {
+      bin: true,
+      warehouse: { select: { city_code: true } },
+      Zone: { select: { zone: true } }
+    }
+  })
+  if (!r) return { warehouse: null, zone: null, bin: null }
+  return {
+    warehouse: r.warehouse?.city_code ?? null,
+    zone: r.Zone?.zone ?? null,
+    bin: r.bin ?? null
+  }
 }
 
 async function resolveUserDiff(
@@ -371,12 +385,22 @@ export async function recordAssetUpdate(
     }
 
     if (before.location_id !== after.location_id) {
-      const [beforeLocation, afterLocation] = await Promise.all([
-        resolveLocationString(before.location_id),
-        resolveLocationString(after.location_id)
+      const [beforeParts, afterParts] = await Promise.all([
+        resolveLocationParts(before.location_id),
+        resolveLocationParts(after.location_id)
       ])
-      diffBefore.location = beforeLocation
-      diffAfter.location = afterLocation
+      if (beforeParts.warehouse !== afterParts.warehouse) {
+        diffBefore.warehouse = beforeParts.warehouse
+        diffAfter.warehouse = afterParts.warehouse
+      }
+      if (beforeParts.zone !== afterParts.zone) {
+        diffBefore.zone = beforeParts.zone
+        diffAfter.zone = afterParts.zone
+      }
+      if (beforeParts.bin !== afterParts.bin) {
+        diffBefore.bin = beforeParts.bin
+        diffAfter.bin = afterParts.bin
+      }
     }
 
     if (before.model_id !== after.model_id && before.model_id && after.model_id) {

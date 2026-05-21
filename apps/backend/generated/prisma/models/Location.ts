@@ -29,29 +29,34 @@ export type AggregateLocation = {
 export type LocationAvgAggregateOutputType = {
   warehouse_id: number | null
   id: number | null
+  zone_id: number | null
 }
 
 export type LocationSumAggregateOutputType = {
   warehouse_id: number | null
   id: number | null
+  zone_id: number | null
 }
 
 export type LocationMinAggregateOutputType = {
   warehouse_id: number | null
-  location: string | null
   id: number | null
+  bin: string | null
+  zone_id: number | null
 }
 
 export type LocationMaxAggregateOutputType = {
   warehouse_id: number | null
-  location: string | null
   id: number | null
+  bin: string | null
+  zone_id: number | null
 }
 
 export type LocationCountAggregateOutputType = {
   warehouse_id: number
-  location: number
   id: number
+  bin: number
+  zone_id: number
   _all: number
 }
 
@@ -59,29 +64,34 @@ export type LocationCountAggregateOutputType = {
 export type LocationAvgAggregateInputType = {
   warehouse_id?: true
   id?: true
+  zone_id?: true
 }
 
 export type LocationSumAggregateInputType = {
   warehouse_id?: true
   id?: true
+  zone_id?: true
 }
 
 export type LocationMinAggregateInputType = {
   warehouse_id?: true
-  location?: true
   id?: true
+  bin?: true
+  zone_id?: true
 }
 
 export type LocationMaxAggregateInputType = {
   warehouse_id?: true
-  location?: true
   id?: true
+  bin?: true
+  zone_id?: true
 }
 
 export type LocationCountAggregateInputType = {
   warehouse_id?: true
-  location?: true
   id?: true
+  bin?: true
+  zone_id?: true
   _all?: true
 }
 
@@ -173,8 +183,9 @@ export type LocationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type LocationGroupByOutputType = {
   warehouse_id: number
-  location: string
   id: number
+  bin: string
+  zone_id: number
   _count: LocationCountAggregateOutputType | null
   _avg: LocationAvgAggregateOutputType | null
   _sum: LocationSumAggregateOutputType | null
@@ -202,36 +213,43 @@ export type LocationWhereInput = {
   OR?: Prisma.LocationWhereInput[]
   NOT?: Prisma.LocationWhereInput | Prisma.LocationWhereInput[]
   warehouse_id?: Prisma.IntFilter<"Location"> | number
-  location?: Prisma.StringFilter<"Location"> | string
   id?: Prisma.IntFilter<"Location"> | number
+  bin?: Prisma.StringFilter<"Location"> | string
+  zone_id?: Prisma.IntFilter<"Location"> | number
   Asset?: Prisma.AssetListRelationFilter
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  Zone?: Prisma.XOR<Prisma.ZoneScalarRelationFilter, Prisma.ZoneWhereInput>
 }
 
 export type LocationOrderByWithRelationInput = {
   warehouse_id?: Prisma.SortOrder
-  location?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  bin?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
   Asset?: Prisma.AssetOrderByRelationAggregateInput
   warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  Zone?: Prisma.ZoneOrderByWithRelationInput
 }
 
 export type LocationWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  warehouse_id_location?: Prisma.LocationWarehouse_idLocationCompoundUniqueInput
+  warehouse_id_zone_id_bin?: Prisma.LocationWarehouse_idZone_idBinCompoundUniqueInput
   AND?: Prisma.LocationWhereInput | Prisma.LocationWhereInput[]
   OR?: Prisma.LocationWhereInput[]
   NOT?: Prisma.LocationWhereInput | Prisma.LocationWhereInput[]
   warehouse_id?: Prisma.IntFilter<"Location"> | number
-  location?: Prisma.StringFilter<"Location"> | string
+  bin?: Prisma.StringFilter<"Location"> | string
+  zone_id?: Prisma.IntFilter<"Location"> | number
   Asset?: Prisma.AssetListRelationFilter
   warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
-}, "id" | "warehouse_id_location">
+  Zone?: Prisma.XOR<Prisma.ZoneScalarRelationFilter, Prisma.ZoneWhereInput>
+}, "id" | "warehouse_id_zone_id_bin">
 
 export type LocationOrderByWithAggregationInput = {
   warehouse_id?: Prisma.SortOrder
-  location?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  bin?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
   _count?: Prisma.LocationCountOrderByAggregateInput
   _avg?: Prisma.LocationAvgOrderByAggregateInput
   _max?: Prisma.LocationMaxOrderByAggregateInput
@@ -244,50 +262,57 @@ export type LocationScalarWhereWithAggregatesInput = {
   OR?: Prisma.LocationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.LocationScalarWhereWithAggregatesInput | Prisma.LocationScalarWhereWithAggregatesInput[]
   warehouse_id?: Prisma.IntWithAggregatesFilter<"Location"> | number
-  location?: Prisma.StringWithAggregatesFilter<"Location"> | string
   id?: Prisma.IntWithAggregatesFilter<"Location"> | number
+  bin?: Prisma.StringWithAggregatesFilter<"Location"> | string
+  zone_id?: Prisma.IntWithAggregatesFilter<"Location"> | number
 }
 
 export type LocationCreateInput = {
-  location: string
+  bin?: string
   Asset?: Prisma.AssetCreateNestedManyWithoutLocationInput
   warehouse: Prisma.WarehouseCreateNestedOneWithoutLocationsInput
+  Zone: Prisma.ZoneCreateNestedOneWithoutLocationInput
 }
 
 export type LocationUncheckedCreateInput = {
   warehouse_id: number
-  location: string
   id?: number
+  bin?: string
+  zone_id: number
   Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUpdateInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
   Asset?: Prisma.AssetUpdateManyWithoutLocationNestedInput
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutLocationsNestedInput
+  Zone?: Prisma.ZoneUpdateOneRequiredWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  location?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  zone_id?: Prisma.IntFieldUpdateOperationsInput | number
   Asset?: Prisma.AssetUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateManyInput = {
   warehouse_id: number
-  location: string
   id?: number
+  bin?: string
+  zone_id: number
 }
 
 export type LocationUpdateManyMutationInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type LocationUncheckedUpdateManyInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  location?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  zone_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type LocationNullableScalarRelationFilter = {
@@ -305,37 +330,43 @@ export type LocationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type LocationWarehouse_idLocationCompoundUniqueInput = {
+export type LocationWarehouse_idZone_idBinCompoundUniqueInput = {
   warehouse_id: number
-  location: string
+  zone_id: number
+  bin: string
 }
 
 export type LocationCountOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
-  location?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  bin?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
 }
 
 export type LocationAvgOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
 }
 
 export type LocationMaxOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
-  location?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  bin?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
 }
 
 export type LocationMinOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
-  location?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  bin?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
 }
 
 export type LocationSumOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
+  zone_id?: Prisma.SortOrder
 }
 
 export type LocationCreateNestedOneWithoutAssetInput = {
@@ -396,15 +427,59 @@ export type LocationUncheckedUpdateManyWithoutWarehouseNestedInput = {
   deleteMany?: Prisma.LocationScalarWhereInput | Prisma.LocationScalarWhereInput[]
 }
 
+export type LocationCreateNestedManyWithoutZoneInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput> | Prisma.LocationCreateWithoutZoneInput[] | Prisma.LocationUncheckedCreateWithoutZoneInput[]
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutZoneInput | Prisma.LocationCreateOrConnectWithoutZoneInput[]
+  createMany?: Prisma.LocationCreateManyZoneInputEnvelope
+  connect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+}
+
+export type LocationUncheckedCreateNestedManyWithoutZoneInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput> | Prisma.LocationCreateWithoutZoneInput[] | Prisma.LocationUncheckedCreateWithoutZoneInput[]
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutZoneInput | Prisma.LocationCreateOrConnectWithoutZoneInput[]
+  createMany?: Prisma.LocationCreateManyZoneInputEnvelope
+  connect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+}
+
+export type LocationUpdateManyWithoutZoneNestedInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput> | Prisma.LocationCreateWithoutZoneInput[] | Prisma.LocationUncheckedCreateWithoutZoneInput[]
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutZoneInput | Prisma.LocationCreateOrConnectWithoutZoneInput[]
+  upsert?: Prisma.LocationUpsertWithWhereUniqueWithoutZoneInput | Prisma.LocationUpsertWithWhereUniqueWithoutZoneInput[]
+  createMany?: Prisma.LocationCreateManyZoneInputEnvelope
+  set?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  disconnect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  delete?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  connect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  update?: Prisma.LocationUpdateWithWhereUniqueWithoutZoneInput | Prisma.LocationUpdateWithWhereUniqueWithoutZoneInput[]
+  updateMany?: Prisma.LocationUpdateManyWithWhereWithoutZoneInput | Prisma.LocationUpdateManyWithWhereWithoutZoneInput[]
+  deleteMany?: Prisma.LocationScalarWhereInput | Prisma.LocationScalarWhereInput[]
+}
+
+export type LocationUncheckedUpdateManyWithoutZoneNestedInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput> | Prisma.LocationCreateWithoutZoneInput[] | Prisma.LocationUncheckedCreateWithoutZoneInput[]
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutZoneInput | Prisma.LocationCreateOrConnectWithoutZoneInput[]
+  upsert?: Prisma.LocationUpsertWithWhereUniqueWithoutZoneInput | Prisma.LocationUpsertWithWhereUniqueWithoutZoneInput[]
+  createMany?: Prisma.LocationCreateManyZoneInputEnvelope
+  set?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  disconnect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  delete?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  connect?: Prisma.LocationWhereUniqueInput | Prisma.LocationWhereUniqueInput[]
+  update?: Prisma.LocationUpdateWithWhereUniqueWithoutZoneInput | Prisma.LocationUpdateWithWhereUniqueWithoutZoneInput[]
+  updateMany?: Prisma.LocationUpdateManyWithWhereWithoutZoneInput | Prisma.LocationUpdateManyWithWhereWithoutZoneInput[]
+  deleteMany?: Prisma.LocationScalarWhereInput | Prisma.LocationScalarWhereInput[]
+}
+
 export type LocationCreateWithoutAssetInput = {
-  location: string
+  bin?: string
   warehouse: Prisma.WarehouseCreateNestedOneWithoutLocationsInput
+  Zone: Prisma.ZoneCreateNestedOneWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutAssetInput = {
   warehouse_id: number
-  location: string
   id?: number
+  bin?: string
+  zone_id: number
 }
 
 export type LocationCreateOrConnectWithoutAssetInput = {
@@ -424,24 +499,28 @@ export type LocationUpdateToOneWithWhereWithoutAssetInput = {
 }
 
 export type LocationUpdateWithoutAssetInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutLocationsNestedInput
+  Zone?: Prisma.ZoneUpdateOneRequiredWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutAssetInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  location?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  zone_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type LocationCreateWithoutWarehouseInput = {
-  location: string
+  bin?: string
   Asset?: Prisma.AssetCreateNestedManyWithoutLocationInput
+  Zone: Prisma.ZoneCreateNestedOneWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutWarehouseInput = {
-  location: string
   id?: number
+  bin?: string
+  zone_id: number
   Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutLocationInput
 }
 
@@ -476,29 +555,98 @@ export type LocationScalarWhereInput = {
   OR?: Prisma.LocationScalarWhereInput[]
   NOT?: Prisma.LocationScalarWhereInput | Prisma.LocationScalarWhereInput[]
   warehouse_id?: Prisma.IntFilter<"Location"> | number
-  location?: Prisma.StringFilter<"Location"> | string
   id?: Prisma.IntFilter<"Location"> | number
+  bin?: Prisma.StringFilter<"Location"> | string
+  zone_id?: Prisma.IntFilter<"Location"> | number
+}
+
+export type LocationCreateWithoutZoneInput = {
+  bin?: string
+  Asset?: Prisma.AssetCreateNestedManyWithoutLocationInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutLocationsInput
+}
+
+export type LocationUncheckedCreateWithoutZoneInput = {
+  warehouse_id: number
+  id?: number
+  bin?: string
+  Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutLocationInput
+}
+
+export type LocationCreateOrConnectWithoutZoneInput = {
+  where: Prisma.LocationWhereUniqueInput
+  create: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput>
+}
+
+export type LocationCreateManyZoneInputEnvelope = {
+  data: Prisma.LocationCreateManyZoneInput | Prisma.LocationCreateManyZoneInput[]
+  skipDuplicates?: boolean
+}
+
+export type LocationUpsertWithWhereUniqueWithoutZoneInput = {
+  where: Prisma.LocationWhereUniqueInput
+  update: Prisma.XOR<Prisma.LocationUpdateWithoutZoneInput, Prisma.LocationUncheckedUpdateWithoutZoneInput>
+  create: Prisma.XOR<Prisma.LocationCreateWithoutZoneInput, Prisma.LocationUncheckedCreateWithoutZoneInput>
+}
+
+export type LocationUpdateWithWhereUniqueWithoutZoneInput = {
+  where: Prisma.LocationWhereUniqueInput
+  data: Prisma.XOR<Prisma.LocationUpdateWithoutZoneInput, Prisma.LocationUncheckedUpdateWithoutZoneInput>
+}
+
+export type LocationUpdateManyWithWhereWithoutZoneInput = {
+  where: Prisma.LocationScalarWhereInput
+  data: Prisma.XOR<Prisma.LocationUpdateManyMutationInput, Prisma.LocationUncheckedUpdateManyWithoutZoneInput>
 }
 
 export type LocationCreateManyWarehouseInput = {
-  location: string
   id?: number
+  bin?: string
+  zone_id: number
 }
 
 export type LocationUpdateWithoutWarehouseInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
   Asset?: Prisma.AssetUpdateManyWithoutLocationNestedInput
+  Zone?: Prisma.ZoneUpdateOneRequiredWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutWarehouseInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  zone_id?: Prisma.IntFieldUpdateOperationsInput | number
   Asset?: Prisma.AssetUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateManyWithoutWarehouseInput = {
-  location?: Prisma.StringFieldUpdateOperationsInput | string
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  zone_id?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type LocationCreateManyZoneInput = {
+  warehouse_id: number
+  id?: number
+  bin?: string
+}
+
+export type LocationUpdateWithoutZoneInput = {
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  Asset?: Prisma.AssetUpdateManyWithoutLocationNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutLocationsNestedInput
+}
+
+export type LocationUncheckedUpdateWithoutZoneInput = {
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
+  Asset?: Prisma.AssetUncheckedUpdateManyWithoutLocationNestedInput
+}
+
+export type LocationUncheckedUpdateManyWithoutZoneInput = {
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  bin?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -534,44 +682,54 @@ export type LocationCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.
 
 export type LocationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   warehouse_id?: boolean
-  location?: boolean
   id?: boolean
+  bin?: boolean
+  zone_id?: boolean
   Asset?: boolean | Prisma.Location$AssetArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.LocationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["location"]>
 
 export type LocationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   warehouse_id?: boolean
-  location?: boolean
   id?: boolean
+  bin?: boolean
+  zone_id?: boolean
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["location"]>
 
 export type LocationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   warehouse_id?: boolean
-  location?: boolean
   id?: boolean
+  bin?: boolean
+  zone_id?: boolean
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["location"]>
 
 export type LocationSelectScalar = {
   warehouse_id?: boolean
-  location?: boolean
   id?: boolean
+  bin?: boolean
+  zone_id?: boolean
 }
 
-export type LocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"warehouse_id" | "location" | "id", ExtArgs["result"]["location"]>
+export type LocationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"warehouse_id" | "id" | "bin" | "zone_id", ExtArgs["result"]["location"]>
 export type LocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Asset?: boolean | Prisma.Location$AssetArgs<ExtArgs>
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.LocationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LocationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
 }
 export type LocationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  Zone?: boolean | Prisma.ZoneDefaultArgs<ExtArgs>
 }
 
 export type $LocationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -579,11 +737,13 @@ export type $LocationPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     Asset: Prisma.$AssetPayload<ExtArgs>[]
     warehouse: Prisma.$WarehousePayload<ExtArgs>
+    Zone: Prisma.$ZonePayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     warehouse_id: number
-    location: string
     id: number
+    bin: string
+    zone_id: number
   }, ExtArgs["result"]["location"]>
   composites: {}
 }
@@ -980,6 +1140,7 @@ export interface Prisma__LocationClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   Asset<T extends Prisma.Location$AssetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Location$AssetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  Zone<T extends Prisma.ZoneDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ZoneDefaultArgs<ExtArgs>>): Prisma.Prisma__ZoneClient<runtime.Types.Result.GetResult<Prisma.$ZonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1010,8 +1171,9 @@ export interface Prisma__LocationClient<T, Null = never, ExtArgs extends runtime
  */
 export interface LocationFieldRefs {
   readonly warehouse_id: Prisma.FieldRef<"Location", 'Int'>
-  readonly location: Prisma.FieldRef<"Location", 'String'>
   readonly id: Prisma.FieldRef<"Location", 'Int'>
+  readonly bin: Prisma.FieldRef<"Location", 'String'>
+  readonly zone_id: Prisma.FieldRef<"Location", 'Int'>
 }
     
 

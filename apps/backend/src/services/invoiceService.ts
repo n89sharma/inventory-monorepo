@@ -2,6 +2,7 @@ import { AppRole, AssetDelta, CreateInvoice, InvoiceDetail, UpdateInvoiceMetadat
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { mapAssetSummary } from './assetService.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
@@ -176,6 +177,6 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       clerk_id: invoice.updated_by.clerk_id,
     },
     customer: invoice.organization,
-    assets
+    assets: assets.map(mapAssetSummary)
   }
 }

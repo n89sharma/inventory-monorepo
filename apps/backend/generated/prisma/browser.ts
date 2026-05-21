@@ -162,3 +162,8 @@ export type Readiness = Prisma.ReadinessModel
  * 
  */
 export type Status = Prisma.StatusModel
+/**
+ * Model Zone
+ * 
+ */
+export type Zone = Prisma.ZoneModel

@@ -32,8 +32,15 @@ export const WarehouseSchema = z.object({
 
 export const AssetLocationSchema = z.object({
   id: z.number(),
-  location: z.string(),
   warehouse_id: z.number(),
+  zone_id: z.number(),
+  zone: z.string(),
+  bin: z.string(),
+})
+
+export const ZoneSchema = z.object({
+  id: z.number(),
+  zone: z.string(),
 })
 
 export const ErrorSchema = z.object({
@@ -52,6 +59,7 @@ export const ReferenceDataSchema = z.object({
   readinesses: z.array(StatusSchema),
   invoiceTypes: z.array(InvoiceTypeSchema),
   warehouses: z.array(WarehouseSchema),
+  zones: z.array(ZoneSchema),
   errors: z.array(ErrorSchema)
 });
 
@@ -68,4 +76,5 @@ export type Status = z.infer<typeof StatusSchema>;
 export type InvoiceType = z.infer<typeof InvoiceTypeSchema>;
 export type Warehouse = z.infer<typeof WarehouseSchema>;
 export type AssetLocation = z.infer<typeof AssetLocationSchema>;
+export type Zone = z.infer<typeof ZoneSchema>;
 export type Error = z.infer<typeof ErrorSchema>;

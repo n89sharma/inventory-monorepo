@@ -24,6 +24,7 @@ model Asset {
   serial_normalized                                   String?                 @default(dbgenerated("lower(regexp_replace((serial_number)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
   readiness_id                                        Int
   status_id                                           Int
+  is_in_transit                                       Boolean                 @default(false)
   arrival                                             Arrival?                @relation(fields: [arrival_id], references: [id])
   departure                                           Departure?              @relation(fields: [departure_id], references: [id])
   hold                                                Hold?                   @relation(fields: [hold_id], references: [id])
@@ -272,12 +273,14 @@ model Warehouse {
 
 model Location {
   warehouse_id Int
-  location     String    @db.VarChar(50)
   id           Int       @id @default(autoincrement())
+  bin          String    @default("")
+  zone_id      Int
   Asset        Asset[]
   warehouse    Warehouse @relation(fields: [warehouse_id], references: [id])
+  Zone         Zone      @relation(fields: [zone_id], references: [id])
 
-  @@unique([warehouse_id, location])
+  @@unique([warehouse_id, zone_id, bin])
 }
 
 model Brand {
@@ -457,4 +460,10 @@ model Status {
   id     Int     @id @default(autoincrement())
   status String  @unique
   Asset  Asset[]
+}
+
+model Zone {
+  id       Int        @id @default(autoincrement())
+  zone     String     @unique
+  Location Location[]
 }

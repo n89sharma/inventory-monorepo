@@ -1,4 +1,4 @@
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -14,6 +14,54 @@ import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
 
+type LocationRow = {
+  warehouse_code: string | null
+  warehouse_street: string | null
+  zone: string | null
+  bin: string | null
+}
+
+export function buildLocation(r: LocationRow): AssetLocationDetails | null {
+  if (!r.warehouse_code || !r.warehouse_street || !r.zone) return null
+  return {
+    warehouse_code: r.warehouse_code,
+    warehouse_street: r.warehouse_street,
+    zone: r.zone,
+    bin: r.bin ?? ''
+  }
+}
+
+type AssetSummaryRow = LocationRow & {
+  id: number
+  barcode: string
+  brand: string
+  model: string
+  asset_type: string
+  serial_number: string
+  meter_total: number | null
+  status: string
+  readiness: string
+  hold_number?: string | null
+  purchase_invoice_id?: number | null
+}
+
+export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
+  return {
+    id: r.id,
+    barcode: r.barcode,
+    brand: r.brand,
+    model: r.model,
+    asset_type: r.asset_type,
+    serial_number: r.serial_number,
+    meter_total: r.meter_total,
+    status: r.status,
+    readiness: r.readiness,
+    location: buildLocation(r),
+    hold_number: r.hold_number ?? null,
+    purchase_invoice_id: r.purchase_invoice_id ?? null
+  }
+}
+
 export async function getAssets(
   model: string,
   statusIds: number[],
@@ -21,9 +69,10 @@ export async function getAssets(
   warehouseIds: number[],
   meterParam: number
 ): Promise<AssetSummary[]> {
-  return prisma.$queryRawTyped(
+  const rows = await prisma.$queryRawTyped(
     getAssetsQuery(model, statusIds, readinessIds, warehouseIds, meterParam)
   )
+  return rows.map(mapAssetSummary)
 }
 
 export async function getAssetDetail(
@@ -91,9 +140,7 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
     asset_type: r.asset_type,
     status: r.status,
     readiness: r.readiness,
-    location: r.location,
-    warehouse_code: r.location_city_code,
-    warehouse_street: r.location_street,
+    location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,
       transport_cost: r.transport_cost?.toNumber() ?? null,
@@ -196,7 +243,7 @@ function escapeCSV(val: unknown): string {
 const CSV_HEADERS = [
   'barcode', 'serial_number', 'model', 'brand', 'asset_type',
   'status', 'readiness',
-  'location', 'warehouse_code', 'warehouse_street', 'created_at',
+  'warehouse_code', 'warehouse_street', 'zone', 'bin', 'created_at',
   'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
   'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
   'specs_cassettes', 'specs_internal_finisher', 'specs_meter_black',
@@ -216,7 +263,11 @@ function generateCsv(assets: AssetDetails[]): string {
   const rows = assets.map(a => [
     a.barcode, a.serial_number, a.model, a.brand, a.asset_type,
     a.status, a.readiness,
-    a.location, a.warehouse_code, a.warehouse_street, a.created_at,
+    a.location?.warehouse_code ?? null,
+    a.location?.warehouse_street ?? null,
+    a.location?.zone ?? null,
+    a.location?.bin ?? null,
+    a.created_at,
     a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
     a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,
     a.specs.cassettes, a.specs.internal_finisher, a.specs.meter_black,
@@ -483,6 +534,8 @@ export async function bulkUpdateAssetPricing(
   }))
 }
 
+const BIN_ZONE = 'BIN'
+
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
   return prisma.$queryRawTyped(getLocationsByWarehouseQuery(warehouseId))
 }
@@ -492,16 +545,40 @@ export async function updateAssetLocation(
   data: UpdateAssetLocation,
   userId: number
 ): Promise<void> {
-  const asset = await prisma.asset.findUnique({
-    where: { barcode }, select: { id: true, location_id: true }
+  const { assetId, beforeLocationId, afterLocationId } = await prisma.$transaction(async (tx) => {
+    const asset = await tx.asset.findUnique({
+      where: { barcode }, select: { id: true, location_id: true }
+    })
+    if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+
+    const zone = await tx.zone.findUnique({ where: { id: data.zone_id }, select: { zone: true } })
+    if (!zone) throw new NotFoundError('Zone not found')
+
+    const warehouse = await tx.warehouse.findUnique({
+      where: { id: data.warehouse_id }, select: { id: true }
+    })
+    if (!warehouse) throw new NotFoundError('Warehouse not found')
+
+    const bin = zone.zone === BIN_ZONE ? data.bin : ''
+
+    const location = await tx.location.upsert({
+      where: {
+        warehouse_id_zone_id_bin: {
+          warehouse_id: data.warehouse_id,
+          zone_id: data.zone_id,
+          bin
+        }
+      },
+      create: { warehouse_id: data.warehouse_id, zone_id: data.zone_id, bin },
+      update: {}
+    })
+
+    await tx.asset.update({ where: { barcode }, data: { location_id: location.id } })
+
+    return { assetId: asset.id, beforeLocationId: asset.location_id, afterLocationId: location.id }
   })
-  if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-  const location = await prisma.location.findUnique({ where: { id: data.location_id } })
-  if (!location) throw new NotFoundError('Location not found')
-
-  await prisma.asset.update({ where: { barcode }, data: { location_id: data.location_id } })
-  await recordAssetUpdate(asset.id, { location_id: asset.location_id }, { location_id: data.location_id }, userId)
+  await recordAssetUpdate(assetId, { location_id: beforeLocationId }, { location_id: afterLocationId }, userId)
 }
 
 export async function getAssetHistory(

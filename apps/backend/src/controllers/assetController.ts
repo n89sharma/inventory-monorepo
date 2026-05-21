@@ -23,7 +23,8 @@ import {
   updateAssetPricing as updateAssetPricingSer,
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   updateAssetSpecs as updateAssetSpecsSer,
-  getLocationsByWarehouse as getLocationsByWarehouseSer
+  getLocationsByWarehouse as getLocationsByWarehouseSer,
+  mapAssetSummary
 } from '../services/assetService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
@@ -105,7 +106,7 @@ export const getAssetSummaryByBarcode = asyncHandler(async (req: Request, res: R
   const { barcode } = req.params
   const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
   if (results.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
-  res.json(successResponse(results[0]))
+  res.json(successResponse(mapAssetSummary(results[0])))
 })
 
 export const createAssetComment = asyncHandler(async (req, res) => {

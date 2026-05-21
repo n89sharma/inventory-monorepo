@@ -7,11 +7,28 @@ import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from "../prisma.js"
+import { mapAssetSummary } from './assetService.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 
 
-const arrivalLocation = 'ARRIVAL'
+const arrivalZone = 'SHIPPING_AND_RECEIVING'
 const arrivalStatus = 'IN_STOCK'
+
+async function ensureArrivalLocationId(
+  tx: Prisma.TransactionClient,
+  warehouseId: number
+): Promise<number> {
+  const zone = await tx.zone.findUnique({ where: { zone: arrivalZone }, select: { id: true } })
+  if (!zone) throw new NotFoundError(`Zone ${arrivalZone} not found`)
+  const location = await tx.location.upsert({
+    where: {
+      warehouse_id_zone_id_bin: { warehouse_id: warehouseId, zone_id: zone.id, bin: '' }
+    },
+    create: { warehouse_id: warehouseId, zone_id: zone.id, bin: '' },
+    update: {}
+  })
+  return location.id
+}
 
 
 const assetIncludeArgs = {
@@ -46,7 +63,7 @@ export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> 
     comment: arrival.notes,
     created_at: arrival.created_at,
     created_by: arrival.created_by.name,
-    assets
+    assets: assets.map(mapAssetSummary)
   }
 }
 
@@ -71,27 +88,30 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
   const barcodes = await generateBarcodes(newArrival.assets, warehouseCode)
   const arrivalNumber = await getNewArrivalNumber(warehouseCode)
 
-  const arrival = await prisma.arrival.create({
-    data: {
-      arrival_number: arrivalNumber,
-      origin: { connect: { id: newArrival.vendor.id } },
-      destination: { connect: { id: newArrival.warehouse.id } },
-      transporter: { connect: { id: newArrival.transporter.id } },
-      notes: newArrival.comment,
-      created_at: currentDateTime,
-      created_by: { connect: { id: userId } },
-      assets: {
-        create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(a, barcodes[a.serialNumber], newArrival.warehouse.id, currentDateTime))
-      }
-    },
-    include: {
-      assets: {
-        select: {
-          id: true, barcode: true, serial_number: true, model_id: true,
-          status_id: true, readiness_id: true
+  const arrival = await prisma.$transaction(async (tx) => {
+    const locationId = await ensureArrivalLocationId(tx, newArrival.warehouse.id)
+    return tx.arrival.create({
+      data: {
+        arrival_number: arrivalNumber,
+        origin: { connect: { id: newArrival.vendor.id } },
+        destination: { connect: { id: newArrival.warehouse.id } },
+        transporter: { connect: { id: newArrival.transporter.id } },
+        notes: newArrival.comment,
+        created_at: currentDateTime,
+        created_by: { connect: { id: userId } },
+        assets: {
+          create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(a, barcodes[a.serialNumber], locationId, currentDateTime))
+        }
+      },
+      include: {
+        assets: {
+          select: {
+            id: true, barcode: true, serial_number: true, model_id: true,
+            status_id: true, readiness_id: true
+          }
         }
       }
-    }
+    })
   })
 
   await recordArrivalCreate(arrival.id, {
@@ -120,14 +140,14 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
 function mapInputAssetToPrismaCreateAsset(
   asset: CreateAsset,
   barcode: string,
-  warehouseId: number,
+  locationId: number,
   currentDateTime: Date): AssetCreateWithoutArrivalInput {
 
   return {
     barcode,
     serial_number: asset.serialNumber,
     model: { connect: { id: asset.model.id } },
-    Location: { connect: { warehouse_id_location: { warehouse_id: warehouseId, location: arrivalLocation } } },
+    Location: { connect: { id: locationId } },
     created_at: currentDateTime,
     Status: { connect: { status: arrivalStatus } },
     Readiness: { connect: { id: asset.readiness.id } },
@@ -329,7 +349,7 @@ export async function updateArrivalAsset(
 
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(existing.barcode))
   if (!summary) throw new NotFoundError(`Asset ${existing.barcode} not found after update`)
-  return summary
+  return mapAssetSummary(summary)
 }
 
 async function createArrivalAssetInTx(
@@ -337,12 +357,12 @@ async function createArrivalAssetInTx(
   arrivalId: number,
   asset: CreateAsset,
   barcode: string,
-  warehouseId: number,
+  locationId: number,
   now: Date
 ) {
   return tx.asset.create({
     data: {
-      ...mapInputAssetToPrismaCreateAsset(asset, barcode, warehouseId, now),
+      ...mapInputAssetToPrismaCreateAsset(asset, barcode, locationId, now),
       arrival: { connect: { id: arrivalId } }
     },
     select: {
@@ -367,7 +387,8 @@ export async function createSingleArrivalAsset(
   const now = new Date()
 
   const created = await prisma.$transaction(async (tx) => {
-    return createArrivalAssetInTx(tx, arrival.id, asset, barcode, arrival.destination_id, now)
+    const locationId = await ensureArrivalLocationId(tx, arrival.destination_id)
+    return createArrivalAssetInTx(tx, arrival.id, asset, barcode, locationId, now)
   })
 
   await recordBatchAssetCreate(
@@ -384,7 +405,7 @@ export async function createSingleArrivalAsset(
 
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(created.barcode))
   if (!summary) throw new NotFoundError(`Asset ${created.barcode} not found after create`)
-  return summary
+  return mapAssetSummary(summary)
 }
 
 async function generateBarcodes(assets: CreateAsset[], warehouseCode: string) {

@@ -1,6 +1,15 @@
 import { z } from 'zod';
 
 
+export const AssetLocationDetailsSchema = z.object({
+  warehouse_code: z.string(),
+  warehouse_street: z.string(),
+  zone: z.string(),
+  bin: z.string(),
+})
+
+export type AssetLocationDetails = z.infer<typeof AssetLocationDetailsSchema>
+
 export const AssetSummarySchema = z.object({
   id: z.number(),
   barcode: z.string(),
@@ -11,8 +20,7 @@ export const AssetSummarySchema = z.object({
   meter_total: z.number().nullable(),
   status: z.string(),
   readiness: z.string(),
-  warehouse_city_code: z.string().nullable(),
-  warehouse_street: z.string().nullable(),
+  location: AssetLocationDetailsSchema.nullable(),
   hold_number: z.string().nullable().optional(),
   purchase_invoice_id: z.number().nullable().optional()
 })
@@ -28,9 +36,7 @@ export const AssetDetailsSchema = z.object({
   serial_number: z.string(),
   status: z.string(),
   readiness: z.string(),
-  location: z.string().nullable(),
-  warehouse_code: z.string().nullable(),
-  warehouse_street: z.string().nullable(),
+  location: AssetLocationDetailsSchema.nullable(),
   cost: z.object({
     purchase_cost: z.number().nullable(),
     transport_cost: z.number().nullable(),
@@ -207,7 +213,9 @@ export const UpdateAssetSpecsSchema = z.object({
 export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>
 
 export const UpdateAssetLocationSchema = z.object({
-  location_id: z.number().int().positive(),
+  warehouse_id: z.number().int().positive(),
+  zone_id: z.number().int().positive(),
+  bin: z.string().default(''),
 })
 
 export type UpdateAssetLocation = z.infer<typeof UpdateAssetLocationSchema>

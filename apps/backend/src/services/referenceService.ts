@@ -10,6 +10,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     readinesses,
     invoiceTypes,
     warehouses,
+    zones,
     errors
   ] = await Promise.all([
     prisma.accessory.findMany(),
@@ -19,6 +20,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     prisma.readiness.findMany(),
     prisma.invoiceType.findMany(),
     prisma.warehouse.findMany(),
+    prisma.zone.findMany({ orderBy: { zone: 'asc' } }),
     prisma.error.findMany()
   ])
 
@@ -30,6 +32,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     readinesses,
     invoiceTypes,
     warehouses,
+    zones,
     errors
   }
 }

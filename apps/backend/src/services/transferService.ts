@@ -3,6 +3,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { NotFoundError } from '../lib/errors.js'
+import { mapAssetSummary } from './assetService.js'
 import { recordAssetUpdateOnCollection, recordTransferCreate, recordTransferUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
@@ -25,7 +26,7 @@ export async function getTransfer(transferNumber: string): Promise<TransferDetai
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets
+    assets: assets.map(mapAssetSummary)
   }
 }
 

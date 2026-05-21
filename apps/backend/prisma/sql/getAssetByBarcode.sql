@@ -6,8 +6,10 @@ select
   a.barcode as barcode,
   a.serial_number as serial_number,
   t.meter_total as meter_total,
-  w.city_code as warehouse_city_code,
+  w.city_code as warehouse_code,
   w.street as warehouse_street,
+  z.zone as zone,
+  l.bin as bin,
   s.status as status,
   r.status as readiness,
   a.purchase_invoice_id as purchase_invoice_id
@@ -20,4 +22,5 @@ from "Asset" a
   join "Readiness" r on r.id = a.readiness_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
+  left join "Zone" z on z.id = l.zone_id
 where a.barcode = $1

@@ -79,7 +79,8 @@ export const ModelName = {
   PartTransfer: 'PartTransfer',
   History: 'History',
   Readiness: 'Readiness',
-  Status: 'Status'
+  Status: 'Status',
+  Zone: 'Zone'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -113,7 +114,8 @@ export const AssetScalarFieldEnum = {
   barcode_normalized: 'barcode_normalized',
   serial_normalized: 'serial_normalized',
   readiness_id: 'readiness_id',
-  status_id: 'status_id'
+  status_id: 'status_id',
+  is_in_transit: 'is_in_transit'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -282,8 +284,9 @@ export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof t
 
 export const LocationScalarFieldEnum = {
   warehouse_id: 'warehouse_id',
-  location: 'location',
-  id: 'id'
+  id: 'id',
+  bin: 'bin',
+  zone_id: 'zone_id'
 } as const
 
 export type LocationScalarFieldEnum = (typeof LocationScalarFieldEnum)[keyof typeof LocationScalarFieldEnum]
@@ -453,6 +456,14 @@ export const StatusScalarFieldEnum = {
 } as const
 
 export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
+
+
+export const ZoneScalarFieldEnum = {
+  id: 'id',
+  zone: 'zone'
+} as const
+
+export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
 
 
 export const SortOrder = {

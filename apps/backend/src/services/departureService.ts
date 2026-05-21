@@ -3,6 +3,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { mapAssetSummary } from './assetService.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
@@ -25,7 +26,7 @@ export async function getDeparture(departureNumber: string): Promise<DepartureDe
     notes: departure.notes,
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
-    assets
+    assets: assets.map(mapAssetSummary)
   }
 }
 

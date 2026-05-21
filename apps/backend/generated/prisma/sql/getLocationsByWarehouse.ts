@@ -8,13 +8,15 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param int4
  */
-export const getLocationsByWarehouse = $runtime.makeTypedQueryFactory("SELECT\nl.id,\nl.location,\nl.warehouse_id\nFROM \"Location\" l\nWHERE l.warehouse_id = $1\nORDER BY l.location ASC") as (int4: number) => $runtime.TypedSql<getLocationsByWarehouse.Parameters, getLocationsByWarehouse.Result>
+export const getLocationsByWarehouse = $runtime.makeTypedQueryFactory("SELECT\nl.id,\nl.warehouse_id,\nl.zone_id,\nz.zone,\nl.bin\nFROM \"Location\" l\nJOIN \"Zone\" z ON z.id = l.zone_id\nWHERE l.warehouse_id = $1\nORDER BY z.zone ASC, l.bin ASC") as (int4: number) => $runtime.TypedSql<getLocationsByWarehouse.Parameters, getLocationsByWarehouse.Result>
 
 export namespace getLocationsByWarehouse {
   export type Parameters = [int4: number]
   export type Result = {
     id: number
-    location: string
     warehouse_id: number
+    zone_id: number
+    zone: string
+    bin: string
   }
 }

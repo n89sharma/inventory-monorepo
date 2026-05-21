@@ -7,9 +7,10 @@ select
   at.asset_type as asset_type,
   s.status  as status,
   rd.status  as readiness,
-  w.city_code as location_city_code,
-  w.street as location_street,
-  l.location as location,
+  w.city_code as warehouse_code,
+  w.street as warehouse_street,
+  z.zone as zone,
+  l.bin as bin,
   a.created_at as created_at,
   -- cost
   c.purchase_cost as purchase_cost,
@@ -72,6 +73,7 @@ from "Asset" a
   left join "TechnicalSpecification" ts on ts.asset_id = a.id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
+  left join "Zone" z on z.id = l.zone_id
   left join "Hold" h on h.id = a.hold_id
   left join "User" hub on hub.id = h.created_by_id
   left join "User" huf on huf.id = h.created_for_id

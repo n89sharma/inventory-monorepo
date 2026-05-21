@@ -6,8 +6,10 @@ select
   a.barcode,
   a.serial_number,
   t.meter_total,
-  w.city_code as warehouse_city_code,
+  w.city_code as warehouse_code,
   w.street as warehouse_street,
+  z.zone as zone,
+  l.bin as bin,
   s.status as status,
   rd.status as readiness
 from "Asset" a
@@ -19,6 +21,7 @@ from "Asset" a
   join "Readiness" rd on rd.id = a.readiness_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
+  left join "Zone" z on z.id = l.zone_id
 where m."name" ~* $1
   and (array_length($2::int[], 1) is null or s.id = any($2::int[]))
   and (array_length($3::int[], 1) is null or rd.id = any($3::int[]))
