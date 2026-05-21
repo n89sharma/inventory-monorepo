@@ -16,7 +16,7 @@ import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDateWithTime, formatThousandsK } from '@/lib/formatters'
+import { formatDateWithTime, formatLocation, formatThousandsK } from '@/lib/formatters'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import type { AssetHistory } from 'shared-types'
@@ -88,10 +88,9 @@ export const AssetDetailsPage = () => {
               <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
               <DataValueRow label="Status" value={assetDetails.status} />
               <DataValueRow label="Readiness" value={assetDetails.readiness} />
-              <DataValueRow label="Warehouse" value={assetDetails.warehouse_code} />
               <DataRow label="Location">
                 <div className="group flex items-center gap-2">
-                  <DataValue value={assetDetails.location} />
+                  <DataValue value={formatLocation(assetDetails.location)} />
                   <Button
                     variant="ghost"
                     size="icon-sm"

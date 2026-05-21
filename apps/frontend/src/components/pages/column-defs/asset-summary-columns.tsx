@@ -3,7 +3,7 @@ import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { CopyButton } from "@/components/custom/copy-button"
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
-import { formatThousandsK } from "@/lib/formatters"
+import { formatLocation, formatThousandsK } from "@/lib/formatters"
 import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -100,9 +100,10 @@ export function createAssetSummaryColumns(
       size: 80
     },
     {
-      accessorKey: "warehouse_city_code",
-      header: "Warehouse",
-      size: 80
+      id: "location",
+      header: "Location",
+      cell: ({ row }) => formatLocation(row.original.location),
+      size: 140
     }
   ]
 

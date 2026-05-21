@@ -1,7 +1,7 @@
 import { StatusBadge } from "@/components/custom/status-badge"
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { Button } from "@/components/shadcn/button"
-import { formatThousandsK } from "@/lib/formatters"
+import { formatLocation, formatThousandsK } from "@/lib/formatters"
 import { TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { AssetSummary } from 'shared-types'
@@ -47,9 +47,10 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
       size: 80
     },
     {
-      accessorKey: "warehouse_city_code",
-      header: "Warehouse",
-      size: 60
+      id: "location",
+      header: "Location",
+      cell: ({ row }) => formatLocation(row.original.location),
+      size: 140
     },
     {
       id: "delete",

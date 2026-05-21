@@ -1,4 +1,15 @@
 import { format } from 'date-fns'
+import type { AssetLocationDetails } from 'shared-types'
+
+const BIN_ZONE = 'BIN'
+
+export function formatLocation(location: AssetLocationDetails | null): string {
+  if (!location) return ''
+  if (location.zone === BIN_ZONE) {
+    return `${location.warehouse_code} | ${location.bin}`
+  }
+  return `${location.warehouse_code} | ${formatSentenceCase(location.zone)}`
+}
 
 export function formatThousandsK(value: number | null): string {
   if (value === null) return ''
