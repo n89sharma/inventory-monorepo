@@ -84,7 +84,11 @@ export function QueryPage(): React.JSX.Element {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const models = useModelStore(state => state.models)
-  const allStatuses = useReferenceDataStore(state => state.statuses)
+  const rawStatuses = useReferenceDataStore(state => state.statuses)
+  const allStatuses = useMemo(
+    () => rawStatuses.filter(s => s.status != 'UNKNOWN' && s.status != 'LEASED'), 
+    [rawStatuses]
+  )
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(
