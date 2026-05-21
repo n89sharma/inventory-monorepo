@@ -5,6 +5,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchResults } from '@/hooks/use-search-results'
+import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
   MIN_QUERY_LENGTH,
@@ -184,7 +185,7 @@ export function QueryPage(): React.JSX.Element {
               selection={draft.statuses}
               onSelectionChange={s => setDraft({ ...draft, statuses: s })}
               options={allStatuses}
-              getLabel={s => s.status}
+              getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Status'
               className='w-45'
             />
@@ -193,7 +194,7 @@ export function QueryPage(): React.JSX.Element {
               selection={draft.readinesses}
               onSelectionChange={s => setDraft({ ...draft, readinesses: s })}
               options={allReadinesses}
-              getLabel={s => s.status}
+              getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Readiness'
               className='w-45'
             />

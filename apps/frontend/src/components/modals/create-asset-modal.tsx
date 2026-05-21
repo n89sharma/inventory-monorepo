@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, type UseFieldArrayAppend, type UseFieldArrayUpdate } from 'react-hook-form'
 import type { CoreFunction, ModelSummary } from 'shared-types'
+import { formatSentenceCase } from '@/lib/formatters'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
 import { SelectOptions } from '../custom/select-options'
@@ -176,7 +177,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
                   selection={readiness}
                   onSelectionChange={onChange}
                   options={readinesses}
-                  getLabel={t => t.status}
+                  getLabel={t => formatSentenceCase(t.status)}
                   fieldLabel='Readiness'
                   fieldRequired={false}
                   error={fieldState.invalid}
