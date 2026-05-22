@@ -49,7 +49,7 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   createPartTransfer: async (barcode, data) => {
     await createPartTransferApi(barcode, data)
-    mutate(assetDetailKey(barcode))
+    invalidateAssetDetails([barcode, data.donor_barcode])
   },
 
   createComment: async (barcode, data) => {
