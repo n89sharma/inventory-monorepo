@@ -8,13 +8,12 @@ import { useSearchResults } from '@/hooks/use-search-results'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
-  MIN_QUERY_LENGTH,
   paramsToFilters,
   type SearchFilters,
 } from '@/lib/search-url-params'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
@@ -29,6 +28,7 @@ const searchColumns = createAssetSummaryColumns('search')
 const getAssetRowId = (row: AssetSummary) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSummary[] = []
+const DEBOUNCE_MS = 300
 
 const QueryResultsTable = memo(function QueryResultsTable({
   assets,
@@ -108,17 +108,60 @@ export function QueryPage(): React.JSX.Element {
 
   const [draft, setDraft] = useState<SearchFilters>(urlFilters)
   const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
+  const debounceTimerRef = useRef<number | null>(null)
+  const lastCommittedKeyRef = useRef<string>(filtersToParams(urlFilters).toString())
+
   if (urlFilters !== prevUrlFilters) {
     setPrevUrlFilters(urlFilters)
-    setDraft(urlFilters)
+    const urlKey = filtersToParams(urlFilters).toString()
+    if (urlKey !== lastCommittedKeyRef.current) {
+      setDraft(urlFilters)
+      lastCommittedKeyRef.current = urlKey
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current !== null) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
+
+  function commitNow(next: SearchFilters) {
+    if (debounceTimerRef.current !== null) {
+      clearTimeout(debounceTimerRef.current)
+      debounceTimerRef.current = null
+    }
+    const params = filtersToParams(next)
+    lastCommittedKeyRef.current = params.toString()
+    setSearchParams(params, { replace: true })
+  }
+
+  function scheduleCommit(next: SearchFilters) {
+    if (debounceTimerRef.current !== null) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    debounceTimerRef.current = window.setTimeout(() => {
+      debounceTimerRef.current = null
+      const params = filtersToParams(next)
+      lastCommittedKeyRef.current = params.toString()
+      setSearchParams(params, { replace: true })
+    }, DEBOUNCE_MS)
+  }
+
+  function updateDraftImmediate(next: SearchFilters) {
+    setDraft(next)
+    commitNow(next)
+  }
+
+  function updateDraftDebounced(next: SearchFilters) {
+    setDraft(next)
+    scheduleCommit(next)
   }
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchResults(urlFilters)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
-
-  function submitQuery() {
-    setSearchParams(filtersToParams(draft))
-  }
 
   async function handleExport() {
     const selectedBarcodes = Object.keys(rowSelection)
@@ -142,9 +185,6 @@ export function QueryPage(): React.JSX.Element {
   }
 
   const exportDisabled = assets.length === 0 || exportLoading
-  const hasSearchTarget = draft.model !== null
-    || (draft.modelQuery !== null && draft.modelQuery.length >= MIN_QUERY_LENGTH)
-  const searchDisabled = !hasSearchTarget || isLoading || exportLoading
 
   return (
     <>
@@ -165,19 +205,23 @@ export function QueryPage(): React.JSX.Element {
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
-          onSubmit={e => { e.preventDefault(); submitQuery() }}
+          onSubmit={e => e.preventDefault()}
         >
           <fieldset disabled={exportLoading} className="contents">
             <ModelSearchInput
               selection={draft.model}
               query={draft.modelQuery ?? ''}
-              onSelectionChange={m => setDraft({ ...draft, model: m, modelQuery: null })}
-              onQueryChange={text => setDraft({
+              onSelectionChange={m => updateDraftImmediate({
+                ...draft, model: m, modelQuery: null,
+              })}
+              onQueryChange={text => updateDraftDebounced({
                 ...draft,
                 modelQuery: text.length > 0 ? text : null,
                 model: null,
               })}
-              onClear={() => setDraft({ ...draft, model: null, modelQuery: null })}
+              onClear={() => updateDraftImmediate({
+                ...draft, model: null, modelQuery: null,
+              })}
               options={models}
               searchKey='model_name'
               getLabel={m => `${m.brand_name} ${m.model_name}`}
@@ -187,7 +231,7 @@ export function QueryPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.statuses}
-              onSelectionChange={s => setDraft({ ...draft, statuses: s })}
+              onSelectionChange={s => updateDraftDebounced({ ...draft, statuses: s })}
               options={allStatuses}
               getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Status'
@@ -196,7 +240,7 @@ export function QueryPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.readinesses}
-              onSelectionChange={s => setDraft({ ...draft, readinesses: s })}
+              onSelectionChange={s => updateDraftDebounced({ ...draft, readinesses: s })}
               options={allReadinesses}
               getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Readiness'
@@ -205,7 +249,9 @@ export function QueryPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.selectedWarehouses}
-              onSelectionChange={w => setDraft({ ...draft, selectedWarehouses: w })}
+              onSelectionChange={w => updateDraftDebounced({
+                ...draft, selectedWarehouses: w,
+              })}
               options={activeWarehouses}
               getLabel={w => w.city_code}
               fieldLabel='Warehouse'
@@ -214,7 +260,7 @@ export function QueryPage(): React.JSX.Element {
 
             <InputWithClearInline
               value={draft.meter}
-              onValueChange={val => setDraft({
+              onValueChange={val => updateDraftDebounced({
                 ...draft,
                 meter: typeof val === 'string' ? null : val,
               })}
@@ -222,13 +268,6 @@ export function QueryPage(): React.JSX.Element {
               inputType='number'
               className='w-45'
             />
-
-            <Button
-              type="submit"
-              disabled={searchDisabled}
-            >
-              Search
-            </Button>
           </fieldset>
         </form>
       </StickyPageHeader>
@@ -236,12 +275,14 @@ export function QueryPage(): React.JSX.Element {
         <div hidden={!isLoading} role="status" aria-live="polite">
           <span>Loading…</span>
         </div>
-        <QueryResultsTable
-          assets={assets}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-          onBulkPriceSave={handleBulkPriceSave}
-        />
+        <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
+          <QueryResultsTable
+            assets={assets}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+            onBulkPriceSave={handleBulkPriceSave}
+          />
+        </div>
       </PageContent>
     </>
   )
