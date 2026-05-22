@@ -13,7 +13,7 @@ import { SelectOptions } from '../custom/select-options'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
+import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
 import MultipleSelector from '../shadcn/multiple-selector'
 
 interface AssetModalProps {
@@ -67,7 +67,11 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
       meterColour: null,
       cassettes: null,
       internalFinisher: '',
-      coreFunctions: []
+      coreFunctions: [],
+      drumLifeC: null,
+      drumLifeM: null,
+      drumLifeY: null,
+      drumLifeK: null
     }
   }
 
@@ -128,7 +132,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='sm:max-w-2xl overflow-y-auto max-h-[90vh]'>
+      <DialogContent className='md:max-w-4xl overflow-y-auto max-h-[90vh]'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
@@ -153,21 +157,59 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
               inputType='string'
             />
 
-            <ControlledInputWithClear
-              control={newAssetForm.control}
-              name='meterBlack'
-              fieldLabel='Meter Black'
-              fieldRequired={true}
-              inputType='number'
-            />
+            <FieldSet>
+              <FieldLegend>Meter</FieldLegend>
+              <FieldGroup className='grid grid-cols-2 gap-3'>
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='meterBlack'
+                  fieldLabel='Black'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='meterColour'
+                  fieldLabel='Colour'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+              </FieldGroup>
+            </FieldSet>
 
-            <ControlledInputWithClear
-              control={newAssetForm.control}
-              name='meterColour'
-              fieldLabel='Meter Colour'
-              fieldRequired={true}
-              inputType='number'
-            />
+            <FieldSet>
+              <FieldLegend>Drum Life</FieldLegend>
+              <FieldGroup className='grid grid-cols-2 gap-3'>
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='drumLifeC'
+                  fieldLabel='C'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='drumLifeM'
+                  fieldLabel='M'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='drumLifeY'
+                  fieldLabel='Y'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='drumLifeK'
+                  fieldLabel='K'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+              </FieldGroup>
+            </FieldSet>
 
             <Controller
               control={newAssetForm.control}

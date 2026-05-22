@@ -78,7 +78,11 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     cassettes: dbAsset.technical_specification?.cassettes ?? 0,
     readiness: dbAsset.Readiness,
     internalFinisher: dbAsset.technical_specification?.internal_finisher ?? '',
-    coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory)
+    coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory),
+    drumLifeC: dbAsset.technical_specification?.drum_life_c ?? 0,
+    drumLifeM: dbAsset.technical_specification?.drum_life_m ?? 0,
+    drumLifeY: dbAsset.technical_specification?.drum_life_y ?? 0,
+    drumLifeK: dbAsset.technical_specification?.drum_life_k ?? 0
   }
 }
 
@@ -160,7 +164,11 @@ function mapInputAssetToPrismaCreateAsset(
         meter_colour: asset.meterColour,
         meter_total: asset.meterBlack + asset.meterColour,
         internal_finisher: asset.internalFinisher,
-        cassettes: asset.cassettes
+        cassettes: asset.cassettes,
+        drum_life_c: asset.drumLifeC,
+        drum_life_m: asset.drumLifeM,
+        drum_life_y: asset.drumLifeY,
+        drum_life_k: asset.drumLifeK
       }
     },
     cost: { create: {} }
@@ -280,7 +288,11 @@ async function updateArrivalAssetCoreFields(
           meter_colour: asset.meterColour,
           meter_total: asset.meterBlack + asset.meterColour,
           cassettes: asset.cassettes,
-          internal_finisher: asset.internalFinisher
+          internal_finisher: asset.internalFinisher,
+          drum_life_c: asset.drumLifeC,
+          drum_life_m: asset.drumLifeM,
+          drum_life_y: asset.drumLifeY,
+          drum_life_k: asset.drumLifeK
         }
       }
     }
@@ -311,7 +323,10 @@ export async function updateArrivalAsset(
     select: {
       id: true, barcode: true, model_id: true, serial_number: true, readiness_id: true,
       technical_specification: {
-        select: { meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true }
+        select: {
+          meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true,
+          drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true
+        }
       }
     }
   })
@@ -336,7 +351,11 @@ export async function updateArrivalAsset(
     meter_black: existing.technical_specification?.meter_black,
     meter_colour: existing.technical_specification?.meter_colour,
     cassettes: existing.technical_specification?.cassettes,
-    internal_finisher: existing.technical_specification?.internal_finisher
+    internal_finisher: existing.technical_specification?.internal_finisher,
+    drum_life_c: existing.technical_specification?.drum_life_c,
+    drum_life_m: existing.technical_specification?.drum_life_m,
+    drum_life_y: existing.technical_specification?.drum_life_y,
+    drum_life_k: existing.technical_specification?.drum_life_k
   }, {
     model_id: asset.model.id,
     serial_number: asset.serialNumber,
@@ -344,7 +363,11 @@ export async function updateArrivalAsset(
     meter_black: asset.meterBlack,
     meter_colour: asset.meterColour,
     cassettes: asset.cassettes,
-    internal_finisher: asset.internalFinisher
+    internal_finisher: asset.internalFinisher,
+    drum_life_c: asset.drumLifeC,
+    drum_life_m: asset.drumLifeM,
+    drum_life_y: asset.drumLifeY,
+    drum_life_k: asset.drumLifeK
   }, userId)
 
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(existing.barcode))

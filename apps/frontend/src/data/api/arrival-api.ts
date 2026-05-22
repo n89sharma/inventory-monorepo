@@ -42,7 +42,11 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       cassettes: s.cassettes!,
       readiness: getSelectedOrNull(s.readiness)!,
       internalFinisher: s.internalFinisher,
-      coreFunctions: s.coreFunctions
+      coreFunctions: s.coreFunctions,
+      drumLifeC: s.drumLifeC!,
+      drumLifeM: s.drumLifeM!,
+      drumLifeY: s.drumLifeY!,
+      drumLifeK: s.drumLifeK!
     })) as CreateArrival['assets']
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
@@ -87,7 +91,11 @@ export async function createSingleArrivalAsset(
     cassettes: asset.cassettes!,
     readiness: getSelectedOrNull(asset.readiness)!,
     internalFinisher: asset.internalFinisher,
-    coreFunctions: asset.coreFunctions
+    coreFunctions: asset.coreFunctions,
+    drumLifeC: asset.drumLifeC!,
+    drumLifeM: asset.drumLifeM!,
+    drumLifeY: asset.drumLifeY!,
+    drumLifeK: asset.drumLifeK!
   } satisfies CreateAsset)
   const { data } = await api.post<AssetSummary>(`/arrivals/${arrivalNumber}/assets`, createSingleArrivalAssetBody)
   return AssetSummarySchema.parse(data)
@@ -111,7 +119,11 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     cassettes: asset.cassettes,
     readiness: getSelectOption(asset.readiness),
     internalFinisher: asset.internalFinisher,
-    coreFunctions: asset.coreFunctions
+    coreFunctions: asset.coreFunctions,
+    drumLifeC: asset.drumLifeC,
+    drumLifeM: asset.drumLifeM,
+    drumLifeY: asset.drumLifeY,
+    drumLifeK: asset.drumLifeK
   }
 }
 
@@ -129,7 +141,11 @@ export async function updateArrivalAsset(
     cassettes: asset.cassettes!,
     readiness: getSelectedOrNull(asset.readiness)!,
     internalFinisher: asset.internalFinisher,
-    coreFunctions: asset.coreFunctions
+    coreFunctions: asset.coreFunctions,
+    drumLifeC: asset.drumLifeC!,
+    drumLifeM: asset.drumLifeM!,
+    drumLifeY: asset.drumLifeY!,
+    drumLifeK: asset.drumLifeK!
   } satisfies UpdateAsset)
   const { data } = await api.patch<AssetSummary>(`/arrivals/${arrivalNumber}/assets/${assetId}`, updateArrivalAssetBody)
   return AssetSummarySchema.parse(data)

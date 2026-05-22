@@ -13,7 +13,11 @@ export const AssetFormSchema = z.object({
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
   readiness: StatusSelectOptionSchema.refine(val => isSelected(val), "Readiness required"),
   internalFinisher: z.string(),
-  coreFunctions: z.array(CoreFunctionsSchema)
+  coreFunctions: z.array(CoreFunctionsSchema),
+  drumLifeC: z.number().min(0).nullable().refine(v => v != null, "Drum life C required"),
+  drumLifeM: z.number().min(0).nullable().refine(v => v != null, "Drum life M required"),
+  drumLifeY: z.number().min(0).nullable().refine(v => v != null, "Drum life Y required"),
+  drumLifeK: z.number().min(0).nullable().refine(v => v != null, "Drum life K required")
 })
 
 // Arrival Form Page within Edit or Create Arrival
@@ -35,7 +39,11 @@ export type AssetForm = {
   cassettes: number | null,
   readiness: SelectOption<Status>,
   internalFinisher: string,
-  coreFunctions: CoreFunction[]
+  coreFunctions: CoreFunction[],
+  drumLifeC: number | null,
+  drumLifeM: number | null,
+  drumLifeY: number | null,
+  drumLifeK: number | null
 }
 
 export type ArrivalForm = {

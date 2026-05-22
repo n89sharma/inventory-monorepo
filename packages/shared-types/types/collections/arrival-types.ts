@@ -38,7 +38,11 @@ export const CreateAssetSchema = z.object({
   cassettes: z.number().min(0, "Cassettes are required"),
   readiness: StatusSchema,
   internalFinisher: z.string(),
-  coreFunctions: z.array(CoreFunctionsSchema)
+  coreFunctions: z.array(CoreFunctionsSchema),
+  drumLifeC: z.number().min(0, "Drum life C required"),
+  drumLifeM: z.number().min(0, "Drum life M required"),
+  drumLifeY: z.number().min(0, "Drum life Y required"),
+  drumLifeK: z.number().min(0, "Drum life K required")
 })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 
