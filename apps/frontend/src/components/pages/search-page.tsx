@@ -190,7 +190,16 @@ export function QueryPage(): React.JSX.Element {
     <>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold">Search</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">Search</h1>
+            {isLoading && (
+              <SpinnerGapIcon
+                className="animate-spin text-muted-foreground"
+                aria-label="Loading"
+                role="status"
+              />
+            )}
+          </div>
           <Button
             variant="outline"
             size="icon"
@@ -272,9 +281,6 @@ export function QueryPage(): React.JSX.Element {
         </form>
       </StickyPageHeader>
       <PageContent className={`flex flex-col gap-2 ${Object.keys(rowSelection).length > 0 ? 'pb-24' : ''}`}>
-        <div hidden={!isLoading} role="status" aria-live="polite">
-          <span>Loading…</span>
-        </div>
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
           <QueryResultsTable
             assets={assets}
