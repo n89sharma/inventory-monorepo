@@ -11,7 +11,8 @@ select
   z.zone as zone,
   l.bin as bin,
   s.status as status,
-  rd.status as readiness
+  rd.status as readiness,
+  a.is_in_transit as is_in_transit
 from "Departure" d
   join "Asset" a on d.id = a.departure_id
   join "TechnicalSpecification" t on t.asset_id = a.id

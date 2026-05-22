@@ -14,5 +14,6 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     location: assetDetails.location,
     hold_number: assetDetails.hold?.hold_number,
     purchase_invoice_id: null,
+    is_in_transit: assetDetails.is_in_transit,
   }
 }

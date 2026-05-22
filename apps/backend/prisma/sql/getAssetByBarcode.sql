@@ -12,7 +12,8 @@ select
   l.bin as bin,
   s.status as status,
   r.status as readiness,
-  a.purchase_invoice_id as purchase_invoice_id
+  a.purchase_invoice_id as purchase_invoice_id,
+  a.is_in_transit as is_in_transit
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
   join "Model" m on m.id = a.model_id

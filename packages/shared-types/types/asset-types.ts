@@ -22,7 +22,8 @@ export const AssetSummarySchema = z.object({
   readiness: z.string(),
   location: AssetLocationDetailsSchema.nullable(),
   hold_number: z.string().nullable().optional(),
-  purchase_invoice_id: z.number().nullable().optional()
+  purchase_invoice_id: z.number().nullable().optional(),
+  is_in_transit: z.boolean()
 })
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
@@ -36,6 +37,7 @@ export const AssetDetailsSchema = z.object({
   serial_number: z.string(),
   status: z.string(),
   readiness: z.string(),
+  is_in_transit: z.boolean(),
   location: AssetLocationDetailsSchema.nullable(),
   cost: z.object({
     purchase_cost: z.number().nullable(),

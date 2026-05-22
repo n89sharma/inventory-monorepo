@@ -21,7 +21,7 @@ Per-app commands (run from within each app directory):
 ```bash
 # Backend
 npm run dev      # tsx watch (hot reload)
-npm run prisma   # npx prisma generate --sql (run after any .sql file change)
+npm run pgen     # npx prisma generate --sql (run after any .sql file change)
 
 # Frontend
 npm run dev      # Vite dev server (port 5173)
@@ -104,7 +104,7 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 |---|---|---|---|
 | **Server setup** | `src/index.ts` | — | Express setup, CORS (`localhost:5173` dev, `shiva-inv.vercel.app` prod), middleware registration. Uses ESM (`"type": "module"`, `moduleResolution: nodenext`). |
 | **Database schema** | `prisma/schema.prisma` | Prisma models | Single source of truth for DB structure — all tables, relations, and field types defined here |
-| **Typed SQL queries** | `prisma/sql/getSomething.sql` | camelCase, descriptive | Raw SQL for complex reads; run `npm run prisma` after any change to regenerate `generated/prisma/sql/` |
+| **Typed SQL queries** | `prisma/sql/getSomething.sql` | camelCase, descriptive | Raw SQL for complex reads; run `npm run pgen` after any change to regenerate `generated/prisma/sql/` |
 | **Service** | `src/services/xyzService.ts` | `entityService.ts` | Pure DB logic — Prisma calls, conflict checks, business rules; no HTTP concerns |
 | **Controller** | `src/controllers/xyzController.ts` | `entityController.ts` | HTTP layer — parse body with `XyzSchema.parse(req.body)`, call service, return 200/201/400/500 |
 | **Route** | `src/routes/xyzRoutes.ts` | `entityRoutes.ts` | Wire URL paths to controller functions; registered in `src/index.ts` |
@@ -131,7 +131,7 @@ Changes to a schema in `shared-types` propagate to both backend validation and f
 4. **Batch reads with `findMany` + `in`.** Fetch a set of related records in one query using `where: { id: { in: ids } }`, then build a `Map` for O(1) lookups.
 5. **Acceptable exceptions (not N+1 bugs):** `updateMany` applies one `data` object to all rows — use individual `update` calls when each row differs. `createMany` cannot nest relation writes — use individual `create` when nested relations are required. `getNextSequence` must be called sequentially per record to guarantee monotonically increasing numbers.
 
-**After removing a feature or query:** Delete any `.sql` files in `prisma/sql/` that are no longer used, then run `npm run prisma` to regenerate `generated/prisma/sql/`. Also check for orphaned imports across the controller, service, and API layers.
+**After removing a feature or query:** Delete any `.sql` files in `prisma/sql/` that are no longer used, then run `npm run pgen` to regenerate `generated/prisma/sql/`. Also check for orphaned imports across the controller, service, and API layers.
 
 **Key backend utilities:**
 - `response400`, `response500`, `successResponse` from `shared-types` — standard response wrappers

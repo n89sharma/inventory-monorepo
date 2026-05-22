@@ -7,7 +7,7 @@ type PageContentProps = {
 
 export function PageContent({ children, className }: PageContentProps): React.JSX.Element {
   return (
-    <div className={cn("max-w-5xl mx-auto w-full px-4 py-4", className)}>
+    <div className={cn("max-w-7xl mx-auto w-full px-4 py-4", className)}>
       {children}
     </div>
   )

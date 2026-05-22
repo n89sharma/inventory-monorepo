@@ -43,6 +43,7 @@ type AssetSummaryRow = LocationRow & {
   readiness: string
   hold_number?: string | null
   purchase_invoice_id?: number | null
+  is_in_transit: boolean
 }
 
 export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
@@ -58,7 +59,8 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     readiness: r.readiness,
     location: buildLocation(r),
     hold_number: r.hold_number ?? null,
-    purchase_invoice_id: r.purchase_invoice_id ?? null
+    purchase_invoice_id: r.purchase_invoice_id ?? null,
+    is_in_transit: r.is_in_transit
   }
 }
 
@@ -140,6 +142,7 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
     asset_type: r.asset_type,
     status: r.status,
     readiness: r.readiness,
+    is_in_transit: r.is_in_transit,
     location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,

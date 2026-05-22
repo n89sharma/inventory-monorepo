@@ -12,6 +12,7 @@ select
   z.zone as zone,
   l.bin as bin,
   a.created_at as created_at,
+  a.is_in_transit as is_in_transit,
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,

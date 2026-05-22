@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetsForArrival = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_code,\nw.street as warehouse_street,\nz.zone as zone,\nl.bin as bin,\ns.status as status,\nrd.status as readiness\nfrom \"Arrival\" ar\njoin \"Asset\" a on ar.id = a.arrival_id\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"Status\" s on s.id = a.status_id\njoin \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nleft join \"Zone\" z on z.id = l.zone_id\nwhere ar.arrival_number  = $1") as (text: string) => $runtime.TypedSql<getAssetsForArrival.Parameters, getAssetsForArrival.Result>
+export const getAssetsForArrival = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nw.city_code as warehouse_code,\nw.street as warehouse_street,\nz.zone as zone,\nl.bin as bin,\ns.status as status,\nrd.status as readiness,\na.is_in_transit as is_in_transit\nfrom \"Arrival\" ar\njoin \"Asset\" a on ar.id = a.arrival_id\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"Status\" s on s.id = a.status_id\njoin \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nleft join \"Zone\" z on z.id = l.zone_id\nwhere ar.arrival_number  = $1") as (text: string) => $runtime.TypedSql<getAssetsForArrival.Parameters, getAssetsForArrival.Result>
 
 export namespace getAssetsForArrival {
   export type Parameters = [text: string]
@@ -26,5 +26,6 @@ export namespace getAssetsForArrival {
     bin: string
     status: string
     readiness: string
+    is_in_transit: boolean
   }
 }
