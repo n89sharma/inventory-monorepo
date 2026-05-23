@@ -18,7 +18,12 @@ import {
 } from "@/components/shadcn/table"
 
 import { Button } from "@/components/shadcn/button"
-import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
+import {
+  CaretDoubleLeftIcon,
+  CaretDoubleRightIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+} from "@phosphor-icons/react"
 
 
 interface DataTableProps<TData, TValue> {
@@ -126,28 +131,48 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-center space-x-2 py-4">
+      <div className="flex flex-col items-center gap-2 p-2">
         <div className="text-sm text-semibold">
           <strong>{start}-{end}</strong> of <strong>{totalRows}</strong>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-          <CaretLeftIcon aria-hidden="true" />
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          <CaretRightIcon aria-hidden="true" />
-          Next
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.firstPage()}
+            disabled={!table.getCanPreviousPage()}
+            aria-label="First page"
+          >
+            <CaretDoubleLeftIcon aria-hidden="true" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <CaretLeftIcon aria-hidden="true" />
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+            <CaretRightIcon aria-hidden="true" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.lastPage()}
+            disabled={!table.getCanNextPage()}
+            aria-label="Last page"
+          >
+            <CaretDoubleRightIcon aria-hidden="true" />
+          </Button>
+        </div>
       </div>
 
     </div>
