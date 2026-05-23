@@ -1,11 +1,32 @@
 import { CopyButton } from "@/components/custom/copy-button"
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
+import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatLocation, formatThousandsK } from "@/lib/formatters"
+import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSearchRow } from 'shared-types'
+
+function SortableHeader({
+  label,
+  onToggle,
+}: {
+  label: string
+  onToggle: () => void
+}) {
+  return (
+    <Button
+      variant="ghost"
+      onClick={onToggle}
+      className="h-auto whitespace-normal py-1"
+    >
+      {label}
+      <ArrowsDownUpIcon />
+    </Button>
+  )
+}
 
 export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
   {
@@ -48,7 +69,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
         <CopyButton value={row.original.barcode} />
       </div>
     ),
-    size: 130
+    size: 140
   },
   {
     accessorKey: "brand",
@@ -69,29 +90,49 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    size: 80
+    size: 100
   },
   {
     accessorKey: "readiness",
-    header: "Readiness",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Readiness"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
     cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
     size: 80
   },
   {
     accessorKey: "meter_total",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Total Meter"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
     cell: ({ row }) => formatThousandsK(row.getValue('meter_total')),
-    header: "Total Meter",
     size: 80
   },
   {
     accessorKey: "cassettes",
-    header: "Cassettes",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Cassettes"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
     cell: ({ row }) => row.original.cassettes ?? '',
     size: 80
   },
   {
     accessorKey: "internal_finisher",
-    header: "Internal Finisher",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Internal Finisher"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
     cell: ({ row }) => row.original.internal_finisher ?? '',
     size: 80
   },

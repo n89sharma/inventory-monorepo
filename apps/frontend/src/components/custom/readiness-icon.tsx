@@ -32,7 +32,7 @@ export function ReadinessIcon({ status }: { status: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="inline-flex">
+        <span className="inline-flex align-middle">
           <Icon size={18} weight={weight} className={className} />
         </span>
       </TooltipTrigger>
