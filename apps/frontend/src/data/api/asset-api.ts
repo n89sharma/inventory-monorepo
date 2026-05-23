@@ -178,6 +178,8 @@ export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
 export async function getAssetsForQuery(
   modelName: string,
   meter: number | null,
+  cassettes: number | null,
+  internalFinisher: string | null,
   statuses: Status[],
   readinesses: Status[],
   warehouses: Warehouse[]): Promise<AssetSearchRow[]> {
@@ -186,6 +188,8 @@ export async function getAssetsForQuery(
     params: {
       model: modelName,
       meter: meter ?? undefined,
+      cassettes: cassettes ?? undefined,
+      internalFinisher: internalFinisher ?? undefined,
       statusIds: statuses.map(s => s.id),
       readinessIds: readinesses.map(s => s.id),
       warehouseIds: warehouses.map(w => w.id),

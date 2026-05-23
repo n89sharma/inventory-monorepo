@@ -30,3 +30,5 @@ where m."name" ~* $1
   and (array_length($3::int[], 1) is null or rd.id = any($3::int[]))
   and (array_length($4::int[], 1) is null or w.id = any($4::int[]))
   and ($5 = -1 or t.meter_total <= $5)
+  and ($6 = -1 or t.cassettes >= $6)
+  and ($7 = '' or t.internal_finisher ~* $7)

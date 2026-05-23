@@ -6,13 +6,18 @@ const PARAM_METER = 'meter'
 const PARAM_STATUS = 'status'
 const PARAM_TECH = 'tech'
 const PARAM_WH = 'wh'
+const PARAM_CAS = 'cas'
+const PARAM_FIN = 'fin'
 
 export const MIN_QUERY_LENGTH = 3
+export const INTERNAL_FINISHER_PATTERN = /^[a-zA-Z0-9\s\-_.]*$/
 
 export type SearchFilters = {
   model: ModelSummary | null
   modelQuery: string | null
   meter: number | null
+  cassettes: number | null
+  internalFinisher: string | null
   statuses: Status[]
   readinesses: Status[]
   selectedWarehouses: Warehouse[]
@@ -29,6 +34,8 @@ export const EMPTY_FILTERS: SearchFilters = {
   model: null,
   modelQuery: null,
   meter: null,
+  cassettes: null,
+  internalFinisher: null,
   statuses: [],
   readinesses: [],
   selectedWarehouses: [],
@@ -56,6 +63,10 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
     params.set(PARAM_Q, filters.modelQuery)
   }
   if (filters.meter !== null) params.set(PARAM_METER, String(filters.meter))
+  if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
+  if (filters.internalFinisher && INTERNAL_FINISHER_PATTERN.test(filters.internalFinisher)) {
+    params.set(PARAM_FIN, filters.internalFinisher)
+  }
   if (filters.statuses.length > 0) {
     params.set(PARAM_STATUS, encodeIds(filters.statuses))
   }
@@ -83,10 +94,20 @@ export function paramsToFilters(
   const meterRaw = params.get(PARAM_METER)
   const meter = meterRaw === null ? null : Number.parseFloat(meterRaw)
 
+  const cassettesRaw = params.get(PARAM_CAS)
+  const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
+
+  const finisherRaw = params.get(PARAM_FIN)
+  const internalFinisher = finisherRaw && INTERNAL_FINISHER_PATTERN.test(finisherRaw)
+    ? finisherRaw
+    : null
+
   return {
     model,
     modelQuery,
     meter: meter === null || Number.isNaN(meter) ? null : meter,
+    cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
+    internalFinisher,
     statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),
     readinesses: decodeIds(params.get(PARAM_TECH), ref.readinesses),
     selectedWarehouses: decodeIds(params.get(PARAM_WH), ref.warehouses),

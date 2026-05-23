@@ -276,6 +276,34 @@ export function QueryPage(): React.JSX.Element {
               inputType='number'
               className='w-45'
             />
+
+            <InputWithClearInline
+              value={draft.cassettes}
+              onValueChange={val => {
+                const next = typeof val === 'string' || val === null
+                  ? null
+                  : Number.isInteger(val) && val >= 0 ? val : null
+                updateDraftDebounced({ ...draft, cassettes: next })
+              }}
+              fieldLabel='Cassettes (min)'
+              inputType='number'
+              className='w-45'
+            />
+
+            <InputWithClearInline
+              value={draft.internalFinisher}
+              onValueChange={val => {
+                if (typeof val !== 'string' && val !== null) return
+                const cleaned = val ? val.replace(/[^a-zA-Z0-9\s\-_.]/g, '') : ''
+                updateDraftDebounced({
+                  ...draft,
+                  internalFinisher: cleaned.length > 0 ? cleaned : null,
+                })
+              }}
+              fieldLabel='Internal Finisher'
+              inputType='string'
+              className='w-45'
+            />
           </fieldset>
         </form>
       </StickyPageHeader>

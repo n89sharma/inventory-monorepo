@@ -93,7 +93,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     accessorKey: "internal_finisher",
     header: "Internal Finisher",
     cell: ({ row }) => row.original.internal_finisher ?? '',
-    size: 120
+    size: 80
   },
   {
     id: "location",

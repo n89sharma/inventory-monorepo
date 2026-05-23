@@ -82,10 +82,20 @@ export async function getAssets(
   statusIds: number[],
   readinessIds: number[],
   warehouseIds: number[],
-  meterParam: number
+  meterParam: number,
+  cassettesParam: number,
+  internalFinisherParam: string
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
-    getAssetsQuery(model, statusIds, readinessIds, warehouseIds, meterParam)
+    getAssetsQuery(
+      model,
+      statusIds,
+      readinessIds,
+      warehouseIds,
+      meterParam,
+      cassettesParam,
+      internalFinisherParam,
+    )
   )
   return rows.map(mapAssetSearchRow)
 }

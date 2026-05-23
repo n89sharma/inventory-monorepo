@@ -18,6 +18,8 @@ export function useSearchResults(filters: SearchFilters) {
       return getAssetsForQuery(
         modelName,
         f.meter,
+        f.cassettes,
+        f.internalFinisher,
         f.statuses,
         f.readinesses,
         f.selectedWarehouses,
