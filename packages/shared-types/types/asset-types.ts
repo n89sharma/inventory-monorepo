@@ -28,6 +28,13 @@ export const AssetSummarySchema = z.object({
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
 
+export const AssetSearchRowSchema = AssetSummarySchema.extend({
+  cassettes: z.number().nullable(),
+  internal_finisher: z.string().nullable(),
+})
+
+export type AssetSearchRow = z.infer<typeof AssetSearchRowSchema>
+
 export const AssetDetailsSchema = z.object({
   id: z.number(),
   barcode: z.string(),

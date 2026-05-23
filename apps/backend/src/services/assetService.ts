@@ -1,4 +1,4 @@
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, type AppRole } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
@@ -64,17 +64,30 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
   }
 }
 
+type AssetSearchRowDb = AssetSummaryRow & {
+  cassettes: number | null
+  internal_finisher: string | null
+}
+
+function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
+  return {
+    ...mapAssetSummary(r),
+    cassettes: r.cassettes,
+    internal_finisher: r.internal_finisher,
+  }
+}
+
 export async function getAssets(
   model: string,
   statusIds: number[],
   readinessIds: number[],
   warehouseIds: number[],
   meterParam: number
-): Promise<AssetSummary[]> {
+): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
     getAssetsQuery(model, statusIds, readinessIds, warehouseIds, meterParam)
   )
-  return rows.map(mapAssetSummary)
+  return rows.map(mapAssetSearchRow)
 }
 
 export async function getAssetDetail(

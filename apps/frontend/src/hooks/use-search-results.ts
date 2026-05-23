@@ -1,6 +1,6 @@
 import { getAssetsForQuery } from '@/data/api/asset-api'
 import { MIN_QUERY_LENGTH, type SearchFilters } from '@/lib/search-url-params'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 import useSWR from 'swr'
 
 const SEARCH_KEY = 'search-assets'
@@ -11,7 +11,7 @@ function hasSearchTarget(f: SearchFilters): boolean {
 }
 
 export function useSearchResults(filters: SearchFilters) {
-  return useSWR<AssetSummary[]>(
+  return useSWR<AssetSearchRow[]>(
     hasSearchTarget(filters) ? [SEARCH_KEY, filters] : null,
     ([, f]: [string, SearchFilters]) => {
       const modelName = f.model?.model_name ?? f.modelQuery!

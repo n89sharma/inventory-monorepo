@@ -6,6 +6,8 @@ select
   a.barcode,
   a.serial_number,
   t.meter_total,
+  t.cassettes,
+  t.internal_finisher,
   w.city_code as warehouse_code,
   w.street as warehouse_street,
   z.zone as zone,

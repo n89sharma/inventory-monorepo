@@ -4,7 +4,7 @@ import type {
   AssetError,
   AssetHistory,
   AssetLocation,
-  AssetSummary,
+  AssetSearchRow,
   AssetTransfer,
   BarcodeSuggestion,
   BulkUpdateAssetPricing,
@@ -26,7 +26,7 @@ import {
   AssetErrorSchema,
   AssetHistorySchema,
   AssetLocationSchema,
-  AssetSummarySchema,
+  AssetSearchRowSchema,
   AssetTransferSchema,
   BarcodeSuggestionSchema,
   BulkUpdateAssetPricingSchema,
@@ -180,9 +180,9 @@ export async function getAssetsForQuery(
   meter: number | null,
   statuses: Status[],
   readinesses: Status[],
-  warehouses: Warehouse[]): Promise<AssetSummary[]> {
+  warehouses: Warehouse[]): Promise<AssetSearchRow[]> {
 
-  const { data } = await api.get<AssetSummary[]>(`/assets`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
     params: {
       model: modelName,
       meter: meter ?? undefined,
@@ -191,5 +191,5 @@ export async function getAssetsForQuery(
       warehouseIds: warehouses.map(w => w.id),
     }
   })
-  return z.array(AssetSummarySchema).parse(data)
+  return z.array(AssetSearchRowSchema).parse(data)
 }

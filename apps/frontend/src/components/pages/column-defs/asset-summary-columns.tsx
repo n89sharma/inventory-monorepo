@@ -1,6 +1,6 @@
-import { StatusBadge } from "@/components/custom/status-badge"
-import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { CopyButton } from "@/components/custom/copy-button"
+import { ReadinessIcon } from "@/components/custom/readiness-icon"
+import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { formatLocation, formatThousandsK } from "@/lib/formatters"
@@ -40,7 +40,7 @@ export function createAssetSummaryColumns(
           aria-label="Select row"
         />
       ),
-      size: 40,
+      size: 30,
       enableSorting: false,
       enableHiding: false,
     },
@@ -48,7 +48,7 @@ export function createAssetSummaryColumns(
       accessorKey: "barcode",
       header: "Barcode",
       cell: ({ row }) => (
-        <div className="group flex items-center justify-center gap-2">
+        <div className="group flex items-center justify-center gap-1">
           <Link
             to={
               isCollection(navigationSection)
@@ -62,30 +62,22 @@ export function createAssetSummaryColumns(
           <CopyButton value={row.original.barcode} />
         </div>
       ),
-      size: 160
+      size: 120
     },
     {
       accessorKey: "brand",
       header: "Brand",
-      size: 80
+      size: 100
     },
     {
       accessorKey: "model",
       header: "Model",
-      size: 120
+      size: 100
     },
     {
       accessorKey: "serial_number",
       header: "Serial Number",
       size: 100
-    },
-    {
-      accessorKey: "meter_total",
-      cell: ({ row }) => {
-        return formatThousandsK(row.getValue('meter_total'))
-      },
-      header: "Total Meter",
-      size: 70
     },
     {
       accessorKey: "status",
@@ -100,10 +92,17 @@ export function createAssetSummaryColumns(
       size: 80
     },
     {
+      accessorKey: "meter_total",
+      cell: ({ row }) => {
+        return formatThousandsK(row.getValue('meter_total'))
+      },
+      header: "Total Meter",
+      size: 80
+    },
+    {
       id: "location",
       header: "Location",
-      cell: ({ row }) => formatLocation(row.original.location),
-      size: 140
+      cell: ({ row }) => formatLocation(row.original.location)
     }
   ]
 

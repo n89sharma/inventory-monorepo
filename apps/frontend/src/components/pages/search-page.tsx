@@ -15,19 +15,18 @@ import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
 import { InputWithClearInline } from '../custom/input-with-clear'
 import { ModelSearchInput } from '../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../custom/multi-select-options'
 import { DataTable } from "../shadcn/data-table"
-import { createAssetSummaryColumns } from './column-defs/asset-summary-columns'
+import { assetSearchColumns } from './column-defs/asset-search-columns'
 
-const searchColumns = createAssetSummaryColumns('search')
-const getAssetRowId = (row: AssetSummary) => row.barcode
+const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
-const EMPTY_ASSETS: AssetSummary[] = []
+const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 300
 
 const QueryResultsTable = memo(function QueryResultsTable({
@@ -36,7 +35,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
   onRowSelectionChange,
   onBulkPriceSave,
 }: {
-  assets: AssetSummary[]
+  assets: AssetSearchRow[]
   rowSelection: RowSelectionState
   onRowSelectionChange: OnChangeFn<RowSelectionState>
   onBulkPriceSave: () => void
@@ -66,7 +65,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
         onSelectAll={selectAllAssets}
       />
       <DataTable
-        columns={searchColumns}
+        columns={assetSearchColumns}
         data={assets}
         rowSelection={rowSelection}
         onRowSelectionChange={onRowSelectionChange}
