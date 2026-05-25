@@ -17,7 +17,11 @@ export const AssetFormSchema = z.object({
   drumLifeC: z.number().min(0).nullable().refine(v => v != null, "Drum life C required"),
   drumLifeM: z.number().min(0).nullable().refine(v => v != null, "Drum life M required"),
   drumLifeY: z.number().min(0).nullable().refine(v => v != null, "Drum life Y required"),
-  drumLifeK: z.number().min(0).nullable().refine(v => v != null, "Drum life K required")
+  drumLifeK: z.number().min(0).nullable().refine(v => v != null, "Drum life K required"),
+  tonerLifeC: z.number().min(0).nullable().refine(v => v != null, "Toner life C required"),
+  tonerLifeM: z.number().min(0).nullable().refine(v => v != null, "Toner life M required"),
+  tonerLifeY: z.number().min(0).nullable().refine(v => v != null, "Toner life Y required"),
+  tonerLifeK: z.number().min(0).nullable().refine(v => v != null, "Toner life K required")
 })
 
 // Arrival Form Page within Edit or Create Arrival
@@ -43,7 +47,11 @@ export type AssetForm = {
   drumLifeC: number | null,
   drumLifeM: number | null,
   drumLifeY: number | null,
-  drumLifeK: number | null
+  drumLifeK: number | null,
+  tonerLifeC: number | null,
+  tonerLifeM: number | null,
+  tonerLifeY: number | null,
+  tonerLifeK: number | null
 }
 
 export type ArrivalForm = {

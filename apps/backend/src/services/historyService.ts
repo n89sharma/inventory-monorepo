@@ -83,6 +83,10 @@ type AssetUpdateFields = Partial<{
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
+  toner_life_k: number | null
   purchase_cost: number | null
   transport_cost: number | null
   processing_cost: number | null
@@ -435,7 +439,8 @@ export async function recordAssetUpdate(
       'serial_number',
       'meter_black', 'meter_colour', 'meter_total',
       'cassettes', 'internal_finisher',
-      'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k'
+      'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k',
+      'toner_life_c', 'toner_life_m', 'toner_life_y', 'toner_life_k'
     ]
     for (const field of plainFields) {
       const beforeVal = (before as Record<string, unknown>)[field]

@@ -1,20 +1,186 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, isSelected, UNSELECTED, type SelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
-import { Controller, useForm, type UseFieldArrayAppend, type UseFieldArrayUpdate } from 'react-hook-form'
-import type { CoreFunction, ModelSummary } from 'shared-types'
+import {
+  Controller,
+  useForm,
+  type Control,
+  type Path,
+  type UseFieldArrayAppend,
+  type UseFieldArrayUpdate,
+} from 'react-hook-form'
+import type { CoreFunction, ModelSummary, Status } from 'shared-types'
 import { formatSentenceCase } from '@/lib/formatters'
+import { cn } from '@/lib/utils'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
-import { SelectOptions } from '../custom/select-options'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../shadcn/dialog'
+import { Field, FieldLabel } from '../shadcn/field'
+import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
+
+const CMYK_CHANNELS = [
+  { letter: 'C', dotClass: 'bg-cyan-500' },
+  { letter: 'M', dotClass: 'bg-fuchsia-500' },
+  { letter: 'Y', dotClass: 'bg-yellow-500' },
+  { letter: 'K', dotClass: 'bg-foreground' },
+] as const
+
+type CMYKFieldNames = {
+  c: Path<AssetForm>
+  m: Path<AssetForm>
+  y: Path<AssetForm>
+  k: Path<AssetForm>
+}
+
+function FormSection(
+  { title, children }: { title: string; children: React.ReactNode }
+) {
+  return (
+    <section className='flex flex-col gap-3'>
+      <div className='flex items-center gap-3'>
+        <h3 className='text-[11px] font-semibold uppercase tracking-wider text-muted-foreground'>
+          {title}
+        </h3>
+        <div className='h-px flex-1 bg-border' />
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function ConsumablesRow(
+  {
+    label,
+    control,
+    names,
+  }: {
+    label: string
+    control: Control<AssetForm>
+    names: CMYKFieldNames
+  }
+) {
+  const orderedNames = [names.c, names.m, names.y, names.k]
+  return (
+    <div className='grid grid-cols-[80px_repeat(4,minmax(0,72px))_auto] items-center gap-2'>
+      <span className='text-sm text-muted-foreground'>{label}</span>
+      {orderedNames.map((fieldName, i) => (
+        <Controller
+          key={fieldName}
+          control={control}
+          name={fieldName}
+          render={({ field, fieldState }) => (
+            <Input
+              type='number'
+              value={(field.value as number | null) ?? ''}
+              onChange={e => {
+                const raw = e.target.value
+                if (raw === '') return field.onChange(null)
+                const n = Number(raw)
+                field.onChange(isNaN(n) ? null : n)
+              }}
+              placeholder='–'
+              aria-invalid={fieldState.invalid}
+              aria-label={`${label} ${CMYK_CHANNELS[i].letter}`}
+              className='h-8 text-center tabular-nums'
+            />
+          )}
+        />
+      ))}
+      <span className='text-xs text-muted-foreground'>%</span>
+    </div>
+  )
+}
+
+function ConsumablesGrid({ control }: { control: Control<AssetForm> }) {
+  return (
+    <div className='flex flex-col gap-2'>
+      <div
+        className='grid grid-cols-[80px_repeat(4,minmax(0,72px))_auto]
+                   items-center gap-2 px-1'
+      >
+        <span />
+        {CMYK_CHANNELS.map(c => (
+          <div key={c.letter} className='flex items-center justify-center gap-1.5'>
+            <span className={cn('size-2 rounded-full', c.dotClass)} />
+            <span className='text-xs font-medium text-muted-foreground'>
+              {c.letter}
+            </span>
+          </div>
+        ))}
+        <span />
+      </div>
+      <ConsumablesRow
+        label='Drum life'
+        control={control}
+        names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
+      />
+      <ConsumablesRow
+        label='Toner'
+        control={control}
+        names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
+      />
+    </div>
+  )
+}
+
+function ReadinessPicker(
+  {
+    selection,
+    onSelectionChange,
+    options,
+    error,
+  }: {
+    selection: SelectOption<Status>
+    onSelectionChange: (s: SelectOption<Status>) => void
+    options: Status[]
+    error: boolean
+  }
+) {
+  const selectedId = isSelected(selection) ? selection.selected.id : null
+  return (
+    <div
+      role='radiogroup'
+      aria-invalid={error}
+      data-invalid={error}
+      className='inline-flex flex-wrap gap-1.5'
+    >
+      {options.map(opt => {
+        const active = opt.id === selectedId
+        return (
+          <button
+            key={opt.id}
+            type='button'
+            role='radio'
+            aria-checked={active}
+            onClick={() =>
+              onSelectionChange(active ? UNSELECTED : getSelectOption(opt))
+            }
+            className={cn(
+              'h-7 rounded-full border px-3 text-xs font-medium transition-colors',
+              active
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-background text-foreground hover:bg-muted',
+            )}
+          >
+            {formatSentenceCase(opt.status)}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 interface AssetModalProps {
   open: boolean
@@ -27,7 +193,16 @@ interface AssetModalProps {
   onUpdateAsset?: (asset: AssetForm) => Promise<void>
 }
 
-export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editingAsset, editingIndex, onCreateAsset, onUpdateAsset }: AssetModalProps): React.JSX.Element {
+export function AssetModal({
+  open,
+  onOpenChange,
+  addNewAsset,
+  updateAsset,
+  editingAsset,
+  editingIndex,
+  onCreateAsset,
+  onUpdateAsset,
+}: AssetModalProps): React.JSX.Element {
   const isEditMode = editingAsset != null
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -38,7 +213,7 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
 
   const newAssetForm = useForm<AssetForm>({
     resolver: zodResolver(AssetFormSchema),
-    defaultValues: getDefaultNewAsset()
+    defaultValues: getDefaultNewAsset(),
   })
   const isDirty = newAssetForm.formState.isDirty
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
@@ -71,7 +246,11 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
       drumLifeC: null,
       drumLifeM: null,
       drumLifeY: null,
-      drumLifeK: null
+      drumLifeK: null,
+      tonerLifeC: null,
+      tonerLifeM: null,
+      tonerLifeY: null,
+      tonerLifeK: null,
     }
   }
 
@@ -132,13 +311,13 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='md:max-w-4xl overflow-y-auto max-h-[90vh]'>
+      <DialogContent className='md:max-w-2xl overflow-y-auto max-h-[90vh]'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={e => e.preventDefault()} className='flex flex-col gap-6'>
 
+          <div className='grid grid-cols-[1fr_200px] gap-4'>
             <ControlledPopoverSearch
               control={newAssetForm.control}
               name='model'
@@ -148,7 +327,6 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
               fieldLabel='Model'
               fieldRequired={true}
             />
-
             <ControlledInputWithClear
               control={newAssetForm.control}
               name='serialNumber'
@@ -156,113 +334,97 @@ export function AssetModal({ open, onOpenChange, addNewAsset, updateAsset, editi
               fieldRequired={true}
               inputType='string'
             />
+          </div>
 
-            <FieldSet>
-              <FieldLegend>Meter</FieldLegend>
-              <FieldGroup className='grid grid-cols-2 gap-3'>
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='meterBlack'
-                  fieldLabel='Black'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='meterColour'
-                  fieldLabel='Colour'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-              </FieldGroup>
-            </FieldSet>
-
-            <FieldSet>
-              <FieldLegend>Drum Life</FieldLegend>
-              <FieldGroup className='grid grid-cols-2 gap-3'>
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='drumLifeC'
-                  fieldLabel='C'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='drumLifeM'
-                  fieldLabel='M'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='drumLifeY'
-                  fieldLabel='Y'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-                <ControlledInputWithClear
-                  control={newAssetForm.control}
-                  name='drumLifeK'
-                  fieldLabel='K'
-                  fieldRequired={true}
-                  inputType='number'
-                />
-              </FieldGroup>
-            </FieldSet>
-
-            <Controller
-              control={newAssetForm.control}
-              name='readiness'
-              render={({ field: { onChange, value: readiness }, fieldState }) => (
-                <SelectOptions
-                  selection={readiness}
+          <Controller
+            control={newAssetForm.control}
+            name='readiness'
+            render={({ field: { onChange, value }, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Readiness</FieldLabel>
+                <ReadinessPicker
+                  selection={value}
                   onSelectionChange={onChange}
                   options={readinesses}
-                  getLabel={t => formatSentenceCase(t.status)}
-                  fieldLabel='Readiness'
-                  fieldRequired={false}
                   error={fieldState.invalid}
                 />
-              )}
-            />
+              </Field>
+            )}
+          />
 
-            <ControlledInputWithClear
-              control={newAssetForm.control}
-              name='cassettes'
-              fieldLabel='Cassettes'
-              fieldRequired={true}
-              inputType='number'
-            />
-
-            <ControlledInputWithClear
-              control={newAssetForm.control}
-              name='internalFinisher'
-              fieldLabel='Internal Finisher'
-              inputType='string'
-            />
-
-            <Field>
-              <FieldLabel>Core Functions</FieldLabel>
-              <Controller
-                name='coreFunctions'
+          <FormSection title='Usage'>
+            <div className='grid grid-cols-[140px_140px] gap-4'>
+              <ControlledInputWithClear
                 control={newAssetForm.control}
-                render={({ field: { onChange, value } }) => (
-                  <MultipleSelector
-                    options={getCoreFunctionOptions(coreFunctions)}
-                    placeholder='Select functions…'
-                    emptyIndicator={<p>No results found.</p>}
-                    value={getCoreFunctionOptions(value)}
-                    onChange={options => onChange(coreFunctions.filter(c => options.map(o => o.id).includes(c.id)))}
-                  />
-                )}
+                name='meterBlack'
+                fieldLabel='Meter — Black'
+                fieldRequired={true}
+                inputType='number'
               />
-            </Field>
+              <ControlledInputWithClear
+                control={newAssetForm.control}
+                name='meterColour'
+                fieldLabel='Meter — Colour'
+                fieldRequired={true}
+                inputType='number'
+              />
+            </div>
+          </FormSection>
 
-          </FieldGroup>
+          <FormSection title='Consumables'>
+            <ConsumablesGrid control={newAssetForm.control} />
+          </FormSection>
+
+          <FormSection title='Hardware'>
+            <div className='flex flex-col gap-4'>
+              <div className='grid grid-cols-[80px_120px] gap-4'>
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='cassettes'
+                  fieldLabel='Cassettes'
+                  fieldRequired={true}
+                  inputType='number'
+                />
+                <ControlledInputWithClear
+                  control={newAssetForm.control}
+                  name='internalFinisher'
+                  fieldLabel='Internal Finisher'
+                  inputType='string'
+                />
+              </div>
+              <Field>
+                <FieldLabel>Core Functions</FieldLabel>
+                <Controller
+                  name='coreFunctions'
+                  control={newAssetForm.control}
+                  render={({ field: { onChange, value } }) => (
+                    <MultipleSelector
+                      options={getCoreFunctionOptions(coreFunctions)}
+                      placeholder='Select functions…'
+                      emptyIndicator={<p>No results found.</p>}
+                      value={getCoreFunctionOptions(value)}
+                      onChange={options =>
+                        onChange(
+                          coreFunctions.filter(c =>
+                            options.map(o => o.id).includes(c.id),
+                          ),
+                        )
+                      }
+                    />
+                  )}
+                />
+              </Field>
+            </div>
+          </FormSection>
+
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => handleOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant='outline'
+            onClick={() => handleOpenChange(false)}
+            type='button'
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button onClick={submitAsset} type='button' disabled={isSubmitting}>

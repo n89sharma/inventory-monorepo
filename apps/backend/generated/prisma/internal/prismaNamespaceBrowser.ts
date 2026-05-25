@@ -80,7 +80,8 @@ export const ModelName = {
   History: 'History',
   Readiness: 'Readiness',
   Status: 'Status',
-  Zone: 'Zone'
+  Zone: 'Zone',
+  Country: 'Country'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -115,7 +116,8 @@ export const AssetScalarFieldEnum = {
   serial_normalized: 'serial_normalized',
   readiness_id: 'readiness_id',
   status_id: 'status_id',
-  is_in_transit: 'is_in_transit'
+  is_in_transit: 'is_in_transit',
+  country_of_origin_id: 'country_of_origin_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -140,7 +142,11 @@ export const TechnicalSpecificationScalarFieldEnum = {
   drum_life_c: 'drum_life_c',
   drum_life_m: 'drum_life_m',
   drum_life_y: 'drum_life_y',
-  drum_life_k: 'drum_life_k'
+  drum_life_k: 'drum_life_k',
+  toner_life_c: 'toner_life_c',
+  toner_life_k: 'toner_life_k',
+  toner_life_m: 'toner_life_m',
+  toner_life_y: 'toner_life_y'
 } as const
 
 export type TechnicalSpecificationScalarFieldEnum = (typeof TechnicalSpecificationScalarFieldEnum)[keyof typeof TechnicalSpecificationScalarFieldEnum]
@@ -464,6 +470,14 @@ export const ZoneScalarFieldEnum = {
 } as const
 
 export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
+
+
+export const CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+} as const
+
+export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -1,6 +1,6 @@
 import { createBrand as createBrandApi, getBrands as getBrandsApi } from '@/data/api/brand-api'
 import type { BrandForm } from '@/ui-types/brand-form-types'
-import type { AssetType, Brand, CoreFunction, Error, InvoiceType, ReferenceData, Status, Warehouse, Zone } from 'shared-types'
+import type { AssetType, Brand, CoreFunction, Country, Error, InvoiceType, ReferenceData, Status, Warehouse, Zone } from 'shared-types'
 import { create } from 'zustand'
 
 interface ReferenceDataStore {
@@ -13,6 +13,7 @@ interface ReferenceDataStore {
   warehouses: Warehouse[]
   zones: Zone[]
   errors: Error[]
+  countries: Country[]
   loading: boolean
 
   setReferenceData: (refData: ReferenceData) => void
@@ -33,6 +34,7 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   warehouses: [],
   zones: [],
   errors: [],
+  countries: [],
   loading: false,
 
   setReferenceData: (referenceData) => set({
@@ -44,7 +46,8 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
     invoiceTypes: referenceData.invoiceTypes,
     warehouses: referenceData.warehouses,
     zones: referenceData.zones,
-    errors: referenceData.errors
+    errors: referenceData.errors,
+    countries: referenceData.countries
   }),
   setBrands: (brands) => set({ brands }),
   setLoading: (loading) => set({ loading }),
@@ -63,6 +66,7 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
     invoiceTypes: [],
     warehouses: [],
     zones: [],
-    errors: []
+    errors: [],
+    countries: []
   })
 }))

@@ -42,7 +42,11 @@ export const CreateAssetSchema = z.object({
   drumLifeC: z.number().min(0, "Drum life C required"),
   drumLifeM: z.number().min(0, "Drum life M required"),
   drumLifeY: z.number().min(0, "Drum life Y required"),
-  drumLifeK: z.number().min(0, "Drum life K required")
+  drumLifeK: z.number().min(0, "Drum life K required"),
+  tonerLifeC: z.number().min(0, "Toner life C required"),
+  tonerLifeM: z.number().min(0, "Toner life M required"),
+  tonerLifeY: z.number().min(0, "Toner life Y required"),
+  tonerLifeK: z.number().min(0, "Toner life K required")
 })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 

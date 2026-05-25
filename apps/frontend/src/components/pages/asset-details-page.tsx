@@ -16,7 +16,7 @@ import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDateWithTime, formatLocation, formatThousandsK } from '@/lib/formatters'
+import { formatDateWithTime, formatLocation, formatSentenceCase, formatThousandsK } from '@/lib/formatters'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import type { AssetHistory } from 'shared-types'
@@ -103,6 +103,10 @@ export const AssetDetailsPage = () => {
                   </Button>
                 </div>
               </DataRow>
+              <DataValueRow
+                label="Country of Origin"
+                value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
+              />
               <DataDateRow label="Created At" value={assetDetails.created_at} />
             </DataRowContainer>
           </Section>
@@ -149,6 +153,13 @@ export const AssetDetailsPage = () => {
             <DataRowContainer>
               <DataValueRow label="Cassettes" value={specs.cassettes} />
               <DataValueRow label="Internal Finisher" value={specs.internal_finisher} />
+              <CMYKRow
+                label="Toner Remaining"
+                c_value={specs.toner_life_c}
+                m_value={specs.toner_life_m}
+                y_value={specs.toner_life_y}
+                k_value={specs.toner_life_k}
+              />
               <CMYKRow
                 label="Drum Life"
                 c_value={specs.drum_life_c}

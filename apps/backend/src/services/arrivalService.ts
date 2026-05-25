@@ -82,7 +82,11 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     drumLifeC: dbAsset.technical_specification?.drum_life_c ?? 0,
     drumLifeM: dbAsset.technical_specification?.drum_life_m ?? 0,
     drumLifeY: dbAsset.technical_specification?.drum_life_y ?? 0,
-    drumLifeK: dbAsset.technical_specification?.drum_life_k ?? 0
+    drumLifeK: dbAsset.technical_specification?.drum_life_k ?? 0,
+    tonerLifeC: dbAsset.technical_specification?.toner_life_c ?? 0,
+    tonerLifeM: dbAsset.technical_specification?.toner_life_m ?? 0,
+    tonerLifeY: dbAsset.technical_specification?.toner_life_y ?? 0,
+    tonerLifeK: dbAsset.technical_specification?.toner_life_k ?? 0
   }
 }
 
@@ -168,7 +172,11 @@ function mapInputAssetToPrismaCreateAsset(
         drum_life_c: asset.drumLifeC,
         drum_life_m: asset.drumLifeM,
         drum_life_y: asset.drumLifeY,
-        drum_life_k: asset.drumLifeK
+        drum_life_k: asset.drumLifeK,
+        toner_life_c: asset.tonerLifeC,
+        toner_life_m: asset.tonerLifeM,
+        toner_life_y: asset.tonerLifeY,
+        toner_life_k: asset.tonerLifeK
       }
     },
     cost: { create: {} }
@@ -292,7 +300,11 @@ async function updateArrivalAssetCoreFields(
           drum_life_c: asset.drumLifeC,
           drum_life_m: asset.drumLifeM,
           drum_life_y: asset.drumLifeY,
-          drum_life_k: asset.drumLifeK
+          drum_life_k: asset.drumLifeK,
+          toner_life_c: asset.tonerLifeC,
+          toner_life_m: asset.tonerLifeM,
+          toner_life_y: asset.tonerLifeY,
+          toner_life_k: asset.tonerLifeK
         }
       }
     }
@@ -325,7 +337,8 @@ export async function updateArrivalAsset(
       technical_specification: {
         select: {
           meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true,
-          drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true
+          drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true,
+          toner_life_c: true, toner_life_m: true, toner_life_y: true, toner_life_k: true
         }
       }
     }
@@ -355,7 +368,11 @@ export async function updateArrivalAsset(
     drum_life_c: existing.technical_specification?.drum_life_c,
     drum_life_m: existing.technical_specification?.drum_life_m,
     drum_life_y: existing.technical_specification?.drum_life_y,
-    drum_life_k: existing.technical_specification?.drum_life_k
+    drum_life_k: existing.technical_specification?.drum_life_k,
+    toner_life_c: existing.technical_specification?.toner_life_c,
+    toner_life_m: existing.technical_specification?.toner_life_m,
+    toner_life_y: existing.technical_specification?.toner_life_y,
+    toner_life_k: existing.technical_specification?.toner_life_k
   }, {
     model_id: asset.model.id,
     serial_number: asset.serialNumber,
@@ -367,7 +384,11 @@ export async function updateArrivalAsset(
     drum_life_c: asset.drumLifeC,
     drum_life_m: asset.drumLifeM,
     drum_life_y: asset.drumLifeY,
-    drum_life_k: asset.drumLifeK
+    drum_life_k: asset.drumLifeK,
+    toner_life_c: asset.tonerLifeC,
+    toner_life_m: asset.tonerLifeM,
+    toner_life_y: asset.tonerLifeY,
+    toner_life_k: asset.tonerLifeK
   }, userId)
 
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(existing.barcode))

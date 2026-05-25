@@ -13,6 +13,7 @@ select
   l.bin as bin,
   a.created_at as created_at,
   a.is_in_transit as is_in_transit,
+  co."name" as country_of_origin,
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,
@@ -30,6 +31,10 @@ select
   ts.drum_life_m as drum_life_m,
   ts.drum_life_y as drum_life_y,
   ts.drum_life_k as drum_life_k,
+  ts.toner_life_c as toner_life_c,
+  ts.toner_life_m as toner_life_m,
+  ts.toner_life_y as toner_life_y,
+  ts.toner_life_k as toner_life_k,
   -- hold
   hub.email as hold_by_email,
   hub."name" as hold_by_name,
@@ -90,4 +95,5 @@ from "Asset" a
   left join "Organization" dt on dt.id = d.transporter_id
   left join "Organization" dc on dc.id = d.destination_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
+  left join "Country" co on co.id = a.country_of_origin_id
 where a.barcode = ANY($1::text[])

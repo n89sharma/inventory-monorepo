@@ -413,7 +413,8 @@ export const ModelName = {
   History: 'History',
   Readiness: 'Readiness',
   Status: 'Status',
-  Zone: 'Zone'
+  Zone: 'Zone',
+  Country: 'Country'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "fileType" | "invoiceType" | "storePart" | "partTransfer" | "history" | "readiness" | "status" | "zone"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "fileType" | "invoiceType" | "storePart" | "partTransfer" | "history" | "readiness" | "status" | "zone" | "country"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2653,6 +2654,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Country: {
+      payload: Prisma.$CountryPayload<ExtArgs>
+      fields: Prisma.CountryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CountryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CountryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        findFirst: {
+          args: Prisma.CountryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CountryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        findMany: {
+          args: Prisma.CountryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>[]
+        }
+        create: {
+          args: Prisma.CountryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        createMany: {
+          args: Prisma.CountryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CountryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>[]
+        }
+        delete: {
+          args: Prisma.CountryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        update: {
+          args: Prisma.CountryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        deleteMany: {
+          args: Prisma.CountryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CountryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CountryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>[]
+        }
+        upsert: {
+          args: Prisma.CountryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CountryPayload>
+        }
+        aggregate: {
+          args: Prisma.CountryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCountry>
+        }
+        groupBy: {
+          args: Prisma.CountryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CountryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CountryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CountryCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2712,7 +2787,8 @@ export const AssetScalarFieldEnum = {
   serial_normalized: 'serial_normalized',
   readiness_id: 'readiness_id',
   status_id: 'status_id',
-  is_in_transit: 'is_in_transit'
+  is_in_transit: 'is_in_transit',
+  country_of_origin_id: 'country_of_origin_id'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -2737,7 +2813,11 @@ export const TechnicalSpecificationScalarFieldEnum = {
   drum_life_c: 'drum_life_c',
   drum_life_m: 'drum_life_m',
   drum_life_y: 'drum_life_y',
-  drum_life_k: 'drum_life_k'
+  drum_life_k: 'drum_life_k',
+  toner_life_c: 'toner_life_c',
+  toner_life_k: 'toner_life_k',
+  toner_life_m: 'toner_life_m',
+  toner_life_y: 'toner_life_y'
 } as const
 
 export type TechnicalSpecificationScalarFieldEnum = (typeof TechnicalSpecificationScalarFieldEnum)[keyof typeof TechnicalSpecificationScalarFieldEnum]
@@ -3063,6 +3143,14 @@ export const ZoneScalarFieldEnum = {
 export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
 
 
+export const CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+} as const
+
+export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3353,6 +3441,7 @@ export type GlobalOmitConfig = {
   readiness?: Prisma.ReadinessOmit
   status?: Prisma.StatusOmit
   zone?: Prisma.ZoneOmit
+  country?: Prisma.CountryOmit
 }
 
 /* Types for Logging */

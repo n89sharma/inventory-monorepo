@@ -166,6 +166,7 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
     status: r.status,
     readiness: r.readiness,
     is_in_transit: r.is_in_transit,
+    country_of_origin: r.country_of_origin,
     location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,
@@ -186,6 +187,10 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
       drum_life_m: r.drum_life_m,
       drum_life_y: r.drum_life_y,
       drum_life_k: r.drum_life_k,
+      toner_life_c: r.toner_life_c,
+      toner_life_m: r.toner_life_m,
+      toner_life_y: r.toner_life_y,
+      toner_life_k: r.toner_life_k,
     },
     created_at: r.created_at,
     hold: mapHold(r),
@@ -269,12 +274,13 @@ function escapeCSV(val: unknown): string {
 const CSV_HEADERS = [
   'barcode', 'serial_number', 'model', 'brand', 'asset_type',
   'status', 'readiness',
-  'warehouse_code', 'warehouse_street', 'zone', 'bin', 'created_at',
+  'warehouse_code', 'warehouse_street', 'zone', 'bin', 'created_at', 'country_of_origin',
   'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
   'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
   'specs_cassettes', 'specs_internal_finisher', 'specs_meter_black',
   'specs_meter_colour', 'specs_meter_total', 'specs_drum_life_c',
   'specs_drum_life_m', 'specs_drum_life_y', 'specs_drum_life_k',
+  'specs_toner_life_c', 'specs_toner_life_m', 'specs_toner_life_y', 'specs_toner_life_k',
   'hold_created_by', 'hold_created_for', 'hold_created_at', 'hold_customer',
   'hold_from_dt', 'hold_to_dt', 'hold_notes', 'hold_hold_number',
   'arrival_arrival_number', 'arrival_origin', 'arrival_destination_code',
@@ -294,11 +300,13 @@ function generateCsv(assets: AssetDetails[]): string {
     a.location?.zone ?? null,
     a.location?.bin ?? null,
     a.created_at,
+    a.country_of_origin,
     a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
     a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,
     a.specs.cassettes, a.specs.internal_finisher, a.specs.meter_black,
     a.specs.meter_colour, a.specs.meter_total, a.specs.drum_life_c,
     a.specs.drum_life_m, a.specs.drum_life_y, a.specs.drum_life_k,
+    a.specs.toner_life_c, a.specs.toner_life_m, a.specs.toner_life_y, a.specs.toner_life_k,
     a.hold?.created_by, a.hold?.created_for, a.hold?.created_at,
     a.hold?.customer, a.hold?.from_dt, a.hold?.to_dt,
     a.hold?.notes, a.hold?.hold_number,
@@ -645,7 +653,8 @@ export async function updateAssetSpecs(
       technical_specification: {
         select: {
           cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true,
-          meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true
+          meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true,
+          toner_life_c: true, toner_life_m: true, toner_life_y: true, toner_life_k: true
         }
       }
     }
@@ -666,13 +675,17 @@ export async function updateAssetSpecs(
         cassettes: data.cassettes, internal_finisher: data.internal_finisher,
         meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
         drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
-        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,
+        toner_life_c: data.toner_life_c, toner_life_m: data.toner_life_m,
+        toner_life_y: data.toner_life_y, toner_life_k: data.toner_life_k
       },
       create: {
         asset_id: asset.id, cassettes: data.cassettes, internal_finisher: data.internal_finisher,
         meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
         drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
-        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+        drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,
+        toner_life_c: data.toner_life_c, toner_life_m: data.toner_life_m,
+        toner_life_y: data.toner_life_y, toner_life_k: data.toner_life_k
       },
     }),
     prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
@@ -688,11 +701,17 @@ export async function updateAssetSpecs(
     drum_life_c: asset.technical_specification?.drum_life_c,
     drum_life_m: asset.technical_specification?.drum_life_m,
     drum_life_y: asset.technical_specification?.drum_life_y,
-    drum_life_k: asset.technical_specification?.drum_life_k
+    drum_life_k: asset.technical_specification?.drum_life_k,
+    toner_life_c: asset.technical_specification?.toner_life_c,
+    toner_life_m: asset.technical_specification?.toner_life_m,
+    toner_life_y: asset.technical_specification?.toner_life_y,
+    toner_life_k: asset.technical_specification?.toner_life_k
   }, {
     cassettes: data.cassettes, internal_finisher: data.internal_finisher,
     meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
     drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
-    drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k
+    drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,
+    toner_life_c: data.toner_life_c, toner_life_m: data.toner_life_m,
+    toner_life_y: data.toner_life_y, toner_life_k: data.toner_life_k
   }, userId)
 }

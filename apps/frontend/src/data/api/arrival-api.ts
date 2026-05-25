@@ -46,7 +46,11 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       drumLifeC: s.drumLifeC!,
       drumLifeM: s.drumLifeM!,
       drumLifeY: s.drumLifeY!,
-      drumLifeK: s.drumLifeK!
+      drumLifeK: s.drumLifeK!,
+      tonerLifeC: s.tonerLifeC!,
+      tonerLifeM: s.tonerLifeM!,
+      tonerLifeY: s.tonerLifeY!,
+      tonerLifeK: s.tonerLifeK!
     })) as CreateArrival['assets']
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
@@ -95,7 +99,11 @@ export async function createSingleArrivalAsset(
     drumLifeC: asset.drumLifeC!,
     drumLifeM: asset.drumLifeM!,
     drumLifeY: asset.drumLifeY!,
-    drumLifeK: asset.drumLifeK!
+    drumLifeK: asset.drumLifeK!,
+    tonerLifeC: asset.tonerLifeC!,
+    tonerLifeM: asset.tonerLifeM!,
+    tonerLifeY: asset.tonerLifeY!,
+    tonerLifeK: asset.tonerLifeK!
   } satisfies CreateAsset)
   const { data } = await api.post<AssetSummary>(`/arrivals/${arrivalNumber}/assets`, createSingleArrivalAssetBody)
   return AssetSummarySchema.parse(data)
@@ -123,7 +131,11 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     drumLifeC: asset.drumLifeC,
     drumLifeM: asset.drumLifeM,
     drumLifeY: asset.drumLifeY,
-    drumLifeK: asset.drumLifeK
+    drumLifeK: asset.drumLifeK,
+    tonerLifeC: asset.tonerLifeC,
+    tonerLifeM: asset.tonerLifeM,
+    tonerLifeY: asset.tonerLifeY,
+    tonerLifeK: asset.tonerLifeK
   }
 }
 
@@ -145,7 +157,11 @@ export async function updateArrivalAsset(
     drumLifeC: asset.drumLifeC!,
     drumLifeM: asset.drumLifeM!,
     drumLifeY: asset.drumLifeY!,
-    drumLifeK: asset.drumLifeK!
+    drumLifeK: asset.drumLifeK!,
+    tonerLifeC: asset.tonerLifeC!,
+    tonerLifeM: asset.tonerLifeM!,
+    tonerLifeY: asset.tonerLifeY!,
+    tonerLifeK: asset.tonerLifeK!
   } satisfies UpdateAsset)
   const { data } = await api.patch<AssetSummary>(`/arrivals/${arrivalNumber}/assets/${assetId}`, updateArrivalAssetBody)
   return AssetSummarySchema.parse(data)

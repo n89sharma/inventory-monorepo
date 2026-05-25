@@ -31,7 +31,18 @@ interface SpecFields {
   drum_life_m: string
   drum_life_y: string
   drum_life_k: string
+  toner_life_c: string
+  toner_life_m: string
+  toner_life_y: string
+  toner_life_k: string
 }
+
+const CMYK_CHANNELS = [
+  { key: 'c', letter: 'C', colorClass: 'text-cyan-500' },
+  { key: 'm', letter: 'M', colorClass: 'text-fuchsia-500' },
+  { key: 'y', letter: 'Y', colorClass: 'text-yellow-500' },
+  { key: 'k', letter: 'K', colorClass: 'text-foreground' },
+] as const
 
 function sanitizeInt(value: string): string {
   return value.replace(/[^\d]/g, '')
@@ -52,6 +63,50 @@ function IntInput({ label, value, onChange }: { label: string; value: string; on
     <div className="flex flex-col gap-1.5">
       <label className="font-medium">{label}</label>
       <Input value={value} onChange={onChange} inputMode="numeric" placeholder="0" />
+    </div>
+  )
+}
+
+function PrefixedIntInput(
+  { letter, colorClass, value, onChange }:
+  { letter: string; colorClass: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }
+) {
+  return (
+    <div className="relative">
+      <span className={`${colorClass} pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium`}>
+        {letter}
+      </span>
+      <Input value={value} onChange={onChange} inputMode="numeric" placeholder="0" className="pl-7" />
+    </div>
+  )
+}
+
+function CMYKInputRow(
+  { label, prefix, fields, setIntField }:
+  {
+    label: string
+    prefix: 'drum_life' | 'toner_life'
+    fields: SpecFields
+    setIntField: (key: keyof SpecFields) => (e: React.ChangeEvent<HTMLInputElement>) => void
+  }
+) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="font-semibold">{label}</span>
+      <div className="grid grid-cols-4 gap-3">
+        {CMYK_CHANNELS.map(c => {
+          const key = `${prefix}_${c.key}` as keyof SpecFields
+          return (
+            <PrefixedIntInput
+              key={c.key}
+              letter={c.letter}
+              colorClass={c.colorClass}
+              value={fields[key]}
+              onChange={setIntField(key)}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -80,6 +135,10 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
     drum_life_m: '',
     drum_life_y: '',
     drum_life_k: '',
+    toner_life_c: '',
+    toner_life_m: '',
+    toner_life_y: '',
+    toner_life_k: '',
   })
   const [selectedFunctions, setSelectedFunctions] = useState<CoreFunction[]>([])
   const [saving, setSaving] = useState(false)
@@ -96,6 +155,10 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         drum_life_m: specs.drum_life_m?.toString() ?? '',
         drum_life_y: specs.drum_life_y?.toString() ?? '',
         drum_life_k: specs.drum_life_k?.toString() ?? '',
+        toner_life_c: specs.toner_life_c?.toString() ?? '',
+        toner_life_m: specs.toner_life_m?.toString() ?? '',
+        toner_life_y: specs.toner_life_y?.toString() ?? '',
+        toner_life_k: specs.toner_life_k?.toString() ?? '',
       })
       setSelectedFunctions(coreFunctions.filter(cf => accessories.includes(cf.accessory)))
     }
@@ -125,6 +188,10 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         drum_life_m: toNullableInt(fields.drum_life_m),
         drum_life_y: toNullableInt(fields.drum_life_y),
         drum_life_k: toNullableInt(fields.drum_life_k),
+        toner_life_c: toNullableInt(fields.toner_life_c),
+        toner_life_m: toNullableInt(fields.toner_life_m),
+        toner_life_y: toNullableInt(fields.toner_life_y),
+        toner_life_k: toNullableInt(fields.toner_life_k),
         accessory_names: selectedFunctions.map(cf => cf.accessory),
       })
       toast.success('Specifications updated.')
@@ -164,15 +231,8 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
           </div>
 
           <div className="flex flex-1 flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold">Drum Life</span>
-              <div className="grid grid-cols-2 gap-3">
-                <IntInput label="C" value={fields.drum_life_c} onChange={setIntField('drum_life_c')} />
-                <IntInput label="M" value={fields.drum_life_m} onChange={setIntField('drum_life_m')} />
-                <IntInput label="Y" value={fields.drum_life_y} onChange={setIntField('drum_life_y')} />
-                <IntInput label="K" value={fields.drum_life_k} onChange={setIntField('drum_life_k')} />
-              </div>
-            </div>
+            <CMYKInputRow label="Drum Life" prefix="drum_life" fields={fields} setIntField={setIntField} />
+            <CMYKInputRow label="Toner Remaining" prefix="toner_life" fields={fields} setIntField={setIntField} />
             <div className="flex flex-col gap-1.5">
               <label className="font-medium">Core Functions</label>
               <MultipleSelector

@@ -37,6 +37,10 @@ export type TechnicalSpecificationAvgAggregateOutputType = {
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_k: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
 }
 
 export type TechnicalSpecificationSumAggregateOutputType = {
@@ -50,6 +54,10 @@ export type TechnicalSpecificationSumAggregateOutputType = {
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_k: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
 }
 
 export type TechnicalSpecificationMinAggregateOutputType = {
@@ -64,6 +72,10 @@ export type TechnicalSpecificationMinAggregateOutputType = {
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_k: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
 }
 
 export type TechnicalSpecificationMaxAggregateOutputType = {
@@ -78,6 +90,10 @@ export type TechnicalSpecificationMaxAggregateOutputType = {
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_k: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
 }
 
 export type TechnicalSpecificationCountAggregateOutputType = {
@@ -92,6 +108,10 @@ export type TechnicalSpecificationCountAggregateOutputType = {
   drum_life_m: number
   drum_life_y: number
   drum_life_k: number
+  toner_life_c: number
+  toner_life_k: number
+  toner_life_m: number
+  toner_life_y: number
   _all: number
 }
 
@@ -107,6 +127,10 @@ export type TechnicalSpecificationAvgAggregateInputType = {
   drum_life_m?: true
   drum_life_y?: true
   drum_life_k?: true
+  toner_life_c?: true
+  toner_life_k?: true
+  toner_life_m?: true
+  toner_life_y?: true
 }
 
 export type TechnicalSpecificationSumAggregateInputType = {
@@ -120,6 +144,10 @@ export type TechnicalSpecificationSumAggregateInputType = {
   drum_life_m?: true
   drum_life_y?: true
   drum_life_k?: true
+  toner_life_c?: true
+  toner_life_k?: true
+  toner_life_m?: true
+  toner_life_y?: true
 }
 
 export type TechnicalSpecificationMinAggregateInputType = {
@@ -134,6 +162,10 @@ export type TechnicalSpecificationMinAggregateInputType = {
   drum_life_m?: true
   drum_life_y?: true
   drum_life_k?: true
+  toner_life_c?: true
+  toner_life_k?: true
+  toner_life_m?: true
+  toner_life_y?: true
 }
 
 export type TechnicalSpecificationMaxAggregateInputType = {
@@ -148,6 +180,10 @@ export type TechnicalSpecificationMaxAggregateInputType = {
   drum_life_m?: true
   drum_life_y?: true
   drum_life_k?: true
+  toner_life_c?: true
+  toner_life_k?: true
+  toner_life_m?: true
+  toner_life_y?: true
 }
 
 export type TechnicalSpecificationCountAggregateInputType = {
@@ -162,6 +198,10 @@ export type TechnicalSpecificationCountAggregateInputType = {
   drum_life_m?: true
   drum_life_y?: true
   drum_life_k?: true
+  toner_life_c?: true
+  toner_life_k?: true
+  toner_life_m?: true
+  toner_life_y?: true
   _all?: true
 }
 
@@ -263,6 +303,10 @@ export type TechnicalSpecificationGroupByOutputType = {
   drum_life_m: number | null
   drum_life_y: number | null
   drum_life_k: number | null
+  toner_life_c: number | null
+  toner_life_k: number | null
+  toner_life_m: number | null
+  toner_life_y: number | null
   _count: TechnicalSpecificationCountAggregateOutputType | null
   _avg: TechnicalSpecificationAvgAggregateOutputType | null
   _sum: TechnicalSpecificationSumAggregateOutputType | null
@@ -300,6 +344,10 @@ export type TechnicalSpecificationWhereInput = {
   drum_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
 }
 
@@ -315,6 +363,10 @@ export type TechnicalSpecificationOrderByWithRelationInput = {
   drum_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
   drum_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
   drum_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
   asset?: Prisma.AssetOrderByWithRelationInput
 }
 
@@ -333,6 +385,10 @@ export type TechnicalSpecificationWhereUniqueInput = Prisma.AtLeast<{
   drum_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   drum_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
 }, "id" | "asset_id">
 
@@ -348,6 +404,10 @@ export type TechnicalSpecificationOrderByWithAggregationInput = {
   drum_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
   drum_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
   drum_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TechnicalSpecificationCountOrderByAggregateInput
   _avg?: Prisma.TechnicalSpecificationAvgOrderByAggregateInput
   _max?: Prisma.TechnicalSpecificationMaxOrderByAggregateInput
@@ -370,6 +430,10 @@ export type TechnicalSpecificationScalarWhereWithAggregatesInput = {
   drum_life_m?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   drum_life_y?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   drum_life_k?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  toner_life_c?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  toner_life_k?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  toner_life_m?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  toner_life_y?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
 }
 
 export type TechnicalSpecificationCreateInput = {
@@ -382,6 +446,10 @@ export type TechnicalSpecificationCreateInput = {
   drum_life_m?: number | null
   drum_life_y?: number | null
   drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
   asset: Prisma.AssetCreateNestedOneWithoutTechnical_specificationInput
 }
 
@@ -397,6 +465,10 @@ export type TechnicalSpecificationUncheckedCreateInput = {
   drum_life_m?: number | null
   drum_life_y?: number | null
   drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
 }
 
 export type TechnicalSpecificationUpdateInput = {
@@ -409,6 +481,10 @@ export type TechnicalSpecificationUpdateInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset?: Prisma.AssetUpdateOneRequiredWithoutTechnical_specificationNestedInput
 }
 
@@ -424,6 +500,10 @@ export type TechnicalSpecificationUncheckedUpdateInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationCreateManyInput = {
@@ -438,6 +518,10 @@ export type TechnicalSpecificationCreateManyInput = {
   drum_life_m?: number | null
   drum_life_y?: number | null
   drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
 }
 
 export type TechnicalSpecificationUpdateManyMutationInput = {
@@ -450,6 +534,10 @@ export type TechnicalSpecificationUpdateManyMutationInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationUncheckedUpdateManyInput = {
@@ -464,6 +552,10 @@ export type TechnicalSpecificationUncheckedUpdateManyInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationNullableScalarRelationFilter = {
@@ -483,6 +575,10 @@ export type TechnicalSpecificationCountOrderByAggregateInput = {
   drum_life_m?: Prisma.SortOrder
   drum_life_y?: Prisma.SortOrder
   drum_life_k?: Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationAvgOrderByAggregateInput = {
@@ -496,6 +592,10 @@ export type TechnicalSpecificationAvgOrderByAggregateInput = {
   drum_life_m?: Prisma.SortOrder
   drum_life_y?: Prisma.SortOrder
   drum_life_k?: Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationMaxOrderByAggregateInput = {
@@ -510,6 +610,10 @@ export type TechnicalSpecificationMaxOrderByAggregateInput = {
   drum_life_m?: Prisma.SortOrder
   drum_life_y?: Prisma.SortOrder
   drum_life_k?: Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationMinOrderByAggregateInput = {
@@ -524,6 +628,10 @@ export type TechnicalSpecificationMinOrderByAggregateInput = {
   drum_life_m?: Prisma.SortOrder
   drum_life_y?: Prisma.SortOrder
   drum_life_k?: Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationSumOrderByAggregateInput = {
@@ -537,6 +645,10 @@ export type TechnicalSpecificationSumOrderByAggregateInput = {
   drum_life_m?: Prisma.SortOrder
   drum_life_y?: Prisma.SortOrder
   drum_life_k?: Prisma.SortOrder
+  toner_life_c?: Prisma.SortOrder
+  toner_life_k?: Prisma.SortOrder
+  toner_life_m?: Prisma.SortOrder
+  toner_life_y?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationCreateNestedOneWithoutAssetInput = {
@@ -581,6 +693,10 @@ export type TechnicalSpecificationCreateWithoutAssetInput = {
   drum_life_m?: number | null
   drum_life_y?: number | null
   drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
 }
 
 export type TechnicalSpecificationUncheckedCreateWithoutAssetInput = {
@@ -594,6 +710,10 @@ export type TechnicalSpecificationUncheckedCreateWithoutAssetInput = {
   drum_life_m?: number | null
   drum_life_y?: number | null
   drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
 }
 
 export type TechnicalSpecificationCreateOrConnectWithoutAssetInput = {
@@ -622,6 +742,10 @@ export type TechnicalSpecificationUpdateWithoutAssetInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationUncheckedUpdateWithoutAssetInput = {
@@ -635,6 +759,10 @@ export type TechnicalSpecificationUncheckedUpdateWithoutAssetInput = {
   drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -651,6 +779,10 @@ export type TechnicalSpecificationSelect<ExtArgs extends runtime.Types.Extension
   drum_life_m?: boolean
   drum_life_y?: boolean
   drum_life_k?: boolean
+  toner_life_c?: boolean
+  toner_life_k?: boolean
+  toner_life_m?: boolean
+  toner_life_y?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
@@ -666,6 +798,10 @@ export type TechnicalSpecificationSelectCreateManyAndReturn<ExtArgs extends runt
   drum_life_m?: boolean
   drum_life_y?: boolean
   drum_life_k?: boolean
+  toner_life_c?: boolean
+  toner_life_k?: boolean
+  toner_life_m?: boolean
+  toner_life_y?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
@@ -681,6 +817,10 @@ export type TechnicalSpecificationSelectUpdateManyAndReturn<ExtArgs extends runt
   drum_life_m?: boolean
   drum_life_y?: boolean
   drum_life_k?: boolean
+  toner_life_c?: boolean
+  toner_life_k?: boolean
+  toner_life_m?: boolean
+  toner_life_y?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
@@ -696,9 +836,13 @@ export type TechnicalSpecificationSelectScalar = {
   drum_life_m?: boolean
   drum_life_y?: boolean
   drum_life_k?: boolean
+  toner_life_c?: boolean
+  toner_life_k?: boolean
+  toner_life_m?: boolean
+  toner_life_y?: boolean
 }
 
-export type TechnicalSpecificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "cassettes" | "internal_finisher" | "meter_black" | "meter_colour" | "meter_total" | "drum_life_c" | "drum_life_m" | "drum_life_y" | "drum_life_k", ExtArgs["result"]["technicalSpecification"]>
+export type TechnicalSpecificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "cassettes" | "internal_finisher" | "meter_black" | "meter_colour" | "meter_total" | "drum_life_c" | "drum_life_m" | "drum_life_y" | "drum_life_k" | "toner_life_c" | "toner_life_k" | "toner_life_m" | "toner_life_y", ExtArgs["result"]["technicalSpecification"]>
 export type TechnicalSpecificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
 }
@@ -726,6 +870,10 @@ export type $TechnicalSpecificationPayload<ExtArgs extends runtime.Types.Extensi
     drum_life_m: number | null
     drum_life_y: number | null
     drum_life_k: number | null
+    toner_life_c: number | null
+    toner_life_k: number | null
+    toner_life_m: number | null
+    toner_life_y: number | null
   }, ExtArgs["result"]["technicalSpecification"]>
   composites: {}
 }
@@ -1161,6 +1309,10 @@ export interface TechnicalSpecificationFieldRefs {
   readonly drum_life_m: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly drum_life_y: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly drum_life_k: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly toner_life_c: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly toner_life_k: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly toner_life_m: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly toner_life_y: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
 }
     
 

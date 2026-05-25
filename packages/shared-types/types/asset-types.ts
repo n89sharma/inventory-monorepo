@@ -45,6 +45,7 @@ export const AssetDetailsSchema = z.object({
   status: z.string(),
   readiness: z.string(),
   is_in_transit: z.boolean(),
+  country_of_origin: z.string().nullable(),
   location: AssetLocationDetailsSchema.nullable(),
   cost: z.object({
     purchase_cost: z.number().nullable(),
@@ -64,7 +65,11 @@ export const AssetDetailsSchema = z.object({
     drum_life_c: z.number().nullable(),
     drum_life_m: z.number().nullable(),
     drum_life_y: z.number().nullable(),
-    drum_life_k: z.number().nullable()
+    drum_life_k: z.number().nullable(),
+    toner_life_c: z.number().nullable(),
+    toner_life_m: z.number().nullable(),
+    toner_life_y: z.number().nullable(),
+    toner_life_k: z.number().nullable()
   }),
   hold: z.object({
     created_by: z.string(),
@@ -216,6 +221,10 @@ export const UpdateAssetSpecsSchema = z.object({
   drum_life_m: z.number().int().nonnegative().nullable(),
   drum_life_y: z.number().int().nonnegative().nullable(),
   drum_life_k: z.number().int().nonnegative().nullable(),
+  toner_life_c: z.number().int().nonnegative().nullable(),
+  toner_life_m: z.number().int().nonnegative().nullable(),
+  toner_life_y: z.number().int().nonnegative().nullable(),
+  toner_life_k: z.number().int().nonnegative().nullable(),
   accessory_names: z.array(z.string()),
 })
 

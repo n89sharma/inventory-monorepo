@@ -191,3 +191,8 @@ export type Status = Prisma.StatusModel
  * 
  */
 export type Zone = Prisma.ZoneModel
+/**
+ * Model Country
+ * 
+ */
+export type Country = Prisma.CountryModel
