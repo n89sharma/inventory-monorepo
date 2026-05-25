@@ -1,8 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import type { Status } from 'shared-types'
-import { getReadinessIconConfig } from './readiness-icon'
+import { ReadinessPillContent, readinessPillClasses } from './readiness-pill'
 
 export function ReadinessPicker(
   {
@@ -31,23 +30,20 @@ export function ReadinessPicker(
       aria-invalid={error}
       className='flex-wrap gap-1.5'
     >
-      {options.map(opt => {
-        const { Icon, className: iconClassName, weight = 'regular' } = getReadinessIconConfig(opt.status)
-        return (
-          <ToggleGroupItem
-            key={opt.id}
-            value={String(opt.id)}
-            className={cn(
-              'h-7 gap-1.5 rounded-full pl-2 pr-3 text-xs font-medium',
-              'data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground',
-              'data-[state=on]:border-secondary data-[state=on]:hover:bg-secondary/80'
-            )}
-          >
-            <Icon size={14} weight={weight} className={iconClassName} />
-            {formatSentenceCase(opt.status)}
-          </ToggleGroupItem>
-        )
-      })}
+      {options.map(opt => (
+        <ToggleGroupItem
+          key={opt.id}
+          value={String(opt.id)}
+          className={cn(
+            readinessPillClasses,
+            'h-7 gap-1.5 px-3 [&_svg]:size-3.5',
+            'data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground',
+            'data-[state=on]:border-secondary data-[state=on]:hover:bg-secondary/80'
+          )}
+        >
+          <ReadinessPillContent status={opt.status} />
+        </ToggleGroupItem>
+      ))}
     </ToggleGroup>
   )
 }

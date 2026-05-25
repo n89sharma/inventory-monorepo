@@ -3,13 +3,19 @@ import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataR
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
+import { ReadinessPill } from '@/components/custom/readiness-pill'
+import { StatusBadge } from '@/components/custom/status-badge'
 import { AssetHistoryList } from '@/components/custom/asset-history'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails } from '@/components/custom/page-breadcrumb'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
+import { AddPartTransferModal } from '@/components/modals/add-part-transfer-modal'
+import { EditErrorsModal } from '@/components/modals/edit-errors-modal'
 import { EditLocationModal } from '@/components/modals/edit-location-modal'
+import { EditPricingModal } from '@/components/modals/edit-pricing-modal'
+import { EditSpecsModal } from '@/components/modals/edit-specs-modal'
 import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
 import { useAssetDetail } from '@/hooks/use-asset-detail'
@@ -22,6 +28,20 @@ import { useState } from 'react'
 import type { AssetHistory } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
+
+function SectionEditButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      variant="ghost"
+      size="xs"
+      type="button"
+      onClick={onClick}
+      className="text-muted-foreground -mr-1"
+    >
+      <PencilSimpleIcon aria-hidden="true" />Edit
+    </Button>
+  )
+}
 
 function AssetHistoryTabContent(
   { barcode, enabled }: { barcode: string; enabled: boolean }
@@ -40,6 +60,10 @@ export const AssetDetailsPage = () => {
   const { section, collectionId, assetId } = useAssetDetailsParams()
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editLocationOpen, setEditLocationOpen] = useState(false)
+  const [editPricingOpen, setEditPricingOpen] = useState(false)
+  const [editSpecsOpen, setEditSpecsOpen] = useState(false)
+  const [editErrorsOpen, setEditErrorsOpen] = useState(false)
+  const [editPartsOpen, setEditPartsOpen] = useState(false)
   const [historyEnabled, setHistoryEnabled] = useState(false)
 
   const assetDetails = data?.assetDetails ?? null
@@ -51,6 +75,8 @@ export const AssetDetailsPage = () => {
 
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
+  const canEditPrices = useCan('edit_prices')
+  const canEditTechSpecs = useCan('edit_tech_specs')
 
   if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
   if (detailError) return <div>{detailError.message}</div>
@@ -85,9 +111,9 @@ export const AssetDetailsPage = () => {
                   <CopyButton value={assetDetails.serial_number} />
                 </div>
               </DataRow>
-              <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
-              <DataValueRow label="Status" value={assetDetails.status} />
-              <DataValueRow label="Readiness" value={assetDetails.readiness} />
+              <DataRow label="Status">
+                <StatusBadge status={assetDetails.status} />
+              </DataRow>
               <DataRow label="Location">
                 <div className="group flex items-center gap-2">
                   <DataValue value={formatLocation(assetDetails.location)} />
@@ -103,17 +129,73 @@ export const AssetDetailsPage = () => {
                   </Button>
                 </div>
               </DataRow>
-              <DataValueRow
-                label="Country of Origin"
-                value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
-              />
               <DataDateRow label="Created At" value={assetDetails.created_at} />
             </DataRowContainer>
           </Section>
 
+          <Section>
+            <SectionHeader
+              title="Specifications"
+              action={canEditTechSpecs && <SectionEditButton onClick={() => setEditSpecsOpen(true)} />}
+            />
+            <DataRowContainer>
+              <DataRow label="Readiness">
+                <ReadinessPill status={assetDetails.readiness} />
+              </DataRow>
+              <DataValueRow
+                label="Country of Origin"
+                value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
+              />
+              <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
+              <CMYKRow
+                label="Drum Life"
+                c_value={specs.drum_life_c}
+                m_value={specs.drum_life_m}
+                y_value={specs.drum_life_y}
+                k_value={specs.drum_life_k}
+              />
+              <CMYKRow
+                label="Toner Remaining"
+                c_value={specs.toner_life_c}
+                m_value={specs.toner_life_m}
+                y_value={specs.toner_life_y}
+                k_value={specs.toner_life_k}
+              />
+              <DataValueRow label="Cassettes" value={specs.cassettes} />
+              <DataValueRow label="Internal Finisher" value={specs.internal_finisher} />
+              <AccessoryRow label="Core Functions" accessories={accessories ?? []}></AccessoryRow>
+            </DataRowContainer>
+          </Section>
+
+          <Section>
+            <SectionHeader
+              title="Errors"
+              action={canEditTechSpecs && <SectionEditButton onClick={() => setEditErrorsOpen(true)} />}
+            />
+            <OptionalSection condition={!!errors?.length} fallback="No errors on record">
+              <ErrorHeader />
+              <DataRowContainer>
+                {errors?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
+              </DataRowContainer>
+            </OptionalSection>
+          </Section>
+
+        </SectionRow>
+
+        <SectionRow>
+
+          <PartsSection
+            asset={assetDetails}
+            partTransfers={partTransfers}
+            action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
+          />
+
           {(canViewPurchasePrice || canViewSalePrice) &&
             <Section>
-              <SectionHeader title="Pricing"></SectionHeader>
+              <SectionHeader
+                title="Pricing"
+                action={canEditPrices && <SectionEditButton onClick={() => setEditPricingOpen(true)} />}
+              />
               <DataRowContainer>
                 {
                   canViewPurchasePrice &&
@@ -130,6 +212,7 @@ export const AssetDetailsPage = () => {
               </DataRowContainer>
             </Section>
           }
+
           <Section>
             <SectionHeader title="Hold"></SectionHeader>
             <OptionalSection condition={!!hold} fallback="No hold on record">
@@ -143,45 +226,6 @@ export const AssetDetailsPage = () => {
               </DataRowContainer>
             </OptionalSection>
           </Section>
-
-        </SectionRow>
-
-        <SectionRow>
-
-          <Section>
-            <SectionHeader title="Specifications"></SectionHeader>
-            <DataRowContainer>
-              <DataValueRow label="Cassettes" value={specs.cassettes} />
-              <DataValueRow label="Internal Finisher" value={specs.internal_finisher} />
-              <CMYKRow
-                label="Toner Remaining"
-                c_value={specs.toner_life_c}
-                m_value={specs.toner_life_m}
-                y_value={specs.toner_life_y}
-                k_value={specs.toner_life_k}
-              />
-              <CMYKRow
-                label="Drum Life"
-                c_value={specs.drum_life_c}
-                m_value={specs.drum_life_m}
-                y_value={specs.drum_life_y}
-                k_value={specs.drum_life_k}
-              />
-              <AccessoryRow label="Core Functions" accessories={accessories ?? []}></AccessoryRow>
-            </DataRowContainer>
-          </Section>
-
-          <Section>
-            <SectionHeader title="Errors"></SectionHeader>
-            <OptionalSection condition={!!errors?.length} fallback="No errors on record">
-              <ErrorHeader />
-              <DataRowContainer>
-                {errors?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
-              </DataRowContainer>
-            </OptionalSection>
-          </Section>
-
-          <PartsSection asset={assetDetails} partTransfers={partTransfers} />
 
         </SectionRow>
 
@@ -256,6 +300,28 @@ export const AssetDetailsPage = () => {
         open={editLocationOpen}
         onOpenChange={setEditLocationOpen}
         assetDetails={assetDetails}
+      />
+      <EditPricingModal
+        open={editPricingOpen}
+        onOpenChange={setEditPricingOpen}
+        assetDetails={assetDetails}
+      />
+      <EditSpecsModal
+        open={editSpecsOpen}
+        onOpenChange={setEditSpecsOpen}
+        assetDetails={assetDetails}
+        accessories={accessories}
+      />
+      <EditErrorsModal
+        open={editErrorsOpen}
+        onOpenChange={setEditErrorsOpen}
+        assetDetails={assetDetails}
+        errors={errors}
+      />
+      <AddPartTransferModal
+        open={editPartsOpen}
+        onOpenChange={setEditPartsOpen}
+        recipientBarcode={assetDetails.barcode}
       />
       </PageContent>
     </>

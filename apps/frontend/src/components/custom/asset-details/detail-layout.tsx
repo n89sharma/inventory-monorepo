@@ -8,7 +8,8 @@ type ChildrenProps = {
 
 type SectionHeaderProps = {
   title: string,
-  className?: string
+  className?: string,
+  action?: React.ReactNode
 }
 
 type TitleProps = {
@@ -57,14 +58,14 @@ export function AssetTitle({ brand, model, barcode, className }: TitleProps): Re
   )
 }
 
-export function SectionHeader({ title, className }: SectionHeaderProps): React.JSX.Element {
+export function SectionHeader({ title, className, action }: SectionHeaderProps): React.JSX.Element {
   return (
-    <h2 className={cn(
-      "text-base font-semibold tracking-tight mb-2",
-      className
-    )}>
-      {title}
-    </h2>
+    <div className={cn("flex items-center justify-between mb-2", className)}>
+      <h2 className="text-base font-semibold tracking-tight">
+        {title}
+      </h2>
+      {action}
+    </div>
   )
 }
 

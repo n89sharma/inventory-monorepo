@@ -10,12 +10,13 @@ import { OptionalSection } from "./asset-details/optional-section";
 type PartSectionProps = {
   asset: AssetDetails
   partTransfers: PartTransfer[]
+  action?: React.ReactNode
 }
-export function PartsSection({ asset, partTransfers }: PartSectionProps): React.JSX.Element {
+export function PartsSection({ asset, partTransfers, action }: PartSectionProps): React.JSX.Element {
 
   return (
     <Section>
-      <SectionHeader title="Parts Transferred" />
+      <SectionHeader title="Parts Transferred" action={action} />
       <OptionalSection condition={!!partTransfers?.length} fallback="No parts installed">
         {
           partTransfers?.map(p => getPartBadge(p, asset.barcode))
