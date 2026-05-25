@@ -35,6 +35,7 @@ const assetIncludeArgs = {
   include: {
     model: true,
     Readiness: true,
+    Country: true,
     technical_specification: true,
     asset_accessories: {
       include: {
@@ -77,6 +78,7 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     meterColour: dbAsset.technical_specification?.meter_colour ?? 0,
     cassettes: dbAsset.technical_specification?.cassettes ?? 0,
     readiness: dbAsset.Readiness,
+    countryOfOrigin: dbAsset.Country,
     internalFinisher: dbAsset.technical_specification?.internal_finisher ?? '',
     coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory),
     drumLifeC: dbAsset.technical_specification?.drum_life_c ?? 0,
@@ -159,6 +161,7 @@ function mapInputAssetToPrismaCreateAsset(
     created_at: currentDateTime,
     Status: { connect: { status: arrivalStatus } },
     Readiness: { connect: { id: asset.readiness.id } },
+    Country: { connect: { id: asset.countryOfOrigin.id } },
     asset_accessories: {
       create: asset.coreFunctions.map(c => ({ accessory_id: c.id }))
     },
@@ -290,6 +293,7 @@ async function updateArrivalAssetCoreFields(
       model_id: asset.model.id,
       serial_number: asset.serialNumber,
       readiness_id: asset.readiness.id,
+      country_of_origin_id: asset.countryOfOrigin?.id ?? null,
       technical_specification: {
         update: {
           meter_black: asset.meterBlack,
@@ -334,6 +338,7 @@ export async function updateArrivalAsset(
     where: { id: assetId, arrival: { arrival_number: arrivalNumber } },
     select: {
       id: true, barcode: true, model_id: true, serial_number: true, readiness_id: true,
+      country_of_origin_id: true,
       technical_specification: {
         select: {
           meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true,
@@ -361,6 +366,7 @@ export async function updateArrivalAsset(
     model_id: existing.model_id,
     serial_number: existing.serial_number,
     readiness_id: existing.readiness_id,
+    country_of_origin_id: existing.country_of_origin_id,
     meter_black: existing.technical_specification?.meter_black,
     meter_colour: existing.technical_specification?.meter_colour,
     cassettes: existing.technical_specification?.cassettes,
@@ -377,6 +383,7 @@ export async function updateArrivalAsset(
     model_id: asset.model.id,
     serial_number: asset.serialNumber,
     readiness_id: asset.readiness.id,
+    country_of_origin_id: asset.countryOfOrigin?.id ?? null,
     meter_black: asset.meterBlack,
     meter_colour: asset.meterColour,
     cassettes: asset.cassettes,

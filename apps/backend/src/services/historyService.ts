@@ -74,6 +74,7 @@ type AssetUpdateFields = Partial<{
   model_id: number
   serial_number: string
   readiness_id: number
+  country_of_origin_id: number | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -433,6 +434,25 @@ export async function recordAssetUpdate(
       ])
       diffBefore.readiness = beforeStatus?.status ?? null
       diffAfter.readiness = afterStatus?.status ?? null
+    }
+
+    if (before.country_of_origin_id !== after.country_of_origin_id) {
+      const [beforeCountry, afterCountry] = await Promise.all([
+        before.country_of_origin_id
+          ? prisma.country.findUnique({
+              where: { id: before.country_of_origin_id },
+              select: { name: true }
+            })
+          : null,
+        after.country_of_origin_id
+          ? prisma.country.findUnique({
+              where: { id: after.country_of_origin_id },
+              select: { name: true }
+            })
+          : null
+      ])
+      diffBefore.country_of_origin = beforeCountry?.name ?? null
+      diffAfter.country_of_origin = afterCountry?.name ?? null
     }
 
     const plainFields = [

@@ -213,6 +213,8 @@ export const BulkUpdateAssetPricingSchema = z.object({
 export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
 
 export const UpdateAssetSpecsSchema = z.object({
+  readiness_id: z.number().int().positive(),
+  country_of_origin_id: z.number().int().positive().nullable(),
   cassettes: z.number().int().nonnegative().nullable(),
   internal_finisher: z.string().nullable(),
   meter_black: z.number().int().nonnegative().nullable(),

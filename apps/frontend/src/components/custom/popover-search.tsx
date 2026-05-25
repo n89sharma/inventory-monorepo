@@ -215,13 +215,14 @@ export function PopoverSearch<T>({
 export function PopoverSearchInline<T>({
   fieldLabel,
   fieldRequired,
+  placeholder,
   ...rest
-}: PopoverSearchProps<T>): React.JSX.Element {
-  const placeholder = fieldRequired ? `${fieldLabel} *` : fieldLabel
+}: PopoverSearchProps<T> & { placeholder?: string }): React.JSX.Element {
+  const resolvedPlaceholder = placeholder ?? (fieldRequired ? `${fieldLabel} *` : fieldLabel)
   return (
     <PopoverSearchBody
       {...rest}
-      placeholder={placeholder}
+      placeholder={resolvedPlaceholder}
       required={fieldRequired}
       header={null}
     />

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { AssetSummarySchema } from '../asset-types.js';
 import { ModelSummarySchema } from '../model-types.js';
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
-import { CoreFunctionsSchema, StatusSchema, WarehouseSchema } from '../reference-data-types.js';
+import { CoreFunctionsSchema, CountrySchema, StatusSchema, WarehouseSchema } from '../reference-data-types.js';
 import { CollectionSummarySchema } from './collection-types.js';
 
 // GET /arrivals?fromDate...&toDate...&warehouse...
@@ -37,6 +37,7 @@ export const CreateAssetSchema = z.object({
   meterColour: z.number().min(0, "Meter must be positive"),
   cassettes: z.number().min(0, "Cassettes are required"),
   readiness: StatusSchema,
+  countryOfOrigin: CountrySchema.refine(val => !!val, "Country of origin is required"),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0, "Drum life C required"),
@@ -61,7 +62,8 @@ export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
 // PATCH /arrivals/:arrivalNumber/assets/:assetId
 export const UpdateAssetSchema = CreateAssetSchema.extend({
-  id: z.number().optional()
+  id: z.number().optional(),
+  countryOfOrigin: CountrySchema.nullable()
 })
 export type UpdateAsset = z.infer<typeof UpdateAssetSchema>
 

@@ -1,5 +1,5 @@
-import type { CoreFunction, ModelSummary, OrgSummary, Status, Warehouse } from "shared-types"
-import { CoreFunctionsSchema, ModelSummarySchema, OrgSummarySchema } from "shared-types"
+import type { CoreFunction, Country, ModelSummary, OrgSummary, Status, Warehouse } from "shared-types"
+import { CoreFunctionsSchema, CountrySchema, ModelSummarySchema, OrgSummarySchema } from "shared-types"
 import z from "zod"
 import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type SelectOption } from "./select-option-types"
 
@@ -12,6 +12,7 @@ export const AssetFormSchema = z.object({
   meterColour: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Colour meter is required"),
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
   readiness: StatusSelectOptionSchema.refine(val => isSelected(val), "Readiness required"),
+  countryOfOrigin: CountrySchema.nullable().refine(val => !!val, "Country of origin is required"),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0).nullable(),
@@ -42,6 +43,7 @@ export type AssetForm = {
   meterColour: number | null,
   cassettes: number | null,
   readiness: SelectOption<Status>,
+  countryOfOrigin: Country | null,
   internalFinisher: string,
   coreFunctions: CoreFunction[],
   drumLifeC: number | null,

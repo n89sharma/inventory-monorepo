@@ -650,6 +650,8 @@ export async function updateAssetSpecs(
     where: { barcode },
     select: {
       id: true,
+      readiness_id: true,
+      country_of_origin_id: true,
       technical_specification: {
         select: {
           cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true,
@@ -669,6 +671,13 @@ export async function updateAssetSpecs(
   })
 
   await prisma.$transaction([
+    prisma.asset.update({
+      where: { id: asset.id },
+      data: {
+        readiness_id: data.readiness_id,
+        country_of_origin_id: data.country_of_origin_id,
+      }
+    }),
     prisma.technicalSpecification.upsert({
       where: { asset_id: asset.id },
       update: {
@@ -693,6 +702,8 @@ export async function updateAssetSpecs(
   ])
 
   await recordAssetUpdate(asset.id, {
+    readiness_id: asset.readiness_id,
+    country_of_origin_id: asset.country_of_origin_id,
     cassettes: asset.technical_specification?.cassettes,
     internal_finisher: asset.technical_specification?.internal_finisher,
     meter_black: asset.technical_specification?.meter_black,
@@ -707,6 +718,8 @@ export async function updateAssetSpecs(
     toner_life_y: asset.technical_specification?.toner_life_y,
     toner_life_k: asset.technical_specification?.toner_life_k
   }, {
+    readiness_id: data.readiness_id,
+    country_of_origin_id: data.country_of_origin_id,
     cassettes: data.cassettes, internal_finisher: data.internal_finisher,
     meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
     drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,

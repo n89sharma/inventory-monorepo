@@ -1,6 +1,7 @@
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from "@/components/custom/consumables-grid"
 import { FormSection } from "@/components/custom/form-section"
 import { HorizontalField } from "@/components/custom/horizontal-field"
+import { PopoverSearchInline } from "@/components/custom/popover-search"
 import { Button } from "@/components/shadcn/button"
 import {
   Dialog,
@@ -13,9 +14,11 @@ import { Input } from "@/components/shadcn/input"
 import MultipleSelector from "@/components/shadcn/multiple-selector"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
+import { formatSentenceCase } from "@/lib/formatters"
+import { cn } from "@/lib/utils"
 import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
-import type { AssetDetails, CoreFunction } from "shared-types"
+import type { AssetDetails, CoreFunction, Country, Status } from "shared-types"
 import { toast } from "sonner"
 
 interface EditSpecsModalProps {
@@ -35,6 +38,8 @@ interface CMYKValues {
 }
 
 interface SpecFields {
+  readiness: Status | null
+  country: Country | null
   meter_black: number | null
   meter_colour: number | null
   cassettes: number | null
@@ -47,6 +52,8 @@ const EMPTY_CMYK: CMYKValues = { c: null, m: null, y: null, k: null }
 const CMYK_CHANNELS: CMYKChannel[] = ['c', 'm', 'y', 'k']
 
 const EMPTY_SPECS: SpecFields = {
+  readiness: null,
+  country: null,
   meter_black: null,
   meter_colour: null,
   cassettes: null,
@@ -84,9 +91,55 @@ function ReadOnlyInt({ value, className }: { value: number; className?: string }
   )
 }
 
+function ReadinessPicker(
+  {
+    selection,
+    onChange,
+    options,
+    error,
+  }: {
+    selection: Status | null
+    onChange: (s: Status | null) => void
+    options: Status[]
+    error?: boolean
+  }
+) {
+  const selectedId = selection?.id ?? null
+  return (
+    <div
+      role='radiogroup'
+      aria-invalid={error}
+      className='inline-flex flex-wrap gap-1.5'
+    >
+      {options.map(opt => {
+        const active = opt.id === selectedId
+        return (
+          <button
+            key={opt.id}
+            type='button'
+            role='radio'
+            aria-checked={active}
+            onClick={() => onChange(active ? null : opt)}
+            className={cn(
+              'h-7 rounded-full border px-3 text-xs font-medium transition-colors',
+              active
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-background text-foreground hover:bg-muted',
+            )}
+          >
+            {formatSentenceCase(opt.status)}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore(state => state.updateAssetSpecs)
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
+  const readinesses = useReferenceDataStore(state => state.readinesses)
+  const countries = useReferenceDataStore(state => state.countries)
 
   const [fields, setFields] = useState<SpecFields>(EMPTY_SPECS)
   const [selectedFunctions, setSelectedFunctions] = useState<CoreFunction[]>([])
@@ -96,6 +149,8 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
     if (open && assetDetails) {
       const { specs } = assetDetails
       setFields({
+        readiness: readinesses.find(r => r.status === assetDetails.readiness) ?? null,
+        country: countries.find(c => c.name === assetDetails.country_of_origin) ?? null,
         meter_black: specs.meter_black,
         meter_colour: specs.meter_colour,
         cassettes: specs.cassettes,
@@ -121,6 +176,8 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
 
   const meterTotal = (fields.meter_black ?? 0) + (fields.meter_colour ?? 0)
 
+  function setReadiness(v: Status | null) { setFields(prev => ({ ...prev, readiness: v })) }
+  function setCountry(v: Country | null) { setFields(prev => ({ ...prev, country: v })) }
   function setMeterBlack(v: number | null) { setFields(prev => ({ ...prev, meter_black: v })) }
   function setMeterColour(v: number | null) { setFields(prev => ({ ...prev, meter_colour: v })) }
   function setCassettes(v: number | null) { setFields(prev => ({ ...prev, cassettes: v })) }
@@ -133,9 +190,15 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
   const selectedOptions = selectedFunctions.map(cf => ({ id: cf.id, label: cf.accessory, value: cf.accessory }))
 
   async function handleSave() {
+    if (!fields.readiness) {
+      toast.error('Readiness is required.', { position: 'top-center' })
+      return
+    }
     setSaving(true)
     try {
       await updateAssetSpecs(assetDetails!.barcode, {
+        readiness_id: fields.readiness.id,
+        country_of_origin_id: fields.country?.id ?? null,
         cassettes: fields.cassettes,
         internal_finisher: fields.internal_finisher || null,
         meter_black: fields.meter_black,
@@ -166,6 +229,30 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         </DialogHeader>
 
         <div className="flex flex-col gap-6">
+
+          <div className="flex flex-col gap-2">
+            <HorizontalField label="Readiness" required>
+              <ReadinessPicker
+                selection={fields.readiness}
+                onChange={setReadiness}
+                options={readinesses}
+                error={!fields.readiness}
+              />
+            </HorizontalField>
+            <HorizontalField label="Country of Origin">
+              <PopoverSearchInline
+                selection={fields.country}
+                onSelectionChange={setCountry}
+                onClear={() => setCountry(null)}
+                options={countries}
+                searchKey="name"
+                getLabel={(c: Country) => formatSentenceCase(c.name)}
+                fieldLabel="Country of Origin"
+                fieldRequired={false}
+                placeholder=""
+              />
+            </HorizontalField>
+          </div>
 
           <FormSection title="Usage">
             <div className="flex flex-col gap-2">

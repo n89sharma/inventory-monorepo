@@ -12,7 +12,7 @@ import {
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
-import type { CoreFunction, ModelSummary, Status } from 'shared-types'
+import type { CoreFunction, Country, ModelSummary, Status } from 'shared-types'
 import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/consumables-grid'
@@ -222,6 +222,7 @@ export function AssetModal({
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
   const readinesses = useReferenceDataStore(state => state.readinesses)
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
+  const countries = useReferenceDataStore(state => state.countries)
   const models = useModelStore(state => state.models)
 
   useEffect(() => {
@@ -242,6 +243,7 @@ export function AssetModal({
       serialNumber: '',
       model: null,
       readiness: untested ? getSelectOption(untested) : UNSELECTED,
+      countryOfOrigin: null,
       meterBlack: null,
       meterColour: null,
       cassettes: null,
@@ -345,6 +347,7 @@ export function AssetModal({
                     getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
                     fieldLabel='Model'
                     fieldRequired={true}
+                    placeholder=''
                     error={fieldState.invalid}
                   />
                 )}
@@ -366,6 +369,26 @@ export function AssetModal({
                     selection={value}
                     onSelectionChange={onChange}
                     options={readinesses}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+            </HorizontalField>
+            <HorizontalField label='Country of Origin' required>
+              <Controller
+                control={newAssetForm.control}
+                name='countryOfOrigin'
+                render={({ field, fieldState }) => (
+                  <PopoverSearchInline
+                    selection={field.value as Country | null}
+                    onSelectionChange={field.onChange}
+                    onClear={() => field.onChange(null)}
+                    options={countries}
+                    searchKey='name'
+                    getLabel={(c: Country) => formatSentenceCase(c.name)}
+                    fieldLabel='Country of Origin'
+                    fieldRequired={true}
+                    placeholder=''
                     error={fieldState.invalid}
                   />
                 )}
