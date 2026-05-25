@@ -1,3 +1,5 @@
+import { FormSection } from "@/components/custom/form-section"
+import { HorizontalField } from "@/components/custom/horizontal-field"
 import { Button } from "@/components/shadcn/button"
 import {
   Dialog,
@@ -29,6 +31,17 @@ interface PricingFields {
   sale_price: string
 }
 
+const EMPTY_PRICING: PricingFields = {
+  purchase_cost: '',
+  transport_cost: '',
+  processing_cost: '',
+  other_cost: '',
+  parts_cost: '',
+  sale_price: '',
+}
+
+const INPUT_WIDTH = 'max-w-[160px]'
+
 function sanitize(value: string): string {
   const cleaned = value.replace(/[^\d.]/g, '')
   const firstDot = cleaned.indexOf('.')
@@ -40,33 +53,30 @@ function toNum(value: string): number {
   return parseFloat(value) || 0
 }
 
-function PriceInput({ label, value, onChange }: { label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+function PriceInput(
+  { value, onChange }:
+  { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }
+) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="font-medium">{label}</label>
-      <div className="relative">
-        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
-        <Input
-          value={value}
-          onChange={onChange}
-          inputMode="decimal"
-          placeholder="0.00"
-          className="pl-7"
-        />
-      </div>
+    <div className={`relative ${INPUT_WIDTH}`}>
+      <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
+      <Input
+        value={value}
+        onChange={onChange}
+        inputMode="decimal"
+        placeholder="0.00"
+        className="pl-7 tabular-nums"
+      />
     </div>
   )
 }
 
-function ReadOnlyPrice({ label, value }: { label: string; value: number }) {
+function ReadOnlyPrice({ value }: { value: number }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="font-medium">{label}</label>
-      <div className="relative">
-        <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
-        <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border pl-7 pr-3">
-          {formatUSD(value)}
-        </div>
+    <div className={`relative ${INPUT_WIDTH}`}>
+      <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
+      <div className="border-input bg-muted/50 flex h-9 items-center rounded-md border pl-7 pr-3 tabular-nums">
+        {formatUSD(value)}
       </div>
     </div>
   )
@@ -75,14 +85,7 @@ function ReadOnlyPrice({ label, value }: { label: string; value: number }) {
 export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPricingModalProps) {
   const updateAssetPricing = useAssetStore(state => state.updateAssetPricing)
 
-  const [fields, setFields] = useState<PricingFields>({
-    purchase_cost: '',
-    transport_cost: '',
-    processing_cost: '',
-    other_cost: '',
-    parts_cost: '',
-    sale_price: '',
-  })
+  const [fields, setFields] = useState<PricingFields>(EMPTY_PRICING)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -124,7 +127,7 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
         parts_cost: toNum(fields.parts_cost),
         sale_price: toNum(fields.sale_price),
       })
-      toast.success('Pricing updated.')
+      toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
     } catch {
       // interceptor already showed the error toast
@@ -139,18 +142,37 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
           <DialogTitle>Edit Asset Pricing</DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-          <PriceInput label="Purchase Cost" value={fields.purchase_cost} onChange={setField('purchase_cost')} />
-          <PriceInput label="Other Cost" value={fields.other_cost} onChange={setField('other_cost')} />
+        <div className="flex flex-col gap-6">
 
-          <PriceInput label="Transport Cost" value={fields.transport_cost} onChange={setField('transport_cost')} />
-          <PriceInput label="Parts Cost" value={fields.parts_cost} onChange={setField('parts_cost')} />
+          <FormSection title="Costs">
+            <div className="flex flex-col gap-2">
+              <HorizontalField label="Purchase">
+                <PriceInput value={fields.purchase_cost} onChange={setField('purchase_cost')} />
+              </HorizontalField>
+              <HorizontalField label="Transport">
+                <PriceInput value={fields.transport_cost} onChange={setField('transport_cost')} />
+              </HorizontalField>
+              <HorizontalField label="Processing">
+                <PriceInput value={fields.processing_cost} onChange={setField('processing_cost')} />
+              </HorizontalField>
+              <HorizontalField label="Parts">
+                <PriceInput value={fields.parts_cost} onChange={setField('parts_cost')} />
+              </HorizontalField>
+              <HorizontalField label="Other">
+                <PriceInput value={fields.other_cost} onChange={setField('other_cost')} />
+              </HorizontalField>
+              <HorizontalField label="Total">
+                <ReadOnlyPrice value={totalCost} />
+              </HorizontalField>
+            </div>
+          </FormSection>
 
-          <PriceInput label="Processing Cost" value={fields.processing_cost} onChange={setField('processing_cost')} />
-          <ReadOnlyPrice label="Total Cost" value={totalCost} />
+          <FormSection title="Sale">
+            <HorizontalField label="Sale Price">
+              <PriceInput value={fields.sale_price} onChange={setField('sale_price')} />
+            </HorizontalField>
+          </FormSection>
 
-          <div />
-          <PriceInput label="Sale Price" value={fields.sale_price} onChange={setField('sale_price')} />
         </div>
 
         <DialogFooter>

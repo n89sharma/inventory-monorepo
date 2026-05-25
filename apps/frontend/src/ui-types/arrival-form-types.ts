@@ -14,13 +14,13 @@ export const AssetFormSchema = z.object({
   readiness: StatusSelectOptionSchema.refine(val => isSelected(val), "Readiness required"),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema),
-  drumLifeC: z.number().min(0).nullable().refine(v => v != null, "Drum life C required"),
-  drumLifeM: z.number().min(0).nullable().refine(v => v != null, "Drum life M required"),
-  drumLifeY: z.number().min(0).nullable().refine(v => v != null, "Drum life Y required"),
+  drumLifeC: z.number().min(0).nullable(),
+  drumLifeM: z.number().min(0).nullable(),
+  drumLifeY: z.number().min(0).nullable(),
   drumLifeK: z.number().min(0).nullable().refine(v => v != null, "Drum life K required"),
-  tonerLifeC: z.number().min(0).nullable().refine(v => v != null, "Toner life C required"),
-  tonerLifeM: z.number().min(0).nullable().refine(v => v != null, "Toner life M required"),
-  tonerLifeY: z.number().min(0).nullable().refine(v => v != null, "Toner life Y required"),
+  tonerLifeC: z.number().min(0).nullable(),
+  tonerLifeM: z.number().min(0).nullable(),
+  tonerLifeY: z.number().min(0).nullable(),
   tonerLifeK: z.number().min(0).nullable().refine(v => v != null, "Toner life K required")
 })
 

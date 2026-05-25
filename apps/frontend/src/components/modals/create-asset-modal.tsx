@@ -16,9 +16,9 @@ import type { CoreFunction, ModelSummary, Status } from 'shared-types'
 import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/consumables-grid'
-import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
 import { FormSection } from '../custom/form-section'
+import { HorizontalField } from '../custom/horizontal-field'
+import { PopoverSearchInline } from '../custom/popover-search'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import {
@@ -28,7 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../shadcn/dialog'
-import { Field, FieldLabel } from '../shadcn/field'
+import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
 
 type CMYKFieldNames = {
@@ -120,6 +120,71 @@ function ReadinessPicker(
   )
 }
 
+function ControlledTextInput(
+  {
+    control,
+    name,
+    placeholder,
+    className,
+  }: {
+    control: Control<AssetForm>
+    name: Path<AssetForm>
+    placeholder?: string
+    className?: string
+  }
+) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Input
+          value={(field.value as string) ?? ''}
+          onChange={e => field.onChange(e.target.value)}
+          placeholder={placeholder ?? '—'}
+          aria-invalid={fieldState.invalid}
+          className={className}
+        />
+      )}
+    />
+  )
+}
+
+function ControlledNumberInput(
+  {
+    control,
+    name,
+    className,
+  }: {
+    control: Control<AssetForm>
+    name: Path<AssetForm>
+    className?: string
+  }
+) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Input
+          type='number'
+          inputMode='numeric'
+          value={(field.value as number | null) ?? ''}
+          onChange={e => {
+            const raw = e.target.value
+            if (raw === '') return field.onChange(null)
+            const n = Number(raw)
+            field.onChange(isNaN(n) ? null : n)
+          }}
+          placeholder='0'
+          aria-invalid={fieldState.invalid}
+          className={cn('tabular-nums', className)}
+        />
+      )}
+    />
+  )
+}
+
 interface AssetModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -163,19 +228,20 @@ export function AssetModal({
     if (open && editingAsset) {
       newAssetForm.reset(editingAsset)
     } else if (open && !editingAsset) {
-      newAssetForm.reset(getDefaultNewAsset())
+      newAssetForm.reset(getDefaultNewAsset(readinesses))
     }
-  }, [open, editingAsset])
+  }, [open, editingAsset, readinesses])
 
   function getCoreFunctionOptions(cfs: CoreFunction[]) {
     return cfs.map(f => ({ id: f.id, label: f.accessory, value: f.accessory }))
   }
 
-  function getDefaultNewAsset() {
+  function getDefaultNewAsset(allReadinesses: Status[] = []) {
+    const untested = allReadinesses.find(r => r.status === 'UNTESTED')
     return {
       serialNumber: '',
       model: null,
-      readiness: UNSELECTED,
+      readiness: untested ? getSelectOption(untested) : UNSELECTED,
       meterBlack: null,
       meterColour: null,
       cassettes: null,
@@ -192,7 +258,16 @@ export function AssetModal({
     }
   }
 
-  async function onValidAsset(asset: AssetForm) {
+  async function onValidAsset(rawAsset: AssetForm) {
+    const asset: AssetForm = {
+      ...rawAsset,
+      drumLifeC: rawAsset.drumLifeC ?? 0,
+      drumLifeM: rawAsset.drumLifeM ?? 0,
+      drumLifeY: rawAsset.drumLifeY ?? 0,
+      tonerLifeC: rawAsset.tonerLifeC ?? 0,
+      tonerLifeM: rawAsset.tonerLifeM ?? 0,
+      tonerLifeY: rawAsset.tonerLifeY ?? 0,
+    }
     if (isEditMode && onUpdateAsset) {
       setIsSubmitting(true)
       try {
@@ -216,7 +291,7 @@ export function AssetModal({
       setIsSubmitting(true)
       try {
         await onCreateAsset(asset)
-        newAssetForm.reset(getDefaultNewAsset())
+        newAssetForm.reset(getDefaultNewAsset(readinesses))
         onOpenChange(false)
       } catch {
         // interceptor already showed the error toast — keep modal open
@@ -226,7 +301,7 @@ export function AssetModal({
       return
     }
     addNewAsset!(asset)
-    newAssetForm.reset(getDefaultNewAsset())
+    newAssetForm.reset(getDefaultNewAsset(readinesses))
     onOpenChange(false)
   }
 
@@ -249,68 +324,76 @@ export function AssetModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='md:max-w-2xl overflow-y-auto max-h-[90vh]'>
+      <DialogContent className='md:max-w-xl overflow-y-auto max-h-[90vh]'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
         <form onSubmit={e => e.preventDefault()} className='flex flex-col gap-6'>
 
-          <div className='grid grid-cols-[1fr_200px] gap-4'>
-            <ControlledPopoverSearch
-              control={newAssetForm.control}
-              name='model'
-              options={models}
-              searchKey='model_name'
-              getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
-              fieldLabel='Model'
-              fieldRequired={true}
-            />
-            <ControlledInputWithClear
-              control={newAssetForm.control}
-              name='serialNumber'
-              fieldLabel='Serial Number'
-              fieldRequired={true}
-              inputType='string'
-            />
+          <div className='flex flex-col gap-2'>
+            <HorizontalField label='Model' required>
+              <Controller
+                control={newAssetForm.control}
+                name='model'
+                render={({ field, fieldState }) => (
+                  <PopoverSearchInline
+                    selection={field.value as ModelSummary | null}
+                    onSelectionChange={field.onChange}
+                    onClear={() => field.onChange(null)}
+                    options={models}
+                    searchKey='model_name'
+                    getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
+                    fieldLabel='Model'
+                    fieldRequired={true}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+            </HorizontalField>
+            <HorizontalField label='Serial Number' required>
+              <ControlledTextInput
+                control={newAssetForm.control}
+                name='serialNumber'
+                className='max-w-[200px]'
+              />
+            </HorizontalField>
+            <HorizontalField label='Readiness' required>
+              <Controller
+                control={newAssetForm.control}
+                name='readiness'
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <ReadinessPicker
+                    selection={value}
+                    onSelectionChange={onChange}
+                    options={readinesses}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+            </HorizontalField>
           </div>
 
-          <Controller
-            control={newAssetForm.control}
-            name='readiness'
-            render={({ field: { onChange, value }, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Readiness</FieldLabel>
-                <ReadinessPicker
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={readinesses}
-                  error={fieldState.invalid}
-                />
-              </Field>
-            )}
-          />
-
           <FormSection title='Usage'>
-            <div className='grid grid-cols-[140px_140px] gap-4'>
-              <ControlledInputWithClear
-                control={newAssetForm.control}
-                name='meterBlack'
-                fieldLabel='Meter — Black'
-                fieldRequired={true}
-                inputType='number'
-              />
-              <ControlledInputWithClear
-                control={newAssetForm.control}
-                name='meterColour'
-                fieldLabel='Meter — Colour'
-                fieldRequired={true}
-                inputType='number'
-              />
+            <div className='flex flex-col gap-2'>
+              <HorizontalField label='Meter — Black' required>
+                <ControlledNumberInput
+                  control={newAssetForm.control}
+                  name='meterBlack'
+                  className='max-w-[160px]'
+                />
+              </HorizontalField>
+              <HorizontalField label='Meter — Colour' required>
+                <ControlledNumberInput
+                  control={newAssetForm.control}
+                  name='meterColour'
+                  className='max-w-[160px]'
+                />
+              </HorizontalField>
             </div>
           </FormSection>
 
           <FormSection title='Consumables'>
-            <ConsumablesGrid>
+            <ConsumablesGrid requiredChannels={['K']}>
               <ControlledConsumablesRow
                 label='Drum life'
                 control={newAssetForm.control}
@@ -325,24 +408,22 @@ export function AssetModal({
           </FormSection>
 
           <FormSection title='Hardware'>
-            <div className='flex flex-col gap-4'>
-              <div className='grid grid-cols-[80px_120px] gap-4'>
-                <ControlledInputWithClear
+            <div className='flex flex-col gap-2'>
+              <HorizontalField label='Cassettes' required>
+                <ControlledNumberInput
                   control={newAssetForm.control}
                   name='cassettes'
-                  fieldLabel='Cassettes'
-                  fieldRequired={true}
-                  inputType='number'
+                  className='max-w-[100px]'
                 />
-                <ControlledInputWithClear
+              </HorizontalField>
+              <HorizontalField label='Internal Finisher'>
+                <ControlledTextInput
                   control={newAssetForm.control}
                   name='internalFinisher'
-                  fieldLabel='Internal Finisher'
-                  inputType='string'
+                  className='max-w-[140px]'
                 />
-              </div>
-              <Field>
-                <FieldLabel>Core Functions</FieldLabel>
+              </HorizontalField>
+              <HorizontalField label='Core Functions'>
                 <Controller
                   name='coreFunctions'
                   control={newAssetForm.control}
@@ -362,7 +443,7 @@ export function AssetModal({
                     />
                   )}
                 />
-              </Field>
+              </HorizontalField>
             </div>
           </FormSection>
 

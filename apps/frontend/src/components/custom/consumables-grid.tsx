@@ -11,7 +11,15 @@ const CMYK_CHANNELS = [
 
 const CELLS_TEMPLATE = 'grid-cols-[repeat(4,minmax(0,72px))_auto]'
 
-export function ConsumablesGrid({ children }: { children: React.ReactNode }) {
+export function ConsumablesGrid(
+  {
+    children,
+    requiredChannels = [],
+  }: {
+    children: React.ReactNode
+    requiredChannels?: Array<'C' | 'M' | 'Y' | 'K'>
+  }
+) {
   return (
     <div className='flex flex-col gap-2'>
       <HorizontalField label=''>
@@ -21,6 +29,9 @@ export function ConsumablesGrid({ children }: { children: React.ReactNode }) {
               <span className={cn('size-2 rounded-full', c.dotClass)} />
               <span className='text-xs font-medium text-muted-foreground'>
                 {c.letter}
+                {requiredChannels.includes(c.letter) && (
+                  <span className='text-destructive ml-0.5'>*</span>
+                )}
               </span>
             </div>
           ))}

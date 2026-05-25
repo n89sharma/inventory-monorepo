@@ -4,11 +4,13 @@ export function HorizontalField(
   {
     label,
     htmlFor,
+    required,
     children,
     className,
   }: {
     label: string
     htmlFor?: string
+    required?: boolean
     children: React.ReactNode
     className?: string
   }
@@ -20,6 +22,7 @@ export function HorizontalField(
         className='text-sm font-medium text-foreground'
       >
         {label}
+        {required && <span className='text-destructive ml-0.5'>*</span>}
       </label>
       <div className='min-w-0'>{children}</div>
     </div>
