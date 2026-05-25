@@ -1,7 +1,7 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
-import { getSelectOption, isSelected, UNSELECTED, type SelectOption } from '@/ui-types/select-option-types'
+import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import {
@@ -19,6 +19,7 @@ import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/cons
 import { FormSection } from '../custom/form-section'
 import { HorizontalField } from '../custom/horizontal-field'
 import { PopoverSearchInline } from '../custom/popover-search'
+import { ReadinessPicker } from '../custom/readiness-picker'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import {
@@ -70,53 +71,6 @@ function ControlledConsumablesRow(
         />
       ))}
     </ConsumablesRow>
-  )
-}
-
-function ReadinessPicker(
-  {
-    selection,
-    onSelectionChange,
-    options,
-    error,
-  }: {
-    selection: SelectOption<Status>
-    onSelectionChange: (s: SelectOption<Status>) => void
-    options: Status[]
-    error: boolean
-  }
-) {
-  const selectedId = isSelected(selection) ? selection.selected.id : null
-  return (
-    <div
-      role='radiogroup'
-      aria-invalid={error}
-      data-invalid={error}
-      className='inline-flex flex-wrap gap-1.5'
-    >
-      {options.map(opt => {
-        const active = opt.id === selectedId
-        return (
-          <button
-            key={opt.id}
-            type='button'
-            role='radio'
-            aria-checked={active}
-            onClick={() =>
-              onSelectionChange(active ? UNSELECTED : getSelectOption(opt))
-            }
-            className={cn(
-              'h-7 rounded-full border px-3 text-xs font-medium transition-colors',
-              active
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-background text-foreground hover:bg-muted',
-            )}
-          >
-            {formatSentenceCase(opt.status)}
-          </button>
-        )
-      })}
-    </div>
   )
 }
 
@@ -326,7 +280,7 @@ export function AssetModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='md:max-w-xl overflow-y-auto max-h-[90vh]'>
+      <DialogContent className='md:max-w-[624px] overflow-y-auto max-h-[90vh]'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
@@ -366,8 +320,8 @@ export function AssetModal({
                 name='readiness'
                 render={({ field: { onChange, value }, fieldState }) => (
                   <ReadinessPicker
-                    selection={value}
-                    onSelectionChange={onChange}
+                    selection={isSelected(value) ? value.selected : null}
+                    onChange={s => onChange(s ? getSelectOption(s) : UNSELECTED)}
                     options={readinesses}
                     error={fieldState.invalid}
                   />

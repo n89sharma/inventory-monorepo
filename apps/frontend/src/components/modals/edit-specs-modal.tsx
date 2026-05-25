@@ -2,6 +2,7 @@ import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from "@/components/c
 import { FormSection } from "@/components/custom/form-section"
 import { HorizontalField } from "@/components/custom/horizontal-field"
 import { PopoverSearchInline } from "@/components/custom/popover-search"
+import { ReadinessPicker } from "@/components/custom/readiness-picker"
 import { Button } from "@/components/shadcn/button"
 import {
   Dialog,
@@ -15,7 +16,6 @@ import MultipleSelector from "@/components/shadcn/multiple-selector"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { formatSentenceCase } from "@/lib/formatters"
-import { cn } from "@/lib/utils"
 import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
 import type { AssetDetails, CoreFunction, Country, Status } from "shared-types"
@@ -87,50 +87,6 @@ function ReadOnlyInt({ value, className }: { value: number; className?: string }
   return (
     <div className={`border-input bg-muted/50 flex h-9 items-center rounded-md border px-3 tabular-nums ${className ?? ''}`}>
       {value}
-    </div>
-  )
-}
-
-function ReadinessPicker(
-  {
-    selection,
-    onChange,
-    options,
-    error,
-  }: {
-    selection: Status | null
-    onChange: (s: Status | null) => void
-    options: Status[]
-    error?: boolean
-  }
-) {
-  const selectedId = selection?.id ?? null
-  return (
-    <div
-      role='radiogroup'
-      aria-invalid={error}
-      className='inline-flex flex-wrap gap-1.5'
-    >
-      {options.map(opt => {
-        const active = opt.id === selectedId
-        return (
-          <button
-            key={opt.id}
-            type='button'
-            role='radio'
-            aria-checked={active}
-            onClick={() => onChange(active ? null : opt)}
-            className={cn(
-              'h-7 rounded-full border px-3 text-xs font-medium transition-colors',
-              active
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-background text-foreground hover:bg-muted',
-            )}
-          >
-            {formatSentenceCase(opt.status)}
-          </button>
-        )
-      })}
     </div>
   )
 }
@@ -223,7 +179,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-[624px]">
         <DialogHeader>
           <DialogTitle>Edit Technical Specifications</DialogTitle>
         </DialogHeader>

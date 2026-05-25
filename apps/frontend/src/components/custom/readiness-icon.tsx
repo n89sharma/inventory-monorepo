@@ -12,7 +12,7 @@ type IconConfig = {
   weight?: 'regular' | 'fill'
 }
 
-function getIconConfig(status: string): IconConfig {
+export function getReadinessIconConfig(status: string): IconConfig {
   switch (status) {
     case 'UNTESTED':
       return { Icon: QuestionIcon, className: 'text-slate-400' }
@@ -28,7 +28,7 @@ function getIconConfig(status: string): IconConfig {
 }
 
 export function ReadinessIcon({ status }: { status: string }) {
-  const { Icon, className, weight = 'regular' } = getIconConfig(status)
+  const { Icon, className, weight = 'regular' } = getReadinessIconConfig(status)
   return (
     <Tooltip>
       <TooltipTrigger asChild>
