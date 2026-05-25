@@ -15,8 +15,10 @@ import {
 import type { CoreFunction, ModelSummary, Status } from 'shared-types'
 import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
+import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/consumables-grid'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { FormSection } from '../custom/form-section'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import {
@@ -27,15 +29,7 @@ import {
   DialogTitle,
 } from '../shadcn/dialog'
 import { Field, FieldLabel } from '../shadcn/field'
-import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
-
-const CMYK_CHANNELS = [
-  { letter: 'C', dotClass: 'bg-cyan-500' },
-  { letter: 'M', dotClass: 'bg-fuchsia-500' },
-  { letter: 'Y', dotClass: 'bg-yellow-500' },
-  { letter: 'K', dotClass: 'bg-foreground' },
-] as const
 
 type CMYKFieldNames = {
   c: Path<AssetForm>
@@ -44,23 +38,9 @@ type CMYKFieldNames = {
   k: Path<AssetForm>
 }
 
-function FormSection(
-  { title, children }: { title: string; children: React.ReactNode }
-) {
-  return (
-    <section className='flex flex-col gap-3'>
-      <div className='flex items-center gap-3'>
-        <h3 className='text-[11px] font-semibold uppercase tracking-wider text-muted-foreground'>
-          {title}
-        </h3>
-        <div className='h-px flex-1 bg-border' />
-      </div>
-      {children}
-    </section>
-  )
-}
+const CMYK_LETTERS: Array<'C' | 'M' | 'Y' | 'K'> = ['C', 'M', 'Y', 'K']
 
-function ConsumablesRow(
+function ControlledConsumablesRow(
   {
     label,
     control,
@@ -73,65 +53,23 @@ function ConsumablesRow(
 ) {
   const orderedNames = [names.c, names.m, names.y, names.k]
   return (
-    <div className='grid grid-cols-[80px_repeat(4,minmax(0,72px))_auto] items-center gap-2'>
-      <span className='text-sm text-muted-foreground'>{label}</span>
+    <ConsumablesRow label={label}>
       {orderedNames.map((fieldName, i) => (
         <Controller
           key={fieldName}
           control={control}
           name={fieldName}
           render={({ field, fieldState }) => (
-            <Input
-              type='number'
-              value={(field.value as number | null) ?? ''}
-              onChange={e => {
-                const raw = e.target.value
-                if (raw === '') return field.onChange(null)
-                const n = Number(raw)
-                field.onChange(isNaN(n) ? null : n)
-              }}
-              placeholder='–'
-              aria-invalid={fieldState.invalid}
-              aria-label={`${label} ${CMYK_CHANNELS[i].letter}`}
-              className='h-8 text-center tabular-nums'
+            <ConsumablesCell
+              value={field.value as number | null}
+              onChange={field.onChange}
+              invalid={fieldState.invalid}
+              ariaLabel={`${label} ${CMYK_LETTERS[i]}`}
             />
           )}
         />
       ))}
-      <span className='text-xs text-muted-foreground'>%</span>
-    </div>
-  )
-}
-
-function ConsumablesGrid({ control }: { control: Control<AssetForm> }) {
-  return (
-    <div className='flex flex-col gap-2'>
-      <div
-        className='grid grid-cols-[80px_repeat(4,minmax(0,72px))_auto]
-                   items-center gap-2 px-1'
-      >
-        <span />
-        {CMYK_CHANNELS.map(c => (
-          <div key={c.letter} className='flex items-center justify-center gap-1.5'>
-            <span className={cn('size-2 rounded-full', c.dotClass)} />
-            <span className='text-xs font-medium text-muted-foreground'>
-              {c.letter}
-            </span>
-          </div>
-        ))}
-        <span />
-      </div>
-      <ConsumablesRow
-        label='Drum life'
-        control={control}
-        names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
-      />
-      <ConsumablesRow
-        label='Toner'
-        control={control}
-        names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
-      />
-    </div>
+    </ConsumablesRow>
   )
 }
 
@@ -372,7 +310,18 @@ export function AssetModal({
           </FormSection>
 
           <FormSection title='Consumables'>
-            <ConsumablesGrid control={newAssetForm.control} />
+            <ConsumablesGrid>
+              <ControlledConsumablesRow
+                label='Drum life'
+                control={newAssetForm.control}
+                names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
+              />
+              <ControlledConsumablesRow
+                label='Toner'
+                control={newAssetForm.control}
+                names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
+              />
+            </ConsumablesGrid>
           </FormSection>
 
           <FormSection title='Hardware'>
