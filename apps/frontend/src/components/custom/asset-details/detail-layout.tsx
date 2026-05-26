@@ -18,10 +18,10 @@ type TitleProps = {
   barcode: string | undefined,
   className?: string
 }
-
+''
 export function DetailsContainer({ children, className }: ChildrenProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col rounded-md bg-card border p-6 gap-8", className)}>
+    <div className={cn("flex flex-col bg-card gap-8", className)}>
       {children}
     </div>
   )

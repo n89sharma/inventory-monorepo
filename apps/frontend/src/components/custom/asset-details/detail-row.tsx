@@ -18,7 +18,8 @@ type CMYKDataProps = {
 
 type ErrorRowProps = {
   error: AssetError,
-  className?: string
+  className?: string,
+  rowClassName?: string
 }
 
 type InvoiceClearedRowProps = {
@@ -217,7 +218,7 @@ export function AccessoryRow({
 }: AccessoryDataProps): React.JSX.Element {
   return (
     <DataRow label={label} rowClassName={rowClassName}>
-      <div className="grid grid-cols-2">
+      <div className="flex flex-wrap gap-1">
         {accessories.map(a => (
           <Badge variant="outline" key={a}>{a}</Badge>
         ))}
@@ -248,9 +249,11 @@ export function ErrorHeader({ className }: { className?: string }): React.JSX.El
   )
 }
 
-export function ErrorRow({ error, className }: ErrorRowProps): React.JSX.Element {
+export function ErrorRow(
+  { error, className, rowClassName }: ErrorRowProps,
+): React.JSX.Element {
   return (
-    <div className={cn("flex border-b py-0.5", className)}>
+    <div className={cn("flex border-b py-0.5", className, rowClassName)}>
       <dt className={cn("text-left font-medium text-semibold min-w-28", className)}>
         {error.code}
       </dt>

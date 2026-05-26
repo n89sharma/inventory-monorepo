@@ -11,22 +11,26 @@ type PartSectionProps = {
   asset: AssetDetails
   partTransfers: PartTransfer[]
   action?: React.ReactNode
+  rowClassName?: string
+  className?: string
 }
-export function PartsSection({ asset, partTransfers, action }: PartSectionProps): React.JSX.Element {
+export function PartsSection(
+  { asset, partTransfers, action, rowClassName, className }: PartSectionProps,
+): React.JSX.Element {
 
   return (
-    <Section>
+    <Section className={className}>
       <SectionHeader title="Parts Transferred" action={action} />
       <OptionalSection condition={!!partTransfers?.length} fallback="No parts installed">
         {
-          partTransfers?.map(p => getPartBadge(p, asset.barcode))
+          partTransfers?.map(p => getPartBadge(p, asset.barcode, rowClassName))
         }
       </OptionalSection>
     </Section>
   )
 }
 
-function getPartBadge(transfer: PartTransfer, currentAsset: string) {
+function getPartBadge(transfer: PartTransfer, currentAsset: string, rowClassName?: string) {
 
   const badge = transfer.donor === currentAsset
     ? <div className="flex items-center gap-0.5">
@@ -45,7 +49,8 @@ function getPartBadge(transfer: PartTransfer, currentAsset: string) {
   return (
     <DataRow
       key={`${transfer.donor}${transfer.part}`}
-      label={transfer.part}>
+      label={transfer.part}
+      rowClassName={rowClassName}>
       {badge}
     </DataRow>
   )

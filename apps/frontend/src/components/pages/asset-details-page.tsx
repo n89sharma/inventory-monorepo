@@ -2,6 +2,7 @@ import { ActivitySection, AssetTitle, DataRowContainer, DetailsContainer, Sectio
 import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow } from '@/components/custom/asset-details/detail-row'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { TransferSection } from '@/components/custom/asset-details/transfer-section'
+import { SectionEditButton } from '@/components/custom/asset-details/section-edit-button'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { ReadinessPill } from '@/components/custom/readiness-pill'
 import { StatusBadge } from '@/components/custom/status-badge'
@@ -25,23 +26,10 @@ import { useCan } from '@/hooks/use-can'
 import { formatDateWithTime, formatLocation, formatSentenceCase, formatThousandsK } from '@/lib/formatters'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
+
 import type { AssetHistory } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
-
-function SectionEditButton({ onClick }: { onClick: () => void }) {
-  return (
-    <Button
-      variant="ghost"
-      size="xs"
-      type="button"
-      onClick={onClick}
-      className="text-muted-foreground -mr-1"
-    >
-      <PencilSimpleIcon aria-hidden="true" />Edit
-    </Button>
-  )
-}
 
 function AssetHistoryTabContent(
   { barcode, enabled }: { barcode: string; enabled: boolean }
