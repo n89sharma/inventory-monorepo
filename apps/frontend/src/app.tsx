@@ -33,7 +33,6 @@ const CreateInvoicePage         = lazy(() => import('./components/pages/invoice/
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
-const AssetDetailRailPage       = lazy(() => import('./components/pages/asset-detail-rail-page').then(m => ({ default: m.AssetDetailRailPage })))
 const QueryPage                 = lazy(() => import('./components/pages/search-page').then(m => ({ default: m.QueryPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
@@ -116,8 +115,6 @@ function AppRoutes() {
                       </PermissionRoute>
                     }
                   />
-
-                  <Route path="/assets/:assetId/rail" element={<AssetDetailRailPage />} />
 
                   <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 

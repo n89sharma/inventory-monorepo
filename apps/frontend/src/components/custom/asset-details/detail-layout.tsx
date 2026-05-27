@@ -1,4 +1,3 @@
-import { CopyButton } from "@/components/custom/copy-button"
 import { cn } from "@/lib/utils"
 
 type ChildrenProps = {
@@ -12,49 +11,11 @@ type SectionHeaderProps = {
   action?: React.ReactNode
 }
 
-type TitleProps = {
-  brand: string | undefined,
-  model: string | undefined,
-  barcode: string | undefined,
-  className?: string
-}
-''
-export function DetailsContainer({ children, className }: ChildrenProps): React.JSX.Element {
-  return (
-    <div className={cn("flex flex-col bg-card gap-8", className)}>
-      {children}
-    </div>
-  )
-}
-
-export function SectionRow({ children, className }: ChildrenProps): React.JSX.Element {
-  return (
-    <div className={cn("flex flex-row flex-wrap gap-8", className)}>
-      {children}
-    </div>
-  )
-}
-
 export function Section({ children, className }: ChildrenProps): React.JSX.Element {
   return (
     <section className={cn("w-64", className)}>
       {children}
     </section>
-  )
-}
-
-export function AssetTitle({ brand, model, barcode, className }: TitleProps): React.JSX.Element {
-  return (
-    <div className={cn("flex flex-col gap-0.5", className)}>
-      <h1 className="text-2xl font-semibold group flex items-center gap-2">
-        {barcode}
-        <CopyButton value={barcode} />
-      </h1>
-      <p className="text-lg group flex items-center gap-2">
-        {`${brand} ${model}`}
-        <CopyButton value={model} />
-      </p>
-    </div>
   )
 }
 

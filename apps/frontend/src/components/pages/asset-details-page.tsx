@@ -1,32 +1,30 @@
-import { ActivitySection, AssetTitle, DataRowContainer, DetailsContainer, Section, SectionHeader, SectionRow } from '@/components/custom/asset-details/detail-layout'
-import { AccessoryRow, CMYKRow, DataCurrencyRow, DataDateRow, DataLinkRow, DataRow, DataValue, DataValueRow, ErrorHeader, ErrorRow, InvoiceClearedRow } from '@/components/custom/asset-details/detail-row'
+import { ActivitySection, DataRowContainer, Section, SectionHeader } from '@/components/custom/asset-details/detail-layout'
+import { AccessoryRow, CMYKRow, DataCurrencyRow, DataRow, DataValueRow } from '@/components/custom/asset-details/detail-row'
+import { Badge } from '@/components/shadcn/badge'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
-import { TransferSection } from '@/components/custom/asset-details/transfer-section'
 import { SectionEditButton } from '@/components/custom/asset-details/section-edit-button'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
-import { ReadinessPill } from '@/components/custom/readiness-pill'
-import { StatusBadge } from '@/components/custom/status-badge'
 import { AssetHistoryList } from '@/components/custom/asset-history'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
 import { getBreadcrumForAssetDetails } from '@/components/custom/page-breadcrumb'
+import { ReadinessPill } from '@/components/custom/readiness-pill'
+import { StatusBadge } from '@/components/custom/status-badge'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { AddPartTransferModal } from '@/components/modals/add-part-transfer-modal'
 import { EditErrorsModal } from '@/components/modals/edit-errors-modal'
-import { EditLocationModal } from '@/components/modals/edit-location-modal'
 import { EditPricingModal } from '@/components/modals/edit-pricing-modal'
 import { EditSpecsModal } from '@/components/modals/edit-specs-modal'
-import { Button } from '@/components/shadcn/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDateWithTime, formatLocation, formatSentenceCase, formatThousandsK } from '@/lib/formatters'
-import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
-
+import { formatDate, formatDateWithTime, formatLocation, formatSentenceCase, formatThousandsK } from '@/lib/formatters'
+import { compareDesc } from 'date-fns'
+import { Fragment, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { AssetHistory } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
@@ -43,11 +41,87 @@ function AssetHistoryTabContent(
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 
+const RAIL_STICKY_TOP = 'calc(var(--app-header-height) + var(--details-header-height, 0px) + 1rem)'
+
+const ROW_GAP = 'gap-8'
+
+function RailCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-card border rounded-md shadow-sm p-3">
+      {children}
+    </div>
+  )
+}
+
+function RailCardHeader(
+  { entity, id, idHref, date }:
+    { entity: string; id: string; idHref: string; date: Date | null },
+) {
+  return (
+    <div className="flex flex-col gap-0.5 border-b pb-2 mb-2">
+      <div className="flex items-center gap-1.5 min-w-0">
+        <span className="text-xs text-muted-foreground shrink-0">{entity}</span>
+        <Link to={idHref} className="text-xs font-medium hover:underline truncate">{id}</Link>
+      </div>
+      {date && <span className="text-xs text-muted-foreground">{formatDate(date)}</span>}
+    </div>
+  )
+}
+
+function RailEmpty({ entity }: { entity: string }) {
+  return (
+    <>
+      <h3 className="text-xs text-muted-foreground font-medium mb-2">{entity}</h3>
+      <p className="text-xs text-muted-foreground italic">Not on record</p>
+    </>
+  )
+}
+
+function AssetSummaryStrip(
+  { status, assetType, serialNumber, location }:
+    { status: string; assetType: string | null; serialNumber: string | null; location: string },
+) {
+  const tokens: { key: string; node: React.ReactNode }[] = [
+    { key: 'status', node: <StatusBadge status={status} /> },
+  ]
+  if (assetType) tokens.push({ key: 'type', node: <span>{assetType}</span> })
+  if (serialNumber) tokens.push({
+    key: 'serial',
+    node: (
+      <span>
+        <span className="text-muted-foreground">S/N</span>{' '}
+        <span className="font-mono">{serialNumber}</span>
+      </span>
+    ),
+  })
+  if (location) tokens.push({ key: 'location', node: <span>{location}</span> })
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {tokens.map((t, i) => (
+        <Fragment key={t.key}>
+          {i > 0 && <span className="text-muted-foreground">·</span>}
+          {t.node}
+        </Fragment>
+      ))}
+    </div>
+  )
+}
+
+function RailField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-xs">{children}</span>
+    </div>
+  )
+}
+
 export const AssetDetailsPage = () => {
 
   const { section, collectionId, assetId } = useAssetDetailsParams()
+
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
-  const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
   const [editSpecsOpen, setEditSpecsOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
@@ -70,225 +144,288 @@ export const AssetDetailsPage = () => {
   if (detailError) return <div>{detailError.message}</div>
   if (!assetDetails) return null
 
-  const { cost, hold, arrival, departure, specs, purchase_invoice } = assetDetails
+  const { cost, hold, specs, arrival, departure } = assetDetails
   const sortedComments = [...(comments ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
+  const populatedLifecycleItems: LifecycleItem[] = []
+  const emptyLifecycleEntities: string[] = []
+
+  if (hold) {
+    populatedLifecycleItems.push({
+      key: 'hold',
+      date: hold.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Hold"
+            id={hold.hold_number}
+            idHref={`/holds/${hold.hold_number}`}
+            date={hold.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="For">{hold.created_for}</RailField>
+            <RailField label="By">{hold.created_by}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    emptyLifecycleEntities.push('Hold')
+  }
+
+  if (arrival) {
+    populatedLifecycleItems.push({
+      key: 'arrival',
+      date: arrival.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Arrival"
+            id={arrival.arrival_number}
+            idHref={`/arrivals/${arrival.arrival_number}`}
+            date={arrival.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="Vendor">{arrival.origin}</RailField>
+            <RailField label="Warehouse">{arrival.destination_code}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    emptyLifecycleEntities.push('Arrival')
+  }
+
+  if (transfers.length > 0) {
+    for (const t of transfers) {
+      populatedLifecycleItems.push({
+        key: `transfer-${t.transfer_number}`,
+        date: t.created_at,
+        node: (
+          <>
+            <RailCardHeader
+              entity="Transfer"
+              id={t.transfer_number}
+              idHref={`/transfers/${t.transfer_number}`}
+              date={t.created_at}
+            />
+            <div className="text-xs flex items-center gap-1">
+              <span>{t.source_code}</span>
+              <span className="text-muted-foreground">→</span>
+              <span>{t.destination_code}</span>
+            </div>
+          </>
+        ),
+      })
+    }
+  } else {
+    emptyLifecycleEntities.push('Transfer')
+  }
+
+  if (departure) {
+    populatedLifecycleItems.push({
+      key: 'departure',
+      date: departure.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Departure"
+            id={departure.departure_number}
+            idHref={`/departures/${departure.departure_number}`}
+            date={departure.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="Warehouse">{departure.origin_code}</RailField>
+            <RailField label="Customer">{departure.destination}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    emptyLifecycleEntities.push('Departure')
+  }
+
+  populatedLifecycleItems.sort((a, b) => {
+    if (a.date === null && b.date === null) return 0
+    if (a.date === null) return 1
+    if (b.date === null) return -1
+    return compareDesc(a.date, b.date)
+  })
 
   return (
     <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, assetId)}
         titleNode={
-          <AssetTitle
-            brand={assetDetails.brand}
-            model={assetDetails.model}
-            barcode={assetDetails.barcode}
-          />
+          <h1 className="text-xl flex items-center gap-6">
+            <span className="font-semibold">
+              {`${assetDetails.brand} ${assetDetails.model}`}
+            </span>
+            <span className="group flex items-center gap-2 font-mono">
+              {assetDetails.barcode}
+              <CopyButton value={assetDetails.barcode} />
+            </span>
+          </h1>
         }
         actions={<AssetEditBar barcode={assetId} />}
-      />
-      <PageContent className="flex flex-col gap-2">
-      <DetailsContainer>
-        <SectionRow>
-          <Section>
-            <SectionHeader title="Summary"></SectionHeader>
-            <DataRowContainer>
-              <DataValueRow label="Asset Type" value={assetDetails.asset_type} />
-              <DataRow label="Serial #">
-                <div className="group flex items-center gap-2">
-                  <DataValue value={assetDetails.serial_number} />
-                  <CopyButton value={assetDetails.serial_number} />
-                </div>
-              </DataRow>
-              <DataRow label="Status">
-                <StatusBadge status={assetDetails.status} />
-              </DataRow>
-              <DataRow label="Location">
-                <div className="group flex items-center gap-2">
-                  <DataValue value={formatLocation(assetDetails.location)} />
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    type="button"
-                    aria-label="Edit location"
-                    onClick={() => setEditLocationOpen(true)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <PencilSimpleIcon aria-hidden="true" />
-                  </Button>
-                </div>
-              </DataRow>
-              <DataDateRow label="Created At" value={assetDetails.created_at} />
-            </DataRowContainer>
-          </Section>
-
-          <Section>
-            <SectionHeader
-              title="Specifications"
-              action={canEditTechSpecs && <SectionEditButton onClick={() => setEditSpecsOpen(true)} />}
-            />
-            <DataRowContainer>
-              <DataRow label="Readiness">
-                <ReadinessPill status={assetDetails.readiness} />
-              </DataRow>
-              <DataValueRow
-                label="Country of Origin"
-                value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
-              />
-              <DataValueRow label="Meter" value={formatThousandsK(specs.meter_total)} />
-              <CMYKRow
-                label="Drum Life"
-                c_value={specs.drum_life_c}
-                m_value={specs.drum_life_m}
-                y_value={specs.drum_life_y}
-                k_value={specs.drum_life_k}
-              />
-              <CMYKRow
-                label="Toner Remaining"
-                c_value={specs.toner_life_c}
-                m_value={specs.toner_life_m}
-                y_value={specs.toner_life_y}
-                k_value={specs.toner_life_k}
-              />
-              <DataValueRow label="Cassettes" value={specs.cassettes} />
-              <DataValueRow label="Internal Finisher" value={specs.internal_finisher} />
-              <AccessoryRow label="Core Functions" accessories={accessories ?? []}></AccessoryRow>
-            </DataRowContainer>
-          </Section>
-
-          <Section>
-            <SectionHeader
-              title="Errors"
-              action={canEditTechSpecs && <SectionEditButton onClick={() => setEditErrorsOpen(true)} />}
-            />
-            <OptionalSection condition={!!errors?.length} fallback="No errors on record">
-              <ErrorHeader />
-              <DataRowContainer>
-                {errors?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} />)}
-              </DataRowContainer>
-            </OptionalSection>
-          </Section>
-
-        </SectionRow>
-
-        <SectionRow>
-
-          <PartsSection
-            asset={assetDetails}
-            partTransfers={partTransfers}
-            action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
+        subtitle={
+          <AssetSummaryStrip
+            status={assetDetails.status}
+            assetType={assetDetails.asset_type}
+            serialNumber={assetDetails.serial_number}
+            location={formatLocation(assetDetails.location)}
           />
-
-          {(canViewPurchasePrice || canViewSalePrice) &&
-            <Section>
-              <SectionHeader
-                title="Pricing"
-                action={canEditPrices && <SectionEditButton onClick={() => setEditPricingOpen(true)} />}
-              />
-              <DataRowContainer>
-                {
-                  canViewPurchasePrice &&
-                  <>
-                    <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} />
-                    <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} />
-                    <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} />
-                    <DataCurrencyRow label="Other Cost" value={cost.other_cost} />
-                    <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} />
-                    <DataCurrencyRow label="Total Cost" value={cost.total_cost} />
-                  </>
-                }
-                {canViewSalePrice && <DataCurrencyRow label="Sale Price" value={cost.sale_price} />}
-              </DataRowContainer>
-            </Section>
-          }
-
-          <Section>
-            <SectionHeader title="Hold"></SectionHeader>
-            <OptionalSection condition={!!hold} fallback="No hold on record">
-              <DataRowContainer>
-                <DataLinkRow label="Hold #" value={hold?.hold_number} to={`/holds/${hold?.hold_number}`} />
-                <DataDateRow label="Date" value={hold?.created_at} />
-                <DataValueRow label="Customer" value={hold?.customer} />
-                <DataValueRow label="For" value={hold?.created_for} />
-                <DataValueRow label="By" value={hold?.created_by} />
-                <DataValueRow label="Notes" value={hold?.notes} />
-              </DataRowContainer>
-            </OptionalSection>
-          </Section>
-
-        </SectionRow>
-
-        <SectionRow>
-
-          <Section>
-            <SectionHeader title="Arrival"></SectionHeader>
-            <OptionalSection condition={!!arrival} fallback="No arrival on record">
-              <DataRowContainer>
-                <DataLinkRow label="Arrival #" value={arrival?.arrival_number} to={`/arrivals/${arrival?.arrival_number}`} />
-                <DataDateRow label="Arrived On" value={arrival?.created_at} />
-                <DataValueRow label="Vendor" value={arrival?.origin} />
-                <DataValueRow label="Warehouse" value={arrival?.destination_code} />
-                <DataValueRow label="Transporter" value={arrival?.transporter} />
-                {purchase_invoice
-                  ? <DataLinkRow label="Invoice #" value={purchase_invoice.invoice_number} to={`/invoices/${purchase_invoice.invoice_number}`} />
-                  : <DataValueRow label="Invoice #" value="-" />
-                }
-                <InvoiceClearedRow isCleared={!!purchase_invoice?.is_cleared} />
-              </DataRowContainer>
-            </OptionalSection>
-          </Section>
-
-          <TransferSection transfers={transfers} />
-
-          <Section>
-            <SectionHeader title="Departure"></SectionHeader>
-            <OptionalSection condition={!!departure} fallback="No departure on record">
-              <DataRowContainer>
-                <DataLinkRow label="Departure #" value={departure?.departure_number} to={`/departures/${departure?.departure_number}`} />
-                <DataDateRow label="Departed On" value={departure?.created_at} />
-                <DataValueRow label="Warehouse" value={departure?.origin_code} />
-                <DataValueRow label="Customer" value={departure?.destination} />
-                <DataValueRow label="Transporter" value={departure?.transporter} />
-              </DataRowContainer>
-            </OptionalSection>
-          </Section>
-
-        </SectionRow>
-
-        <ActivitySection>
-          <Tabs
-            defaultValue="comments"
-            onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
-          >
-            <TabsList variant="line">
-              <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2 mb-0" /></TabsTrigger>
-              <TabsTrigger value="history"><SectionHeader title="History" className="px-2 mb-0" /></TabsTrigger>
-            </TabsList>
-            <TabsContent value="comments" className="flex flex-col gap-3 py-3 overflow-y-auto max-h-105 pr-1">
-              <AddCommentInput barcode={assetDetails.barcode} />
-              {
-                sortedComments.map(c => (<Comment
-                  key={`${c.username}-${c.created_at}`}
-                  user={c.username}
-                  date={formatDateWithTime(c.created_at)}
-                  avatarFallback={c.initials}
-                  comment={c.comment}
-                  tags={EMPTY_TAGS}
-                />))
-              }
-            </TabsContent>
-            <TabsContent value="history" className="py-3 overflow-y-auto max-h-105 pr-1">
-              <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
-            </TabsContent>
-          </Tabs>
-        </ActivitySection>
-
-      </DetailsContainer>
-
-      <EditLocationModal
-        open={editLocationOpen}
-        onOpenChange={setEditLocationOpen}
-        assetDetails={assetDetails}
+        }
       />
+      <PageContent>
+        <div className="flex gap-8">
+          <div className="flex-1 min-w-0 flex flex-col gap-8">
+
+            <Section className="w-full">
+              <SectionHeader
+                title="Specifications"
+                action={canEditTechSpecs && <SectionEditButton onClick={() => setEditSpecsOpen(true)} />}
+              />
+              <div className="flex flex-row gap-x-8">
+                <DataRowContainer className="flex-1 min-w-0">
+                  <DataRow label="Readiness" rowClassName={ROW_GAP}>
+                    <ReadinessPill status={assetDetails.readiness} />
+                  </DataRow>
+                  <DataValueRow
+                    label="Country of Origin"
+                    value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
+                    rowClassName={ROW_GAP}
+                  />
+                  <DataValueRow label="Total Meter" value={formatThousandsK(specs.meter_total)} rowClassName={ROW_GAP} />
+                  <DataValueRow label="Cassettes" value={specs.cassettes} rowClassName={ROW_GAP} />
+                  <DataValueRow label="Internal Finisher" value={specs.internal_finisher} rowClassName={ROW_GAP} />
+                </DataRowContainer>
+                <DataRowContainer className="flex-1 min-w-0">
+                  <CMYKRow
+                    label="Drum Life"
+                    c_value={specs.drum_life_c}
+                    m_value={specs.drum_life_m}
+                    y_value={specs.drum_life_y}
+                    k_value={specs.drum_life_k}
+                    rowClassName={ROW_GAP}
+                  />
+                  <CMYKRow
+                    label="Toner Remaining"
+                    c_value={specs.toner_life_c}
+                    m_value={specs.toner_life_m}
+                    y_value={specs.toner_life_y}
+                    k_value={specs.toner_life_k}
+                    rowClassName={ROW_GAP}
+                  />
+                  <AccessoryRow label="Core Functions" accessories={accessories ?? []} rowClassName={ROW_GAP} />
+                </DataRowContainer>
+              </div>
+            </Section>
+
+            <div className="flex gap-8">
+              <Section className="flex-1 min-w-0">
+                <SectionHeader
+                  title="Errors"
+                  action={canEditTechSpecs && <SectionEditButton onClick={() => setEditErrorsOpen(true)} />}
+                />
+                <OptionalSection condition={!!errors?.length} fallback="No errors on record">
+                  <DataRowContainer>
+                    {errors?.map(e => (
+                      <DataRow key={`${e.code}-${e.added_at}`} label={e.code} rowClassName={ROW_GAP}>
+                        {e.is_fixed
+                          ? <Badge variant="success">Fixed</Badge>
+                          : <Badge variant="destructive">Open</Badge>}
+                      </DataRow>
+                    ))}
+                  </DataRowContainer>
+                </OptionalSection>
+              </Section>
+
+              <PartsSection
+                asset={assetDetails}
+                partTransfers={partTransfers}
+                action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
+                rowClassName={ROW_GAP}
+                className="flex-1 min-w-0"
+              />
+            </div>
+
+            {(canViewPurchasePrice || canViewSalePrice) &&
+              <Section className="w-full">
+                <SectionHeader
+                  title="Pricing"
+                  action={canEditPrices && <SectionEditButton onClick={() => setEditPricingOpen(true)} />}
+                />
+                <div className="flex flex-row gap-x-8">
+                  <DataRowContainer className="flex-1 min-w-0">
+                    {canViewPurchasePrice && (
+                      <>
+                        <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow label="Total Cost" value={cost.total_cost} rowClassName={ROW_GAP} />
+                      </>
+                    )}
+                    {canViewSalePrice && <DataCurrencyRow label="Sale Price" value={cost.sale_price} rowClassName={ROW_GAP} />}
+                  </DataRowContainer>
+                  <DataRowContainer className="flex-1 min-w-0">
+                    {canViewPurchasePrice && (
+                      <>
+                        <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow label="Other Cost" value={cost.other_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} rowClassName={ROW_GAP} />
+                      </>
+                    )}
+                  </DataRowContainer>
+                </div>
+              </Section>
+            }
+
+            <ActivitySection className="min-w-0">
+              <Tabs
+                defaultValue="comments"
+                onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
+              >
+                <TabsList variant="line">
+                  <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2 mb-0" /></TabsTrigger>
+                  <TabsTrigger value="history"><SectionHeader title="History" className="px-2 mb-0" /></TabsTrigger>
+                </TabsList>
+                <TabsContent value="comments" className="flex flex-col gap-3 py-3 overflow-y-auto max-h-105 pr-1">
+                  <AddCommentInput barcode={assetDetails.barcode} />
+                  {
+                    sortedComments.map(c => (<Comment
+                      key={`${c.username}-${c.created_at}`}
+                      user={c.username}
+                      date={formatDateWithTime(c.created_at)}
+                      avatarFallback={c.initials}
+                      comment={c.comment}
+                      tags={EMPTY_TAGS}
+                    />))
+                  }
+                </TabsContent>
+                <TabsContent value="history" className="py-3 overflow-y-auto overflow-x-hidden max-h-105 pr-1 break-words">
+                  <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
+                </TabsContent>
+              </Tabs>
+            </ActivitySection>
+
+          </div>
+
+          <aside
+            className="w-48 shrink-0 self-start sticky flex flex-col gap-3"
+            style={{ top: RAIL_STICKY_TOP }}
+            aria-label="Lifecycle"
+          >
+            {populatedLifecycleItems.map(item => (
+              <RailCard key={item.key}>{item.node}</RailCard>
+            ))}
+            {emptyLifecycleEntities.map(entity => (
+              <RailCard key={`empty-${entity}`}><RailEmpty entity={entity} /></RailCard>
+            ))}
+          </aside>
+        </div>
+      </PageContent>
+
       <EditPricingModal
         open={editPricingOpen}
         onOpenChange={setEditPricingOpen}
@@ -311,7 +448,6 @@ export const AssetDetailsPage = () => {
         onOpenChange={setEditPartsOpen}
         recipientBarcode={assetDetails.barcode}
       />
-      </PageContent>
     </>
   )
 }

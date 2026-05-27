@@ -182,7 +182,7 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
       internal_finisher: r.internal_finisher,
       meter_black: r.meter_black,
       meter_colour: r.meter_colour,
-      meter_total: r.meter_black && r.meter_colour ? r.meter_black + r.meter_colour : 0,
+      meter_total: r.meter_total,
       drum_life_c: r.drum_life_c,
       drum_life_m: r.drum_life_m,
       drum_life_y: r.drum_life_y,

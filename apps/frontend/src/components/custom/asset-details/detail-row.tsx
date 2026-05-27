@@ -1,11 +1,7 @@
-import { CopyButton } from "@/components/custom/copy-button"
 import { Badge } from "@/components/shadcn/badge"
-import { Checkbox } from "@/components/shadcn/checkbox"
-import { formatDate, formatUSD } from "@/lib/formatters"
+import { formatUSD } from "@/lib/formatters"
 import { cn } from "@/lib/utils"
 import { CurrencyDollarIcon } from "@phosphor-icons/react"
-import { Link } from "react-router-dom"
-import { type AssetError } from "shared-types"
 
 type CMYKDataProps = {
   label: string,
@@ -13,17 +9,6 @@ type CMYKDataProps = {
   m_value: number | undefined | null,
   y_value: number | undefined | null,
   k_value: number | undefined | null,
-  rowClassName?: string
-}
-
-type ErrorRowProps = {
-  error: AssetError,
-  className?: string,
-  rowClassName?: string
-}
-
-type InvoiceClearedRowProps = {
-  isCleared: boolean,
   rowClassName?: string
 }
 
@@ -54,19 +39,6 @@ type DataCurrencyRowProps = {
   rowClassName?: string
 }
 
-type DataLinkRowProps = {
-  label: string,
-  value: string | undefined | null,
-  to: string,
-  rowClassName?: string
-}
-
-type DataDateRowProps = {
-  label: string,
-  value: Date | null | undefined,
-  rowClassName?: string
-}
-
 type LabelProps = {
   label: string,
   className?: string
@@ -77,7 +49,7 @@ type ValueProps = {
   className?: string
 }
 
-export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
+function DataLabel({ label, className }: LabelProps): React.JSX.Element {
   return (
     <dt className={cn("text-left text-muted-foreground min-w-26", className)}>
       {label}
@@ -85,7 +57,7 @@ export function DataLabel({ label, className }: LabelProps): React.JSX.Element {
   )
 }
 
-export function DataValue({ value, className }: ValueProps): React.JSX.Element {
+function DataValue({ value, className }: ValueProps): React.JSX.Element {
   const valuePresent =
     (typeof value === 'string' && value.length > 0) ||
     (value)
@@ -97,7 +69,6 @@ export function DataValue({ value, className }: ValueProps): React.JSX.Element {
   )
 }
 
-// Composable shell — label + arbitrary children in the value slot
 export function DataRow({
   label,
   children,
@@ -112,7 +83,6 @@ export function DataRow({
   )
 }
 
-// Plain text value row
 export function DataValueRow({
   label,
   value,
@@ -127,7 +97,6 @@ export function DataValueRow({
   )
 }
 
-// Currency value row — formats number internally, shows '-' for null/undefined
 export function DataCurrencyRow({
   label,
   value,
@@ -140,40 +109,6 @@ export function DataCurrencyRow({
         <span className="tabular-nums text-right w-20">
           {value != null ? formatUSD(value) : '-'}
         </span>
-      </dd>
-    </DataRow>
-  )
-}
-
-// Link value row
-export function DataLinkRow({
-  label,
-  value,
-  to,
-  rowClassName
-}: DataLinkRowProps): React.JSX.Element {
-  return (
-    <DataRow label={label} rowClassName={rowClassName}>
-      <dd className="group flex min-w-0 items-center gap-2">
-        {value
-          ? <Link to={to} className="text-primary hover:underline wrap-break-words min-w-0">{value}</Link>
-          : '-'}
-        {value && <CopyButton value={value} />}
-      </dd>
-    </DataRow>
-  )
-}
-
-// Date value row — formats Date internally, shows '-' for null/undefined
-export function DataDateRow({
-  label,
-  value,
-  rowClassName
-}: DataDateRowProps): React.JSX.Element {
-  return (
-    <DataRow label={label} rowClassName={rowClassName}>
-      <dd>
-        {value ? formatDate(value) : '-'}
       </dd>
     </DataRow>
   )
@@ -224,51 +159,5 @@ export function AccessoryRow({
         ))}
       </div>
     </DataRow>
-  )
-}
-
-export function InvoiceClearedRow({
-  isCleared,
-  rowClassName
-}: InvoiceClearedRowProps): React.JSX.Element {
-  return (
-    <DataRow label="Cleared?" rowClassName={rowClassName}>
-      <dd className="flex min-w-0 items-center gap-1">
-        <Checkbox checked={isCleared} />
-      </dd>
-    </DataRow>
-  )
-}
-
-export function ErrorHeader({ className }: { className?: string }): React.JSX.Element {
-  return (
-    <div className={cn("flex border-b border-t-2 items-center py-0.5", className)}>
-      <dt className={cn("text-muted-foreground min-w-28", className)}>Code</dt>
-      <dd className={cn("text-muted-foreground", className)}>Fixed?</dd>
-    </div>
-  )
-}
-
-export function ErrorRow(
-  { error, className, rowClassName }: ErrorRowProps,
-): React.JSX.Element {
-  return (
-    <div className={cn("flex border-b py-0.5", className, rowClassName)}>
-      <dt className={cn("text-left font-medium text-semibold min-w-28", className)}>
-        {error.code}
-      </dt>
-      <dd className={cn("flex items-center gap-1", className)}>
-        <Checkbox id={error.code} checked={error.is_fixed} />
-      </dd>
-    </div>
-  )
-}
-
-export function PartsHeader({ className }: { className?: string }): React.JSX.Element {
-  return (
-    <div className={cn("flex items-center py-0.5", className)}>
-      <dt className={cn("text-muted-foreground min-w-28", className)}>Part</dt>
-      <dd className={cn("text-muted-foreground", className)}>Donor</dd>
-    </div>
   )
 }

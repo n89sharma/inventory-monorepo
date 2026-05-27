@@ -27,6 +27,7 @@ select
   ts.internal_finisher as internal_finisher,
   ts.meter_black as meter_black,
   ts.meter_colour as meter_colour,
+  ts.meter_total as meter_total,
   ts.drum_life_c as drum_life_c,
   ts.drum_life_m as drum_life_m,
   ts.drum_life_y as drum_life_y,

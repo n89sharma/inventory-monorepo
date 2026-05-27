@@ -6,6 +6,7 @@ import { assetDetailsToSummary, type Permission } from "shared-types"
 import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
+import { EditLocationModal } from "../modals/edit-location-modal"
 import { EditPricingModal } from "../modals/edit-pricing-modal"
 import { EditSpecsModal } from "../modals/edit-specs-modal"
 import { Button } from "../shadcn/button"
@@ -34,6 +35,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const accessories = data?.accessories ?? []
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editErrorsOpen, setEditErrorsOpen] = useState(false)
+  const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
   const [editSpecsOpen, setEditSpecsOpen] = useState(false)
   const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
@@ -51,6 +53,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     canEditSpecs && { key: 'specs', label: 'Specifications', onSelect: () => setEditSpecsOpen(true) },
     canEditSpecs && { key: 'errors', label: 'Errors', onSelect: () => setEditErrorsOpen(true) },
     canEditSpecs && { key: 'parts', label: 'Parts', onSelect: () => setAddPartTransferOpen(true) },
+    canEditSpecs && { key: 'location', label: 'Location', onSelect: () => setEditLocationOpen(true) },
   ].filter((i): i is MenuItem => i !== false)
 
   const collectionGroup: MenuItem[] = canCreateSomeCollections
@@ -127,6 +130,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         onOpenChange={setEditErrorsOpen}
         assetDetails={assetDetails}
         errors={errors}
+      />
+
+      <EditLocationModal
+        open={editLocationOpen}
+        onOpenChange={setEditLocationOpen}
+        assetDetails={assetDetails}
       />
 
       <AddPartTransferModal
