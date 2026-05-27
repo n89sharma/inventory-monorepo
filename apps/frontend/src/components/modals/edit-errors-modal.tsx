@@ -1,5 +1,5 @@
+import { Badge } from "@/components/shadcn/badge"
 import { Button } from "@/components/shadcn/button"
-import { Checkbox } from "@/components/shadcn/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import type { AssetDetails, AssetError, Error, UpdateError } from "shared-types"
 import { toast } from "sonner"
 import { PopoverSearch } from "../custom/popover-search"
+import { UnsavedChangesDialog } from "../custom/unsaved-changes-dialog"
 
 interface EditErrorsModalProps {
   open: boolean
@@ -28,13 +29,15 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
   const updateAssetErrors = useAssetStore(state => state.updateAssetErrors)
 
   const [localErrors, setLocalErrors] = useState<UpdateError[]>([])
-  const [selectedError, setSelectedError] = useState<Error | null>(null)
+  const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
+  const [searchResetKey, setSearchResetKey] = useState(0)
 
   useEffect(() => {
     if (open) {
       setLocalErrors(errors.map(e => ({ code: e.code, is_fixed: e.is_fixed })))
-      setSelectedError(null)
+      setDirty(false)
     }
   }, [open])
 
@@ -44,18 +47,20 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
   const localCodes = new Set(localErrors.map(e => e.code))
   const availableErrors = allErrors.filter(e => e.brand_id === brandId && !localCodes.has(e.code))
 
-  function handleAdd() {
-    if (!selectedError) return
-    setLocalErrors(prev => [...prev, { code: selectedError.code, is_fixed: false }])
-    setSelectedError(null)
+  function handleSelect(error: Error) {
+    setLocalErrors(prev => [...prev, { code: error.code, is_fixed: false }])
+    setDirty(true)
+    setSearchResetKey(k => k + 1)
   }
 
   function handleToggleFixed(code: string) {
     setLocalErrors(prev => prev.map(e => e.code === code ? { ...e, is_fixed: !e.is_fixed } : e))
+    setDirty(true)
   }
 
   function handleRemove(code: string) {
     setLocalErrors(prev => prev.filter(e => e.code !== code))
+    setDirty(true)
   }
 
   async function handleSave() {
@@ -71,41 +76,39 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
     setSaving(false)
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && dirty) {
+      setConfirmCloseOpen(true)
+      return
+    }
+    onOpenChange(nextOpen)
+  }
+
+  function discardAndClose() {
+    setConfirmCloseOpen(false)
+    onOpenChange(false)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl overflow-y-auto max-h-[90vh]">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] min-h-[500px] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Errors</DialogTitle>
         </DialogHeader>
 
-        <div className="flex gap-2 items-end">
-          <PopoverSearch
-            selection={selectedError}
-            onSelectionChange={setSelectedError}
-            onClear={() => setSelectedError(null)}
-            options={availableErrors}
-            getLabel={e => e.description ? `${e.code} — ${e.description}` : e.code}
-            searchKey="code"
-            fieldLabel="Add Error"
-            fieldRequired={false}
-            className="flex-1"
-          />
-          <Button
-            onClick={handleAdd}
-            disabled={!selectedError}
-            variant="secondary"
-            type="button"
-          >
-            Add Error
-          </Button>
-        </div>
+        <PopoverSearch
+          key={searchResetKey}
+          selection={null}
+          onSelectionChange={handleSelect}
+          onClear={() => { }}
+          options={availableErrors}
+          getLabel={e => e.description ? `${e.code} — ${e.description}` : e.code}
+          searchKey="code"
+          fieldLabel="Add Error"
+          fieldRequired={false}
+        />
 
-        <div className="rounded-md border">
-          <div className="flex items-center border-b px-3 py-1.5 text-muted-foreground">
-            <span className="flex-1">Code</span>
-            <span className="w-16 text-center">Fixed?</span>
-            <span className="w-8" />
-          </div>
+        <div className="rounded-md border flex-1 overflow-y-auto">
           {localErrors.length === 0
             ? (
               <p className="px-3 py-4 text-center text-muted-foreground">
@@ -121,10 +124,15 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
                     {description && <span className="text-xs text-muted-foreground">{description}</span>}
                   </div>
                   <div className="flex w-16 justify-center">
-                    <Checkbox
-                      checked={e.is_fixed}
-                      onCheckedChange={() => handleToggleFixed(e.code)}
-                    />
+                    <Badge asChild variant={e.is_fixed ? "success" : "destructive"}>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFixed(e.code)}
+                        className="cursor-pointer hover:opacity-80 transition-opacity"
+                      >
+                        {e.is_fixed ? 'Fixed' : 'Open'}
+                      </button>
+                    </Badge>
                   </div>
                   <div className="flex w-8 justify-center">
                     <Button
@@ -145,14 +153,19 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
+          <Button variant="outline" onClick={() => handleOpenChange(false)} type="button">
             Cancel
           </Button>
-          <Button onClick={handleSave} type="button" disabled={saving}>
+          <Button onClick={handleSave} type="button" disabled={saving || !dirty}>
             {saving ? 'Saving…' : 'Save changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
+      <UnsavedChangesDialog
+        open={confirmCloseOpen}
+        onOpenChange={setConfirmCloseOpen}
+        onDiscard={discardAndClose}
+      />
     </Dialog>
   )
 }

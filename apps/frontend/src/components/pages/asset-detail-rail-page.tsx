@@ -1,5 +1,6 @@
 import { ActivitySection, DataRowContainer, Section, SectionHeader } from '@/components/custom/asset-details/detail-layout'
-import { AccessoryRow, CMYKRow, DataCurrencyRow, DataRow, DataValueRow, ErrorHeader, ErrorRow } from '@/components/custom/asset-details/detail-row'
+import { AccessoryRow, CMYKRow, DataCurrencyRow, DataRow, DataValueRow } from '@/components/custom/asset-details/detail-row'
+import { Badge } from '@/components/shadcn/badge'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { SectionEditButton } from '@/components/custom/asset-details/section-edit-button'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
@@ -219,9 +220,14 @@ export const AssetDetailRailPage = () => {
                   action={canEditTechSpecs && <SectionEditButton onClick={() => setEditErrorsOpen(true)} />}
                 />
                 <OptionalSection condition={!!errors?.length} fallback="No errors on record">
-                  <ErrorHeader />
                   <DataRowContainer>
-                    {errors?.map(e => <ErrorRow key={`${e.code}-${e.added_at}`} error={e} rowClassName={ROW_GAP} />)}
+                    {errors?.map(e => (
+                      <DataRow key={`${e.code}-${e.added_at}`} label={e.code} rowClassName={ROW_GAP}>
+                        {e.is_fixed
+                          ? <Badge variant="success">Fixed</Badge>
+                          : <Badge variant="destructive">Open</Badge>}
+                      </DataRow>
+                    ))}
                   </DataRowContainer>
                 </OptionalSection>
               </Section>

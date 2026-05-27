@@ -1,8 +1,6 @@
-import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 import type { AssetDetails, PartTransfer } from "shared-types";
 import { Badge } from "../shadcn/badge";
-import { Button } from "../shadcn/button";
 import { Section, SectionHeader } from "./asset-details/detail-layout";
 import { DataRow } from "./asset-details/detail-row";
 import { OptionalSection } from "./asset-details/optional-section";
@@ -31,27 +29,27 @@ export function PartsSection(
 }
 
 function getPartBadge(transfer: PartTransfer, currentAsset: string, rowClassName?: string) {
+  const isDonor = transfer.donor === currentAsset
+  const counterpartBarcode = isDonor ? transfer.recipient : transfer.donor
 
-  const badge = transfer.donor === currentAsset
-    ? <div className="flex items-center gap-0.5">
-      <Badge variant="destructive">{transfer.is_exchange ? 'Exchange Donor' : 'Removed'}</Badge>
-      <Button asChild variant="link" size="xs" className="p-0">
-        <Link to={`/search/${transfer.recipient}`}><ArrowUpRightIcon /></Link>
-      </Button>
-    </div>
-    : <div className="flex items-center gap-0.5">
-      <Badge className="bg-lime-300 text-secondary-foreground">{transfer.is_exchange ? 'Exchange Recipient' : 'Added'}</Badge>
-      <Button asChild variant="link" size="xs" className="p-0">
-        <Link to={`/search/${transfer.donor}`}><ArrowUpRightIcon /></Link>
-      </Button>
-    </div>
+  const badge = isDonor
+    ? <Badge variant="destructive">{transfer.is_exchange ? 'Removed (exchange)' : 'Removed'}</Badge>
+    : <Badge variant="success">{transfer.is_exchange ? 'Added (exchange)' : 'Added'}</Badge>
 
   return (
     <DataRow
       key={`${transfer.donor}${transfer.part}`}
       label={transfer.part}
       rowClassName={rowClassName}>
-      {badge}
+      <div className="flex items-center gap-2">
+        {badge}
+        <Link
+          to={`/search/${counterpartBarcode}`}
+          className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
+        >
+          {counterpartBarcode}
+        </Link>
+      </div>
     </DataRow>
   )
 }

@@ -1,5 +1,5 @@
+import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
 import { Button } from '@/components/shadcn/button'
-import { Checkbox } from '@/components/shadcn/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
 import { useAssetStore } from '@/data/store/asset-store'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowRightIcon, ArrowsLeftRightIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { CreatePartTransferSchema, type CreatePartTransfer } from 'shared-types'
@@ -68,25 +69,81 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
 
         <div className="flex flex-col gap-4">
           <Field>
-            <FieldLabel>Recipient Asset</FieldLabel>
-            <p>{recipientBarcode}</p>
-          </Field>
+            <div className="flex items-center gap-2">
+              <Controller
+                control={form.control}
+                name="donor_barcode"
+                render={({ field, fieldState }) => (
+                  <div className="flex-1">
+                    {field.value
+                      ? (
+                        <div className="flex h-8 items-center gap-2 rounded-lg border bg-transparent pl-2.5 pr-1 text-sm">
+                          <span className="font-mono flex-1">{field.value}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label="Clear donor asset"
+                            onClick={() => field.onChange('')}
+                            className="size-6"
+                          >
+                            <XIcon aria-hidden="true" />
+                          </Button>
+                        </div>
+                      )
+                      : (
+                        <AddAssetByBarcode
+                          getAssets={() => []}
+                          onAddAsset={(asset) => {
+                            field.onChange(asset.barcode)
+                            form.clearErrors('donor_barcode')
+                          }}
+                          entityName="part transfer"
+                          validateAsset={(asset) =>
+                            asset.barcode === recipientBarcode
+                              ? 'Donor and recipient cannot be the same asset'
+                              : null
+                          }
+                          showLeadingIcon
+                        />
+                      )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </div>
+                )}
+              />
 
-          <Controller
-            control={form.control}
-            name="donor_barcode"
-            render={({ field, fieldState }) => (
-              <Field>
-                <FieldLabel>Donor Asset</FieldLabel>
-                <Input
-                  {...field}
-                  placeholder="Scan or enter donor barcode…"
-                  aria-invalid={fieldState.invalid}
-                />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+              <Controller
+                control={form.control}
+                name="is_exchange"
+                render={({ field }) => (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label={field.value ? 'Switch to one-way transfer' : 'Switch to exchange'}
+                    onClick={() => field.onChange(!field.value)}
+                  >
+                    {field.value ? <ArrowsLeftRightIcon /> : <ArrowRightIcon />}
+                  </Button>
+                )}
+              />
+
+              <div className="flex-1">
+                <div className="flex h-8 items-center rounded-lg border bg-transparent px-2.5 text-sm">
+                  <span className="font-mono">{recipientBarcode}</span>
+                </div>
+              </div>
+            </div>
+            <Controller
+              control={form.control}
+              name="is_exchange"
+              render={({ field }) => (
+                <p className="text-center text-xs text-muted-foreground mt-1">
+                  {field.value ? 'Exchange' : 'One-way transfer'}
+                </p>
+              )}
+            />
+          </Field>
 
           <Controller
             control={form.control}
@@ -101,23 +158,6 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="is_exchange"
-            render={({ field }) => (
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  id="is_exchange"
-                />
-                <label htmlFor="is_exchange" className="cursor-pointer">
-                  Exchange (part swapped in both directions)
-                </label>
-              </div>
             )}
           />
 
