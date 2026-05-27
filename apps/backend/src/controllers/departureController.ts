@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
-import { DateRangeWithWarehouseSchema } from '../middleware/validation.js'
+import { DepartureListQuerySchema } from '../middleware/validation.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -15,8 +15,11 @@ import {
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export const getDepartures = asyncHandler(async (req, res) => {
-  const { fromDate, toDate, warehouse } = res.locals.query as z.infer<typeof DateRangeWithWarehouseSchema>
-  const departures = await prisma.$queryRawTyped(getDeparturesDb(fromDate, toDate, warehouse ?? 0))
+  const { fromDate, toDate, warehouse, customer } =
+    res.locals.query as z.infer<typeof DepartureListQuerySchema>
+  const departures = await prisma.$queryRawTyped(
+    getDeparturesDb(fromDate, toDate, warehouse ?? 0, customer ?? 0)
+  )
   res.json(successResponse(departures))
 })
 

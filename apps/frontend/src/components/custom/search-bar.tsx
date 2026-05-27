@@ -1,6 +1,5 @@
-import { Button } from "@/components/shadcn/button"
 import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-types'
-import { ANY_OPTION, getSelectOption, isSelected, type SelectOption } from '@/ui-types/select-option-types'
+import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
 import { subDays } from "date-fns"
 import React from 'react'
 import { DatePickerFieldInline } from './date-picker'
@@ -20,15 +19,8 @@ export function SearchBar({
   onSearch,
   children }: SearchBarProps): React.JSX.Element {
 
-  const { fromDate, toDate, origin, destination, holdFor, holdBy } = searchOptions
-  const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy } = setSearchOptions
-
-  async function handleSearch() {
-    if (!isSelected(fromDate)) return
-    const toDateOrDefault: SelectOption<Date> = isSelected(toDate) ? toDate : getSelectOption(new Date())
-    setToDate(toDateOrDefault)
-    await onSearch({ fromDate, toDate: toDateOrDefault, origin, destination, holdBy, holdFor })
-  }
+  const { fromDate, toDate } = searchOptions
+  const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy, setCustomer } = setSearchOptions
 
   async function handleQuickSearch(days: number) {
     const from = getSelectOption(subDays(new Date(), days))
@@ -40,6 +32,7 @@ export function SearchBar({
     if (setDestination) setDestination(ANY_OPTION)
     if (setHoldBy) setHoldBy(ANY_OPTION)
     if (setHoldFor) setHoldFor(ANY_OPTION)
+    if (setCustomer) setCustomer(ANY_OPTION)
 
     await onSearch({
       fromDate: from,
@@ -47,7 +40,8 @@ export function SearchBar({
       origin: ANY_OPTION,
       destination: ANY_OPTION,
       holdBy: ANY_OPTION,
-      holdFor: ANY_OPTION
+      holdFor: ANY_OPTION,
+      customer: ANY_OPTION
     })
   }
 
@@ -70,10 +64,6 @@ export function SearchBar({
       />
 
       {children}
-
-      <Button onClick={handleSearch} variant="secondary">
-        Search
-      </Button>
     </div>
   )
 }

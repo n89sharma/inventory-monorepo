@@ -1,4 +1,4 @@
-import type { User, Warehouse } from 'shared-types'
+import type { OrgSummary, User, Warehouse } from 'shared-types'
 import type { SelectOption } from './select-option-types'
 
 export type SearchOptions = {
@@ -8,6 +8,7 @@ export type SearchOptions = {
   destination?: SelectOption<Warehouse>
   holdBy?: SelectOption<User>
   holdFor?: SelectOption<User>
+  customer?: SelectOption<OrgSummary>
 }
 
 export type SetSearchOptions = {
@@ -17,4 +18,5 @@ export type SetSearchOptions = {
   setDestination?: (d: SelectOption<Warehouse>) => void
   setHoldBy?: (b: SelectOption<User>) => void
   setHoldFor?: (f: SelectOption<User>) => void
+  setCustomer?: (c: SelectOption<OrgSummary>) => void
 }

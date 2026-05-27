@@ -28,6 +28,20 @@ export const DateRangeWithWarehouseSchema = z.object({
   message: 'fromDate must be before toDate',
 })
 
+export const DepartureListQuerySchema = z.object({
+  fromDate: z.string(),
+  toDate: z.string().optional(),
+  warehouse: z.coerce.number().int().optional(),
+  customer: z.coerce.number().int().optional(),
+}).transform((data) => ({
+  fromDate: new Date(data.fromDate),
+  toDate: data.toDate ? new Date(data.toDate) : new Date(),
+  warehouse: data.warehouse,
+  customer: data.customer,
+})).refine((data) => !isAfter(data.fromDate, data.toDate), {
+  message: 'fromDate must be before toDate',
+})
+
 export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.query)

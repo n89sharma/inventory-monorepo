@@ -1,7 +1,7 @@
 import { getDepartureDetail, getDepartures } from '@/data/api/departure-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { Warehouse } from 'shared-types'
+import type { OrgSummary, Warehouse } from 'shared-types'
 import useSWR, { mutate, preload } from 'swr'
 
 export const departureDetailKey = (departureNumber: string) => `departure:${departureNumber}`
@@ -21,12 +21,14 @@ type DepartureListKey = readonly [
   string | null,
   string | null,
   number | null,
+  number | null,
 ]
 
 function departureListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
-  origin: SelectOption<Warehouse>
+  origin: SelectOption<Warehouse>,
+  customer: SelectOption<OrgSummary>
 ): DepartureListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -36,17 +38,19 @@ function departureListKey(
     from.toISOString(),
     to?.toISOString() ?? null,
     getIdOrNullFromSelection(origin),
+    getIdOrNullFromSelection(customer),
   ]
 }
 
 export function useDeparturesList(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
-  origin: SelectOption<Warehouse>
+  origin: SelectOption<Warehouse>,
+  customer: SelectOption<OrgSummary>
 ) {
   return useSWR(
-    departureListKey(fromDate, toDate, origin),
-    () => getDepartures(fromDate, toDate, origin)
+    departureListKey(fromDate, toDate, origin, customer),
+    () => getDepartures(fromDate, toDate, origin, customer)
   )
 }
 

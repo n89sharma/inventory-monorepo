@@ -1,7 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, UpdateDepartureMetadata, Warehouse } from 'shared-types'
+import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, OrgSummary, UpdateDepartureMetadata, Warehouse } from 'shared-types'
 import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, UpdateDepartureMetadataSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -11,13 +11,15 @@ type CreateDepartureResponse = z.infer<typeof CreateDepartureResponseSchema>
 export async function getDepartures(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
-  origin: SelectOption<Warehouse>
+  origin: SelectOption<Warehouse>,
+  customer: SelectOption<OrgSummary>
 ): Promise<DepartureSummary[]> {
   const { data } = await api.get<DepartureSummary[]>(`/departures`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(origin),
+      customer: getIdOrNullFromSelection(customer),
     }
   })
   return z.array(DepartureSummarySchema).parse(data)
