@@ -13,7 +13,7 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     readiness: assetDetails.readiness,
     location: assetDetails.location,
     hold_number: assetDetails.hold?.hold_number,
-    purchase_invoice_id: null,
+    purchase_invoice_number: assetDetails.purchase_invoice?.invoice_number ?? null,
     is_in_transit: assetDetails.is_in_transit,
   }
 }

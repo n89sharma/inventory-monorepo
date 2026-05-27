@@ -12,7 +12,8 @@ select
   l.bin as bin,
   s.status as status,
   rd.status as readiness,
-  a.is_in_transit as is_in_transit
+  a.is_in_transit as is_in_transit,
+  pi.invoice_number as purchase_invoice_number
 from "Hold" h
   join "Asset" a on h.id = a.hold_id
   join "TechnicalSpecification" t on t.asset_id = a.id
@@ -24,4 +25,5 @@ from "Hold" h
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
+  left join "Invoice" pi on pi.id = a.purchase_invoice_id
 where h.hold_number = $1

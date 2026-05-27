@@ -20,7 +20,7 @@ import { AssetModal } from '../../modals/create-asset-modal'
 import { EditArrivalMetadataModal } from '../../modals/edit-arrival-metadata-modal'
 import { DataTable } from '../../shadcn/data-table'
 import { useCan } from '@/hooks/use-can'
-import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
+import { createArrivalAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
@@ -56,8 +56,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   }
 
   const columns = useMemo(
-    () => createAssetSummaryColumns(
-      'arrivals',
+    () => createArrivalAssetSummaryColumns(
       arrivalNumber,
       asset => mutations.removeAsset(arrivalNumber, asset),
       canEditArrival ? asset => handleEditAsset(asset.id) : undefined,

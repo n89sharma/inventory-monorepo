@@ -62,12 +62,12 @@ export function createAssetSummaryColumns(
           <CopyButton value={row.original.barcode} />
         </div>
       ),
-      size: 120
+      size: 140
     },
     {
       accessorKey: "brand",
       header: "Brand",
-      size: 100
+      size: 80
     },
     {
       accessorKey: "model",
@@ -148,4 +148,30 @@ export function createAssetSummaryColumns(
   }
 
   return columns
+}
+
+export function createArrivalAssetSummaryColumns(
+  collectionId: string,
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
+
+  const baseColumns = createAssetSummaryColumns('arrivals', collectionId, onDelete, onEdit, disabledRowId)
+  const invoiceColumn: ColumnDef<AssetSummary> = {
+    accessorKey: 'purchase_invoice_number',
+    header: 'Invoice',
+    cell: ({ row }) => {
+      const invoiceNumber = row.original.purchase_invoice_number ?? null
+      if (invoiceNumber === null) return null
+      return (
+        <Link to={`/invoices/${invoiceNumber}`} className="text-primary hover:underline">
+          {invoiceNumber}
+        </Link>
+      )
+    },
+    size: 70
+  }
+  const serialIndex = baseColumns.findIndex(c => 'accessorKey' in c && c.accessorKey === 'serial_number')
+  baseColumns.splice(serialIndex + 1, 0, invoiceColumn)
+  return baseColumns
 }

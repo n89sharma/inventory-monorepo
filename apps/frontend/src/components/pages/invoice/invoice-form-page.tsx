@@ -34,7 +34,7 @@ interface InvoiceFormPageProps {
 }
 
 function validateInvoiceAsset(asset: AssetSummary): string | null {
-  if (asset.purchase_invoice_id != null) return `${asset.barcode} is already linked to another invoice`
+  if (asset.purchase_invoice_number != null) return `${asset.barcode} is already linked to another invoice`
   return null
 }
 

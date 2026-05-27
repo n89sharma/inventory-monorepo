@@ -42,7 +42,7 @@ type AssetSummaryRow = LocationRow & {
   status: string
   readiness: string
   hold_number?: string | null
-  purchase_invoice_id?: number | null
+  purchase_invoice_number: string | null
   is_in_transit: boolean
 }
 
@@ -59,7 +59,7 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     readiness: r.readiness,
     location: buildLocation(r),
     hold_number: r.hold_number ?? null,
-    purchase_invoice_id: r.purchase_invoice_id ?? null,
+    purchase_invoice_number: r.purchase_invoice_number,
     is_in_transit: r.is_in_transit
   }
 }

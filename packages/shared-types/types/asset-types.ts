@@ -22,7 +22,7 @@ export const AssetSummarySchema = z.object({
   readiness: z.string(),
   location: AssetLocationDetailsSchema.nullable(),
   hold_number: z.string().nullable().optional(),
-  purchase_invoice_id: z.number().nullable().optional(),
+  purchase_invoice_number: z.string().nullable(),
   is_in_transit: z.boolean()
 })
 

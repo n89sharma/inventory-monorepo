@@ -12,7 +12,8 @@ select
   l.bin as bin,
   st.status as status,
   rd.status as readiness,
-  a.is_in_transit as is_in_transit
+  a.is_in_transit as is_in_transit,
+  pi.invoice_number as purchase_invoice_number
 from "AssetTransfer" tt
   join "Transfer" t on t.id = tt.transfer_id
   join "Asset" a on a.id = tt.asset_id
@@ -25,4 +26,5 @@ from "AssetTransfer" tt
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
+  left join "Invoice" pi on pi.id = a.purchase_invoice_id
 where t.transfer_number = $1
