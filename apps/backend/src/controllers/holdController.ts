@@ -4,6 +4,7 @@ import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateHoldSchema, Hol
 import { z } from 'zod'
 import { getHolds as getHoldsDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
+import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
@@ -20,8 +21,8 @@ export const HoldQuerySchema = z.object({
   holdBy: z.coerce.number().int().optional(),
   holdFor: z.coerce.number().int().optional(),
 }).transform((data) => ({
-  fromDate: new Date(data.fromDate),
-  toDate: data.toDate ? new Date(data.toDate) : new Date(),
+  fromDate: normalizeFromDate(data.fromDate),
+  toDate: normalizeToDate(data.toDate),
   holdBy: data.holdBy,
   holdFor: data.holdFor,
 })).refine((data) => !isAfter(data.fromDate, data.toDate), {

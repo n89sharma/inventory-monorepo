@@ -1,6 +1,7 @@
 import { isAfter } from 'date-fns'
 import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
+import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 
 export function validateBarcode(req: Request, res: Response, next: NextFunction) {
   const barcode = req.body.barcode || req.params.barcode || req.query.barcode
@@ -22,8 +23,8 @@ export const ArrivalListQuerySchema = z.object({
   warehouse: z.coerce.number().int().optional(),
   vendor: z.coerce.number().int().optional(),
 }).transform((data) => ({
-  fromDate: new Date(data.fromDate),
-  toDate: data.toDate ? new Date(data.toDate) : new Date(),
+  fromDate: normalizeFromDate(data.fromDate),
+  toDate: normalizeToDate(data.toDate),
   warehouse: data.warehouse,
   vendor: data.vendor,
 })).refine((data) => !isAfter(data.fromDate, data.toDate), {
@@ -36,8 +37,8 @@ export const DepartureListQuerySchema = z.object({
   warehouse: z.coerce.number().int().optional(),
   customer: z.coerce.number().int().optional(),
 }).transform((data) => ({
-  fromDate: new Date(data.fromDate),
-  toDate: data.toDate ? new Date(data.toDate) : new Date(),
+  fromDate: normalizeFromDate(data.fromDate),
+  toDate: normalizeToDate(data.toDate),
   warehouse: data.warehouse,
   customer: data.customer,
 })).refine((data) => !isAfter(data.fromDate, data.toDate), {
@@ -60,9 +61,9 @@ export function validateDateRange(req: Request, res: Response, next: NextFunctio
     return res.status(400).json({ error: "fromDate not provided" })
   }
 
-  const fromDate = new Date(String(req.query.fromDate))
-  const toDate = req.query.toDate ? new Date(String(req.query.toDate)) : new Date()
-  
+  const fromDate = normalizeFromDate(String(req.query.fromDate))
+  const toDate = normalizeToDate(req.query.toDate ? String(req.query.toDate) : undefined)
+
   if (isAfter(fromDate, toDate)) {
     return res.status(400).json({ error: "fromDate must be before toDate" })
   }
