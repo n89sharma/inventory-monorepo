@@ -18,5 +18,6 @@ left join lateral (
 ) ac on true
 where a.created_at between $1 and $2
 and ($3 = 0 or w.id = $3)
+and ($4 = 0 or o.id = $4)
 order by a.created_at desc
 limit 500

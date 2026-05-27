@@ -9,6 +9,7 @@ export type SearchOptions = {
   holdBy?: SelectOption<User>
   holdFor?: SelectOption<User>
   customer?: SelectOption<OrgSummary>
+  vendor?: SelectOption<OrgSummary>
 }
 
 export type SetSearchOptions = {
@@ -19,4 +20,5 @@ export type SetSearchOptions = {
   setHoldBy?: (b: SelectOption<User>) => void
   setHoldFor?: (f: SelectOption<User>) => void
   setCustomer?: (c: SelectOption<OrgSummary>) => void
+  setVendor?: (v: SelectOption<OrgSummary>) => void
 }

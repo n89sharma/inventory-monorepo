@@ -3,13 +3,13 @@ import { useUserStore } from '@/data/store/user-store'
 import { HoldMetadataFormSchema, type HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { HoldDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
-import { SelectOptions } from '../custom/select-options'
+import { ControlledSelectOptionPopoverSearch } from '../custom/controlled-select-option-popover-search'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
@@ -29,6 +29,7 @@ export function EditHoldMetadataModal({
   onSave,
 }: EditHoldMetadataModalProps): React.JSX.Element {
   const users = useUserStore(state => state.users)
+  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
   const orgs = useOrgStore(state => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -69,22 +70,14 @@ export function EditHoldMetadataModal({
         </DialogHeader>
         <form onSubmit={e => e.preventDefault()}>
           <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
-            <Controller
+            <ControlledSelectOptionPopoverSearch
               control={form.control}
               name='created_for'
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={users}
-                  getLabel={u => u.name}
-                  getKey={u => u.name}
-                  fieldLabel='Created For'
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
+              options={activeUsers}
+              searchKey='name'
+              getLabel={u => u.name}
+              fieldLabel='Created For'
+              fieldRequired={true}
             />
             <ControlledPopoverSearch
               control={form.control}

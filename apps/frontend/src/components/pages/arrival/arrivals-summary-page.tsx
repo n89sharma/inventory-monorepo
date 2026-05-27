@@ -1,12 +1,15 @@
 import { useArrivalStore } from "@/data/store/arrival-store"
 import { preloadArrivalDetail, useArrivalsList } from "@/hooks/use-arrival"
+import { useOrgStore } from "@/data/store/org-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
+import { ANY_OPTION, getSelectedOrNull, getSelectOption } from "@/ui-types/select-option-types"
 import { useCan } from "@/hooks/use-can"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
+import { PopoverSearchInline } from "../../custom/popover-search"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
@@ -20,12 +23,15 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
   const setToDate = useArrivalStore(state => state.setToDate)
   const destination = useArrivalStore(state => state.destination)
   const setDestination = useArrivalStore(state => state.setDestination)
+  const vendor = useArrivalStore(state => state.vendor)
+  const setVendor = useArrivalStore(state => state.setVendor)
   const hasSearched = useArrivalStore(state => state.hasSearched)
   const setHasSearched = useArrivalStore(state => state.setHasSearched)
   const warehouses = useReferenceDataStore(state => state.warehouses)
   const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const orgs = useOrgStore(state => state.organizations)
 
-  const { data: arrivals = [] } = useArrivalsList(fromDate, toDate, destination)
+  const { data: arrivals = [] } = useArrivalsList(fromDate, toDate, destination, vendor)
 
   async function onArrivalSearch(_: SearchOptions) {
     setHasSearched(true)
@@ -43,8 +49,8 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
       onRowMouseEnter={(arrival) => preloadArrivalDetail(arrival.arrival_number)}
       searchBar={
         <SearchBar
-          searchOptions={{ fromDate, toDate, destination }}
-          setSearchOptions={{ setFromDate, setToDate, setDestination }}
+          searchOptions={{ fromDate, toDate, destination, vendor }}
+          setSearchOptions={{ setFromDate, setToDate, setDestination, setVendor }}
           onSearch={onArrivalSearch}
         >
           <SelectOptionsInline
@@ -54,6 +60,18 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
             getLabel={w => w.city_code}
             fieldLabel="Warehouse"
             anyAllowed={true}
+          />
+          <PopoverSearchInline
+            selection={getSelectedOrNull(vendor)}
+            onSelectionChange={org => setVendor(getSelectOption(org))}
+            onClear={() => setVendor(ANY_OPTION)}
+            options={orgs}
+            searchKey="name"
+            getLabel={o => o.name}
+            fieldLabel="Vendor"
+            fieldRequired={false}
+            placeholder="Vendor"
+            className="w-48"
           />
         </SearchBar>
       }

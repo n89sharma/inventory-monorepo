@@ -1,7 +1,7 @@
 import { api } from '@/data/api/axios-client'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
+import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, OrgSummary, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
 import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -11,13 +11,15 @@ type CreateArrivalResponse = z.infer<typeof CreateArrivalResponseSchema>
 export async function getArrivals(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
-  destination: SelectOption<Warehouse>
+  destination: SelectOption<Warehouse>,
+  vendor: SelectOption<OrgSummary>
 ): Promise<ArrivalSummary[]> {
   const { data } = await api.get<ArrivalSummary[]>(`/arrivals`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
-      warehouse: getIdOrNullFromSelection(destination)
+      warehouse: getIdOrNullFromSelection(destination),
+      vendor: getIdOrNullFromSelection(vendor)
     }
   })
   return z.array(ArrivalSummarySchema).parse(data)

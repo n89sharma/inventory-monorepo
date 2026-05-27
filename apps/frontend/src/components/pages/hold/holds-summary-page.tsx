@@ -4,10 +4,12 @@ import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
 import { preloadHoldDetail, useHoldsList } from "@/hooks/use-hold"
 import type { SearchOptions } from "@/ui-types/search-option-types"
+import { ANY_OPTION, getSelectedOrNull, getSelectOption } from "@/ui-types/select-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
+import { useMemo } from "react"
 import { Link } from "react-router-dom"
+import { PopoverSearchInline } from "../../custom/popover-search"
 import { SearchBar } from "../../custom/search-bar"
-import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
 import { CollectionPage } from "../collection-page"
 import { holdTableColumns } from "../column-defs/hold-columns"
@@ -23,7 +25,8 @@ export function HoldSummaryPage(): React.JSX.Element {
   const setHoldFor = useHoldStore(state => state.setHoldFor)
   const hasSearched = useHoldStore(state => state.hasSearched)
   const setHasSearched = useHoldStore(state => state.setHasSearched)
-  const activeUsers = useUserStore(state => state.users)
+  const users = useUserStore(state => state.users)
+  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
 
   const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor)
 
@@ -47,23 +50,29 @@ export function HoldSummaryPage(): React.JSX.Element {
           setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
           onSearch={onHoldSearch}
         >
-          <SelectOptionsInline
-            selection={holdBy!}
-            onSelectionChange={setHoldBy!}
+          <PopoverSearchInline
+            selection={getSelectedOrNull(holdBy)}
+            onSelectionChange={u => setHoldBy(getSelectOption(u))}
+            onClear={() => setHoldBy(ANY_OPTION)}
             options={activeUsers}
+            searchKey="name"
             getLabel={u => u.name}
-            getKey={u => u.name}
             fieldLabel="Hold By"
-            anyAllowed={true}
+            fieldRequired={false}
+            placeholder="Hold By"
+            className="w-48"
           />
-          <SelectOptionsInline
-            selection={holdFor!}
-            onSelectionChange={setHoldFor!}
+          <PopoverSearchInline
+            selection={getSelectedOrNull(holdFor)}
+            onSelectionChange={u => setHoldFor(getSelectOption(u))}
+            onClear={() => setHoldFor(ANY_OPTION)}
             options={activeUsers}
+            searchKey="name"
             getLabel={u => u.name}
-            getKey={u => u.name}
             fieldLabel="Hold For"
-            anyAllowed={true}
+            fieldRequired={false}
+            placeholder="Hold For"
+            className="w-48"
           />
         </SearchBar>
       }

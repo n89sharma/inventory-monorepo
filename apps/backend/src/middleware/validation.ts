@@ -16,14 +16,16 @@ export function validateBarcode(req: Request, res: Response, next: NextFunction)
   next()
 }
 
-export const DateRangeWithWarehouseSchema = z.object({
+export const ArrivalListQuerySchema = z.object({
   fromDate: z.string(),
   toDate: z.string().optional(),
   warehouse: z.coerce.number().int().optional(),
+  vendor: z.coerce.number().int().optional(),
 }).transform((data) => ({
   fromDate: new Date(data.fromDate),
   toDate: data.toDate ? new Date(data.toDate) : new Date(),
   warehouse: data.warehouse,
+  vendor: data.vendor,
 })).refine((data) => !isAfter(data.fromDate, data.toDate), {
   message: 'fromDate must be before toDate',
 })

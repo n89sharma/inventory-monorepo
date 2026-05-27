@@ -9,11 +9,12 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param timestamp
  * @param timestamp
  * @param int4
+ * @param int4
  */
-export const getArrivals = $runtime.makeTypedQueryFactory("select\na.id as id,\na.arrival_number as arrival_number,\na.created_at as created_at,\nw.city_code as destination_code,\nw.street as destination_street,\no.\"name\" as vendor,\nt.\"name\" as transporter,\nu.\"name\"  as created_by,\nac.asset_count as asset_count\nfrom \"Arrival\" a\nleft join \"User\" u on u.id = a.created_by_id\njoin \"Warehouse\" w on w.id = a.destination_id\njoin \"Organization\" o on o.id = a.origin_id\njoin \"Organization\" t on t.id = a.transporter_id\nleft join lateral (\nselect count(*)::int as asset_count from \"Asset\" ast where ast.arrival_id = a.id\n) ac on true\nwhere a.created_at between $1 and $2\nand ($3 = 0 or w.id = $3)\norder by a.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number) => $runtime.TypedSql<getArrivals.Parameters, getArrivals.Result>
+export const getArrivals = $runtime.makeTypedQueryFactory("select\na.id as id,\na.arrival_number as arrival_number,\na.created_at as created_at,\nw.city_code as destination_code,\nw.street as destination_street,\no.\"name\" as vendor,\nt.\"name\" as transporter,\nu.\"name\"  as created_by,\nac.asset_count as asset_count\nfrom \"Arrival\" a\nleft join \"User\" u on u.id = a.created_by_id\njoin \"Warehouse\" w on w.id = a.destination_id\njoin \"Organization\" o on o.id = a.origin_id\njoin \"Organization\" t on t.id = a.transporter_id\nleft join lateral (\nselect count(*)::int as asset_count from \"Asset\" ast where ast.arrival_id = a.id\n) ac on true\nwhere a.created_at between $1 and $2\nand ($3 = 0 or w.id = $3)\nand ($4 = 0 or o.id = $4)\norder by a.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getArrivals.Parameters, getArrivals.Result>
 
 export namespace getArrivals {
-  export type Parameters = [timestamp: Date, timestamp: Date, int4: number]
+  export type Parameters = [timestamp: Date, timestamp: Date, int4: number, int4: number]
   export type Result = {
     id: number
     arrival_number: string

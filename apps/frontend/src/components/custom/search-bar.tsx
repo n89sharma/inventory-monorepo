@@ -20,7 +20,7 @@ export function SearchBar({
   children }: SearchBarProps): React.JSX.Element {
 
   const { fromDate, toDate } = searchOptions
-  const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy, setCustomer } = setSearchOptions
+  const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy, setCustomer, setVendor } = setSearchOptions
 
   async function handleQuickSearch(days: number) {
     const from = getSelectOption(subDays(new Date(), days))
@@ -33,6 +33,7 @@ export function SearchBar({
     if (setHoldBy) setHoldBy(ANY_OPTION)
     if (setHoldFor) setHoldFor(ANY_OPTION)
     if (setCustomer) setCustomer(ANY_OPTION)
+    if (setVendor) setVendor(ANY_OPTION)
 
     await onSearch({
       fromDate: from,
@@ -41,7 +42,8 @@ export function SearchBar({
       destination: ANY_OPTION,
       holdBy: ANY_OPTION,
       holdFor: ANY_OPTION,
-      customer: ANY_OPTION
+      customer: ANY_OPTION,
+      vendor: ANY_OPTION
     })
   }
 
