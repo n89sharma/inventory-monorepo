@@ -3,11 +3,14 @@ import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip"
 import { formatLocation, formatThousandsK } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSearchRow } from 'shared-types'
+
+const HELD_STATUS = 'HELD'
 
 function SortableHeader({
   label,
@@ -89,7 +92,24 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
+    cell: ({ row }) => {
+      const { status, held_by, hold_number } = row.original
+      if (status !== HELD_STATUS || !held_by || !hold_number) {
+        return <StatusBadge status={status} />
+      }
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-block">
+              <StatusBadge status={status} />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            Held by {held_by} ({hold_number})
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
     size: 80
   },
   {
@@ -140,5 +160,19 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     id: "location",
     header: "Location",
     cell: ({ row }) => formatLocation(row.original.location)
+  },
+  {
+    id: "latest_comment",
+    header: "Last Comment",
+    cell: ({ row }) => {
+      const { latest_comment } = row.original
+      if (!latest_comment) return ''
+      return (
+        <div className="text-left text-xs">
+          <div className="whitespace-pre-wrap">{latest_comment}</div>
+        </div>
+      )
+    },
+    size: 220
   }
 ]
