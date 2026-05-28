@@ -29,6 +29,7 @@ const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 300
+const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 
 const QueryResultsTable = memo(function QueryResultsTable({
   assets,
@@ -72,6 +73,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
         onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
         defaultSort={defaultSort}
+        pinLeft={PIN_LEFT}
       />
     </>
   )

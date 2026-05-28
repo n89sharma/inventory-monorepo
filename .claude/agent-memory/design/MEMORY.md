@@ -4,3 +4,4 @@
 - [Asset status fields — two-field model and visual hierarchy](ux_asset_status_fields.md) — Two fields ratified; Ownership (primary pill) + Location (muted text, same cell); badge default-case color bug noted
 - [Meter range filter on Search page](ux_meter_range_filter.md) — Two side-by-side InputWithClearInline boxes in w-45 slot; popover/combined-input/slider all rejected
 - [Search page minimum-criteria gate](ux_search_minimum_criteria.md) — Explicit Search button (not auto-fire); disabled+tooltip before criteria met; guided empty state; result-cap inline banner above table
+- [Hold info in Search table](ux_hold_info_in_search.md) — Hover/focus popover on Status badge (not columns, not row expansion, not drawer); needs AssetSearchRow schema extension for org+user name fields

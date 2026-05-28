@@ -1,4 +1,4 @@
-import type { ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState } from "@tanstack/react-table"
+import type { Column, ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
@@ -6,7 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { memo, useState } from 'react'
+import { memo, useState, type CSSProperties } from 'react'
 
 import {
   Table,
@@ -35,6 +35,32 @@ interface DataTableProps<TData, TValue> {
   getRowId?: (originalRow: TData, index: number) => string
   initialPageSize?: number
   defaultSort?: { id: string; desc: boolean }
+  pinLeft?: string[]
+}
+
+function pinStyle<TData>(column: Column<TData>): CSSProperties {
+  if (column.getIsPinned() !== 'left') return {}
+  return {
+    position: 'sticky',
+    left: column.getStart('left'),
+    zIndex: 1,
+  }
+}
+
+function pinHeaderClass<TData>(column: Column<TData>): string {
+  if (column.getIsPinned() !== 'left') return ''
+  const shadow = column.getIsLastColumn('left')
+    ? 'shadow-[inset_-1px_0_0_var(--border)]'
+    : ''
+  return `bg-background ${shadow}`.trim()
+}
+
+function pinCellClass<TData>(column: Column<TData>): string {
+  if (column.getIsPinned() !== 'left') return ''
+  const shadow = column.getIsLastColumn('left')
+    ? 'shadow-[inset_-1px_0_0_var(--border)]'
+    : ''
+  return `bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted ${shadow}`.trim()
 }
 
 export function DataTable<TData, TValue>({
@@ -46,6 +72,7 @@ export function DataTable<TData, TValue>({
   getRowId,
   initialPageSize = 25,
   defaultSort,
+  pinLeft,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
@@ -72,7 +99,8 @@ export function DataTable<TData, TValue>({
       pagination: {
         pageSize: initialPageSize,
         pageIndex: 0
-      }
+      },
+      columnPinning: { left: pinLeft ?? [], right: [] },
     }
   })
 
@@ -94,8 +122,8 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      style={{ width: header.getSize() }}
-                      className="whitespace-normal text-center"
+                      style={{ width: header.getSize(), ...pinStyle(header.column) }}
+                      className={`whitespace-normal text-center ${pinHeaderClass(header.column)}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -191,7 +219,7 @@ function DataRowImpl<TData>({
   return (
     <TableRow
       data-state={isSelected && "selected"}
-      className="cursor-pointer"
+      className="group/row cursor-pointer"
       onMouseEnter={() => onRowMouseEnter?.(row.original)}
       onClick={(e) => {
         if (!(e.target as HTMLElement).closest('a, button')) row.toggleSelected()
@@ -200,8 +228,8 @@ function DataRowImpl<TData>({
       {row.getVisibleCells().map((cell) => (
         <TableCell
           key={cell.id}
-          style={{ width: cell.column.getSize() }}
-          className="whitespace-normal text-center"
+          style={{ width: cell.column.getSize(), ...pinStyle(cell.column) }}
+          className={`whitespace-normal text-center ${pinCellClass(cell.column)}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>

@@ -31,6 +31,11 @@ export type AssetSummary = z.infer<typeof AssetSummarySchema>
 export const AssetSearchRowSchema = AssetSummarySchema.extend({
   cassettes: z.number().nullable(),
   internal_finisher: z.string().nullable(),
+  hold_number: z.string().nullable(),
+  held_by: z.string().nullable(),
+  latest_comment: z.string().nullable(),
+  latest_comment_by: z.string().nullable(),
+  latest_comment_at: z.coerce.date().nullable(),
 })
 
 export type AssetSearchRow = z.infer<typeof AssetSearchRowSchema>

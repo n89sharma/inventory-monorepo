@@ -67,6 +67,11 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
 type AssetSearchRowDb = AssetSummaryRow & {
   cassettes: number | null
   internal_finisher: string | null
+  hold_number: string | null
+  held_by: string | null
+  latest_comment: string | null
+  latest_comment_by: string | null
+  latest_comment_at: Date | null
 }
 
 function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
@@ -74,6 +79,11 @@ function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     ...mapAssetSummary(r),
     cassettes: r.cassettes,
     internal_finisher: r.internal_finisher,
+    hold_number: r.hold_number,
+    held_by: r.held_by,
+    latest_comment: r.latest_comment,
+    latest_comment_by: r.latest_comment_by,
+    latest_comment_at: r.latest_comment_at,
   }
 }
 

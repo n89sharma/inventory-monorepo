@@ -74,7 +74,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
   {
     accessorKey: "brand",
     header: "Brand",
-    size: 100
+    size: 80
   },
   {
     accessorKey: "model",
@@ -90,7 +90,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    size: 100
+    size: 80
   },
   {
     accessorKey: "readiness",
