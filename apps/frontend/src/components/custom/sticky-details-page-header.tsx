@@ -1,5 +1,5 @@
 import { CopyButton } from '@/components/custom/copy-button'
-import { PageBreadcrumb } from '@/components/custom/page-breadcrumb'
+import { PageBreadcrumbToTitle } from '@/components/custom/page-breadcrumb'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 
 type BreadcrumbSegment = { label: string; href?: string }
@@ -19,7 +19,7 @@ export function StickyDetailsPageHeader(
   const { breadcrumbSegments, actions, subtitle } = props
   return (
     <StickyPageHeader>
-      <PageBreadcrumb segments={breadcrumbSegments} />
+      <PageBreadcrumbToTitle segments={breadcrumbSegments} />
       <div className="flex items-center justify-between gap-4">
         {props.titleNode ?? (
           <h1 className="text-2xl font-semibold group flex items-center gap-2">

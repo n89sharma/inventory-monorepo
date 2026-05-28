@@ -59,7 +59,7 @@ export function TransferDetailsPage(): React.JSX.Element {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('transfers', transferNumber)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary('transfers')}
         title={`Transfer ${transferNumber}`}
         copyValue={transferNumber}
         actions={

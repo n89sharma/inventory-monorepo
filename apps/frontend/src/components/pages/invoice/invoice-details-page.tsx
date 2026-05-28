@@ -59,7 +59,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('invoices', invoiceNumber)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary('invoices')}
         title={`Invoice ${invoiceNumber}`}
         copyValue={invoiceNumber}
         actions={

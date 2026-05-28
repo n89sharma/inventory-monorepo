@@ -17,7 +17,8 @@ export function useSearchResults(filters: SearchFilters) {
       const modelName = f.model?.model_name ?? f.modelQuery!
       return getAssetsForQuery(
         modelName,
-        f.meter,
+        f.meterMin,
+        f.meterMax,
         f.cassettes,
         f.internalFinisher,
         f.statuses,

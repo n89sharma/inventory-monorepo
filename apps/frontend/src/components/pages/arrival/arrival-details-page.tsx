@@ -87,7 +87,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('arrivals', arrivalNumber)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary('arrivals')}
         title={`Arrival ${arrivalNumber}`}
         copyValue={arrivalNumber}
         actions={

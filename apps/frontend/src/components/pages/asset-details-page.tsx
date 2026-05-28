@@ -256,7 +256,7 @@ export const AssetDetailsPage = () => {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, assetId)}
+        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId)}
         titleNode={
           <h1 className="text-xl flex items-center gap-6">
             <span className="font-semibold">

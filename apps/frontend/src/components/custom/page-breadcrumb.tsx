@@ -21,7 +21,15 @@ interface PageBreadcrumbProps {
   onNavigate?: (href: string) => void
 }
 
-export function PageBreadcrumb({ segments, onNavigate }: PageBreadcrumbProps): React.JSX.Element {
+interface BreadcrumbBaseProps extends PageBreadcrumbProps {
+  trailingSeparator: boolean
+}
+
+function BreadcrumbBase({
+  segments,
+  onNavigate,
+  trailingSeparator,
+}: BreadcrumbBaseProps): React.JSX.Element {
   function renderLink(href: string, label: string) {
     if (!onNavigate) {
       return <BreadcrumbLink asChild><Link to={href}>{label}</Link></BreadcrumbLink>
@@ -41,59 +49,60 @@ export function PageBreadcrumb({ segments, onNavigate }: PageBreadcrumbProps): R
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {segments.map((seg, i) => {
-          const isLast = i === segments.length - 1
-          return (
-            <React.Fragment key={i}>
-              {i > 0 && <BreadcrumbSeparator />}
-              <BreadcrumbItem>
-                {isLast
-                  ? <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-                  : renderLink(seg.href!, seg.label)
-                }
-              </BreadcrumbItem>
-            </React.Fragment>
-          )
-        })}
+        {segments.map((seg, i) => (
+          <React.Fragment key={i}>
+            {i > 0 ? <BreadcrumbSeparator /> : null}
+            <BreadcrumbItem>
+              {seg.href
+                ? renderLink(seg.href, seg.label)
+                : <BreadcrumbPage>{seg.label}</BreadcrumbPage>
+              }
+            </BreadcrumbItem>
+          </React.Fragment>
+        ))}
+        {trailingSeparator ? <BreadcrumbSeparator /> : null}
       </BreadcrumbList>
     </Breadcrumb>
   )
 }
 
+// Used by edit/create headers: the final segment is the current page, fully shown.
+export function PageBreadcrumb(props: PageBreadcrumbProps): React.JSX.Element {
+  return <BreadcrumbBase {...props} trailingSeparator={false} />
+}
+
+// Used by detail headers: trailing caret points into the page title below the breadcrumb.
+export function PageBreadcrumbToTitle(props: PageBreadcrumbProps): React.JSX.Element {
+  return <BreadcrumbBase {...props} trailingSeparator={true} />
+}
+
 export function getBreadcrumForAssetDetails(
   section: NavigationSection,
-  collectionId: string | null,
-  assetId: string): BreadcrumbSegment[] {
-
+  collectionId: string | null): BreadcrumbSegment[] {
 
   if (isCollection(section)) {
     return [
       { label: formatSentenceCase(section), href: `/${section}` },
-      { label: collectionId ?? '', href: `/${section}/${collectionId}` },
-      { label: assetId }
+      { label: collectionId ?? '', href: `/${section}/${collectionId}` }
     ]
   }
 
   switch (section) {
     case 'search':
       return [
-        { label: 'Search', href: '/search' },
-        { label: assetId }
+        { label: 'Search', href: '/search' }
       ]
     default:
       return [
-        { label: 'Home', href: '/' },
-        { label: assetId }
+        { label: 'Home', href: '/' }
       ]
   }
 }
 
 export function getBreadcrumbForAssetSummary(
-  section: NavigationSection,
-  collectionId: string | null): BreadcrumbSegment[] {
+  section: NavigationSection): BreadcrumbSegment[] {
 
   return [
-    { label: formatSentenceCase(section), href: `/${section}` },
-    { label: collectionId ?? '' }
+    { label: formatSentenceCase(section), href: `/${section}` }
   ]
 }

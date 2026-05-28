@@ -59,7 +59,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('departures', departureNumber)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary('departures')}
         title={`Departure ${departureNumber}`}
         copyValue={departureNumber}
         actions={

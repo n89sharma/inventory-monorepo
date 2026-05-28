@@ -59,7 +59,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('holds', holdNumber)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary('holds')}
         title={`Hold ${holdNumber}`}
         copyValue={holdNumber}
         actions={

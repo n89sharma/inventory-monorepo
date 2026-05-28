@@ -10,6 +10,7 @@ export type InputWithClearProps = {
   fieldRequired?: boolean
   error?: boolean
   className?: string
+  suffix?: React.ReactNode
 }
 
 type InputWithClearBodyProps = Omit<InputWithClearProps, 'fieldLabel' | 'fieldRequired'> & {
@@ -25,6 +26,7 @@ function InputWithClearBody({
   className,
   placeholder,
   header,
+  suffix,
 }: InputWithClearBodyProps): React.JSX.Element {
 
   const resolvedInputType = inputType ?? 'string'
@@ -57,6 +59,9 @@ function InputWithClearBody({
         </InputGroupInput>
 
         <InputGroupAddon align="inline-end">
+          {suffix ? (
+            <span className="text-muted-foreground pr-1">{suffix}</span>
+          ) : null}
           <InputGroupButton
             size="icon-sm"
             aria-label="Clear"

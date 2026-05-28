@@ -19,6 +19,7 @@ import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
 import { InputWithClearInline } from '../custom/input-with-clear'
+import { MeterRangeInput } from '../custom/meter-range-input'
 import { ModelSearchInput } from '../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../custom/multi-select-options'
 import { DataTable } from "../shadcn/data-table"
@@ -266,15 +267,12 @@ export function QueryPage(): React.JSX.Element {
               className='w-45'
             />
 
-            <InputWithClearInline
-              value={draft.meter}
-              onValueChange={val => updateDraftDebounced({
-                ...draft,
-                meter: typeof val === 'string' ? null : val,
-              })}
-              fieldLabel='Meter'
-              inputType='number'
-              className='w-45'
+            <MeterRangeInput
+              min={draft.meterMin}
+              max={draft.meterMax}
+              onMinChange={val => updateDraftDebounced({ ...draft, meterMin: val })}
+              onMaxChange={val => updateDraftDebounced({ ...draft, meterMax: val })}
+              className='w-72'
             />
 
             <InputWithClearInline

@@ -2,7 +2,8 @@ import type { ModelSummary, Status, Warehouse } from 'shared-types'
 
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
-const PARAM_METER = 'meter'
+const PARAM_METER_MIN = 'meter_min'
+const PARAM_METER_MAX = 'meter_max'
 const PARAM_STATUS = 'status'
 const PARAM_TECH = 'tech'
 const PARAM_WH = 'wh'
@@ -15,7 +16,8 @@ export const INTERNAL_FINISHER_PATTERN = /^[a-zA-Z0-9\s\-_.]*$/
 export type SearchFilters = {
   model: ModelSummary | null
   modelQuery: string | null
-  meter: number | null
+  meterMin: number | null
+  meterMax: number | null
   cassettes: number | null
   internalFinisher: string | null
   statuses: Status[]
@@ -33,12 +35,19 @@ export type SearchReferenceData = {
 export const EMPTY_FILTERS: SearchFilters = {
   model: null,
   modelQuery: null,
-  meter: null,
+  meterMin: null,
+  meterMax: null,
   cassettes: null,
   internalFinisher: null,
   statuses: [],
   readinesses: [],
   selectedWarehouses: [],
+}
+
+function parseNonNegativeNumber(raw: string | null): number | null {
+  if (raw === null) return null
+  const parsed = Number.parseFloat(raw)
+  return Number.isNaN(parsed) || parsed < 0 ? null : parsed
 }
 
 function encodeIds(items: { id: number }[]): string {
@@ -62,7 +71,8 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
   } else if (filters.modelQuery && filters.modelQuery.length >= MIN_QUERY_LENGTH) {
     params.set(PARAM_Q, filters.modelQuery)
   }
-  if (filters.meter !== null) params.set(PARAM_METER, String(filters.meter))
+  if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
+  if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
   if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
   if (filters.internalFinisher && INTERNAL_FINISHER_PATTERN.test(filters.internalFinisher)) {
     params.set(PARAM_FIN, filters.internalFinisher)
@@ -91,8 +101,8 @@ export function paramsToFilters(
   const qRaw = params.get(PARAM_Q)
   const modelQuery = !model && qRaw && qRaw.length >= MIN_QUERY_LENGTH ? qRaw : null
 
-  const meterRaw = params.get(PARAM_METER)
-  const meter = meterRaw === null ? null : Number.parseFloat(meterRaw)
+  const meterMin = parseNonNegativeNumber(params.get(PARAM_METER_MIN))
+  const meterMax = parseNonNegativeNumber(params.get(PARAM_METER_MAX))
 
   const cassettesRaw = params.get(PARAM_CAS)
   const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
@@ -105,7 +115,8 @@ export function paramsToFilters(
   return {
     model,
     modelQuery,
-    meter: meter === null || Number.isNaN(meter) ? null : meter,
+    meterMin,
+    meterMax,
     cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
     internalFinisher,
     statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),

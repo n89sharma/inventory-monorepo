@@ -82,7 +82,8 @@ export async function getAssets(
   statusIds: number[],
   readinessIds: number[],
   warehouseIds: number[],
-  meterParam: number,
+  meterMinParam: number,
+  meterMaxParam: number,
   cassettesParam: number,
   internalFinisherParam: string
 ): Promise<AssetSearchRow[]> {
@@ -92,7 +93,8 @@ export async function getAssets(
       statusIds,
       readinessIds,
       warehouseIds,
-      meterParam,
+      meterMinParam,
+      meterMaxParam,
       cassettesParam,
       internalFinisherParam,
     )
