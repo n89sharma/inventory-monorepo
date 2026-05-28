@@ -33,6 +33,7 @@ const CreateInvoicePage         = lazy(() => import('./components/pages/invoice/
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
+const ReportsPage               = lazy(() => import('./components/pages/reports-page').then(m => ({ default: m.ReportsPage })))
 const QueryPage                 = lazy(() => import('./components/pages/search-page').then(m => ({ default: m.QueryPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
@@ -111,7 +112,7 @@ function AppRoutes() {
                     path="/reports"
                     element={
                       <PermissionRoute permission="view_reports">
-                        <ArrivalsSummaryPage />
+                        <ReportsPage />
                       </PermissionRoute>
                     }
                   />
