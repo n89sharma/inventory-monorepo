@@ -72,14 +72,16 @@ export function ConsumablesCell(
   return (
     <Input
       type='number'
+      min={0}
       value={value ?? ''}
       onChange={e => {
         const raw = e.target.value
         if (raw === '') return onChange(null)
         const n = Number(raw)
-        onChange(isNaN(n) ? null : n)
+        if (isNaN(n)) return onChange(null)
+        onChange(Math.max(0, n))
       }}
-      placeholder='–'
+      placeholder=''
       aria-invalid={invalid}
       aria-label={ariaLabel}
       className='h-8 text-center tabular-nums'

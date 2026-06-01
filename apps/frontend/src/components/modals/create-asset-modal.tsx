@@ -1,23 +1,25 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { formatSentenceCase } from '@/lib/formatters'
+import { cn } from '@/lib/utils'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Controller,
   useForm,
+  useWatch,
   type Control,
   type Path,
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
 import type { CoreFunction, Country, ModelSummary, Status } from 'shared-types'
-import { formatSentenceCase } from '@/lib/formatters'
-import { cn } from '@/lib/utils'
+import { AssetErrorsEditor } from '../custom/asset-errors-editor'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/consumables-grid'
-import { FormSection } from '../custom/form-section'
 import { HorizontalField } from '../custom/horizontal-field'
+import { InputWithClearInline } from '../custom/input-with-clear'
 import { PopoverSearchInline } from '../custom/popover-search'
 import { ReadinessPicker } from '../custom/readiness-picker'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
@@ -31,6 +33,9 @@ import {
 } from '../shadcn/dialog'
 import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
+import { Textarea } from '../shadcn/textarea'
+
+const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 
 type CMYKFieldNames = {
   c: Path<AssetForm>
@@ -95,7 +100,7 @@ function ControlledTextInput(
         <Input
           value={(field.value as string) ?? ''}
           onChange={e => field.onChange(e.target.value)}
-          placeholder={placeholder ?? '—'}
+          placeholder={placeholder ?? ''}
           aria-invalid={fieldState.invalid}
           className={className}
         />
@@ -123,14 +128,16 @@ function ControlledNumberInput(
         <Input
           type='number'
           inputMode='numeric'
+          min={0}
           value={(field.value as number | null) ?? ''}
           onChange={e => {
             const raw = e.target.value
             if (raw === '') return field.onChange(null)
             const n = Number(raw)
-            field.onChange(isNaN(n) ? null : n)
+            if (isNaN(n)) return field.onChange(null)
+            field.onChange(Math.max(0, n))
           }}
-          placeholder='0'
+          placeholder=''
           aria-invalid={fieldState.invalid}
           className={cn('tabular-nums', className)}
         />
@@ -177,6 +184,7 @@ export function AssetModal({
   const readinesses = useReferenceDataStore(state => state.readinesses)
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const countries = useReferenceDataStore(state => state.countries)
+  const brands = useReferenceDataStore(state => state.brands)
   const models = useModelStore(state => state.models)
 
   useEffect(() => {
@@ -186,6 +194,43 @@ export function AssetModal({
       newAssetForm.reset(getDefaultNewAsset(readinesses))
     }
   }, [open, editingAsset, readinesses])
+
+  // Watch readiness + model to (a) drive the errors editor's enabled/brand state
+  // and (b) clear errors on transitions: leaving HAS_ERRORS, or switching to a
+  // model whose brand differs from the previous brand. Refs track the previous
+  // observed value so the post-reset run doesn't fire a spurious clear.
+  const readinessSelection = useWatch({ control: newAssetForm.control, name: 'readiness' })
+  const modelSelection = useWatch({ control: newAssetForm.control, name: 'model' })
+  const currentReadinessStatus = isSelected(readinessSelection)
+    ? readinessSelection.selected.status
+    : null
+  const currentBrandName = modelSelection?.brand_name ?? null
+  const brandId = currentBrandName
+    ? brands.find(b => b.name === currentBrandName)?.id ?? null
+    : null
+  const isHasErrors = currentReadinessStatus === HAS_ERRORS_READINESS
+
+  const prevReadinessRef = useRef<string | null | undefined>(undefined)
+  const prevBrandRef = useRef<string | null | undefined>(undefined)
+
+  useEffect(() => {
+    const prev = prevReadinessRef.current
+    if (prev === HAS_ERRORS_READINESS && currentReadinessStatus !== HAS_ERRORS_READINESS) {
+      newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
+    }
+    prevReadinessRef.current = currentReadinessStatus
+  }, [currentReadinessStatus, newAssetForm])
+
+  useEffect(() => {
+    // Clear only when transitioning between two distinct non-null brands.
+    // Going from "no model" → "a model" keeps any errors the user added before
+    // picking the model; the backend will reject a brand mismatch on submit.
+    const prev = prevBrandRef.current
+    if (prev && currentBrandName && prev !== currentBrandName) {
+      newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
+    }
+    prevBrandRef.current = currentBrandName
+  }, [currentBrandName, newAssetForm])
 
   function getCoreFunctionOptions(cfs: CoreFunction[]) {
     return cfs.map(f => ({ id: f.id, label: f.accessory, value: f.accessory }))
@@ -211,6 +256,8 @@ export function AssetModal({
       tonerLifeM: null,
       tonerLifeY: null,
       tonerLifeK: null,
+      errors: [],
+      comment: null,
     }
   }
 
@@ -280,11 +327,14 @@ export function AssetModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='md:max-w-[624px] overflow-y-auto max-h-[90vh]'>
+      <DialogContent className='md:max-w-175 max-h-[90vh] flex flex-col'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()} className='flex flex-col gap-6'>
+        <form
+          onSubmit={e => e.preventDefault()}
+          className='flex flex-col gap-6 flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-1 pt-2 pb-1'
+        >
 
           <div className='flex flex-col gap-2'>
             <HorizontalField label='Model' required>
@@ -328,6 +378,22 @@ export function AssetModal({
                 )}
               />
             </HorizontalField>
+            <HorizontalField label='Errors' required={isHasErrors}>
+              <Controller
+                control={newAssetForm.control}
+                name='errors'
+                render={({ field, fieldState }) => (
+                  <AssetErrorsEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    brandId={brandId}
+                    disabled={!isHasErrors}
+                    invalid={fieldState.invalid}
+                    renderSearch={slot => <PopoverSearchInline {...slot} fieldLabel="" />}
+                  />
+                )}
+              />
+            </HorizontalField>
             <HorizontalField label='Country of Origin' required>
               <Controller
                 control={newAssetForm.control}
@@ -350,79 +416,106 @@ export function AssetModal({
             </HorizontalField>
           </div>
 
-          <FormSection title='Usage'>
-            <div className='flex flex-col gap-2'>
-              <HorizontalField label='Meter — Black' required>
-                <ControlledNumberInput
-                  control={newAssetForm.control}
-                  name='meterBlack'
-                  className='max-w-[160px]'
-                />
-              </HorizontalField>
-              <HorizontalField label='Meter — Colour' required>
-                <ControlledNumberInput
-                  control={newAssetForm.control}
-                  name='meterColour'
-                  className='max-w-[160px]'
-                />
-              </HorizontalField>
-            </div>
-          </FormSection>
-
-          <FormSection title='Consumables'>
-            <ConsumablesGrid requiredChannels={['K']}>
-              <ControlledConsumablesRow
-                label='Drum life'
+          <HorizontalField label='Meter' required>
+            <div className='flex items-center gap-2'>
+              <Controller
                 control={newAssetForm.control}
-                names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
+                name='meterColour'
+                render={({ field, fieldState }) => (
+                  <InputWithClearInline
+                    value={field.value}
+                    onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
+                    fieldLabel=''
+                    inputType='number'
+                    suffix='C'
+                    error={fieldState.invalid}
+                    className='w-42'
+                  />
+                )}
               />
-              <ControlledConsumablesRow
-                label='Toner'
+              <Controller
                 control={newAssetForm.control}
-                names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
+                name='meterBlack'
+                render={({ field, fieldState }) => (
+                  <InputWithClearInline
+                    value={field.value}
+                    onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
+                    fieldLabel=''
+                    inputType='number'
+                    suffix='B'
+                    error={fieldState.invalid}
+                    className='w-42'
+                  />
+                )}
               />
-            </ConsumablesGrid>
-          </FormSection>
-
-          <FormSection title='Hardware'>
-            <div className='flex flex-col gap-2'>
-              <HorizontalField label='Cassettes' required>
-                <ControlledNumberInput
-                  control={newAssetForm.control}
-                  name='cassettes'
-                  className='max-w-[100px]'
-                />
-              </HorizontalField>
-              <HorizontalField label='Internal Finisher'>
-                <ControlledTextInput
-                  control={newAssetForm.control}
-                  name='internalFinisher'
-                  className='max-w-[140px]'
-                />
-              </HorizontalField>
-              <HorizontalField label='Core Functions'>
-                <Controller
-                  name='coreFunctions'
-                  control={newAssetForm.control}
-                  render={({ field: { onChange, value } }) => (
-                    <MultipleSelector
-                      options={getCoreFunctionOptions(coreFunctions)}
-                      placeholder='Select functions…'
-                      emptyIndicator={<p>No results found.</p>}
-                      value={getCoreFunctionOptions(value)}
-                      onChange={options =>
-                        onChange(
-                          coreFunctions.filter(c =>
-                            options.map(o => o.id).includes(c.id),
-                          ),
-                        )
-                      }
-                    />
-                  )}
-                />
-              </HorizontalField>
             </div>
-          </FormSection>
+          </HorizontalField>
+
+          <ConsumablesGrid requiredChannels={['K']}>
+            <ControlledConsumablesRow
+              label='Drum life'
+              control={newAssetForm.control}
+              names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
+            />
+            <ControlledConsumablesRow
+              label='Toner'
+              control={newAssetForm.control}
+              names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
+            />
+          </ConsumablesGrid>
+
+          <div className='flex flex-col gap-2'>
+            <HorizontalField label='Cassettes' required>
+              <ControlledNumberInput
+                control={newAssetForm.control}
+                name='cassettes'
+                className='max-w-[100px]'
+              />
+            </HorizontalField>
+            <HorizontalField label='Internal Finisher'>
+              <ControlledTextInput
+                control={newAssetForm.control}
+                name='internalFinisher'
+                className='max-w-[140px]'
+              />
+            </HorizontalField>
+            <HorizontalField label='Core Functions'>
+              <Controller
+                name='coreFunctions'
+                control={newAssetForm.control}
+                render={({ field: { onChange, value } }) => (
+                  <MultipleSelector
+                    options={getCoreFunctionOptions(coreFunctions)}
+                    placeholder='Select functions…'
+                    emptyIndicator={<p>No results found.</p>}
+                    value={getCoreFunctionOptions(value)}
+                    onChange={options =>
+                      onChange(
+                        coreFunctions.filter(c =>
+                          options.map(o => o.id).includes(c.id),
+                        ),
+                      )
+                    }
+                  />
+                )}
+              />
+            </HorizontalField>
+          </div>
+
+          <HorizontalField label='Comment'>
+            <Controller
+              control={newAssetForm.control}
+              name='comment'
+              render={({ field }) => (
+                <Textarea
+                  value={field.value ?? ''}
+                  onChange={e => field.onChange(e.target.value === '' ? null : e.target.value)}
+                  maxLength={2000}
+                  rows={3}
+                />
+              )}
+            />
+          </HorizontalField>
 
         </form>
         <DialogFooter>

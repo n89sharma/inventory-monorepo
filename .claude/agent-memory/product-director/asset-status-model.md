@@ -1,132 +1,182 @@
 ---
 name: asset-status-model
-description: Loon per-unit asset status model — Inventory Status field + Location field (zone + bin_code) + in_transit boolean design decisions, rejected proposals, and MVP boundaries
+description: Loon per-unit asset model — Inventory Status field + Location (zone + bin_code) + in_transit boolean + is_departed boolean. Decisions, rejected proposals, and MVP boundaries (ratified 2026-05-29)
 metadata:
   type: project
 ---
 
-## Design Decision: Two-Axis Model (Inventory Status + Location) + in_transit boolean
+## Design: Three-Axis Model
 
-**Adopted:** Two separate fields — `inventory_status` (lifecycle/ownership state) and `Location` (zone + bin_code coordinate pair) — plus an `in_transit` boolean (decided, see below).
+**Adopted:** Three orthogonal fields on Asset:
+1. `inventory_status` (FK to `Status` reference table) — lifecycle/ownership state
+2. `Location` = `zone` (FK to zone reference) + `bin_code` (string, nullable) — physical coordinate
+3. Two booleans: `is_in_transit` and `is_departed` — flags for cross-cutting states
 
-**Rejected:** Overloading a single `bin_code` string with mixed semantics — e.g. encoding "TECH" or "RECEIVING" as pseudo-bin values. Reason: loses type safety, makes querying ambiguous, and conflates two different concepts in one column.
+**Rejected:** Overloading a single `bin_code` string with mixed semantics (e.g. encoding "TECH" or "RECEIVING" as pseudo-bin values). Loses type safety, conflates concepts.
 
-**Decided (prior conversation, 2026-05-20):** `in_transit` boolean IS part of the model. Rationale documented in prior conversation history — reasons include query simplicity, lifecycle event triggers, and separation from zone semantics. Do not re-open this.
-
-**Decided (2026-05-20):** Clearing Location on dispatch is acceptable. Location history is preserved independently (audit/history table). The live Location field can be set to null on sale/delivery without destroying audit trail. History and live-field are separate concerns.
-
-**Clarified (not rejected):** Staging zones (Receiving, Tech, InTransit) ARE physical places, not lifecycle states. A repair bench is a place. A dock is a place. A truck is a place. These belong in Location, not Inventory Status.
+**Clarified:** Staging zones (Receiving, Tech) ARE physical places, not lifecycle states. A repair bench is a place. A dock is a place. These belong in Location, not Inventory Status.
 
 ---
 
-## Inventory Status Field (Lifecycle/Ownership Status)
+## Inventory Status Field
 
-Field name: **Inventory Status** (`inventory_status` in DB). UI label: "Status" or "Inventory Status". Do NOT call this field "Disposition" — that is an academic/jargon term warehouse operators do not use. See [[feedback-no-disposition-term]].
+DB column: `status_id` → `Status` reference table. UI label: "Status" or "Inventory Status". Do NOT call this field "Disposition" (academic jargon warehouse operators do not use).
 
-Enum values (MVP):
-- `On Order` — PO placed, not yet physically received (replaces "Purchased" — "Purchased" implies it's here)
-- `Available` — on premises, cleared, can be sold/assigned. NOT "In Stock" — "In Stock" is a quantity aggregate concept (Zoho/Cin7 framing); "Available" is per-unit.
-- `In QC` — arrived at dock but awaiting QC pass; bridges On Order → Available. Required: without it, arriving assets either appear Available prematurely or stay On Order incorrectly.
-- `On Hold` — DERIVED from active Hold record; NOT a writable status field
-- `Sold` — sold; triggers archive/soft-delete once Delivered (leaves active list)
-- `Scrapped` — written off as scrap
-- `Parted Out` — cannibalised for parts
-- `Returned` — returned by customer; re-enters QC flow
-- `Unknown` — legacy/migration values only. Keep in enum; **hide from create/edit dropdowns**; DO show in filter dropdowns so legacy data is discoverable and queryable.
-- `Lost` — written off as unrecoverable (distinct from Unknown/Missing). Fast-follow v1.1.
+**Enum values (MVP):**
+- ~~`On Order`~~ — REMOVED from asset enum. See [[lifecycle-event-status-models]]; the pre-receipt state is being modeled as a future separate `OrderedAsset` entity, not as an asset status. (Pending OrderedAsset decision — see `.notes/lifecycle-notes.md` items #1–#4.)
+- `Available` — on premises, cleared, can be sold/assigned. NOT "In Stock" (that is a quantity-aggregate concept from Zoho/Cin7; "Available" is per-unit).
+- `In QC` — arrived at dock but awaiting QC pass; bridges receipt → Available.
+- `On Hold` — DERIVED from active Hold record; NOT a writable status field.
+- `Sold` — sold; **set at Departure Confirmed** (not Completed). Asset may still be physically on premises while Sold. Active-list visibility is governed by `is_departed`, NOT by Sold status. Trade-off acknowledged; revisit if accounting/reporting friction emerges.
+- `Scrapped` — written off as scrap.
+- `Parted Out` — cannibalised for parts.
+- `Returned` — returned by customer; re-enters QC flow.
+- `Unknown` — legacy/migration values only. Hide from create/edit dropdowns; show in filter dropdowns so legacy data stays queryable.
 
-**Removed:** `Leased` — not used. Dropped from enum entirely.
+**Removed:** `Leased` (not used), `Reserved` (we chose Sold-at-Confirmed instead — see [[lifecycle-event-status-models]]), `Lost` (deferred).
 
-**Rejected:** `Unavailable` as a catch-all bucket — destroys reporting; GM cannot query by reason.
-**Rejected:** "In Stock" as the label for Available — tautological for per-unit tracking, confuses users migrating from Zoho/Cin7 where "In Stock" means a quantity.
+**Rejected:** `Unavailable` as catch-all bucket (destroys reporting).
+**Rejected:** "In Stock" as the label for Available (tautological for per-unit tracking).
 
-**Key rule:** `On Hold` / `Reserved` must be derived from the Holds feature, not a separately writable field. Dual-write creates guaranteed sync bugs. ShipHero's manually-settable "Reserved" is a known pain point in their support queue.
+**Key rule:** `On Hold` is the only derived status — it derives from an active Hold record. All other statuses are writable / set explicitly by lifecycle events. Dual-write between status and event state was the prior failure mode (Reserved-derived-from-Departure); we now keep Sold writable and use `is_departed` for archival semantics instead.
+
+**Transfer pending indicator:** When asset is on a Transfer in Confirmed state, location stays at origin (stale, acceptable for MVP). A `pending_transfer_id` FK on Asset signals the pending transfer. UI shows "Pending Transfer to [Destination]" badge. Cleared at Transfer Completed.
 
 ---
 
 ## Location Field
 
-Location is a **two-part coordinate**: `zone` (enum) + `bin_code` (string, nullable).
+Two-part coordinate: `zone` (FK to Zone reference) + `bin_code` (string, nullable).
 
-### Zone Enum
+### Zone values
+- `Bin` — asset in a specific named bin; `bin_code` required and populated.
+- `Receiving` — inbound dock / receiving area (physical place). New assets land here at Arrival Completed.
+- `Shipping` — outbound dock / shipping staging area (still on premises). Distinct from in-transit.
+- `Tech` — repair bench / tech area.
+- `InTransit` — off-premises, on a truck between locations.
+- `Unknown` — location not known (replaces old `isMissing` boolean).
 
-- `Bin` — asset is in a specific named bin location; `bin_code` is required and populated
-- `Receiving` — asset is at the inbound dock / receiving area (physical place, not a lifecycle state)
-- `Shipping` — asset is at the outbound dock / shipping staging area (distinct from InTransit — asset is still on premises). Fishbowl and inFlow both distinguish Packing/Shipping staging from In Transit.
-- `Tech` — asset is at a repair bench or tech area (physical place)
-- `InTransit` — asset is off-premises, on a truck or in transit between locations
-- `Unknown` — asset location is not known (replaces old `isMissing` boolean — zone is a better carrier for this)
+**Removed:** `Departed` zone. We now use `location_id = null` + `is_departed = true` on Asset instead. Reason: "Departed" is not a place — it is neither a warehouse, a zone, nor a bin. It is an event state. Modeling it as a boolean flag keeps Location's semantics clean and lets UI render "Departed" derivably.
 
 ### Bin code
-
-- `bin_code`: string (e.g. `W0-01-011`), **only populated when `zone = Bin`**. Null for all other zones.
-- When an asset leaves its bin for Tech or elsewhere, the bin is **freed for reuse**. No "home bin" concept.
-- When an asset returns from Tech or Receiving, it gets a **fresh bin assignment**. There is no memory of where it was before.
+- `bin_code`: string (e.g. `W0-01-011`), only populated when `zone = Bin`. Null for all other zones.
+- When an asset leaves its bin (for Tech or elsewhere), the bin is freed for reuse. No "home bin" concept.
+- When an asset returns from Tech / Receiving, it gets a fresh bin assignment. No memory of prior bin.
 
 ### Competitor Comparison
-
 | Competitor | Staging Zone Model |
 |---|---|
-| **inFlow** | Staging locations are first-class peers of bins — dock, receiving, and tech bench appear in the same location selector as bin locations. |
-| **Fishbowl** | Same approach — staging locations (Receiving, Inspection, Scrap) are regular location records in the location hierarchy, not a separate status field. |
-| **Sortly** | Uses a folder/hierarchy model (`Location > Sub-location`). "Tech Bench" is a sub-location just like a shelf. Staging zones are just locations with no bin codes. |
-| **Asset Panda** | Free-text location field — no zone enum, no bin codes. Works for simple cases; breaks for warehouse floor ops. Their reviews cite this as the main gap. |
-| **Asset Tiger** | Similar to Asset Panda — single location string, no structured zones. |
+| **inFlow** | Staging locations are first-class peers of bins. |
+| **Fishbowl** | Staging locations are regular location records in the hierarchy. |
+| **Sortly** | Folder/hierarchy model. Staging = locations with no bin codes. |
+| **Asset Panda / Asset Tiger** | Free-text location. Breaks for warehouse floor ops. |
 
-**Verdict:** Staging-as-peer-of-bin is the dominant pattern among warehouse-aware competitors (inFlow, Fishbowl, Sortly). Loon's `zone` enum is a clean, type-safe version of this.
+Verdict: staging-as-peer-of-bin is the dominant pattern. Loon's `zone` enum is a clean, type-safe version.
 
 ---
 
-## in_transit Boolean
+## is_in_transit Boolean
 
-**Decided:** `in_transit` is a first-class boolean field on the asset. It coexists with `zone=InTransit` — they are not redundant by design choice. Rationale is in prior conversation history: query simplicity, lifecycle event triggers, separation from zone semantics. Do not re-litigate.
+First-class boolean on Asset. Coexists with `zone = InTransit` by design choice — rationale (query simplicity, lifecycle event triggers, separation from zone semantics) is in prior conversation history. Do not re-litigate. Retained for v1.1 IN_TRANSIT state work; dormant for MVP.
+
+---
+
+## is_departed Boolean
+
+First-class boolean on Asset. Set to `true` at Departure Completed, when:
+- `location_id` → null
+- `status` stays `Sold` (already set at Departure Confirmed)
+- `is_departed` → true
+
+Never cleared in MVP (no cancel/reopen). UI renders Asset location as "Departed" when `is_departed = true`. Replaces the prior `Departed` zone tombstone idea.
+
+---
+
+## Active-List Rule
+
+The asset "active list" filter shows assets with `is_departed = false`. NOT based on `status = Sold`. This decouples archival from status so that Confirmed-but-not-yet-shipped (Sold + on-premises) assets remain visible to floor staff who need to find them.
 
 ---
 
 ## Invalid State Combinations to Guard
 
-The Inventory Status × Location matrix admits nonsense combinations that need validation:
+- `Available + zone ≠ Bin` — **suspicious**. Warn on save; do not hard-block.
+- `InTransit zone` — **only valid** during an active Transfer/Departure workflow. Orphaned InTransit = data quality error.
+- `Sold + On Hold` — **invalid**.
+- `Scrapped / Parted Out + InTransit` — **invalid**.
+- `is_departed = true + location_id ≠ null` — **invalid**. Departed assets must have null location.
+- `is_departed = true + status ≠ Sold` — **invalid**. Only Sold assets can be departed.
 
-- `On Order + zone=Bin` — **invalid**: asset is not on premises; it has no physical location in the warehouse yet. Location should be null or absent entirely.
-- `On Order + zone=Receiving` — **valid**: asset has arrived at dock but not yet formally received into inventory.
-- `Available + zone≠Bin` — **suspicious**: an Available asset should normally be in a named bin. Warn on save; do not hard-block (edge cases exist).
-- `InTransit zone` — **only valid** during an active Arrival, Transfer, or Departure workflow. Orphaned InTransit (no linked workflow) is a data quality error.
-- `Sold + On Hold` — **invalid**: already sold, can't hold.
-- `Scrapped/Parted Out + InTransit` — **invalid**: no use case.
-- `Lost + zone=Bin` — **invalid**: if you know the bin, it's not lost.
-
-Implement field-level validation (or a state machine) to enforce valid transitions.
+Implement field-level validation or a state machine.
 
 ---
 
-## Inventory Status vs Current "Availability Status" Mapping
+## Old Availability Status → New Inventory Status
 
-| Old Availability Status | New Inventory Status |
-|------------------------|----------------------|
-| Unknown | `Unknown` (legacy-only, hidden from create/edit UI) |
-| Available | Available |
-| Held | On Hold (derived) |
-| Sold | Sold |
-| Parts | Parted Out |
-| Scrap | Scrapped |
-| Returned | Returned |
-| Leased | Removed — not used |
+| Old | New |
+|---|---|
+| Unknown | `Unknown` (legacy-only, hidden from create/edit) |
+| Available | `Available` |
+| Held | `On Hold` (derived) |
+| Sold | `Sold` |
+| Parts | `Parted Out` |
+| Scrap | `Scrapped` |
+| Returned | `Returned` |
+| Leased | removed |
 
-Old "Tracking Status" states (Missing, Purchasing, Inbound, Receiving, Repairing, In Stock, Packing, Outbound, Delivered) collapse into: Inventory Status + Location zone + Arrival status (already modeled separately via ArrivalStatus). See [[arrival-status-model]].
+Old "Tracking Status" states (Missing, Purchasing, Inbound, Receiving, Repairing, In Stock, Packing, Outbound, Delivered) collapse into Inventory Status + Location zone + Arrival/Transfer/Departure status (modeled separately — see [[lifecycle-event-status-models]]).
 
-**Missing:** Previously modeled as `isMissing` boolean. Now carried by `zone=Unknown` — cleaner, no extra column, consistent with how zone is already queried.
+**Missing:** carried by `zone = Unknown` (cleaner than the old `isMissing` boolean).
 
 ---
 
 ## Dispatch / Archive Behavior
 
-**Decided:** On sale/delivery, clearing Location (setting to null) is acceptable. Location history is persisted independently in the audit/history table — that trail is not affected by clearing the live field. Assets that are sold/delivered are archived (soft-deleted) and leave the active inventory list. The active list is for assets the warehouse is actively managing.
+At Departure Completed:
+- `status` stays `Sold` (set earlier at Departure Confirmed)
+- `location_id` → null
+- `is_departed` → true
+
+Asset disappears from active list (the `is_departed = false` filter). Location history is preserved independently in the audit/history table — live `location_id` being null does not destroy audit trail.
+
+UI renders the live Location as "Departed" when `is_departed = true`. Historical location queries use the history table.
 
 ---
 
 ## MVP vs Deferred
 
-- `MVP`: Inventory Status enum (On Order, Available, In QC, On Hold[derived], Sold, Scrapped, Parted Out, Returned; Unknown legacy-only hidden from create/edit); zone enum (Bin/Receiving/Shipping/Tech/InTransit/Unknown); bin_code when zone=Bin; in_transit boolean; On Hold derived from Holds; invalid combo validation (Postgres check constraint); clear Location on dispatch (history persists separately)
-- `Fast-Follow (v1.1)`: Lost inventory status value; InTransit zone enforcement tied to active workflow records (orphan detection); auto-archive on Sold+Delivered; multi-warehouse transfer tracking
-- `Future (v2+)`: Demo/Loaner status, Consigned status, sub-zone precision (which bench? which dock bay?)
-- `Don't Build`: home-bin memory; Leased (not used); Consigned until a paying customer asks for it; "Unavailable" catch-all bucket
+**MVP:**
+- Inventory Status enum (Available, In QC, On Hold derived, Sold, Scrapped, Parted Out, Returned, Unknown legacy-only)
+- Zone enum (Bin / Receiving / Shipping / Tech / InTransit / Unknown)
+- `bin_code` populated only when `zone = Bin`
+- `is_in_transit` boolean (dormant)
+- `is_departed` boolean (set at Departure Completed)
+- On Hold derived from Holds
+- Active-list filter on `is_departed = false`
+- Invalid-combo validation (Postgres check constraints)
+- Dispatch: location null + `is_departed = true`
+
+**Fast-Follow (v1.1):**
+- `Lost` inventory status value
+- InTransit zone enforcement tied to active workflow records (orphan detection)
+- Multi-warehouse transfer pending-state polish
+- `OrderedAsset` entity for pre-receipt state (pending decision — `.notes/lifecycle-notes.md` #1–#4)
+- Cancelled/Reopen for lifecycle events ([[lifecycle-event-status-models]])
+
+**Future (v2+):**
+- Demo/Loaner status
+- Consigned status
+- Sub-zone precision (which bench? which dock bay?)
+
+**Don't Build:**
+- Home-bin memory
+- Leased (not used)
+- Consigned until a paying customer asks
+- "Unavailable" catch-all bucket
+- `Departed` as a zone value (now modeled as `is_departed` boolean)
+- `Reserved` as an inventory status (we chose Sold-at-Confirmed; revisit if accounting friction emerges)
+
+## See Also
+
+- [[lifecycle-event-status-models]] — Arrival/Transfer/Departure status model, asset side-effects per transition
+- [[ux-lifecycle-event-statuses]] — UI/badge/transition surface decisions

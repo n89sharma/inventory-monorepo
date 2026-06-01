@@ -4,10 +4,11 @@ import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generate
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
+import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from "../prisma.js"
-import { mapAssetSummary } from './assetService.js'
+import { mapAssetSummary, reconcileAssetErrors, upsertLatestComment } from './assetService.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 
 
@@ -41,6 +42,16 @@ const assetIncludeArgs = {
       include: {
         Accessory: true
       }
+    },
+    asset_errors: {
+      select: { error_id: true, is_fixed: true }
+    },
+    // Latest comment only — the edit modal prefills a single textarea.
+    // Including the full stream would balloon the payload on long-lived assets.
+    comments: {
+      take: 1,
+      orderBy: { created_at: 'desc' },
+      select: { comment: true }
     }
   }
 } satisfies AssetDefaultArgs
@@ -88,7 +99,9 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     tonerLifeC: dbAsset.technical_specification?.toner_life_c ?? 0,
     tonerLifeM: dbAsset.technical_specification?.toner_life_m ?? 0,
     tonerLifeY: dbAsset.technical_specification?.toner_life_y ?? 0,
-    tonerLifeK: dbAsset.technical_specification?.toner_life_k ?? 0
+    tonerLifeK: dbAsset.technical_specification?.toner_life_k ?? 0,
+    errors: dbAsset.asset_errors.map(r => ({ error_id: r.error_id, is_fixed: r.is_fixed })),
+    comment: dbAsset.comments[0]?.comment ?? null
   }
 }
 
@@ -97,8 +110,10 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
   const currentDateTime = new Date()
   const barcodes = await generateBarcodes(newArrival.assets, warehouseCode)
   const arrivalNumber = await getNewArrivalNumber(warehouseCode)
+  const brandIdByModelId = await resolveModelBrands(newArrival.assets.map(a => a.model.id))
 
   const arrival = await prisma.$transaction(async (tx) => {
+    await validateErrorBrands(tx, buildErrorBrandPairs(newArrival.assets, brandIdByModelId))
     const locationId = await ensureArrivalLocationId(tx, newArrival.warehouse.id)
     return tx.arrival.create({
       data: {
@@ -110,7 +125,9 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
         created_at: currentDateTime,
         created_by: { connect: { id: userId } },
         assets: {
-          create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(a, barcodes[a.serialNumber], locationId, currentDateTime))
+          create: newArrival.assets.map(a => mapInputAssetToPrismaCreateAsset(
+            a, barcodes[a.serialNumber], locationId, currentDateTime, userId
+          ))
         }
       },
       include: {
@@ -151,7 +168,11 @@ function mapInputAssetToPrismaCreateAsset(
   asset: CreateAsset,
   barcode: string,
   locationId: number,
-  currentDateTime: Date): AssetCreateWithoutArrivalInput {
+  currentDateTime: Date,
+  userId: number): AssetCreateWithoutArrivalInput {
+
+  const errors = asset.errors ?? []
+  const commentText = asset.comment?.trim() ?? ''
 
   return {
     barcode,
@@ -182,8 +203,57 @@ function mapInputAssetToPrismaCreateAsset(
         toner_life_k: asset.tonerLifeK
       }
     },
-    cost: { create: {} }
+    cost: { create: {} },
+    asset_errors: errors.length > 0 ? {
+      create: errors.map(e => ({
+        error_id: e.error_id,
+        is_fixed: e.is_fixed,
+        added_by: userId,
+        added_at: currentDateTime,
+        fixed_at: e.is_fixed ? currentDateTime : null,
+        fixed_by: e.is_fixed ? userId : null
+      }))
+    } : undefined,
+    comments: commentText !== '' ? {
+      create: [{
+        created_by_id: userId,
+        comment: commentText,
+        created_at: currentDateTime,
+        updated_at: currentDateTime
+      }]
+    } : undefined
   }
+}
+
+/**
+ * One query to resolve every asset's model → brand_id. The brand is needed to
+ * pair each asset's error_ids with its expected brand for validation.
+ */
+async function resolveModelBrands(modelIds: number[]): Promise<Map<number, number>> {
+  if (modelIds.length === 0) return new Map()
+  const rows = await prisma.model.findMany({
+    where: { id: { in: modelIds } },
+    select: { id: true, brand_id: true }
+  })
+  return new Map(rows.map(r => [r.id, r.brand_id]))
+}
+
+/**
+ * Flatten the per-asset (model → expected brand, errors) shape into the
+ * { errorId, expectedBrandId } pairs that `validateErrorBrands` consumes.
+ */
+function buildErrorBrandPairs(
+  assets: Array<{ model: { id: number }; errors?: { error_id: number }[] }>,
+  brandIdByModelId: Map<number, number>
+): Array<{ errorId: number; expectedBrandId: number }> {
+  return assets.flatMap(a => {
+    if (!a.errors || a.errors.length === 0) return []
+    const expectedBrandId = brandIdByModelId.get(a.model.id)
+    if (expectedBrandId === undefined) {
+      throw new NotFoundError(`Model ${a.model.id} not found`)
+    }
+    return a.errors.map(e => ({ errorId: e.error_id, expectedBrandId }))
+  })
 }
 
 
@@ -351,8 +421,10 @@ export async function updateArrivalAsset(
   if (!existing) throw new NotFoundError(`Asset ${assetId} not found on arrival ${arrivalNumber}`)
 
   const assetWithId: UpdateAsset = { ...asset, id: assetId }
+  const brandIdByModelId = await resolveModelBrands([asset.model.id])
 
   await prisma.$transaction(async (tx) => {
+    await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
     await tx.assetAccessory.deleteMany({ where: { asset_id: assetId } })
     await updateArrivalAssetCoreFields(tx, assetWithId)
     if (asset.coreFunctions.length > 0) {
@@ -360,6 +432,8 @@ export async function updateArrivalAsset(
         data: asset.coreFunctions.map(cf => ({ asset_id: assetId, accessory_id: cf.id }))
       })
     }
+    await reconcileAssetErrors(tx, assetId, asset.errors ?? [], userId)
+    await upsertLatestComment(tx, assetId, asset.comment ?? null, userId)
   })
 
   await recordAssetUpdate(assetId, {
@@ -409,11 +483,12 @@ async function createArrivalAssetInTx(
   asset: CreateAsset,
   barcode: string,
   locationId: number,
-  now: Date
+  now: Date,
+  userId: number
 ) {
   return tx.asset.create({
     data: {
-      ...mapInputAssetToPrismaCreateAsset(asset, barcode, locationId, now),
+      ...mapInputAssetToPrismaCreateAsset(asset, barcode, locationId, now, userId),
       arrival: { connect: { id: arrivalId } }
     },
     select: {
@@ -436,10 +511,12 @@ export async function createSingleArrivalAsset(
 
   const barcode = await getNewAssetBarcode(arrival.destination.city_code)
   const now = new Date()
+  const brandIdByModelId = await resolveModelBrands([asset.model.id])
 
   const created = await prisma.$transaction(async (tx) => {
+    await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
     const locationId = await ensureArrivalLocationId(tx, arrival.destination_id)
-    return createArrivalAssetInTx(tx, arrival.id, asset, barcode, locationId, now)
+    return createArrivalAssetInTx(tx, arrival.id, asset, barcode, locationId, now, userId)
   })
 
   await recordBatchAssetCreate(

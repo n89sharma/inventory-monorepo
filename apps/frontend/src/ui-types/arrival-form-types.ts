@@ -1,7 +1,9 @@
-import type { CoreFunction, Country, ModelSummary, OrgSummary, Status, Warehouse } from "shared-types"
-import { CoreFunctionsSchema, CountrySchema, ModelSummarySchema, OrgSummarySchema } from "shared-types"
+import type { CoreFunction, Country, ModelSummary, OrgSummary, Status, UpdateError, Warehouse } from "shared-types"
+import { CoreFunctionsSchema, CountrySchema, ModelSummarySchema, OrgSummarySchema, UpdateErrorSchema } from "shared-types"
 import z from "zod"
 import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type SelectOption } from "./select-option-types"
+
+const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 
 // Asset Modal within Edit or Create Asset
 export const AssetFormSchema = z.object({
@@ -22,7 +24,23 @@ export const AssetFormSchema = z.object({
   tonerLifeC: z.number().min(0).nullable(),
   tonerLifeM: z.number().min(0).nullable(),
   tonerLifeY: z.number().min(0).nullable(),
-  tonerLifeK: z.number().min(0).nullable().refine(v => v != null, "Toner life K required")
+  tonerLifeK: z.number().min(0).nullable().refine(v => v != null, "Toner life K required"),
+  errors: z.array(UpdateErrorSchema),
+  comment: z.string().max(2000).nullable()
+}).superRefine((val, ctx) => {
+  // Errors are required iff Readiness = Has Errors. The reverse direction is
+  // prevented by the UI: the errors input is only enabled when Has Errors is
+  // the current selection. Validating both ways here would surface a confusing
+  // error against a disabled field.
+  if (isSelected(val.readiness)
+    && val.readiness.selected.status === HAS_ERRORS_READINESS
+    && val.errors.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['errors'],
+      message: 'Add at least one error'
+    })
+  }
 })
 
 // Arrival Form Page within Edit or Create Arrival
@@ -53,7 +71,9 @@ export type AssetForm = {
   tonerLifeC: number | null,
   tonerLifeM: number | null,
   tonerLifeY: number | null,
-  tonerLifeK: number | null
+  tonerLifeK: number | null,
+  errors: UpdateError[],
+  comment: string | null
 }
 
 export type ArrivalForm = {

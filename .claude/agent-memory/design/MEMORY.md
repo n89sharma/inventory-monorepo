@@ -5,3 +5,4 @@
 - [Meter range filter on Search page](ux_meter_range_filter.md) — Two side-by-side InputWithClearInline boxes in w-45 slot; popover/combined-input/slider all rejected
 - [Search page minimum-criteria gate](ux_search_minimum_criteria.md) — Explicit Search button (not auto-fire); disabled+tooltip before criteria met; guided empty state; result-cap inline banner above table
 - [Hold info in Search table](ux_hold_info_in_search.md) — Hover/focus popover on Status badge (not columns, not row expansion, not drawer); needs AssetSearchRow schema extension for org+user name fields
+- [Lifecycle event statuses — Arrival/Transfer/Departure](ux_lifecycle_event_statuses.md) — Draft→Confirmed→Completed only (Cancelled/Reopen/IN_TRANSIT all deferred); outlined-ring badge variant; single primary transition button; list filter unchanged (no hiding Completed); Arrival uses Expected Assets (OrderedAsset) for receive workflow; ratified 2026-05-29

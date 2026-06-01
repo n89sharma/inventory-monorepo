@@ -53,7 +53,9 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       tonerLifeC: s.tonerLifeC!,
       tonerLifeM: s.tonerLifeM!,
       tonerLifeY: s.tonerLifeY!,
-      tonerLifeK: s.tonerLifeK!
+      tonerLifeK: s.tonerLifeK!,
+      errors: s.errors,
+      comment: s.comment
     })) as CreateArrival['assets']
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
@@ -107,7 +109,9 @@ export async function createSingleArrivalAsset(
     tonerLifeC: asset.tonerLifeC!,
     tonerLifeM: asset.tonerLifeM!,
     tonerLifeY: asset.tonerLifeY!,
-    tonerLifeK: asset.tonerLifeK!
+    tonerLifeK: asset.tonerLifeK!,
+    errors: asset.errors,
+    comment: asset.comment
   } satisfies CreateAsset)
   const { data } = await api.post<AssetSummary>(`/arrivals/${arrivalNumber}/assets`, createSingleArrivalAssetBody)
   return AssetSummarySchema.parse(data)
@@ -140,7 +144,9 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     tonerLifeC: asset.tonerLifeC,
     tonerLifeM: asset.tonerLifeM,
     tonerLifeY: asset.tonerLifeY,
-    tonerLifeK: asset.tonerLifeK
+    tonerLifeK: asset.tonerLifeK,
+    errors: asset.errors,
+    comment: asset.comment
   }
 }
 
@@ -167,7 +173,9 @@ export async function updateArrivalAsset(
     tonerLifeC: asset.tonerLifeC!,
     tonerLifeM: asset.tonerLifeM!,
     tonerLifeY: asset.tonerLifeY!,
-    tonerLifeK: asset.tonerLifeK!
+    tonerLifeK: asset.tonerLifeK!,
+    errors: asset.errors,
+    comment: asset.comment
   } satisfies UpdateAsset)
   const { data } = await api.patch<AssetSummary>(`/arrivals/${arrivalNumber}/assets/${assetId}`, updateArrivalAssetBody)
   return AssetSummarySchema.parse(data)

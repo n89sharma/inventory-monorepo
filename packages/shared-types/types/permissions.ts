@@ -113,6 +113,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'view_collections',
     'create_update_arrival',
     'create_update_transfer',
+    'create_update_departure'
   ],
   picker: [
     'view_asset',

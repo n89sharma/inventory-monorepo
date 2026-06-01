@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { ModelSummarySchema } from './model-types.js';
+import { CoreFunctionsSchema, CountrySchema, StatusSchema } from './reference-data-types.js';
 
 
 export const AssetLocationDetailsSchema = z.object({
@@ -115,6 +117,39 @@ export const AssetDetailsSchema = z.object({
 
 export type AssetDetails = z.infer<typeof AssetDetailsSchema>
 
+// Subset of an asset error used as input on create + update flows.
+// Frontend sends the error_id straight from the reference-data store; backend
+// verifies the id's brand matches the asset's model brand.
+export const UpdateErrorSchema = z.object({
+  error_id: z.number().int().positive(),
+  is_fixed: z.boolean()
+})
+export type UpdateError = z.infer<typeof UpdateErrorSchema>
+
+// POST /arrivals  (and POST /arrivals/:n/assets) — payload for creating an asset
+export const CreateAssetSchema = z.object({
+  model: ModelSummarySchema.refine(val => !!val, "Model is required"),
+  serialNumber: z.string().refine(val => val.length > 0, "Serial number is required"),
+  meterBlack: z.number().min(0, "Meter must be positive"),
+  meterColour: z.number().min(0, "Meter must be positive"),
+  cassettes: z.number().min(0, "Cassettes are required"),
+  readiness: StatusSchema,
+  countryOfOrigin: CountrySchema.refine(val => !!val, "Country of origin is required"),
+  internalFinisher: z.string(),
+  coreFunctions: z.array(CoreFunctionsSchema),
+  drumLifeC: z.number().min(0, "Drum life C required"),
+  drumLifeM: z.number().min(0, "Drum life M required"),
+  drumLifeY: z.number().min(0, "Drum life Y required"),
+  drumLifeK: z.number().min(0, "Drum life K required"),
+  tonerLifeC: z.number().min(0, "Toner life C required"),
+  tonerLifeM: z.number().min(0, "Toner life M required"),
+  tonerLifeY: z.number().min(0, "Toner life Y required"),
+  tonerLifeK: z.number().min(0, "Toner life K required"),
+  errors: z.array(UpdateErrorSchema).default([]),
+  comment: z.string().max(2000).nullable().default(null)
+})
+export type CreateAsset = z.infer<typeof CreateAssetSchema>
+
 export const AssetErrorSchema = z.object({
   error_id: z.number(),
   brand_id: z.number(),
@@ -173,16 +208,10 @@ export const BarcodeSuggestionSchema = z.object({
 
 export type BarcodeSuggestion = z.infer<typeof BarcodeSuggestionSchema>
 
-export const UpdateErrorSchema = z.object({
-  code: z.string(),
-  is_fixed: z.boolean()
-})
-
 export const UpdateAssetErrorsSchema = z.object({
   errors: z.array(UpdateErrorSchema).max(100)
 })
 
-export type UpdateError = z.infer<typeof UpdateErrorSchema>
 export type UpdateAssetErrors = z.infer<typeof UpdateAssetErrorsSchema>
 
 export const CreatePartTransferSchema = z.object({

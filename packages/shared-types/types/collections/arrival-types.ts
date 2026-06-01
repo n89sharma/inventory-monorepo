@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { AssetSummarySchema } from '../asset-types.js';
-import { ModelSummarySchema } from '../model-types.js';
+import { AssetSummarySchema, CreateAssetSchema } from '../asset-types.js';
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
-import { CoreFunctionsSchema, CountrySchema, StatusSchema, WarehouseSchema } from '../reference-data-types.js';
+import { CountrySchema, WarehouseSchema } from '../reference-data-types.js';
 import { CollectionSummarySchema } from './collection-types.js';
 
 // GET /arrivals?fromDate...&toDate...&warehouse...
@@ -29,28 +28,6 @@ export const ArrivalDetailSchema = z.object({
 })
 export type ArrivalDetail = z.infer<typeof ArrivalDetailSchema>
 
-// POST /arrivals
-export const CreateAssetSchema = z.object({
-  model: ModelSummarySchema.refine(val => !!val, "Model is required"),
-  serialNumber: z.string().refine(val => val.length > 0, "Serial number is required"),
-  meterBlack: z.number().min(0, "Meter must be positive"),
-  meterColour: z.number().min(0, "Meter must be positive"),
-  cassettes: z.number().min(0, "Cassettes are required"),
-  readiness: StatusSchema,
-  countryOfOrigin: CountrySchema.refine(val => !!val, "Country of origin is required"),
-  internalFinisher: z.string(),
-  coreFunctions: z.array(CoreFunctionsSchema),
-  drumLifeC: z.number().min(0, "Drum life C required"),
-  drumLifeM: z.number().min(0, "Drum life M required"),
-  drumLifeY: z.number().min(0, "Drum life Y required"),
-  drumLifeK: z.number().min(0, "Drum life K required"),
-  tonerLifeC: z.number().min(0, "Toner life C required"),
-  tonerLifeM: z.number().min(0, "Toner life M required"),
-  tonerLifeY: z.number().min(0, "Toner life Y required"),
-  tonerLifeK: z.number().min(0, "Toner life K required")
-})
-export type CreateAsset = z.infer<typeof CreateAssetSchema>
-
 export const CreateArrivalSchema = z.object({
   vendor: OrgSummarySchema.refine(val => !!val, "Vendor required"),
   transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
@@ -61,6 +38,10 @@ export const CreateArrivalSchema = z.object({
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
 // PATCH /arrivals/:arrivalNumber/assets/:assetId
+//
+// countryOfOrigin is nullable here (not in CreateAsset) because legacy asset
+// rows pre-date that field being required. The non-null rule is enforced at
+// the frontend form layer so the user must pick a country when editing.
 export const UpdateAssetSchema = CreateAssetSchema.extend({
   id: z.number().optional(),
   countryOfOrigin: CountrySchema.nullable()
