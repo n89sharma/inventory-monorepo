@@ -1,4 +1,4 @@
-import type { Column, ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState } from "@tanstack/react-table"
+import type { Column, ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState, VisibilityState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   defaultSort?: { id: string; desc: boolean }
   pinLeft?: string[]
   getRowHref?: (row: TData) => string
+  columnVisibility?: VisibilityState
 }
 
 function pinStyle<TData>(column: Column<TData>): CSSProperties {
@@ -90,6 +91,7 @@ export function DataTable<TData, TValue>({
   defaultSort,
   pinLeft,
   getRowHref,
+  columnVisibility,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
@@ -111,6 +113,7 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       rowSelection,
+      columnVisibility,
     },
     initialState: {
       pagination: {

@@ -5,6 +5,11 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchResults } from '@/hooks/use-search-results'
+import {
+  DEFAULT_VISIBLE_COLUMN_IDS,
+  ENABLED_PICKABLE_COUNT,
+  PICKABLE_COLUMNS,
+} from '@/lib/asset-column-sections'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
@@ -12,12 +17,13 @@ import {
   type SearchFilters,
 } from '@/lib/search-url-params'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
-import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
+import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
+import { ColumnPickerButton } from '../custom/column-picker-button'
 import { InputWithClearInline } from '../custom/input-with-clear'
 import { MeterRangeInput } from '../custom/meter-range-input'
 import { ModelSearchInput } from '../custom/model-search-input'
@@ -38,11 +44,13 @@ const QueryResultsTable = memo(function QueryResultsTable({
   rowSelection,
   onRowSelectionChange,
   onBulkPriceSave,
+  columnVisibility,
 }: {
   assets: AssetSearchRow[]
   rowSelection: RowSelectionState
   onRowSelectionChange: OnChangeFn<RowSelectionState>
   onBulkPriceSave: () => void
+  columnVisibility: VisibilityState
 }) {
   const [prevAssets, setPrevAssets] = useState(assets)
 
@@ -77,6 +85,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
         defaultSort={defaultSort}
         pinLeft={PIN_LEFT}
         getRowHref={a => `/search/${a.barcode}`}
+        columnVisibility={columnVisibility}
       />
     </>
   )
@@ -87,6 +96,19 @@ export function QueryPage(): React.JSX.Element {
   const exportAssets = useAssetStore(state => state.exportAssets)
   const [exportLoading, setExportLoading] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    () => new Set(DEFAULT_VISIBLE_COLUMN_IDS),
+  )
+  const columnVisibility = useMemo<VisibilityState>(
+    () => {
+      const out: VisibilityState = {}
+      for (const col of PICKABLE_COLUMNS) {
+        out[col.id] = visibleColumns.has(col.id)
+      }
+      return out
+    },
+    [visibleColumns],
+  )
 
   const models = useModelStore(state => state.models)
   const rawStatuses = useReferenceDataStore(state => state.statuses)
@@ -220,17 +242,25 @@ export function QueryPage(): React.JSX.Element {
               />
             )}
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleExport}
-            disabled={exportDisabled}
-            aria-label="Export to CSV"
-          >
-            {exportLoading
-              ? <SpinnerGapIcon className="animate-spin" />
-              : <DownloadSimpleIcon />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ColumnPickerButton
+              visible={visibleColumns}
+              onVisibleChange={setVisibleColumns}
+              onReset={() => setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMN_IDS))}
+              totalPickable={ENABLED_PICKABLE_COUNT}
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleExport}
+              disabled={exportDisabled}
+              aria-label="Export to CSV"
+            >
+              {exportLoading
+                ? <SpinnerGapIcon className="animate-spin" />
+                : <DownloadSimpleIcon />}
+            </Button>
+          </div>
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
@@ -333,6 +363,7 @@ export function QueryPage(): React.JSX.Element {
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
             onBulkPriceSave={handleBulkPriceSave}
+            columnVisibility={columnVisibility}
           />
         </div>
       </PageContent>

@@ -1,4 +1,3 @@
-import { CopyButton } from "@/components/custom/copy-button"
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
@@ -59,37 +58,39 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     enableHiding: false,
   },
   {
+    id: "barcode",
     accessorKey: "barcode",
     header: "Barcode",
     cell: ({ row }) => (
-      <div className="group flex items-center justify-center gap-1">
-        <Link
-          to={`/search/${row.original.barcode}`}
-          className="font-mono text-foreground hover:underline"
-        >
-          {row.getValue('barcode')}
-        </Link>
-        <CopyButton value={row.original.barcode} />
-      </div>
+      <Link
+        to={`/search/${row.original.barcode}`}
+        className="font-mono text-foreground hover:underline"
+      >
+        {row.getValue('barcode')}
+      </Link>
     ),
-    size: 140
+    size: 120
   },
   {
+    id: "brand",
     accessorKey: "brand",
     header: "Brand",
     size: 80
   },
   {
+    id: "model",
     accessorKey: "model",
     header: "Model",
     size: 100
   },
   {
+    id: "serial_number",
     accessorKey: "serial_number",
     header: "Serial Number",
     size: 100
   },
   {
+    id: "status",
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -113,6 +114,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 80
   },
   {
+    id: "readiness",
     accessorKey: "readiness",
     header: ({ column }) => (
       <SortableHeader
@@ -124,6 +126,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 80
   },
   {
+    id: "specs_meter_total",
     accessorKey: "meter_total",
     header: ({ column }) => (
       <SortableHeader
@@ -131,10 +134,11 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => formatThousandsK(row.getValue('meter_total')),
+    cell: ({ row }) => formatThousandsK(row.getValue('specs_meter_total')),
     size: 80
   },
   {
+    id: "specs_cassettes",
     accessorKey: "cassettes",
     header: ({ column }) => (
       <SortableHeader
@@ -146,6 +150,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 80
   },
   {
+    id: "specs_internal_finisher",
     accessorKey: "internal_finisher",
     header: ({ column }) => (
       <SortableHeader
