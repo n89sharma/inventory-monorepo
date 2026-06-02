@@ -1,13 +1,13 @@
 import axios, { isAxiosError } from "axios"
-import { toast } from 'sonner'
 import type { ApiResponse } from 'shared-types'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 const apiUrl = import.meta.env.VITE_INVENTORY_API_URL
 
 export const api = axios.create({
   baseURL: apiUrl,
-  timeout: 5000,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json"
   }
