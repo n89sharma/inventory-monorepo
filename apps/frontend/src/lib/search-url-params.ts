@@ -10,7 +10,7 @@ const PARAM_WH = 'wh'
 const PARAM_CAS = 'cas'
 const PARAM_FIN = 'fin'
 
-export const MIN_QUERY_LENGTH = 3
+export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 export const INTERNAL_FINISHER_PATTERN = /^[a-zA-Z0-9\s\-_.]*$/
 
 export type SearchFilters = {
@@ -68,7 +68,7 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.model) {
     params.set(PARAM_MODEL, String(filters.model.id))
-  } else if (filters.modelQuery && filters.modelQuery.length >= MIN_QUERY_LENGTH) {
+  } else if (filters.modelQuery && filters.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH) {
     params.set(PARAM_Q, filters.modelQuery)
   }
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
@@ -99,7 +99,7 @@ export function paramsToFilters(
     : null
 
   const qRaw = params.get(PARAM_Q)
-  const modelQuery = !model && qRaw && qRaw.length >= MIN_QUERY_LENGTH ? qRaw : null
+  const modelQuery = !model && qRaw && qRaw.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? qRaw : null
 
   const meterMin = parseNonNegativeNumber(params.get(PARAM_METER_MIN))
   const meterMax = parseNonNegativeNumber(params.get(PARAM_METER_MAX))
