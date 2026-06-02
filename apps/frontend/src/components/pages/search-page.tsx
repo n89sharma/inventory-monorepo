@@ -28,7 +28,7 @@ import { assetSearchColumns } from './column-defs/asset-search-columns'
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
-const DEBOUNCE_MS = 500
+const DEBOUNCE_MS = 600
 const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
 const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
