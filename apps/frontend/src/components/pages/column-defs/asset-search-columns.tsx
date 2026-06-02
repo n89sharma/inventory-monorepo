@@ -65,7 +65,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
       <div className="group flex items-center justify-center gap-1">
         <Link
           to={`/search/${row.original.barcode}`}
-          className="text-primary hover:underline font-medium"
+          className="font-mono text-foreground hover:underline"
         >
           {row.getValue('barcode')}
         </Link>

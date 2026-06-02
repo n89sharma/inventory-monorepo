@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { memo, useState, type CSSProperties } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Table,
@@ -36,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   initialPageSize?: number
   defaultSort?: { id: string; desc: boolean }
   pinLeft?: string[]
+  getRowHref?: (row: TData) => string
 }
 
 function pinStyle<TData>(column: Column<TData>): CSSProperties {
@@ -47,12 +49,26 @@ function pinStyle<TData>(column: Column<TData>): CSSProperties {
   }
 }
 
+const SCROLL_BOX_MAX_HEIGHT =
+  'calc(100vh - var(--app-header-height, 0px) - var(--details-header-height, 0px) - 7rem)'
+
+function headerStickyStyle<TData>(column: Column<TData>): CSSProperties {
+  if (column.getIsPinned() === 'left') {
+    return {
+      position: 'sticky',
+      top: 0,
+      left: column.getStart('left'),
+      zIndex: 11,
+    }
+  }
+  return { position: 'sticky', top: 0, zIndex: 10 }
+}
+
 function pinHeaderClass<TData>(column: Column<TData>): string {
-  if (column.getIsPinned() !== 'left') return ''
-  const shadow = column.getIsLastColumn('left')
+  const shadow = column.getIsPinned() === 'left' && column.getIsLastColumn('left')
     ? 'shadow-[inset_-1px_0_0_var(--border)]'
     : ''
-  return `bg-background ${shadow}`.trim()
+  return `bg-muted ${shadow}`.trim()
 }
 
 function pinCellClass<TData>(column: Column<TData>): string {
@@ -73,6 +89,7 @@ export function DataTable<TData, TValue>({
   initialPageSize = 25,
   defaultSort,
   pinLeft,
+  getRowHref,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
@@ -113,7 +130,10 @@ export function DataTable<TData, TValue>({
   return (
     <div>
 
-      <div className="overflow-x-auto rounded-md border">
+      <div
+        className="overflow-auto rounded-md border"
+        style={{ maxHeight: SCROLL_BOX_MAX_HEIGHT }}
+      >
         <Table className="table-fixed !w-max min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -122,8 +142,8 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      style={{ width: header.getSize(), ...pinStyle(header.column) }}
-                      className={`whitespace-normal text-center ${pinHeaderClass(header.column)}`}
+                      style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
+                      className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -146,6 +166,7 @@ export function DataTable<TData, TValue>({
                     row={row}
                     isSelected={row.getIsSelected()}
                     onRowMouseEnter={onRowMouseEnter}
+                    getRowHref={getRowHref}
                   />
                 )))
               : (
@@ -210,19 +231,29 @@ export function DataTable<TData, TValue>({
 function DataRowImpl<TData>({
   row,
   isSelected,
-  onRowMouseEnter
+  onRowMouseEnter,
+  getRowHref,
 }: {
   row: Row<TData>
   isSelected: boolean
   onRowMouseEnter?: (row: TData) => void
+  getRowHref?: (row: TData) => string
 }) {
+  const navigate = useNavigate()
   return (
     <TableRow
       data-state={isSelected && "selected"}
       className="group/row cursor-pointer"
       onMouseEnter={() => onRowMouseEnter?.(row.original)}
       onClick={(e) => {
-        if (!(e.target as HTMLElement).closest('a, button')) row.toggleSelected()
+        if ((e.target as HTMLElement).closest('a, button, [role=checkbox]')) return
+        if (e.shiftKey || !getRowHref) {
+          row.toggleSelected()
+          return
+        }
+        const href = getRowHref(row.original)
+        if (e.metaKey || e.ctrlKey) window.open(href, '_blank')
+        else navigate(href)
       }}
     >
       {row.getVisibleCells().map((cell) => (

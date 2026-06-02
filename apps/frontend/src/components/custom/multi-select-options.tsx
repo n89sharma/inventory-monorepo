@@ -9,7 +9,7 @@ import {
 import { Field, FieldLabel } from "@/components/shadcn/field"
 import { cn } from "@/lib/utils"
 import { CaretDownIcon } from "@phosphor-icons/react"
-import type React from "react"
+import React from "react"
 
 type MultiSelectMenuProps<T extends { id: number }> = {
   selection: T[]
@@ -17,6 +17,7 @@ type MultiSelectMenuProps<T extends { id: number }> = {
   options: T[]
   getLabel: (entity: T) => string
   trigger: React.ReactNode
+  dividerAfterIds?: number[]
 }
 
 function MultiSelectMenu<T extends { id: number }>({
@@ -25,8 +26,10 @@ function MultiSelectMenu<T extends { id: number }>({
   options,
   getLabel,
   trigger,
+  dividerAfterIds,
 }: MultiSelectMenuProps<T>): React.JSX.Element {
   const allSelected = options.length > 0 && selection.length === options.length
+  const dividerSet = dividerAfterIds ? new Set(dividerAfterIds) : null
 
   function toggle(option: T, checked: boolean) {
     if (checked) onSelectionChange([...selection, option])
@@ -50,14 +53,16 @@ function MultiSelectMenu<T extends { id: number }>({
         </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
         {options.map(option => (
-          <DropdownMenuCheckboxItem
-            key={option.id}
-            checked={selection.some(s => s.id === option.id)}
-            onCheckedChange={checked => toggle(option, checked)}
-            onSelect={e => e.preventDefault()}
-          >
-            {getLabel(option)}
-          </DropdownMenuCheckboxItem>
+          <React.Fragment key={option.id}>
+            <DropdownMenuCheckboxItem
+              checked={selection.some(s => s.id === option.id)}
+              onCheckedChange={checked => toggle(option, checked)}
+              onSelect={e => e.preventDefault()}
+            >
+              {getLabel(option)}
+            </DropdownMenuCheckboxItem>
+            {dividerSet?.has(option.id) && <DropdownMenuSeparator />}
+          </React.Fragment>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -71,6 +76,7 @@ type MultiSelectOptionsProps<T extends { id: number }> = {
   getLabel: (entity: T) => string
   fieldLabel: string
   className?: string
+  dividerAfterIds?: number[]
 }
 
 export function MultiSelectOptions<T extends { id: number }>({
@@ -80,6 +86,7 @@ export function MultiSelectOptions<T extends { id: number }>({
   getLabel,
   fieldLabel,
   className,
+  dividerAfterIds,
 }: MultiSelectOptionsProps<T>): React.JSX.Element {
   const triggerLabel = selection.length === 0 ? 'Any' : `${selection.length} selected`
   return (
@@ -90,6 +97,7 @@ export function MultiSelectOptions<T extends { id: number }>({
         onSelectionChange={onSelectionChange}
         options={options}
         getLabel={getLabel}
+        dividerAfterIds={dividerAfterIds}
         trigger={
           <Button variant="outline" className="w-full justify-between font-normal">
             {triggerLabel}
@@ -108,6 +116,7 @@ export function MultiSelectOptionsInline<T extends { id: number }>({
   getLabel,
   fieldLabel,
   className,
+  dividerAfterIds,
 }: MultiSelectOptionsProps<T>): React.JSX.Element {
   const triggerLabel = selection.length === 0
     ? fieldLabel
@@ -118,6 +127,7 @@ export function MultiSelectOptionsInline<T extends { id: number }>({
       onSelectionChange={onSelectionChange}
       options={options}
       getLabel={getLabel}
+      dividerAfterIds={dividerAfterIds}
       trigger={
         <Button
           variant="outline"

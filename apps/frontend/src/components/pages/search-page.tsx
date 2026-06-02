@@ -28,8 +28,10 @@ import { assetSearchColumns } from './column-defs/asset-search-columns'
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
-const DEBOUNCE_MS = 300
+const DEBOUNCE_MS = 500
 const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
+const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
+const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
 
 const QueryResultsTable = memo(function QueryResultsTable({
   assets,
@@ -74,6 +76,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
         getRowId={getAssetRowId}
         defaultSort={defaultSort}
         pinLeft={PIN_LEFT}
+        getRowHref={a => `/search/${a.barcode}`}
       />
     </>
   )
@@ -88,8 +91,23 @@ export function QueryPage(): React.JSX.Element {
   const models = useModelStore(state => state.models)
   const rawStatuses = useReferenceDataStore(state => state.statuses)
   const allStatuses = useMemo(
-    () => rawStatuses.filter(s => s.status != 'UNKNOWN' && s.status != 'LEASED'), 
+    () => {
+      const filtered = rawStatuses.filter(
+        s => s.status != 'UNKNOWN' && s.status != 'LEASED',
+      )
+      const top: typeof filtered = []
+      for (const key of STATUS_TOP_ORDER) {
+        const found = filtered.find(s => s.status === key)
+        if (found) top.push(found)
+      }
+      const rest = filtered.filter(s => !STATUS_TOP_ORDER.includes(s.status as typeof STATUS_TOP_ORDER[number]))
+      return [...top, ...rest]
+    },
     [rawStatuses]
+  )
+  const statusDividerAfterIds = useMemo(
+    () => allStatuses.filter(s => STATUS_DIVIDER_AFTER.has(s.status)).map(s => s.id),
+    [allStatuses],
   )
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
@@ -247,6 +265,7 @@ export function QueryPage(): React.JSX.Element {
               getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Status'
               className='w-45'
+              dividerAfterIds={statusDividerAfterIds}
             />
 
             <MultiSelectOptionsInline
