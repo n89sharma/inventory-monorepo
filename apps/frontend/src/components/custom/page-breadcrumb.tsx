@@ -78,7 +78,9 @@ export function PageBreadcrumbToTitle(props: PageBreadcrumbProps): React.JSX.Ele
 
 export function getBreadcrumForAssetDetails(
   section: NavigationSection,
-  collectionId: string | null): BreadcrumbSegment[] {
+  collectionId: string | null,
+  backUrl: string | null = null,
+): BreadcrumbSegment[] {
 
   if (isCollection(section)) {
     return [
@@ -90,7 +92,7 @@ export function getBreadcrumForAssetDetails(
   switch (section) {
     case 'search':
       return [
-        { label: 'Search', href: '/search' }
+        { label: 'Search', href: backUrl ?? '/search' }
       ]
     default:
       return [

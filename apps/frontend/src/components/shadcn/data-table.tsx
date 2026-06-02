@@ -7,7 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { memo, useState, type CSSProperties } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import {
   Table,
@@ -240,6 +240,7 @@ function DataRowImpl<TData>({
   getRowHref?: (row: TData) => string
 }) {
   const navigate = useNavigate()
+  const location = useLocation()
   return (
     <TableRow
       data-state={isSelected && "selected"}
@@ -253,7 +254,7 @@ function DataRowImpl<TData>({
         }
         const href = getRowHref(row.original)
         if (e.metaKey || e.ctrlKey) window.open(href, '_blank')
-        else navigate(href)
+        else navigate(href, { state: { from: location.pathname + location.search } })
       }}
     >
       {row.getVisibleCells().map((cell) => (
