@@ -41,6 +41,13 @@ No tests are configured yet.
 1. `mcp__context7__resolve-library-id` → then `mcp__context7__query-docs`
 This applies even for APIs you think you know — library versions change and Context7 reflects current docs.
 
+**Before recommending any NEW library** (one not already in `package.json`), verify it is alive — applies to Claude AND every sub-agent (architect, etc.):
+1. GitHub last commit must be within the last 3 months — check via `https://api.github.com/repos/<owner>/<repo>/commits?per_page=1`
+2. npm last publish must be within the last 3 months — check via `https://registry.npmjs.org/<package>` → `time["<latest>"]`
+3. Recommendation must include: GitHub stars, total commits, first-published year, verified last-commit date, runtime dependency count
+4. Never claim "actively maintained" / "battle-tested" / "recent" without a freshness check performed in the current session. Multi-package monorepos: verify the specific sub-package, not the umbrella repo.
+A stale recommendation is worse than no recommendation.
+
 ### Conditional Rendering Rules
 
 **Binary condition (show or fallback):** Use a Guard Component (`condition: boolean`, `fallback: ReactNode`, `children: ReactNode`). Reference: `apps/frontend/src/components/custom/asset-details/optional-section.tsx`.

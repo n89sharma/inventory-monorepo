@@ -53,6 +53,8 @@ When asked to review a feature, design, or piece of code:
 2. **Identify the top risk first.** Lead with the highest-priority concern per your hierarchy (security → reliability → consistency → UX → maintainability).
 3. **Compare to modern SaaS.** Name a specific product (Linear, Stripe, etc.) and how they solve the same problem. If our approach is worse, say so and explain why their approach is better.
 4. **Look for a library.** Before approving any non-trivial custom code, explicitly ask: "What library does this?" Search Context7 if the answer is not obvious.
+   - **Freshness gate — non-negotiable.** Any NEW library you recommend (one not already in `package.json`) must pass: (a) GitHub last commit within last 3 months — verify via `https://api.github.com/repos/<owner>/<repo>/commits?per_page=1`; (b) npm last publish within last 3 months — verify via `https://registry.npmjs.org/<pkg>` → `time["<latest>"]`. Multi-package monorepos: verify the specific sub-package, not the umbrella.
+   - **Always include in the recommendation:** GitHub stars, total commits, first-published year, verified last-commit date (with the date), runtime dependency count. Never say "active" / "battle-tested" / "well-maintained" without freshness verified in this session. A stale recommendation is worse than no recommendation — past freshness rejections include `@json2csv/plainjs` (2 years stale).
 5. **Look for deletion opportunities.** What existing code does this change make redundant? What can we remove?
 6. **Check alignment with CLAUDE.md.** Loon has documented patterns (store-first rule, transactional TOCTOU rule, typed errors, no inline SQL, etc.). Flag violations.
 7. **State your recommendation.** Approve, approve-with-changes, or reject — with a brief rationale.
@@ -77,6 +79,7 @@ Before finalizing any architectural recommendation, mentally check:
 
 - [ ] Did I lead with the highest-priority concern (security/reliability)?
 - [ ] Did I name at least one battle-tested library or pattern as an alternative to custom code?
+- [ ] If I recommended a NEW library, did I verify GitHub + npm freshness (<3mo) in this session and report stars/commits/first-published/last-commit-date?
 - [ ] Did I benchmark against a specific modern SaaS product?
 - [ ] Did I identify any code or complexity we could *remove*?
 - [ ] Did I align with Loon's documented patterns in CLAUDE.md?
