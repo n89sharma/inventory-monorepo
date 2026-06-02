@@ -15,6 +15,7 @@ import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
+import { generateCsvReport } from './reportService.js'
 
 type LocationRow = {
   warehouse_code: string | null
@@ -169,7 +170,9 @@ export async function getTransfers(barcode: string): Promise<AssetTransfer[]> {
   return prisma.$queryRawTyped(getAssetTransfersQuery(barcode))
 }
 
-function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
+type AssetDetailRow = getAssetDetailsBatchQuery.Result
+
+function mapAssetDetail(r: AssetDetailRow): AssetDetails {
   return {
     id: r.id,
     barcode: r.barcode,
@@ -214,13 +217,13 @@ function mapAssetDetail(r: getAssetDetailsQuery.Result): AssetDetails {
   }
 }
 
-function mapHold(r: getAssetDetailsQuery.Result) {
+function mapHold(r: AssetDetailRow) {
   if (!r.hold_number) return null
   return {
-    created_by: r.hold_by_name,
-    created_for: r.hold_for_name,
+    created_by: r.hold_by_name!,
+    created_for: r.hold_for_name!,
     created_at: r.hold_created_at,
-    customer: r.hold_customer,
+    customer: r.hold_customer!,
     from_dt: r.hold_from,
     to_dt: r.hold_to,
     notes: r.hold_notes,
@@ -228,111 +231,49 @@ function mapHold(r: getAssetDetailsQuery.Result) {
   }
 }
 
-function mapArrival(r: getAssetDetailsQuery.Result) {
+function mapArrival(r: AssetDetailRow) {
   if (!r.arrival_number) return null
   return {
     arrival_number: r.arrival_number,
-    origin: r.arrival_origin,
-    destination_code: r.arrival_destination_city_code,
-    destination_street: r.arrival_destination_street,
-    transporter: r.arrival_transporter,
-    created_by: r.arrival_created_by_name,
+    origin: r.arrival_origin!,
+    destination_code: r.arrival_destination_city_code!,
+    destination_street: r.arrival_destination_street!,
+    transporter: r.arrival_transporter!,
+    created_by: r.arrival_created_by_name!,
     notes: r.arrival_notes,
-    created_at: r.arrival_created_at
+    created_at: r.arrival_created_at!
   }
 }
 
-function mapDeparture(r: getAssetDetailsQuery.Result) {
+function mapDeparture(r: AssetDetailRow) {
   if (!r.departure_number) return null
   return {
     departure_number: r.departure_number,
-    origin_code: r.departure_origin_city_code,
-    origin_street: r.departure_origin_street,
-    destination: r.departure_destination,
-    transporter: r.departure_transporter,
-    created_by: r.departure_created_by_name,
+    origin_code: r.departure_origin_city_code!,
+    origin_street: r.departure_origin_street!,
+    destination: r.departure_destination!,
+    transporter: r.departure_transporter!,
+    created_by: r.departure_created_by_name ?? '',
     notes: r.departure_notes,
-    created_at: r.departure_created_at
+    created_at: r.departure_created_at!
   }
 }
 
-function mapInvoice(r: getAssetDetailsQuery.Result) {
+function mapInvoice(r: AssetDetailRow) {
   if (!r.purchase_invoice_number) return null
   return {
     invoice_number: r.purchase_invoice_number,
-    is_cleared: r.purchase_invoice_is_cleared
+    is_cleared: r.purchase_invoice_is_cleared!
   }
 }
 
-export async function exportAssets(
+export async function exportGeneralReport(
   barcodes: string[],
   role: AppRole | null
 ): Promise<string> {
   const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
-  const details = results.map(r => redactCost(
-    mapAssetDetail(r as unknown as getAssetDetailsQuery.Result),
-    role
-  ))
-  return generateCsv(details)
-}
-
-function escapeCSV(val: unknown): string {
-  if (val === null || val === undefined) return ''
-  const str = val instanceof Date ? val.toISOString() : String(val)
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    return `"${str.replace(/"/g, '""')}"`
-  }
-  return str
-}
-
-const CSV_HEADERS = [
-  'barcode', 'serial_number', 'model', 'brand', 'asset_type',
-  'status', 'readiness',
-  'warehouse_code', 'warehouse_street', 'zone', 'bin', 'created_at', 'country_of_origin',
-  'cost_purchase_cost', 'cost_transport_cost', 'cost_processing_cost',
-  'cost_other_cost', 'cost_parts_cost', 'cost_total_cost', 'cost_sale_price',
-  'specs_cassettes', 'specs_internal_finisher', 'specs_meter_black',
-  'specs_meter_colour', 'specs_meter_total', 'specs_drum_life_c',
-  'specs_drum_life_m', 'specs_drum_life_y', 'specs_drum_life_k',
-  'specs_toner_life_c', 'specs_toner_life_m', 'specs_toner_life_y', 'specs_toner_life_k',
-  'hold_created_by', 'hold_created_for', 'hold_created_at', 'hold_customer',
-  'hold_from_dt', 'hold_to_dt', 'hold_notes', 'hold_hold_number',
-  'arrival_arrival_number', 'arrival_origin', 'arrival_destination_code',
-  'arrival_destination_street', 'arrival_transporter', 'arrival_created_by',
-  'arrival_notes', 'arrival_created_at', 'departure_departure_number',
-  'departure_origin_code', 'departure_origin_street', 'departure_destination',
-  'departure_transporter', 'departure_created_by', 'departure_notes',
-  'departure_created_at', 'purchase_invoice_invoice_number', 'purchase_invoice_is_cleared',
-]
-
-function generateCsv(assets: AssetDetails[]): string {
-  const rows = assets.map(a => [
-    a.barcode, a.serial_number, a.model, a.brand, a.asset_type,
-    a.status, a.readiness,
-    a.location?.warehouse_code ?? null,
-    a.location?.warehouse_street ?? null,
-    a.location?.zone ?? null,
-    a.location?.bin ?? null,
-    a.created_at,
-    a.country_of_origin,
-    a.cost.purchase_cost, a.cost.transport_cost, a.cost.processing_cost,
-    a.cost.other_cost, a.cost.parts_cost, a.cost.total_cost, a.cost.sale_price,
-    a.specs.cassettes, a.specs.internal_finisher, a.specs.meter_black,
-    a.specs.meter_colour, a.specs.meter_total, a.specs.drum_life_c,
-    a.specs.drum_life_m, a.specs.drum_life_y, a.specs.drum_life_k,
-    a.specs.toner_life_c, a.specs.toner_life_m, a.specs.toner_life_y, a.specs.toner_life_k,
-    a.hold?.created_by, a.hold?.created_for, a.hold?.created_at,
-    a.hold?.customer, a.hold?.from_dt, a.hold?.to_dt,
-    a.hold?.notes, a.hold?.hold_number,
-    a.arrival?.arrival_number, a.arrival?.origin, a.arrival?.destination_code,
-    a.arrival?.destination_street, a.arrival?.transporter, a.arrival?.created_by,
-    a.arrival?.notes, a.arrival?.created_at, a.departure?.departure_number,
-    a.departure?.origin_code, a.departure?.origin_street, a.departure?.destination,
-    a.departure?.transporter, a.departure?.created_by, a.departure?.notes,
-    a.departure?.created_at, a.purchase_invoice?.invoice_number,
-    a.purchase_invoice?.is_cleared,
-  ].map(escapeCSV))
-  return [CSV_HEADERS.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const details = results.map(r => mapAssetDetail(r))
+  return generateCsvReport('general_report', details, role)
 }
 
 export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<void> {

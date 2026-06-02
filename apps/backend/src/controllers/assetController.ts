@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetSummary, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, BarcodeSuggestion, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -7,7 +7,10 @@ import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import {
-  getAssets as getAssetsSer,
+  bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
+  createComment as createCommentSer,
+  createPartTransfer as createPartTransferSer,
+  exportGeneralReport as exportGeneralReportSer,
   getAccessories as getAssetAccessoriesSer,
   getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
@@ -15,16 +18,13 @@ import {
   getAssetHistory as getAssetHistorySer,
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
-  createComment as createCommentSer,
-  createPartTransfer as createPartTransferSer,
-  exportAssets as exportAssetsSer,
+  getAssets as getAssetsSer,
+  getLocationsByWarehouse as getLocationsByWarehouseSer,
+  mapAssetSummary,
   updateAssetErrors as updateAssetErrorsSer,
   updateAssetLocation as updateAssetLocationSer,
   updateAssetPricing as updateAssetPricingSer,
-  bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
-  updateAssetSpecs as updateAssetSpecsSer,
-  getLocationsByWarehouse as getLocationsByWarehouseSer,
-  mapAssetSummary
+  updateAssetSpecs as updateAssetSpecsSer
 } from '../services/assetService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
@@ -173,9 +173,9 @@ export const ExportAssetsSchema = z.object({
   barcodes: z.array(z.string()).min(1).max(2000)
 })
 
-export const exportAssets = asyncHandler(async (req, res) => {
+export const exportGeneralReport = asyncHandler(async (req, res) => {
   const { barcodes } = ExportAssetsSchema.parse(req.body)
-  const csv = await exportAssetsSer(barcodes, res.locals.dbUserRole)
+  const csv = await exportGeneralReportSer(barcodes, res.locals.dbUserRole)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
