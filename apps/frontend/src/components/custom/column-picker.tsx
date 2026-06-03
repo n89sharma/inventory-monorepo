@@ -3,7 +3,6 @@ import { Checkbox } from '@/components/shadcn/checkbox'
 import { Input } from '@/components/shadcn/input'
 import {
   COLUMN_SECTIONS,
-  PICKABLE_COLUMNS,
   type PickableColumn,
 } from '@/lib/asset-column-sections'
 import { cn } from '@/lib/utils'
@@ -18,6 +17,7 @@ type ColumnPickerProps = {
   visibleColSet: Set<string>
   onVisibleChange: (next: Set<string>) => void
   onReset: () => void
+  columns: readonly PickableColumn[]
 }
 
 function matchesQuery(column: PickableColumn, query: string): boolean {
@@ -126,19 +126,20 @@ export function ColumnPicker({
   visibleColSet,
   onVisibleChange,
   onReset,
+  columns: allColumns,
 }: ColumnPickerProps): React.JSX.Element {
   const [query, setQuery] = useState('')
 
   const groupedSections = useMemo(
     () => COLUMN_SECTIONS.map(section => {
-      const columns = PICKABLE_COLUMNS.filter(
+      const columns = allColumns.filter(
         c => c.section === section.id && matchesQuery(c, query),
       )
       const enabled = columns.filter(c => !c.disabled)
       const visibleEnabled = enabled.filter(c => visibleColSet.has(c.id))
       return { section, columns, enabled, visibleEnabled }
     }).filter(g => g.columns.length > 0),
-    [query, visibleColSet],
+    [query, visibleColSet, allColumns],
   )
 
   const hasAnyMatch = groupedSections.length > 0

@@ -67,26 +67,89 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
   }
 }
 
-type AssetSearchRowDb = AssetSummaryRow & {
-  cassettes: number | null
-  internal_finisher: string | null
-  hold_number: string | null
+type AssetSearchRowDb = LocationRow & {
+  id: number
+  barcode: string
+  brand: string
+  model: string
+  asset_type: string
+  serial_number: string
+  status: string
+  readiness: string
+  is_in_transit: boolean
+  country_of_origin: string | null
+  specs_meter_total: number | null
+  specs_cassettes: number | null
+  specs_internal_finisher: string | null
+  specs_toner_life_c: number | null
+  specs_toner_life_m: number | null
+  specs_toner_life_y: number | null
+  specs_toner_life_k: number | null
+  cost_purchase_cost: Prisma.Decimal | null
+  cost_total_cost: Prisma.Decimal | null
+  cost_sale_price: Prisma.Decimal | null
+  hold_hold_number: string | null
   held_by: string | null
+  vendor: string | null
+  customer: string | null
+  departed_at: Date | null
+  purchase_invoice_invoice_number: string | null
   latest_comment: string | null
   latest_comment_by: string | null
   latest_comment_at: Date | null
 }
 
+function decimalToNumber(d: Prisma.Decimal | null): number | null {
+  return d === null ? null : d.toNumber()
+}
+
 function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
   return {
-    ...mapAssetSummary(r),
-    cassettes: r.cassettes,
-    internal_finisher: r.internal_finisher,
-    hold_number: r.hold_number,
+    id: r.id,
+    barcode: r.barcode,
+    brand: r.brand,
+    model: r.model,
+    asset_type: r.asset_type,
+    serial_number: r.serial_number,
+    status: r.status,
+    readiness: r.readiness,
+    location: buildLocation(r),
+    is_in_transit: r.is_in_transit,
+    country_of_origin: r.country_of_origin,
+    specs_meter_total: r.specs_meter_total,
+    specs_cassettes: r.specs_cassettes,
+    specs_internal_finisher: r.specs_internal_finisher,
+    specs_toner_life_c: r.specs_toner_life_c,
+    specs_toner_life_m: r.specs_toner_life_m,
+    specs_toner_life_y: r.specs_toner_life_y,
+    specs_toner_life_k: r.specs_toner_life_k,
+    cost_purchase_cost: decimalToNumber(r.cost_purchase_cost),
+    cost_total_cost: decimalToNumber(r.cost_total_cost),
+    cost_sale_price: decimalToNumber(r.cost_sale_price),
+    hold_hold_number: r.hold_hold_number,
     held_by: r.held_by,
+    vendor: r.vendor,
+    customer: r.customer,
+    departed_at: r.departed_at,
+    purchase_invoice_invoice_number: r.purchase_invoice_invoice_number,
     latest_comment: r.latest_comment,
     latest_comment_by: r.latest_comment_by,
     latest_comment_at: r.latest_comment_at,
+  }
+}
+
+function redactSearchRowCost(
+  row: AssetSearchRow,
+  role: AppRole | null,
+): AssetSearchRow {
+  const permissions = role ? ROLE_PERMISSIONS[role] : []
+  const canViewPurchase = permissions.includes('view_purchase_price')
+  const canViewSale = permissions.includes('view_sale_price')
+  return {
+    ...row,
+    cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
+    cost_total_cost: canViewPurchase ? row.cost_total_cost : null,
+    cost_sale_price: canViewSale ? row.cost_sale_price : null,
   }
 }
 
@@ -98,7 +161,8 @@ export async function getAssets(
   meterMinParam: number,
   meterMaxParam: number,
   cassettesParam: number,
-  internalFinisherParam: string
+  internalFinisherParam: string,
+  role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
     getAssetsQuery(
@@ -112,7 +176,7 @@ export async function getAssets(
       internalFinisherParam,
     )
   )
-  return rows.map(mapAssetSearchRow)
+  return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
 }
 
 export async function getAssetDetail(

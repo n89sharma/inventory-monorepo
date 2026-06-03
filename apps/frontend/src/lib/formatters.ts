@@ -12,7 +12,7 @@ export function formatLocation(location: AssetLocationDetails | null): string {
 }
 
 export function formatThousandsK(value: number | null): string {
-  if (value === null) return ''
+  if (value === null || value === undefined || Number.isNaN(value)) return ''
   if (value < 1000) return value.toString()
   return (value / 1000).toFixed(0) + " K"
 }
@@ -34,11 +34,13 @@ export function formatSentenceCase(str: string): string {
     .replace(/\b\w/g, c => c.toUpperCase())
 }
 
-export function formatDateWithTime(rawDate: Date): string {
+export function formatDateWithTime(rawDate: Date | null): string {
+  if (rawDate === null) return ''
   return format(rawDate, 'MMMM dd, yyyy, h:mm a')
 }
 
-export function formatDate(rawDate: Date): string {
+export function formatDate(rawDate: Date | null): string {
+  if (rawDate === null) return ''
   return format(rawDate, 'MMMM dd, yyyy')
 }
 

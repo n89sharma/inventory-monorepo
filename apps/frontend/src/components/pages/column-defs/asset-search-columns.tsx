@@ -3,7 +3,7 @@ import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip"
-import { formatLocation, formatThousandsK } from "@/lib/formatters"
+import { formatDate, formatLocation, formatThousandsK, formatUSD } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
@@ -58,7 +58,6 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     enableHiding: false,
   },
   {
-    id: "barcode",
     accessorKey: "barcode",
     header: "Barcode",
     cell: ({ row }) => (
@@ -72,30 +71,31 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 120
   },
   {
-    id: "brand",
     accessorKey: "brand",
     header: "Brand",
     size: 80
   },
   {
-    id: "model",
     accessorKey: "model",
     header: "Model",
     size: 100
   },
   {
-    id: "serial_number",
+    accessorKey: "asset_type",
+    header: "Asset Type",
+    size: 100
+  },
+  {
     accessorKey: "serial_number",
     header: "Serial Number",
     size: 100
   },
   {
-    id: "status",
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { status, held_by, hold_number } = row.original
-      if (status !== HELD_STATUS || !held_by || !hold_number) {
+      const { status, held_by, hold_hold_number } = row.original
+      if (status !== HELD_STATUS || !held_by || !hold_hold_number) {
         return <StatusBadge status={status} />
       }
       return (
@@ -106,7 +106,7 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
             </span>
           </TooltipTrigger>
           <TooltipContent>
-            Held by {held_by} ({hold_number})
+            Held by {held_by} ({hold_hold_number})
           </TooltipContent>
         </Tooltip>
       )
@@ -114,7 +114,6 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 80
   },
   {
-    id: "readiness",
     accessorKey: "readiness",
     header: ({ column }) => (
       <SortableHeader
@@ -126,45 +125,170 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     size: 80
   },
   {
-    id: "specs_meter_total",
-    accessorKey: "meter_total",
+    id: "location",
+    header: "Location",
+    cell: ({ row }) => formatLocation(row.original.location)
+  },
+  {
+    accessorKey: "country_of_origin",
+    header: "Country of Origin",
+    cell: ({ row }) => row.original.country_of_origin ?? '',
+    size: 100
+  },
+  {
+    accessorKey: "specs_meter_total",
     header: ({ column }) => (
       <SortableHeader
         label="Total Meter"
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => formatThousandsK(row.getValue('specs_meter_total')),
+    cell: ({ row }) => formatThousandsK(row.original.specs_meter_total),
     size: 80
   },
   {
-    id: "specs_cassettes",
-    accessorKey: "cassettes",
+    accessorKey: "specs_cassettes",
     header: ({ column }) => (
       <SortableHeader
         label="Cassettes"
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => row.original.cassettes ?? '',
+    cell: ({ row }) => row.original.specs_cassettes ?? '',
     size: 80
   },
   {
-    id: "specs_internal_finisher",
-    accessorKey: "internal_finisher",
+    accessorKey: "specs_internal_finisher",
     header: ({ column }) => (
       <SortableHeader
         label="Internal Finisher"
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => row.original.internal_finisher ?? '',
+    cell: ({ row }) => row.original.specs_internal_finisher ?? '',
     size: 80
   },
   {
-    id: "location",
-    header: "Location",
-    cell: ({ row }) => formatLocation(row.original.location)
+    accessorKey: "specs_toner_life_c",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Toner Life C"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.specs_toner_life_c ?? '',
+    size: 80
+  },
+  {
+    accessorKey: "specs_toner_life_m",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Toner Life M"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.specs_toner_life_m ?? '',
+    size: 80
+  },
+  {
+    accessorKey: "specs_toner_life_y",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Toner Life Y"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.specs_toner_life_y ?? '',
+    size: 80
+  },
+  {
+    accessorKey: "specs_toner_life_k",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Toner Life K"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.specs_toner_life_k ?? '',
+    size: 80
+  },
+  {
+    accessorKey: "cost_purchase_cost",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Purchase Cost"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatUSD(row.original.cost_purchase_cost),
+    size: 90
+  },
+  {
+    accessorKey: "cost_total_cost",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Total Cost"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatUSD(row.original.cost_total_cost),
+    size: 90
+  },
+  {
+    accessorKey: "cost_sale_price",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Sale Price"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatUSD(row.original.cost_sale_price),
+    size: 90
+  },
+  {
+    accessorKey: "hold_hold_number",
+    header: "Hold #",
+    cell: ({ row }) => row.original.hold_hold_number ?? '',
+    size: 100
+  },
+  {
+    accessorKey: "vendor",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Vendor"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.vendor ?? '',
+    size: 120
+  },
+  {
+    accessorKey: "customer",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Customer"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.customer ?? '',
+    size: 120
+  },
+  {
+    accessorKey: "departed_at",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Departed At"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatDate(row.original.departed_at),
+    size: 100
+  },
+  {
+    accessorKey: "purchase_invoice_invoice_number",
+    header: "Invoice #",
+    cell: ({ row }) => row.original.purchase_invoice_invoice_number ?? '',
+    size: 100
   },
   {
     id: "latest_comment",

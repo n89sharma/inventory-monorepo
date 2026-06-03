@@ -61,7 +61,8 @@ export const getAssets = asyncHandler(async (req, res) => {
     isNaN(meterMin) ? -1 : meterMin,
     isNaN(meterMax) ? -1 : meterMax,
     isNaN(cassettes) ? -1 : cassettes,
-    internalFinisher ?? ''
+    internalFinisher ?? '',
+    res.locals.dbUserRole,
   )
   res.json(successResponse(data))
 })

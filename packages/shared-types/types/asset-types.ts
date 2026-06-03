@@ -12,13 +12,18 @@ export const AssetLocationDetailsSchema = z.object({
 
 export type AssetLocationDetails = z.infer<typeof AssetLocationDetailsSchema>
 
-export const AssetSummarySchema = z.object({
+export const AssetIdentitySchema = z.object({
   id: z.number(),
   barcode: z.string(),
   brand: z.string(),
   model: z.string(),
   asset_type: z.string(),
   serial_number: z.string(),
+})
+
+export type AssetIdentity = z.infer<typeof AssetIdentitySchema>
+
+export const AssetSummarySchema = AssetIdentitySchema.extend({
   meter_total: z.number().nullable(),
   status: z.string(),
   readiness: z.string(),
@@ -30,11 +35,31 @@ export const AssetSummarySchema = z.object({
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
 
-export const AssetSearchRowSchema = AssetSummarySchema.extend({
-  cassettes: z.number().nullable(),
-  internal_finisher: z.string().nullable(),
-  hold_number: z.string().nullable(),
+// Identity fields intentionally duplicated from AssetIdentitySchema — not extended.
+// AssetSearchRow is its own contract sized for the global Search results table.
+export const AssetSearchRowSchema = z.object({
+  ...AssetIdentitySchema.shape,
+  status: z.string(),
+  readiness: z.string(),
+  location: AssetLocationDetailsSchema.nullable(),
+  is_in_transit: z.boolean(),
+  country_of_origin: z.string().nullable(),
+  specs_meter_total: z.number().nullable(),
+  specs_cassettes: z.number().nullable(),
+  specs_internal_finisher: z.string().nullable(),
+  specs_toner_life_c: z.number().nullable(),
+  specs_toner_life_m: z.number().nullable(),
+  specs_toner_life_y: z.number().nullable(),
+  specs_toner_life_k: z.number().nullable(),
+  cost_purchase_cost: z.number().nullable(),
+  cost_total_cost: z.number().nullable(),
+  cost_sale_price: z.number().nullable(),
+  hold_hold_number: z.string().nullable(),
   held_by: z.string().nullable(),
+  vendor: z.string().nullable(),
+  customer: z.string().nullable(),
+  departed_at: z.coerce.date().nullable(),
+  purchase_invoice_invoice_number: z.string().nullable(),
   latest_comment: z.string().nullable(),
   latest_comment_by: z.string().nullable(),
   latest_comment_at: z.coerce.date().nullable(),

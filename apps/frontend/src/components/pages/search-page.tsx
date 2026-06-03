@@ -7,7 +7,6 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchResults } from '@/hooks/use-search-results'
 import {
   DEFAULT_VISIBLE_COLUMN_IDS,
-  ENABLED_PICKABLE_COUNT,
   PICKABLE_COLUMNS,
 } from '@/lib/asset-column-sections'
 import { formatSentenceCase } from '@/lib/formatters'
@@ -20,7 +19,7 @@ import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { AssetSearchRow } from 'shared-types'
+import type { AssetSearchRow, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { BulkEditBar } from '../custom/bulk-edit-bar'
 import { ColumnPickerButton } from '../custom/column-picker-button'
@@ -32,6 +31,24 @@ import { DataTable } from "../shadcn/data-table"
 import { assetSearchColumns } from './column-defs/asset-search-columns'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
+
+function toAssetSummary(r: AssetSearchRow): AssetSummary {
+  return {
+    id: r.id,
+    barcode: r.barcode,
+    brand: r.brand,
+    model: r.model,
+    asset_type: r.asset_type,
+    serial_number: r.serial_number,
+    meter_total: r.specs_meter_total,
+    status: r.status,
+    readiness: r.readiness,
+    location: r.location,
+    hold_number: r.hold_hold_number,
+    purchase_invoice_number: r.purchase_invoice_invoice_number,
+    is_in_transit: r.is_in_transit,
+  }
+}
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 600
@@ -59,7 +76,9 @@ const QueryResultsTable = memo(function QueryResultsTable({
     onRowSelectionChange({})
   }
 
-  const selectedAssets = assets.filter(a => rowSelection[a.barcode])
+  const selectedAssets: AssetSummary[] = assets
+    .filter(a => rowSelection[a.barcode])
+    .map(toAssetSummary)
 
   function selectAllAssets() {
     const all: RowSelectionState = {}
@@ -247,7 +266,6 @@ export function QueryPage(): React.JSX.Element {
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}
               onReset={() => setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMN_IDS))}
-              totalPickable={ENABLED_PICKABLE_COUNT}
             />
             <Button
               variant="outline"
