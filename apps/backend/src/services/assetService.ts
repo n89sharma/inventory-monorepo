@@ -244,6 +244,7 @@ function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     barcode: r.barcode,
     serial_number: r.serial_number,
     model: r.model,
+    is_colour: r.is_colour,
     brand: r.brand,
     asset_type: r.asset_type,
     status: r.status,
@@ -725,6 +726,7 @@ export async function updateAssetSpecs(
       id: true,
       readiness_id: true,
       country_of_origin_id: true,
+      manufactured_year: true,
       technical_specification: {
         select: {
           cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true,
@@ -749,6 +751,7 @@ export async function updateAssetSpecs(
       data: {
         readiness_id: data.readiness_id,
         country_of_origin_id: data.country_of_origin_id,
+        manufactured_year: data.manufactured_year,
       }
     }),
     prisma.technicalSpecification.upsert({
@@ -777,6 +780,7 @@ export async function updateAssetSpecs(
   await recordAssetUpdate(asset.id, {
     readiness_id: asset.readiness_id,
     country_of_origin_id: asset.country_of_origin_id,
+    manufactured_year: asset.manufactured_year,
     cassettes: asset.technical_specification?.cassettes,
     internal_finisher: asset.technical_specification?.internal_finisher,
     meter_black: asset.technical_specification?.meter_black,
@@ -793,6 +797,7 @@ export async function updateAssetSpecs(
   }, {
     readiness_id: data.readiness_id,
     country_of_origin_id: data.country_of_origin_id,
+    manufactured_year: data.manufactured_year,
     cassettes: data.cassettes, internal_finisher: data.internal_finisher,
     meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
     drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,

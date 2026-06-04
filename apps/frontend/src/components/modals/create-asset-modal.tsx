@@ -1,7 +1,5 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { formatSentenceCase } from '@/lib/formatters'
-import { cn } from '@/lib/utils'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,18 +8,14 @@ import {
   Controller,
   useForm,
   useWatch,
-  type Control,
-  type Path,
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
-import type { CoreFunction, Country, ModelSummary, Status } from 'shared-types'
+import type { ModelSummary, Status } from 'shared-types'
 import { AssetErrorsEditor } from '../custom/asset-errors-editor'
-import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from '../custom/consumables-grid'
 import { HorizontalField } from '../custom/horizontal-field'
-import { InputWithClearInline } from '../custom/input-with-clear'
 import { PopoverSearchInline } from '../custom/popover-search'
-import { ReadinessPicker } from '../custom/readiness-picker'
+import { ControlledTextInput, INPUT_WIDTH, TechnicalSpecsFields } from '../custom/technical-specs-fields'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
 import {
@@ -31,120 +25,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../shadcn/dialog'
-import { Input } from '../shadcn/input'
-import MultipleSelector from '../shadcn/multiple-selector'
 import { Textarea } from '../shadcn/textarea'
 
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
-
-type CMYKFieldNames = {
-  c: Path<AssetForm>
-  m: Path<AssetForm>
-  y: Path<AssetForm>
-  k: Path<AssetForm>
-}
-
-const CMYK_LETTERS: Array<'C' | 'M' | 'Y' | 'K'> = ['C', 'M', 'Y', 'K']
-
-function ControlledConsumablesRow(
-  {
-    label,
-    control,
-    names,
-  }: {
-    label: string
-    control: Control<AssetForm>
-    names: CMYKFieldNames
-  }
-) {
-  const orderedNames = [names.c, names.m, names.y, names.k]
-  return (
-    <ConsumablesRow label={label}>
-      {orderedNames.map((fieldName, i) => (
-        <Controller
-          key={fieldName}
-          control={control}
-          name={fieldName}
-          render={({ field, fieldState }) => (
-            <ConsumablesCell
-              value={field.value as number | null}
-              onChange={field.onChange}
-              invalid={fieldState.invalid}
-              ariaLabel={`${label} ${CMYK_LETTERS[i]}`}
-            />
-          )}
-        />
-      ))}
-    </ConsumablesRow>
-  )
-}
-
-function ControlledTextInput(
-  {
-    control,
-    name,
-    placeholder,
-    className,
-  }: {
-    control: Control<AssetForm>
-    name: Path<AssetForm>
-    placeholder?: string
-    className?: string
-  }
-) {
-  return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field, fieldState }) => (
-        <Input
-          value={(field.value as string) ?? ''}
-          onChange={e => field.onChange(e.target.value)}
-          placeholder={placeholder ?? ''}
-          aria-invalid={fieldState.invalid}
-          className={className}
-        />
-      )}
-    />
-  )
-}
-
-function ControlledNumberInput(
-  {
-    control,
-    name,
-    className,
-  }: {
-    control: Control<AssetForm>
-    name: Path<AssetForm>
-    className?: string
-  }
-) {
-  return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field, fieldState }) => (
-        <Input
-          type='number'
-          inputMode='numeric'
-          min={0}
-          value={(field.value as number | null) ?? ''}
-          onChange={e => {
-            const raw = e.target.value
-            if (raw === '') return field.onChange(null)
-            const n = Number(raw)
-            if (isNaN(n)) return field.onChange(null)
-            field.onChange(Math.max(0, n))
-          }}
-          placeholder=''
-          aria-invalid={fieldState.invalid}
-          className={cn('tabular-nums', className)}
-        />
-      )}
-    />
-  )
-}
 
 interface AssetModalProps {
   open: boolean
@@ -182,8 +65,6 @@ export function AssetModal({
   const isDirty = newAssetForm.formState.isDirty
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
   const readinesses = useReferenceDataStore(state => state.readinesses)
-  const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
-  const countries = useReferenceDataStore(state => state.countries)
   const brands = useReferenceDataStore(state => state.brands)
   const models = useModelStore(state => state.models)
 
@@ -232,10 +113,6 @@ export function AssetModal({
     }
     prevBrandRef.current = currentBrandName
   }, [currentBrandName, newAssetForm])
-
-  function getCoreFunctionOptions(cfs: CoreFunction[]) {
-    return cfs.map(f => ({ id: f.id, label: f.accessory, value: f.accessory }))
-  }
 
   function getDefaultNewAsset(allReadinesses: Status[] = []) {
     const untested = allReadinesses.find(r => r.status === 'UNTESTED')
@@ -355,6 +232,7 @@ export function AssetModal({
                     fieldRequired={true}
                     placeholder=''
                     error={fieldState.invalid}
+                    className={INPUT_WIDTH}
                   />
                 )}
               />
@@ -363,153 +241,33 @@ export function AssetModal({
               <ControlledTextInput
                 control={newAssetForm.control}
                 name='serialNumber'
-                className='max-w-[200px]'
-              />
-            </HorizontalField>
-            <HorizontalField label='Readiness' required>
-              <Controller
-                control={newAssetForm.control}
-                name='readiness'
-                render={({ field: { onChange, value }, fieldState }) => (
-                  <ReadinessPicker
-                    selection={isSelected(value) ? value.selected : null}
-                    onChange={s => onChange(s ? getSelectOption(s) : UNSELECTED)}
-                    options={readinesses}
-                    error={fieldState.invalid}
-                  />
-                )}
-              />
-            </HorizontalField>
-            <HorizontalField label='Errors' required={isHasErrors}>
-              <Controller
-                control={newAssetForm.control}
-                name='errors'
-                render={({ field, fieldState }) => (
-                  <AssetErrorsEditor
-                    value={field.value}
-                    onChange={field.onChange}
-                    brandId={brandId}
-                    disabled={!isHasErrors}
-                    invalid={fieldState.invalid}
-                    renderSearch={slot => <PopoverSearchInline {...slot} fieldLabel="" />}
-                  />
-                )}
-              />
-            </HorizontalField>
-            <HorizontalField label='Country of Origin' required>
-              <Controller
-                control={newAssetForm.control}
-                name='countryOfOrigin'
-                render={({ field, fieldState }) => (
-                  <PopoverSearchInline
-                    selection={field.value as Country | null}
-                    onSelectionChange={field.onChange}
-                    onClear={() => field.onChange(null)}
-                    options={countries}
-                    searchKey='name'
-                    getLabel={(c: Country) => formatSentenceCase(c.name)}
-                    fieldLabel='Country of Origin'
-                    fieldRequired={true}
-                    placeholder=''
-                    error={fieldState.invalid}
-                  />
-                )}
-              />
-            </HorizontalField>
-            <HorizontalField label='Manufactured Year'>
-              <ControlledNumberInput
-                control={newAssetForm.control}
-                name='manufacturedYear'
-                className='max-w-[100px]'
+                className={INPUT_WIDTH}
               />
             </HorizontalField>
           </div>
 
-          <HorizontalField label='Meter' required>
-            <div className='flex items-center gap-2'>
-              <Controller
-                control={newAssetForm.control}
-                name='meterColour'
-                render={({ field, fieldState }) => (
-                  <InputWithClearInline
-                    value={field.value}
-                    onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
-                    fieldLabel=''
-                    inputType='number'
-                    suffix='C'
-                    error={fieldState.invalid}
-                    className='w-42'
-                  />
-                )}
-              />
-              <Controller
-                control={newAssetForm.control}
-                name='meterBlack'
-                render={({ field, fieldState }) => (
-                  <InputWithClearInline
-                    value={field.value}
-                    onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
-                    fieldLabel=''
-                    inputType='number'
-                    suffix='B'
-                    error={fieldState.invalid}
-                    className='w-42'
-                  />
-                )}
-              />
-            </div>
-          </HorizontalField>
-
-          <ConsumablesGrid requiredChannels={isColourModel ? ['C', 'M', 'Y', 'K'] : ['K']}>
-            <ControlledConsumablesRow
-              label='Drum life'
-              control={newAssetForm.control}
-              names={{ c: 'drumLifeC', m: 'drumLifeM', y: 'drumLifeY', k: 'drumLifeK' }}
-            />
-            <ControlledConsumablesRow
-              label='Toner'
-              control={newAssetForm.control}
-              names={{ c: 'tonerLifeC', m: 'tonerLifeM', y: 'tonerLifeY', k: 'tonerLifeK' }}
-            />
-          </ConsumablesGrid>
-
-          <div className='flex flex-col gap-2'>
-            <HorizontalField label='Cassettes' required>
-              <ControlledNumberInput
-                control={newAssetForm.control}
-                name='cassettes'
-                className='max-w-[100px]'
-              />
-            </HorizontalField>
-            <HorizontalField label='Internal Finisher'>
-              <ControlledTextInput
-                control={newAssetForm.control}
-                name='internalFinisher'
-                className='max-w-[140px]'
-              />
-            </HorizontalField>
-            <HorizontalField label='Core Functions'>
-              <Controller
-                name='coreFunctions'
-                control={newAssetForm.control}
-                render={({ field: { onChange, value } }) => (
-                  <MultipleSelector
-                    options={getCoreFunctionOptions(coreFunctions)}
-                    placeholder='Select functions…'
-                    emptyIndicator={<p>No results found.</p>}
-                    value={getCoreFunctionOptions(value)}
-                    onChange={options =>
-                      onChange(
-                        coreFunctions.filter(c =>
-                          options.map(o => o.id).includes(c.id),
-                        ),
-                      )
-                    }
-                  />
-                )}
-              />
-            </HorizontalField>
-          </div>
+          <TechnicalSpecsFields
+            control={newAssetForm.control}
+            isColour={isColourModel}
+            renderAfterReadiness={
+              <HorizontalField label='Errors' required={isHasErrors}>
+                <Controller
+                  control={newAssetForm.control}
+                  name='errors'
+                  render={({ field, fieldState }) => (
+                    <AssetErrorsEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      brandId={brandId}
+                      disabled={!isHasErrors}
+                      invalid={fieldState.invalid}
+                      renderSearch={slot => <PopoverSearchInline {...slot} fieldLabel="" className={INPUT_WIDTH} />}
+                    />
+                  )}
+                />
+              </HorizontalField>
+            }
+          />
 
           <HorizontalField label='Comment'>
             <Controller

@@ -3,6 +3,7 @@ select
   a.barcode as barcode,
   a.serial_number as serial_number,
   m."name" as model,
+  m.is_colour as is_colour,
   b."name" as brand,
   at.asset_type as asset_type,
   s.status  as status,
