@@ -205,6 +205,7 @@ export function AssetModal({
     ? readinessSelection.selected.status
     : null
   const currentBrandName = modelSelection?.brand_name ?? null
+  const isColourModel = modelSelection?.is_colour ?? false
   const brandId = currentBrandName
     ? brands.find(b => b.name === currentBrandName)?.id ?? null
     : null
@@ -459,7 +460,7 @@ export function AssetModal({
             </div>
           </HorizontalField>
 
-          <ConsumablesGrid requiredChannels={['K']}>
+          <ConsumablesGrid requiredChannels={isColourModel ? ['C', 'M', 'Y', 'K'] : ['K']}>
             <ControlledConsumablesRow
               label='Drum life'
               control={newAssetForm.control}

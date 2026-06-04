@@ -6,6 +6,17 @@ import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const CURRENT_YEAR = new Date().getFullYear()
 
+// Colour models require the C/M/Y channels for both drum life and toner; K is
+// always required (enforced inline on the field). Mono models require K only.
+const COLOUR_REQUIRED_CHANNELS = [
+  { field: 'drumLifeC', label: 'Drum life C' },
+  { field: 'drumLifeM', label: 'Drum life M' },
+  { field: 'drumLifeY', label: 'Drum life Y' },
+  { field: 'tonerLifeC', label: 'Toner life C' },
+  { field: 'tonerLifeM', label: 'Toner life M' },
+  { field: 'tonerLifeY', label: 'Toner life Y' },
+] as const
+
 // Asset Modal within Edit or Create Asset
 export const AssetFormSchema = z.object({
   id: z.number().optional(),
@@ -46,6 +57,18 @@ export const AssetFormSchema = z.object({
       path: ['errors'],
       message: 'Add at least one error'
     })
+  }
+
+  if (val.model?.is_colour) {
+    for (const { field, label } of COLOUR_REQUIRED_CHANNELS) {
+      if (val[field] == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [field],
+          message: `${label} required`
+        })
+      }
+    }
   }
 })
 

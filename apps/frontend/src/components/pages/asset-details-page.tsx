@@ -293,16 +293,21 @@ export const AssetDetailsPage = () => {
                   <DataRow label="Readiness" rowClassName={ROW_GAP}>
                     <ReadinessPill status={assetDetails.readiness} />
                   </DataRow>
+                  <DataValueRow label="Total Meter" value={formatThousandsK(specs.meter_total)} rowClassName={ROW_GAP} />
                   <DataValueRow
                     label="Country of Origin"
                     value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
                     rowClassName={ROW_GAP}
                   />
-                  <DataValueRow label="Total Meter" value={formatThousandsK(specs.meter_total)} rowClassName={ROW_GAP} />
-                  <DataValueRow label="Cassettes" value={specs.cassettes} rowClassName={ROW_GAP} />
-                  <DataValueRow label="Internal Finisher" value={specs.internal_finisher} rowClassName={ROW_GAP} />
+                  <DataValueRow
+                    label="Manufactured Year"
+                    value={assetDetails.manufactured_year}
+                    rowClassName={ROW_GAP}
+                  />
                 </DataRowContainer>
                 <DataRowContainer className="flex-1 min-w-0">
+                  <DataValueRow label="Cassettes" value={specs.cassettes} rowClassName={ROW_GAP} />
+                  <DataValueRow label="Internal Finisher" value={specs.internal_finisher} rowClassName={ROW_GAP} />
                   <CMYKRow
                     label="Drum Life"
                     c_value={specs.drum_life_c}
