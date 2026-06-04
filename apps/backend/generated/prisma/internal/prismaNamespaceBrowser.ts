@@ -117,7 +117,8 @@ export const AssetScalarFieldEnum = {
   readiness_id: 'readiness_id',
   status_id: 'status_id',
   is_in_transit: 'is_in_transit',
-  country_of_origin_id: 'country_of_origin_id'
+  country_of_origin_id: 'country_of_origin_id',
+  manufactured_year: 'manufactured_year'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
@@ -312,7 +313,8 @@ export const ModelScalarFieldEnum = {
   weight: 'weight',
   size: 'size',
   brand_id: 'brand_id',
-  asset_type_id: 'asset_type_id'
+  asset_type_id: 'asset_type_id',
+  is_colour: 'is_colour'
 } as const
 
 export type ModelScalarFieldEnum = (typeof ModelScalarFieldEnum)[keyof typeof ModelScalarFieldEnum]

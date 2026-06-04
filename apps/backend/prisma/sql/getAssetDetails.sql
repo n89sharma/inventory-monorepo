@@ -14,6 +14,7 @@ select
   a.created_at as created_at,
   a.is_in_transit as is_in_transit,
   co."name" as country_of_origin,
+  a.manufactured_year as manufactured_year,
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,

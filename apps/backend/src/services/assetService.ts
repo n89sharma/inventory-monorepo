@@ -78,6 +78,7 @@ type AssetSearchRowDb = LocationRow & {
   readiness: string
   is_in_transit: boolean
   country_of_origin: string | null
+  manufactured_year: number | null
   specs_meter_total: number | null
   specs_cassettes: number | null
   specs_internal_finisher: string | null
@@ -116,6 +117,7 @@ function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     location: buildLocation(r),
     is_in_transit: r.is_in_transit,
     country_of_origin: r.country_of_origin,
+    manufactured_year: r.manufactured_year,
     specs_meter_total: r.specs_meter_total,
     specs_cassettes: r.specs_cassettes,
     specs_internal_finisher: r.specs_internal_finisher,
@@ -248,6 +250,7 @@ function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     readiness: r.readiness,
     is_in_transit: r.is_in_transit,
     country_of_origin: r.country_of_origin,
+    manufactured_year: r.manufactured_year,
     location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,

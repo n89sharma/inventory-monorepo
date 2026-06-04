@@ -243,6 +243,7 @@ export function AssetModal({
       model: null,
       readiness: untested ? getSelectOption(untested) : UNSELECTED,
       countryOfOrigin: null,
+      manufacturedYear: null,
       meterBlack: null,
       meterColour: null,
       cassettes: null,
@@ -412,6 +413,13 @@ export function AssetModal({
                     error={fieldState.invalid}
                   />
                 )}
+              />
+            </HorizontalField>
+            <HorizontalField label='Manufactured Year'>
+              <ControlledNumberInput
+                control={newAssetForm.control}
+                name='manufacturedYear'
+                className='max-w-[100px]'
               />
             </HorizontalField>
           </div>

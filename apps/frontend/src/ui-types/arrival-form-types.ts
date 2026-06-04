@@ -1,9 +1,10 @@
 import type { CoreFunction, Country, ModelSummary, OrgSummary, Status, UpdateError, Warehouse } from "shared-types"
-import { CoreFunctionsSchema, CountrySchema, ModelSummarySchema, OrgSummarySchema, UpdateErrorSchema } from "shared-types"
+import { CoreFunctionsSchema, CountrySchema, MIN_MANUFACTURED_YEAR, ModelSummarySchema, OrgSummarySchema, UpdateErrorSchema } from "shared-types"
 import z from "zod"
 import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type SelectOption } from "./select-option-types"
 
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
+const CURRENT_YEAR = new Date().getFullYear()
 
 // Asset Modal within Edit or Create Asset
 export const AssetFormSchema = z.object({
@@ -15,6 +16,11 @@ export const AssetFormSchema = z.object({
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
   readiness: StatusSelectOptionSchema.refine(val => isSelected(val), "Readiness required"),
   countryOfOrigin: CountrySchema.nullable().refine(val => !!val, "Country of origin is required"),
+  manufacturedYear: z.number()
+    .int()
+    .min(MIN_MANUFACTURED_YEAR, `Year must be ${MIN_MANUFACTURED_YEAR} or later`)
+    .max(CURRENT_YEAR, `Year cannot be in the future`)
+    .nullable(),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0).nullable(),
@@ -62,6 +68,7 @@ export type AssetForm = {
   cassettes: number | null,
   readiness: SelectOption<Status>,
   countryOfOrigin: Country | null,
+  manufacturedYear: number | null,
   internalFinisher: string,
   coreFunctions: CoreFunction[],
   drumLifeC: number | null,

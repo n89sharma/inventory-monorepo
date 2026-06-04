@@ -7,7 +7,8 @@ export const ModelSummarySchema = z.object({
   model_name: z.string(),
   asset_type: z.string(),
   weight: z.number(),
-  size: z.number()
+  size: z.number(),
+  is_colour: z.boolean()
 });
 
 export type ModelSummary = z.infer<typeof ModelSummarySchema>;
@@ -17,7 +18,8 @@ export const CreateModelSchema = z.object({
   weight: z.number().min(0),
   size: z.number().min(0),
   brand_id: z.number(),
-  asset_type_id: z.number()
+  asset_type_id: z.number(),
+  is_colour: z.boolean().default(false)
 });
 
 export type CreateModel = z.infer<typeof CreateModelSchema>;

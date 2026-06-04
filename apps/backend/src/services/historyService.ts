@@ -75,6 +75,7 @@ type AssetUpdateFields = Partial<{
   serial_number: string
   readiness_id: number
   country_of_origin_id: number | null
+  manufactured_year: number | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -457,6 +458,7 @@ export async function recordAssetUpdate(
 
     const plainFields = [
       'serial_number',
+      'manufactured_year',
       'meter_black', 'meter_colour', 'meter_total',
       'cassettes', 'internal_finisher',
       'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k',

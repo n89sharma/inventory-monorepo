@@ -16,7 +16,8 @@ export async function createModel(form: ModelForm): Promise<{ id: number }> {
     weight: form.weight,
     size: form.size,
     brand_id: form.brand!.id,
-    asset_type_id: (form.assetType as { state: 'SELECTED'; selected: { id: number } }).selected.id
+    asset_type_id: (form.assetType as { state: 'SELECTED'; selected: { id: number } }).selected.id,
+    is_colour: form.is_colour
   } satisfies CreateModel)
   const { data } = await api.post<{ id: number }>('/models', createModelBody)
   return CreateModelResponseSchema.parse(data)

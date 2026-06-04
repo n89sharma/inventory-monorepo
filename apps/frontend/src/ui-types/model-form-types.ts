@@ -8,7 +8,8 @@ export const ModelFormSchema = z.object({
   weight: z.number().min(0),
   size: z.number().min(0),
   brand: BrandSchema.nullable().refine(val => !!val, 'Brand is required'),
-  assetType: AssetTypeSelectOptionSchema.refine(val => isSelected(val), 'Asset type is required')
+  assetType: AssetTypeSelectOptionSchema.refine(val => isSelected(val), 'Asset type is required'),
+  is_colour: z.boolean()
 })
 
 export type ModelForm = {
@@ -17,4 +18,5 @@ export type ModelForm = {
   size: number
   brand: Brand | null
   assetType: SelectOption<AssetType>
+  is_colour: boolean
 }

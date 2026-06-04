@@ -22,7 +22,8 @@ export async function createModel(
         weight: body.weight,
         size: body.size,
         brand_id: body.brand_id,
-        asset_type_id: body.asset_type_id
+        asset_type_id: body.asset_type_id,
+        is_colour: body.is_colour
       }
     })
     res.status(201).json(successResponse({ id: model.id }))
@@ -50,6 +51,7 @@ export async function mapDbModelToSummaryModel(modelId: number): Promise<ModelSu
     model_name: model.name,
     asset_type: assetType.asset_type,
     weight: model.weight,
-    size: model.size
+    size: model.size,
+    is_colour: model.is_colour
   }
 }

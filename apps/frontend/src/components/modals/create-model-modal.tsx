@@ -12,8 +12,10 @@ import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
 import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
 import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
+import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { FieldGroup } from '../shadcn/field'
+import { Label } from '../shadcn/label'
 
 interface CreateModelModalProps {
   open: boolean
@@ -40,7 +42,8 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
       weight: 0,
       size: 0,
       brand: null,
-      assetType: UNSELECTED
+      assetType: UNSELECTED,
+      is_colour: false
     }
   }
 
@@ -120,6 +123,21 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
               fieldLabel='Size'
               fieldRequired={true}
               inputType='number'
+            />
+
+            <Controller
+              control={form.control}
+              name='is_colour'
+              render={({ field: { onChange, value } }) => (
+                <div className='flex items-center gap-2 self-end pb-2'>
+                  <Checkbox
+                    id='is_colour'
+                    checked={value}
+                    onCheckedChange={checked => onChange(checked === true)}
+                  />
+                  <Label htmlFor='is_colour'>Colour</Label>
+                </div>
+              )}
             />
 
           </FieldGroup>

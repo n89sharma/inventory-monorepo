@@ -39,7 +39,7 @@ const toNumberArray = (val: unknown) =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
 export const AssetQuerySchema = z.object({
-  model: z.string().min(3).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/),
+  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),

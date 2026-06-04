@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { ModelSummarySchema } from './model-types.js';
 import { CoreFunctionsSchema, CountrySchema, StatusSchema } from './reference-data-types.js';
 
+export const MIN_MANUFACTURED_YEAR = 1980;
+export const MAX_MANUFACTURED_YEAR = 2100;
+
 
 export const AssetLocationDetailsSchema = z.object({
   warehouse_code: z.string(),
@@ -44,6 +47,7 @@ export const AssetSearchRowSchema = z.object({
   location: AssetLocationDetailsSchema.nullable(),
   is_in_transit: z.boolean(),
   country_of_origin: z.string().nullable(),
+  manufactured_year: z.number().nullable(),
   specs_meter_total: z.number().nullable(),
   specs_cassettes: z.number().nullable(),
   specs_internal_finisher: z.string().nullable(),
@@ -78,6 +82,7 @@ export const AssetDetailsSchema = z.object({
   readiness: z.string(),
   is_in_transit: z.boolean(),
   country_of_origin: z.string().nullable(),
+  manufactured_year: z.number().nullable(),
   location: AssetLocationDetailsSchema.nullable(),
   cost: z.object({
     purchase_cost: z.number().nullable(),
@@ -160,6 +165,7 @@ export const CreateAssetSchema = z.object({
   cassettes: z.number().min(0, "Cassettes are required"),
   readiness: StatusSchema,
   countryOfOrigin: CountrySchema.refine(val => !!val, "Country of origin is required"),
+  manufacturedYear: z.number().int().min(MIN_MANUFACTURED_YEAR).max(MAX_MANUFACTURED_YEAR).nullable(),
   internalFinisher: z.string(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0, "Drum life C required"),

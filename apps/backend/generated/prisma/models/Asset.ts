@@ -38,6 +38,7 @@ export type AssetAvgAggregateOutputType = {
   readiness_id: number | null
   status_id: number | null
   country_of_origin_id: number | null
+  manufactured_year: number | null
 }
 
 export type AssetSumAggregateOutputType = {
@@ -52,6 +53,7 @@ export type AssetSumAggregateOutputType = {
   readiness_id: number | null
   status_id: number | null
   country_of_origin_id: number | null
+  manufactured_year: number | null
 }
 
 export type AssetMinAggregateOutputType = {
@@ -72,6 +74,7 @@ export type AssetMinAggregateOutputType = {
   status_id: number | null
   is_in_transit: boolean | null
   country_of_origin_id: number | null
+  manufactured_year: number | null
 }
 
 export type AssetMaxAggregateOutputType = {
@@ -92,6 +95,7 @@ export type AssetMaxAggregateOutputType = {
   status_id: number | null
   is_in_transit: boolean | null
   country_of_origin_id: number | null
+  manufactured_year: number | null
 }
 
 export type AssetCountAggregateOutputType = {
@@ -112,6 +116,7 @@ export type AssetCountAggregateOutputType = {
   status_id: number
   is_in_transit: number
   country_of_origin_id: number
+  manufactured_year: number
   _all: number
 }
 
@@ -128,6 +133,7 @@ export type AssetAvgAggregateInputType = {
   readiness_id?: true
   status_id?: true
   country_of_origin_id?: true
+  manufactured_year?: true
 }
 
 export type AssetSumAggregateInputType = {
@@ -142,6 +148,7 @@ export type AssetSumAggregateInputType = {
   readiness_id?: true
   status_id?: true
   country_of_origin_id?: true
+  manufactured_year?: true
 }
 
 export type AssetMinAggregateInputType = {
@@ -162,6 +169,7 @@ export type AssetMinAggregateInputType = {
   status_id?: true
   is_in_transit?: true
   country_of_origin_id?: true
+  manufactured_year?: true
 }
 
 export type AssetMaxAggregateInputType = {
@@ -182,6 +190,7 @@ export type AssetMaxAggregateInputType = {
   status_id?: true
   is_in_transit?: true
   country_of_origin_id?: true
+  manufactured_year?: true
 }
 
 export type AssetCountAggregateInputType = {
@@ -202,6 +211,7 @@ export type AssetCountAggregateInputType = {
   status_id?: true
   is_in_transit?: true
   country_of_origin_id?: true
+  manufactured_year?: true
   _all?: true
 }
 
@@ -309,6 +319,7 @@ export type AssetGroupByOutputType = {
   status_id: number
   is_in_transit: boolean
   country_of_origin_id: number | null
+  manufactured_year: number | null
   _count: AssetCountAggregateOutputType | null
   _avg: AssetAvgAggregateOutputType | null
   _sum: AssetSumAggregateOutputType | null
@@ -352,6 +363,7 @@ export type AssetWhereInput = {
   status_id?: Prisma.IntFilter<"Asset"> | number
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
   country_of_origin_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
   arrival?: Prisma.XOR<Prisma.ArrivalNullableScalarRelationFilter, Prisma.ArrivalWhereInput> | null
   Country?: Prisma.XOR<Prisma.CountryNullableScalarRelationFilter, Prisma.CountryWhereInput> | null
   departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
@@ -391,6 +403,7 @@ export type AssetOrderByWithRelationInput = {
   status_id?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrderInput | Prisma.SortOrder
   arrival?: Prisma.ArrivalOrderByWithRelationInput
   Country?: Prisma.CountryOrderByWithRelationInput
   departure?: Prisma.DepartureOrderByWithRelationInput
@@ -433,6 +446,7 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   status_id?: Prisma.IntFilter<"Asset"> | number
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
   country_of_origin_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
   arrival?: Prisma.XOR<Prisma.ArrivalNullableScalarRelationFilter, Prisma.ArrivalWhereInput> | null
   Country?: Prisma.XOR<Prisma.CountryNullableScalarRelationFilter, Prisma.CountryWhereInput> | null
   departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
@@ -472,6 +486,7 @@ export type AssetOrderByWithAggregationInput = {
   status_id?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AssetCountOrderByAggregateInput
   _avg?: Prisma.AssetAvgOrderByAggregateInput
   _max?: Prisma.AssetMaxOrderByAggregateInput
@@ -500,6 +515,7 @@ export type AssetScalarWhereWithAggregatesInput = {
   status_id?: Prisma.IntWithAggregatesFilter<"Asset"> | number
   is_in_transit?: Prisma.BoolWithAggregatesFilter<"Asset"> | boolean
   country_of_origin_id?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
+  manufactured_year?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
 }
 
 export type AssetCreateInput = {
@@ -509,6 +525,7 @@ export type AssetCreateInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -548,6 +565,7 @@ export type AssetUncheckedCreateInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -566,6 +584,7 @@ export type AssetUpdateInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -605,6 +624,7 @@ export type AssetUncheckedUpdateInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -634,6 +654,7 @@ export type AssetCreateManyInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateManyMutationInput = {
@@ -643,6 +664,7 @@ export type AssetUpdateManyMutationInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetUncheckedUpdateManyInput = {
@@ -663,6 +685,7 @@ export type AssetUncheckedUpdateManyInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCountOrderByAggregateInput = {
@@ -683,6 +706,7 @@ export type AssetCountOrderByAggregateInput = {
   status_id?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrder
 }
 
 export type AssetAvgOrderByAggregateInput = {
@@ -697,6 +721,7 @@ export type AssetAvgOrderByAggregateInput = {
   readiness_id?: Prisma.SortOrder
   status_id?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrder
 }
 
 export type AssetMaxOrderByAggregateInput = {
@@ -717,6 +742,7 @@ export type AssetMaxOrderByAggregateInput = {
   status_id?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrder
 }
 
 export type AssetMinOrderByAggregateInput = {
@@ -737,6 +763,7 @@ export type AssetMinOrderByAggregateInput = {
   status_id?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrder
 }
 
 export type AssetSumOrderByAggregateInput = {
@@ -751,6 +778,7 @@ export type AssetSumOrderByAggregateInput = {
   readiness_id?: Prisma.SortOrder
   status_id?: Prisma.SortOrder
   country_of_origin_id?: Prisma.SortOrder
+  manufactured_year?: Prisma.SortOrder
 }
 
 export type AssetScalarRelationFilter = {
@@ -784,16 +812,16 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
+export type IntFieldUpdateOperationsInput = {
+  set?: number
   increment?: number
   decrement?: number
   multiply?: number
@@ -1353,6 +1381,7 @@ export type AssetCreateWithoutTechnical_specificationInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -1391,6 +1420,7 @@ export type AssetUncheckedCreateWithoutTechnical_specificationInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -1424,6 +1454,7 @@ export type AssetUpdateWithoutTechnical_specificationInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -1462,6 +1493,7 @@ export type AssetUncheckedUpdateWithoutTechnical_specificationInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -1479,6 +1511,7 @@ export type AssetCreateWithoutCostInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -1517,6 +1550,7 @@ export type AssetUncheckedCreateWithoutCostInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -1550,6 +1584,7 @@ export type AssetUpdateWithoutCostInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -1588,6 +1623,7 @@ export type AssetUncheckedUpdateWithoutCostInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -1605,6 +1641,7 @@ export type AssetCreateWithoutAsset_accessoriesInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -1643,6 +1680,7 @@ export type AssetUncheckedCreateWithoutAsset_accessoriesInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1676,6 +1714,7 @@ export type AssetUpdateWithoutAsset_accessoriesInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -1714,6 +1753,7 @@ export type AssetUncheckedUpdateWithoutAsset_accessoriesInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1731,6 +1771,7 @@ export type AssetCreateWithoutAsset_errorsInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -1769,6 +1810,7 @@ export type AssetUncheckedCreateWithoutAsset_errorsInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1802,6 +1844,7 @@ export type AssetUpdateWithoutAsset_errorsInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -1840,6 +1883,7 @@ export type AssetUncheckedUpdateWithoutAsset_errorsInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1857,6 +1901,7 @@ export type AssetCreateWithoutAsset_transfersInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -1895,6 +1940,7 @@ export type AssetUncheckedCreateWithoutAsset_transfersInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAssetInput
@@ -1928,6 +1974,7 @@ export type AssetUpdateWithoutAsset_transfersInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -1966,6 +2013,7 @@ export type AssetUncheckedUpdateWithoutAsset_transfersInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAssetNestedInput
@@ -1983,6 +2031,7 @@ export type AssetCreateWithoutArrivalInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
@@ -2020,6 +2069,7 @@ export type AssetUncheckedCreateWithoutArrivalInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2078,6 +2128,7 @@ export type AssetScalarWhereInput = {
   status_id?: Prisma.IntFilter<"Asset"> | number
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
   country_of_origin_id?: Prisma.IntNullableFilter<"Asset"> | number | null
+  manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
 }
 
 export type AssetCreateWithoutDepartureInput = {
@@ -2087,6 +2138,7 @@ export type AssetCreateWithoutDepartureInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
@@ -2124,6 +2176,7 @@ export type AssetUncheckedCreateWithoutDepartureInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2168,6 +2221,7 @@ export type AssetCreateWithoutHoldInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2205,6 +2259,7 @@ export type AssetUncheckedCreateWithoutHoldInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2249,6 +2304,7 @@ export type AssetCreateWithoutPurchase_invoiceInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2286,6 +2342,7 @@ export type AssetUncheckedCreateWithoutPurchase_invoiceInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2314,6 +2371,7 @@ export type AssetCreateWithoutSales_invoiceInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2351,6 +2409,7 @@ export type AssetUncheckedCreateWithoutSales_invoiceInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2411,6 +2470,7 @@ export type AssetCreateWithoutLocationInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2448,6 +2508,7 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2492,6 +2553,7 @@ export type AssetCreateWithoutModelInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2529,6 +2591,7 @@ export type AssetUncheckedCreateWithoutModelInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2573,6 +2636,7 @@ export type AssetCreateWithoutFilesInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2611,6 +2675,7 @@ export type AssetUncheckedCreateWithoutFilesInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2644,6 +2709,7 @@ export type AssetUpdateWithoutFilesInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -2682,6 +2748,7 @@ export type AssetUncheckedUpdateWithoutFilesInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2699,6 +2766,7 @@ export type AssetCreateWithoutCommentsInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2737,6 +2805,7 @@ export type AssetUncheckedCreateWithoutCommentsInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2770,6 +2839,7 @@ export type AssetUpdateWithoutCommentsInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -2808,6 +2878,7 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -2825,6 +2896,7 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2863,6 +2935,7 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_donor_asset_idT
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2885,6 +2958,7 @@ export type AssetCreateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -2923,6 +2997,7 @@ export type AssetUncheckedCreateWithoutPartTransfer_PartTransfer_recipient_asset
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -2956,6 +3031,7 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_donor_asset_idToAssetInp
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -2994,6 +3070,7 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_donor_asset_idT
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3022,6 +3099,7 @@ export type AssetUpdateWithoutPartTransfer_PartTransfer_recipient_asset_idToAsse
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3060,6 +3138,7 @@ export type AssetUncheckedUpdateWithoutPartTransfer_PartTransfer_recipient_asset
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3077,6 +3156,7 @@ export type AssetCreateWithoutReadinessInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -3114,6 +3194,7 @@ export type AssetUncheckedCreateWithoutReadinessInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -3158,6 +3239,7 @@ export type AssetCreateWithoutStatusInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   Country?: Prisma.CountryCreateNestedOneWithoutAssetInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
@@ -3195,6 +3277,7 @@ export type AssetUncheckedCreateWithoutStatusInput = {
   readiness_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -3239,6 +3322,7 @@ export type AssetCreateWithoutCountryInput = {
   barcode_normalized?: string | null
   serial_normalized?: string | null
   is_in_transit?: boolean
+  manufactured_year?: number | null
   arrival?: Prisma.ArrivalCreateNestedOneWithoutAssetsInput
   departure?: Prisma.DepartureCreateNestedOneWithoutAssetsInput
   hold?: Prisma.HoldCreateNestedOneWithoutAssetsInput
@@ -3276,6 +3360,7 @@ export type AssetUncheckedCreateWithoutCountryInput = {
   readiness_id: number
   status_id: number
   is_in_transit?: boolean
+  manufactured_year?: number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAssetInput
   asset_errors?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAssetInput
   asset_transfers?: Prisma.AssetTransferUncheckedCreateNestedManyWithoutAssetInput
@@ -3330,6 +3415,7 @@ export type AssetCreateManyArrivalInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutArrivalInput = {
@@ -3339,6 +3425,7 @@ export type AssetUpdateWithoutArrivalInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
@@ -3376,6 +3463,7 @@ export type AssetUncheckedUpdateWithoutArrivalInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3404,6 +3492,7 @@ export type AssetUncheckedUpdateManyWithoutArrivalInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyDepartureInput = {
@@ -3423,6 +3512,7 @@ export type AssetCreateManyDepartureInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutDepartureInput = {
@@ -3432,6 +3522,7 @@ export type AssetUpdateWithoutDepartureInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
@@ -3469,6 +3560,7 @@ export type AssetUncheckedUpdateWithoutDepartureInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3497,6 +3589,7 @@ export type AssetUncheckedUpdateManyWithoutDepartureInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyHoldInput = {
@@ -3516,6 +3609,7 @@ export type AssetCreateManyHoldInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutHoldInput = {
@@ -3525,6 +3619,7 @@ export type AssetUpdateWithoutHoldInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3562,6 +3657,7 @@ export type AssetUncheckedUpdateWithoutHoldInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3590,6 +3686,7 @@ export type AssetUncheckedUpdateManyWithoutHoldInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyPurchase_invoiceInput = {
@@ -3609,6 +3706,7 @@ export type AssetCreateManyPurchase_invoiceInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetCreateManySales_invoiceInput = {
@@ -3628,6 +3726,7 @@ export type AssetCreateManySales_invoiceInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutPurchase_invoiceInput = {
@@ -3637,6 +3736,7 @@ export type AssetUpdateWithoutPurchase_invoiceInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3674,6 +3774,7 @@ export type AssetUncheckedUpdateWithoutPurchase_invoiceInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3702,6 +3803,7 @@ export type AssetUncheckedUpdateManyWithoutPurchase_invoiceInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetUpdateWithoutSales_invoiceInput = {
@@ -3711,6 +3813,7 @@ export type AssetUpdateWithoutSales_invoiceInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3748,6 +3851,7 @@ export type AssetUncheckedUpdateWithoutSales_invoiceInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3776,6 +3880,7 @@ export type AssetUncheckedUpdateManyWithoutSales_invoiceInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyLocationInput = {
@@ -3795,6 +3900,7 @@ export type AssetCreateManyLocationInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutLocationInput = {
@@ -3804,6 +3910,7 @@ export type AssetUpdateWithoutLocationInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3841,6 +3948,7 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3869,6 +3977,7 @@ export type AssetUncheckedUpdateManyWithoutLocationInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyModelInput = {
@@ -3888,6 +3997,7 @@ export type AssetCreateManyModelInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutModelInput = {
@@ -3897,6 +4007,7 @@ export type AssetUpdateWithoutModelInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -3934,6 +4045,7 @@ export type AssetUncheckedUpdateWithoutModelInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -3962,6 +4074,7 @@ export type AssetUncheckedUpdateManyWithoutModelInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyReadinessInput = {
@@ -3981,6 +4094,7 @@ export type AssetCreateManyReadinessInput = {
   status_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutReadinessInput = {
@@ -3990,6 +4104,7 @@ export type AssetUpdateWithoutReadinessInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -4027,6 +4142,7 @@ export type AssetUncheckedUpdateWithoutReadinessInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -4055,6 +4171,7 @@ export type AssetUncheckedUpdateManyWithoutReadinessInput = {
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyStatusInput = {
@@ -4074,6 +4191,7 @@ export type AssetCreateManyStatusInput = {
   readiness_id: number
   is_in_transit?: boolean
   country_of_origin_id?: number | null
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutStatusInput = {
@@ -4083,6 +4201,7 @@ export type AssetUpdateWithoutStatusInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   Country?: Prisma.CountryUpdateOneWithoutAssetNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
@@ -4120,6 +4239,7 @@ export type AssetUncheckedUpdateWithoutStatusInput = {
   readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -4148,6 +4268,7 @@ export type AssetUncheckedUpdateManyWithoutStatusInput = {
   readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   country_of_origin_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type AssetCreateManyCountryInput = {
@@ -4167,6 +4288,7 @@ export type AssetCreateManyCountryInput = {
   readiness_id: number
   status_id: number
   is_in_transit?: boolean
+  manufactured_year?: number | null
 }
 
 export type AssetUpdateWithoutCountryInput = {
@@ -4176,6 +4298,7 @@ export type AssetUpdateWithoutCountryInput = {
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrival?: Prisma.ArrivalUpdateOneWithoutAssetsNestedInput
   departure?: Prisma.DepartureUpdateOneWithoutAssetsNestedInput
   hold?: Prisma.HoldUpdateOneWithoutAssetsNestedInput
@@ -4213,6 +4336,7 @@ export type AssetUncheckedUpdateWithoutCountryInput = {
   readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_accessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAssetNestedInput
   asset_errors?: Prisma.AssetErrorUncheckedUpdateManyWithoutAssetNestedInput
   asset_transfers?: Prisma.AssetTransferUncheckedUpdateManyWithoutAssetNestedInput
@@ -4241,6 +4365,7 @@ export type AssetUncheckedUpdateManyWithoutCountryInput = {
   readiness_id?: Prisma.IntFieldUpdateOperationsInput | number
   status_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -4346,6 +4471,7 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   status_id?: boolean
   is_in_transit?: boolean
   country_of_origin_id?: boolean
+  manufactured_year?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
   Country?: boolean | Prisma.Asset$CountryArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
@@ -4386,6 +4512,7 @@ export type AssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status_id?: boolean
   is_in_transit?: boolean
   country_of_origin_id?: boolean
+  manufactured_year?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
   Country?: boolean | Prisma.Asset$CountryArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
@@ -4416,6 +4543,7 @@ export type AssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status_id?: boolean
   is_in_transit?: boolean
   country_of_origin_id?: boolean
+  manufactured_year?: boolean
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
   Country?: boolean | Prisma.Asset$CountryArgs<ExtArgs>
   departure?: boolean | Prisma.Asset$departureArgs<ExtArgs>
@@ -4446,9 +4574,10 @@ export type AssetSelectScalar = {
   status_id?: boolean
   is_in_transit?: boolean
   country_of_origin_id?: boolean
+  manufactured_year?: boolean
 }
 
-export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "created_at" | "location_id" | "barcode_normalized" | "serial_normalized" | "readiness_id" | "status_id" | "is_in_transit" | "country_of_origin_id", ExtArgs["result"]["asset"]>
+export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "created_at" | "location_id" | "barcode_normalized" | "serial_normalized" | "readiness_id" | "status_id" | "is_in_transit" | "country_of_origin_id" | "manufactured_year", ExtArgs["result"]["asset"]>
 export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrival?: boolean | Prisma.Asset$arrivalArgs<ExtArgs>
   Country?: boolean | Prisma.Asset$CountryArgs<ExtArgs>
@@ -4537,6 +4666,7 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     status_id: number
     is_in_transit: boolean
     country_of_origin_id: number | null
+    manufactured_year: number | null
   }, ExtArgs["result"]["asset"]>
   composites: {}
 }
@@ -4996,6 +5126,7 @@ export interface AssetFieldRefs {
   readonly status_id: Prisma.FieldRef<"Asset", 'Int'>
   readonly is_in_transit: Prisma.FieldRef<"Asset", 'Boolean'>
   readonly country_of_origin_id: Prisma.FieldRef<"Asset", 'Int'>
+  readonly manufactured_year: Prisma.FieldRef<"Asset", 'Int'>
 }
     
 
