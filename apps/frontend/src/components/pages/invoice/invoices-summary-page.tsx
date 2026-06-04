@@ -35,6 +35,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       columns={invoiceTableColumns}
       data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
+      getRowHref={(invoice) => `/invoices/${invoice.invoice_number}`}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate }}

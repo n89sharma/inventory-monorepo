@@ -47,6 +47,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
       columns={arrivalTableColumns}
       data={arrivals}
       onRowMouseEnter={(arrival) => preloadArrivalDetail(arrival.arrival_number)}
+      getRowHref={(arrival) => `/arrivals/${arrival.arrival_number}`}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, destination, vendor }}

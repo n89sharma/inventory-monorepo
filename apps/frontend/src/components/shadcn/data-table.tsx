@@ -1,4 +1,4 @@
-import type { Column, ColumnDef, OnChangeFn, Row, RowSelectionState, SortingState, VisibilityState } from "@tanstack/react-table"
+import type { Column, ColumnDef, OnChangeFn, Row, RowData, RowSelectionState, SortingState, VisibilityState } from "@tanstack/react-table"
 import {
   flexRender,
   getCoreRowModel,
@@ -6,6 +6,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    cellClassName?: string
+  }
+}
 import { memo, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -146,7 +152,7 @@ export function DataTable<TData, TValue>({
                     <TableHead
                       key={header.id}
                       style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                      className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)}`}
+                      className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -247,24 +253,27 @@ function DataRowImpl<TData>({
   return (
     <TableRow
       data-state={isSelected && "selected"}
-      className="group/row cursor-pointer"
+      className={`group/row ${getRowHref ? 'cursor-pointer' : ''}`.trim()}
       onMouseEnter={() => onRowMouseEnter?.(row.original)}
       onClick={(e) => {
-        if ((e.target as HTMLElement).closest('a, button, [role=checkbox]')) return
-        if (e.shiftKey || !getRowHref) {
-          row.toggleSelected()
-          return
-        }
+        if (!getRowHref) return
+        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return
+        if (hasTextSelection()) return
         const href = getRowHref(row.original)
         if (e.metaKey || e.ctrlKey) window.open(href, '_blank')
         else navigate(href, { state: { from: location.pathname + location.search } })
+      }}
+      onAuxClick={(e) => {
+        if (e.button !== 1 || !getRowHref) return
+        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return
+        window.open(getRowHref(row.original), '_blank')
       }}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell
           key={cell.id}
           style={{ width: cell.column.getSize(), ...pinStyle(cell.column) }}
-          className={`whitespace-normal text-center ${pinCellClass(cell.column)}`}
+          className={`relative whitespace-normal text-center ${pinCellClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
@@ -274,3 +283,10 @@ function DataRowImpl<TData>({
 }
 
 const DataRow = memo(DataRowImpl) as typeof DataRowImpl
+
+const INTERACTIVE_SELECTOR = 'a, button, [role=checkbox]'
+
+function hasTextSelection(): boolean {
+  const selection = window.getSelection()
+  return selection !== null && selection.toString().length > 0
+}

@@ -47,6 +47,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
       columns={departureTableColumns}
       data={departures}
       onRowMouseEnter={(departure) => preloadDepartureDetail(departure.departure_number)}
+      getRowHref={(departure) => `/departures/${departure.departure_number}`}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, customer }}

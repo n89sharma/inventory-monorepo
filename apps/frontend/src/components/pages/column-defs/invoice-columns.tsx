@@ -1,34 +1,15 @@
-import { CopyButton } from "@/components/custom/copy-button"
-import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { Link } from "react-router-dom"
 import type { InvoiceSummary } from 'shared-types'
-import { assetCountColumn, createdAtColumn, createdByColumn } from './shared-columns'
+import { assetCountColumn, createdAtColumn, createdByColumn, createIdColumn } from './shared-columns'
 
 export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
-  {
+  createIdColumn<InvoiceSummary>({
     accessorKey: "invoice_number",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Invoice Number
-        <ArrowsDownUpIcon />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="group flex items-center justify-center gap-2">
-        <Link to={`/invoices/${row.original.invoice_number}`} className="text-primary hover:underline font-medium">
-          {row.getValue('invoice_number')}
-        </Link>
-        <CopyButton value={row.original.invoice_number} />
-      </div>
-    ),
-    size: 140
-  },
+    header: "Invoice Number",
+    href: row => `/invoices/${row.invoice_number}`,
+    value: row => row.invoice_number,
+  }),
   createdAtColumn as ColumnDef<InvoiceSummary>,
   createdByColumn as ColumnDef<InvoiceSummary>,
   { accessorKey: "organization", header: "Organization" },

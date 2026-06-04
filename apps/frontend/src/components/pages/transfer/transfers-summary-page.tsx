@@ -43,6 +43,7 @@ export function TransferSummaryPage(): React.JSX.Element {
       columns={transferTableColumns}
       data={transfers}
       onRowMouseEnter={(transfer) => preloadTransferDetail(transfer.transfer_number)}
+      getRowHref={(transfer) => `/transfers/${transfer.transfer_number}`}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, destination }}

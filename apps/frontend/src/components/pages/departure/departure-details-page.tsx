@@ -1,93 +1,60 @@
 import { DepartureSummaryStrip } from '@/components/custom/cards/departure-summary-strip'
 import { SummaryField } from '@/components/custom/cards/summary-field'
-import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
-import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
-import { PageContent } from '@/components/layout/page-content'
-import { formatDate } from '@/lib/formatters'
 import { getDepartureHistory } from '@/data/api/departure-api'
-import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { formatDate } from '@/lib/formatters'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
-import type { RowSelectionState } from '@tanstack/react-table'
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
-import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
+import { useCallback } from 'react'
+import { useParams } from 'react-router-dom'
+import type { AssetSummary } from 'shared-types'
 import { AddAssetBar } from '../../custom/add-asset-bar'
-import { BulkEditBar } from '../../custom/bulk-edit-bar'
-import { CollectionEditBar } from '../../custom/collection-edit-bar'
 import { EditDepartureMetadataModal } from '../../modals/edit-departure-metadata-modal'
-import { DataTable } from '../../shadcn/data-table'
-import { useCan } from '@/hooks/use-can'
+import { CollectionDetailPage } from '../collection-detail-page'
 import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
   if (departureNumber === undefined) throw new Error('Missing collectionId parameter')
-  
-  const { state } = useLocation()
+
   const mutations = useDepartureMutations()
-  const canEditDeparture = useCan('create_update_departure')
-  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
+  const detail = useDepartureDetail(departureNumber)
 
-  const columns = useMemo(
-    () => createAssetSummaryColumns(
-      'departures',
-      departureNumber,
-      asset => mutations.removeAsset(departureNumber, asset)
-    ),
-    [departureNumber, mutations]
+  const buildColumns = useCallback(
+    (assetHref: (asset: AssetSummary) => string) =>
+      createAssetSummaryColumns(assetHref, asset => mutations.removeAsset(departureNumber, asset)),
+    [mutations, departureNumber],
   )
-  const { data: departure, error: detailError, isLoading: detailLoading } = useDepartureDetail(departureNumber)
-
-  useEffect(() => {
-    const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
-    if (payload) showEntityCreatedToast(payload)
-  }, [])
-
-  useEffect(() => {
-    return () => mutations.flushPending(departureNumber)
-  }, [departureNumber, mutations])
-
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-
-  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
-  if (detailError) return <div>{detailError.message}</div>
-  if (!departure) return <div>Departure not found</div>
-
-  const selectedAssets = departure.assets.filter(a => rowSelection[a.barcode])
 
   return (
-    <>
-      <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary('departures')}
-        title={`Departure ${departureNumber}`}
-        copyValue={departureNumber}
-        actions={
-          <CollectionEditBar
-            section="departures"
-            collectionId={departureNumber}
-            assets={departure.assets}
-            historyCacheKey={`departure-history:${departureNumber}`}
-            historyFetcher={() => getDepartureHistory(departureNumber)}
-            onEdit={() => setIsMetadataModalOpen(true)}
-          />
-        }
-        subtitle={
-          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            <SummaryField label="Customer" value={departure.customer.name} />
-            <SummaryField label="Departed" value={formatDate(departure.created_at)} />
-          </div>
-        }
-      />
-      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
-      <DepartureSummaryStrip departure={departure} />
-      <EditDepartureMetadataModal
-        open={isMetadataModalOpen}
-        onOpenChange={setIsMetadataModalOpen}
-        departure={departure}
-        onSave={metadata => mutations.updateMetadata(departureNumber, metadata)}
-      />
-      {canEditDeparture && (
+    <CollectionDetailPage
+      section="departures"
+      titleLabel="Departure"
+      collectionId={departureNumber}
+      permission="create_update_departure"
+      detail={detail}
+      notFoundLabel="Departure not found"
+      refreshKey={departureDetailKey(departureNumber)}
+      historyCacheKey={`departure-history:${departureNumber}`}
+      historyFetcher={() => getDepartureHistory(departureNumber)}
+      onBulkRemove={assets => mutations.bulkRemoveAssets(departureNumber, assets)}
+      onFlushPending={mutations.flushPending}
+      buildColumns={buildColumns}
+      renderSummaryStrip={departure => <DepartureSummaryStrip departure={departure} />}
+      renderSubtitle={departure => (
+        <>
+          <SummaryField label="Customer" value={departure.customer.name} />
+          <SummaryField label="Departed" value={formatDate(departure.created_at)} />
+        </>
+      )}
+      renderMetadataModal={(departure, control) => (
+        <EditDepartureMetadataModal
+          open={control.open}
+          onOpenChange={control.onOpenChange}
+          departure={departure}
+          onSave={metadata => mutations.updateMetadata(departureNumber, metadata)}
+        />
+      )}
+      renderAddAssetBar={departure => (
         <AddAssetBar
           existingAssets={departure.assets}
           entityName='departure'
@@ -95,26 +62,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
           onAddBatchFromHold={assets => mutations.addAssetBatch(departureNumber, assets)}
         />
       )}
-      <BulkEditBar
-        selectedAssets={selectedAssets}
-        onClear={() => setRowSelection({})}
-        refreshKey={departureDetailKey(departureNumber)}
-        currentCollectionType="departures"
-        returnTo={`/departures/${departureNumber}`}
-        onBulkRemove={assets => mutations.bulkRemoveAssets(departureNumber, assets)}
-        totalCount={departure.assets.length}
-        onSelectAll={() => setRowSelection(Object.fromEntries(departure.assets.map(a => [a.barcode, true])))}
-      />
-      <DataTable
-        columns={columns}
-        data={departure.assets}
-        onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        getRowId={row => row.barcode}
-        defaultSort={{ id: 'barcode', desc: true }}
-      />
-      </PageContent>
-    </>
+    />
   )
 }

@@ -1,13 +1,12 @@
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
-import { Checkbox } from "@/components/shadcn/checkbox"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip"
 import { formatDate, formatLocation, formatThousandsK, formatUSD } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { Link } from "react-router-dom"
 import type { AssetSearchRow } from 'shared-types'
+import { createIdColumn, createSelectColumn } from './shared-columns'
 
 const HELD_STATUS = 'HELD'
 
@@ -31,45 +30,13 @@ function SortableHeader({
 }
 
 export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected()
-            ? true
-            : table.getIsSomePageRowsSelected()
-              ? 'indeterminate'
-              : false
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all on this page"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    size: 30,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
+  createSelectColumn<AssetSearchRow>(),
+  createIdColumn<AssetSearchRow>({
     accessorKey: "barcode",
     header: "Barcode",
-    cell: ({ row }) => (
-      <Link
-        to={`/search/${row.original.barcode}`}
-        className="font-mono text-foreground hover:underline"
-      >
-        {row.getValue('barcode')}
-      </Link>
-    ),
-    size: 120
-  },
+    href: row => `/search/${row.barcode}`,
+    value: row => row.barcode,
+  }),
   {
     accessorKey: "brand",
     header: "Brand",

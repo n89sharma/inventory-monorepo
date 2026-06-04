@@ -44,6 +44,7 @@ export function HoldSummaryPage(): React.JSX.Element {
       columns={holdTableColumns}
       data={holds}
       onRowMouseEnter={(hold) => preloadHoldDetail(hold.hold_number)}
+      getRowHref={(hold) => `/holds/${hold.hold_number}`}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, holdBy, holdFor }}
