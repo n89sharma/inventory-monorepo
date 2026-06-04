@@ -1,4 +1,4 @@
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
@@ -335,13 +335,14 @@ function mapInvoice(r: AssetDetailRow) {
   }
 }
 
-export async function exportGeneralReport(
+export async function exportAssetReport(
   barcodes: string[],
-  role: AppRole | null
+  role: AppRole | null,
+  variant: ReportVariant
 ): Promise<string> {
   const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
   const details = results.map(r => mapAssetDetail(r))
-  return generateCsvReport('general_report', details, role)
+  return generateCsvReport(variant, details, role)
 }
 
 export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<void> {

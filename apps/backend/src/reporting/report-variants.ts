@@ -1,4 +1,7 @@
+import type { ReportVariant } from 'shared-types'
 import type { AssetColumnKey } from './asset-columns.js'
+
+export type { ReportVariant }
 
 const BASE_SECTION = [
   'barcode',
@@ -114,6 +117,4 @@ export const REPORT_VARIANTS = {
   departure_report: DEPARTURE_REPORT_COLUMNS,
   invoice_report: INVOICE_REPORT_COLUMNS,
   hold_report: HOLD_REPORT_COLUMNS
-} as const satisfies Record<string, readonly AssetColumnKey[]>
-
-export type ReportVariant = keyof typeof REPORT_VARIANTS
+} as const satisfies Record<ReportVariant, readonly AssetColumnKey[]>

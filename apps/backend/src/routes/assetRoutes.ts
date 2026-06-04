@@ -6,7 +6,7 @@ import {
   bulkUpdateAssetPricing,
   createAssetComment,
   createPartTransfer,
-  exportGeneralReport,
+  exportAssetReport,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
@@ -32,7 +32,7 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', requirePermission('view_asset'), validateQuery(AssetQuerySchema), getAssets)
-router.post('/export', requirePermission('view_asset'), exportGeneralReport)
+router.post('/export', requirePermission('view_asset'), exportAssetReport)
 router.get('/suggestions', requirePermission('view_asset'), validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
 router.get('/locations', requirePermission('view_asset'), validateQuery(LocationsByWarehouseQuerySchema), getLocationsByWarehouse)
 router.get('/:barcode/history', requirePermission('view_asset'), getAssetHistory)

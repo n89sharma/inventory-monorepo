@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -10,7 +10,7 @@ import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   createComment as createCommentSer,
   createPartTransfer as createPartTransferSer,
-  exportGeneralReport as exportGeneralReportSer,
+  exportAssetReport as exportAssetReportSer,
   getAccessories as getAssetAccessoriesSer,
   getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
@@ -170,13 +170,9 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
   res.json(successResponse(null))
 })
 
-export const ExportAssetsSchema = z.object({
-  barcodes: z.array(z.string()).min(1).max(2000)
-})
-
-export const exportGeneralReport = asyncHandler(async (req, res) => {
-  const { barcodes } = ExportAssetsSchema.parse(req.body)
-  const csv = await exportGeneralReportSer(barcodes, res.locals.dbUserRole)
+export const exportAssetReport = asyncHandler(async (req, res) => {
+  const { barcodes, variant } = ExportAssetsSchema.parse(req.body)
+  const csv = await exportAssetReportSer(barcodes, res.locals.dbUserRole, variant)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)

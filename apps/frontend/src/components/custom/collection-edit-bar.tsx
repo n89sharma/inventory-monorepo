@@ -2,7 +2,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
-import { type AssetSummary, type CollectionHistory, type Permission } from "shared-types"
+import { type AssetSummary, type CollectionHistory, type Permission, type ReportVariant } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
 import { Button } from "../shadcn/button"
@@ -11,16 +11,16 @@ import { CollectionHistorySheet } from "./collection-history-sheet"
 import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
-const SECTION_EDIT_PERMISSION = {
-  arrivals: 'create_update_arrival',
-  transfers: 'create_update_transfer',
-  departures: 'create_update_departure',
-  holds: 'create_update_hold',
-  invoices: 'create_update_invoice',
-} as const satisfies Record<string, Permission>
+const SECTION_CONFIG = {
+  arrivals: { permission: 'create_update_arrival', reportVariant: 'arrival_report' },
+  transfers: { permission: 'create_update_transfer', reportVariant: 'transfer_report' },
+  departures: { permission: 'create_update_departure', reportVariant: 'departure_report' },
+  holds: { permission: 'create_update_hold', reportVariant: 'hold_report' },
+  invoices: { permission: 'create_update_invoice', reportVariant: 'invoice_report' },
+} as const satisfies Record<string, { permission: Permission; reportVariant: ReportVariant }>
 
 type CollectionEditBarProps = {
-  section: keyof typeof SECTION_EDIT_PERMISSION
+  section: keyof typeof SECTION_CONFIG
   collectionId: string
   assets?: AssetSummary[]
   historyCacheKey: string
@@ -37,7 +37,7 @@ export function CollectionEditBar({
   onEdit,
 }: CollectionEditBarProps): React.JSX.Element {
 
-  const canEdit = useCan(SECTION_EDIT_PERMISSION[section])
+  const canEdit = useCan(SECTION_CONFIG[section].permission)
   const canDelete = useCan('delete_collection')
 
   const exportAssets = useAssetStore(state => state.exportAssets)
@@ -56,7 +56,7 @@ export function CollectionEditBar({
 
     setExportLoading(true)
     try {
-      await exportAssets(barcodes, `${section}-${collectionId}.csv`)
+      await exportAssets(barcodes, `${section}-${collectionId}.csv`, SECTION_CONFIG[section].reportVariant)
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {

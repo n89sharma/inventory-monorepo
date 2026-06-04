@@ -12,6 +12,7 @@ import type {
   CreateComment,
   CreatePartTransfer,
   PartTransfer,
+  ReportVariant,
   Status,
   UpdateAssetErrors,
   UpdateAssetLocation,
@@ -33,6 +34,7 @@ import {
   CommentSchema,
   CreateCommentSchema,
   CreatePartTransferSchema,
+  ExportAssetsSchema,
   PartTransferSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
@@ -40,8 +42,6 @@ import {
   UpdateAssetSpecsSchema
 } from 'shared-types'
 import { z } from 'zod'
-
-const ExportAssetsBodySchema = z.object({ barcodes: z.array(z.string()).min(1) })
 
 export async function getBarcodeSuggestions(q: string): Promise<BarcodeSuggestion[]> {
   try {
@@ -153,8 +153,14 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
   }
 }
 
-export async function exportAssets(barcodes: string[], filename?: string): Promise<void> {
-  const exportAssetsBody = ExportAssetsBodySchema.parse({ barcodes } satisfies z.infer<typeof ExportAssetsBodySchema>)
+export async function exportAssets(
+  barcodes: string[],
+  filename?: string,
+  variant?: ReportVariant
+): Promise<void> {
+  const exportAssetsBody = ExportAssetsSchema.parse(
+    { barcodes, variant } satisfies z.input<typeof ExportAssetsSchema>
+  )
   const response = await api.post('/assets/export', exportAssetsBody, { responseType: 'blob' })
   const disposition = response.headers['content-disposition'] as string | undefined
   const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
