@@ -17,6 +17,7 @@ import invoiceRoutes from './routes/invoiceRoutes.js'
 import modelRoutes from './routes/modelRoutes.js'
 import organizationRoutes from './routes/organizationRoutes.js'
 import constantRoutes from './routes/referenceRoutes.js'
+import reportRoutes from './routes/reportRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import transferRoutes from './routes/transferRoutes.js'
 import userRoutes from './routes/userRoutes.js'
@@ -125,6 +126,7 @@ app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
 app.use('/admin', adminRoutes)
 app.use('/search', searchRoutes)
+app.use('/reports', reportRoutes)
 
 app.use(errorHandler)
 

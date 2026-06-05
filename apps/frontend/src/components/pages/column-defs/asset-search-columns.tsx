@@ -6,7 +6,7 @@ import { formatDate, formatLocation, formatThousandsK, formatUSD } from "@/lib/f
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { AssetSearchRow } from 'shared-types'
-import { createIdColumn, createSelectColumn } from './shared-columns'
+import { createIdColumn } from './shared-columns'
 
 const HELD_STATUS = 'HELD'
 
@@ -29,12 +29,14 @@ function SortableHeader({
   )
 }
 
-export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
-  createSelectColumn<AssetSearchRow>(),
+export function createAssetSearchColumns(
+  detailHref: (row: AssetSearchRow) => string,
+): ColumnDef<AssetSearchRow>[] {
+  return [
   createIdColumn<AssetSearchRow>({
     accessorKey: "barcode",
     header: "Barcode",
-    href: row => `/search/${row.barcode}`,
+    href: detailHref,
     value: row => row.barcode,
   }),
   {
@@ -271,4 +273,5 @@ export const assetSearchColumns: ColumnDef<AssetSearchRow>[] = [
     },
     size: 220
   }
-]
+  ]
+}

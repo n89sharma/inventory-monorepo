@@ -27,6 +27,7 @@ export type ModelSearchInputProps<T> = {
   searchKey: string
   getLabel: (item: T) => string
   placeholder: string
+  clearLabel?: string
   className?: string
 }
 
@@ -40,6 +41,7 @@ export function ModelSearchInput<T>({
   searchKey,
   getLabel,
   placeholder,
+  clearLabel = 'Clear',
   className,
 }: ModelSearchInputProps<T>): React.JSX.Element {
   const [matches, setMatches] = useState<T[]>([])
@@ -129,7 +131,7 @@ export function ModelSearchInput<T>({
               <button
                 type="button"
                 onClick={handleClear}
-                aria-label="Clear model"
+                aria-label={clearLabel}
                 className={cn(
                   "ml-0.5 inline-flex size-4 shrink-0 items-center justify-center",
                   "rounded-full hover:bg-foreground/10",

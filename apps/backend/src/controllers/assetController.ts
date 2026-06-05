@@ -19,6 +19,7 @@ import {
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
   getAssets as getAssetsSer,
+  getStockReportAssets as getStockReportAssetsSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer,
   mapAssetSummary,
   updateAssetErrors as updateAssetErrorsSer,
@@ -62,6 +63,38 @@ export const getAssets = asyncHandler(async (req, res) => {
     isNaN(meterMax) ? -1 : meterMax,
     isNaN(cassettes) ? -1 : cassettes,
     internalFinisher ?? '',
+    [],
+    [],
+    res.locals.dbUserRole,
+  )
+  res.json(successResponse(data))
+})
+
+export const StockReportQuerySchema = z.object({
+  warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number)))
+    .refine(ids => ids.length > 0, { message: 'At least one warehouse is required' }),
+  brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  meterMin: z.string().optional().transform(Number),
+  meterMax: z.string().optional().transform(Number),
+  includeHeld: z.enum(['true', 'false']).optional()
+})
+
+export const getStockReport = asyncHandler(async (req, res) => {
+  const {
+    warehouseIds, brandIds, assetTypeIds, readinessIds, model, meterMin, meterMax, includeHeld
+  } = res.locals.query as z.infer<typeof StockReportQuerySchema>
+  const data = await getStockReportAssetsSer(
+    warehouseIds,
+    brandIds,
+    assetTypeIds,
+    readinessIds,
+    model ?? '',
+    isNaN(meterMin) ? -1 : meterMin,
+    isNaN(meterMax) ? -1 : meterMax,
+    includeHeld === 'true',
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

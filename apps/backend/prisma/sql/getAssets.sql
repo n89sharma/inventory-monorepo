@@ -60,7 +60,7 @@ from "Asset" a
     limit 1
   ) lc on true
   left join "User" lcu on lcu.id = lc.created_by_id
-where m."name" ~* $1
+where ($1 = '' or m."name" ~* $1)
   and (array_length($2::int[], 1) is null or s.id = any($2::int[]))
   and (array_length($3::int[], 1) is null or rd.id = any($3::int[]))
   and (array_length($4::int[], 1) is null or w.id = any($4::int[]))
@@ -68,3 +68,5 @@ where m."name" ~* $1
   and ($6 = -1 or t.meter_total <= $6)
   and ($7 = -1 or t.cassettes >= $7)
   and ($8 = '' or t.internal_finisher ~* $8)
+  and (array_length($9::int[], 1) is null or b.id = any($9::int[]))
+  and (array_length($10::int[], 1) is null or at.id = any($10::int[]))

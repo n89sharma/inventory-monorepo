@@ -164,6 +164,8 @@ export async function getAssets(
   meterMaxParam: number,
   cassettesParam: number,
   internalFinisherParam: string,
+  brandIds: number[],
+  assetTypeIds: number[],
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
@@ -176,9 +178,45 @@ export async function getAssets(
       meterMaxParam,
       cassettesParam,
       internalFinisherParam,
+      brandIds,
+      assetTypeIds,
     )
   )
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+}
+
+const IN_STOCK_STATUS = 'IN_STOCK'
+const HELD_STATUS = 'HELD'
+
+export async function getStockReportAssets(
+  warehouseIds: number[],
+  brandIds: number[],
+  assetTypeIds: number[],
+  readinessIds: number[],
+  model: string,
+  meterMinParam: number,
+  meterMaxParam: number,
+  includeHeld: boolean,
+  role: AppRole | null,
+): Promise<AssetSearchRow[]> {
+  const wantedStatuses = includeHeld ? [IN_STOCK_STATUS, HELD_STATUS] : [IN_STOCK_STATUS]
+  const statuses = await prisma.status.findMany({
+    where: { status: { in: wantedStatuses } },
+    select: { id: true },
+  })
+  return getAssets(
+    model,
+    statuses.map(s => s.id),
+    readinessIds,
+    warehouseIds,
+    meterMinParam,
+    meterMaxParam,
+    -1,
+    '',
+    brandIds,
+    assetTypeIds,
+    role,
+  )
 }
 
 export async function getAssetDetail(

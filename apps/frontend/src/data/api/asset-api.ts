@@ -6,7 +6,9 @@ import type {
   AssetLocation,
   AssetSearchRow,
   AssetTransfer,
+  AssetType,
   BarcodeSuggestion,
+  Brand,
   BulkUpdateAssetPricing,
   Comment,
   CreateComment,
@@ -201,6 +203,31 @@ export async function getAssetsForQuery(
       statusIds: statuses.map(s => s.id),
       readinessIds: readinesses.map(s => s.id),
       warehouseIds: warehouses.map(w => w.id),
+    }
+  })
+  return z.array(AssetSearchRowSchema).parse(data)
+}
+
+export async function getStockReportAssets(
+  warehouses: Warehouse[],
+  brand: Brand | null,
+  assetTypes: AssetType[],
+  readinesses: Status[],
+  model: string | null,
+  meterMin: number | null,
+  meterMax: number | null,
+  includeHeld: boolean): Promise<AssetSearchRow[]> {
+
+  const { data } = await api.get<AssetSearchRow[]>(`/reports/stock`, {
+    params: {
+      warehouseIds: warehouses.map(w => w.id),
+      brandIds: brand ? [brand.id] : [],
+      assetTypeIds: assetTypes.map(a => a.id),
+      readinessIds: readinesses.map(s => s.id),
+      model: model ?? undefined,
+      meterMin: meterMin ?? undefined,
+      meterMax: meterMax ?? undefined,
+      includeHeld: includeHeld ? 'true' : undefined,
     }
   })
   return z.array(AssetSearchRowSchema).parse(data)

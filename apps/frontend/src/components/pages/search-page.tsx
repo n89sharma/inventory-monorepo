@@ -28,7 +28,13 @@ import { MeterRangeInput } from '../custom/meter-range-input'
 import { ModelSearchInput } from '../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../custom/multi-select-options'
 import { DataTable } from "../shadcn/data-table"
-import { assetSearchColumns } from './column-defs/asset-search-columns'
+import { createAssetSearchColumns } from './column-defs/asset-search-columns'
+import { createSelectColumn } from './column-defs/shared-columns'
+
+const assetSearchColumns = [
+  createSelectColumn<AssetSearchRow>(),
+  ...createAssetSearchColumns(a => `/search/${a.barcode}`),
+]
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 
@@ -303,6 +309,7 @@ export function QueryPage(): React.JSX.Element {
               searchKey='model_name'
               getLabel={m => `${m.brand_name} ${m.model_name}`}
               placeholder='Model *'
+              clearLabel='Clear model'
               className='w-45'
             />
 

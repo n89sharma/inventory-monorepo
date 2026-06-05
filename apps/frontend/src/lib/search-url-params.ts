@@ -50,11 +50,11 @@ function parseNonNegativeNumber(raw: string | null): number | null {
   return Number.isNaN(parsed) || parsed < 0 ? null : parsed
 }
 
-function encodeIds(items: { id: number }[]): string {
+export function encodeIds(items: { id: number }[]): string {
   return items.map(i => i.id).join(',')
 }
 
-function decodeIds<T extends { id: number }>(raw: string | null, lookup: T[]): T[] {
+export function decodeIds<T extends { id: number }>(raw: string | null, lookup: T[]): T[] {
   if (!raw) return []
   const byId = new Map(lookup.map(item => [item.id, item]))
   return raw

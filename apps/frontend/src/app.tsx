@@ -33,7 +33,7 @@ const CreateInvoicePage         = lazy(() => import('./components/pages/invoice/
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
-const ReportsPage               = lazy(() => import('./components/pages/reports-page').then(m => ({ default: m.ReportsPage })))
+const StockReportPage           = lazy(() => import('./components/pages/stock-report-page').then(m => ({ default: m.StockReportPage })))
 const QueryPage                 = lazy(() => import('./components/pages/search-page').then(m => ({ default: m.QueryPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
@@ -108,14 +108,16 @@ function AppRoutes() {
                   />
                   <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
 
+                  <Route path="/reports" element={<Navigate to="/reports/stock" replace />} />
                   <Route
-                    path="/reports"
+                    path="/reports/stock"
                     element={
                       <PermissionRoute permission="view_reports">
-                        <ReportsPage />
+                        <StockReportPage />
                       </PermissionRoute>
                     }
                   />
+                  <Route path="/reports/stock/:assetId" element={<AssetDetailsPage />} />
 
                   <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 

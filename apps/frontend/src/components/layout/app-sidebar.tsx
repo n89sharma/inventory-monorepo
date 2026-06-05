@@ -69,6 +69,10 @@ const SETTINGS_SUB_ITEMS = [
   { title: 'Organizations', url: '/settings/organizations' },
 ]
 
+const REPORTS_SUB_ITEMS = [
+  { title: 'Stock', url: '/reports/stock' },
+]
+
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 
 export function AppSidebar(): React.JSX.Element {
@@ -81,9 +85,16 @@ export function AppSidebar(): React.JSX.Element {
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
 
+  const isReportsActive = location.pathname.startsWith('/reports')
+  const [reportsOpen, setReportsOpen] = useState(isReportsActive)
+
   useEffect(() => {
     if (isSettingsActive) setSettingsOpen(true)
   }, [isSettingsActive])
+
+  useEffect(() => {
+    if (isReportsActive) setReportsOpen(true)
+  }, [isReportsActive])
 
   return (
     <Sidebar collapsible="icon">
@@ -122,11 +133,36 @@ export function AppSidebar(): React.JSX.Element {
               })}
               {
                 canViewReports &&
-                <SidebarMenuItem key='Reports'>
-                  <SidebarMenuButton asChild isActive={location.pathname.startsWith('/reports') ? true : undefined}>
-                    <Link to='/reports'><ChartLineUpIcon aria-hidden="true" /><span>Reports</span></Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <Collapsible
+                  open={reportsOpen}
+                  onOpenChange={setReportsOpen}
+                  className="group/collapsible"
+                  asChild
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton isActive={isReportsActive ? true : undefined}>
+                        <ChartLineUpIcon aria-hidden="true" />
+                        <span>Reports</span>
+                        <CaretDownIcon
+                          className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
+                          aria-hidden="true"
+                        />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {REPORTS_SUB_ITEMS.map(item => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
+                              <Link to={item.url}>{item.title}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
               }
               {
                 canManageSettings &&
