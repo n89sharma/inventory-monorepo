@@ -45,6 +45,8 @@ export * from "./sql/getModels.js"
 
 export * from "./sql/getOrganizations.js"
 
+export * from "./sql/getProfitabilityCube.js"
+
 export * from "./sql/getTransfers.js"
 
 export * from "./sql/getUsers.js"

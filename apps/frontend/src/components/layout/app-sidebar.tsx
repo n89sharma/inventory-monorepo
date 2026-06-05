@@ -71,6 +71,7 @@ const SETTINGS_SUB_ITEMS = [
 
 const REPORTS_SUB_ITEMS = [
   { title: 'Stock', url: '/reports/stock' },
+  { title: 'Profitability', url: '/reports/profitability' },
 ]
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
