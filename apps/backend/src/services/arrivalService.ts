@@ -4,6 +4,7 @@ import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generate
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
+import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -91,7 +92,7 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     readiness: dbAsset.Readiness,
     countryOfOrigin: dbAsset.Country,
     manufacturedYear: dbAsset.manufactured_year,
-    internalFinisher: dbAsset.technical_specification?.internal_finisher ?? '',
+    componentId: dbAsset.technical_specification?.component_id ?? null,
     coreFunctions: dbAsset.asset_accessories.map(ac => ac.Accessory),
     drumLifeC: dbAsset.technical_specification?.drum_life_c ?? 0,
     drumLifeM: dbAsset.technical_specification?.drum_life_m ?? 0,
@@ -115,6 +116,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
 
   const arrival = await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs(newArrival.assets, brandIdByModelId))
+    await validateComponentBrands(tx, buildComponentBrandPairs(newArrival.assets, brandIdByModelId))
     const locationId = await ensureArrivalLocationId(tx, newArrival.warehouse.id)
     return tx.arrival.create({
       data: {
@@ -193,7 +195,7 @@ function mapInputAssetToPrismaCreateAsset(
         meter_black: asset.meterBlack,
         meter_colour: asset.meterColour,
         meter_total: asset.meterBlack + asset.meterColour,
-        internal_finisher: asset.internalFinisher,
+        component_id: asset.componentId,
         cassettes: asset.cassettes,
         drum_life_c: asset.drumLifeC,
         drum_life_m: asset.drumLifeM,
@@ -255,6 +257,24 @@ function buildErrorBrandPairs(
       throw new NotFoundError(`Model ${a.model.id} not found`)
     }
     return a.errors.map(e => ({ errorId: e.error_id, expectedBrandId }))
+  })
+}
+
+/**
+ * Pair each asset's chosen component (when set) with its model's expected brand
+ * for `validateComponentBrands`. Mirrors `buildErrorBrandPairs`.
+ */
+function buildComponentBrandPairs(
+  assets: Array<{ model: { id: number }; componentId?: number | null }>,
+  brandIdByModelId: Map<number, number>
+): Array<{ componentId: number; expectedBrandId: number }> {
+  return assets.flatMap(a => {
+    if (a.componentId == null) return []
+    const expectedBrandId = brandIdByModelId.get(a.model.id)
+    if (expectedBrandId === undefined) {
+      throw new NotFoundError(`Model ${a.model.id} not found`)
+    }
+    return [{ componentId: a.componentId, expectedBrandId }]
   })
 }
 
@@ -373,7 +393,7 @@ async function updateArrivalAssetCoreFields(
           meter_colour: asset.meterColour,
           meter_total: asset.meterBlack + asset.meterColour,
           cassettes: asset.cassettes,
-          internal_finisher: asset.internalFinisher,
+          component_id: asset.componentId,
           drum_life_c: asset.drumLifeC,
           drum_life_m: asset.drumLifeM,
           drum_life_y: asset.drumLifeY,
@@ -414,7 +434,7 @@ export async function updateArrivalAsset(
       country_of_origin_id: true, manufactured_year: true,
       technical_specification: {
         select: {
-          meter_black: true, meter_colour: true, cassettes: true, internal_finisher: true,
+          meter_black: true, meter_colour: true, cassettes: true, component_id: true,
           drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true,
           toner_life_c: true, toner_life_m: true, toner_life_y: true, toner_life_k: true
         }
@@ -428,6 +448,7 @@ export async function updateArrivalAsset(
 
   await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
+    await validateComponentBrands(tx, buildComponentBrandPairs([asset], brandIdByModelId))
     await tx.assetAccessory.deleteMany({ where: { asset_id: assetId } })
     await updateArrivalAssetCoreFields(tx, assetWithId)
     if (asset.coreFunctions.length > 0) {
@@ -448,7 +469,7 @@ export async function updateArrivalAsset(
     meter_black: existing.technical_specification?.meter_black,
     meter_colour: existing.technical_specification?.meter_colour,
     cassettes: existing.technical_specification?.cassettes,
-    internal_finisher: existing.technical_specification?.internal_finisher,
+    component_id: existing.technical_specification?.component_id,
     drum_life_c: existing.technical_specification?.drum_life_c,
     drum_life_m: existing.technical_specification?.drum_life_m,
     drum_life_y: existing.technical_specification?.drum_life_y,
@@ -466,7 +487,7 @@ export async function updateArrivalAsset(
     meter_black: asset.meterBlack,
     meter_colour: asset.meterColour,
     cassettes: asset.cassettes,
-    internal_finisher: asset.internalFinisher,
+    component_id: asset.componentId,
     drum_life_c: asset.drumLifeC,
     drum_life_m: asset.drumLifeM,
     drum_life_y: asset.drumLifeY,
@@ -520,6 +541,7 @@ export async function createSingleArrivalAsset(
 
   const created = await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
+    await validateComponentBrands(tx, buildComponentBrandPairs([asset], brandIdByModelId))
     const locationId = await ensureArrivalLocationId(tx, arrival.destination_id)
     return createArrivalAssetInTx(tx, arrival.id, asset, barcode, locationId, now, userId)
   })

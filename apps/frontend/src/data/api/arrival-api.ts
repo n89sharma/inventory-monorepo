@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
 import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, OrgSummary, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
@@ -45,7 +46,7 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       readiness: getSelectedOrNull(s.readiness)!,
       countryOfOrigin: s.countryOfOrigin!,
       manufacturedYear: s.manufacturedYear,
-      internalFinisher: s.internalFinisher,
+      componentId: s.component?.id ?? null,
       coreFunctions: s.coreFunctions,
       drumLifeC: s.drumLifeC!,
       drumLifeM: s.drumLifeM!,
@@ -102,7 +103,7 @@ export async function createSingleArrivalAsset(
     readiness: getSelectedOrNull(asset.readiness)!,
     countryOfOrigin: asset.countryOfOrigin!,
     manufacturedYear: asset.manufacturedYear,
-    internalFinisher: asset.internalFinisher,
+    componentId: asset.component?.id ?? null,
     coreFunctions: asset.coreFunctions,
     drumLifeC: asset.drumLifeC!,
     drumLifeM: asset.drumLifeM!,
@@ -138,7 +139,7 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     readiness: getSelectOption(asset.readiness),
     countryOfOrigin: asset.countryOfOrigin,
     manufacturedYear: asset.manufacturedYear,
-    internalFinisher: asset.internalFinisher,
+    component: useReferenceDataStore.getState().components.find(c => c.id === asset.componentId) ?? null,
     coreFunctions: asset.coreFunctions,
     drumLifeC: asset.drumLifeC,
     drumLifeM: asset.drumLifeM,
@@ -168,7 +169,7 @@ export async function updateArrivalAsset(
     readiness: getSelectedOrNull(asset.readiness)!,
     countryOfOrigin: asset.countryOfOrigin,
     manufacturedYear: asset.manufacturedYear,
-    internalFinisher: asset.internalFinisher,
+    componentId: asset.component?.id ?? null,
     coreFunctions: asset.coreFunctions,
     drumLifeC: asset.drumLifeC!,
     drumLifeM: asset.drumLifeM!,

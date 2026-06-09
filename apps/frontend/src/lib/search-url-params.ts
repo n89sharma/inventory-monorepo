@@ -1,4 +1,4 @@
-import type { ModelSummary, Status, Warehouse } from 'shared-types'
+import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
@@ -11,7 +11,6 @@ const PARAM_CAS = 'cas'
 const PARAM_FIN = 'fin'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
-export const INTERNAL_FINISHER_PATTERN = /^[a-zA-Z0-9\s\-_.]*$/
 
 export type SearchFilters = {
   model: ModelSummary | null
@@ -19,7 +18,7 @@ export type SearchFilters = {
   meterMin: number | null
   meterMax: number | null
   cassettes: number | null
-  internalFinisher: string | null
+  internalFinisher: Component | null
   statuses: Status[]
   readinesses: Status[]
   selectedWarehouses: Warehouse[]
@@ -30,6 +29,7 @@ export type SearchReferenceData = {
   statuses: Status[]
   readinesses: Status[]
   warehouses: Warehouse[]
+  components: Component[]
 }
 
 export const EMPTY_FILTERS: SearchFilters = {
@@ -74,8 +74,8 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
   if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
   if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
-  if (filters.internalFinisher && INTERNAL_FINISHER_PATTERN.test(filters.internalFinisher)) {
-    params.set(PARAM_FIN, filters.internalFinisher)
+  if (filters.internalFinisher) {
+    params.set(PARAM_FIN, String(filters.internalFinisher.id))
   }
   if (filters.statuses.length > 0) {
     params.set(PARAM_STATUS, encodeIds(filters.statuses))
@@ -108,8 +108,8 @@ export function paramsToFilters(
   const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
 
   const finisherRaw = params.get(PARAM_FIN)
-  const internalFinisher = finisherRaw && INTERNAL_FINISHER_PATTERN.test(finisherRaw)
-    ? finisherRaw
+  const internalFinisher = finisherRaw
+    ? ref.components.find(c => c.id === Number.parseInt(finisherRaw, 10)) ?? null
     : null
 
   return {

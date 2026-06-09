@@ -1,5 +1,5 @@
-import type { CoreFunction, Country, ModelSummary, OrgSummary, Status, UpdateError, Warehouse } from "shared-types"
-import { CoreFunctionsSchema, CountrySchema, MIN_MANUFACTURED_YEAR, ModelSummarySchema, OrgSummarySchema, UpdateErrorSchema } from "shared-types"
+import type { Component, CoreFunction, Country, ModelSummary, OrgSummary, Status, UpdateError, Warehouse } from "shared-types"
+import { ComponentSchema, CoreFunctionsSchema, CountrySchema, MIN_MANUFACTURED_YEAR, ModelSummarySchema, OrgSummarySchema, UpdateErrorSchema } from "shared-types"
 import z from "zod"
 import { isSelected, StatusSelectOptionSchema, WarehouseSelectOptionSchema, type SelectOption } from "./select-option-types"
 
@@ -31,7 +31,7 @@ const specFieldsShape = {
   meterBlack: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Black meter is required"),
   meterColour: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Colour meter is required"),
   cassettes: z.number().min(0).nullable().refine(v => v != null && v != undefined, "Cassettes is required"),
-  internalFinisher: z.string(),
+  component: ComponentSchema.nullable(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0).nullable(),
   drumLifeM: z.number().min(0).nullable(),
@@ -112,7 +112,7 @@ export type AssetForm = {
   readiness: SelectOption<Status>,
   countryOfOrigin: Country | null,
   manufacturedYear: number | null,
-  internalFinisher: string,
+  component: Component | null,
   coreFunctions: CoreFunction[],
   drumLifeC: number | null,
   drumLifeM: number | null,
@@ -133,7 +133,7 @@ export type SpecsForm = {
   meterBlack: number | null,
   meterColour: number | null,
   cassettes: number | null,
-  internalFinisher: string,
+  component: Component | null,
   coreFunctions: CoreFunction[],
   drumLifeC: number | null,
   drumLifeM: number | null,

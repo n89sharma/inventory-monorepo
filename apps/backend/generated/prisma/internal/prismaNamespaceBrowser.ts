@@ -81,7 +81,8 @@ export const ModelName = {
   Readiness: 'Readiness',
   Status: 'Status',
   Zone: 'Zone',
-  Country: 'Country'
+  Country: 'Country',
+  Component: 'Component'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -136,7 +137,6 @@ export const TechnicalSpecificationScalarFieldEnum = {
   id: 'id',
   asset_id: 'asset_id',
   cassettes: 'cassettes',
-  internal_finisher: 'internal_finisher',
   meter_black: 'meter_black',
   meter_colour: 'meter_colour',
   meter_total: 'meter_total',
@@ -147,7 +147,8 @@ export const TechnicalSpecificationScalarFieldEnum = {
   toner_life_c: 'toner_life_c',
   toner_life_k: 'toner_life_k',
   toner_life_m: 'toner_life_m',
-  toner_life_y: 'toner_life_y'
+  toner_life_y: 'toner_life_y',
+  component_id: 'component_id'
 } as const
 
 export type TechnicalSpecificationScalarFieldEnum = (typeof TechnicalSpecificationScalarFieldEnum)[keyof typeof TechnicalSpecificationScalarFieldEnum]
@@ -480,6 +481,15 @@ export const CountryScalarFieldEnum = {
 } as const
 
 export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
+
+
+export const ComponentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  brand_id: 'brand_id'
+} as const
+
+export type ComponentScalarFieldEnum = (typeof ComponentScalarFieldEnum)[keyof typeof ComponentScalarFieldEnum]
 
 
 export const SortOrder = {

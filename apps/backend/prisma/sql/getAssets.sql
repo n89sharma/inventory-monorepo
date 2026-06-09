@@ -16,7 +16,7 @@ select
   l.bin as bin,
   t.meter_total as specs_meter_total,
   t.cassettes as specs_cassettes,
-  t.internal_finisher as specs_internal_finisher,
+  cmp."name" as specs_internal_finisher,
   t.toner_life_c as specs_toner_life_c,
   t.toner_life_m as specs_toner_life_m,
   t.toner_life_y as specs_toner_life_y,
@@ -35,6 +35,7 @@ select
   lcu."name" as latest_comment_by
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
+  left join "Component" cmp on cmp.id = t.component_id
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
@@ -67,6 +68,6 @@ where ($1 = '' or m."name" ~* $1)
   and ($5 = -1 or t.meter_total >= $5)
   and ($6 = -1 or t.meter_total <= $6)
   and ($7 = -1 or t.cassettes >= $7)
-  and ($8 = '' or t.internal_finisher ~* $8)
+  and ($8 = -1 or cmp.id = $8)
   and (array_length($9::int[], 1) is null or b.id = any($9::int[]))
   and (array_length($10::int[], 1) is null or at.id = any($10::int[]))

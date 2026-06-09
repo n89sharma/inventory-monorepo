@@ -192,6 +192,7 @@ export type BrandWhereInput = {
   NOT?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
   id?: Prisma.IntFilter<"Brand"> | number
   name?: Prisma.StringFilter<"Brand"> | string
+  Component?: Prisma.ComponentListRelationFilter
   errors?: Prisma.ErrorListRelationFilter
   models?: Prisma.ModelListRelationFilter
 }
@@ -199,6 +200,7 @@ export type BrandWhereInput = {
 export type BrandOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  Component?: Prisma.ComponentOrderByRelationAggregateInput
   errors?: Prisma.ErrorOrderByRelationAggregateInput
   models?: Prisma.ModelOrderByRelationAggregateInput
 }
@@ -209,6 +211,7 @@ export type BrandWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
   OR?: Prisma.BrandWhereInput[]
   NOT?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
+  Component?: Prisma.ComponentListRelationFilter
   errors?: Prisma.ErrorListRelationFilter
   models?: Prisma.ModelListRelationFilter
 }, "id" | "name">
@@ -233,6 +236,7 @@ export type BrandScalarWhereWithAggregatesInput = {
 
 export type BrandCreateInput = {
   name: string
+  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelCreateNestedManyWithoutBrandInput
 }
@@ -240,12 +244,14 @@ export type BrandCreateInput = {
 export type BrandUncheckedCreateInput = {
   id?: number
   name: string
+  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
 }
@@ -253,6 +259,7 @@ export type BrandUpdateInput = {
 export type BrandUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
 }
@@ -327,14 +334,30 @@ export type BrandUpdateOneRequiredWithoutModelsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutModelsInput, Prisma.BrandUpdateWithoutModelsInput>, Prisma.BrandUncheckedUpdateWithoutModelsInput>
 }
 
+export type BrandCreateNestedOneWithoutComponentInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentInput
+  connect?: Prisma.BrandWhereUniqueInput
+}
+
+export type BrandUpdateOneRequiredWithoutComponentNestedInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentInput
+  upsert?: Prisma.BrandUpsertWithoutComponentInput
+  connect?: Prisma.BrandWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutComponentInput, Prisma.BrandUpdateWithoutComponentInput>, Prisma.BrandUncheckedUpdateWithoutComponentInput>
+}
+
 export type BrandCreateWithoutErrorsInput = {
   name: string
+  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutErrorsInput = {
   id?: number
   name: string
+  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
 }
 
@@ -356,23 +379,27 @@ export type BrandUpdateToOneWithWhereWithoutErrorsInput = {
 
 export type BrandUpdateWithoutErrorsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutErrorsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutModelsInput = {
   name: string
+  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutModelsInput = {
   id?: number
   name: string
+  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
 }
 
@@ -394,13 +421,57 @@ export type BrandUpdateToOneWithWhereWithoutModelsInput = {
 
 export type BrandUpdateWithoutModelsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutModelsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
+}
+
+export type BrandCreateWithoutComponentInput = {
+  name: string
+  errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
+  models?: Prisma.ModelCreateNestedManyWithoutBrandInput
+}
+
+export type BrandUncheckedCreateWithoutComponentInput = {
+  id?: number
+  name: string
+  errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
+  models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
+}
+
+export type BrandCreateOrConnectWithoutComponentInput = {
+  where: Prisma.BrandWhereUniqueInput
+  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+}
+
+export type BrandUpsertWithoutComponentInput = {
+  update: Prisma.XOR<Prisma.BrandUpdateWithoutComponentInput, Prisma.BrandUncheckedUpdateWithoutComponentInput>
+  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+  where?: Prisma.BrandWhereInput
+}
+
+export type BrandUpdateToOneWithWhereWithoutComponentInput = {
+  where?: Prisma.BrandWhereInput
+  data: Prisma.XOR<Prisma.BrandUpdateWithoutComponentInput, Prisma.BrandUncheckedUpdateWithoutComponentInput>
+}
+
+export type BrandUpdateWithoutComponentInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
+  models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
+}
+
+export type BrandUncheckedUpdateWithoutComponentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
+  models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 
@@ -409,11 +480,13 @@ export type BrandUncheckedUpdateWithoutModelsInput = {
  */
 
 export type BrandCountOutputType = {
+  Component: number
   errors: number
   models: number
 }
 
 export type BrandCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  Component?: boolean | BrandCountOutputTypeCountComponentArgs
   errors?: boolean | BrandCountOutputTypeCountErrorsArgs
   models?: boolean | BrandCountOutputTypeCountModelsArgs
 }
@@ -426,6 +499,13 @@ export type BrandCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the BrandCountOutputType
    */
   select?: Prisma.BrandCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * BrandCountOutputType without action
+ */
+export type BrandCountOutputTypeCountComponentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComponentWhereInput
 }
 
 /**
@@ -446,6 +526,7 @@ export type BrandCountOutputTypeCountModelsArgs<ExtArgs extends runtime.Types.Ex
 export type BrandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  Component?: boolean | Prisma.Brand$ComponentArgs<ExtArgs>
   errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
   models?: boolean | Prisma.Brand$modelsArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
@@ -468,6 +549,7 @@ export type BrandSelectScalar = {
 
 export type BrandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["brand"]>
 export type BrandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  Component?: boolean | Prisma.Brand$ComponentArgs<ExtArgs>
   errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
   models?: boolean | Prisma.Brand$modelsArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
@@ -478,6 +560,7 @@ export type BrandIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $BrandPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Brand"
   objects: {
+    Component: Prisma.$ComponentPayload<ExtArgs>[]
     errors: Prisma.$ErrorPayload<ExtArgs>[]
     models: Prisma.$ModelPayload<ExtArgs>[]
   }
@@ -878,6 +961,7 @@ readonly fields: BrandFieldRefs;
  */
 export interface Prisma__BrandClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  Component<T extends Prisma.Brand$ComponentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$ComponentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   errors<T extends Prisma.Brand$errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   models<T extends Prisma.Brand$modelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$modelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1310,6 +1394,30 @@ export type BrandDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Brands to delete.
    */
   limit?: number
+}
+
+/**
+ * Brand.Component
+ */
+export type Brand$ComponentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Component
+   */
+  select?: Prisma.ComponentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Component
+   */
+  omit?: Prisma.ComponentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComponentInclude<ExtArgs> | null
+  where?: Prisma.ComponentWhereInput
+  orderBy?: Prisma.ComponentOrderByWithRelationInput | Prisma.ComponentOrderByWithRelationInput[]
+  cursor?: Prisma.ComponentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
 }
 
 /**

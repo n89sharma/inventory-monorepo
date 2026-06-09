@@ -80,7 +80,7 @@ type AssetUpdateFields = Partial<{
   meter_colour: number | null
   meter_total: number | null
   cassettes: number | null
-  internal_finisher: string | null
+  component_id: number | null
   drum_life_c: number | null
   drum_life_m: number | null
   drum_life_y: number | null
@@ -178,6 +178,12 @@ async function resolveInvoiceNumber(id: number | null | undefined): Promise<stri
   if (!id) return null
   const r = await prisma.invoice.findUnique({ where: { id }, select: { invoice_number: true } })
   return r?.invoice_number ?? null
+}
+
+async function resolveComponentName(id: number | null | undefined): Promise<string | null> {
+  if (!id) return null
+  const r = await prisma.component.findUnique({ where: { id }, select: { name: true } })
+  return r?.name ?? null
 }
 
 type LocationParts = { warehouse: string | null; zone: string | null; bin: string | null }
@@ -456,11 +462,20 @@ export async function recordAssetUpdate(
       diffAfter.country_of_origin = afterCountry?.name ?? null
     }
 
+    if (before.component_id !== after.component_id) {
+      const [beforeComponent, afterComponent] = await Promise.all([
+        resolveComponentName(before.component_id),
+        resolveComponentName(after.component_id)
+      ])
+      diffBefore.internal_finisher = beforeComponent
+      diffAfter.internal_finisher = afterComponent
+    }
+
     const plainFields = [
       'serial_number',
       'manufactured_year',
       'meter_black', 'meter_colour', 'meter_total',
-      'cassettes', 'internal_finisher',
+      'cassettes',
       'drum_life_c', 'drum_life_m', 'drum_life_y', 'drum_life_k',
       'toner_life_c', 'toner_life_m', 'toner_life_y', 'toner_life_k'
     ]

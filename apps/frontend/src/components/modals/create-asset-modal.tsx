@@ -125,7 +125,7 @@ export function AssetModal({
       meterBlack: null,
       meterColour: null,
       cassettes: null,
-      internalFinisher: '',
+      component: null,
       coreFunctions: [],
       drumLifeC: null,
       drumLifeM: null,
@@ -249,6 +249,7 @@ export function AssetModal({
           <TechnicalSpecsFields
             control={newAssetForm.control}
             isColour={isColourModel}
+            brandName={currentBrandName}
             renderAfterReadiness={
               <HorizontalField label='Errors' required={isHasErrors}>
                 <Controller

@@ -33,7 +33,7 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   meterBlack: null,
   meterColour: null,
   cassettes: null,
-  internalFinisher: '',
+  component: null,
   coreFunctions: [],
   drumLifeC: null,
   drumLifeM: null,
@@ -51,6 +51,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
   const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
   const readinesses = useReferenceDataStore(state => state.readinesses)
   const countries = useReferenceDataStore(state => state.countries)
+  const components = useReferenceDataStore(state => state.components)
 
   const form = useForm<SpecsForm>({
     resolver: zodResolver(SpecsFormSchema),
@@ -69,7 +70,9 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         meterBlack: specs.meter_black,
         meterColour: specs.meter_colour,
         cassettes: specs.cassettes,
-        internalFinisher: specs.internal_finisher ?? '',
+        component: components.find(
+          c => c.brand_name === assetDetails.brand && c.name === specs.internal_finisher,
+        ) ?? null,
         coreFunctions: coreFunctions.filter(cf => accessories.includes(cf.accessory)),
         drumLifeC: specs.drum_life_c,
         drumLifeM: specs.drum_life_m,
@@ -94,7 +97,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         country_of_origin_id: values.countryOfOrigin?.id ?? null,
         manufactured_year: values.manufacturedYear,
         cassettes: values.cassettes,
-        internal_finisher: values.internalFinisher || null,
+        component_id: values.component?.id ?? null,
         meter_black: values.meterBlack,
         meter_colour: values.meterColour,
         drum_life_c: values.drumLifeC,
@@ -136,6 +139,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
           <TechnicalSpecsFields
             control={form.control}
             isColour={assetDetails.is_colour}
+            brandName={assetDetails.brand}
           />
         </form>
 

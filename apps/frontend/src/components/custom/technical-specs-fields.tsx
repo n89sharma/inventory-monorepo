@@ -2,18 +2,20 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { getSelectOption, isSelected, UNSELECTED, type SelectOption } from '@/ui-types/select-option-types'
+import { useMemo, useState } from 'react'
 import {
   Controller,
   type Control,
   type FieldValues,
   type Path,
 } from 'react-hook-form'
-import type { CoreFunction, Country, Status } from 'shared-types'
+import type { Component, CoreFunction, Country, Status } from 'shared-types'
 import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from './consumables-grid'
 import { HorizontalField } from './horizontal-field'
 import { InputWithClearInline } from './input-with-clear'
+import { ModelSearchInput } from './model-search-input'
 import { PopoverSearchInline } from './popover-search'
 import { ReadinessPicker } from './readiness-picker'
 
@@ -137,9 +139,59 @@ function getCoreFunctionOptions(cfs: CoreFunction[]) {
   return cfs.map(f => ({ id: f.id, label: f.accessory, value: f.accessory }))
 }
 
+/**
+ * Internal-finisher picker. Mirrors the Model search input: a pill once a
+ * Component is selected, a type-to-filter combobox otherwise. Options are the
+ * brand's components when a brand is known, else the full cross-brand list
+ * (labelled with the brand to disambiguate repeated names).
+ */
+function ControlledComponentSearch<T extends FieldValues>(
+  {
+    control,
+    name,
+    brandName,
+    className,
+  }: {
+    control: Control<T>
+    name: Path<T>
+    brandName: string | null
+    className?: string
+  }
+) {
+  const components = useReferenceDataStore(state => state.components)
+  const [query, setQuery] = useState('')
+  const options = useMemo(
+    () => (brandName ? components.filter(c => c.brand_name === brandName) : components),
+    [components, brandName],
+  )
+  const getLabel = (c: Component) => (brandName ? c.name : `${c.brand_name} — ${c.name}`)
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <ModelSearchInput
+          selection={field.value as Component | null}
+          query={query}
+          onSelectionChange={(c: Component) => { field.onChange(c); setQuery('') }}
+          onQueryChange={setQuery}
+          onClear={() => { field.onChange(null); setQuery('') }}
+          options={options}
+          searchKey='name'
+          getLabel={getLabel}
+          placeholder=''
+          clearLabel='Clear internal finisher'
+          className={className}
+        />
+      )}
+    />
+  )
+}
+
 interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
+  brandName: string | null
   renderAfterReadiness?: React.ReactNode
 }
 
@@ -154,7 +206,7 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
  * field paths are cast once via `p()`.
  */
 export function TechnicalSpecsFields<T extends FieldValues>(
-  { control, isColour, renderAfterReadiness }: TechnicalSpecsFieldsProps<T>
+  { control, isColour, brandName, renderAfterReadiness }: TechnicalSpecsFieldsProps<T>
 ) {
   const readinesses = useReferenceDataStore(state => state.readinesses)
   const countries = useReferenceDataStore(state => state.countries)
@@ -273,9 +325,10 @@ export function TechnicalSpecsFields<T extends FieldValues>(
           />
         </HorizontalField>
         <HorizontalField label='Internal Finisher'>
-          <ControlledTextInput
+          <ControlledComponentSearch
             control={control}
-            name={p('internalFinisher')}
+            name={p('component')}
+            brandName={brandName}
             className={INPUT_WIDTH}
           />
         </HorizontalField>

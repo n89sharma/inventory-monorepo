@@ -196,3 +196,8 @@ export type Zone = Prisma.ZoneModel
  * 
  */
 export type Country = Prisma.CountryModel
+/**
+ * Model Component
+ * 
+ */
+export type Component = Prisma.ComponentModel

@@ -42,8 +42,9 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
       size: 70
     },
     {
-      accessorKey: "internalFinisher",
+      id: "component",
       header: "Internal Finisher",
+      accessorFn: row => row.component?.name ?? '',
       size: 70
     },
     {

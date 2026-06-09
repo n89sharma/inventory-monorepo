@@ -56,6 +56,13 @@ export const ErrorSchema = z.object({
   category: z.string()
 })
 
+export const ComponentSchema = z.object({
+  id: z.number(),
+  brand_id: z.number(),
+  brand_name: z.string(),
+  name: z.string()
+})
+
 export const ReferenceDataSchema = z.object({
   coreFunctions: z.array(CoreFunctionsSchema),
   assetTypes: z.array(AssetTypeSchema),
@@ -66,6 +73,7 @@ export const ReferenceDataSchema = z.object({
   warehouses: z.array(WarehouseSchema),
   zones: z.array(ZoneSchema),
   errors: z.array(ErrorSchema),
+  components: z.array(ComponentSchema),
   countries: z.array(CountrySchema)
 });
 
@@ -84,4 +92,5 @@ export type Warehouse = z.infer<typeof WarehouseSchema>;
 export type AssetLocation = z.infer<typeof AssetLocationSchema>;
 export type Zone = z.infer<typeof ZoneSchema>;
 export type Error = z.infer<typeof ErrorSchema>;
+export type Component = z.infer<typeof ComponentSchema>;
 export type Country = z.infer<typeof CountrySchema>;

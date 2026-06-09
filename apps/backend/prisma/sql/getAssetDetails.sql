@@ -26,7 +26,7 @@ select
   c.sale_price as sale_price,
   -- technical spec
   ts.cassettes as ts_cassettes,
-  ts.internal_finisher as internal_finisher,
+  cmp."name" as internal_finisher,
   ts.meter_black as meter_black,
   ts.meter_colour as meter_colour,
   ts.meter_total as meter_total,
@@ -80,6 +80,7 @@ from "Asset" a
   join "Readiness" rd on rd.id = a.readiness_id
   left join "Cost" c on c.asset_id = a.id
   left join "TechnicalSpecification" ts on ts.asset_id = a.id
+  left join "Component" cmp on cmp.id = ts.component_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id

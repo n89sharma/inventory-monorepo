@@ -63,27 +63,28 @@ model Asset {
 }
 
 model TechnicalSpecification {
-  id                Int     @id @default(autoincrement())
-  asset_id          Int     @unique
-  cassettes         Int?
-  internal_finisher String?
-  meter_black       Int?
-  meter_colour      Int?
-  meter_total       Int?
-  drum_life_c       Int?
-  drum_life_m       Int?
-  drum_life_y       Int?
-  drum_life_k       Int?
-  toner_life_c      Int?
-  toner_life_k      Int?
-  toner_life_m      Int?
-  toner_life_y      Int?
-  asset             Asset   @relation(fields: [asset_id], references: [id])
+  id           Int        @id @default(autoincrement())
+  asset_id     Int        @unique
+  cassettes    Int?
+  meter_black  Int?
+  meter_colour Int?
+  meter_total  Int?
+  drum_life_c  Int?
+  drum_life_m  Int?
+  drum_life_y  Int?
+  drum_life_k  Int?
+  toner_life_c Int?
+  toner_life_k Int?
+  toner_life_m Int?
+  toner_life_y Int?
+  component_id Int?
+  asset        Asset      @relation(fields: [asset_id], references: [id])
+  Component    Component? @relation(fields: [component_id], references: [id])
 
   @@index([meter_total])
-  @@index([internal_finisher])
   @@index([meter_black])
   @@index([meter_colour])
+  @@index([component_id])
 }
 
 model Cost {
@@ -291,10 +292,11 @@ model Location {
 }
 
 model Brand {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique
-  errors Error[]
-  models Model[]
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  Component Component[]
+  errors    Error[]
+  models    Model[]
 }
 
 model Model {
@@ -480,4 +482,15 @@ model Country {
   id    Int     @id @default(autoincrement())
   name  String
   Asset Asset[]
+}
+
+model Component {
+  id                     Int                      @id @default(autoincrement())
+  name                   String
+  brand_id               Int
+  Brand                  Brand                    @relation(fields: [brand_id], references: [id])
+  TechnicalSpecification TechnicalSpecification[]
+
+  @@unique([brand_id, name])
+  @@index([name])
 }

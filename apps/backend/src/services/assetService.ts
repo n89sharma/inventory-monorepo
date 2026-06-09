@@ -11,6 +11,7 @@ import {
   getAssetTransfers as getAssetTransfersQuery,
   getLocationsByWarehouse as getLocationsByWarehouseQuery
 } from '../../generated/prisma/sql.js'
+import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -163,7 +164,7 @@ export async function getAssets(
   meterMinParam: number,
   meterMaxParam: number,
   cassettesParam: number,
-  internalFinisherParam: string,
+  componentIdParam: number,
   brandIds: number[],
   assetTypeIds: number[],
   role: AppRole | null,
@@ -177,7 +178,7 @@ export async function getAssets(
       meterMinParam,
       meterMaxParam,
       cassettesParam,
-      internalFinisherParam,
+      componentIdParam,
       brandIds,
       assetTypeIds,
     )
@@ -212,7 +213,7 @@ export async function getStockReportAssets(
     meterMinParam,
     meterMaxParam,
     -1,
-    '',
+    -1,
     brandIds,
     assetTypeIds,
     role,
@@ -766,9 +767,10 @@ export async function updateAssetSpecs(
       readiness_id: true,
       country_of_origin_id: true,
       manufactured_year: true,
+      model: { select: { brand_id: true } },
       technical_specification: {
         select: {
-          cassettes: true, internal_finisher: true, meter_black: true, meter_colour: true,
+          cassettes: true, component_id: true, meter_black: true, meter_colour: true,
           meter_total: true, drum_life_c: true, drum_life_m: true, drum_life_y: true, drum_life_k: true,
           toner_life_c: true, toner_life_m: true, toner_life_y: true, toner_life_k: true
         }
@@ -776,6 +778,13 @@ export async function updateAssetSpecs(
     }
   })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+
+  if (data.component_id !== null) {
+    await validateComponentBrands(
+      prisma,
+      [{ componentId: data.component_id, expectedBrandId: asset.model.brand_id }]
+    )
+  }
 
   const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
 
@@ -796,7 +805,7 @@ export async function updateAssetSpecs(
     prisma.technicalSpecification.upsert({
       where: { asset_id: asset.id },
       update: {
-        cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+        cassettes: data.cassettes, component_id: data.component_id,
         meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
         drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
         drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,
@@ -804,7 +813,7 @@ export async function updateAssetSpecs(
         toner_life_y: data.toner_life_y, toner_life_k: data.toner_life_k
       },
       create: {
-        asset_id: asset.id, cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+        asset_id: asset.id, cassettes: data.cassettes, component_id: data.component_id,
         meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
         drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
         drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,
@@ -821,7 +830,7 @@ export async function updateAssetSpecs(
     country_of_origin_id: asset.country_of_origin_id,
     manufactured_year: asset.manufactured_year,
     cassettes: asset.technical_specification?.cassettes,
-    internal_finisher: asset.technical_specification?.internal_finisher,
+    component_id: asset.technical_specification?.component_id,
     meter_black: asset.technical_specification?.meter_black,
     meter_colour: asset.technical_specification?.meter_colour,
     meter_total: asset.technical_specification?.meter_total,
@@ -837,7 +846,7 @@ export async function updateAssetSpecs(
     readiness_id: data.readiness_id,
     country_of_origin_id: data.country_of_origin_id,
     manufactured_year: data.manufactured_year,
-    cassettes: data.cassettes, internal_finisher: data.internal_finisher,
+    cassettes: data.cassettes, component_id: data.component_id,
     meter_black: data.meter_black, meter_colour: data.meter_colour, meter_total,
     drum_life_c: data.drum_life_c, drum_life_m: data.drum_life_m,
     drum_life_y: data.drum_life_y, drum_life_k: data.drum_life_k,

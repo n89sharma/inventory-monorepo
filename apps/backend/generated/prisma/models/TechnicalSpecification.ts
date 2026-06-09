@@ -41,6 +41,7 @@ export type TechnicalSpecificationAvgAggregateOutputType = {
   toner_life_k: number | null
   toner_life_m: number | null
   toner_life_y: number | null
+  component_id: number | null
 }
 
 export type TechnicalSpecificationSumAggregateOutputType = {
@@ -58,13 +59,13 @@ export type TechnicalSpecificationSumAggregateOutputType = {
   toner_life_k: number | null
   toner_life_m: number | null
   toner_life_y: number | null
+  component_id: number | null
 }
 
 export type TechnicalSpecificationMinAggregateOutputType = {
   id: number | null
   asset_id: number | null
   cassettes: number | null
-  internal_finisher: string | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -76,13 +77,13 @@ export type TechnicalSpecificationMinAggregateOutputType = {
   toner_life_k: number | null
   toner_life_m: number | null
   toner_life_y: number | null
+  component_id: number | null
 }
 
 export type TechnicalSpecificationMaxAggregateOutputType = {
   id: number | null
   asset_id: number | null
   cassettes: number | null
-  internal_finisher: string | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -94,13 +95,13 @@ export type TechnicalSpecificationMaxAggregateOutputType = {
   toner_life_k: number | null
   toner_life_m: number | null
   toner_life_y: number | null
+  component_id: number | null
 }
 
 export type TechnicalSpecificationCountAggregateOutputType = {
   id: number
   asset_id: number
   cassettes: number
-  internal_finisher: number
   meter_black: number
   meter_colour: number
   meter_total: number
@@ -112,6 +113,7 @@ export type TechnicalSpecificationCountAggregateOutputType = {
   toner_life_k: number
   toner_life_m: number
   toner_life_y: number
+  component_id: number
   _all: number
 }
 
@@ -131,6 +133,7 @@ export type TechnicalSpecificationAvgAggregateInputType = {
   toner_life_k?: true
   toner_life_m?: true
   toner_life_y?: true
+  component_id?: true
 }
 
 export type TechnicalSpecificationSumAggregateInputType = {
@@ -148,13 +151,13 @@ export type TechnicalSpecificationSumAggregateInputType = {
   toner_life_k?: true
   toner_life_m?: true
   toner_life_y?: true
+  component_id?: true
 }
 
 export type TechnicalSpecificationMinAggregateInputType = {
   id?: true
   asset_id?: true
   cassettes?: true
-  internal_finisher?: true
   meter_black?: true
   meter_colour?: true
   meter_total?: true
@@ -166,13 +169,13 @@ export type TechnicalSpecificationMinAggregateInputType = {
   toner_life_k?: true
   toner_life_m?: true
   toner_life_y?: true
+  component_id?: true
 }
 
 export type TechnicalSpecificationMaxAggregateInputType = {
   id?: true
   asset_id?: true
   cassettes?: true
-  internal_finisher?: true
   meter_black?: true
   meter_colour?: true
   meter_total?: true
@@ -184,13 +187,13 @@ export type TechnicalSpecificationMaxAggregateInputType = {
   toner_life_k?: true
   toner_life_m?: true
   toner_life_y?: true
+  component_id?: true
 }
 
 export type TechnicalSpecificationCountAggregateInputType = {
   id?: true
   asset_id?: true
   cassettes?: true
-  internal_finisher?: true
   meter_black?: true
   meter_colour?: true
   meter_total?: true
@@ -202,6 +205,7 @@ export type TechnicalSpecificationCountAggregateInputType = {
   toner_life_k?: true
   toner_life_m?: true
   toner_life_y?: true
+  component_id?: true
   _all?: true
 }
 
@@ -295,7 +299,6 @@ export type TechnicalSpecificationGroupByOutputType = {
   id: number
   asset_id: number
   cassettes: number | null
-  internal_finisher: string | null
   meter_black: number | null
   meter_colour: number | null
   meter_total: number | null
@@ -307,6 +310,7 @@ export type TechnicalSpecificationGroupByOutputType = {
   toner_life_k: number | null
   toner_life_m: number | null
   toner_life_y: number | null
+  component_id: number | null
   _count: TechnicalSpecificationCountAggregateOutputType | null
   _avg: TechnicalSpecificationAvgAggregateOutputType | null
   _sum: TechnicalSpecificationSumAggregateOutputType | null
@@ -336,7 +340,6 @@ export type TechnicalSpecificationWhereInput = {
   id?: Prisma.IntFilter<"TechnicalSpecification"> | number
   asset_id?: Prisma.IntFilter<"TechnicalSpecification"> | number
   cassettes?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
-  internal_finisher?: Prisma.StringNullableFilter<"TechnicalSpecification"> | string | null
   meter_black?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   meter_colour?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   meter_total?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
@@ -348,14 +351,15 @@ export type TechnicalSpecificationWhereInput = {
   toner_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   toner_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   toner_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  component_id?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  Component?: Prisma.XOR<Prisma.ComponentNullableScalarRelationFilter, Prisma.ComponentWhereInput> | null
 }
 
 export type TechnicalSpecificationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   asset_id?: Prisma.SortOrder
   cassettes?: Prisma.SortOrderInput | Prisma.SortOrder
-  internal_finisher?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_black?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_colour?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_total?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -367,7 +371,9 @@ export type TechnicalSpecificationOrderByWithRelationInput = {
   toner_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
   toner_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
   toner_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
+  component_id?: Prisma.SortOrderInput | Prisma.SortOrder
   asset?: Prisma.AssetOrderByWithRelationInput
+  Component?: Prisma.ComponentOrderByWithRelationInput
 }
 
 export type TechnicalSpecificationWhereUniqueInput = Prisma.AtLeast<{
@@ -377,7 +383,6 @@ export type TechnicalSpecificationWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TechnicalSpecificationWhereInput[]
   NOT?: Prisma.TechnicalSpecificationWhereInput | Prisma.TechnicalSpecificationWhereInput[]
   cassettes?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
-  internal_finisher?: Prisma.StringNullableFilter<"TechnicalSpecification"> | string | null
   meter_black?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   meter_colour?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   meter_total?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
@@ -389,14 +394,15 @@ export type TechnicalSpecificationWhereUniqueInput = Prisma.AtLeast<{
   toner_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   toner_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   toner_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  component_id?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  Component?: Prisma.XOR<Prisma.ComponentNullableScalarRelationFilter, Prisma.ComponentWhereInput> | null
 }, "id" | "asset_id">
 
 export type TechnicalSpecificationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   asset_id?: Prisma.SortOrder
   cassettes?: Prisma.SortOrderInput | Prisma.SortOrder
-  internal_finisher?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_black?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_colour?: Prisma.SortOrderInput | Prisma.SortOrder
   meter_total?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -408,6 +414,7 @@ export type TechnicalSpecificationOrderByWithAggregationInput = {
   toner_life_k?: Prisma.SortOrderInput | Prisma.SortOrder
   toner_life_m?: Prisma.SortOrderInput | Prisma.SortOrder
   toner_life_y?: Prisma.SortOrderInput | Prisma.SortOrder
+  component_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TechnicalSpecificationCountOrderByAggregateInput
   _avg?: Prisma.TechnicalSpecificationAvgOrderByAggregateInput
   _max?: Prisma.TechnicalSpecificationMaxOrderByAggregateInput
@@ -422,7 +429,6 @@ export type TechnicalSpecificationScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"TechnicalSpecification"> | number
   asset_id?: Prisma.IntWithAggregatesFilter<"TechnicalSpecification"> | number
   cassettes?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
-  internal_finisher?: Prisma.StringNullableWithAggregatesFilter<"TechnicalSpecification"> | string | null
   meter_black?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   meter_colour?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   meter_total?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
@@ -434,11 +440,11 @@ export type TechnicalSpecificationScalarWhereWithAggregatesInput = {
   toner_life_k?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   toner_life_m?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
   toner_life_y?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
+  component_id?: Prisma.IntNullableWithAggregatesFilter<"TechnicalSpecification"> | number | null
 }
 
 export type TechnicalSpecificationCreateInput = {
   cassettes?: number | null
-  internal_finisher?: string | null
   meter_black?: number | null
   meter_colour?: number | null
   meter_total?: number | null
@@ -451,13 +457,13 @@ export type TechnicalSpecificationCreateInput = {
   toner_life_m?: number | null
   toner_life_y?: number | null
   asset: Prisma.AssetCreateNestedOneWithoutTechnical_specificationInput
+  Component?: Prisma.ComponentCreateNestedOneWithoutTechnicalSpecificationInput
 }
 
 export type TechnicalSpecificationUncheckedCreateInput = {
   id?: number
   asset_id: number
   cassettes?: number | null
-  internal_finisher?: string | null
   meter_black?: number | null
   meter_colour?: number | null
   meter_total?: number | null
@@ -469,11 +475,11 @@ export type TechnicalSpecificationUncheckedCreateInput = {
   toner_life_k?: number | null
   toner_life_m?: number | null
   toner_life_y?: number | null
+  component_id?: number | null
 }
 
 export type TechnicalSpecificationUpdateInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -486,13 +492,13 @@ export type TechnicalSpecificationUpdateInput = {
   toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset?: Prisma.AssetUpdateOneRequiredWithoutTechnical_specificationNestedInput
+  Component?: Prisma.ComponentUpdateOneWithoutTechnicalSpecificationNestedInput
 }
 
 export type TechnicalSpecificationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -504,13 +510,13 @@ export type TechnicalSpecificationUncheckedUpdateInput = {
   toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  component_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationCreateManyInput = {
   id?: number
   asset_id: number
   cassettes?: number | null
-  internal_finisher?: string | null
   meter_black?: number | null
   meter_colour?: number | null
   meter_total?: number | null
@@ -522,11 +528,11 @@ export type TechnicalSpecificationCreateManyInput = {
   toner_life_k?: number | null
   toner_life_m?: number | null
   toner_life_y?: number | null
+  component_id?: number | null
 }
 
 export type TechnicalSpecificationUpdateManyMutationInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -544,7 +550,6 @@ export type TechnicalSpecificationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -556,6 +561,7 @@ export type TechnicalSpecificationUncheckedUpdateManyInput = {
   toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  component_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type TechnicalSpecificationNullableScalarRelationFilter = {
@@ -567,7 +573,6 @@ export type TechnicalSpecificationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   asset_id?: Prisma.SortOrder
   cassettes?: Prisma.SortOrder
-  internal_finisher?: Prisma.SortOrder
   meter_black?: Prisma.SortOrder
   meter_colour?: Prisma.SortOrder
   meter_total?: Prisma.SortOrder
@@ -579,6 +584,7 @@ export type TechnicalSpecificationCountOrderByAggregateInput = {
   toner_life_k?: Prisma.SortOrder
   toner_life_m?: Prisma.SortOrder
   toner_life_y?: Prisma.SortOrder
+  component_id?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationAvgOrderByAggregateInput = {
@@ -596,13 +602,13 @@ export type TechnicalSpecificationAvgOrderByAggregateInput = {
   toner_life_k?: Prisma.SortOrder
   toner_life_m?: Prisma.SortOrder
   toner_life_y?: Prisma.SortOrder
+  component_id?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   asset_id?: Prisma.SortOrder
   cassettes?: Prisma.SortOrder
-  internal_finisher?: Prisma.SortOrder
   meter_black?: Prisma.SortOrder
   meter_colour?: Prisma.SortOrder
   meter_total?: Prisma.SortOrder
@@ -614,13 +620,13 @@ export type TechnicalSpecificationMaxOrderByAggregateInput = {
   toner_life_k?: Prisma.SortOrder
   toner_life_m?: Prisma.SortOrder
   toner_life_y?: Prisma.SortOrder
+  component_id?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   asset_id?: Prisma.SortOrder
   cassettes?: Prisma.SortOrder
-  internal_finisher?: Prisma.SortOrder
   meter_black?: Prisma.SortOrder
   meter_colour?: Prisma.SortOrder
   meter_total?: Prisma.SortOrder
@@ -632,6 +638,7 @@ export type TechnicalSpecificationMinOrderByAggregateInput = {
   toner_life_k?: Prisma.SortOrder
   toner_life_m?: Prisma.SortOrder
   toner_life_y?: Prisma.SortOrder
+  component_id?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationSumOrderByAggregateInput = {
@@ -649,6 +656,17 @@ export type TechnicalSpecificationSumOrderByAggregateInput = {
   toner_life_k?: Prisma.SortOrder
   toner_life_m?: Prisma.SortOrder
   toner_life_y?: Prisma.SortOrder
+  component_id?: Prisma.SortOrder
+}
+
+export type TechnicalSpecificationListRelationFilter = {
+  every?: Prisma.TechnicalSpecificationWhereInput
+  some?: Prisma.TechnicalSpecificationWhereInput
+  none?: Prisma.TechnicalSpecificationWhereInput
+}
+
+export type TechnicalSpecificationOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type TechnicalSpecificationCreateNestedOneWithoutAssetInput = {
@@ -683,9 +701,50 @@ export type TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TechnicalSpecificationUpdateToOneWithWhereWithoutAssetInput, Prisma.TechnicalSpecificationUpdateWithoutAssetInput>, Prisma.TechnicalSpecificationUncheckedUpdateWithoutAssetInput>
 }
 
+export type TechnicalSpecificationCreateNestedManyWithoutComponentInput = {
+  create?: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput> | Prisma.TechnicalSpecificationCreateWithoutComponentInput[] | Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput[]
+  connectOrCreate?: Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput | Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput[]
+  createMany?: Prisma.TechnicalSpecificationCreateManyComponentInputEnvelope
+  connect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+}
+
+export type TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput = {
+  create?: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput> | Prisma.TechnicalSpecificationCreateWithoutComponentInput[] | Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput[]
+  connectOrCreate?: Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput | Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput[]
+  createMany?: Prisma.TechnicalSpecificationCreateManyComponentInputEnvelope
+  connect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+}
+
+export type TechnicalSpecificationUpdateManyWithoutComponentNestedInput = {
+  create?: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput> | Prisma.TechnicalSpecificationCreateWithoutComponentInput[] | Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput[]
+  connectOrCreate?: Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput | Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput[]
+  upsert?: Prisma.TechnicalSpecificationUpsertWithWhereUniqueWithoutComponentInput | Prisma.TechnicalSpecificationUpsertWithWhereUniqueWithoutComponentInput[]
+  createMany?: Prisma.TechnicalSpecificationCreateManyComponentInputEnvelope
+  set?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  disconnect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  delete?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  connect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  update?: Prisma.TechnicalSpecificationUpdateWithWhereUniqueWithoutComponentInput | Prisma.TechnicalSpecificationUpdateWithWhereUniqueWithoutComponentInput[]
+  updateMany?: Prisma.TechnicalSpecificationUpdateManyWithWhereWithoutComponentInput | Prisma.TechnicalSpecificationUpdateManyWithWhereWithoutComponentInput[]
+  deleteMany?: Prisma.TechnicalSpecificationScalarWhereInput | Prisma.TechnicalSpecificationScalarWhereInput[]
+}
+
+export type TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput = {
+  create?: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput> | Prisma.TechnicalSpecificationCreateWithoutComponentInput[] | Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput[]
+  connectOrCreate?: Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput | Prisma.TechnicalSpecificationCreateOrConnectWithoutComponentInput[]
+  upsert?: Prisma.TechnicalSpecificationUpsertWithWhereUniqueWithoutComponentInput | Prisma.TechnicalSpecificationUpsertWithWhereUniqueWithoutComponentInput[]
+  createMany?: Prisma.TechnicalSpecificationCreateManyComponentInputEnvelope
+  set?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  disconnect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  delete?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  connect?: Prisma.TechnicalSpecificationWhereUniqueInput | Prisma.TechnicalSpecificationWhereUniqueInput[]
+  update?: Prisma.TechnicalSpecificationUpdateWithWhereUniqueWithoutComponentInput | Prisma.TechnicalSpecificationUpdateWithWhereUniqueWithoutComponentInput[]
+  updateMany?: Prisma.TechnicalSpecificationUpdateManyWithWhereWithoutComponentInput | Prisma.TechnicalSpecificationUpdateManyWithWhereWithoutComponentInput[]
+  deleteMany?: Prisma.TechnicalSpecificationScalarWhereInput | Prisma.TechnicalSpecificationScalarWhereInput[]
+}
+
 export type TechnicalSpecificationCreateWithoutAssetInput = {
   cassettes?: number | null
-  internal_finisher?: string | null
   meter_black?: number | null
   meter_colour?: number | null
   meter_total?: number | null
@@ -697,12 +756,12 @@ export type TechnicalSpecificationCreateWithoutAssetInput = {
   toner_life_k?: number | null
   toner_life_m?: number | null
   toner_life_y?: number | null
+  Component?: Prisma.ComponentCreateNestedOneWithoutTechnicalSpecificationInput
 }
 
 export type TechnicalSpecificationUncheckedCreateWithoutAssetInput = {
   id?: number
   cassettes?: number | null
-  internal_finisher?: string | null
   meter_black?: number | null
   meter_colour?: number | null
   meter_total?: number | null
@@ -714,6 +773,7 @@ export type TechnicalSpecificationUncheckedCreateWithoutAssetInput = {
   toner_life_k?: number | null
   toner_life_m?: number | null
   toner_life_y?: number | null
+  component_id?: number | null
 }
 
 export type TechnicalSpecificationCreateOrConnectWithoutAssetInput = {
@@ -734,7 +794,154 @@ export type TechnicalSpecificationUpdateToOneWithWhereWithoutAssetInput = {
 
 export type TechnicalSpecificationUpdateWithoutAssetInput = {
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  Component?: Prisma.ComponentUpdateOneWithoutTechnicalSpecificationNestedInput
+}
+
+export type TechnicalSpecificationUncheckedUpdateWithoutAssetInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  component_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type TechnicalSpecificationCreateWithoutComponentInput = {
+  cassettes?: number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
+  drum_life_c?: number | null
+  drum_life_m?: number | null
+  drum_life_y?: number | null
+  drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
+  asset: Prisma.AssetCreateNestedOneWithoutTechnical_specificationInput
+}
+
+export type TechnicalSpecificationUncheckedCreateWithoutComponentInput = {
+  id?: number
+  asset_id: number
+  cassettes?: number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
+  drum_life_c?: number | null
+  drum_life_m?: number | null
+  drum_life_y?: number | null
+  drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
+}
+
+export type TechnicalSpecificationCreateOrConnectWithoutComponentInput = {
+  where: Prisma.TechnicalSpecificationWhereUniqueInput
+  create: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput>
+}
+
+export type TechnicalSpecificationCreateManyComponentInputEnvelope = {
+  data: Prisma.TechnicalSpecificationCreateManyComponentInput | Prisma.TechnicalSpecificationCreateManyComponentInput[]
+  skipDuplicates?: boolean
+}
+
+export type TechnicalSpecificationUpsertWithWhereUniqueWithoutComponentInput = {
+  where: Prisma.TechnicalSpecificationWhereUniqueInput
+  update: Prisma.XOR<Prisma.TechnicalSpecificationUpdateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedUpdateWithoutComponentInput>
+  create: Prisma.XOR<Prisma.TechnicalSpecificationCreateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedCreateWithoutComponentInput>
+}
+
+export type TechnicalSpecificationUpdateWithWhereUniqueWithoutComponentInput = {
+  where: Prisma.TechnicalSpecificationWhereUniqueInput
+  data: Prisma.XOR<Prisma.TechnicalSpecificationUpdateWithoutComponentInput, Prisma.TechnicalSpecificationUncheckedUpdateWithoutComponentInput>
+}
+
+export type TechnicalSpecificationUpdateManyWithWhereWithoutComponentInput = {
+  where: Prisma.TechnicalSpecificationScalarWhereInput
+  data: Prisma.XOR<Prisma.TechnicalSpecificationUpdateManyMutationInput, Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentInput>
+}
+
+export type TechnicalSpecificationScalarWhereInput = {
+  AND?: Prisma.TechnicalSpecificationScalarWhereInput | Prisma.TechnicalSpecificationScalarWhereInput[]
+  OR?: Prisma.TechnicalSpecificationScalarWhereInput[]
+  NOT?: Prisma.TechnicalSpecificationScalarWhereInput | Prisma.TechnicalSpecificationScalarWhereInput[]
+  id?: Prisma.IntFilter<"TechnicalSpecification"> | number
+  asset_id?: Prisma.IntFilter<"TechnicalSpecification"> | number
+  cassettes?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_black?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_colour?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  meter_total?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  drum_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  drum_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  drum_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  drum_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_c?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_k?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_m?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  toner_life_y?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+  component_id?: Prisma.IntNullableFilter<"TechnicalSpecification"> | number | null
+}
+
+export type TechnicalSpecificationCreateManyComponentInput = {
+  id?: number
+  asset_id: number
+  cassettes?: number | null
+  meter_black?: number | null
+  meter_colour?: number | null
+  meter_total?: number | null
+  drum_life_c?: number | null
+  drum_life_m?: number | null
+  drum_life_y?: number | null
+  drum_life_k?: number | null
+  toner_life_c?: number | null
+  toner_life_k?: number | null
+  toner_life_m?: number | null
+  toner_life_y?: number | null
+}
+
+export type TechnicalSpecificationUpdateWithoutComponentInput = {
+  cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  drum_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_c?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_k?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_m?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  asset?: Prisma.AssetUpdateOneRequiredWithoutTechnical_specificationNestedInput
+}
+
+export type TechnicalSpecificationUncheckedUpdateWithoutComponentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
+  cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -748,10 +955,10 @@ export type TechnicalSpecificationUpdateWithoutAssetInput = {
   toner_life_y?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
-export type TechnicalSpecificationUncheckedUpdateWithoutAssetInput = {
+export type TechnicalSpecificationUncheckedUpdateManyWithoutComponentInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   cassettes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  internal_finisher?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   meter_black?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_colour?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   meter_total?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -771,7 +978,6 @@ export type TechnicalSpecificationSelect<ExtArgs extends runtime.Types.Extension
   id?: boolean
   asset_id?: boolean
   cassettes?: boolean
-  internal_finisher?: boolean
   meter_black?: boolean
   meter_colour?: boolean
   meter_total?: boolean
@@ -783,14 +989,15 @@ export type TechnicalSpecificationSelect<ExtArgs extends runtime.Types.Extension
   toner_life_k?: boolean
   toner_life_m?: boolean
   toner_life_y?: boolean
+  component_id?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
 export type TechnicalSpecificationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   asset_id?: boolean
   cassettes?: boolean
-  internal_finisher?: boolean
   meter_black?: boolean
   meter_colour?: boolean
   meter_total?: boolean
@@ -802,14 +1009,15 @@ export type TechnicalSpecificationSelectCreateManyAndReturn<ExtArgs extends runt
   toner_life_k?: boolean
   toner_life_m?: boolean
   toner_life_y?: boolean
+  component_id?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
 export type TechnicalSpecificationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   asset_id?: boolean
   cassettes?: boolean
-  internal_finisher?: boolean
   meter_black?: boolean
   meter_colour?: boolean
   meter_total?: boolean
@@ -821,14 +1029,15 @@ export type TechnicalSpecificationSelectUpdateManyAndReturn<ExtArgs extends runt
   toner_life_k?: boolean
   toner_life_m?: boolean
   toner_life_y?: boolean
+  component_id?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }, ExtArgs["result"]["technicalSpecification"]>
 
 export type TechnicalSpecificationSelectScalar = {
   id?: boolean
   asset_id?: boolean
   cassettes?: boolean
-  internal_finisher?: boolean
   meter_black?: boolean
   meter_colour?: boolean
   meter_total?: boolean
@@ -840,29 +1049,33 @@ export type TechnicalSpecificationSelectScalar = {
   toner_life_k?: boolean
   toner_life_m?: boolean
   toner_life_y?: boolean
+  component_id?: boolean
 }
 
-export type TechnicalSpecificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "cassettes" | "internal_finisher" | "meter_black" | "meter_colour" | "meter_total" | "drum_life_c" | "drum_life_m" | "drum_life_y" | "drum_life_k" | "toner_life_c" | "toner_life_k" | "toner_life_m" | "toner_life_y", ExtArgs["result"]["technicalSpecification"]>
+export type TechnicalSpecificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "cassettes" | "meter_black" | "meter_colour" | "meter_total" | "drum_life_c" | "drum_life_m" | "drum_life_y" | "drum_life_k" | "toner_life_c" | "toner_life_k" | "toner_life_m" | "toner_life_y" | "component_id", ExtArgs["result"]["technicalSpecification"]>
 export type TechnicalSpecificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }
 export type TechnicalSpecificationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }
 export type TechnicalSpecificationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  Component?: boolean | Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>
 }
 
 export type $TechnicalSpecificationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TechnicalSpecification"
   objects: {
     asset: Prisma.$AssetPayload<ExtArgs>
+    Component: Prisma.$ComponentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     asset_id: number
     cassettes: number | null
-    internal_finisher: string | null
     meter_black: number | null
     meter_colour: number | null
     meter_total: number | null
@@ -874,6 +1087,7 @@ export type $TechnicalSpecificationPayload<ExtArgs extends runtime.Types.Extensi
     toner_life_k: number | null
     toner_life_m: number | null
     toner_life_y: number | null
+    component_id: number | null
   }, ExtArgs["result"]["technicalSpecification"]>
   composites: {}
 }
@@ -1269,6 +1483,7 @@ readonly fields: TechnicalSpecificationFieldRefs;
 export interface Prisma__TechnicalSpecificationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  Component<T extends Prisma.TechnicalSpecification$ComponentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TechnicalSpecification$ComponentArgs<ExtArgs>>): Prisma.Prisma__ComponentClient<runtime.Types.Result.GetResult<Prisma.$ComponentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1301,7 +1516,6 @@ export interface TechnicalSpecificationFieldRefs {
   readonly id: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly asset_id: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly cassettes: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
-  readonly internal_finisher: Prisma.FieldRef<"TechnicalSpecification", 'String'>
   readonly meter_black: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly meter_colour: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly meter_total: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
@@ -1313,6 +1527,7 @@ export interface TechnicalSpecificationFieldRefs {
   readonly toner_life_k: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly toner_life_m: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
   readonly toner_life_y: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
+  readonly component_id: Prisma.FieldRef<"TechnicalSpecification", 'Int'>
 }
     
 
@@ -1720,6 +1935,25 @@ export type TechnicalSpecificationDeleteManyArgs<ExtArgs extends runtime.Types.E
    * Limit how many TechnicalSpecifications to delete.
    */
   limit?: number
+}
+
+/**
+ * TechnicalSpecification.Component
+ */
+export type TechnicalSpecification$ComponentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Component
+   */
+  select?: Prisma.ComponentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Component
+   */
+  omit?: Prisma.ComponentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComponentInclude<ExtArgs> | null
+  where?: Prisma.ComponentWhereInput
 }
 
 /**

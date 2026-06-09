@@ -159,6 +159,7 @@ export function QueryPage(): React.JSX.Element {
   )
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
+  const allComponents = useReferenceDataStore(state => state.components)
   const activeWarehouses = useMemo(
     () => allWarehouses.filter(w => w.is_active),
     [allWarehouses],
@@ -170,11 +171,13 @@ export function QueryPage(): React.JSX.Element {
       statuses: allStatuses,
       readinesses: allReadinesses,
       warehouses: allWarehouses,
+      components: allComponents,
     }),
-    [searchParams, models, allStatuses, allReadinesses, allWarehouses],
+    [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
   )
 
   const [draft, setDraft] = useState<SearchFilters>(urlFilters)
+  const [finisherQuery, setFinisherQuery] = useState('')
   const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
   const debounceTimerRef = useRef<number | null>(null)
   const lastCommittedKeyRef = useRef<string>(filtersToParams(urlFilters).toString())
@@ -365,18 +368,23 @@ export function QueryPage(): React.JSX.Element {
               className='w-45'
             />
 
-            <InputWithClearInline
-              value={draft.internalFinisher}
-              onValueChange={val => {
-                if (typeof val !== 'string' && val !== null) return
-                const cleaned = val ? val.replace(/[^a-zA-Z0-9\s\-_.]/g, '') : ''
-                updateDraftDebounced({
-                  ...draft,
-                  internalFinisher: cleaned.length > 0 ? cleaned : null,
-                })
+            <ModelSearchInput
+              selection={draft.internalFinisher}
+              query={finisherQuery}
+              onSelectionChange={c => {
+                setFinisherQuery('')
+                updateDraftImmediate({ ...draft, internalFinisher: c })
               }}
-              fieldLabel='Internal Finisher'
-              inputType='string'
+              onQueryChange={setFinisherQuery}
+              onClear={() => {
+                setFinisherQuery('')
+                updateDraftImmediate({ ...draft, internalFinisher: null })
+              }}
+              options={allComponents}
+              searchKey='name'
+              getLabel={c => `${c.brand_name} — ${c.name}`}
+              placeholder='Internal Finisher'
+              clearLabel='Clear internal finisher'
               className='w-45'
             />
           </fieldset>
