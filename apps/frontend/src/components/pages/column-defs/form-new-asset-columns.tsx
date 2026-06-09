@@ -1,8 +1,10 @@
+import { ReadinessPill } from "@/components/custom/readiness-pill"
 import { Badge } from "@/components/shadcn/badge"
 import { Button } from "@/components/shadcn/button"
 import { formatThousandsK } from "@/lib/formatters"
 import type { AssetForm } from "@/ui-types/arrival-form-types"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
+import { getSelectedOrNull } from "@/ui-types/select-option-types"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { CoreFunction } from 'shared-types'
 
@@ -52,6 +54,9 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
     {
       accessorKey: "readiness.selected.status",
       header: "Readiness",
+      cell: ({ row }) => (
+        <ReadinessPill status={getSelectedOrNull(row.original.readiness)?.status} />
+      ),
       size: 100
     },
     {

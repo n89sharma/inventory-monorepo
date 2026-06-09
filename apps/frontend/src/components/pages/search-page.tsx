@@ -9,6 +9,7 @@ import {
   DEFAULT_VISIBLE_COLUMN_IDS,
   PICKABLE_COLUMNS,
 } from '@/lib/asset-column-sections'
+import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
@@ -327,7 +328,7 @@ export function QueryPage(): React.JSX.Element {
               selection={draft.readinesses}
               onSelectionChange={s => updateDraftDebounced({ ...draft, readinesses: s })}
               options={allReadinesses}
-              getLabel={s => formatSentenceCase(s.status)}
+              getLabel={s => getReadinessDisplay(s.status)}
               fieldLabel='Readiness'
               className='w-45'
             />

@@ -1,4 +1,5 @@
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
+import { getReadinessDisplay } from './readiness-icon'
 import {
   EntryHeader,
   FieldDiffRow,
@@ -8,7 +9,16 @@ import {
 type CreateRecord = Extract<AssetHistoryRecord, { action_type: 'CREATE' }>
 type UpdateRecord = Extract<AssetHistoryRecord, { action_type: 'UPDATE' }>
 
-const UPDATE_FIELDS: { key: keyof AssetUpdateDiff; label: string }[] = [
+const formatReadinessDiff = (value: unknown) =>
+  typeof value === 'string' ? getReadinessDisplay(value) : value
+
+type UpdateField = {
+  key: keyof AssetUpdateDiff
+  label: string
+  format?: (value: unknown) => unknown
+}
+
+const UPDATE_FIELDS: UpdateField[] = [
   { key: 'serial_number', label: 'Serial Number' },
   { key: 'arrival_number', label: 'Arrival' },
   { key: 'departure_number', label: 'Departure' },
@@ -18,7 +28,7 @@ const UPDATE_FIELDS: { key: keyof AssetUpdateDiff; label: string }[] = [
   { key: 'zone', label: 'Zone' },
   { key: 'bin', label: 'Bin' },
   { key: 'model_name', label: 'Model' },
-  { key: 'readiness', label: 'Readiness' },
+  { key: 'readiness', label: 'Readiness', format: formatReadinessDiff },
   { key: 'meter_black', label: 'Meter Black' },
   { key: 'meter_colour', label: 'Meter Colour' },
   { key: 'cassettes', label: 'Cassettes' },
@@ -55,8 +65,14 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="updated" />
       <div className="flex flex-col gap-0.5">
-        {changedFields.map(({ key, label }) => (
-          <FieldDiffRow key={key} label={label} before={before[key]} after={after[key]} />
+        {changedFields.map(({ key, label, format }) => (
+          <FieldDiffRow
+            key={key}
+            label={label}
+            before={before[key]}
+            after={after[key]}
+            format={format}
+          />
         ))}
       </div>
     </div>

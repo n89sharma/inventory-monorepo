@@ -24,10 +24,15 @@ export function FieldChip({ label, value }: { label: string; value: unknown }) {
 }
 
 export function FieldDiffRow(
-  { label, before, after }: { label: string; before: unknown; after: unknown }
+  { label, before, after, format }: {
+    label: string
+    before: unknown
+    after: unknown
+    format?: (value: unknown) => unknown
+  }
 ) {
-  const beforeStr = formatHistoryValue(before)
-  const afterStr = formatHistoryValue(after)
+  const beforeStr = formatHistoryValue(format ? format(before) : before)
+  const afterStr = formatHistoryValue(format ? format(after) : after)
   const hasBefore = beforeStr !== ''
   const hasAfter = afterStr !== ''
 

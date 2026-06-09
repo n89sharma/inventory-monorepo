@@ -1,4 +1,3 @@
-import { formatSentenceCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { getReadinessIconConfig } from './readiness-icon'
 
@@ -8,11 +7,11 @@ export const readinessPillClasses = cn(
 )
 
 export function ReadinessPillContent({ status }: { status: string }) {
-  const { Icon, className, weight = 'regular' } = getReadinessIconConfig(status)
+  const { Icon, className, weight, display } = getReadinessIconConfig(status)
   return (
     <>
       <Icon size={12} weight={weight} className={className} />
-      {formatSentenceCase(status)}
+      {display}
     </>
   )
 }
