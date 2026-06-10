@@ -5,7 +5,7 @@ import {
   PopoverTrigger,
 } from '@/components/shadcn/popover'
 import { useCan } from '@/hooks/use-can'
-import { PICKABLE_COLUMNS, type PickableColumn } from '@/components/pages/column-defs/pickable-columns'
+import { ASSET_TABLE_COLUMNS, type AssetTableColumn } from '@/components/pages/column-defs/asset-table-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'
@@ -22,12 +22,12 @@ export function ColumnPickerButton({
   onReset,
 }: ColumnPickerButtonProps): React.JSX.Element {
   const can = useCan()
-  const permittedColumns = useMemo<readonly PickableColumn[]>(
-    () => (PICKABLE_COLUMNS as readonly PickableColumn[])
+  const permittedColumns = useMemo<readonly AssetTableColumn[]>(
+    () => (ASSET_TABLE_COLUMNS as readonly AssetTableColumn[])
       .filter(c => !c.permission || can(c.permission)),
     [can],
   )
-  const enabledCount = permittedColumns.filter(c => !c.disabled).length
+  const enabledCount = permittedColumns.filter(c => c.enabled).length
   const visibleCount = permittedColumns.filter(c => visible.has(c.id)).length
   return (
     <Popover>

@@ -3,8 +3,8 @@ import { Checkbox } from '@/components/shadcn/checkbox'
 import { Input } from '@/components/shadcn/input'
 import {
   COLUMN_SECTIONS,
-  type PickableColumn,
-} from '@/components/pages/column-defs/pickable-columns'
+  type AssetTableColumn,
+} from '@/components/pages/column-defs/asset-table-columns'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -17,10 +17,10 @@ type ColumnPickerProps = {
   visibleColSet: Set<string>
   onVisibleChange: (next: Set<string>) => void
   onReset: () => void
-  columns: readonly PickableColumn[]
+  columns: readonly AssetTableColumn[]
 }
 
-function matchesQuery(column: PickableColumn, query: string): boolean {
+function matchesQuery(column: AssetTableColumn, query: string): boolean {
   if (query.length === 0) return true
   return column.label.toLowerCase().includes(query.toLowerCase())
 }
@@ -84,7 +84,7 @@ function ColumnRow({
   isOn,
   onToggle,
 }: {
-  column: PickableColumn
+  column: AssetTableColumn
   isOn: boolean
   onToggle: (checked: boolean) => void
 }): React.JSX.Element {
@@ -92,14 +92,14 @@ function ColumnRow({
     <label
       className={cn(
         'flex items-center gap-2 rounded px-2 py-1 text-sm',
-        column.disabled
-          ? 'cursor-not-allowed text-muted-foreground/60'
-          : 'cursor-pointer hover:bg-accent hover:text-accent-foreground',
+        column.enabled
+          ? 'cursor-pointer hover:bg-accent hover:text-accent-foreground'
+          : 'cursor-not-allowed text-muted-foreground/60',
       )}
     >
       <Checkbox
         checked={isOn}
-        disabled={column.disabled}
+        disabled={!column.enabled}
         onCheckedChange={checked => onToggle(!!checked)}
       />
       <span className='truncate'>{column.label}</span>
@@ -133,9 +133,9 @@ export function ColumnPicker({
   const groupedSections = useMemo(
     () => COLUMN_SECTIONS.map(section => {
       const columns = allColumns.filter(
-        c => c.section === section.id && !c.disabled && matchesQuery(c, query),
+        c => c.section === section.id && c.enabled && matchesQuery(c, query),
       )
-      const enabled = columns.filter(c => !c.disabled)
+      const enabled = columns.filter(c => c.enabled)
       const visibleEnabled = enabled.filter(c => visibleColSet.has(c.id))
       return { section, columns, enabled, visibleEnabled }
     }).filter(g => g.columns.length > 0),

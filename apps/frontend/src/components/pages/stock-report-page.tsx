@@ -4,9 +4,9 @@ import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useStockReport } from '@/hooks/use-stock-report'
 import {
+  ASSET_TABLE_COLUMNS,
   DEFAULT_VISIBLE_COLUMN_IDS,
-  PICKABLE_COLUMNS,
-} from '@/components/pages/column-defs/pickable-columns'
+} from '@/components/pages/column-defs/asset-table-columns'
 import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import {
   filtersToParams,
@@ -42,7 +42,7 @@ export function StockReportPage(): React.JSX.Element {
   const columnVisibility = useMemo<VisibilityState>(
     () => {
       const out: VisibilityState = {}
-      for (const col of PICKABLE_COLUMNS) {
+      for (const col of ASSET_TABLE_COLUMNS) {
         out[col.id] = visibleColumns.has(col.id)
       }
       return out
