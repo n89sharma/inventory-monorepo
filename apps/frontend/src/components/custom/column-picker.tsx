@@ -4,7 +4,7 @@ import { Input } from '@/components/shadcn/input'
 import {
   COLUMN_SECTIONS,
   type PickableColumn,
-} from '@/lib/asset-column-sections'
+} from '@/components/pages/column-defs/pickable-columns'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -133,7 +133,7 @@ export function ColumnPicker({
   const groupedSections = useMemo(
     () => COLUMN_SECTIONS.map(section => {
       const columns = allColumns.filter(
-        c => c.section === section.id && matchesQuery(c, query),
+        c => c.section === section.id && !c.disabled && matchesQuery(c, query),
       )
       const enabled = columns.filter(c => !c.disabled)
       const visibleEnabled = enabled.filter(c => visibleColSet.has(c.id))

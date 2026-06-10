@@ -37,7 +37,6 @@ export const PICKABLE_COLUMNS = [
   { id: 'status',        label: 'Status',        section: 'general', defaultVisible: true,  disabled: false },
   { id: 'readiness',     label: 'Readiness',     section: 'general', defaultVisible: true,  disabled: false },
   { id: 'location',      label: 'Location',      section: 'general', defaultVisible: true,  disabled: false },
-  { id: 'created_at',    label: 'Created At',    section: 'general', defaultVisible: false, disabled: true  },
 
   // Specs
   { id: 'country_of_origin',       label: 'Country of Origin', section: 'specs', defaultVisible: false, disabled: false },
@@ -60,7 +59,7 @@ export const PICKABLE_COLUMNS = [
   { id: 'arrival_warehouse',      label: 'Arrival Warehouse',   section: 'arrival', defaultVisible: false, disabled: true  },
   { id: 'arrival_transporter',    label: 'Arrival Transporter', section: 'arrival', defaultVisible: false, disabled: true  },
   { id: 'arrival_created_by',     label: 'Arrived By',          section: 'arrival', defaultVisible: false, disabled: true  },
-  { id: 'arrival_created_at',     label: 'Arrived At',          section: 'arrival', defaultVisible: false, disabled: true  },
+  { id: 'arrival_created_at',     label: 'Arrived At',          section: 'arrival', defaultVisible: false, disabled: false },
 
   // Departure
   { id: 'departure_departure_number', label: 'Departure #',           section: 'departure', defaultVisible: false, disabled: true  },
@@ -71,11 +70,11 @@ export const PICKABLE_COLUMNS = [
   { id: 'departed_at',                label: 'Departed At',           section: 'departure', defaultVisible: false, disabled: false },
 
   // Hold
-  { id: 'hold_hold_number', label: 'Hold #',          section: 'hold', defaultVisible: false, disabled: false },
-  { id: 'hold_created_by',  label: 'Held By',         section: 'hold', defaultVisible: false, disabled: true  },
-  { id: 'hold_created_for', label: 'Held For',        section: 'hold', defaultVisible: false, disabled: true  },
-  { id: 'hold_customer',    label: 'Hold Customer',   section: 'hold', defaultVisible: false, disabled: true  },
-  { id: 'hold_created_at',  label: 'Hold Created At', section: 'hold', defaultVisible: false, disabled: true  },
+  { id: 'hold_hold_number', label: 'Hold #',          section: 'hold', defaultVisible: false, disabled: true  },
+  { id: 'held_by',          label: 'Held By',         section: 'hold', defaultVisible: false, disabled: false },
+  { id: 'hold_created_for', label: 'Held For',        section: 'hold', defaultVisible: false, disabled: false },
+  { id: 'hold_customer',    label: 'Hold Customer',   section: 'hold', defaultVisible: false, disabled: false },
+  { id: 'hold_created_at',  label: 'Hold Created',    section: 'hold', defaultVisible: false, disabled: false },
   { id: 'hold_from_dt',     label: 'Hold From',       section: 'hold', defaultVisible: false, disabled: true  },
   { id: 'hold_to_dt',       label: 'Hold To',         section: 'hold', defaultVisible: false, disabled: true  },
   { id: 'hold_notes',       label: 'Hold Notes',      section: 'hold', defaultVisible: false, disabled: true  },

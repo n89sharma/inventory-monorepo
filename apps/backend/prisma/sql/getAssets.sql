@@ -26,9 +26,13 @@ select
   c.sale_price as cost_sale_price,
   h.hold_number as hold_hold_number,
   hu."name" as held_by,
+  hu2."name" as hold_created_for,
+  hc."name" as hold_customer,
+  h.created_at as hold_created_at,
   ro."name" as vendor,
   do_."name" as customer,
   d.created_at as departed_at,
+  r.created_at as arrival_created_at,
   pi.invoice_number as purchase_invoice_invoice_number,
   lc.comment as latest_comment,
   lc.created_at as latest_comment_at,
@@ -49,6 +53,8 @@ from "Asset" a
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
   left join "Hold" h on h.id = a.hold_id
   left join "User" hu on hu.id = h.created_by_id
+  left join "User" hu2 on hu2.id = h.created_for_id
+  left join "Organization" hc on hc.id = h.customer_id
   left join "Arrival" r on r.id = a.arrival_id
   left join "Organization" ro on ro.id = r.origin_id
   left join "Departure" d on d.id = a.departure_id

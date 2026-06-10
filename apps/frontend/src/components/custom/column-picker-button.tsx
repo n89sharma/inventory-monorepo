@@ -5,7 +5,7 @@ import {
   PopoverTrigger,
 } from '@/components/shadcn/popover'
 import { useCan } from '@/hooks/use-can'
-import { PICKABLE_COLUMNS, type PickableColumn } from '@/lib/asset-column-sections'
+import { PICKABLE_COLUMNS, type PickableColumn } from '@/components/pages/column-defs/pickable-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'

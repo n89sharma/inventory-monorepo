@@ -221,6 +221,50 @@ export function createAssetSearchColumns(
     size: 100
   },
   {
+    accessorKey: "held_by",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Held By"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.held_by ?? '',
+    size: 120
+  },
+  {
+    accessorKey: "hold_created_for",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Held For"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.hold_created_for ?? '',
+    size: 120
+  },
+  {
+    accessorKey: "hold_customer",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Hold Customer"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => row.original.hold_customer ?? '',
+    size: 120
+  },
+  {
+    accessorKey: "hold_created_at",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Hold Created"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatDate(row.original.hold_created_at),
+    size: 100
+  },
+  {
     accessorKey: "vendor",
     header: ({ column }) => (
       <SortableHeader
@@ -230,6 +274,17 @@ export function createAssetSearchColumns(
     ),
     cell: ({ row }) => row.original.vendor ?? '',
     size: 120
+  },
+  {
+    accessorKey: "arrival_created_at",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Arrived At"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => formatDate(row.original.arrival_created_at),
+    size: 100
   },
   {
     accessorKey: "customer",

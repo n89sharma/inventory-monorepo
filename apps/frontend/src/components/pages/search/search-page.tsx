@@ -8,7 +8,7 @@ import { useSearchResults } from '@/hooks/use-search-results'
 import {
   DEFAULT_VISIBLE_COLUMN_IDS,
   PICKABLE_COLUMNS,
-} from '@/lib/asset-column-sections'
+} from '@/components/pages/column-defs/pickable-columns'
 import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
@@ -22,15 +22,15 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
-import { BulkEditBar } from '../custom/bulk-edit-bar'
-import { ColumnPickerButton } from '../custom/column-picker-button'
-import { InputWithClearInline } from '../custom/input-with-clear'
-import { MeterRangeInput } from '../custom/meter-range-input'
-import { ModelSearchInput } from '../custom/model-search-input'
-import { MultiSelectOptionsInline } from '../custom/multi-select-options'
-import { DataTable } from "../shadcn/data-table"
-import { createAssetSearchColumns } from './column-defs/asset-search-columns'
-import { createSelectColumn } from './column-defs/shared-columns'
+import { BulkEditBar } from '../../custom/bulk-edit-bar'
+import { ColumnPickerButton } from '../../custom/column-picker-button'
+import { InputWithClearInline } from '../../custom/input-with-clear'
+import { MeterRangeInput } from '../../custom/meter-range-input'
+import { ModelSearchInput } from '../../custom/model-search-input'
+import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
+import { DataTable } from "../../shadcn/data-table"
+import { createAssetSearchColumns } from '../column-defs/asset-search-columns'
+import { createSelectColumn } from '../column-defs/shared-columns'
 
 const assetSearchColumns = [
   createSelectColumn<AssetSearchRow>(),

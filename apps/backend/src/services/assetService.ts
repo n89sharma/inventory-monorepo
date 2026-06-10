@@ -92,9 +92,13 @@ type AssetSearchRowDb = LocationRow & {
   cost_sale_price: Prisma.Decimal | null
   hold_hold_number: string | null
   held_by: string | null
+  hold_created_for: string | null
+  hold_customer: string | null
+  hold_created_at: Date | null
   vendor: string | null
   customer: string | null
   departed_at: Date | null
+  arrival_created_at: Date | null
   purchase_invoice_invoice_number: string | null
   latest_comment: string | null
   latest_comment_by: string | null
@@ -131,9 +135,13 @@ function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     cost_sale_price: decimalToNumber(r.cost_sale_price),
     hold_hold_number: r.hold_hold_number,
     held_by: r.held_by,
+    hold_created_for: r.hold_created_for,
+    hold_customer: r.hold_customer,
+    hold_created_at: r.hold_created_at,
     vendor: r.vendor,
     customer: r.customer,
     departed_at: r.departed_at,
+    arrival_created_at: r.arrival_created_at,
     purchase_invoice_invoice_number: r.purchase_invoice_invoice_number,
     latest_comment: r.latest_comment,
     latest_comment_by: r.latest_comment_by,

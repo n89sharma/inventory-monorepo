@@ -6,7 +6,7 @@ import { useStockReport } from '@/hooks/use-stock-report'
 import {
   DEFAULT_VISIBLE_COLUMN_IDS,
   PICKABLE_COLUMNS,
-} from '@/lib/asset-column-sections'
+} from '@/components/pages/column-defs/pickable-columns'
 import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import {
   filtersToParams,
