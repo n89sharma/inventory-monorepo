@@ -11,7 +11,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param int4
  * @param int4
  */
-export const getDepartures = $runtime.makeTypedQueryFactory("select\nd.id as id,\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nwo.street as origin_street,\nod.\"name\" as destination,\nt.\"name\" as transporter,\nd.created_at as created_at,\nu.\"name\"  as created_by,\nac.asset_count as asset_count\nfrom \"Departure\" d\njoin \"User\" u on u.id = d.created_by_id\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\njoin \"Organization\" t on t.id = d.transporter_id\nleft join lateral (\nselect count(*)::int as asset_count from \"Asset\" ast where ast.departure_id = d.id\n) ac on true\nwhere d.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or od.id = $4)\norder by d.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getDepartures.Parameters, getDepartures.Result>
+export const getDepartures = $runtime.makeTypedQueryFactory("select\nd.id as id,\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nwo.street as origin_street,\nod.\"name\" as destination,\nt.\"name\" as transporter,\nd.created_at as created_at,\nu.\"name\"  as created_by,\nac.asset_count as asset_count,\nac.copier_count as copier_count,\nac.finisher_count as finisher_count,\nac.accessory_count as accessory_count,\nac.other_count as other_count\nfrom \"Departure\" d\njoin \"User\" u on u.id = d.created_by_id\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\njoin \"Organization\" t on t.id = d.transporter_id\nleft join lateral (\nselect\ncount(*)::int as asset_count,\ncount(*) filter (where atype.asset_type = 'COPIER')::int as copier_count,\ncount(*) filter (where atype.asset_type = 'FINISHER')::int as finisher_count,\ncount(*) filter (where atype.asset_type = 'ACCESSORY')::int as accessory_count,\ncount(*) filter (\nwhere atype.asset_type not in ('COPIER', 'FINISHER', 'ACCESSORY')\n)::int as other_count\nfrom \"Asset\" ast\njoin \"Model\" m on m.id = ast.model_id\njoin \"AssetType\" atype on atype.id = m.asset_type_id\nwhere ast.departure_id = d.id\n) ac on true\nwhere d.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or od.id = $4)\norder by d.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getDepartures.Parameters, getDepartures.Result>
 
 export namespace getDepartures {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number, int4: number]
@@ -25,5 +25,9 @@ export namespace getDepartures {
     created_at: Date
     created_by: string
     asset_count: number | null
+    copier_count: number | null
+    finisher_count: number | null
+    accessory_count: number | null
+    other_count: number | null
   }
 }

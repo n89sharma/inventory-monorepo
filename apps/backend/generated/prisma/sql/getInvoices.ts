@@ -9,7 +9,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param timestamp
  * @param timestamp
  */
-export const getInvoices = $runtime.makeTypedQueryFactory("select\ni.id as id,\ni.invoice_number,\no.\"name\" as organization,\nu.\"name\" as created_by,\ni.created_at as created_at,\ni.is_cleared as is_cleared,\nit.type as invoice_type,\nac.asset_count as asset_count\nfrom \"Invoice\" i\njoin \"InvoiceType\" it on it.id = i.invoice_type_id\njoin \"Organization\" o on o.id = i.organization_id\njoin \"User\" u on u.id = i.updated_by_id\nleft join lateral (\nselect (\ncount(*) filter (where ast.purchase_invoice_id = i.id) +\ncount(*) filter (where ast.sales_invoice_id    = i.id)\n)::int as asset_count\nfrom \"Asset\" ast\nwhere ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id\n) ac on true\nwhere i.created_at between $1 and $2\norder by i.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date) => $runtime.TypedSql<getInvoices.Parameters, getInvoices.Result>
+export const getInvoices = $runtime.makeTypedQueryFactory("select\ni.id as id,\ni.invoice_number,\no.\"name\" as organization,\nu.\"name\" as created_by,\ni.created_at as created_at,\ni.is_cleared as is_cleared,\nit.type as invoice_type,\nac.asset_count as asset_count,\nac.copier_count as copier_count,\nac.finisher_count as finisher_count,\nac.accessory_count as accessory_count,\nac.other_count as other_count\nfrom \"Invoice\" i\njoin \"InvoiceType\" it on it.id = i.invoice_type_id\njoin \"Organization\" o on o.id = i.organization_id\njoin \"User\" u on u.id = i.updated_by_id\nleft join lateral (\nselect\ncount(*)::int as asset_count,\ncount(*) filter (where atype.asset_type = 'COPIER')::int as copier_count,\ncount(*) filter (where atype.asset_type = 'FINISHER')::int as finisher_count,\ncount(*) filter (where atype.asset_type = 'ACCESSORY')::int as accessory_count,\ncount(*) filter (\nwhere atype.asset_type not in ('COPIER', 'FINISHER', 'ACCESSORY')\n)::int as other_count\nfrom \"Asset\" ast\njoin \"Model\" m on m.id = ast.model_id\njoin \"AssetType\" atype on atype.id = m.asset_type_id\nwhere ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id\n) ac on true\nwhere i.created_at between $1 and $2\norder by i.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date) => $runtime.TypedSql<getInvoices.Parameters, getInvoices.Result>
 
 export namespace getInvoices {
   export type Parameters = [timestamp: Date, timestamp: Date]
@@ -22,5 +22,9 @@ export namespace getInvoices {
     is_cleared: boolean
     invoice_type: string
     asset_count: number | null
+    copier_count: number | null
+    finisher_count: number | null
+    accessory_count: number | null
+    other_count: number | null
   }
 }

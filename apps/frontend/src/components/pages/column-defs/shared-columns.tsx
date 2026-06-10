@@ -1,5 +1,6 @@
 import { Button } from "@/components/shadcn/button"
 import { Checkbox } from "@/components/shadcn/checkbox"
+import { AssetTypeBreakdown } from "@/components/custom/asset-type-breakdown"
 import { formatDate } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -121,6 +122,7 @@ export const createdByColumn: ColumnDef<CollectionSummarySchema> = {
 
 export const assetCountColumn: ColumnDef<CollectionSummarySchema> = {
   accessorKey: "asset_count",
-  header: "Assets",
-  size: 50,
+  header: "Copiers / Total",
+  size: 110,
+  cell: ({ row }) => <AssetTypeBreakdown summary={row.original} />,
 }

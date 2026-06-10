@@ -11,7 +11,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param int4
  * @param int4
  */
-export const getTransfers = $runtime.makeTypedQueryFactory("select\nt.id as id,\nt.transfer_number as transfer_number,\nt.created_at as created_at,\nwo.city_code as origin_code,\nwo.street as origin_street,\nwd.city_code as destination_code,\nwd.street as destination_street,\ntr.\"name\" as transporter,\nu.\"name\"  as created_by,\nac.asset_count as asset_count\nfrom \"Transfer\" t\njoin \"User\" u on u.id = t.created_by_id\njoin \"Warehouse\" wo on wo.id = t.origin_id\njoin \"Warehouse\" wd on wd.id = t.destination_id\njoin \"Organization\" tr on tr.id = t.transporter_id\nleft join lateral (\nselect count(*)::int as asset_count from \"AssetTransfer\" at where at.transfer_id = t.id\n) ac on true\nwhere t.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or wd.id = $4)\norder by t.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getTransfers.Parameters, getTransfers.Result>
+export const getTransfers = $runtime.makeTypedQueryFactory("select\nt.id as id,\nt.transfer_number as transfer_number,\nt.created_at as created_at,\nwo.city_code as origin_code,\nwo.street as origin_street,\nwd.city_code as destination_code,\nwd.street as destination_street,\ntr.\"name\" as transporter,\nu.\"name\"  as created_by,\nac.asset_count as asset_count,\nac.copier_count as copier_count,\nac.finisher_count as finisher_count,\nac.accessory_count as accessory_count,\nac.other_count as other_count\nfrom \"Transfer\" t\njoin \"User\" u on u.id = t.created_by_id\njoin \"Warehouse\" wo on wo.id = t.origin_id\njoin \"Warehouse\" wd on wd.id = t.destination_id\njoin \"Organization\" tr on tr.id = t.transporter_id\nleft join lateral (\nselect\ncount(*)::int as asset_count,\ncount(*) filter (where atype.asset_type = 'COPIER')::int as copier_count,\ncount(*) filter (where atype.asset_type = 'FINISHER')::int as finisher_count,\ncount(*) filter (where atype.asset_type = 'ACCESSORY')::int as accessory_count,\ncount(*) filter (\nwhere atype.asset_type not in ('COPIER', 'FINISHER', 'ACCESSORY')\n)::int as other_count\nfrom \"AssetTransfer\" at\njoin \"Asset\" a on a.id = at.asset_id\njoin \"Model\" m on m.id = a.model_id\njoin \"AssetType\" atype on atype.id = m.asset_type_id\nwhere at.transfer_id = t.id\n) ac on true\nwhere t.created_at between $1 and $2\nand ($3 = 0 or wo.id = $3)\nand ($4 = 0 or wd.id = $4)\norder by t.created_at desc\nlimit 500") as (timestamp: Date, timestamp: Date, int4: number, int4: number) => $runtime.TypedSql<getTransfers.Parameters, getTransfers.Result>
 
 export namespace getTransfers {
   export type Parameters = [timestamp: Date, timestamp: Date, int4: number, int4: number]
@@ -26,5 +26,9 @@ export namespace getTransfers {
     transporter: string
     created_by: string
     asset_count: number | null
+    copier_count: number | null
+    finisher_count: number | null
+    accessory_count: number | null
+    other_count: number | null
   }
 }

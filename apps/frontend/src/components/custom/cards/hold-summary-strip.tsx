@@ -1,5 +1,6 @@
 import { formatDate } from '@/lib/formatters'
 import type { HoldDetail } from 'shared-types'
+import { AssetCompositionField } from './asset-composition-field'
 import { SummaryField } from './summary-field'
 
 export function HoldSummaryStrip({ hold }: { hold: HoldDetail }) {
@@ -9,6 +10,7 @@ export function HoldSummaryStrip({ hold }: { hold: HoldDetail }) {
       <SummaryField label="Created" value={formatDate(hold.created_at)} />
       {hold.from_dt && <SummaryField label="From" value={formatDate(hold.from_dt)} />}
       {hold.notes && <SummaryField label="Note" value={hold.notes} />}
+      <AssetCompositionField assets={hold.assets} />
     </div>
   )
 }

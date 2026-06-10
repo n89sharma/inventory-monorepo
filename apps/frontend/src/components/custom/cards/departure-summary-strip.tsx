@@ -1,4 +1,5 @@
 import type { DepartureDetail } from 'shared-types'
+import { AssetCompositionField } from './asset-composition-field'
 import { SummaryField } from './summary-field'
 
 export function DepartureSummaryStrip({ departure }: { departure: DepartureDetail }) {
@@ -8,6 +9,7 @@ export function DepartureSummaryStrip({ departure }: { departure: DepartureDetai
       <SummaryField label="Transporter" value={departure.transporter.name} />
       {departure.created_by && <SummaryField label="By" value={departure.created_by} />}
       {departure.notes && <SummaryField label="Note" value={departure.notes} />}
+      <AssetCompositionField assets={departure.assets} />
     </div>
   )
 }
