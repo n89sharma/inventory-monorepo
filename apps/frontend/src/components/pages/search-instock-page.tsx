@@ -3,19 +3,15 @@ import { PageContent } from "@/components/layout/page-content"
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchInStock } from '@/hooks/use-search-instock'
-import {
-  ASSET_TABLE_COLUMNS,
-  DEFAULT_VISIBLE_COLUMN_IDS,
-} from '@/components/pages/column-defs/asset-table-columns'
+import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useUrlFilters } from '@/hooks/use-url-filters'
 import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import {
   filtersToParams,
   paramsToFilters,
-  type SearchInStockFilters,
 } from '@/lib/search-instock-params'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import type { VisibilityState } from '@tanstack/react-table'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { ColumnPickerButton } from '../custom/column-picker-button'
@@ -36,19 +32,8 @@ const PIN_LEFT = ['barcode', 'brand', 'model']
 export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const [brandQuery, setBrandQuery] = useState('')
-  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    () => new Set(DEFAULT_VISIBLE_COLUMN_IDS),
-  )
-  const columnVisibility = useMemo<VisibilityState>(
-    () => {
-      const out: VisibilityState = {}
-      for (const col of ASSET_TABLE_COLUMNS) {
-        out[col.id] = visibleColumns.has(col.id)
-      }
-      return out
-    },
-    [visibleColumns],
-  )
+  const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
+    useColumnVisibility()
 
   const models = useModelStore(state => state.models)
   const allBrands = useReferenceDataStore(state => state.brands)
@@ -71,59 +56,12 @@ export function SearchInStockPage(): React.JSX.Element {
     [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses],
   )
 
-  const [draft, setDraft] = useState<SearchInStockFilters>(urlFilters)
-  const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
-  const debounceTimerRef = useRef<number | null>(null)
-  const lastCommittedKeyRef = useRef<string>(filtersToParams(urlFilters).toString())
-
-  if (urlFilters !== prevUrlFilters) {
-    setPrevUrlFilters(urlFilters)
-    const urlKey = filtersToParams(urlFilters).toString()
-    if (urlKey !== lastCommittedKeyRef.current) {
-      setDraft(urlFilters)
-      lastCommittedKeyRef.current = urlKey
-    }
-  }
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current !== null) {
-        clearTimeout(debounceTimerRef.current)
-      }
-    }
-  }, [])
-
-  function commitNow(next: SearchInStockFilters) {
-    if (debounceTimerRef.current !== null) {
-      clearTimeout(debounceTimerRef.current)
-      debounceTimerRef.current = null
-    }
-    const params = filtersToParams(next)
-    lastCommittedKeyRef.current = params.toString()
-    setSearchParams(params, { replace: true })
-  }
-
-  function scheduleCommit(next: SearchInStockFilters) {
-    if (debounceTimerRef.current !== null) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    debounceTimerRef.current = window.setTimeout(() => {
-      debounceTimerRef.current = null
-      const params = filtersToParams(next)
-      lastCommittedKeyRef.current = params.toString()
-      setSearchParams(params, { replace: true })
-    }, DEBOUNCE_MS)
-  }
-
-  function updateDraftImmediate(next: SearchInStockFilters) {
-    setDraft(next)
-    commitNow(next)
-  }
-
-  function updateDraftDebounced(next: SearchInStockFilters) {
-    setDraft(next)
-    scheduleCommit(next)
-  }
+  const { draft, updateImmediate, updateDebounced } = useUrlFilters(
+    urlFilters,
+    filtersToParams,
+    setSearchParams,
+    DEBOUNCE_MS,
+  )
 
   const { data: assets = EMPTY_ASSETS, isLoading } = useSearchInStock(urlFilters)
 
@@ -132,7 +70,7 @@ export function SearchInStockPage(): React.JSX.Element {
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">Stock Report</h1>
+            <h1 className="text-2xl font-semibold">In Stock</h1>
             {isLoading && (
               <SpinnerGapIcon
                 className="animate-spin text-muted-foreground"
@@ -144,7 +82,7 @@ export function SearchInStockPage(): React.JSX.Element {
           <ColumnPickerButton
             visible={visibleColumns}
             onVisibleChange={setVisibleColumns}
-            onReset={() => setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMN_IDS))}
+            onReset={resetColumns}
           />
         </div>
         <form
@@ -153,7 +91,7 @@ export function SearchInStockPage(): React.JSX.Element {
         >
           <MultiSelectOptionsInline
             selection={draft.warehouses}
-            onSelectionChange={w => updateDraftDebounced({ ...draft, warehouses: w })}
+            onSelectionChange={w => updateDebounced({ ...draft, warehouses: w })}
             options={activeWarehouses}
             getLabel={w => w.city_code}
             fieldLabel='Warehouse'
@@ -165,12 +103,12 @@ export function SearchInStockPage(): React.JSX.Element {
             query={brandQuery}
             onSelectionChange={b => {
               setBrandQuery('')
-              updateDraftImmediate({ ...draft, brand: b })
+              updateImmediate({ ...draft, brand: b })
             }}
             onQueryChange={setBrandQuery}
             onClear={() => {
               setBrandQuery('')
-              updateDraftImmediate({ ...draft, brand: null })
+              updateImmediate({ ...draft, brand: null })
             }}
             options={allBrands}
             searchKey='name'
@@ -182,7 +120,7 @@ export function SearchInStockPage(): React.JSX.Element {
 
           <MultiSelectOptionsInline
             selection={draft.assetTypes}
-            onSelectionChange={a => updateDraftDebounced({ ...draft, assetTypes: a })}
+            onSelectionChange={a => updateDebounced({ ...draft, assetTypes: a })}
             options={allAssetTypes}
             getLabel={a => a.asset_type}
             fieldLabel='Asset Type'
@@ -192,15 +130,15 @@ export function SearchInStockPage(): React.JSX.Element {
           <ModelSearchInput
             selection={draft.model}
             query={draft.modelQuery ?? ''}
-            onSelectionChange={m => updateDraftImmediate({
+            onSelectionChange={m => updateImmediate({
               ...draft, model: m, modelQuery: null,
             })}
-            onQueryChange={text => updateDraftDebounced({
+            onQueryChange={text => updateDebounced({
               ...draft,
               modelQuery: text.length > 0 ? text : null,
               model: null,
             })}
-            onClear={() => updateDraftImmediate({
+            onClear={() => updateImmediate({
               ...draft, model: null, modelQuery: null,
             })}
             options={models}
@@ -212,7 +150,7 @@ export function SearchInStockPage(): React.JSX.Element {
 
           <MultiSelectOptionsInline
             selection={draft.readinesses}
-            onSelectionChange={s => updateDraftDebounced({ ...draft, readinesses: s })}
+            onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
             options={allReadinesses}
             getLabel={s => getReadinessDisplay(s.status)}
             fieldLabel='Readiness'
@@ -222,15 +160,15 @@ export function SearchInStockPage(): React.JSX.Element {
           <MeterRangeInput
             min={draft.meterMin}
             max={draft.meterMax}
-            onMinChange={val => updateDraftDebounced({ ...draft, meterMin: val })}
-            onMaxChange={val => updateDraftDebounced({ ...draft, meterMax: val })}
+            onMinChange={val => updateDebounced({ ...draft, meterMin: val })}
+            onMaxChange={val => updateDebounced({ ...draft, meterMax: val })}
             className='w-72'
           />
 
           <Toggle
             variant="outline"
             pressed={draft.includeHeld}
-            onPressedChange={v => updateDraftImmediate({ ...draft, includeHeld: v })}
+            onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
             aria-label="Include held assets"
           >
             {draft.includeHeld ? 'Hide Held' : 'Show Held'}

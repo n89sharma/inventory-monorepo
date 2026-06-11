@@ -5,20 +5,17 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchAll } from '@/hooks/use-search-all'
-import {
-  ASSET_TABLE_COLUMNS,
-  DEFAULT_VISIBLE_COLUMN_IDS,
-} from '@/components/pages/column-defs/asset-table-columns'
+import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useUrlFilters } from '@/hooks/use-url-filters'
 import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
   paramsToFilters,
-  type SearchAllFilters,
 } from '@/lib/search-all-params'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
@@ -122,19 +119,8 @@ export function SearchAllPage(): React.JSX.Element {
   const exportAssets = useAssetStore(state => state.exportAssets)
   const [exportLoading, setExportLoading] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    () => new Set(DEFAULT_VISIBLE_COLUMN_IDS),
-  )
-  const columnVisibility = useMemo<VisibilityState>(
-    () => {
-      const out: VisibilityState = {}
-      for (const col of ASSET_TABLE_COLUMNS) {
-        out[col.id] = visibleColumns.has(col.id)
-      }
-      return out
-    },
-    [visibleColumns],
-  )
+  const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
+    useColumnVisibility()
 
   const models = useModelStore(state => state.models)
   const rawStatuses = useReferenceDataStore(state => state.statuses)
@@ -176,60 +162,13 @@ export function SearchAllPage(): React.JSX.Element {
     [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
   )
 
-  const [draft, setDraft] = useState<SearchAllFilters>(urlFilters)
   const [finisherQuery, setFinisherQuery] = useState('')
-  const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
-  const debounceTimerRef = useRef<number | null>(null)
-  const lastCommittedKeyRef = useRef<string>(filtersToParams(urlFilters).toString())
-
-  if (urlFilters !== prevUrlFilters) {
-    setPrevUrlFilters(urlFilters)
-    const urlKey = filtersToParams(urlFilters).toString()
-    if (urlKey !== lastCommittedKeyRef.current) {
-      setDraft(urlFilters)
-      lastCommittedKeyRef.current = urlKey
-    }
-  }
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current !== null) {
-        clearTimeout(debounceTimerRef.current)
-      }
-    }
-  }, [])
-
-  function commitNow(next: SearchAllFilters) {
-    if (debounceTimerRef.current !== null) {
-      clearTimeout(debounceTimerRef.current)
-      debounceTimerRef.current = null
-    }
-    const params = filtersToParams(next)
-    lastCommittedKeyRef.current = params.toString()
-    setSearchParams(params, { replace: true })
-  }
-
-  function scheduleCommit(next: SearchAllFilters) {
-    if (debounceTimerRef.current !== null) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    debounceTimerRef.current = window.setTimeout(() => {
-      debounceTimerRef.current = null
-      const params = filtersToParams(next)
-      lastCommittedKeyRef.current = params.toString()
-      setSearchParams(params, { replace: true })
-    }, DEBOUNCE_MS)
-  }
-
-  function updateDraftImmediate(next: SearchAllFilters) {
-    setDraft(next)
-    commitNow(next)
-  }
-
-  function updateDraftDebounced(next: SearchAllFilters) {
-    setDraft(next)
-    scheduleCommit(next)
-  }
+  const { draft, updateImmediate, updateDebounced } = useUrlFilters(
+    urlFilters,
+    filtersToParams,
+    setSearchParams,
+    DEBOUNCE_MS,
+  )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
@@ -262,7 +201,7 @@ export function SearchAllPage(): React.JSX.Element {
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">Search</h1>
+            <h1 className="text-2xl font-semibold">All Assets</h1>
             {isLoading && (
               <SpinnerGapIcon
                 className="animate-spin text-muted-foreground"
@@ -275,7 +214,7 @@ export function SearchAllPage(): React.JSX.Element {
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}
-              onReset={() => setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMN_IDS))}
+              onReset={resetColumns}
             />
             <Button
               variant="outline"
@@ -298,15 +237,15 @@ export function SearchAllPage(): React.JSX.Element {
             <ModelSearchInput
               selection={draft.model}
               query={draft.modelQuery ?? ''}
-              onSelectionChange={m => updateDraftImmediate({
+              onSelectionChange={m => updateImmediate({
                 ...draft, model: m, modelQuery: null,
               })}
-              onQueryChange={text => updateDraftDebounced({
+              onQueryChange={text => updateDebounced({
                 ...draft,
                 modelQuery: text.length > 0 ? text : null,
                 model: null,
               })}
-              onClear={() => updateDraftImmediate({
+              onClear={() => updateImmediate({
                 ...draft, model: null, modelQuery: null,
               })}
               options={models}
@@ -319,7 +258,7 @@ export function SearchAllPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.statuses}
-              onSelectionChange={s => updateDraftDebounced({ ...draft, statuses: s })}
+              onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
               options={allStatuses}
               getLabel={s => formatSentenceCase(s.status)}
               fieldLabel='Status'
@@ -329,7 +268,7 @@ export function SearchAllPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.readinesses}
-              onSelectionChange={s => updateDraftDebounced({ ...draft, readinesses: s })}
+              onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
               options={allReadinesses}
               getLabel={s => getReadinessDisplay(s.status)}
               fieldLabel='Readiness'
@@ -338,7 +277,7 @@ export function SearchAllPage(): React.JSX.Element {
 
             <MultiSelectOptionsInline
               selection={draft.selectedWarehouses}
-              onSelectionChange={w => updateDraftDebounced({
+              onSelectionChange={w => updateDebounced({
                 ...draft, selectedWarehouses: w,
               })}
               options={activeWarehouses}
@@ -350,8 +289,8 @@ export function SearchAllPage(): React.JSX.Element {
             <MeterRangeInput
               min={draft.meterMin}
               max={draft.meterMax}
-              onMinChange={val => updateDraftDebounced({ ...draft, meterMin: val })}
-              onMaxChange={val => updateDraftDebounced({ ...draft, meterMax: val })}
+              onMinChange={val => updateDebounced({ ...draft, meterMin: val })}
+              onMaxChange={val => updateDebounced({ ...draft, meterMax: val })}
               className='w-72'
             />
 
@@ -361,7 +300,7 @@ export function SearchAllPage(): React.JSX.Element {
                 const next = typeof val === 'string' || val === null
                   ? null
                   : Number.isInteger(val) && val >= 0 ? val : null
-                updateDraftDebounced({ ...draft, cassettes: next })
+                updateDebounced({ ...draft, cassettes: next })
               }}
               fieldLabel='Cassettes (min)'
               inputType='number'
@@ -373,12 +312,12 @@ export function SearchAllPage(): React.JSX.Element {
               query={finisherQuery}
               onSelectionChange={c => {
                 setFinisherQuery('')
-                updateDraftImmediate({ ...draft, internalFinisher: c })
+                updateImmediate({ ...draft, internalFinisher: c })
               }}
               onQueryChange={setFinisherQuery}
               onClear={() => {
                 setFinisherQuery('')
-                updateDraftImmediate({ ...draft, internalFinisher: null })
+                updateImmediate({ ...draft, internalFinisher: null })
               }}
               options={allComponents}
               searchKey='name'
