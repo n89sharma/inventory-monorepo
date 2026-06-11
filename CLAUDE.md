@@ -31,6 +31,9 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
 - **Output contract.** Terse and direct. No preamble, no restating my request, no summary of
   what you're about to do. Lead with the answer or the diff.
 - **Simplest sufficient solution.** No abstraction, config, or generality that wasn't asked for.
+- **Rename as its own step.** When a refactor includes a naming change, do the rename first as a
+  standalone, behavior-preserving commit — verify it builds/works — *then* make functional changes.
+  Always present the rename as a separate step. Never mix renames with logic changes in one commit.
 
 ## Commands
 
