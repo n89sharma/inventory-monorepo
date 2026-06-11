@@ -19,7 +19,7 @@ import {
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
   getAssets as getAssetsSer,
-  getStockReportAssets as getStockReportAssetsSer,
+  getAssetsForSearchInStock as getAssetsForSearchInStockSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer,
   mapAssetSummary,
   updateAssetErrors as updateAssetErrorsSer,
@@ -70,7 +70,7 @@ export const getAssets = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const StockReportQuerySchema = z.object({
+export const SearchInStockQuerySchema = z.object({
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number)))
     .refine(ids => ids.length > 0, { message: 'At least one warehouse is required' }),
   brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -82,11 +82,11 @@ export const StockReportQuerySchema = z.object({
   includeHeld: z.enum(['true', 'false']).optional()
 })
 
-export const getStockReport = asyncHandler(async (req, res) => {
+export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
   const {
     warehouseIds, brandIds, assetTypeIds, readinessIds, model, meterMin, meterMax, includeHeld
-  } = res.locals.query as z.infer<typeof StockReportQuerySchema>
-  const data = await getStockReportAssetsSer(
+  } = res.locals.query as z.infer<typeof SearchInStockQuerySchema>
+  const data = await getAssetsForSearchInStockSer(
     warehouseIds,
     brandIds,
     assetTypeIds,
