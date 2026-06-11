@@ -5,14 +5,14 @@ const PARAM_Q = 'q'
 const PARAM_METER_MIN = 'meter_min'
 const PARAM_METER_MAX = 'meter_max'
 const PARAM_STATUS = 'status'
-const PARAM_TECH = 'tech'
+const PARAM_READINESS = 'readiness'
 const PARAM_WH = 'wh'
 const PARAM_CAS = 'cas'
 const PARAM_FIN = 'fin'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 
-export type SearchFilters = {
+export type SearchAllFilters = {
   model: ModelSummary | null
   modelQuery: string | null
   meterMin: number | null
@@ -24,7 +24,7 @@ export type SearchFilters = {
   selectedWarehouses: Warehouse[]
 }
 
-export type SearchReferenceData = {
+export type SearchAllReferenceData = {
   models: ModelSummary[]
   statuses: Status[]
   readinesses: Status[]
@@ -32,7 +32,7 @@ export type SearchReferenceData = {
   components: Component[]
 }
 
-export const EMPTY_FILTERS: SearchFilters = {
+export const EMPTY_SEARCH_ALL_FILTERS: SearchAllFilters = {
   model: null,
   modelQuery: null,
   meterMin: null,
@@ -64,7 +64,7 @@ export function decodeIds<T extends { id: number }>(raw: string | null, lookup: 
     .filter((item): item is T => item !== undefined)
 }
 
-export function filtersToParams(filters: SearchFilters): URLSearchParams {
+export function filtersToParams(filters: SearchAllFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.model) {
     params.set(PARAM_MODEL, String(filters.model.id))
@@ -81,7 +81,7 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
     params.set(PARAM_STATUS, encodeIds(filters.statuses))
   }
   if (filters.readinesses.length > 0) {
-    params.set(PARAM_TECH, encodeIds(filters.readinesses))
+    params.set(PARAM_READINESS, encodeIds(filters.readinesses))
   }
   if (filters.selectedWarehouses.length > 0) {
     params.set(PARAM_WH, encodeIds(filters.selectedWarehouses))
@@ -91,8 +91,8 @@ export function filtersToParams(filters: SearchFilters): URLSearchParams {
 
 export function paramsToFilters(
   params: URLSearchParams,
-  ref: SearchReferenceData,
-): SearchFilters {
+  ref: SearchAllReferenceData,
+): SearchAllFilters {
   const modelId = params.get(PARAM_MODEL)
   const model = modelId
     ? ref.models.find(m => m.id === Number.parseInt(modelId, 10)) ?? null
@@ -120,7 +120,7 @@ export function paramsToFilters(
     cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
     internalFinisher,
     statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),
-    readinesses: decodeIds(params.get(PARAM_TECH), ref.readinesses),
+    readinesses: decodeIds(params.get(PARAM_READINESS), ref.readinesses),
     selectedWarehouses: decodeIds(params.get(PARAM_WH), ref.warehouses),
   }
 }

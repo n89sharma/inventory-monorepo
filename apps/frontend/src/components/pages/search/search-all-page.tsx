@@ -4,7 +4,7 @@ import { Button } from "@/components/shadcn/button"
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useSearchResults } from '@/hooks/use-search-results'
+import { useSearchAll } from '@/hooks/use-search-all'
 import {
   ASSET_TABLE_COLUMNS,
   DEFAULT_VISIBLE_COLUMN_IDS,
@@ -14,8 +14,8 @@ import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
   paramsToFilters,
-  type SearchFilters,
-} from '@/lib/search-url-params'
+  type SearchAllFilters,
+} from '@/lib/search-all-params'
 import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -63,7 +63,7 @@ const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
 const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
 
-const QueryResultsTable = memo(function QueryResultsTable({
+const SearchAllResultsTable = memo(function SearchAllResultsTable({
   assets,
   rowSelection,
   onRowSelectionChange,
@@ -117,7 +117,7 @@ const QueryResultsTable = memo(function QueryResultsTable({
   )
 })
 
-export function QueryPage(): React.JSX.Element {
+export function SearchAllPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const exportAssets = useAssetStore(state => state.exportAssets)
   const [exportLoading, setExportLoading] = useState(false)
@@ -176,7 +176,7 @@ export function QueryPage(): React.JSX.Element {
     [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
   )
 
-  const [draft, setDraft] = useState<SearchFilters>(urlFilters)
+  const [draft, setDraft] = useState<SearchAllFilters>(urlFilters)
   const [finisherQuery, setFinisherQuery] = useState('')
   const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
   const debounceTimerRef = useRef<number | null>(null)
@@ -199,7 +199,7 @@ export function QueryPage(): React.JSX.Element {
     }
   }, [])
 
-  function commitNow(next: SearchFilters) {
+  function commitNow(next: SearchAllFilters) {
     if (debounceTimerRef.current !== null) {
       clearTimeout(debounceTimerRef.current)
       debounceTimerRef.current = null
@@ -209,7 +209,7 @@ export function QueryPage(): React.JSX.Element {
     setSearchParams(params, { replace: true })
   }
 
-  function scheduleCommit(next: SearchFilters) {
+  function scheduleCommit(next: SearchAllFilters) {
     if (debounceTimerRef.current !== null) {
       clearTimeout(debounceTimerRef.current)
     }
@@ -221,17 +221,17 @@ export function QueryPage(): React.JSX.Element {
     }, DEBOUNCE_MS)
   }
 
-  function updateDraftImmediate(next: SearchFilters) {
+  function updateDraftImmediate(next: SearchAllFilters) {
     setDraft(next)
     commitNow(next)
   }
 
-  function updateDraftDebounced(next: SearchFilters) {
+  function updateDraftDebounced(next: SearchAllFilters) {
     setDraft(next)
     scheduleCommit(next)
   }
 
-  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchResults(urlFilters)
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
 
   async function handleExport() {
@@ -392,7 +392,7 @@ export function QueryPage(): React.JSX.Element {
       </StickyPageHeader>
       <PageContent className={`flex flex-col gap-2 ${Object.keys(rowSelection).length > 0 ? 'pb-24' : ''}`}>
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <QueryResultsTable
+          <SearchAllResultsTable
             assets={assets}
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}

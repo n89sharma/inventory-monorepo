@@ -184,7 +184,7 @@ export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
   return AssetHistorySchema.parse(data)
 }
 
-export async function getAssetsForQuery(
+export async function getAssetsForSearchAll(
   modelName: string,
   meterMin: number | null,
   meterMax: number | null,
@@ -209,7 +209,7 @@ export async function getAssetsForQuery(
   return z.array(AssetSearchRowSchema).parse(data)
 }
 
-export async function getStockReportAssets(
+export async function getAssetsForSearchInStock(
   warehouses: Warehouse[],
   brand: Brand | null,
   assetTypes: AssetType[],

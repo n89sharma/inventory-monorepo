@@ -3,14 +3,14 @@ import {
   MIN_MODEL_INPUT_QUERY_LENGTH,
   decodeIds,
   encodeIds,
-} from '@/lib/search-url-params'
+} from '@/lib/search-all-params'
 
 const PARAM_WH = 'wh'
 const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
-const PARAM_TECH = 'tech'
+const PARAM_READINESS = 'readiness'
 const PARAM_METER_MIN = 'meter_min'
 const PARAM_METER_MAX = 'meter_max'
 const PARAM_HELD = 'held'
@@ -18,7 +18,7 @@ const HELD_ON = '1'
 
 export const DEFAULT_WAREHOUSE_CODE = 'YYZ'
 
-export type StockReportFilters = {
+export type SearchInStockFilters = {
   warehouses: Warehouse[]
   brand: Brand | null
   assetTypes: AssetType[]
@@ -30,7 +30,7 @@ export type StockReportFilters = {
   includeHeld: boolean
 }
 
-export type StockReportReferenceData = {
+export type SearchInStockReferenceData = {
   warehouses: Warehouse[]
   brands: Brand[]
   assetTypes: AssetType[]
@@ -44,7 +44,7 @@ function parseNonNegativeNumber(raw: string | null): number | null {
   return Number.isNaN(parsed) || parsed < 0 ? null : parsed
 }
 
-export function filtersToParams(filters: StockReportFilters): URLSearchParams {
+export function filtersToParams(filters: SearchInStockFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.warehouses.length > 0) {
     params.set(PARAM_WH, encodeIds(filters.warehouses))
@@ -56,7 +56,7 @@ export function filtersToParams(filters: StockReportFilters): URLSearchParams {
   } else if (filters.modelQuery && filters.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH) {
     params.set(PARAM_Q, filters.modelQuery)
   }
-  if (filters.readinesses.length > 0) params.set(PARAM_TECH, encodeIds(filters.readinesses))
+  if (filters.readinesses.length > 0) params.set(PARAM_READINESS, encodeIds(filters.readinesses))
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
   if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
   if (filters.includeHeld) params.set(PARAM_HELD, HELD_ON)
@@ -65,8 +65,8 @@ export function filtersToParams(filters: StockReportFilters): URLSearchParams {
 
 export function paramsToFilters(
   params: URLSearchParams,
-  ref: StockReportReferenceData,
-): StockReportFilters {
+  ref: SearchInStockReferenceData,
+): SearchInStockFilters {
   const whRaw = params.get(PARAM_WH)
   const defaultWarehouse = ref.warehouses.find(w => w.city_code === DEFAULT_WAREHOUSE_CODE)
   const warehouses = whRaw === null
@@ -92,7 +92,7 @@ export function paramsToFilters(
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
     model,
     modelQuery,
-    readinesses: decodeIds(params.get(PARAM_TECH), ref.readinesses),
+    readinesses: decodeIds(params.get(PARAM_READINESS), ref.readinesses),
     meterMin: parseNonNegativeNumber(params.get(PARAM_METER_MIN)),
     meterMax: parseNonNegativeNumber(params.get(PARAM_METER_MAX)),
     includeHeld: params.get(PARAM_HELD) === HELD_ON,

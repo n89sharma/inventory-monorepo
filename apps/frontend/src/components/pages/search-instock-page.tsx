@@ -2,7 +2,7 @@ import { StickyPageHeader } from "@/components/custom/sticky-page-header"
 import { PageContent } from "@/components/layout/page-content"
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useStockReport } from '@/hooks/use-stock-report'
+import { useSearchInStock } from '@/hooks/use-search-instock'
 import {
   ASSET_TABLE_COLUMNS,
   DEFAULT_VISIBLE_COLUMN_IDS,
@@ -11,8 +11,8 @@ import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import {
   filtersToParams,
   paramsToFilters,
-  type StockReportFilters,
-} from '@/lib/stock-report-url-params'
+  type SearchInStockFilters,
+} from '@/lib/search-instock-params'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -26,14 +26,14 @@ import { DataTable } from "../shadcn/data-table"
 import { Toggle } from "../shadcn/toggle"
 import { createAssetSearchColumns } from './column-defs/asset-search-columns'
 
-const stockReportColumns = createAssetSearchColumns(a => `/reports/stock/${a.barcode}`)
+const searchInStockColumns = createAssetSearchColumns(a => `/reports/stock/${a.barcode}`)
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 600
 const PIN_LEFT = ['barcode', 'brand', 'model']
 
-export function StockReportPage(): React.JSX.Element {
+export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const [brandQuery, setBrandQuery] = useState('')
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
@@ -71,7 +71,7 @@ export function StockReportPage(): React.JSX.Element {
     [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses],
   )
 
-  const [draft, setDraft] = useState<StockReportFilters>(urlFilters)
+  const [draft, setDraft] = useState<SearchInStockFilters>(urlFilters)
   const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
   const debounceTimerRef = useRef<number | null>(null)
   const lastCommittedKeyRef = useRef<string>(filtersToParams(urlFilters).toString())
@@ -93,7 +93,7 @@ export function StockReportPage(): React.JSX.Element {
     }
   }, [])
 
-  function commitNow(next: StockReportFilters) {
+  function commitNow(next: SearchInStockFilters) {
     if (debounceTimerRef.current !== null) {
       clearTimeout(debounceTimerRef.current)
       debounceTimerRef.current = null
@@ -103,7 +103,7 @@ export function StockReportPage(): React.JSX.Element {
     setSearchParams(params, { replace: true })
   }
 
-  function scheduleCommit(next: StockReportFilters) {
+  function scheduleCommit(next: SearchInStockFilters) {
     if (debounceTimerRef.current !== null) {
       clearTimeout(debounceTimerRef.current)
     }
@@ -115,17 +115,17 @@ export function StockReportPage(): React.JSX.Element {
     }, DEBOUNCE_MS)
   }
 
-  function updateDraftImmediate(next: StockReportFilters) {
+  function updateDraftImmediate(next: SearchInStockFilters) {
     setDraft(next)
     commitNow(next)
   }
 
-  function updateDraftDebounced(next: StockReportFilters) {
+  function updateDraftDebounced(next: SearchInStockFilters) {
     setDraft(next)
     scheduleCommit(next)
   }
 
-  const { data: assets = EMPTY_ASSETS, isLoading } = useStockReport(urlFilters)
+  const { data: assets = EMPTY_ASSETS, isLoading } = useSearchInStock(urlFilters)
 
   return (
     <>
@@ -240,7 +240,7 @@ export function StockReportPage(): React.JSX.Element {
       <PageContent className="flex flex-col gap-2">
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
           <DataTable
-            columns={stockReportColumns}
+            columns={searchInStockColumns}
             data={assets}
             getRowId={getAssetRowId}
             defaultSort={defaultSort}

@@ -33,9 +33,9 @@ const CreateInvoicePage         = lazy(() => import('./components/pages/invoice/
 const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/invoice-details-page').then(m => ({ default: m.InvoiceDetailsPage })))
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
-const StockReportPage           = lazy(() => import('./components/pages/stock-report-page').then(m => ({ default: m.StockReportPage })))
+const SearchInStockPage         = lazy(() => import('./components/pages/search-instock-page').then(m => ({ default: m.SearchInStockPage })))
 const ProfitabilityReportPage   = lazy(() => import('./components/pages/profitability-report-page').then(m => ({ default: m.ProfitabilityReportPage })))
-const QueryPage                 = lazy(() => import('./components/pages/search/search-page').then(m => ({ default: m.QueryPage })))
+const SearchAllPage             = lazy(() => import('./components/pages/search/search-all-page').then(m => ({ default: m.SearchAllPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
 const UserManagementPage        = lazy(() => import('./components/pages/admin/user-management-page').then(m => ({ default: m.UserManagementPage })))
@@ -114,7 +114,7 @@ function AppRoutes() {
                     path="/reports/stock"
                     element={
                       <PermissionRoute permission="view_reports">
-                        <StockReportPage />
+                        <SearchInStockPage />
                       </PermissionRoute>
                     }
                   />
@@ -130,7 +130,7 @@ function AppRoutes() {
 
                   <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 
-                  <Route path="/search" element={<QueryPage />} />
+                  <Route path="/search" element={<SearchAllPage />} />
                   <Route path="/search/:assetId" element={<AssetDetailsPage />} />
 
                   <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
