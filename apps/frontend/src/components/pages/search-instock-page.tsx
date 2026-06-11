@@ -26,7 +26,7 @@ import { DataTable } from "../shadcn/data-table"
 import { Toggle } from "../shadcn/toggle"
 import { createAssetSearchColumns } from './column-defs/asset-search-columns'
 
-const searchInStockColumns = createAssetSearchColumns(a => `/reports/stock/${a.barcode}`)
+const searchInStockColumns = createAssetSearchColumns(a => `/search/instock/${a.barcode}`)
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const defaultSort = { id: 'barcode', desc: true } as const
 const EMPTY_ASSETS: AssetSearchRow[] = []
@@ -245,7 +245,7 @@ export function SearchInStockPage(): React.JSX.Element {
             getRowId={getAssetRowId}
             defaultSort={defaultSort}
             pinLeft={PIN_LEFT}
-            getRowHref={a => `/reports/stock/${a.barcode}`}
+            getRowHref={a => `/search/instock/${a.barcode}`}
             columnVisibility={columnVisibility}
           />
         </div>

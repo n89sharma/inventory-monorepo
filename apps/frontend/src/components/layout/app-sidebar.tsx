@@ -56,12 +56,12 @@ const sidebarItems = [
     title: "Invoices",
     url: "/invoices",
     icon: <InvoiceIcon aria-hidden="true" />
-  },
-  {
-    title: "Search",
-    url: "/search",
-    icon: <MagnifyingGlassIcon aria-hidden="true" />
   }
+]
+
+const SEARCH_ASSETS_SUB_ITEMS = [
+  { title: 'All', url: '/search/all' },
+  { title: 'In Stock', url: '/search/instock' },
 ]
 
 const SETTINGS_SUB_ITEMS = [
@@ -70,7 +70,6 @@ const SETTINGS_SUB_ITEMS = [
 ]
 
 const REPORTS_SUB_ITEMS = [
-  { title: 'Stock', url: '/reports/stock' },
   { title: 'Profitability', url: '/reports/profitability' },
 ]
 
@@ -89,6 +88,9 @@ export function AppSidebar(): React.JSX.Element {
   const isReportsActive = location.pathname.startsWith('/reports')
   const [reportsOpen, setReportsOpen] = useState(isReportsActive)
 
+  const isSearchAssetsActive = location.pathname.startsWith('/search')
+  const [searchAssetsOpen, setSearchAssetsOpen] = useState(isSearchAssetsActive)
+
   useEffect(() => {
     if (isSettingsActive) setSettingsOpen(true)
   }, [isSettingsActive])
@@ -96,6 +98,10 @@ export function AppSidebar(): React.JSX.Element {
   useEffect(() => {
     if (isReportsActive) setReportsOpen(true)
   }, [isReportsActive])
+
+  useEffect(() => {
+    if (isSearchAssetsActive) setSearchAssetsOpen(true)
+  }, [isSearchAssetsActive])
 
   return (
     <Sidebar collapsible="icon">
@@ -132,6 +138,36 @@ export function AppSidebar(): React.JSX.Element {
                   </SidebarMenuItem>
                 )
               })}
+              <Collapsible
+                open={searchAssetsOpen}
+                onOpenChange={setSearchAssetsOpen}
+                className="group/collapsible"
+                asChild
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton isActive={isSearchAssetsActive ? true : undefined}>
+                      <MagnifyingGlassIcon aria-hidden="true" />
+                      <span>Search Assets</span>
+                      <CaretDownIcon
+                        className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
+                        aria-hidden="true"
+                      />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {SEARCH_ASSETS_SUB_ITEMS.map(item => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <SidebarMenuSubButton asChild isActive={location.pathname.startsWith(item.url) ? true : undefined}>
+                            <Link to={item.url}>{item.title}</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
               {
                 canViewReports &&
                 <Collapsible

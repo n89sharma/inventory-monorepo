@@ -44,7 +44,7 @@ function getPartBadge(transfer: PartTransfer, currentAsset: string, rowClassName
       <div className="flex items-center gap-2">
         {badge}
         <Link
-          to={`/search/${counterpartBarcode}`}
+          to={`/search/all/${counterpartBarcode}`}
           className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
         >
           {counterpartBarcode}

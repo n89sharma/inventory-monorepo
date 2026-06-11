@@ -68,7 +68,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     setPopoverOpen(false)
     setQuery("")
     if (item.kind === 'asset') {
-      navigate(`/search/${item.data.barcode}`)
+      navigate(`/search/all/${item.data.barcode}`)
     } else if (item.kind === 'arrival') {
       navigate(`/arrivals/${item.data.arrival_number}`)
     } else if (item.kind === 'departure') {

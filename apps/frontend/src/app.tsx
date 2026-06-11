@@ -109,9 +109,7 @@ function AppRoutes() {
                   />
                   <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
 
-                  <Route path="/reports" element={<Navigate to="/reports/stock" replace />} />
-                  <Route path="/reports/stock" element={<SearchInStockPage />} />
-                  <Route path="/reports/stock/:assetId" element={<AssetDetailsPage />} />
+                  <Route path="/reports" element={<Navigate to="/reports/profitability" replace />} />
                   <Route
                     path="/reports/profitability"
                     element={
@@ -123,8 +121,10 @@ function AppRoutes() {
 
                   <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 
-                  <Route path="/search" element={<SearchAllPage />} />
-                  <Route path="/search/:assetId" element={<AssetDetailsPage />} />
+                  <Route path="/search/all" element={<SearchAllPage />} />
+                  <Route path="/search/all/:assetId" element={<AssetDetailsPage />} />
+                  <Route path="/search/instock" element={<SearchInStockPage />} />
+                  <Route path="/search/instock/:assetId" element={<AssetDetailsPage />} />
 
                   <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
                   <Route

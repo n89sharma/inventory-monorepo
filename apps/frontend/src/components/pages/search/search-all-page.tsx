@@ -34,7 +34,7 @@ import { createSelectColumn } from '../column-defs/shared-columns'
 
 const assetSearchColumns = [
   createSelectColumn<AssetSearchRow>(),
-  ...createAssetSearchColumns(a => `/search/${a.barcode}`),
+  ...createAssetSearchColumns(a => `/search/all/${a.barcode}`),
 ]
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
@@ -110,7 +110,7 @@ const SearchAllResultsTable = memo(function SearchAllResultsTable({
         getRowId={getAssetRowId}
         defaultSort={defaultSort}
         pinLeft={PIN_LEFT}
-        getRowHref={a => `/search/${a.barcode}`}
+        getRowHref={a => `/search/all/${a.barcode}`}
         columnVisibility={columnVisibility}
       />
     </>

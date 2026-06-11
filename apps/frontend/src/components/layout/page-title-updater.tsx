@@ -31,6 +31,14 @@ function deriveTitle(pathname: string): string {
   const sectionLabel = SECTION_LABEL[section]
   const entityLabel = ENTITY_LABEL[section]
 
+  // /search/all, /search/instock (+ /:assetId)
+  if (section === 'search') {
+    const view = id === 'instock' ? 'In Stock' : 'All'
+    return sub
+      ? `Asset ${sub} | ${view} | Search Assets | ${APP_NAME}`
+      : `${view} | Search Assets | ${APP_NAME}`
+  }
+
   // /section/:id/edit
   if (sub === 'edit') return sectionLabel ? `Edit ${id} | ${sectionLabel} | ${APP_NAME}` : APP_NAME
 

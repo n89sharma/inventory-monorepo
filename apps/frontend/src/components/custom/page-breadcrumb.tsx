@@ -92,7 +92,7 @@ export function getBreadcrumForAssetDetails(
   switch (section) {
     case 'search':
       return [
-        { label: 'Search', href: backUrl ?? '/search' }
+        { label: 'Search Assets', href: backUrl ?? '/search/all' }
       ]
     default:
       return [
