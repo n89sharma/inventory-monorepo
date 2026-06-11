@@ -7,7 +7,6 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchAll } from '@/hooks/use-search-all'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useUrlFilters } from '@/hooks/use-url-filters'
-import { getReadinessDisplay } from '@/components/custom/readiness-icon'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
@@ -23,8 +22,11 @@ import { BulkEditBar } from '../../custom/bulk-edit-bar'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { InputWithClearInline } from '../../custom/input-with-clear'
 import { MeterRangeInput } from '../../custom/meter-range-input'
+import { ModelFilter } from '../../custom/model-filter'
 import { ModelSearchInput } from '../../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
+import { ReadinessFilter } from '../../custom/readiness-filter'
+import { WarehouseFilter } from '../../custom/warehouse-filter'
 import { DataTable } from "../../shadcn/data-table"
 import { createAssetSearchColumns } from '../column-defs/asset-search-columns'
 import { createSelectColumn } from '../column-defs/shared-columns'
@@ -146,10 +148,6 @@ export function SearchAllPage(): React.JSX.Element {
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const allComponents = useReferenceDataStore(state => state.components)
-  const activeWarehouses = useMemo(
-    () => allWarehouses.filter(w => w.is_active),
-    [allWarehouses],
-  )
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -234,7 +232,7 @@ export function SearchAllPage(): React.JSX.Element {
           onSubmit={e => e.preventDefault()}
         >
           <fieldset disabled={exportLoading} className="contents">
-            <ModelSearchInput
+            <ModelFilter
               selection={draft.model}
               query={draft.modelQuery ?? ''}
               onSelectionChange={m => updateImmediate({
@@ -248,12 +246,7 @@ export function SearchAllPage(): React.JSX.Element {
               onClear={() => updateImmediate({
                 ...draft, model: null, modelQuery: null,
               })}
-              options={models}
-              searchKey='model_name'
-              getLabel={m => `${m.brand_name} ${m.model_name}`}
               placeholder='Model *'
-              clearLabel='Clear model'
-              className='w-45'
             />
 
             <MultiSelectOptionsInline
@@ -266,24 +259,16 @@ export function SearchAllPage(): React.JSX.Element {
               dividerAfterIds={statusDividerAfterIds}
             />
 
-            <MultiSelectOptionsInline
+            <ReadinessFilter
               selection={draft.readinesses}
               onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
-              options={allReadinesses}
-              getLabel={s => getReadinessDisplay(s.status)}
-              fieldLabel='Readiness'
-              className='w-45'
             />
 
-            <MultiSelectOptionsInline
+            <WarehouseFilter
               selection={draft.selectedWarehouses}
               onSelectionChange={w => updateDebounced({
                 ...draft, selectedWarehouses: w,
               })}
-              options={activeWarehouses}
-              getLabel={w => w.city_code}
-              fieldLabel='Warehouse'
-              className='w-45'
             />
 
             <MeterRangeInput
