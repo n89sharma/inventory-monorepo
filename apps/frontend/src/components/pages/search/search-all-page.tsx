@@ -150,7 +150,7 @@ export function SearchAllPage(): React.JSX.Element {
 
           <WarehouseFilter
             selection={draft.selectedWarehouses}
-            onSelectionChange={w => updateDebounced({
+            onSelectionChange={w => updateImmediate({
               ...draft, selectedWarehouses: w,
             })}
           />

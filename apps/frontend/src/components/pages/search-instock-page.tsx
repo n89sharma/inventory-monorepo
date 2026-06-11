@@ -96,7 +96,7 @@ export function SearchInStockPage(): React.JSX.Element {
         >
           <WarehouseFilter
             selection={draft.warehouses}
-            onSelectionChange={w => updateDebounced({ ...draft, warehouses: w })}
+            onSelectionChange={w => updateImmediate({ ...draft, warehouses: w })}
           />
 
           <ModelSearchInput

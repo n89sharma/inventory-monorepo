@@ -1,7 +1,9 @@
-import { MultiSelectOptionsInline } from '@/components/custom/multi-select-options'
+import { Toggle } from '@/components/shadcn/toggle'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useMemo } from 'react'
 import type { Warehouse } from 'shared-types'
+
+const ALL_LABEL = 'All Warehouses'
 
 export function WarehouseFilter({
   selection,
@@ -15,14 +17,33 @@ export function WarehouseFilter({
     () => allWarehouses.filter(w => w.is_active),
     [allWarehouses],
   )
+
+  const isAll = activeWarehouses.length > 0
+    && selection.length === activeWarehouses.length
+  const isOnly = (w: Warehouse) =>
+    selection.length === 1 && selection[0].id === w.id
+
   return (
-    <MultiSelectOptionsInline
-      selection={selection}
-      onSelectionChange={onSelectionChange}
-      options={activeWarehouses}
-      getLabel={w => w.city_code}
-      fieldLabel='Warehouse'
-      className='w-45'
-    />
+    <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Filter by warehouse">
+      <Toggle
+        variant="outline"
+        pressed={isAll}
+        onPressedChange={pressed => onSelectionChange(pressed ? activeWarehouses : [])}
+        aria-label="Select all warehouses"
+      >
+        {ALL_LABEL}
+      </Toggle>
+      {activeWarehouses.map(w => (
+        <Toggle
+          key={w.id}
+          variant="outline"
+          pressed={isOnly(w)}
+          onPressedChange={pressed => onSelectionChange(pressed ? [w] : [])}
+          aria-label={`Filter by ${w.city_code} warehouse`}
+        >
+          {w.city_code}
+        </Toggle>
+      ))}
+    </div>
   )
 }
