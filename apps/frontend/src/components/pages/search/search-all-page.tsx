@@ -116,6 +116,13 @@ export function SearchAllPage(): React.JSX.Element {
           className="flex flex-row flex-wrap gap-2 items-end"
           onSubmit={e => e.preventDefault()}
         >
+          <WarehouseFilter
+            selection={draft.selectedWarehouses}
+            onSelectionChange={w => updateImmediate({
+              ...draft, selectedWarehouses: w,
+            })}
+          />
+
           <ModelFilter
             selection={draft.model}
             query={draft.modelQuery ?? ''}
@@ -146,13 +153,6 @@ export function SearchAllPage(): React.JSX.Element {
           <ReadinessFilter
             selection={draft.readinesses}
             onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
-          />
-
-          <WarehouseFilter
-            selection={draft.selectedWarehouses}
-            onSelectionChange={w => updateImmediate({
-              ...draft, selectedWarehouses: w,
-            })}
           />
 
           <MeterRangeInput

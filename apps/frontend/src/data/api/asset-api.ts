@@ -217,6 +217,8 @@ export async function getAssetsForSearchInStock(
   model: string | null,
   meterMin: number | null,
   meterMax: number | null,
+  cassettes: number | null,
+  component: Component | null,
   includeHeld: boolean): Promise<AssetSearchRow[]> {
 
   const { data } = await api.get<AssetSearchRow[]>(`/reports/stock`, {
@@ -228,6 +230,8 @@ export async function getAssetsForSearchInStock(
       model: model ?? undefined,
       meterMin: meterMin ?? undefined,
       meterMax: meterMax ?? undefined,
+      cassettes: cassettes ?? undefined,
+      componentId: component?.id ?? undefined,
       includeHeld: includeHeld ? 'true' : undefined,
     }
   })

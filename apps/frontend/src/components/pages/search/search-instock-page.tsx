@@ -17,6 +17,7 @@ import type { AssetSearchRow } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
+import { InputWithClearInline } from '../../custom/input-with-clear'
 import { MeterRangeInput } from '../../custom/meter-range-input'
 import { ModelFilter } from '../../custom/model-filter'
 import { ModelSearchInput } from '../../custom/model-search-input'
@@ -32,6 +33,7 @@ const DEBOUNCE_MS = 600
 export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const [brandQuery, setBrandQuery] = useState('')
+  const [finisherQuery, setFinisherQuery] = useState('')
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
     useColumnVisibility()
 
@@ -40,6 +42,7 @@ export function SearchInStockPage(): React.JSX.Element {
   const allAssetTypes = useReferenceDataStore(state => state.assetTypes)
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
+  const allComponents = useReferenceDataStore(state => state.components)
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -48,8 +51,9 @@ export function SearchInStockPage(): React.JSX.Element {
       assetTypes: allAssetTypes,
       models,
       readinesses: allReadinesses,
+      components: allComponents,
     }),
-    [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses],
+    [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses, allComponents],
   )
 
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(
@@ -99,6 +103,22 @@ export function SearchInStockPage(): React.JSX.Element {
             onSelectionChange={w => updateImmediate({ ...draft, warehouses: w })}
           />
 
+          <ModelFilter
+            selection={draft.model}
+            query={draft.modelQuery ?? ''}
+            onSelectionChange={m => updateImmediate({
+              ...draft, model: m, modelQuery: null,
+            })}
+            onQueryChange={text => updateDebounced({
+              ...draft,
+              modelQuery: text.length > 0 ? text : null,
+              model: null,
+            })}
+            onClear={() => updateImmediate({
+              ...draft, model: null, modelQuery: null,
+            })}
+          />
+
           <ModelSearchInput
             selection={draft.brand}
             query={brandQuery}
@@ -128,21 +148,14 @@ export function SearchInStockPage(): React.JSX.Element {
             className='w-45'
           />
 
-          <ModelFilter
-            selection={draft.model}
-            query={draft.modelQuery ?? ''}
-            onSelectionChange={m => updateImmediate({
-              ...draft, model: m, modelQuery: null,
-            })}
-            onQueryChange={text => updateDebounced({
-              ...draft,
-              modelQuery: text.length > 0 ? text : null,
-              model: null,
-            })}
-            onClear={() => updateImmediate({
-              ...draft, model: null, modelQuery: null,
-            })}
-          />
+          <Toggle
+            variant="outline"
+            pressed={draft.includeHeld}
+            onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
+            aria-label="Include held assets"
+          >
+            {draft.includeHeld ? 'Hide Held' : 'Show Held'}
+          </Toggle>
 
           <ReadinessFilter
             selection={draft.readinesses}
@@ -157,14 +170,38 @@ export function SearchInStockPage(): React.JSX.Element {
             className='w-72'
           />
 
-          <Toggle
-            variant="outline"
-            pressed={draft.includeHeld}
-            onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
-            aria-label="Include held assets"
-          >
-            {draft.includeHeld ? 'Hide Held' : 'Show Held'}
-          </Toggle>
+          <InputWithClearInline
+            value={draft.cassettes}
+            onValueChange={val => {
+              const next = typeof val === 'string' || val === null
+                ? null
+                : Number.isInteger(val) && val >= 0 ? val : null
+              updateDebounced({ ...draft, cassettes: next })
+            }}
+            fieldLabel='Cassettes (min)'
+            inputType='number'
+            className='w-45'
+          />
+
+          <ModelSearchInput
+            selection={draft.internalFinisher}
+            query={finisherQuery}
+            onSelectionChange={c => {
+              setFinisherQuery('')
+              updateImmediate({ ...draft, internalFinisher: c })
+            }}
+            onQueryChange={setFinisherQuery}
+            onClear={() => {
+              setFinisherQuery('')
+              updateImmediate({ ...draft, internalFinisher: null })
+            }}
+            options={allComponents}
+            searchKey='name'
+            getLabel={c => `${c.brand_name} — ${c.name}`}
+            placeholder='Internal Finisher'
+            clearLabel='Clear internal finisher'
+            className='w-45'
+          />
         </form>
       </StickyPageHeader>
       <PageContent className={`flex flex-col gap-2 ${selection.hasSelection ? 'pb-24' : ''}`}>

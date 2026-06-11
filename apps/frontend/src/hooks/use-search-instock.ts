@@ -20,6 +20,8 @@ export function useSearchInStock(filters: SearchInStockFilters) {
       f.model?.model_name ?? f.modelQuery,
       f.meterMin,
       f.meterMax,
+      f.cassettes,
+      f.internalFinisher,
       f.includeHeld,
     ),
     {

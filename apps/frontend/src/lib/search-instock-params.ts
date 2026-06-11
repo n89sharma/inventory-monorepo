@@ -1,4 +1,4 @@
-import type { AssetType, Brand, ModelSummary, Status, Warehouse } from 'shared-types'
+import type { AssetType, Brand, Component, ModelSummary, Status, Warehouse } from 'shared-types'
 import {
   decodeIds,
   encodeIds,
@@ -13,6 +13,8 @@ const PARAM_TYPE = 'type'
 const PARAM_READINESS = 'readiness'
 const PARAM_METER_MIN = 'meter_min'
 const PARAM_METER_MAX = 'meter_max'
+const PARAM_CAS = 'cas'
+const PARAM_FIN = 'fin'
 const PARAM_HELD = 'held'
 const HELD_ON = '1'
 
@@ -27,6 +29,8 @@ export type SearchInStockFilters = {
   readinesses: Status[]
   meterMin: number | null
   meterMax: number | null
+  cassettes: number | null
+  internalFinisher: Component | null
   includeHeld: boolean
 }
 
@@ -36,6 +40,7 @@ export type SearchInStockReferenceData = {
   assetTypes: AssetType[]
   models: ModelSummary[]
   readinesses: Status[]
+  components: Component[]
 }
 
 export function filtersToParams(filters: SearchInStockFilters): URLSearchParams {
@@ -49,6 +54,8 @@ export function filtersToParams(filters: SearchInStockFilters): URLSearchParams 
   if (filters.readinesses.length > 0) params.set(PARAM_READINESS, encodeIds(filters.readinesses))
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
   if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
+  if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
+  if (filters.internalFinisher) params.set(PARAM_FIN, String(filters.internalFinisher.id))
   if (filters.includeHeld) params.set(PARAM_HELD, HELD_ON)
   return params
 }
@@ -70,6 +77,14 @@ export function paramsToFilters(
     ? ref.brands.find(b => b.id === Number.parseInt(brandId, 10)) ?? null
     : null
 
+  const finisherRaw = params.get(PARAM_FIN)
+  const internalFinisher = finisherRaw
+    ? ref.components.find(c => c.id === Number.parseInt(finisherRaw, 10)) ?? null
+    : null
+
+  const cassettesRaw = params.get(PARAM_CAS)
+  const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
+
   return {
     warehouses,
     brand,
@@ -79,6 +94,8 @@ export function paramsToFilters(
     readinesses: decodeIds(params.get(PARAM_READINESS), ref.readinesses),
     meterMin: parseNonNegativeNumber(params.get(PARAM_METER_MIN)),
     meterMax: parseNonNegativeNumber(params.get(PARAM_METER_MAX)),
+    cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
+    internalFinisher,
     includeHeld: params.get(PARAM_HELD) === HELD_ON,
   }
 }

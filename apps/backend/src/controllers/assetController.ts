@@ -79,12 +79,15 @@ export const SearchInStockQuerySchema = z.object({
   model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
   meterMin: z.string().optional().transform(Number),
   meterMax: z.string().optional().transform(Number),
+  cassettes: z.string().optional().transform(Number),
+  componentId: z.string().optional().transform(Number),
   includeHeld: z.enum(['true', 'false']).optional()
 })
 
 export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
   const {
-    warehouseIds, brandIds, assetTypeIds, readinessIds, model, meterMin, meterMax, includeHeld
+    warehouseIds, brandIds, assetTypeIds, readinessIds, model,
+    meterMin, meterMax, cassettes, componentId, includeHeld
   } = res.locals.query as z.infer<typeof SearchInStockQuerySchema>
   const data = await getAssetsForSearchInStockSer(
     warehouseIds,
@@ -94,6 +97,8 @@ export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
     model ?? '',
     isNaN(meterMin) ? -1 : meterMin,
     isNaN(meterMax) ? -1 : meterMax,
+    isNaN(cassettes) ? -1 : cassettes,
+    isNaN(componentId) ? -1 : componentId,
     includeHeld === 'true',
     res.locals.dbUserRole,
   )
