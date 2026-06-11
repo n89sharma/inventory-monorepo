@@ -12,7 +12,7 @@ const router = express.Router()
 
 router.use(requireAuth)
 
-router.get('/stock', requirePermission('view_reports'), validateQuery(SearchInStockQuerySchema), getAssetsForSearchInStock)
+router.get('/stock', requirePermission('view_asset'), validateQuery(SearchInStockQuerySchema), getAssetsForSearchInStock)
 
 router.get(
   '/profitability',

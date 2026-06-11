@@ -110,14 +110,7 @@ function AppRoutes() {
                   <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
 
                   <Route path="/reports" element={<Navigate to="/reports/stock" replace />} />
-                  <Route
-                    path="/reports/stock"
-                    element={
-                      <PermissionRoute permission="view_reports">
-                        <SearchInStockPage />
-                      </PermissionRoute>
-                    }
-                  />
+                  <Route path="/reports/stock" element={<SearchInStockPage />} />
                   <Route path="/reports/stock/:assetId" element={<AssetDetailsPage />} />
                   <Route
                     path="/reports/profitability"
