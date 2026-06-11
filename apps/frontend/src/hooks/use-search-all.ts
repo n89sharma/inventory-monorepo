@@ -1,5 +1,6 @@
 import { getAssetsForSearchAll } from '@/data/api/asset-api'
-import { MIN_MODEL_INPUT_QUERY_LENGTH, type SearchAllFilters } from '@/lib/search-all-params'
+import { MIN_MODEL_INPUT_QUERY_LENGTH } from '@/lib/asset-filter-params'
+import type { SearchAllFilters } from '@/lib/search-all-params'
 import type { AssetSearchRow } from 'shared-types'
 import useSWR from 'swr'
 

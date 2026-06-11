@@ -1,7 +1,12 @@
 import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
+import {
+  decodeIds,
+  encodeIds,
+  getModelParams,
+  parseNonNegativeNumber,
+  setModelParams,
+} from '@/lib/asset-filter-params'
 
-const PARAM_MODEL = 'model'
-const PARAM_Q = 'q'
 const PARAM_METER_MIN = 'meter_min'
 const PARAM_METER_MAX = 'meter_max'
 const PARAM_STATUS = 'status'
@@ -9,8 +14,6 @@ const PARAM_READINESS = 'readiness'
 const PARAM_WH = 'wh'
 const PARAM_CAS = 'cas'
 const PARAM_FIN = 'fin'
-
-export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 
 export type SearchAllFilters = {
   model: ModelSummary | null
@@ -44,33 +47,9 @@ export const EMPTY_SEARCH_ALL_FILTERS: SearchAllFilters = {
   selectedWarehouses: [],
 }
 
-function parseNonNegativeNumber(raw: string | null): number | null {
-  if (raw === null) return null
-  const parsed = Number.parseFloat(raw)
-  return Number.isNaN(parsed) || parsed < 0 ? null : parsed
-}
-
-export function encodeIds(items: { id: number }[]): string {
-  return items.map(i => i.id).join(',')
-}
-
-export function decodeIds<T extends { id: number }>(raw: string | null, lookup: T[]): T[] {
-  if (!raw) return []
-  const byId = new Map(lookup.map(item => [item.id, item]))
-  return raw
-    .split(',')
-    .map(s => Number.parseInt(s, 10))
-    .map(id => byId.get(id))
-    .filter((item): item is T => item !== undefined)
-}
-
 export function filtersToParams(filters: SearchAllFilters): URLSearchParams {
   const params = new URLSearchParams()
-  if (filters.model) {
-    params.set(PARAM_MODEL, String(filters.model.id))
-  } else if (filters.modelQuery && filters.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH) {
-    params.set(PARAM_Q, filters.modelQuery)
-  }
+  setModelParams(params, filters.model, filters.modelQuery)
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
   if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
   if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
@@ -93,16 +72,7 @@ export function paramsToFilters(
   params: URLSearchParams,
   ref: SearchAllReferenceData,
 ): SearchAllFilters {
-  const modelId = params.get(PARAM_MODEL)
-  const model = modelId
-    ? ref.models.find(m => m.id === Number.parseInt(modelId, 10)) ?? null
-    : null
-
-  const qRaw = params.get(PARAM_Q)
-  const modelQuery = !model && qRaw && qRaw.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? qRaw : null
-
-  const meterMin = parseNonNegativeNumber(params.get(PARAM_METER_MIN))
-  const meterMax = parseNonNegativeNumber(params.get(PARAM_METER_MAX))
+  const { model, modelQuery } = getModelParams(params, ref.models)
 
   const cassettesRaw = params.get(PARAM_CAS)
   const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
@@ -115,8 +85,8 @@ export function paramsToFilters(
   return {
     model,
     modelQuery,
-    meterMin,
-    meterMax,
+    meterMin: parseNonNegativeNumber(params.get(PARAM_METER_MIN)),
+    meterMax: parseNonNegativeNumber(params.get(PARAM_METER_MAX)),
     cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
     internalFinisher,
     statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),

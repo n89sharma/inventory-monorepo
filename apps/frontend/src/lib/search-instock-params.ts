@@ -1,15 +1,15 @@
 import type { AssetType, Brand, ModelSummary, Status, Warehouse } from 'shared-types'
 import {
-  MIN_MODEL_INPUT_QUERY_LENGTH,
   decodeIds,
   encodeIds,
-} from '@/lib/search-all-params'
+  getModelParams,
+  parseNonNegativeNumber,
+  setModelParams,
+} from '@/lib/asset-filter-params'
 
 const PARAM_WH = 'wh'
 const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
-const PARAM_MODEL = 'model'
-const PARAM_Q = 'q'
 const PARAM_READINESS = 'readiness'
 const PARAM_METER_MIN = 'meter_min'
 const PARAM_METER_MAX = 'meter_max'
@@ -38,12 +38,6 @@ export type SearchInStockReferenceData = {
   readinesses: Status[]
 }
 
-function parseNonNegativeNumber(raw: string | null): number | null {
-  if (raw === null) return null
-  const parsed = Number.parseFloat(raw)
-  return Number.isNaN(parsed) || parsed < 0 ? null : parsed
-}
-
 export function filtersToParams(filters: SearchInStockFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.warehouses.length > 0) {
@@ -51,11 +45,7 @@ export function filtersToParams(filters: SearchInStockFilters): URLSearchParams 
   }
   if (filters.brand) params.set(PARAM_BRAND, String(filters.brand.id))
   if (filters.assetTypes.length > 0) params.set(PARAM_TYPE, encodeIds(filters.assetTypes))
-  if (filters.model) {
-    params.set(PARAM_MODEL, String(filters.model.id))
-  } else if (filters.modelQuery && filters.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH) {
-    params.set(PARAM_Q, filters.modelQuery)
-  }
+  setModelParams(params, filters.model, filters.modelQuery)
   if (filters.readinesses.length > 0) params.set(PARAM_READINESS, encodeIds(filters.readinesses))
   if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
   if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
@@ -73,13 +63,7 @@ export function paramsToFilters(
     ? (defaultWarehouse ? [defaultWarehouse] : [])
     : decodeIds(whRaw, ref.warehouses)
 
-  const modelId = params.get(PARAM_MODEL)
-  const model = modelId
-    ? ref.models.find(m => m.id === Number.parseInt(modelId, 10)) ?? null
-    : null
-
-  const qRaw = params.get(PARAM_Q)
-  const modelQuery = !model && qRaw && qRaw.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? qRaw : null
+  const { model, modelQuery } = getModelParams(params, ref.models)
 
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
