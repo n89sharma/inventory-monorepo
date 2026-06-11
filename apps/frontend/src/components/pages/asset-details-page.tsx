@@ -396,7 +396,7 @@ export const AssetDetailsPage = () => {
                   <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2 mb-0" /></TabsTrigger>
                   <TabsTrigger value="history"><SectionHeader title="History" className="px-2 mb-0" /></TabsTrigger>
                 </TabsList>
-                <TabsContent value="comments" className="flex flex-col gap-3 py-3 overflow-y-auto max-h-105 pr-1">
+                <TabsContent value="comments" className="space-y-3 py-3 min-h-96">
                   <AddCommentInput barcode={assetDetails.barcode} />
                   {
                     sortedComments.map(c => (<Comment
@@ -409,7 +409,7 @@ export const AssetDetailsPage = () => {
                     />))
                   }
                 </TabsContent>
-                <TabsContent value="history" className="py-3 overflow-y-auto overflow-x-hidden max-h-105 pr-1 break-words">
+                <TabsContent value="history" className="py-3 overflow-x-hidden break-words min-h-96">
                   <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
                 </TabsContent>
               </Tabs>
