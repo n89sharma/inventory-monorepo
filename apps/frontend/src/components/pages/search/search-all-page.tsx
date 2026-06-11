@@ -1,10 +1,9 @@
 import { StickyPageHeader } from "@/components/custom/sticky-page-header"
 import { PageContent } from "@/components/layout/page-content"
-import { Button } from "@/components/shadcn/button"
-import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchAll } from '@/hooks/use-search-all'
+import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import { formatSentenceCase } from '@/lib/formatters'
@@ -12,14 +11,13 @@ import {
   filtersToParams,
   paramsToFilters,
 } from '@/lib/search-all-params'
-import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
-import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { SpinnerGapIcon } from '@phosphor-icons/react'
+import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { AssetSearchRow, AssetSummary } from 'shared-types'
-import { toast } from 'sonner'
-import { BulkEditBar } from '../../custom/bulk-edit-bar'
+import type { AssetSearchRow } from 'shared-types'
+import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
+import { ExportAssetsButton } from '../../custom/export-assets-button'
 import { InputWithClearInline } from '../../custom/input-with-clear'
 import { MeterRangeInput } from '../../custom/meter-range-input'
 import { ModelFilter } from '../../custom/model-filter'
@@ -27,100 +25,15 @@ import { ModelSearchInput } from '../../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
 import { ReadinessFilter } from '../../custom/readiness-filter'
 import { WarehouseFilter } from '../../custom/warehouse-filter'
-import { DataTable } from "../../shadcn/data-table"
-import { createAssetSearchColumns } from '../column-defs/asset-search-columns'
-import { createSelectColumn } from '../column-defs/shared-columns'
 
-const assetSearchColumns = [
-  createSelectColumn<AssetSearchRow>(),
-  ...createAssetSearchColumns(a => `/search/all/${a.barcode}`),
-]
-
-const getAssetRowId = (row: AssetSearchRow) => row.barcode
-
-function toAssetSummary(r: AssetSearchRow): AssetSummary {
-  return {
-    id: r.id,
-    barcode: r.barcode,
-    brand: r.brand,
-    model: r.model,
-    asset_type: r.asset_type,
-    serial_number: r.serial_number,
-    meter_total: r.specs_meter_total,
-    status: r.status,
-    readiness: r.readiness,
-    location: r.location,
-    hold_number: r.hold_hold_number,
-    purchase_invoice_number: r.purchase_invoice_invoice_number,
-    is_in_transit: r.is_in_transit,
-  }
-}
-const defaultSort = { id: 'barcode', desc: true } as const
+const getRowHref = (a: AssetSearchRow) => `/search/all/${a.barcode}`
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 600
-const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
 const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
 
-const SearchAllResultsTable = memo(function SearchAllResultsTable({
-  assets,
-  rowSelection,
-  onRowSelectionChange,
-  onBulkPriceSave,
-  columnVisibility,
-}: {
-  assets: AssetSearchRow[]
-  rowSelection: RowSelectionState
-  onRowSelectionChange: OnChangeFn<RowSelectionState>
-  onBulkPriceSave: () => void
-  columnVisibility: VisibilityState
-}) {
-  const [prevAssets, setPrevAssets] = useState(assets)
-
-  if (assets !== prevAssets) {
-    setPrevAssets(assets)
-    onRowSelectionChange({})
-  }
-
-  const selectedAssets: AssetSummary[] = assets
-    .filter(a => rowSelection[a.barcode])
-    .map(toAssetSummary)
-
-  function selectAllAssets() {
-    const all: RowSelectionState = {}
-    for (const asset of assets) all[asset.barcode] = true
-    onRowSelectionChange(all)
-  }
-
-  return (
-    <>
-      <BulkEditBar
-        selectedAssets={selectedAssets}
-        onClear={() => onRowSelectionChange({})}
-        onPriceSaveSuccess={onBulkPriceSave}
-        totalCount={assets.length}
-        onSelectAll={selectAllAssets}
-      />
-      <DataTable
-        columns={assetSearchColumns}
-        data={assets}
-        rowSelection={rowSelection}
-        onRowSelectionChange={onRowSelectionChange}
-        getRowId={getAssetRowId}
-        defaultSort={defaultSort}
-        pinLeft={PIN_LEFT}
-        getRowHref={a => `/search/all/${a.barcode}`}
-        columnVisibility={columnVisibility}
-      />
-    </>
-  )
-})
-
 export function SearchAllPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
-  const exportAssets = useAssetStore(state => state.exportAssets)
-  const [exportLoading, setExportLoading] = useState(false)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
     useColumnVisibility()
 
@@ -169,30 +82,8 @@ export function SearchAllPage(): React.JSX.Element {
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
+  const selection = useAssetSelection(assets)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
-
-  async function handleExport() {
-    const selectedBarcodes = Object.keys(rowSelection)
-    const barcodesToExport = selectedBarcodes.length > 0
-      ? selectedBarcodes
-      : assets.map(a => a.barcode)
-
-    if (barcodesToExport.length > 2000) {
-      toast.error('Please select 2000 assets or less', { position: 'top-center' })
-      return
-    }
-
-    setExportLoading(true)
-    try {
-      await exportAssets(barcodesToExport)
-    } catch {
-      toast.error('Failed to export assets', { position: 'top-center' })
-    } finally {
-      setExportLoading(false)
-    }
-  }
-
-  const exportDisabled = assets.length === 0 || exportLoading
 
   return (
     <>
@@ -214,114 +105,107 @@ export function SearchAllPage(): React.JSX.Element {
               onVisibleChange={setVisibleColumns}
               onReset={resetColumns}
             />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleExport}
-              disabled={exportDisabled}
-              aria-label="Export to CSV"
-            >
-              {exportLoading
-                ? <SpinnerGapIcon className="animate-spin" />
-                : <DownloadSimpleIcon />}
-            </Button>
+            <ExportAssetsButton
+              loading={selection.exportLoading}
+              disabled={selection.exportDisabled}
+              onClick={selection.handleExport}
+            />
           </div>
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
           onSubmit={e => e.preventDefault()}
         >
-          <fieldset disabled={exportLoading} className="contents">
-            <ModelFilter
-              selection={draft.model}
-              query={draft.modelQuery ?? ''}
-              onSelectionChange={m => updateImmediate({
-                ...draft, model: m, modelQuery: null,
-              })}
-              onQueryChange={text => updateDebounced({
-                ...draft,
-                modelQuery: text.length > 0 ? text : null,
-                model: null,
-              })}
-              onClear={() => updateImmediate({
-                ...draft, model: null, modelQuery: null,
-              })}
-              placeholder='Model *'
-            />
+          <ModelFilter
+            selection={draft.model}
+            query={draft.modelQuery ?? ''}
+            onSelectionChange={m => updateImmediate({
+              ...draft, model: m, modelQuery: null,
+            })}
+            onQueryChange={text => updateDebounced({
+              ...draft,
+              modelQuery: text.length > 0 ? text : null,
+              model: null,
+            })}
+            onClear={() => updateImmediate({
+              ...draft, model: null, modelQuery: null,
+            })}
+            placeholder='Model *'
+          />
 
-            <MultiSelectOptionsInline
-              selection={draft.statuses}
-              onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
-              options={allStatuses}
-              getLabel={s => formatSentenceCase(s.status)}
-              fieldLabel='Status'
-              className='w-45'
-              dividerAfterIds={statusDividerAfterIds}
-            />
+          <MultiSelectOptionsInline
+            selection={draft.statuses}
+            onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
+            options={allStatuses}
+            getLabel={s => formatSentenceCase(s.status)}
+            fieldLabel='Status'
+            className='w-45'
+            dividerAfterIds={statusDividerAfterIds}
+          />
 
-            <ReadinessFilter
-              selection={draft.readinesses}
-              onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
-            />
+          <ReadinessFilter
+            selection={draft.readinesses}
+            onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
+          />
 
-            <WarehouseFilter
-              selection={draft.selectedWarehouses}
-              onSelectionChange={w => updateDebounced({
-                ...draft, selectedWarehouses: w,
-              })}
-            />
+          <WarehouseFilter
+            selection={draft.selectedWarehouses}
+            onSelectionChange={w => updateDebounced({
+              ...draft, selectedWarehouses: w,
+            })}
+          />
 
-            <MeterRangeInput
-              min={draft.meterMin}
-              max={draft.meterMax}
-              onMinChange={val => updateDebounced({ ...draft, meterMin: val })}
-              onMaxChange={val => updateDebounced({ ...draft, meterMax: val })}
-              className='w-72'
-            />
+          <MeterRangeInput
+            min={draft.meterMin}
+            max={draft.meterMax}
+            onMinChange={val => updateDebounced({ ...draft, meterMin: val })}
+            onMaxChange={val => updateDebounced({ ...draft, meterMax: val })}
+            className='w-72'
+          />
 
-            <InputWithClearInline
-              value={draft.cassettes}
-              onValueChange={val => {
-                const next = typeof val === 'string' || val === null
-                  ? null
-                  : Number.isInteger(val) && val >= 0 ? val : null
-                updateDebounced({ ...draft, cassettes: next })
-              }}
-              fieldLabel='Cassettes (min)'
-              inputType='number'
-              className='w-45'
-            />
+          <InputWithClearInline
+            value={draft.cassettes}
+            onValueChange={val => {
+              const next = typeof val === 'string' || val === null
+                ? null
+                : Number.isInteger(val) && val >= 0 ? val : null
+              updateDebounced({ ...draft, cassettes: next })
+            }}
+            fieldLabel='Cassettes (min)'
+            inputType='number'
+            className='w-45'
+          />
 
-            <ModelSearchInput
-              selection={draft.internalFinisher}
-              query={finisherQuery}
-              onSelectionChange={c => {
-                setFinisherQuery('')
-                updateImmediate({ ...draft, internalFinisher: c })
-              }}
-              onQueryChange={setFinisherQuery}
-              onClear={() => {
-                setFinisherQuery('')
-                updateImmediate({ ...draft, internalFinisher: null })
-              }}
-              options={allComponents}
-              searchKey='name'
-              getLabel={c => `${c.brand_name} — ${c.name}`}
-              placeholder='Internal Finisher'
-              clearLabel='Clear internal finisher'
-              className='w-45'
-            />
-          </fieldset>
+          <ModelSearchInput
+            selection={draft.internalFinisher}
+            query={finisherQuery}
+            onSelectionChange={c => {
+              setFinisherQuery('')
+              updateImmediate({ ...draft, internalFinisher: c })
+            }}
+            onQueryChange={setFinisherQuery}
+            onClear={() => {
+              setFinisherQuery('')
+              updateImmediate({ ...draft, internalFinisher: null })
+            }}
+            options={allComponents}
+            searchKey='name'
+            getLabel={c => `${c.brand_name} — ${c.name}`}
+            placeholder='Internal Finisher'
+            clearLabel='Clear internal finisher'
+            className='w-45'
+          />
         </form>
       </StickyPageHeader>
-      <PageContent className={`flex flex-col gap-2 ${Object.keys(rowSelection).length > 0 ? 'pb-24' : ''}`}>
+      <PageContent className={`flex flex-col gap-2 ${selection.hasSelection ? 'pb-24' : ''}`}>
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <SearchAllResultsTable
+          <AssetResultsTable
             assets={assets}
-            rowSelection={rowSelection}
-            onRowSelectionChange={setRowSelection}
+            rowSelection={selection.rowSelection}
+            onRowSelectionChange={selection.setRowSelection}
             onBulkPriceSave={handleBulkPriceSave}
             columnVisibility={columnVisibility}
+            getRowHref={getRowHref}
           />
         </div>
       </PageContent>

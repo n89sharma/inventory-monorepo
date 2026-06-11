@@ -3,6 +3,7 @@ import { PageContent } from "@/components/layout/page-content"
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchInStock } from '@/hooks/use-search-instock'
+import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import {
@@ -10,26 +11,23 @@ import {
   paramsToFilters,
 } from '@/lib/search-instock-params'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
+import { AssetResultsTable } from '../custom/asset-results-table'
 import { ColumnPickerButton } from '../custom/column-picker-button'
+import { ExportAssetsButton } from '../custom/export-assets-button'
 import { MeterRangeInput } from '../custom/meter-range-input'
 import { ModelFilter } from '../custom/model-filter'
 import { ModelSearchInput } from '../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../custom/multi-select-options'
 import { ReadinessFilter } from '../custom/readiness-filter'
 import { WarehouseFilter } from '../custom/warehouse-filter'
-import { DataTable } from "../shadcn/data-table"
 import { Toggle } from "../shadcn/toggle"
-import { createAssetSearchColumns } from './column-defs/asset-search-columns'
 
-const searchInStockColumns = createAssetSearchColumns(a => `/search/instock/${a.barcode}`)
-const getAssetRowId = (row: AssetSearchRow) => row.barcode
-const defaultSort = { id: 'barcode', desc: true } as const
+const getRowHref = (a: AssetSearchRow) => `/search/instock/${a.barcode}`
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 600
-const PIN_LEFT = ['barcode', 'brand', 'model']
 
 export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -61,7 +59,9 @@ export function SearchInStockPage(): React.JSX.Element {
     DEBOUNCE_MS,
   )
 
-  const { data: assets = EMPTY_ASSETS, isLoading } = useSearchInStock(urlFilters)
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchInStock(urlFilters)
+  const selection = useAssetSelection(assets)
+  const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
 
   return (
     <>
@@ -77,11 +77,18 @@ export function SearchInStockPage(): React.JSX.Element {
               />
             )}
           </div>
-          <ColumnPickerButton
-            visible={visibleColumns}
-            onVisibleChange={setVisibleColumns}
-            onReset={resetColumns}
-          />
+          <div className="flex items-center gap-2">
+            <ColumnPickerButton
+              visible={visibleColumns}
+              onVisibleChange={setVisibleColumns}
+              onReset={resetColumns}
+            />
+            <ExportAssetsButton
+              loading={selection.exportLoading}
+              disabled={selection.exportDisabled}
+              onClick={selection.handleExport}
+            />
+          </div>
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
@@ -160,16 +167,15 @@ export function SearchInStockPage(): React.JSX.Element {
           </Toggle>
         </form>
       </StickyPageHeader>
-      <PageContent className="flex flex-col gap-2">
+      <PageContent className={`flex flex-col gap-2 ${selection.hasSelection ? 'pb-24' : ''}`}>
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <DataTable
-            columns={searchInStockColumns}
-            data={assets}
-            getRowId={getAssetRowId}
-            defaultSort={defaultSort}
-            pinLeft={PIN_LEFT}
-            getRowHref={a => `/search/instock/${a.barcode}`}
+          <AssetResultsTable
+            assets={assets}
+            rowSelection={selection.rowSelection}
+            onRowSelectionChange={selection.setRowSelection}
+            onBulkPriceSave={handleBulkPriceSave}
             columnVisibility={columnVisibility}
+            getRowHref={getRowHref}
           />
         </div>
       </PageContent>
