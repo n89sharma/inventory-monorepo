@@ -36,7 +36,8 @@ export const ASSET_TABLE_COLUMNS = [
   { id: 'serial_number', label: 'Serial Number', section: 'general', defaultColumn: true,  enabled: true },
   { id: 'status',        label: 'Status',        section: 'general', defaultColumn: true,  enabled: true },
   { id: 'readiness',     label: 'Readiness',     section: 'general', defaultColumn: true,  enabled: true },
-  { id: 'location',      label: 'Location',      section: 'general', defaultColumn: true,  enabled: true },
+  { id: 'location',      label: 'Location',      section: 'general', defaultColumn: false, enabled: true },
+  { id: 'stock_days',    label: 'Stock Days',    section: 'general', defaultColumn: true,  enabled: true },
 
   // Specs
   { id: 'country_of_origin',       label: 'Country of Origin', section: 'specs', defaultColumn: false, enabled: true },

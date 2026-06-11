@@ -7,7 +7,7 @@ import { memo, useMemo } from 'react'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
-const defaultSort = { id: 'barcode', desc: true } as const
+const defaultSort = { id: 'stock_days', desc: false } as const
 const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 
 function toAssetSummary(r: AssetSearchRow): AssetSummary {

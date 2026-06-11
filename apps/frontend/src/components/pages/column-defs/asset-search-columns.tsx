@@ -5,10 +5,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/too
 import { formatDate, formatLocation, formatThousandsK, formatUSD } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
+import { differenceInCalendarDays } from "date-fns"
 import type { AssetSearchRow } from 'shared-types'
 import { createIdColumn } from './shared-columns'
 
 const HELD_STATUS = 'HELD'
+
+const stockDays = (arrived: Date | null): number | undefined =>
+  arrived ? differenceInCalendarDays(new Date(), arrived) : undefined
 
 function SortableHeader({
   label,
@@ -285,6 +289,19 @@ export function createAssetSearchColumns(
     ),
     cell: ({ row }) => formatDate(row.original.arrival_created_at),
     size: 100
+  },
+  {
+    id: "stock_days",
+    accessorFn: row => stockDays(row.arrival_created_at),
+    header: ({ column }) => (
+      <SortableHeader
+        label="Stock Days"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => stockDays(row.original.arrival_created_at) ?? '',
+    sortUndefined: 'last',
+    size: 80
   },
   {
     accessorKey: "customer",
