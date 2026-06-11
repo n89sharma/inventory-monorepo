@@ -15,9 +15,10 @@ import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
+import { CassettesFilter } from '../../custom/cassettes-filter'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
-import { InputWithClearInline } from '../../custom/input-with-clear'
+import { InternalFinisherFilter } from '../../custom/internal-finisher-filter'
 import { MeterRangeInput } from '../../custom/meter-range-input'
 import { ModelFilter } from '../../custom/model-filter'
 import { ModelSearchInput } from '../../custom/model-search-input'
@@ -33,7 +34,6 @@ const DEBOUNCE_MS = 600
 export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const [brandQuery, setBrandQuery] = useState('')
-  const [finisherQuery, setFinisherQuery] = useState('')
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
     useColumnVisibility()
 
@@ -170,37 +170,15 @@ export function SearchInStockPage(): React.JSX.Element {
             className='w-72'
           />
 
-          <InputWithClearInline
+          <CassettesFilter
             value={draft.cassettes}
-            onValueChange={val => {
-              const next = typeof val === 'string' || val === null
-                ? null
-                : Number.isInteger(val) && val >= 0 ? val : null
-              updateDebounced({ ...draft, cassettes: next })
-            }}
-            fieldLabel='Cassettes (min)'
-            inputType='number'
-            className='w-45'
+            onValueChange={val => updateDebounced({ ...draft, cassettes: val })}
           />
 
-          <ModelSearchInput
+          <InternalFinisherFilter
             selection={draft.internalFinisher}
-            query={finisherQuery}
-            onSelectionChange={c => {
-              setFinisherQuery('')
-              updateImmediate({ ...draft, internalFinisher: c })
-            }}
-            onQueryChange={setFinisherQuery}
-            onClear={() => {
-              setFinisherQuery('')
-              updateImmediate({ ...draft, internalFinisher: null })
-            }}
-            options={allComponents}
-            searchKey='name'
-            getLabel={c => `${c.brand_name} — ${c.name}`}
-            placeholder='Internal Finisher'
-            clearLabel='Clear internal finisher'
-            className='w-45'
+            onSelectionChange={c => updateImmediate({ ...draft, internalFinisher: c })}
+            onClear={() => updateImmediate({ ...draft, internalFinisher: null })}
           />
         </form>
       </StickyPageHeader>

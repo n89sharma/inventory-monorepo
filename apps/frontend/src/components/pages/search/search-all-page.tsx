@@ -12,16 +12,16 @@ import {
   paramsToFilters,
 } from '@/lib/search-all-params'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
+import { CassettesFilter } from '../../custom/cassettes-filter'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
-import { InputWithClearInline } from '../../custom/input-with-clear'
+import { InternalFinisherFilter } from '../../custom/internal-finisher-filter'
 import { MeterRangeInput } from '../../custom/meter-range-input'
 import { ModelFilter } from '../../custom/model-filter'
-import { ModelSearchInput } from '../../custom/model-search-input'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
 import { ReadinessFilter } from '../../custom/readiness-filter'
 import { WarehouseFilter } from '../../custom/warehouse-filter'
@@ -73,7 +73,6 @@ export function SearchAllPage(): React.JSX.Element {
     [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
   )
 
-  const [finisherQuery, setFinisherQuery] = useState('')
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(
     urlFilters,
     filtersToParams,
@@ -117,9 +116,9 @@ export function SearchAllPage(): React.JSX.Element {
           onSubmit={e => e.preventDefault()}
         >
           <WarehouseFilter
-            selection={draft.selectedWarehouses}
+            selection={draft.warehouses}
             onSelectionChange={w => updateImmediate({
-              ...draft, selectedWarehouses: w,
+              ...draft, warehouses: w,
             })}
           />
 
@@ -163,37 +162,15 @@ export function SearchAllPage(): React.JSX.Element {
             className='w-72'
           />
 
-          <InputWithClearInline
+          <CassettesFilter
             value={draft.cassettes}
-            onValueChange={val => {
-              const next = typeof val === 'string' || val === null
-                ? null
-                : Number.isInteger(val) && val >= 0 ? val : null
-              updateDebounced({ ...draft, cassettes: next })
-            }}
-            fieldLabel='Cassettes (min)'
-            inputType='number'
-            className='w-45'
+            onValueChange={val => updateDebounced({ ...draft, cassettes: val })}
           />
 
-          <ModelSearchInput
+          <InternalFinisherFilter
             selection={draft.internalFinisher}
-            query={finisherQuery}
-            onSelectionChange={c => {
-              setFinisherQuery('')
-              updateImmediate({ ...draft, internalFinisher: c })
-            }}
-            onQueryChange={setFinisherQuery}
-            onClear={() => {
-              setFinisherQuery('')
-              updateImmediate({ ...draft, internalFinisher: null })
-            }}
-            options={allComponents}
-            searchKey='name'
-            getLabel={c => `${c.brand_name} — ${c.name}`}
-            placeholder='Internal Finisher'
-            clearLabel='Clear internal finisher'
-            className='w-45'
+            onSelectionChange={c => updateImmediate({ ...draft, internalFinisher: c })}
+            onClear={() => updateImmediate({ ...draft, internalFinisher: null })}
           />
         </form>
       </StickyPageHeader>

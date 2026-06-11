@@ -1,9 +1,44 @@
-import type { ModelSummary } from 'shared-types'
+import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
+const PARAM_WH = 'wh'
+const PARAM_READINESS = 'readiness'
+const PARAM_METER_MIN = 'meter_min'
+const PARAM_METER_MAX = 'meter_max'
+const PARAM_CAS = 'cas'
+const PARAM_FIN = 'fin'
+
+export type SharedAssetFilters = {
+  warehouses: Warehouse[]
+  model: ModelSummary | null
+  modelQuery: string | null
+  readinesses: Status[]
+  meterMin: number | null
+  meterMax: number | null
+  cassettes: number | null
+  internalFinisher: Component | null
+}
+
+export type SharedAssetReferenceData = {
+  warehouses: Warehouse[]
+  models: ModelSummary[]
+  readinesses: Status[]
+  components: Component[]
+}
+
+export const EMPTY_SHARED_FILTERS: SharedAssetFilters = {
+  warehouses: [],
+  model: null,
+  modelQuery: null,
+  readinesses: [],
+  meterMin: null,
+  meterMax: null,
+  cassettes: null,
+  internalFinisher: null,
+}
 
 export function encodeIds(items: { id: number }[]): string {
   return items.map(i => i.id).join(',')
@@ -48,4 +83,53 @@ export function getModelParams(
   const qRaw = params.get(PARAM_Q)
   const modelQuery = !model && qRaw && qRaw.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? qRaw : null
   return { model, modelQuery }
+}
+
+export function setSharedFilterParams(
+  params: URLSearchParams,
+  filters: SharedAssetFilters,
+): void {
+  if (filters.warehouses.length > 0) params.set(PARAM_WH, encodeIds(filters.warehouses))
+  setModelParams(params, filters.model, filters.modelQuery)
+  if (filters.readinesses.length > 0) params.set(PARAM_READINESS, encodeIds(filters.readinesses))
+  if (filters.meterMin !== null) params.set(PARAM_METER_MIN, String(filters.meterMin))
+  if (filters.meterMax !== null) params.set(PARAM_METER_MAX, String(filters.meterMax))
+  if (filters.cassettes !== null) params.set(PARAM_CAS, String(filters.cassettes))
+  if (filters.internalFinisher) params.set(PARAM_FIN, String(filters.internalFinisher.id))
+}
+
+export function getSharedFilters(
+  params: URLSearchParams,
+  ref: SharedAssetReferenceData,
+  defaultWarehouseCode?: string,
+): SharedAssetFilters {
+  const whRaw = params.get(PARAM_WH)
+  let warehouses: Warehouse[]
+  if (whRaw === null && defaultWarehouseCode) {
+    const defaultWarehouse = ref.warehouses.find(w => w.city_code === defaultWarehouseCode)
+    warehouses = defaultWarehouse ? [defaultWarehouse] : []
+  } else {
+    warehouses = decodeIds(whRaw, ref.warehouses)
+  }
+
+  const { model, modelQuery } = getModelParams(params, ref.models)
+
+  const finisherRaw = params.get(PARAM_FIN)
+  const internalFinisher = finisherRaw
+    ? ref.components.find(c => c.id === Number.parseInt(finisherRaw, 10)) ?? null
+    : null
+
+  const cassettesRaw = params.get(PARAM_CAS)
+  const cassettes = cassettesRaw === null ? null : Number.parseInt(cassettesRaw, 10)
+
+  return {
+    warehouses,
+    model,
+    modelQuery,
+    readinesses: decodeIds(params.get(PARAM_READINESS), ref.readinesses),
+    meterMin: parseNonNegativeNumber(params.get(PARAM_METER_MIN)),
+    meterMax: parseNonNegativeNumber(params.get(PARAM_METER_MAX)),
+    cassettes: cassettes === null || Number.isNaN(cassettes) || cassettes < 0 ? null : cassettes,
+    internalFinisher,
+  }
 }

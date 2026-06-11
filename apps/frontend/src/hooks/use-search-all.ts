@@ -24,7 +24,7 @@ export function useSearchAll(filters: SearchAllFilters) {
         f.internalFinisher,
         f.statuses,
         f.readinesses,
-        f.selectedWarehouses,
+        f.warehouses,
       )
     },
     {
