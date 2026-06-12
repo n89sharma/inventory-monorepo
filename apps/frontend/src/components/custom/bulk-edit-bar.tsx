@@ -1,5 +1,5 @@
 import { useCan } from '@/hooks/use-can'
-import { DotsThreeVerticalIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { CurrencyDollarIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
@@ -152,16 +152,9 @@ export function BulkEditBar({
               <Button variant="secondary" onClick={openAddTo}>Add to</Button>
             )}
             {canEditPrices && (
-              <DropdownMenu>
-                <Button asChild variant="ghost" size="icon" aria-label="More actions">
-                  <DropdownMenuTrigger>
-                    <DotsThreeVerticalIcon />
-                  </DropdownMenuTrigger>
-                </Button>
-                <DropdownMenuContent className="w-max" side="top" align="end">
-                  <DropdownMenuItem onSelect={openBulkPricing}>Edit prices</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button variant="secondary" onClick={openBulkPricing}>
+                <CurrencyDollarIcon />Edit prices
+              </Button>
             )}
             {showBulkRemove && (
               <Button variant="destructive" className="ml-6" onClick={handleBulkRemove}>
