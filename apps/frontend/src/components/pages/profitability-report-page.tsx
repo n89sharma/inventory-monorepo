@@ -1,4 +1,4 @@
-import { PopoverSearchInline } from '@/components/custom/popover-search'
+import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import {
@@ -35,7 +35,7 @@ import {
 } from '@/lib/profitability-report-url-params'
 import { formatUSD } from '@/lib/formatters'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
@@ -132,6 +132,7 @@ function DimensionSearch({
   options: DimensionOption[]
   onChange: (next: DimensionValue) => void
 }): React.JSX.Element {
+  const [query, setQuery] = useState('')
   const selection = value === null
     ? null
     : options.find(option => option.value === value) ?? null
@@ -139,16 +140,17 @@ function DimensionSearch({
   return (
     <div className="flex flex-col gap-1">
       <span className="text-xs text-muted-foreground">{label}</span>
-      <PopoverSearchInline
+      <SearchSelectInput
         selection={selection}
-        onSelectionChange={(option: DimensionOption) => onChange(option.value)}
-        onClear={() => onChange(null)}
+        query={query}
+        onSelectionChange={option => { setQuery(''); onChange(option.value) }}
+        onQueryChange={setQuery}
+        onClear={() => { setQuery(''); onChange(null) }}
         options={options}
-        getLabel={option => option.label}
         searchKey="label"
-        fieldLabel={label}
-        fieldRequired={false}
+        getLabel={option => option.label}
         placeholder={placeholder}
+        clearLabel={`Clear ${label.toLowerCase()}`}
         className="w-45"
       />
     </div>

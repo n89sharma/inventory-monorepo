@@ -1,4 +1,4 @@
-import { ModelSearchInput } from '@/components/custom/model-search-input'
+import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useState } from 'react'
 import type { Component } from 'shared-types'
@@ -15,7 +15,7 @@ export function InternalFinisherFilter({
   const [query, setQuery] = useState('')
   const allComponents = useReferenceDataStore(state => state.components)
   return (
-    <ModelSearchInput
+    <SearchSelectInput
       selection={selection}
       query={query}
       onSelectionChange={c => {

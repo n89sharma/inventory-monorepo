@@ -1,4 +1,4 @@
-import { ModelSearchInput } from '@/components/custom/model-search-input'
+import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useModelStore } from '@/data/store/model-store'
 import type { ModelSummary } from 'shared-types'
 
@@ -19,7 +19,7 @@ export function ModelFilter({
 }): React.JSX.Element {
   const models = useModelStore(state => state.models)
   return (
-    <ModelSearchInput
+    <SearchSelectInput
       selection={selection}
       query={query}
       onSelectionChange={onSelectionChange}

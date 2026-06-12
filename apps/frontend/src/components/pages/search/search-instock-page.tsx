@@ -22,7 +22,7 @@ import { ExportAssetsButton } from '../../custom/export-assets-button'
 import { InternalFinisherFilter } from '../../custom/internal-finisher-filter'
 import { MeterRangeInput } from '../../custom/meter-range-input'
 import { ModelFilter } from '../../custom/model-filter'
-import { ModelSearchInput } from '../../custom/model-search-input'
+import { SearchSelectInput } from '../../custom/search-select-input'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
 import { ReadinessFilter } from '../../custom/readiness-filter'
 import { WarehouseFilter } from '../../custom/warehouse-filter'
@@ -123,7 +123,7 @@ export function SearchInStockPage(): React.JSX.Element {
             })}
           />
 
-          <ModelSearchInput
+          <SearchSelectInput
             selection={draft.brand}
             query={brandQuery}
             onSelectionChange={b => {

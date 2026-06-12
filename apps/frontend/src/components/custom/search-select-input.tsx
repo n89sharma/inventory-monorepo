@@ -17,7 +17,7 @@ const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
 const SUGGESTION_LIMIT = 6
 const FUSE_THRESHOLD = 0.5
 
-export type ModelSearchInputProps<T> = {
+export type SearchSelectInputProps<T> = {
   selection: T | null
   query: string
   onSelectionChange: (item: T) => void
@@ -31,7 +31,7 @@ export type ModelSearchInputProps<T> = {
   className?: string
 }
 
-export function ModelSearchInput<T>({
+export function SearchSelectInput<T>({
   selection,
   query,
   onSelectionChange,
@@ -43,7 +43,7 @@ export function ModelSearchInput<T>({
   placeholder,
   clearLabel = 'Clear',
   className,
-}: ModelSearchInputProps<T>): React.JSX.Element {
+}: SearchSelectInputProps<T>): React.JSX.Element {
   const [matches, setMatches] = useState<T[]>([])
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)

@@ -15,7 +15,7 @@ import MultipleSelector from '../shadcn/multiple-selector'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from './consumables-grid'
 import { HorizontalField } from './horizontal-field'
 import { InputWithClearInline } from './input-with-clear'
-import { ModelSearchInput } from './model-search-input'
+import { SearchSelectInput } from './search-select-input'
 import { PopoverSearchInline } from './popover-search'
 import { ReadinessPicker } from './readiness-picker'
 
@@ -170,7 +170,7 @@ function ControlledComponentSearch<T extends FieldValues>(
       control={control}
       name={name}
       render={({ field }) => (
-        <ModelSearchInput
+        <SearchSelectInput
           selection={field.value as Component | null}
           query={query}
           onSelectionChange={(c: Component) => { field.onChange(c); setQuery('') }}
