@@ -13,8 +13,9 @@ import {
 } from 'react-hook-form'
 import type { ModelSummary, Status } from 'shared-types'
 import { AssetErrorsEditor } from '../custom/asset-errors-editor'
+import { ControlledSearchSelectField } from '../custom/controlled-search-select-field'
 import { HorizontalField } from '../custom/horizontal-field'
-import { PopoverSearchInline } from '../custom/popover-search'
+import { SearchSelectInput } from '../custom/search-select-input'
 import { ControlledTextInput, INPUT_WIDTH, TechnicalSpecsFields } from '../custom/technical-specs-fields'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
@@ -217,24 +218,14 @@ export function AssetModal({
 
           <div className='flex flex-col gap-2'>
             <HorizontalField label='Model' required>
-              <Controller
+              <ControlledSearchSelectField
                 control={newAssetForm.control}
                 name='model'
-                render={({ field, fieldState }) => (
-                  <PopoverSearchInline
-                    selection={field.value as ModelSummary | null}
-                    onSelectionChange={field.onChange}
-                    onClear={() => field.onChange(null)}
-                    options={models}
-                    searchKey='model_name'
-                    getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
-                    fieldLabel='Model'
-                    fieldRequired={true}
-                    placeholder=''
-                    error={fieldState.invalid}
-                    className={INPUT_WIDTH}
-                  />
-                )}
+                options={models}
+                searchKey='model_name'
+                getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
+                clearLabel='Clear model'
+                className={INPUT_WIDTH}
               />
             </HorizontalField>
             <HorizontalField label='Serial Number' required>
@@ -262,7 +253,7 @@ export function AssetModal({
                       brandId={brandId}
                       disabled={!isHasErrors}
                       invalid={fieldState.invalid}
-                      renderSearch={slot => <PopoverSearchInline {...slot} fieldLabel="" className={INPUT_WIDTH} />}
+                      renderSearch={slot => <SearchSelectInput {...slot} placeholder="" className={INPUT_WIDTH} />}
                     />
                   )}
                 />

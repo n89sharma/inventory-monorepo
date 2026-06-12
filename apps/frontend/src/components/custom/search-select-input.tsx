@@ -29,6 +29,12 @@ export type SearchSelectInputProps<T> = {
   placeholder: string
   clearLabel?: string
   className?: string
+  error?: boolean
+  sanitize?: (raw: string) => string
+}
+
+function stripDisallowedChars(raw: string): string {
+  return raw.replace(DISALLOWED_CHARS_PATTERN, '')
 }
 
 export function SearchSelectInput<T>({
@@ -43,6 +49,8 @@ export function SearchSelectInput<T>({
   placeholder,
   clearLabel = 'Clear',
   className,
+  error,
+  sanitize = stripDisallowedChars,
 }: SearchSelectInputProps<T>): React.JSX.Element {
   const [matches, setMatches] = useState<T[]>([])
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -67,7 +75,7 @@ export function SearchSelectInput<T>({
   )
 
   function updateSearch(rawInput: string) {
-    const clean = rawInput.replace(DISALLOWED_CHARS_PATTERN, '')
+    const clean = sanitize(rawInput)
     onQueryChange(clean)
     if (!clean.trim()) {
       setMatches([])
@@ -124,7 +132,7 @@ export function SearchSelectInput<T>({
   if (selection) {
     return (
       <div className={className}>
-        <Field>
+        <Field data-invalid={error}>
           <div className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5">
             <Badge variant="secondary" className="min-w-0 max-w-full gap-1 pr-0.5">
               <span className="truncate">{getLabel(selection)}</span>
@@ -153,7 +161,7 @@ export function SearchSelectInput<T>({
           <div />
         </PopoverTrigger>
         <PopoverAnchor asChild>
-          <Field>
+          <Field data-invalid={error}>
             <InputGroup>
               <InputGroupInput
                 value={query}
@@ -163,6 +171,7 @@ export function SearchSelectInput<T>({
                 placeholder={placeholder}
                 autoComplete="off"
                 role="combobox"
+                aria-invalid={error}
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton

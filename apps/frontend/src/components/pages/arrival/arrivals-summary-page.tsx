@@ -4,12 +4,11 @@ import { useOrgStore } from "@/data/store/org-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION, getSelectedOrNull, getSelectOption } from "@/ui-types/select-option-types"
+import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
 import { useCan } from "@/hooks/use-can"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
-import { PopoverSearchInline } from "../../custom/popover-search"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
@@ -62,16 +61,14 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
             fieldLabel="Warehouse"
             anyAllowed={true}
           />
-          <PopoverSearchInline
-            selection={getSelectedOrNull(vendor)}
-            onSelectionChange={org => setVendor(getSelectOption(org))}
-            onClear={() => setVendor(ANY_OPTION)}
+          <SearchSelectOptionFilter
+            selection={vendor}
+            onChange={setVendor}
             options={orgs}
             searchKey="name"
             getLabel={o => o.name}
-            fieldLabel="Vendor"
-            fieldRequired={false}
             placeholder="Vendor"
+            clearLabel="Clear vendor"
             className="w-48"
           />
         </SearchBar>

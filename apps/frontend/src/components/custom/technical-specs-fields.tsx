@@ -15,8 +15,8 @@ import MultipleSelector from '../shadcn/multiple-selector'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from './consumables-grid'
 import { HorizontalField } from './horizontal-field'
 import { InputWithClearInline } from './input-with-clear'
+import { ControlledSearchSelectField } from './controlled-search-select-field'
 import { SearchSelectInput } from './search-select-input'
-import { PopoverSearchInline } from './popover-search'
 import { ReadinessPicker } from './readiness-picker'
 
 const CMYK_LETTERS = ['C', 'M', 'Y', 'K'] as const
@@ -238,24 +238,14 @@ export function TechnicalSpecsFields<T extends FieldValues>(
         {renderAfterReadiness}
 
         <HorizontalField label='Country of Origin' required>
-          <Controller
+          <ControlledSearchSelectField
             control={control}
             name={p('countryOfOrigin')}
-            render={({ field, fieldState }) => (
-              <PopoverSearchInline
-                selection={field.value as Country | null}
-                onSelectionChange={field.onChange}
-                onClear={() => field.onChange(null)}
-                options={countries}
-                searchKey='name'
-                getLabel={(c: Country) => formatSentenceCase(c.name)}
-                fieldLabel='Country of Origin'
-                fieldRequired={true}
-                placeholder=''
-                error={fieldState.invalid}
-                className={INPUT_WIDTH}
-              />
-            )}
+            options={countries}
+            searchKey='name'
+            getLabel={(c: Country) => formatSentenceCase(c.name)}
+            clearLabel='Clear country of origin'
+            className={INPUT_WIDTH}
           />
         </HorizontalField>
 

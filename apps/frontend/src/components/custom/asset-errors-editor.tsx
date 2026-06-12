@@ -7,19 +7,20 @@ import { useState, type ReactNode } from 'react'
 import type { Error as ReferenceErrorType, UpdateError } from 'shared-types'
 
 /**
- * Props passed to the caller-supplied search input. The caller chooses *which*
- * PopoverSearch variant to render (labelled vs inline) and spreads these props
- * onto it. Everything except the variant choice lives here.
+ * Props passed to the caller-supplied search input. These match
+ * `SearchSelectInput`'s data props, so the caller spreads them on and adds only
+ * presentation (placeholder, width). The selected error is appended to the list
+ * below — the box itself never holds a selection, so `selection` is always null.
  */
 export type AssetErrorsSearchSlotProps = {
-  key: number
   selection: null
+  query: string
+  onQueryChange: (text: string) => void
   onSelectionChange: (e: ReferenceErrorType) => void
   onClear: () => void
   options: ReferenceErrorType[]
   getLabel: (e: ReferenceErrorType) => string
   searchKey: 'code'
-  fieldRequired: false
   error: boolean
 }
 
@@ -36,7 +37,7 @@ export function AssetErrorsEditor(
   { value, onChange, brandId, disabled = false, invalid = false, renderSearch }: AssetErrorsEditorProps
 ) {
   const allErrors = useReferenceDataStore(state => state.errors)
-  const [searchResetKey, setSearchResetKey] = useState(0)
+  const [query, setQuery] = useState('')
 
   const selectedIds = new Set(value.map(e => e.error_id))
   // When no brand is known (no model picked yet), search across every brand's
@@ -50,7 +51,7 @@ export function AssetErrorsEditor(
 
   function handleSelect(error: ReferenceErrorType) {
     onChange([...value, { error_id: error.id, is_fixed: false }])
-    setSearchResetKey(k => k + 1)
+    setQuery('')
   }
 
   function handleToggleFixed(errorId: number) {
@@ -62,14 +63,14 @@ export function AssetErrorsEditor(
   }
 
   const searchSlotProps: AssetErrorsSearchSlotProps = {
-    key: searchResetKey,
     selection: null,
+    query,
+    onQueryChange: setQuery,
     onSelectionChange: handleSelect,
-    onClear: () => { },
+    onClear: () => setQuery(''),
     options: availableErrors,
     getLabel: e => e.description ? `${e.code} — ${e.description}` : e.code,
     searchKey: 'code',
-    fieldRequired: false,
     error: invalid,
   }
 

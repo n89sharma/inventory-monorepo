@@ -8,7 +8,7 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { InvoiceDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
 import { Checkbox } from '../shadcn/checkbox'
@@ -74,7 +74,7 @@ export function EditInvoiceMetadataModal({
               <FieldLabel>Invoice Number</FieldLabel>
               <Input value={invoice.invoice_number} disabled readOnly />
             </Field>
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='organization'
               options={orgs}

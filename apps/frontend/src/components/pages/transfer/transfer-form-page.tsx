@@ -9,7 +9,7 @@ import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to-create-form'
-import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { SelectOptions } from '../../custom/select-options'
 import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
@@ -119,7 +119,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
                 )}
               />
 
-              <ControlledPopoverSearch
+              <ControlledSearchSelectInput
                 control={form.control}
                 name='transporter'
                 options={orgs}

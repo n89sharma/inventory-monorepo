@@ -74,8 +74,12 @@ nullable fields start `null`). The `*-api.ts` file bridges them.
 - **Routing (`app.tsx`):** specific routes before param routes — `/holds/new` before
   `/holds/:collectionId`.
 - **`SelectOption<T>`** (`ui-types/select-option-types.ts`): states `SELECTED { selected: T }` /
-  `UNSELECTED` / `ANY`. `SelectOptions` for small fixed lists; `ControlledPopoverSearch` for
-  large searchable lists (stores `T | null`). `getIdOrNullFromSelection()` extracts `.selected.id`
+  `UNSELECTED` / `ANY`. `SelectOptions` for small fixed lists; for large searchable lists use the
+  chip-based `SearchSelectInput` (`components/custom/search-select-input.tsx`, stores `T | null`,
+  controlled `query`) — via `ControlledSearchSelectInput` (labelled form field),
+  `ControlledSearchSelectField` (label supplied by a wrapping `HorizontalField`),
+  `ControlledSelectOptionSearchSelect` (`SelectOption<T>` form field), or
+  `SearchSelectOptionFilter` (`SelectOption<T>` list-page filter). `getIdOrNullFromSelection()` extracts `.selected.id`
   — extend its union when adding a selectable type.
 - **`MultiSelectOptions`** (`components/custom/multi-select-options.tsx`): small fixed lists,
   multiple selections. `DropdownMenu` + `DropdownMenuCheckboxItem`; keep open on select with

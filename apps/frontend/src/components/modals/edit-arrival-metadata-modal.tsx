@@ -8,7 +8,7 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { ArrivalDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -70,7 +70,7 @@ export function EditArrivalMetadataModal({
         </DialogHeader>
         <form onSubmit={e => e.preventDefault()}>
           <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='vendor'
               options={orgs}
@@ -79,7 +79,7 @@ export function EditArrivalMetadataModal({
               fieldLabel='Vendor'
               fieldRequired={true}
             />
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='transporter'
               options={orgs}

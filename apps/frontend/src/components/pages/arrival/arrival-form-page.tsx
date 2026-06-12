@@ -10,7 +10,7 @@ import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
-import { ControlledPopoverSearch } from '../../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { SelectOptions } from '../../custom/select-options'
 import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { AssetModal } from '../../modals/create-asset-modal'
@@ -89,7 +89,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
             <FieldLegend>General Arrival Information</FieldLegend>
             <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
 
-              <ControlledPopoverSearch
+              <ControlledSearchSelectInput
                 control={form.control}
                 name='vendor'
                 options={orgs}
@@ -100,7 +100,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
                 className='max-w-60'
               />
 
-              <ControlledPopoverSearch
+              <ControlledSearchSelectInput
                 control={form.control}
                 name='transporter'
                 options={orgs}

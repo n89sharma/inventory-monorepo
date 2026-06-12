@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 import type { AssetDetails, AssetError, UpdateError } from "shared-types"
 import { toast } from "sonner"
 import { AssetErrorsEditor } from "../custom/asset-errors-editor"
-import { PopoverSearch } from "../custom/popover-search"
+import { SearchSelectInput } from "../custom/search-select-input"
 import { UnsavedChangesDialog } from "../custom/unsaved-changes-dialog"
 
 interface EditErrorsModalProps {
@@ -84,7 +84,7 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
           value={localErrors}
           onChange={handleChange}
           brandId={brandId}
-          renderSearch={slot => <PopoverSearch {...slot} fieldLabel="Add Error" />}
+          renderSearch={slot => <SearchSelectInput {...slot} placeholder="Add error" />}
         />
 
         {localErrors.length === 0 && (

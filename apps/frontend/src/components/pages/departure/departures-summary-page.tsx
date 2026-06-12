@@ -4,11 +4,10 @@ import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { preloadDepartureDetail, useDeparturesList } from "@/hooks/use-departure"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION, getSelectedOrNull, getSelectOption } from "@/ui-types/select-option-types"
+import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
-import { PopoverSearchInline } from "../../custom/popover-search"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptionsInline } from "../../custom/select-options"
 import { Button } from "../../shadcn/button"
@@ -62,16 +61,14 @@ export function DepartureSummaryPage(): React.JSX.Element {
             fieldLabel="Warehouse"
             anyAllowed={true}
           />
-          <PopoverSearchInline
-            selection={getSelectedOrNull(customer)}
-            onSelectionChange={org => setCustomer(getSelectOption(org))}
-            onClear={() => setCustomer(ANY_OPTION)}
+          <SearchSelectOptionFilter
+            selection={customer}
+            onChange={setCustomer}
             options={orgs}
             searchKey="name"
             getLabel={o => o.name}
-            fieldLabel="Customer"
-            fieldRequired={false}
             placeholder="Customer"
+            clearLabel="Clear customer"
             className="w-48"
           />
         </SearchBar>

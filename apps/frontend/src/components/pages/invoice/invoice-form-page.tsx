@@ -1,5 +1,5 @@
 import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
-import { ControlledPopoverSearch } from '@/components/custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '@/components/custom/controlled-search-select-input'
 import { SelectOptions } from '@/components/custom/select-options'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
 import { PageContent } from '@/components/layout/page-content'
@@ -98,7 +98,7 @@ export function InvoiceFormPage(
                 )}
               />
 
-              <ControlledPopoverSearch
+              <ControlledSearchSelectInput
                 control={form.control}
                 name='organization'
                 options={orgs}

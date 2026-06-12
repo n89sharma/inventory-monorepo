@@ -1,6 +1,6 @@
 import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
-import { ControlledPopoverSearch } from '@/components/custom/controlled-popover-search'
-import { ControlledSelectOptionPopoverSearch } from '@/components/custom/controlled-select-option-popover-search'
+import { ControlledSearchSelectInput } from '@/components/custom/controlled-search-select-input'
+import { ControlledSelectOptionSearchSelect } from '@/components/custom/controlled-select-option-search-select'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { PageContent } from '@/components/layout/page-content'
@@ -84,7 +84,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
               <FieldLegend>General Hold Information</FieldLegend>
               <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
 
-                <ControlledSelectOptionPopoverSearch
+                <ControlledSelectOptionSearchSelect
                   control={form.control}
                   name='created_for'
                   options={activeUsers}
@@ -95,7 +95,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                   className='max-w-60'
                 />
 
-                <ControlledPopoverSearch
+                <ControlledSearchSelectInput
                   control={form.control}
                   name='customer'
                   options={orgs}

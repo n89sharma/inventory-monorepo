@@ -8,7 +8,7 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { DepartureDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -86,7 +86,7 @@ export function EditDepartureMetadataModal({
                 />
               )}
             />
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='customer'
               options={orgs}
@@ -95,7 +95,7 @@ export function EditDepartureMetadataModal({
               fieldLabel='Customer'
               fieldRequired={true}
             />
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='transporter'
               options={orgs}

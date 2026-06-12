@@ -15,7 +15,7 @@ import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
 import type { AssetDetails, AssetLocation, Warehouse, Zone } from "shared-types"
 import { toast } from "sonner"
-import { PopoverSearch } from "../custom/popover-search"
+import { SearchSelectInput } from "../custom/search-select-input"
 
 interface EditLocationModalProps {
   open: boolean
@@ -41,6 +41,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null)
   const [binLocations, setBinLocations] = useState<AssetLocation[]>([])
   const [selectedBin, setSelectedBin] = useState<AssetLocation | null>(null)
+  const [binQuery, setBinQuery] = useState('')
   const [fetchingLocations, setFetchingLocations] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -171,17 +172,25 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
               ? <div className="flex items-center gap-2 text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading bins…</div>
               : binLocations.length === 0
                 ? <p className="text-muted-foreground">No bins available for this warehouse</p>
-                : <PopoverSearch
-                    selection={selectedBin}
-                    onSelectionChange={setSelectedBin}
-                    onClear={() => setSelectedBin(null)}
-                    options={binLocations}
-                    getLabel={l => l.bin}
-                    searchKey="bin"
-                    fieldLabel="Bin"
-                    fieldRequired={true}
-                    filterInput={filterBinInput}
-                  />
+                : <Field>
+                    <FieldLabel>
+                      Bin
+                      <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <SearchSelectInput
+                      selection={selectedBin}
+                      query={binQuery}
+                      onSelectionChange={loc => { setSelectedBin(loc); setBinQuery('') }}
+                      onQueryChange={setBinQuery}
+                      onClear={() => { setSelectedBin(null); setBinQuery('') }}
+                      options={binLocations}
+                      searchKey="bin"
+                      getLabel={l => l.bin}
+                      sanitize={filterBinInput}
+                      placeholder=""
+                      clearLabel="Clear bin"
+                    />
+                  </Field>
           )}
         </div>
 

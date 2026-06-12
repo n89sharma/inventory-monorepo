@@ -4,11 +4,10 @@ import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
 import { preloadHoldDetail, useHoldsList } from "@/hooks/use-hold"
 import type { SearchOptions } from "@/ui-types/search-option-types"
-import { ANY_OPTION, getSelectedOrNull, getSelectOption } from "@/ui-types/select-option-types"
+import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
 import { PlusIcon } from "@phosphor-icons/react"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
-import { PopoverSearchInline } from "../../custom/popover-search"
 import { SearchBar } from "../../custom/search-bar"
 import { Button } from "../../shadcn/button"
 import { CollectionPage } from "../collection-page"
@@ -51,28 +50,24 @@ export function HoldSummaryPage(): React.JSX.Element {
           setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
           onSearch={onHoldSearch}
         >
-          <PopoverSearchInline
-            selection={getSelectedOrNull(holdBy)}
-            onSelectionChange={u => setHoldBy(getSelectOption(u))}
-            onClear={() => setHoldBy(ANY_OPTION)}
+          <SearchSelectOptionFilter
+            selection={holdBy}
+            onChange={setHoldBy}
             options={activeUsers}
             searchKey="name"
             getLabel={u => u.name}
-            fieldLabel="Hold By"
-            fieldRequired={false}
             placeholder="Hold By"
+            clearLabel="Clear hold by"
             className="w-48"
           />
-          <PopoverSearchInline
-            selection={getSelectedOrNull(holdFor)}
-            onSelectionChange={u => setHoldFor(getSelectOption(u))}
-            onClear={() => setHoldFor(ANY_OPTION)}
+          <SearchSelectOptionFilter
+            selection={holdFor}
+            onChange={setHoldFor}
             options={activeUsers}
             searchKey="name"
             getLabel={u => u.name}
-            fieldLabel="Hold For"
-            fieldRequired={false}
             placeholder="Hold For"
+            clearLabel="Clear hold for"
             className="w-48"
           />
         </SearchBar>

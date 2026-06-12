@@ -8,8 +8,8 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { HoldDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
-import { ControlledSelectOptionPopoverSearch } from '../custom/controlled-select-option-popover-search'
+import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
+import { ControlledSelectOptionSearchSelect } from '../custom/controlled-select-option-search-select'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
@@ -70,7 +70,7 @@ export function EditHoldMetadataModal({
         </DialogHeader>
         <form onSubmit={e => e.preventDefault()}>
           <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
-            <ControlledSelectOptionPopoverSearch
+            <ControlledSelectOptionSearchSelect
               control={form.control}
               name='created_for'
               options={activeUsers}
@@ -79,7 +79,7 @@ export function EditHoldMetadataModal({
               fieldLabel='Created For'
               fieldRequired={true}
             />
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='customer'
               options={orgs}

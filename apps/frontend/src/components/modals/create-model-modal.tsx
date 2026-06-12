@@ -9,7 +9,7 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import type { AssetType, Brand } from 'shared-types'
 import { toast } from 'sonner'
 import { ControlledInputWithClear } from '../custom/controlled-input-with-clear'
-import { ControlledPopoverSearch } from '../custom/controlled-popover-search'
+import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
 import { Checkbox } from '../shadcn/checkbox'
@@ -82,7 +82,7 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
               inputType='string'
             />
 
-            <ControlledPopoverSearch
+            <ControlledSearchSelectInput
               control={form.control}
               name='brand'
               options={brands}
