@@ -13,7 +13,7 @@ declare module "@tanstack/react-table" {
   }
 }
 import { memo, useState, type CSSProperties } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Table,
@@ -249,7 +249,6 @@ function DataRowImpl<TData>({
   getRowHref?: (row: TData) => string
 }) {
   const navigate = useNavigate()
-  const location = useLocation()
   return (
     <TableRow
       data-state={isSelected && "selected"}
@@ -261,7 +260,7 @@ function DataRowImpl<TData>({
         if (hasTextSelection()) return
         const href = getRowHref(row.original)
         if (e.metaKey || e.ctrlKey) window.open(href, '_blank')
-        else navigate(href, { state: { from: location.pathname + location.search } })
+        else navigate(href)
       }}
       onAuxClick={(e) => {
         if (e.button !== 1 || !getRowHref) return

@@ -119,8 +119,8 @@ function RailField({ label, children }: { label: string; children: React.ReactNo
 
 export const AssetDetailsPage = () => {
 
-  const { section, collectionId, assetId } = useAssetDetailsParams()
-  const backUrl = useLocation().state?.from ?? null
+  const { section, collectionId, assetId, searchList } = useAssetDetailsParams()
+  const listSearch = useLocation().search
 
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
@@ -257,7 +257,7 @@ export const AssetDetailsPage = () => {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, backUrl)}
+        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, searchList, listSearch)}
         titleNode={
           <h1 className="text-xl flex items-center gap-6">
             <span className="font-semibold">

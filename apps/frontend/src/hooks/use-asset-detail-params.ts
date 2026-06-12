@@ -1,10 +1,15 @@
-import type { NavigationSection } from '@/ui-types/navigation-context'
-import { useParams } from "react-router-dom"
+import {
+  getSearchList,
+  type NavigationSection,
+  type SearchList,
+} from '@/ui-types/navigation-context'
+import { useLocation, useParams } from "react-router-dom"
 
 interface AssetDetailsParams {
   section: NavigationSection
   collectionId: string | null
   assetId: string
+  searchList: SearchList | null
 }
 
 export function useAssetDetailsParams(): AssetDetailsParams {
@@ -13,15 +18,21 @@ export function useAssetDetailsParams(): AssetDetailsParams {
     collectionId: string
     assetId: string
   }>()
+  const { pathname } = useLocation()
 
   if (assetId === undefined)
     throw new Error('Asset ID must be provided for asset detail page route')
 
   // url:/arrivals/123/789
   if (assetId && section && collectionId) {
-    return { section: section as NavigationSection, collectionId, assetId };
+    return { section: section as NavigationSection, collectionId, assetId, searchList: null };
   }
 
-  return { section: 'search' as NavigationSection, collectionId: null, assetId }
+  return {
+    section: 'search' as NavigationSection,
+    collectionId: null,
+    assetId,
+    searchList: getSearchList(pathname),
+  }
 
 }

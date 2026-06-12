@@ -14,6 +14,7 @@ import {
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { assetDetailHref } from '@/ui-types/navigation-context'
 import type { AssetSearchRow } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
 import { CassettesFilter } from '../../custom/cassettes-filter'
@@ -26,7 +27,6 @@ import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
 import { ReadinessFilter } from '../../custom/readiness-filter'
 import { WarehouseFilter } from '../../custom/warehouse-filter'
 
-const getRowHref = (a: AssetSearchRow) => `/search/all/${a.barcode}`
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEBOUNCE_MS = 600
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
@@ -83,6 +83,10 @@ export function SearchAllPage(): React.JSX.Element {
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
   const selection = useAssetSelection(assets)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
+  const getRowHref = useCallback(
+    (a: AssetSearchRow) => assetDetailHref('all', a.barcode, searchParams),
+    [searchParams],
+  )
 
   return (
     <>

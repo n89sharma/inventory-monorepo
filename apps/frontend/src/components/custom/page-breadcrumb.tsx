@@ -8,7 +8,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/shadcn/breadcrumb'
-import { isCollection, type NavigationSection } from '@/ui-types/navigation-context'
+import {
+  isCollection,
+  SEARCH_LIST_LABELS,
+  type NavigationSection,
+  type SearchList,
+} from '@/ui-types/navigation-context'
 import { formatSentenceCase } from '@/lib/formatters'
 
 interface BreadcrumbSegment {
@@ -76,10 +81,13 @@ export function PageBreadcrumbToTitle(props: PageBreadcrumbProps): React.JSX.Ele
   return <BreadcrumbBase {...props} trailingSeparator={true} />
 }
 
+const DEFAULT_SEARCH_LIST: SearchList = 'all'
+
 export function getBreadcrumForAssetDetails(
   section: NavigationSection,
   collectionId: string | null,
-  backUrl: string | null = null,
+  searchList: SearchList | null,
+  listSearch: string,
 ): BreadcrumbSegment[] {
 
   if (isCollection(section)) {
@@ -90,10 +98,12 @@ export function getBreadcrumForAssetDetails(
   }
 
   switch (section) {
-    case 'search':
+    case 'search': {
+      const list = searchList ?? DEFAULT_SEARCH_LIST
       return [
-        { label: 'Search Assets', href: backUrl ?? '/search/all' }
+        { label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }
       ]
+    }
     default:
       return [
         { label: 'Home', href: '/' }
