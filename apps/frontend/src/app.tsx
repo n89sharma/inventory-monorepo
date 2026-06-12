@@ -36,6 +36,7 @@ const AssetDetailsPage          = lazy(() => import('./components/pages/asset-de
 const SearchInStockPage         = lazy(() => import('./components/pages/search/search-instock-page').then(m => ({ default: m.SearchInStockPage })))
 const ProfitabilityReportPage   = lazy(() => import('./components/pages/profitability-report-page').then(m => ({ default: m.ProfitabilityReportPage })))
 const SearchAllPage             = lazy(() => import('./components/pages/search/search-all-page').then(m => ({ default: m.SearchAllPage })))
+const PriceCheckPage            = lazy(() => import('./components/pages/search/price-check-page').then(m => ({ default: m.PriceCheckPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
 const OrganizationsSettingsPage = lazy(() => import('./components/pages/settings/organizations-settings-page').then(m => ({ default: m.OrganizationsSettingsPage })))
 const UserManagementPage        = lazy(() => import('./components/pages/admin/user-management-page').then(m => ({ default: m.UserManagementPage })))
@@ -125,6 +126,15 @@ function AppRoutes() {
                   <Route path="/search/all/:assetId" element={<AssetDetailsPage />} />
                   <Route path="/search/instock" element={<SearchInStockPage />} />
                   <Route path="/search/instock/:assetId" element={<AssetDetailsPage />} />
+                  <Route
+                    path="/search/price-check"
+                    element={
+                      <PermissionRoute permission="view_sale_price">
+                        <PriceCheckPage />
+                      </PermissionRoute>
+                    }
+                  />
+                  <Route path="/search/price-check/:assetId" element={<AssetDetailsPage />} />
 
                   <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
                   <Route

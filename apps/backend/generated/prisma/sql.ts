@@ -41,7 +41,11 @@ export * from "./sql/getInvoices.js"
 
 export * from "./sql/getLocationsByWarehouse.js"
 
+export * from "./sql/getModelLastSale.js"
+
 export * from "./sql/getModels.js"
+
+export * from "./sql/getModelSales.js"
 
 export * from "./sql/getOrganizations.js"
 

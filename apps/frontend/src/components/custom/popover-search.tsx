@@ -69,6 +69,7 @@ function PopoverSearchBody<T>({
     if (!inputVal.trim()) {
       setMatches([])
       setPopoverOpen(false)
+      if (selection) onClear()
       return
     }
     setMatches(fuse.search(inputVal, { limit: 6 }).map(r => r.item))

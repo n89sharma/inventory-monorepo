@@ -75,12 +75,15 @@ const REPORTS_SUB_ITEMS = [
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 
+const PRICE_CHECK_ITEM = { title: 'Price Check', url: '/search/price-check' }
+
 export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
 
   const canManageSettings = useCan('manage_settings')
   const canManageUsers = useCan('manage_users')
   const canViewReports = useCan('view_reports')
+  const canViewSalePrice = useCan('view_sale_price')
 
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
@@ -164,6 +167,16 @@ export function AppSidebar(): React.JSX.Element {
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
+                      {canViewSalePrice && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={location.pathname.startsWith(PRICE_CHECK_ITEM.url) ? true : undefined}
+                          >
+                            <Link to={PRICE_CHECK_ITEM.url}>{PRICE_CHECK_ITEM.title}</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>

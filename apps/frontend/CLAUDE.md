@@ -87,4 +87,6 @@ nullable fields start `null`). The `*-api.ts` file bridges them.
 - **Global data:** `useGlobalData` fetches users, orgs, models, reference data once in `App.tsx`
   → available via `useUserStore` / `useOrgStore` / `useModelStore` / `useReferenceDataStore`.
   Never re-fetch these in a form or page. `useAutoSearch` pre-populates list pages on first visit.
-  `useLocalStorage` persists with a versioned key.
+- **Page state lives in the URL** (`lib/search-*-params.ts` pattern: `filtersToParams` /
+  `paramsToFilters`) so views are shareable and survive back-navigation. Local `useState` only
+  for transient state (typeahead text) — state the deviation explicitly.

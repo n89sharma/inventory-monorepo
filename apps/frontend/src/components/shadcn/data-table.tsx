@@ -45,6 +45,7 @@ interface DataTableProps<TData, TValue> {
   pinLeft?: string[]
   getRowHref?: (row: TData) => string
   columnVisibility?: VisibilityState
+  scrollMaxHeight?: string
 }
 
 function pinStyle<TData>(column: Column<TData>): CSSProperties {
@@ -98,6 +99,7 @@ export function DataTable<TData, TValue>({
   pinLeft,
   getRowHref,
   columnVisibility,
+  scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
@@ -141,7 +143,7 @@ export function DataTable<TData, TValue>({
 
       <div
         className="overflow-auto rounded-md border"
-        style={{ maxHeight: SCROLL_BOX_MAX_HEIGHT }}
+        style={{ maxHeight: scrollMaxHeight }}
       >
         <Table className="table-fixed !w-max min-w-full">
           <TableHeader>

@@ -4,9 +4,20 @@ import { searchArrivals, searchBarcodes, searchDepartures, searchHolds, searchIn
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
+import { getModelSales as getModelSalesSer } from '../services/modelSalesService.js'
 
 export const GlobalSearchQuerySchema = z.object({
   q: z.string().min(1).max(50).regex(/^[a-zA-Z0-9\s\-_.]*$/)
+})
+
+export const ModelSalesQuerySchema = z.object({
+  modelId: z.coerce.number().int().positive(),
+})
+
+export const getModelSales = asyncHandler(async (req, res) => {
+  const { modelId } = res.locals.query as z.infer<typeof ModelSalesQuerySchema>
+  const data = await getModelSalesSer(modelId)
+  res.json(successResponse(data))
 })
 
 export const globalSearch = asyncHandler(async (req, res) => {
