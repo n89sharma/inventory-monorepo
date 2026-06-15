@@ -51,6 +51,7 @@ export const AssetQuerySchema = z.object({
   meterMax: z.string().optional().transform(Number),
   cassettes: z.string().optional().transform(Number),
   componentId: z.string().optional().transform(Number),
+  customerId: z.string().optional().transform(Number),
   fromDate: z.coerce.date().optional(),
   toDate: z.coerce.date().optional()
 })
@@ -74,7 +75,7 @@ function resolveDepartedRange(
 export const getAssets = asyncHandler(async (req, res) => {
   const {
     model, statusIds, readinessIds, warehouseIds, brandIds, assetTypeIds,
-    meterMin, meterMax, cassettes, componentId, fromDate, toDate
+    meterMin, meterMax, cassettes, componentId, customerId, fromDate, toDate
   } = res.locals.query as z.infer<typeof AssetQuerySchema>
   const { departedFrom, departedTo } = resolveDepartedRange(fromDate, toDate)
   const data = await getAssetsSer(
@@ -90,6 +91,7 @@ export const getAssets = asyncHandler(async (req, res) => {
     assetTypeIds,
     departedFrom,
     departedTo,
+    isNaN(customerId) ? -1 : customerId,
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

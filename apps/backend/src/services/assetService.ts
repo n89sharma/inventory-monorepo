@@ -180,6 +180,7 @@ export async function getAssets(
   assetTypeIds: number[],
   departedFrom: Date | null,
   departedTo: Date | null,
+  customerIdParam: number,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
@@ -196,6 +197,7 @@ export async function getAssets(
       assetTypeIds,
       departedFrom ?? NO_DATE_LOWER_BOUND,
       departedTo ?? NO_DATE_UPPER_BOUND,
+      customerIdParam,
     )
   )
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
@@ -235,6 +237,7 @@ export async function getAssetsForSearchInStock(
     assetTypeIds,
     null,
     null,
+    -1,
     role,
   )
 }

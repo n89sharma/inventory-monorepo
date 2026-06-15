@@ -1,4 +1,4 @@
-import type { AssetType, Brand, Status } from 'shared-types'
+import type { AssetType, Brand, OrgSummary, Status } from 'shared-types'
 import {
   decodeIds,
   DEFAULT_WAREHOUSE_CODE,
@@ -13,6 +13,7 @@ const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
 const PARAM_OTHER = 'other'
 const PARAM_RANGE = 'range'
+const PARAM_CUSTOMER = 'customer'
 const OTHER_ON = '1'
 
 export const SOLD_STATUS = 'SOLD'
@@ -28,11 +29,13 @@ export type SearchSoldFilters = SharedAssetFilters & {
   assetTypes: AssetType[]
   showOther: boolean
   range: SoldRangeMonths
+  customer: OrgSummary | null
 }
 
 export type SearchSoldReferenceData = SharedAssetReferenceData & {
   brands: Brand[]
   assetTypes: AssetType[]
+  customers: OrgSummary[]
 }
 
 export function resolveSoldStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
@@ -49,6 +52,7 @@ export function filtersToParams(filters: SearchSoldFilters): URLSearchParams {
   if (filters.assetTypes.length > 0) params.set(PARAM_TYPE, encodeIds(filters.assetTypes))
   if (filters.showOther) params.set(PARAM_OTHER, OTHER_ON)
   if (filters.range !== DEFAULT_RANGE) params.set(PARAM_RANGE, String(filters.range))
+  if (filters.customer) params.set(PARAM_CUSTOMER, String(filters.customer.id))
   return params
 }
 
@@ -66,11 +70,17 @@ export function paramsToFilters(
     ? (rangeRaw as SoldRangeMonths)
     : DEFAULT_RANGE
 
+  const customerId = params.get(PARAM_CUSTOMER)
+  const customer = customerId
+    ? ref.customers.find(c => c.id === Number.parseInt(customerId, 10)) ?? null
+    : null
+
   return {
     ...getSharedFilters(params, ref, DEFAULT_WAREHOUSE_CODE),
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
     showOther: params.get(PARAM_OTHER) === OTHER_ON,
     range,
+    customer,
   }
 }

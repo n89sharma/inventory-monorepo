@@ -1,7 +1,9 @@
 import { AssetBrowseFilters } from '@/components/custom/asset-browse-filters'
+import { CustomerFilter } from '@/components/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/filters/departed-date-range-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useModelStore } from '@/data/store/model-store'
+import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchSold } from '@/hooks/use-search-sold'
 import { useUrlFilters } from '@/hooks/use-url-filters'
@@ -25,6 +27,7 @@ export function SearchSoldPage(): React.JSX.Element {
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const allComponents = useReferenceDataStore(state => state.components)
+  const allCustomers = useOrgStore(state => state.organizations)
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -34,8 +37,12 @@ export function SearchSoldPage(): React.JSX.Element {
       models,
       readinesses: allReadinesses,
       components: allComponents,
+      customers: allCustomers,
     }),
-    [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses, allComponents],
+    [
+      searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
+      allComponents, allCustomers,
+    ],
   )
 
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(
@@ -71,6 +78,11 @@ export function SearchSoldPage(): React.JSX.Element {
         <DepartedDateRangeFilter
           value={draft.range}
           onValueChange={range => updateImmediate({ ...draft, range })}
+        />
+        <CustomerFilter
+          selection={draft.customer}
+          onSelectionChange={c => updateImmediate({ ...draft, customer: c })}
+          onClear={() => updateImmediate({ ...draft, customer: null })}
         />
       </AssetBrowseFilters>
     </AssetSearchPage>

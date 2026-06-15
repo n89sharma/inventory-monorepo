@@ -14,6 +14,7 @@ import type {
   Comment,
   CreateComment,
   CreatePartTransfer,
+  OrgSummary,
   PartTransfer,
   ReportVariant,
   Status,
@@ -219,6 +220,7 @@ export async function getAssetsForSold(
   meterMax: number | null,
   cassettes: number | null,
   component: Component | null,
+  customer: OrgSummary | null,
   statuses: Status[],
   fromDate: Date): Promise<AssetSearchRow[]> {
 
@@ -234,6 +236,7 @@ export async function getAssetsForSold(
       meterMax: meterMax ?? undefined,
       cassettes: cassettes ?? undefined,
       componentId: component?.id ?? undefined,
+      customerId: customer?.id ?? undefined,
       fromDate: fromDate.toISOString(),
     }
   })

@@ -24,6 +24,7 @@ export function useSearchSold(filters: SearchSoldFilters) {
       f.meterMax,
       f.cassettes,
       f.internalFinisher,
+      f.customer,
       statuses,
       subMonths(new Date(), f.range),
     ),
