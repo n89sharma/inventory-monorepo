@@ -67,7 +67,7 @@ from "Asset" a
     limit 1
   ) lc on true
   left join "User" lcu on lcu.id = lc.created_by_id
-where ($1 = '' or m."name" ~* $1)
+where ($1 = '' or m."name" ilike '%' || $1 || '%')
   and (array_length($2::int[], 1) is null or s.id = any($2::int[]))
   and (array_length($3::int[], 1) is null or rd.id = any($3::int[]))
   and (array_length($4::int[], 1) is null or w.id = any($4::int[]))

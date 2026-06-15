@@ -74,7 +74,7 @@ from "Departure" d
   left join "User" lcu on lcu.id = lc.created_by_id
 where d.created_at >= $1
   and d.created_at <= $2
-  and ($3 = '' or m."name" ~* $3)
+  and ($3 = '' or m."name" ilike '%' || $3 || '%')
   and (array_length($4::int[], 1) is null or s.id = any($4::int[]))
   and (array_length($5::int[], 1) is null or rd.id = any($5::int[]))
   and (array_length($6::int[], 1) is null or w.id = any($6::int[]))
