@@ -16,6 +16,8 @@ import {
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
+  getSoldAssets,
+  SoldAssetQuerySchema,
   getBarcodeSuggestions,
   getLocationsByWarehouse,
   updateAssetErrors,
@@ -32,6 +34,7 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', requirePermission('view_asset'), validateQuery(AssetQuerySchema), getAssets)
+router.get('/sold', requirePermission('view_asset'), validateQuery(SoldAssetQuerySchema), getSoldAssets)
 router.post('/export', requirePermission('view_asset'), exportAssetReport)
 router.get('/suggestions', requirePermission('view_asset'), validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
 router.get('/locations', requirePermission('view_asset'), validateQuery(LocationsByWarehouseQuerySchema), getLocationsByWarehouse)

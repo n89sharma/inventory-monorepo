@@ -225,7 +225,7 @@ export async function getAssetsForSold(
   fromDate: Date,
   toDate: Date): Promise<AssetSearchRow[]> {
 
-  const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/assets/sold`, {
     params: {
       warehouseIds: warehouses.map(w => w.id),
       brandIds: brand ? [brand.id] : [],

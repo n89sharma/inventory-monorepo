@@ -1,3 +1,4 @@
+import { endOfDay, startOfDay } from 'date-fns'
 import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import {
@@ -9,7 +10,8 @@ import {
   getAssetPartTransfer as getAssetPartTransferQuery,
   getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
-  getLocationsByWarehouse as getLocationsByWarehouseQuery
+  getLocationsByWarehouse as getLocationsByWarehouseQuery,
+  getSoldAssets as getSoldAssetsQuery
 } from '../../generated/prisma/sql.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
@@ -197,6 +199,42 @@ export async function getAssets(
       assetTypeIds,
       departedFrom ?? NO_DATE_LOWER_BOUND,
       departedTo ?? NO_DATE_UPPER_BOUND,
+      customerIdParam,
+    )
+  )
+  return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+}
+
+export async function getSoldAssets(
+  model: string,
+  statusIds: number[],
+  readinessIds: number[],
+  warehouseIds: number[],
+  meterMinParam: number,
+  meterMaxParam: number,
+  cassettesParam: number,
+  componentIdParam: number,
+  brandIds: number[],
+  assetTypeIds: number[],
+  departedFrom: Date,
+  departedTo: Date,
+  customerIdParam: number,
+  role: AppRole | null,
+): Promise<AssetSearchRow[]> {
+  const rows = await prisma.$queryRawTyped(
+    getSoldAssetsQuery(
+      startOfDay(departedFrom),
+      endOfDay(departedTo),
+      model,
+      statusIds,
+      readinessIds,
+      warehouseIds,
+      meterMinParam,
+      meterMaxParam,
+      cassettesParam,
+      componentIdParam,
+      brandIds,
+      assetTypeIds,
       customerIdParam,
     )
   )

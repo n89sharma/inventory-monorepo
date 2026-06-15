@@ -20,6 +20,7 @@ import {
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
   getAssets as getAssetsSer,
+  getSoldAssets as getSoldAssetsSer,
   getAssetsForSearchInStock as getAssetsForSearchInStockSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer,
   mapAssetSummary,
@@ -79,6 +80,59 @@ export const getAssets = asyncHandler(async (req, res) => {
   } = res.locals.query as z.infer<typeof AssetQuerySchema>
   const { departedFrom, departedTo } = resolveDepartedRange(fromDate, toDate)
   const data = await getAssetsSer(
+    model ?? '',
+    statusIds,
+    readinessIds,
+    warehouseIds,
+    isNaN(meterMin) ? -1 : meterMin,
+    isNaN(meterMax) ? -1 : meterMax,
+    isNaN(cassettes) ? -1 : cassettes,
+    isNaN(componentId) ? -1 : componentId,
+    brandIds,
+    assetTypeIds,
+    departedFrom,
+    departedTo,
+    isNaN(customerId) ? -1 : customerId,
+    res.locals.dbUserRole,
+  )
+  res.json(successResponse(data))
+})
+
+export const SoldAssetQuerySchema = z.object({
+  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  meterMin: z.string().optional().transform(Number),
+  meterMax: z.string().optional().transform(Number),
+  cassettes: z.string().optional().transform(Number),
+  componentId: z.string().optional().transform(Number),
+  customerId: z.string().optional().transform(Number),
+  fromDate: z.coerce.date(),
+  toDate: z.coerce.date()
+})
+
+function resolveSoldRange(
+  fromDate: Date,
+  toDate: Date,
+): { departedFrom: Date; departedTo: Date } {
+  const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
+  const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
+  if (isAfter(departedFrom, toDate)) {
+    throw new ValidationError('fromDate must be before toDate')
+  }
+  return { departedFrom, departedTo: toDate }
+}
+
+export const getSoldAssets = asyncHandler(async (req, res) => {
+  const {
+    model, statusIds, readinessIds, warehouseIds, brandIds, assetTypeIds,
+    meterMin, meterMax, cassettes, componentId, customerId, fromDate, toDate
+  } = res.locals.query as z.infer<typeof SoldAssetQuerySchema>
+  const { departedFrom, departedTo } = resolveSoldRange(fromDate, toDate)
+  const data = await getSoldAssetsSer(
     model ?? '',
     statusIds,
     readinessIds,
