@@ -32,7 +32,7 @@ export function InternalFinisherFilter({
       getLabel={c => `${c.brand_name} — ${c.name}`}
       placeholder='Internal Finisher'
       clearLabel='Clear internal finisher'
-      className='w-45'
+      className='w-35'
     />
   )
 }

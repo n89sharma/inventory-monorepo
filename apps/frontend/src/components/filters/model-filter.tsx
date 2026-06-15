@@ -30,7 +30,7 @@ export function ModelFilter({
       getLabel={m => `${m.brand_name} ${m.model_name}`}
       placeholder={placeholder}
       clearLabel='Clear model'
-      className='w-45'
+      className='w-35'
     />
   )
 }

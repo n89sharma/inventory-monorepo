@@ -33,7 +33,7 @@ export function BrandFilter({
       getLabel={b => b.name}
       placeholder='Brand'
       clearLabel='Clear brand'
-      className='w-45'
+      className='w-35'
     />
   )
 }

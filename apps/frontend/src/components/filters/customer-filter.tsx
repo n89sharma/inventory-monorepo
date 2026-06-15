@@ -33,7 +33,7 @@ export function CustomerFilter({
       getLabel={c => c.name}
       placeholder='Customer'
       clearLabel='Clear customer'
-      className='w-45'
+      className='w-35'
     />
   )
 }

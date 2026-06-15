@@ -18,7 +18,7 @@ export function CassettesFilter({
       }}
       fieldLabel='Cassettes (min)'
       inputType='number'
-      className='w-45'
+      className='w-35'
     />
   )
 }

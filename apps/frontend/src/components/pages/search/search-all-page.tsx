@@ -1,23 +1,23 @@
+import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { StickyPageHeader } from "@/components/custom/sticky-page-header"
 import { PageContent } from "@/components/layout/page-content"
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useSearchAll } from '@/hooks/use-search-all'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useSearchAll } from '@/hooks/use-search-all'
 import { useUrlFilters } from '@/hooks/use-url-filters'
-import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
   paramsToFilters,
 } from '@/lib/search-all-params'
+import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { assetDetailHref } from '@/ui-types/navigation-context'
 import type { AssetSearchRow } from 'shared-types'
-import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
@@ -125,7 +125,7 @@ export function SearchAllPage(): React.JSX.Element {
                 options={allStatuses}
                 getLabel={s => formatSentenceCase(s.status)}
                 fieldLabel='Status'
-                className='w-45'
+                className='w-35'
                 dividerAfterIds={statusDividerAfterIds}
               />
             }

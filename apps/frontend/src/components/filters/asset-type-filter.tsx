@@ -18,7 +18,7 @@ export function AssetTypeFilter({
       options={allAssetTypes}
       getLabel={a => a.asset_type}
       fieldLabel='Asset Type'
-      className='w-45'
+      className='w-35'
     />
   )
 }

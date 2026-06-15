@@ -18,7 +18,7 @@ export function ReadinessFilter({
       options={readinesses}
       getLabel={s => getReadinessDisplay(s.status)}
       fieldLabel='Readiness'
-      className='w-45'
+      className='w-35'
     />
   )
 }
