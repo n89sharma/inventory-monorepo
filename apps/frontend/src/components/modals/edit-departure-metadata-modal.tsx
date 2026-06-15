@@ -90,7 +90,6 @@ export function EditDepartureMetadataModal({
               control={form.control}
               name='customer'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Customer'
               fieldRequired={true}
@@ -99,7 +98,6 @@ export function EditDepartureMetadataModal({
               control={form.control}
               name='transporter'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Transporter'
               fieldRequired={true}

@@ -222,7 +222,6 @@ export function AssetModal({
                 control={newAssetForm.control}
                 name='model'
                 options={models}
-                searchKey='model_name'
                 getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
                 clearLabel='Clear model'
                 className={INPUT_WIDTH}

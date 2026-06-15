@@ -29,7 +29,6 @@ export function BrandFilter({
         onClear()
       }}
       options={allBrands}
-      searchKey='name'
       getLabel={b => b.name}
       placeholder='Brand'
       clearLabel='Clear brand'

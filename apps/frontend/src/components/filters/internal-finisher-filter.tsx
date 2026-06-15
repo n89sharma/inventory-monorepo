@@ -28,7 +28,6 @@ export function InternalFinisherFilter({
         onClear()
       }}
       options={allComponents}
-      searchKey='name'
       getLabel={c => `${c.brand_name} — ${c.name}`}
       placeholder='Internal Finisher'
       clearLabel='Clear internal finisher'

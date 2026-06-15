@@ -7,7 +7,6 @@ type ControlledSearchSelectInputProps<T, TForm extends FieldValues> = {
   control: Control<TForm>
   name: Path<TForm>
   options: T[]
-  searchKey: string
   getLabel: (i: T) => string
   fieldLabel: string
   fieldRequired: boolean
@@ -18,7 +17,6 @@ export function ControlledSearchSelectInput<T, TForm extends FieldValues>({
   control,
   name,
   options,
-  searchKey,
   getLabel,
   fieldLabel,
   fieldRequired,
@@ -43,7 +41,6 @@ export function ControlledSearchSelectInput<T, TForm extends FieldValues>({
         onQueryChange={setQuery}
         onClear={() => { field.onChange(null); setQuery('') }}
         options={options}
-        searchKey={searchKey}
         getLabel={getLabel}
         placeholder=""
         clearLabel={`Clear ${fieldLabel.toLowerCase()}`}

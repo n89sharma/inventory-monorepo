@@ -177,7 +177,6 @@ function ControlledComponentSearch<T extends FieldValues>(
           onQueryChange={setQuery}
           onClear={() => { field.onChange(null); setQuery('') }}
           options={options}
-          searchKey='name'
           getLabel={getLabel}
           placeholder=''
           clearLabel='Clear internal finisher'
@@ -242,7 +241,6 @@ export function TechnicalSpecsFields<T extends FieldValues>(
             control={control}
             name={p('countryOfOrigin')}
             options={countries}
-            searchKey='name'
             getLabel={(c: Country) => formatSentenceCase(c.name)}
             clearLabel='Clear country of origin'
             className={INPUT_WIDTH}

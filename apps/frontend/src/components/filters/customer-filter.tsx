@@ -28,9 +28,7 @@ export function CustomerFilter({
         setQuery('')
         onClear()
       }}
-      options={allCustomers}
-      searchKey='name'
-      getLabel={c => c.name}
+      options={allCustomers}      getLabel={c => c.name}
       placeholder='Customer'
       clearLabel='Clear customer'
       className='w-35'

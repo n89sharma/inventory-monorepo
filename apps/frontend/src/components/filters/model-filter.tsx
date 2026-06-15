@@ -26,7 +26,6 @@ export function ModelFilter({
       onQueryChange={onQueryChange}
       onClear={onClear}
       options={models}
-      searchKey='model_name'
       getLabel={m => `${m.brand_name} ${m.model_name}`}
       placeholder={placeholder}
       clearLabel='Clear model'

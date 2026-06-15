@@ -78,7 +78,6 @@ export function EditInvoiceMetadataModal({
               control={form.control}
               name='organization'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Organization'
               fieldRequired={true}

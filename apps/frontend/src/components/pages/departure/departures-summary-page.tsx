@@ -65,7 +65,6 @@ export function DepartureSummaryPage(): React.JSX.Element {
             selection={customer}
             onChange={setCustomer}
             options={orgs}
-            searchKey="name"
             getLabel={o => o.name}
             placeholder="Customer"
             clearLabel="Clear customer"

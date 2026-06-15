@@ -65,7 +65,6 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
             selection={vendor}
             onChange={setVendor}
             options={orgs}
-            searchKey="name"
             getLabel={o => o.name}
             placeholder="Vendor"
             clearLabel="Clear vendor"

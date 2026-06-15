@@ -20,7 +20,6 @@ export type AssetErrorsSearchSlotProps = {
   onClear: () => void
   options: ReferenceErrorType[]
   getLabel: (e: ReferenceErrorType) => string
-  searchKey: 'code'
   error: boolean
 }
 
@@ -70,7 +69,6 @@ export function AssetErrorsEditor(
     onClear: () => setQuery(''),
     options: availableErrors,
     getLabel: e => e.description ? `${e.code} — ${e.description}` : e.code,
-    searchKey: 'code',
     error: invalid,
   }
 

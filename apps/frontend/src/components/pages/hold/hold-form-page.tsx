@@ -88,7 +88,6 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                   control={form.control}
                   name='created_for'
                   options={activeUsers}
-                  searchKey='name'
                   getLabel={u => u.name}
                   fieldLabel='Created For'
                   fieldRequired={true}
@@ -99,7 +98,6 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
                   control={form.control}
                   name='customer'
                   options={orgs}
-                  searchKey='name'
                   getLabel={o => o.name}
                   fieldLabel='Customer'
                   fieldRequired={true}

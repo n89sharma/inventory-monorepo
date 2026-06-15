@@ -74,7 +74,6 @@ export function EditArrivalMetadataModal({
               control={form.control}
               name='vendor'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Vendor'
               fieldRequired={true}
@@ -83,7 +82,6 @@ export function EditArrivalMetadataModal({
               control={form.control}
               name='transporter'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Transporter'
               fieldRequired={true}

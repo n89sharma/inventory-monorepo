@@ -16,7 +16,6 @@ type SearchSelectOptionFilterProps<T> = {
   selection: SelectOption<T>
   onChange: (next: SelectOption<T>) => void
   options: T[]
-  searchKey: string
   getLabel: (item: T) => string
   placeholder: string
   clearLabel?: string
@@ -27,7 +26,6 @@ export function SearchSelectOptionFilter<T>({
   selection,
   onChange,
   options,
-  searchKey,
   getLabel,
   placeholder,
   clearLabel,
@@ -42,7 +40,6 @@ export function SearchSelectOptionFilter<T>({
       onQueryChange={setQuery}
       onClear={() => { onChange(ANY_OPTION); setQuery('') }}
       options={options}
-      searchKey={searchKey}
       getLabel={getLabel}
       placeholder={placeholder}
       clearLabel={clearLabel}

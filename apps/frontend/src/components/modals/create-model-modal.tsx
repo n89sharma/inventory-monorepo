@@ -86,7 +86,6 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
               control={form.control}
               name='brand'
               options={brands}
-              searchKey='name'
               getLabel={(b: Brand) => b.name}
               fieldLabel='Brand'
               fieldRequired={true}

@@ -54,7 +54,6 @@ export function HoldSummaryPage(): React.JSX.Element {
             selection={holdBy}
             onChange={setHoldBy}
             options={activeUsers}
-            searchKey="name"
             getLabel={u => u.name}
             placeholder="Hold By"
             clearLabel="Clear hold by"
@@ -64,7 +63,6 @@ export function HoldSummaryPage(): React.JSX.Element {
             selection={holdFor}
             onChange={setHoldFor}
             options={activeUsers}
-            searchKey="name"
             getLabel={u => u.name}
             placeholder="Hold For"
             clearLabel="Clear hold for"

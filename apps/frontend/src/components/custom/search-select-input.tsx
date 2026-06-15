@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { XIcon } from '@phosphor-icons/react'
-import Fuse from 'fuse.js'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { defaultFilter } from 'cmdk'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '../shadcn/badge'
 import { Field } from '../shadcn/field'
 import {
@@ -13,8 +13,7 @@ import {
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 
 const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
-const SUGGESTION_LIMIT = 6
-const FUSE_THRESHOLD = 0.5
+const SUGGESTION_LIMIT = 10
 
 export type SearchSelectInputProps<T> = {
   selection: T | null
@@ -23,7 +22,6 @@ export type SearchSelectInputProps<T> = {
   onQueryChange: (text: string) => void
   onClear: () => void
   options: T[]
-  searchKey: string
   getLabel: (item: T) => string
   placeholder: string
   clearLabel?: string
@@ -43,7 +41,6 @@ export function SearchSelectInput<T>({
   onQueryChange,
   onClear,
   options,
-  searchKey,
   getLabel,
   placeholder,
   clearLabel = 'Clear',
@@ -64,15 +61,6 @@ export function SearchSelectInput<T>({
     }
   }, [pendingFocus, selection])
 
-  const fuse = useMemo(
-    () => new Fuse(options, {
-      keys: [searchKey],
-      threshold: FUSE_THRESHOLD,
-      shouldSort: true,
-    }),
-    [options, searchKey],
-  )
-
   function updateSearch(rawInput: string) {
     const clean = sanitize(rawInput)
     onQueryChange(clean)
@@ -82,7 +70,24 @@ export function SearchSelectInput<T>({
       setHighlightedIndex(-1)
       return
     }
-    setMatches(fuse.search(clean, { limit: SUGGESTION_LIMIT }).map(r => r.item))
+    const needle = clean.toLowerCase()
+    const substringMatches = options
+      .map(option => ({ option, index: getLabel(option).toLowerCase().indexOf(needle) }))
+      .filter(result => result.index !== -1)
+      .sort((a, b) =>
+        a.index - b.index || getLabel(a.option).length - getLabel(b.option).length,
+      )
+      .map(result => result.option)
+
+    const ranked = substringMatches.length > 0
+      ? substringMatches
+      : options
+          .map(option => ({ option, score: defaultFilter(getLabel(option), clean) }))
+          .filter(result => result.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map(result => result.option)
+
+    setMatches(ranked.slice(0, SUGGESTION_LIMIT))
     setPopoverOpen(true)
   }
 
@@ -190,7 +195,7 @@ export function SearchSelectInput<T>({
           align="start"
           onOpenAutoFocus={e => { e.preventDefault() }}
           onCloseAutoFocus={e => { e.preventDefault() }}
-          className="w-max max-w-md"
+          className="w-max min-w-45 max-w-md"
         >
           <div className="max-h-72 overflow-y-auto">
             {matches.map((m, i) => (

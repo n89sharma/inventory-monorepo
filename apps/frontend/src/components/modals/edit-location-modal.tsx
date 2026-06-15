@@ -184,7 +184,6 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
                       onQueryChange={setBinQuery}
                       onClear={() => { setSelectedBin(null); setBinQuery('') }}
                       options={binLocations}
-                      searchKey="bin"
                       getLabel={l => l.bin}
                       sanitize={filterBinInput}
                       placeholder=""

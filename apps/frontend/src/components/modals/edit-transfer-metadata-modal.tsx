@@ -106,7 +106,6 @@ export function EditTransferMetadataModal({
               control={form.control}
               name='transporter'
               options={orgs}
-              searchKey='name'
               getLabel={o => o.name}
               fieldLabel='Transporter'
               fieldRequired={true}

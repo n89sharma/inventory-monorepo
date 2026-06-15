@@ -147,7 +147,6 @@ function DimensionSearch({
         onQueryChange={setQuery}
         onClear={() => { setQuery(''); onChange(null) }}
         options={options}
-        searchKey="label"
         getLabel={option => option.label}
         placeholder={placeholder}
         clearLabel={`Clear ${label.toLowerCase()}`}
