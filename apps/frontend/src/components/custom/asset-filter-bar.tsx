@@ -1,5 +1,3 @@
-import { AssetTypeFilter } from '@/components/filters/asset-type-filter'
-import { BrandFilter } from '@/components/filters/brand-filter'
 import { CassettesFilter } from '@/components/filters/cassettes-filter'
 import { InternalFinisherFilter } from '@/components/filters/internal-finisher-filter'
 import { MeterRangeInput } from '@/components/filters/meter-range-input'
@@ -7,23 +5,23 @@ import { ModelFilter } from '@/components/filters/model-filter'
 import { ReadinessFilter } from '@/components/filters/readiness-filter'
 import { WarehouseFilter } from '@/components/filters/warehouse-filter'
 import type { SharedAssetFilters } from '@/lib/asset-filter-params'
-import type { AssetType, Brand } from 'shared-types'
 
-type BrowseFilters = SharedAssetFilters & {
-  brand: Brand | null
-  assetTypes: AssetType[]
-}
+const DEFAULT_MODEL_PLACEHOLDER = 'Model'
 
-export function AssetBrowseFilters<T extends BrowseFilters>({
+export function AssetFilterBar<T extends SharedAssetFilters>({
   draft,
   onImmediate,
   onDebounced,
-  children,
+  scopeSlot,
+  identitySlot,
+  modelPlaceholder = DEFAULT_MODEL_PLACEHOLDER,
 }: {
   draft: T
   onImmediate: (next: T) => void
   onDebounced: (next: T) => void
-  children: React.ReactNode
+  scopeSlot?: React.ReactNode
+  identitySlot?: React.ReactNode
+  modelPlaceholder?: string
 }): React.JSX.Element {
   return (
     <>
@@ -31,6 +29,10 @@ export function AssetBrowseFilters<T extends BrowseFilters>({
         selection={draft.warehouses}
         onSelectionChange={w => onImmediate({ ...draft, warehouses: w })}
       />
+
+      {scopeSlot}
+
+      {identitySlot}
 
       <ModelFilter
         selection={draft.model}
@@ -46,20 +48,8 @@ export function AssetBrowseFilters<T extends BrowseFilters>({
         onClear={() => onImmediate({
           ...draft, model: null, modelQuery: null,
         })}
+        placeholder={modelPlaceholder}
       />
-
-      <BrandFilter
-        selection={draft.brand}
-        onSelectionChange={b => onImmediate({ ...draft, brand: b })}
-        onClear={() => onImmediate({ ...draft, brand: null })}
-      />
-
-      <AssetTypeFilter
-        selection={draft.assetTypes}
-        onSelectionChange={a => onDebounced({ ...draft, assetTypes: a })}
-      />
-
-      {children}
 
       <ReadinessFilter
         selection={draft.readinesses}

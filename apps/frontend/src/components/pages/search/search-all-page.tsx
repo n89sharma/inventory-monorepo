@@ -17,16 +17,11 @@ import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import type { AssetSearchRow } from 'shared-types'
+import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { AssetResultsTable } from '../../custom/asset-results-table'
-import { CassettesFilter } from '@/components/filters/cassettes-filter'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
-import { InternalFinisherFilter } from '@/components/filters/internal-finisher-filter'
-import { MeterRangeInput } from '@/components/filters/meter-range-input'
-import { ModelFilter } from '@/components/filters/model-filter'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
-import { ReadinessFilter } from '@/components/filters/readiness-filter'
-import { WarehouseFilter } from '@/components/filters/warehouse-filter'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
@@ -118,62 +113,22 @@ export function SearchAllPage(): React.JSX.Element {
           className="flex flex-row flex-wrap gap-2 items-end"
           onSubmit={e => e.preventDefault()}
         >
-          <WarehouseFilter
-            selection={draft.warehouses}
-            onSelectionChange={w => updateImmediate({
-              ...draft, warehouses: w,
-            })}
-          />
-
-          <ModelFilter
-            selection={draft.model}
-            query={draft.modelQuery ?? ''}
-            onSelectionChange={m => updateImmediate({
-              ...draft, model: m, modelQuery: null,
-            })}
-            onQueryChange={text => updateDebounced({
-              ...draft,
-              modelQuery: text.length > 0 ? text : null,
-              model: null,
-            })}
-            onClear={() => updateImmediate({
-              ...draft, model: null, modelQuery: null,
-            })}
-            placeholder='Model *'
-          />
-
-          <MultiSelectOptionsInline
-            selection={draft.statuses}
-            onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
-            options={allStatuses}
-            getLabel={s => formatSentenceCase(s.status)}
-            fieldLabel='Status'
-            className='w-45'
-            dividerAfterIds={statusDividerAfterIds}
-          />
-
-          <ReadinessFilter
-            selection={draft.readinesses}
-            onSelectionChange={s => updateDebounced({ ...draft, readinesses: s })}
-          />
-
-          <MeterRangeInput
-            min={draft.meterMin}
-            max={draft.meterMax}
-            onMinChange={val => updateDebounced({ ...draft, meterMin: val })}
-            onMaxChange={val => updateDebounced({ ...draft, meterMax: val })}
-            className='w-72'
-          />
-
-          <CassettesFilter
-            value={draft.cassettes}
-            onValueChange={val => updateDebounced({ ...draft, cassettes: val })}
-          />
-
-          <InternalFinisherFilter
-            selection={draft.internalFinisher}
-            onSelectionChange={c => updateImmediate({ ...draft, internalFinisher: c })}
-            onClear={() => updateImmediate({ ...draft, internalFinisher: null })}
+          <AssetFilterBar
+            draft={draft}
+            onImmediate={updateImmediate}
+            onDebounced={updateDebounced}
+            modelPlaceholder='Model *'
+            scopeSlot={
+              <MultiSelectOptionsInline
+                selection={draft.statuses}
+                onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
+                options={allStatuses}
+                getLabel={s => formatSentenceCase(s.status)}
+                fieldLabel='Status'
+                className='w-45'
+                dividerAfterIds={statusDividerAfterIds}
+              />
+            }
           />
         </form>
       </StickyPageHeader>

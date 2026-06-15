@@ -1,4 +1,5 @@
-import { AssetBrowseFilters } from '@/components/custom/asset-browse-filters'
+import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
+import { AssetIdentityFilters } from '@/components/custom/asset-identity-filters'
 import { CustomerFilter } from '@/components/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/filters/departed-date-range-filter'
 import { Toggle } from '@/components/shadcn/toggle'
@@ -62,29 +63,39 @@ export function SearchSoldPage(): React.JSX.Element {
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
     >
-      <AssetBrowseFilters
+      <AssetFilterBar
         draft={draft}
         onImmediate={updateImmediate}
         onDebounced={updateDebounced}
-      >
-        <Toggle
-          variant="outline"
-          pressed={draft.showOther}
-          onPressedChange={v => updateImmediate({ ...draft, showOther: v })}
-          aria-label="Show harvested and scrapped assets"
-        >
-          {draft.showOther ? 'Show Sold' : 'Show Harvested/Scrapped'}
-        </Toggle>
-        <DepartedDateRangeFilter
-          value={draft.range}
-          onValueChange={range => updateImmediate({ ...draft, range })}
-        />
-        <CustomerFilter
-          selection={draft.customer}
-          onSelectionChange={c => updateImmediate({ ...draft, customer: c })}
-          onClear={() => updateImmediate({ ...draft, customer: null })}
-        />
-      </AssetBrowseFilters>
+        scopeSlot={
+          <>
+            <Toggle
+              variant="outline"
+              pressed={draft.showOther}
+              onPressedChange={v => updateImmediate({ ...draft, showOther: v })}
+              aria-label="Show harvested and scrapped assets"
+            >
+              {draft.showOther ? 'Show Sold' : 'Show Harvested/Scrapped'}
+            </Toggle>
+            <DepartedDateRangeFilter
+              value={draft.range}
+              onValueChange={range => updateImmediate({ ...draft, range })}
+            />
+            <CustomerFilter
+              selection={draft.customer}
+              onSelectionChange={c => updateImmediate({ ...draft, customer: c })}
+              onClear={() => updateImmediate({ ...draft, customer: null })}
+            />
+          </>
+        }
+        identitySlot={
+          <AssetIdentityFilters
+            draft={draft}
+            onImmediate={updateImmediate}
+            onDebounced={updateDebounced}
+          />
+        }
+      />
     </AssetSearchPage>
   )
 }

@@ -1,4 +1,5 @@
-import { AssetBrowseFilters } from '@/components/custom/asset-browse-filters'
+import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
+import { AssetIdentityFilters } from '@/components/custom/asset-identity-filters'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
@@ -54,20 +55,28 @@ export function SearchInStockPage(): React.JSX.Element {
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
     >
-      <AssetBrowseFilters
+      <AssetFilterBar
         draft={draft}
         onImmediate={updateImmediate}
         onDebounced={updateDebounced}
-      >
-        <Toggle
-          variant="outline"
-          pressed={draft.includeHeld}
-          onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
-          aria-label="Include held assets"
-        >
-          {draft.includeHeld ? 'Hide Held' : 'Show Held'}
-        </Toggle>
-      </AssetBrowseFilters>
+        scopeSlot={
+          <Toggle
+            variant="outline"
+            pressed={draft.includeHeld}
+            onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
+            aria-label="Include held assets"
+          >
+            {draft.includeHeld ? 'Hide Held' : 'Show Held'}
+          </Toggle>
+        }
+        identitySlot={
+          <AssetIdentityFilters
+            draft={draft}
+            onImmediate={updateImmediate}
+            onDebounced={updateDebounced}
+          />
+        }
+      />
     </AssetSearchPage>
   )
 }
