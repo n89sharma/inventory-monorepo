@@ -178,6 +178,7 @@ export function DataTable<TData, TValue>({
                     isSelected={row.getIsSelected()}
                     onRowMouseEnter={onRowMouseEnter}
                     getRowHref={getRowHref}
+                    columnVisibility={columnVisibility}
                   />
                 )))
               : (
@@ -249,6 +250,7 @@ function DataRowImpl<TData>({
   isSelected: boolean
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
+  columnVisibility?: VisibilityState
 }) {
   const navigate = useNavigate()
   return (
