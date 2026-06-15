@@ -6,6 +6,7 @@ import { useSearchAll } from '@/hooks/use-search-all'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useUrlFilters } from '@/hooks/use-url-filters'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
 import { formatSentenceCase } from '@/lib/formatters'
 import {
   filtersToParams,
@@ -34,7 +35,7 @@ const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
 export function SearchAllPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
-    useColumnVisibility()
+    useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
 
   const models = useModelStore(state => state.models)
   const rawStatuses = useReferenceDataStore(state => state.statuses)

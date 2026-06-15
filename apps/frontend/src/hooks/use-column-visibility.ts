@@ -1,18 +1,15 @@
-import {
-  ASSET_TABLE_COLUMNS,
-  DEFAULT_VISIBLE_COLUMN_IDS,
-} from '@/components/pages/column-defs/asset-table-columns'
+import { ASSET_TABLE_COLUMNS } from '@/components/pages/column-defs/asset-table-columns'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 
-export function useColumnVisibility(): {
+export function useColumnVisibility(defaultColumnIds: readonly string[]): {
   visibleColumns: Set<string>
   setVisibleColumns: (columns: Set<string>) => void
   columnVisibility: VisibilityState
   reset: () => void
 } {
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    () => new Set(DEFAULT_VISIBLE_COLUMN_IDS),
+    () => new Set(defaultColumnIds),
   )
 
   const columnVisibility = useMemo<VisibilityState>(
@@ -27,7 +24,7 @@ export function useColumnVisibility(): {
   )
 
   function reset() {
-    setVisibleColumns(new Set(DEFAULT_VISIBLE_COLUMN_IDS))
+    setVisibleColumns(new Set(defaultColumnIds))
   }
 
   return { visibleColumns, setVisibleColumns, columnVisibility, reset }

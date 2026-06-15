@@ -1,6 +1,7 @@
 import { ColumnPickerButton } from '@/components/custom/column-picker-button'
 import { ExportAssetsButton } from '@/components/custom/export-assets-button'
 import { AssetResultsTable } from '@/components/custom/asset-results-table'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
@@ -28,7 +29,7 @@ export function AssetSearchPage({
 }): React.JSX.Element {
   const [searchParams] = useSearchParams()
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
-    useColumnVisibility()
+    useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
   const selection = useAssetSelection(assets)
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
