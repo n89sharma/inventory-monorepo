@@ -1,17 +1,16 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
-import Fuse from 'fuse.js'
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
-import { ScrollArea } from '../shadcn/scroll-area'
+import { cn } from '@/lib/utils'
 import { XIcon } from '@phosphor-icons/react'
+import Fuse from 'fuse.js'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Badge } from '../shadcn/badge'
+import { Field } from '../shadcn/field'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from '../shadcn/input-group'
-import { Field } from '../shadcn/field'
-import { Badge } from '../shadcn/badge'
-import { cn } from '@/lib/utils'
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 
 const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
 const SUGGESTION_LIMIT = 6
@@ -191,9 +190,9 @@ export function SearchSelectInput<T>({
           align="start"
           onOpenAutoFocus={e => { e.preventDefault() }}
           onCloseAutoFocus={e => { e.preventDefault() }}
-          className="w-[var(--radix-popover-trigger-width)]"
+          className="w-max max-w-md"
         >
-          <ScrollArea>
+          <div className="max-h-72 overflow-y-auto">
             {matches.map((m, i) => (
               <button
                 key={`${getLabel(m)}-${i}`}
@@ -209,7 +208,7 @@ export function SearchSelectInput<T>({
                   }
                 }}
                 className={cn(
-                  "w-full text-left p-2 cursor-pointer rounded-sm",
+                  "block w-full text-left p-2 cursor-pointer rounded-sm whitespace-nowrap",
                   highlightedIndex === i
                     ? "bg-accent text-accent-foreground"
                     : "hover:bg-accent/50",
@@ -218,7 +217,7 @@ export function SearchSelectInput<T>({
                 {getLabel(m)}
               </button>
             ))}
-          </ScrollArea>
+          </div>
         </PopoverContent>
       </Popover>
     </div>
