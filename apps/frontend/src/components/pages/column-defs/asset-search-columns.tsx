@@ -50,7 +50,12 @@ export function createAssetSearchColumns(
   },
   {
     accessorKey: "model",
-    header: "Model",
+    header: ({ column }) => (
+      <SortableHeader
+        label="Model"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
     size: 100
   },
   {
