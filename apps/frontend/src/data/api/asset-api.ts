@@ -222,7 +222,8 @@ export async function getAssetsForSold(
   component: Component | null,
   customer: OrgSummary | null,
   statuses: Status[],
-  fromDate: Date): Promise<AssetSearchRow[]> {
+  fromDate: Date,
+  toDate: Date): Promise<AssetSearchRow[]> {
 
   const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
     params: {
@@ -238,6 +239,7 @@ export async function getAssetsForSold(
       componentId: component?.id ?? undefined,
       customerId: customer?.id ?? undefined,
       fromDate: fromDate.toISOString(),
+      toDate: toDate.toISOString(),
     }
   })
   return z.array(AssetSearchRowSchema).parse(data)

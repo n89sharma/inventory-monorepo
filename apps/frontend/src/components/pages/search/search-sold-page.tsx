@@ -78,8 +78,9 @@ export function SearchSoldPage(): React.JSX.Element {
               {draft.showOther ? 'Show Sold' : 'Show Harvested/Scrapped'}
             </Toggle>
             <DepartedDateRangeFilter
-              value={draft.range}
-              onValueChange={range => updateImmediate({ ...draft, range })}
+              from={draft.fromDate}
+              to={draft.toDate}
+              onChange={(fromDate, toDate) => updateImmediate({ ...draft, fromDate, toDate })}
             />
             <CustomerFilter
               selection={draft.customer}

@@ -1,5 +1,15 @@
 import type { AssetType, Brand, OrgSummary, Status } from 'shared-types'
 import {
+  isAfter,
+  isBefore,
+  isValid,
+  format,
+  parseISO,
+  startOfDay,
+  subDays,
+  subMonths,
+} from 'date-fns'
+import {
   decodeIds,
   DEFAULT_WAREHOUSE_CODE,
   encodeIds,
@@ -12,7 +22,8 @@ import {
 const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
 const PARAM_OTHER = 'other'
-const PARAM_RANGE = 'range'
+const PARAM_FROM = 'from'
+const PARAM_TO = 'to'
 const PARAM_CUSTOMER = 'customer'
 const OTHER_ON = '1'
 
@@ -20,15 +31,24 @@ export const SOLD_STATUS = 'SOLD'
 export const HARVESTED_STATUS = 'HARVESTED'
 export const SCRAPPED_STATUS = 'SCRAPPED'
 
-export const SOLD_RANGE_MONTHS = [1, 6] as const
-export type SoldRangeMonths = typeof SOLD_RANGE_MONTHS[number]
-const DEFAULT_RANGE: SoldRangeMonths = 1
+export const MAX_DEPARTED_MONTHS = 18
+const DEFAULT_FROM_DAYS = 30
+const URL_DATE_FORMAT = 'yyyy-MM-dd'
+
+export function getDepartedFloor(): Date {
+  return startOfDay(subMonths(new Date(), MAX_DEPARTED_MONTHS))
+}
+
+export function isValidSoldDateRange(from: Date, to: Date): boolean {
+  return !isBefore(from, getDepartedFloor()) && !isAfter(from, to)
+}
 
 export type SearchSoldFilters = SharedAssetFilters & {
   brand: Brand | null
   assetTypes: AssetType[]
   showOther: boolean
-  range: SoldRangeMonths
+  fromDate: Date
+  toDate: Date
   customer: OrgSummary | null
 }
 
@@ -51,7 +71,8 @@ export function filtersToParams(filters: SearchSoldFilters): URLSearchParams {
   if (filters.brand) params.set(PARAM_BRAND, String(filters.brand.id))
   if (filters.assetTypes.length > 0) params.set(PARAM_TYPE, encodeIds(filters.assetTypes))
   if (filters.showOther) params.set(PARAM_OTHER, OTHER_ON)
-  if (filters.range !== DEFAULT_RANGE) params.set(PARAM_RANGE, String(filters.range))
+  params.set(PARAM_FROM, format(filters.fromDate, URL_DATE_FORMAT))
+  params.set(PARAM_TO, format(filters.toDate, URL_DATE_FORMAT))
   if (filters.customer) params.set(PARAM_CUSTOMER, String(filters.customer.id))
   return params
 }
@@ -65,10 +86,15 @@ export function paramsToFilters(
     ? ref.brands.find(b => b.id === Number.parseInt(brandId, 10)) ?? null
     : null
 
-  const rangeRaw = Number.parseInt(params.get(PARAM_RANGE) ?? '', 10)
-  const range = SOLD_RANGE_MONTHS.includes(rangeRaw as SoldRangeMonths)
-    ? (rangeRaw as SoldRangeMonths)
-    : DEFAULT_RANGE
+  const fromRaw = params.get(PARAM_FROM)
+  const parsedFrom = fromRaw ? parseISO(fromRaw) : null
+  const fromDate = parsedFrom && isValid(parsedFrom)
+    ? parsedFrom
+    : startOfDay(subDays(new Date(), DEFAULT_FROM_DAYS))
+
+  const toRaw = params.get(PARAM_TO)
+  const parsedTo = toRaw ? parseISO(toRaw) : null
+  const toDate = parsedTo && isValid(parsedTo) ? parsedTo : new Date()
 
   const customerId = params.get(PARAM_CUSTOMER)
   const customer = customerId
@@ -80,7 +106,8 @@ export function paramsToFilters(
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
     showOther: params.get(PARAM_OTHER) === OTHER_ON,
-    range,
+    fromDate,
+    toDate,
     customer,
   }
 }

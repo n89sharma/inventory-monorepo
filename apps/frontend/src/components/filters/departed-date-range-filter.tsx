@@ -1,34 +1,53 @@
-import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { SOLD_RANGE_MONTHS, type SoldRangeMonths } from '@/lib/search-sold-params'
+import { DatePickerFieldInline } from '@/components/custom/date-picker'
+import { getDepartedFloor, isValidSoldDateRange } from '@/lib/search-sold-params'
+import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 
-const RANGE_LABELS = {
-  1: 'Last month',
-  6: 'Last 6 months',
-} as const satisfies Record<SoldRangeMonths, string>
+const INVALID_RANGE_MESSAGE = 'Only data from the last 18 months can be shown'
 
 export function DepartedDateRangeFilter({
-  value,
-  onValueChange,
+  from,
+  to,
+  onChange,
 }: {
-  value: SoldRangeMonths
-  onValueChange: (range: SoldRangeMonths) => void
+  from: Date
+  to: Date
+  onChange: (from: Date, to: Date) => void
 }): React.JSX.Element {
+  const floor = getDepartedFloor()
+  const today = new Date()
+  const valid = isValidSoldDateRange(from, to)
+
   return (
-    <ToggleGroup
-      type="single"
-      variant="outline"
-      value={String(value)}
-      onValueChange={v => {
-        if (v === '') return
-        onValueChange(Number.parseInt(v, 10) as SoldRangeMonths)
-      }}
-      aria-label="Departed within"
-    >
-      {SOLD_RANGE_MONTHS.map(range => (
-        <ToggleGroupItem key={range} value={String(range)}>
-          {RANGE_LABELS[range]}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-row gap-2">
+        <DatePickerFieldInline
+          label="From"
+          id="departed-from"
+          date={getSelectOption(from)}
+          setDate={d => {
+            const next = getSelectedOrNull(d)
+            if (next) onChange(next, to)
+          }}
+          disabled={[{ before: floor }, { after: to }]}
+          startMonth={floor}
+          endMonth={today}
+        />
+        <DatePickerFieldInline
+          label="To"
+          id="departed-to"
+          date={getSelectOption(to)}
+          setDate={d => {
+            const next = getSelectedOrNull(d)
+            if (next) onChange(from, next)
+          }}
+          disabled={[{ before: from }, { after: today }]}
+          startMonth={floor}
+          endMonth={today}
+        />
+      </div>
+      {valid ? null : (
+        <p className="text-destructive text-xs">{INVALID_RANGE_MESSAGE}</p>
+      )}
+    </div>
   )
 }

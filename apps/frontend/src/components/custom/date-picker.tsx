@@ -8,6 +8,7 @@ import {
 } from "@/components/shadcn/popover"
 import { getSelectedOrNull, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
 import { format } from "date-fns"
+import type { Matcher } from "react-day-picker"
 
 interface DatePickerFieldProps {
   label: string
@@ -15,9 +16,21 @@ interface DatePickerFieldProps {
   setDate: (date: SelectOption<Date>) => void
   id: string
   className?: string
+  disabled?: Matcher | Matcher[]
+  startMonth?: Date
+  endMonth?: Date
 }
 
-export function DatePickerField({ label, date, setDate, id, className }: DatePickerFieldProps): React.JSX.Element {
+export function DatePickerField({
+  label,
+  date,
+  setDate,
+  id,
+  className,
+  disabled,
+  startMonth,
+  endMonth,
+}: DatePickerFieldProps): React.JSX.Element {
   return (
     <Field className={className}>
       <FieldLabel>{label}</FieldLabel>
@@ -37,6 +50,9 @@ export function DatePickerField({ label, date, setDate, id, className }: DatePic
             selected={getSelectedOrNull(date)}
             onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
             defaultMonth={getSelectedOrNull(date)}
+            disabled={disabled}
+            startMonth={startMonth}
+            endMonth={endMonth}
           />
         </PopoverContent>
       </Popover>
@@ -44,7 +60,16 @@ export function DatePickerField({ label, date, setDate, id, className }: DatePic
   )
 }
 
-export function DatePickerFieldInline({ label, date, setDate, id, className }: DatePickerFieldProps): React.JSX.Element {
+export function DatePickerFieldInline({
+  label,
+  date,
+  setDate,
+  id,
+  className,
+  disabled,
+  startMonth,
+  endMonth,
+}: DatePickerFieldProps): React.JSX.Element {
   const triggerLabel = isSelected(date)
     ? `${label}: ${format(date.selected, "PPP")}`
     : label
@@ -65,6 +90,9 @@ export function DatePickerFieldInline({ label, date, setDate, id, className }: D
           selected={getSelectedOrNull(date)}
           onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
           defaultMonth={getSelectedOrNull(date)}
+          disabled={disabled}
+          startMonth={startMonth}
+          endMonth={endMonth}
         />
       </PopoverContent>
     </Popover>
