@@ -1,9 +1,10 @@
+import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
 import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { NotFoundError } from '../lib/errors.js'
+import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import {
@@ -40,22 +41,44 @@ const toNumberArray = (val: unknown) =>
   val === undefined ? [] : Array.isArray(val) ? val : [val]
 
 export const AssetQuerySchema = z.object({
-  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/),
+  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
+  assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   meterMin: z.string().optional().transform(Number),
   meterMax: z.string().optional().transform(Number),
   cassettes: z.string().optional().transform(Number),
-  componentId: z.string().optional().transform(Number)
+  componentId: z.string().optional().transform(Number),
+  fromDate: z.coerce.date().optional(),
+  toDate: z.coerce.date().optional()
 })
+
+const MAX_DEPARTED_WINDOW_MONTHS = 18
+
+function resolveDepartedRange(
+  fromDate: Date | undefined,
+  toDate: Date | undefined,
+): { departedFrom: Date | null; departedTo: Date | null } {
+  if (!fromDate) return { departedFrom: null, departedTo: null }
+  const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
+  const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
+  const departedTo = toDate ?? new Date()
+  if (isAfter(departedFrom, departedTo)) {
+    throw new ValidationError('fromDate must be before toDate')
+  }
+  return { departedFrom, departedTo }
+}
 
 export const getAssets = asyncHandler(async (req, res) => {
   const {
-    model, statusIds, readinessIds, warehouseIds, meterMin, meterMax, cassettes, componentId
+    model, statusIds, readinessIds, warehouseIds, brandIds, assetTypeIds,
+    meterMin, meterMax, cassettes, componentId, fromDate, toDate
   } = res.locals.query as z.infer<typeof AssetQuerySchema>
+  const { departedFrom, departedTo } = resolveDepartedRange(fromDate, toDate)
   const data = await getAssetsSer(
-    model,
+    model ?? '',
     statusIds,
     readinessIds,
     warehouseIds,
@@ -63,8 +86,10 @@ export const getAssets = asyncHandler(async (req, res) => {
     isNaN(meterMax) ? -1 : meterMax,
     isNaN(cassettes) ? -1 : cassettes,
     isNaN(componentId) ? -1 : componentId,
-    [],
-    [],
+    brandIds,
+    assetTypeIds,
+    departedFrom,
+    departedTo,
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

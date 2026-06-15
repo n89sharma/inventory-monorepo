@@ -2,6 +2,8 @@ import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 
+export const DEFAULT_WAREHOUSE_CODE = 'YYZ'
+
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
 const PARAM_WH = 'wh'

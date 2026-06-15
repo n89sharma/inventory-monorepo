@@ -1,6 +1,7 @@
 import type { AssetType, Brand } from 'shared-types'
 import {
   decodeIds,
+  DEFAULT_WAREHOUSE_CODE,
   encodeIds,
   getSharedFilters,
   setSharedFilterParams,
@@ -12,8 +13,6 @@ const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
 const PARAM_HELD = 'held'
 const HELD_ON = '1'
-
-export const DEFAULT_WAREHOUSE_CODE = 'YYZ'
 
 export type SearchInStockFilters = SharedAssetFilters & {
   brand: Brand | null

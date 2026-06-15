@@ -1,4 +1,4 @@
-import { InputWithClearInline } from './input-with-clear'
+import { InputWithClearInline } from '@/components/custom/input-with-clear'
 
 export type MeterRangeInputProps = {
   min: number | null

@@ -1,13 +1,14 @@
 import { AssetBrowseFilters } from '@/components/custom/asset-browse-filters'
+import { DepartedDateRangeFilter } from '@/components/filters/departed-date-range-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useSearchInStock } from '@/hooks/use-search-instock'
+import { useSearchSold } from '@/hooks/use-search-sold'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import {
   filtersToParams,
   paramsToFilters,
-} from '@/lib/search-instock-params'
+} from '@/lib/search-sold-params'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
@@ -15,7 +16,7 @@ import { AssetSearchPage } from './asset-search-page'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 
-export function SearchInStockPage(): React.JSX.Element {
+export function SearchSoldPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const models = useModelStore(state => state.models)
@@ -43,13 +44,13 @@ export function SearchInStockPage(): React.JSX.Element {
     setSearchParams,
   )
 
-  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchInStock(urlFilters)
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchSold(urlFilters)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
 
   return (
     <AssetSearchPage
-      title="In Stock"
-      navContext="instock"
+      title="Sold"
+      navContext="sold"
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
@@ -61,12 +62,16 @@ export function SearchInStockPage(): React.JSX.Element {
       >
         <Toggle
           variant="outline"
-          pressed={draft.includeHeld}
-          onPressedChange={v => updateImmediate({ ...draft, includeHeld: v })}
-          aria-label="Include held assets"
+          pressed={draft.showOther}
+          onPressedChange={v => updateImmediate({ ...draft, showOther: v })}
+          aria-label="Show harvested and scrapped assets"
         >
-          {draft.includeHeld ? 'Hide Held' : 'Show Held'}
+          {draft.showOther ? 'Show Sold' : 'Show Harvested/Scrapped'}
         </Toggle>
+        <DepartedDateRangeFilter
+          value={draft.range}
+          onValueChange={range => updateImmediate({ ...draft, range })}
+        />
       </AssetBrowseFilters>
     </AssetSearchPage>
   )

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
+const DEFAULT_FILTER_DEBOUNCE_MS = 600
+
 export function useUrlFilters<TFilters>(
   urlFilters: TFilters,
   filtersToParams: (filters: TFilters) => URLSearchParams,
   setSearchParams: (params: URLSearchParams, options?: { replace?: boolean }) => void,
-  debounceMs: number,
+  debounceMs: number = DEFAULT_FILTER_DEBOUNCE_MS,
 ): {
   draft: TFilters
   updateImmediate: (next: TFilters) => void

@@ -1,4 +1,4 @@
-import { ModelFilter } from '@/components/custom/model-filter'
+import { ModelFilter } from '@/components/filters/model-filter'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import {

@@ -164,6 +164,9 @@ function redactSearchRowCost(
   }
 }
 
+const NO_DATE_LOWER_BOUND = new Date('0001-01-01T00:00:00.000Z')
+const NO_DATE_UPPER_BOUND = new Date('9999-12-31T00:00:00.000Z')
+
 export async function getAssets(
   model: string,
   statusIds: number[],
@@ -175,6 +178,8 @@ export async function getAssets(
   componentIdParam: number,
   brandIds: number[],
   assetTypeIds: number[],
+  departedFrom: Date | null,
+  departedTo: Date | null,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
@@ -189,6 +194,8 @@ export async function getAssets(
       componentIdParam,
       brandIds,
       assetTypeIds,
+      departedFrom ?? NO_DATE_LOWER_BOUND,
+      departedTo ?? NO_DATE_UPPER_BOUND,
     )
   )
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
@@ -226,6 +233,8 @@ export async function getAssetsForSearchInStock(
     componentIdParam,
     brandIds,
     assetTypeIds,
+    null,
+    null,
     role,
   )
 }

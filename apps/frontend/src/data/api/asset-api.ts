@@ -209,6 +209,37 @@ export async function getAssetsForSearchAll(
   return z.array(AssetSearchRowSchema).parse(data)
 }
 
+export async function getAssetsForSold(
+  warehouses: Warehouse[],
+  brand: Brand | null,
+  assetTypes: AssetType[],
+  readinesses: Status[],
+  model: string | null,
+  meterMin: number | null,
+  meterMax: number | null,
+  cassettes: number | null,
+  component: Component | null,
+  statuses: Status[],
+  fromDate: Date): Promise<AssetSearchRow[]> {
+
+  const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
+    params: {
+      warehouseIds: warehouses.map(w => w.id),
+      brandIds: brand ? [brand.id] : [],
+      assetTypeIds: assetTypes.map(a => a.id),
+      readinessIds: readinesses.map(s => s.id),
+      statusIds: statuses.map(s => s.id),
+      model: model ?? undefined,
+      meterMin: meterMin ?? undefined,
+      meterMax: meterMax ?? undefined,
+      cassettes: cassettes ?? undefined,
+      componentId: component?.id ?? undefined,
+      fromDate: fromDate.toISOString(),
+    }
+  })
+  return z.array(AssetSearchRowSchema).parse(data)
+}
+
 export async function getAssetsForSearchInStock(
   warehouses: Warehouse[],
   brand: Brand | null,

@@ -34,6 +34,7 @@ const InvoiceDetailsPage        = lazy(() => import('./components/pages/invoice/
 
 const AssetDetailsPage          = lazy(() => import('./components/pages/asset-details-page').then(m => ({ default: m.AssetDetailsPage })))
 const SearchInStockPage         = lazy(() => import('./components/pages/search/search-instock-page').then(m => ({ default: m.SearchInStockPage })))
+const SearchSoldPage            = lazy(() => import('./components/pages/search/search-sold-page').then(m => ({ default: m.SearchSoldPage })))
 const ProfitabilityReportPage   = lazy(() => import('./components/pages/profitability-report-page').then(m => ({ default: m.ProfitabilityReportPage })))
 const SearchAllPage             = lazy(() => import('./components/pages/search/search-all-page').then(m => ({ default: m.SearchAllPage })))
 const PriceCheckPage            = lazy(() => import('./components/pages/search/price-check-page').then(m => ({ default: m.PriceCheckPage })))
@@ -126,6 +127,8 @@ function AppRoutes() {
                   <Route path="/search/all/:assetId" element={<AssetDetailsPage />} />
                   <Route path="/search/instock" element={<SearchInStockPage />} />
                   <Route path="/search/instock/:assetId" element={<AssetDetailsPage />} />
+                  <Route path="/search/sold" element={<SearchSoldPage />} />
+                  <Route path="/search/sold/:assetId" element={<AssetDetailsPage />} />
                   <Route
                     path="/search/price-check"
                     element={
