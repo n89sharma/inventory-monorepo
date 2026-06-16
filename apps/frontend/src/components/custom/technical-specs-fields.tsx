@@ -1,5 +1,5 @@
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { formatSentenceCase } from '@/lib/formatters'
+import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { getSelectOption, isSelected, UNSELECTED, type SelectOption } from '@/ui-types/select-option-types'
 import { useMemo, useState } from 'react'
@@ -241,7 +241,7 @@ export function TechnicalSpecsFields<T extends FieldValues>(
             control={control}
             name={p('countryOfOrigin')}
             options={countries}
-            getLabel={(c: Country) => formatSentenceCase(c.name)}
+            getLabel={(c: Country) => formatTitleCase(c.name)}
             clearLabel='Clear country of origin'
             className={INPUT_WIDTH}
           />

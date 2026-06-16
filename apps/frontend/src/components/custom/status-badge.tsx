@@ -1,5 +1,5 @@
 import { Badge } from '@/components/shadcn/badge'
-import { formatSentenceCase } from '@/lib/formatters'
+import { formatTitleCase } from '@/lib/formatters'
 
 function getBadgeClass(status: string): string {
   switch (status) {
@@ -13,7 +13,7 @@ function getBadgeClass(status: string): string {
 export function StatusBadge({ status }: { status: string }) {
   return (
     <Badge className={`text-xs ${getBadgeClass(status)}`}>
-      {formatSentenceCase(status)}
+      {formatTitleCase(status)}
     </Badge>
   )
 }

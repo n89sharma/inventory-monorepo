@@ -21,7 +21,7 @@ import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDate, formatDateWithTime, formatLocation, formatSentenceCase, formatThousandsK } from '@/lib/formatters'
+import { formatDate, formatDateWithTime, formatLocation, formatTitleCase, formatThousandsK } from '@/lib/formatters'
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -296,7 +296,7 @@ export const AssetDetailsPage = () => {
                   <DataValueRow label="Total Meter" value={formatThousandsK(specs.meter_total)} rowClassName={ROW_GAP} />
                   <DataValueRow
                     label="Country of Origin"
-                    value={assetDetails.country_of_origin ? formatSentenceCase(assetDetails.country_of_origin) : null}
+                    value={assetDetails.country_of_origin ? formatTitleCase(assetDetails.country_of_origin) : null}
                     rowClassName={ROW_GAP}
                   />
                   <DataValueRow

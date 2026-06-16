@@ -28,7 +28,7 @@ import {
 import { Toggle } from '@/components/shadcn/toggle'
 import { PageContent } from '@/components/layout/page-content'
 import { useUserStore } from '@/data/store/user-store'
-import { formatSentenceCase } from '@/lib/formatters'
+import { formatTitleCase } from '@/lib/formatters'
 import { useUser } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -148,7 +148,7 @@ export function UserManagementPage() {
                 <SelectGroup>
                   {ASSIGNABLE_ROLES.map(role => (
                     <SelectItem key={role} value={role}>
-                      {formatSentenceCase(role)}
+                      {formatTitleCase(role)}
                     </SelectItem>
                   ))}
                 </SelectGroup>

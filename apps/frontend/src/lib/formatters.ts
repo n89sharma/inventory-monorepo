@@ -8,7 +8,7 @@ export function formatLocation(location: AssetLocationDetails | null): string {
   if (location.zone === BIN_ZONE) {
     return `${location.warehouse_code} | ${location.bin}`
   }
-  return `${location.warehouse_code} | ${formatSentenceCase(location.zone)}`
+  return `${location.warehouse_code} | ${formatTitleCase(location.zone)}`
 }
 
 export function formatThousandsK(value: number | null): string {
@@ -27,7 +27,7 @@ export function formatUSD(value: number | null): string {
   return currencyValue
 }
 
-export function formatSentenceCase(str: string): string {
+export function formatTitleCase(str: string): string {
   return str
     .toLowerCase()
     .replace(/_/g, ' ')

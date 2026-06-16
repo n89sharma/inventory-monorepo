@@ -8,7 +8,7 @@ import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useSearchAll } from '@/hooks/use-search-all'
 import { useUrlFilters } from '@/hooks/use-url-filters'
-import { formatSentenceCase } from '@/lib/formatters'
+import { formatTitleCase } from '@/lib/formatters'
 import {
   filtersToParams,
   paramsToFilters,
@@ -123,7 +123,7 @@ export function SearchAllPage(): React.JSX.Element {
                 selection={draft.statuses}
                 onSelectionChange={s => updateDebounced({ ...draft, statuses: s })}
                 options={allStatuses}
-                getLabel={s => formatSentenceCase(s.status)}
+                getLabel={s => formatTitleCase(s.status)}
                 fieldLabel='Status'
                 className='w-35'
                 dividerAfterIds={statusDividerAfterIds}

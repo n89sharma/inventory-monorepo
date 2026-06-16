@@ -14,7 +14,7 @@ import {
   type NavigationSection,
   type SearchList,
 } from '@/ui-types/navigation-context'
-import { formatSentenceCase } from '@/lib/formatters'
+import { formatTitleCase } from '@/lib/formatters'
 
 interface BreadcrumbSegment {
   label: string
@@ -92,7 +92,7 @@ export function getBreadcrumForAssetDetails(
 
   if (isCollection(section)) {
     return [
-      { label: formatSentenceCase(section), href: `/${section}` },
+      { label: formatTitleCase(section), href: `/${section}` },
       { label: collectionId ?? '', href: `/${section}/${collectionId}` }
     ]
   }
@@ -115,6 +115,6 @@ export function getBreadcrumbForAssetSummary(
   section: NavigationSection): BreadcrumbSegment[] {
 
   return [
-    { label: formatSentenceCase(section), href: `/${section}` }
+    { label: formatTitleCase(section), href: `/${section}` }
   ]
 }

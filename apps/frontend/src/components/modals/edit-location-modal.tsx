@@ -10,7 +10,7 @@ import { Field, FieldLabel } from "@/components/shadcn/field"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { formatSentenceCase } from "@/lib/formatters"
+import { formatTitleCase } from "@/lib/formatters"
 import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
 import type { AssetDetails, AssetLocation, Warehouse, Zone } from "shared-types"
@@ -159,7 +159,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
                 <SelectGroup>
                   {zones.map(z => (
                     <SelectItem key={z.id} value={String(z.id)}>
-                      {formatSentenceCase(z.zone)}
+                      {formatTitleCase(z.zone)}
                     </SelectItem>
                   ))}
                 </SelectGroup>
