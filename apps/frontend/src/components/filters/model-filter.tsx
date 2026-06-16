@@ -1,5 +1,6 @@
 import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useModelStore } from '@/data/store/model-store'
+import { modelLabel } from '@/lib/reference-labels'
 import type { ModelSummary } from 'shared-types'
 
 export function ModelFilter({
@@ -26,7 +27,7 @@ export function ModelFilter({
       onQueryChange={onQueryChange}
       onClear={onClear}
       options={models}
-      getLabel={m => `${m.brand_name} ${m.model_name}`}
+      getLabel={modelLabel}
       placeholder={placeholder}
       clearLabel='Clear model'
       className='w-35'

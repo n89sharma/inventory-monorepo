@@ -1,5 +1,6 @@
 import { MultiSelectOptionsInline } from '@/components/custom/multi-select-options'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { assetTypeLabel } from '@/lib/reference-labels'
 import type { AssetType } from 'shared-types'
 
 export function AssetTypeFilter({
@@ -16,7 +17,7 @@ export function AssetTypeFilter({
       selection={selection}
       onSelectionChange={onSelectionChange}
       options={allAssetTypes}
-      getLabel={a => a.asset_type}
+      getLabel={assetTypeLabel}
       fieldLabel='Asset Type'
       className='w-35'
     />

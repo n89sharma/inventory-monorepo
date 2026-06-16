@@ -1,3 +1,4 @@
+import { formatTitleCase } from "@/lib/formatters"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { ArrivalSummary } from 'shared-types'
 import { assetCountColumn, createdAtColumn, createdByColumn, createIdColumn } from './shared-columns'
@@ -12,7 +13,15 @@ export const arrivalTableColumns: ColumnDef<ArrivalSummary>[] = [
   createdAtColumn as ColumnDef<ArrivalSummary>,
   createdByColumn as ColumnDef<ArrivalSummary>,
   { accessorKey: "destination_code", header: "Warehouse", size: 80 },
-  { accessorKey: "transporter", header: "Transporter" },
-  { accessorKey: "vendor", header: "Vendor" },
+  {
+    accessorKey: "transporter",
+    header: "Transporter",
+    cell: ({ row }) => formatTitleCase(row.original.transporter ?? ''),
+  },
+  {
+    accessorKey: "vendor",
+    header: "Vendor",
+    cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
+  },
   assetCountColumn as ColumnDef<ArrivalSummary>,
 ]

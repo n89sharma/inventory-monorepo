@@ -1,5 +1,6 @@
 import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { componentLabel } from '@/lib/reference-labels'
 import { useState } from 'react'
 import type { Component } from 'shared-types'
 
@@ -28,7 +29,7 @@ export function InternalFinisherFilter({
         onClear()
       }}
       options={allComponents}
-      getLabel={c => `${c.brand_name} — ${c.name}`}
+      getLabel={componentLabel}
       placeholder='Internal Finisher'
       clearLabel='Clear internal finisher'
       className='w-35'

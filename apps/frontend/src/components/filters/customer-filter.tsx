@@ -1,5 +1,6 @@
 import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useOrgStore } from '@/data/store/org-store'
+import { organizationLabel } from '@/lib/reference-labels'
 import { useState } from 'react'
 import type { OrgSummary } from 'shared-types'
 
@@ -28,7 +29,8 @@ export function CustomerFilter({
         setQuery('')
         onClear()
       }}
-      options={allCustomers}      getLabel={c => c.name}
+      options={allCustomers}
+      getLabel={organizationLabel}
       placeholder='Customer'
       clearLabel='Clear customer'
       className='w-35'

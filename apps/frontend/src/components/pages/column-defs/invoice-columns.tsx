@@ -1,4 +1,5 @@
 import { Checkbox } from "@/components/shadcn/checkbox"
+import { formatTitleCase } from "@/lib/formatters"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { InvoiceSummary } from 'shared-types'
 import { assetCountColumn, createdAtColumn, createdByColumn, createIdColumn } from './shared-columns'
@@ -12,7 +13,11 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   }),
   createdAtColumn as ColumnDef<InvoiceSummary>,
   createdByColumn as ColumnDef<InvoiceSummary>,
-  { accessorKey: "organization", header: "Organization" },
+  {
+    accessorKey: "organization",
+    header: "Organization",
+    cell: ({ row }) => formatTitleCase(row.original.organization ?? ''),
+  },
   {
     accessorKey: "is_cleared",
     header: "Cleared",
@@ -23,6 +28,10 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
       </div>
     ),
   },
-  { accessorKey: "invoice_type", header: "Invoice Type" },
+  {
+    accessorKey: "invoice_type",
+    header: "Invoice Type",
+    cell: ({ row }) => formatTitleCase(row.original.invoice_type ?? ''),
+  },
   assetCountColumn as ColumnDef<InvoiceSummary>,
 ]

@@ -2,7 +2,7 @@ import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip"
-import { formatDate, formatLocation, formatThousandsK, formatUSD } from "@/lib/formatters"
+import { formatDate, formatLocation, formatThousandsK, formatTitleCase, formatUSD } from "@/lib/formatters"
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { differenceInCalendarDays } from "date-fns"
@@ -46,6 +46,7 @@ export function createAssetSearchColumns(
   {
     accessorKey: "brand",
     header: "Brand",
+    cell: ({ row }) => formatTitleCase(row.original.brand),
     size: 80
   },
   {
@@ -61,6 +62,7 @@ export function createAssetSearchColumns(
   {
     accessorKey: "asset_type",
     header: "Asset Type",
+    cell: ({ row }) => formatTitleCase(row.original.asset_type),
     size: 100
   },
   {
@@ -110,7 +112,7 @@ export function createAssetSearchColumns(
   {
     accessorKey: "country_of_origin",
     header: "Country of Origin",
-    cell: ({ row }) => row.original.country_of_origin ?? '',
+    cell: ({ row }) => formatTitleCase(row.original.country_of_origin ?? ''),
     size: 100
   },
   {
@@ -259,7 +261,7 @@ export function createAssetSearchColumns(
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => row.original.hold_customer ?? '',
+    cell: ({ row }) => formatTitleCase(row.original.hold_customer ?? ''),
     size: 120
   },
   {
@@ -281,7 +283,7 @@ export function createAssetSearchColumns(
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => row.original.vendor ?? '',
+    cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
     size: 120
   },
   {
@@ -316,7 +318,7 @@ export function createAssetSearchColumns(
         onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
       />
     ),
-    cell: ({ row }) => row.original.customer ?? '',
+    cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
     size: 120
   },
   {

@@ -1,7 +1,7 @@
 import { ReadinessPill } from "@/components/custom/readiness-pill"
 import { Badge } from "@/components/shadcn/badge"
 import { Button } from "@/components/shadcn/button"
-import { formatThousandsK } from "@/lib/formatters"
+import { formatThousandsK, formatTitleCase } from "@/lib/formatters"
 import type { AssetForm } from "@/ui-types/arrival-form-types"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { getSelectedOrNull } from "@/ui-types/select-option-types"
@@ -17,6 +17,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
     {
       accessorKey: "model.brand_name",
       header: "Brand",
+      cell: ({ row }) => formatTitleCase(row.original.model?.brand_name ?? ''),
       size: 80
     },
     {
@@ -44,7 +45,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
     {
       id: "component",
       header: "Internal Finisher",
-      accessorFn: row => row.component?.name ?? '',
+      accessorFn: row => formatTitleCase(row.component?.name ?? ''),
       size: 70
     },
     {

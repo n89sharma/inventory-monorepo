@@ -1,7 +1,7 @@
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
-import { formatLocation, formatThousandsK } from "@/lib/formatters"
+import { formatLocation, formatThousandsK, formatTitleCase } from "@/lib/formatters"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
@@ -25,6 +25,7 @@ export function createAssetSummaryColumns(
     {
       accessorKey: "brand",
       header: "Brand",
+      cell: ({ row }) => formatTitleCase(row.original.brand),
       size: 80
     },
     {

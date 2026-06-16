@@ -1,3 +1,4 @@
+import { formatTitleCase } from "@/lib/formatters"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { HoldSummary } from 'shared-types'
 import { assetCountColumn, createdAtColumn, createdByColumn, createIdColumn } from './shared-columns'
@@ -11,7 +12,11 @@ export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   }),
   createdByColumn as ColumnDef<HoldSummary>,
   { accessorKey: "created_for", header: "Created For" },
-  { accessorKey: "customer", header: "Customer" },
+  {
+    accessorKey: "customer",
+    header: "Customer",
+    cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
+  },
   createdAtColumn as ColumnDef<HoldSummary>,
   assetCountColumn as ColumnDef<HoldSummary>,
 ]
