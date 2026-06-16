@@ -7,7 +7,7 @@ import { memo, useMemo } from 'react'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
-const defaultSort = { id: 'stock_days', desc: false } as const
+const STOCK_DAYS_ASC_SORT = { id: 'stock_days', desc: false } as const
 const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
 
 function toAssetSummary(r: AssetSearchRow): AssetSummary {
@@ -35,6 +35,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave,
   columnVisibility,
   getRowHref,
+  defaultSort = STOCK_DAYS_ASC_SORT,
 }: {
   assets: AssetSearchRow[]
   rowSelection: RowSelectionState
@@ -42,6 +43,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave: () => void
   columnVisibility: VisibilityState
   getRowHref: (asset: AssetSearchRow) => string
+  defaultSort?: { id: string; desc: boolean }
 }) {
   const columns = useMemo(
     () => [createSelectColumn<AssetSearchRow>(), ...createAssetSearchColumns(getRowHref)],

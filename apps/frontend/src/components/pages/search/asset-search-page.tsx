@@ -18,6 +18,7 @@ export function AssetSearchPage({
   assets,
   isLoading,
   onBulkPriceSave,
+  defaultSort,
   children,
 }: {
   title: string
@@ -25,6 +26,7 @@ export function AssetSearchPage({
   assets: AssetSearchRow[]
   isLoading: boolean
   onBulkPriceSave: () => void
+  defaultSort?: { id: string; desc: boolean }
   children: React.ReactNode
 }): React.JSX.Element {
   const [searchParams] = useSearchParams()
@@ -79,6 +81,7 @@ export function AssetSearchPage({
             onBulkPriceSave={onBulkPriceSave}
             columnVisibility={columnVisibility}
             getRowHref={getRowHref}
+            defaultSort={defaultSort}
           />
         </div>
       </PageContent>

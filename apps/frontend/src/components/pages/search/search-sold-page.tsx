@@ -18,6 +18,7 @@ import type { AssetSearchRow } from 'shared-types'
 import { AssetSearchPage } from './asset-search-page'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
+const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true } as const
 
 export function SearchSoldPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -62,6 +63,7 @@ export function SearchSoldPage(): React.JSX.Element {
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
+      defaultSort={DEPARTED_AT_DESC_SORT}
     >
       <AssetFilterBar
         draft={draft}
