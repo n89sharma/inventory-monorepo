@@ -8,6 +8,7 @@ import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
+  archiveHold as archiveHoldSer,
   createHold as createHoldSer,
   getHold as getHoldSer,
   patchHoldAssets as patchHoldAssetsSer,
@@ -50,6 +51,11 @@ export const patchHoldMetadata = asyncHandler(async (req, res) => {
 export const patchHoldAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchHoldAssetsSer(req.params.holdNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const archiveHold = asyncHandler(async (req, res) => {
+  await archiveHoldSer(req.params.holdNumber, res.locals.dbUserId)
   res.status(204).send()
 })
 

@@ -1,6 +1,6 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
-import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
+import { DotsThreeVerticalIcon, DownloadSimpleIcon, LockSimpleOpenIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { type AssetSummary, type CollectionHistory, type ReportVariant } from "shared-types"
 import { toast } from "sonner"
@@ -27,6 +27,7 @@ type CollectionEditBarProps = {
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
+  onRelease?: () => void
 }
 
 export function CollectionEditBar({
@@ -37,6 +38,7 @@ export function CollectionEditBar({
   historyCacheKey,
   historyFetcher,
   onEdit,
+  onRelease,
 }: CollectionEditBarProps): React.JSX.Element {
 
   const canDelete = useCan('delete_collection')
@@ -67,6 +69,9 @@ export function CollectionEditBar({
 
   const exportDisabled = !barcodes || barcodes.length === 0 || exportLoading
 
+  const showRelease = canEdit && Boolean(onRelease)
+  const showDelete = !onRelease && canDelete
+
   return (
     <div className="flex gap-2">
       <ShareButton />
@@ -87,7 +92,7 @@ export function CollectionEditBar({
       {canEdit && (
         <Button onClick={onEdit}><PencilSimpleIcon />Edit</Button>
       )}
-      {canDelete && (
+      {(showRelease || showDelete) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -95,9 +100,16 @@ export function CollectionEditBar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-              <TrashIcon />Delete
-            </DropdownMenuItem>
+            {showRelease && (
+              <DropdownMenuItem variant="destructive" onSelect={onRelease}>
+                <LockSimpleOpenIcon />Release
+              </DropdownMenuItem>
+            )}
+            {showDelete && (
+              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                <TrashIcon />Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

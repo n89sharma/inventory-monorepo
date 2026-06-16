@@ -42,6 +42,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
     control: { open: boolean; onOpenChange: (open: boolean) => void },
   ) => React.ReactNode
   renderAddAssetBar?: (entity: TEntity) => React.ReactNode
+  onRelease?: () => void
 }
 
 export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>({
@@ -62,6 +63,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderSubtitle,
   renderMetadataModal,
   renderAddAssetBar,
+  onRelease,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state } = useLocation()
   const hasPermission = useCan(permission)
@@ -106,6 +108,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             historyCacheKey={historyCacheKey}
             historyFetcher={historyFetcher}
             onEdit={() => setIsMetadataModalOpen(true)}
+            onRelease={onRelease}
           />
         }
         subtitle={

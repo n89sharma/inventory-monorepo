@@ -8,6 +8,7 @@ select
 	h.created_at as created_at,
 	h.from_dt as from_dt,
 	h.to_dt as to_dt,
+	h.archived_at as archived_at,
   ac.asset_count as asset_count,
   ac.copier_count as copier_count,
   ac.finisher_count as finisher_count,
@@ -34,5 +35,6 @@ left join lateral (
 where h.created_at between $1 and $2
 and ($3 = 0 or ub.id = $3)
 and ($4 = 0 or uf.id = $4)
+and h.archived_at is null
 order by h.created_at desc
 limit 500

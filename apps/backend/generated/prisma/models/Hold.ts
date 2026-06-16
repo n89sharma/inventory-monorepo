@@ -50,6 +50,7 @@ export type HoldMinAggregateOutputType = {
   created_at: Date | null
   from_dt: Date | null
   to_dt: Date | null
+  archived_at: Date | null
 }
 
 export type HoldMaxAggregateOutputType = {
@@ -62,6 +63,7 @@ export type HoldMaxAggregateOutputType = {
   created_at: Date | null
   from_dt: Date | null
   to_dt: Date | null
+  archived_at: Date | null
 }
 
 export type HoldCountAggregateOutputType = {
@@ -74,6 +76,7 @@ export type HoldCountAggregateOutputType = {
   created_at: number
   from_dt: number
   to_dt: number
+  archived_at: number
   _all: number
 }
 
@@ -102,6 +105,7 @@ export type HoldMinAggregateInputType = {
   created_at?: true
   from_dt?: true
   to_dt?: true
+  archived_at?: true
 }
 
 export type HoldMaxAggregateInputType = {
@@ -114,6 +118,7 @@ export type HoldMaxAggregateInputType = {
   created_at?: true
   from_dt?: true
   to_dt?: true
+  archived_at?: true
 }
 
 export type HoldCountAggregateInputType = {
@@ -126,6 +131,7 @@ export type HoldCountAggregateInputType = {
   created_at?: true
   from_dt?: true
   to_dt?: true
+  archived_at?: true
   _all?: true
 }
 
@@ -225,6 +231,7 @@ export type HoldGroupByOutputType = {
   created_at: Date
   from_dt: Date | null
   to_dt: Date | null
+  archived_at: Date | null
   _count: HoldCountAggregateOutputType | null
   _avg: HoldAvgAggregateOutputType | null
   _sum: HoldSumAggregateOutputType | null
@@ -260,6 +267,7 @@ export type HoldWhereInput = {
   created_at?: Prisma.DateTimeFilter<"Hold"> | Date | string
   from_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   assets?: Prisma.AssetListRelationFilter
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   created_for?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -276,6 +284,7 @@ export type HoldOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   from_dt?: Prisma.SortOrderInput | Prisma.SortOrder
   to_dt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived_at?: Prisma.SortOrderInput | Prisma.SortOrder
   assets?: Prisma.AssetOrderByRelationAggregateInput
   created_by?: Prisma.UserOrderByWithRelationInput
   created_for?: Prisma.UserOrderByWithRelationInput
@@ -295,6 +304,7 @@ export type HoldWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Hold"> | Date | string
   from_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   assets?: Prisma.AssetListRelationFilter
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   created_for?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -311,6 +321,7 @@ export type HoldOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrder
   from_dt?: Prisma.SortOrderInput | Prisma.SortOrder
   to_dt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.HoldCountOrderByAggregateInput
   _avg?: Prisma.HoldAvgOrderByAggregateInput
   _max?: Prisma.HoldMaxOrderByAggregateInput
@@ -331,6 +342,7 @@ export type HoldScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Hold"> | Date | string
   from_dt?: Prisma.DateTimeNullableWithAggregatesFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableWithAggregatesFilter<"Hold"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Hold"> | Date | string | null
 }
 
 export type HoldCreateInput = {
@@ -339,6 +351,7 @@ export type HoldCreateInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
@@ -355,6 +368,7 @@ export type HoldUncheckedCreateInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutHoldInput
 }
 
@@ -364,6 +378,7 @@ export type HoldUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
@@ -380,6 +395,7 @@ export type HoldUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutHoldNestedInput
 }
 
@@ -393,6 +409,7 @@ export type HoldCreateManyInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
 }
 
 export type HoldUpdateManyMutationInput = {
@@ -401,6 +418,7 @@ export type HoldUpdateManyMutationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HoldUncheckedUpdateManyInput = {
@@ -413,6 +431,7 @@ export type HoldUncheckedUpdateManyInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HoldNullableScalarRelationFilter = {
@@ -430,6 +449,7 @@ export type HoldCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   from_dt?: Prisma.SortOrder
   to_dt?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
 }
 
 export type HoldAvgOrderByAggregateInput = {
@@ -449,6 +469,7 @@ export type HoldMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   from_dt?: Prisma.SortOrder
   to_dt?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
 }
 
 export type HoldMinOrderByAggregateInput = {
@@ -461,6 +482,7 @@ export type HoldMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   from_dt?: Prisma.SortOrder
   to_dt?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
 }
 
 export type HoldSumOrderByAggregateInput = {
@@ -628,6 +650,7 @@ export type HoldCreateWithoutAssetsInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
@@ -643,6 +666,7 @@ export type HoldUncheckedCreateWithoutAssetsInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
 }
 
 export type HoldCreateOrConnectWithoutAssetsInput = {
@@ -667,6 +691,7 @@ export type HoldUpdateWithoutAssetsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
@@ -682,6 +707,7 @@ export type HoldUncheckedUpdateWithoutAssetsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HoldCreateWithoutCreated_byInput = {
@@ -690,6 +716,7 @@ export type HoldCreateWithoutCreated_byInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
@@ -704,6 +731,7 @@ export type HoldUncheckedCreateWithoutCreated_byInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutHoldInput
 }
 
@@ -723,6 +751,7 @@ export type HoldCreateWithoutCreated_forInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
@@ -737,6 +766,7 @@ export type HoldUncheckedCreateWithoutCreated_forInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutHoldInput
 }
 
@@ -779,6 +809,7 @@ export type HoldScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"Hold"> | Date | string
   from_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
 }
 
 export type HoldUpsertWithWhereUniqueWithoutCreated_forInput = {
@@ -803,6 +834,7 @@ export type HoldCreateWithoutCustomerInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
@@ -817,6 +849,7 @@ export type HoldUncheckedCreateWithoutCustomerInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutHoldInput
 }
 
@@ -855,6 +888,7 @@ export type HoldCreateManyCreated_byInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
 }
 
 export type HoldCreateManyCreated_forInput = {
@@ -866,6 +900,7 @@ export type HoldCreateManyCreated_forInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
 }
 
 export type HoldUpdateWithoutCreated_byInput = {
@@ -874,6 +909,7 @@ export type HoldUpdateWithoutCreated_byInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
@@ -888,6 +924,7 @@ export type HoldUncheckedUpdateWithoutCreated_byInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutHoldNestedInput
 }
 
@@ -900,6 +937,7 @@ export type HoldUncheckedUpdateManyWithoutCreated_byInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HoldUpdateWithoutCreated_forInput = {
@@ -908,6 +946,7 @@ export type HoldUpdateWithoutCreated_forInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
@@ -922,6 +961,7 @@ export type HoldUncheckedUpdateWithoutCreated_forInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutHoldNestedInput
 }
 
@@ -934,6 +974,7 @@ export type HoldUncheckedUpdateManyWithoutCreated_forInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type HoldCreateManyCustomerInput = {
@@ -945,6 +986,7 @@ export type HoldCreateManyCustomerInput = {
   created_at: Date | string
   from_dt?: Date | string | null
   to_dt?: Date | string | null
+  archived_at?: Date | string | null
 }
 
 export type HoldUpdateWithoutCustomerInput = {
@@ -953,6 +995,7 @@ export type HoldUpdateWithoutCustomerInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
@@ -967,6 +1010,7 @@ export type HoldUncheckedUpdateWithoutCustomerInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutHoldNestedInput
 }
 
@@ -979,6 +1023,7 @@ export type HoldUncheckedUpdateManyWithoutCustomerInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1022,6 +1067,7 @@ export type HoldSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   created_at?: boolean
   from_dt?: boolean
   to_dt?: boolean
+  archived_at?: boolean
   assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   created_for?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1039,6 +1085,7 @@ export type HoldSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   created_at?: boolean
   from_dt?: boolean
   to_dt?: boolean
+  archived_at?: boolean
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   created_for?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1054,6 +1101,7 @@ export type HoldSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   created_at?: boolean
   from_dt?: boolean
   to_dt?: boolean
+  archived_at?: boolean
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   created_for?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1069,9 +1117,10 @@ export type HoldSelectScalar = {
   created_at?: boolean
   from_dt?: boolean
   to_dt?: boolean
+  archived_at?: boolean
 }
 
-export type HoldOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "hold_number" | "created_by_id" | "created_for_id" | "customer_id" | "notes" | "created_at" | "from_dt" | "to_dt", ExtArgs["result"]["hold"]>
+export type HoldOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "hold_number" | "created_by_id" | "created_for_id" | "customer_id" | "notes" | "created_at" | "from_dt" | "to_dt" | "archived_at", ExtArgs["result"]["hold"]>
 export type HoldInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1108,6 +1157,7 @@ export type $HoldPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     created_at: Date
     from_dt: Date | null
     to_dt: Date | null
+    archived_at: Date | null
   }, ExtArgs["result"]["hold"]>
   composites: {}
 }
@@ -1544,6 +1594,7 @@ export interface HoldFieldRefs {
   readonly created_at: Prisma.FieldRef<"Hold", 'DateTime'>
   readonly from_dt: Prisma.FieldRef<"Hold", 'DateTime'>
   readonly to_dt: Prisma.FieldRef<"Hold", 'DateTime'>
+  readonly archived_at: Prisma.FieldRef<"Hold", 'DateTime'>
 }
     
 

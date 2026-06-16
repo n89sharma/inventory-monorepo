@@ -261,7 +261,8 @@ export const HoldScalarFieldEnum = {
   notes: 'notes',
   created_at: 'created_at',
   from_dt: 'from_dt',
-  to_dt: 'to_dt'
+  to_dt: 'to_dt',
+  archived_at: 'archived_at'
 } as const
 
 export type HoldScalarFieldEnum = (typeof HoldScalarFieldEnum)[keyof typeof HoldScalarFieldEnum]

@@ -41,6 +41,10 @@ export async function getHoldDetail(holdNumber: string): Promise<HoldDetail> {
   return HoldDetailSchema.parse(data)
 }
 
+export async function archiveHold(holdNumber: string): Promise<void> {
+  await api.patch(`/holds/${holdNumber}/archive`)
+}
+
 export async function getHoldHistory(holdNumber: string): Promise<CollectionHistory> {
   const { data } = await api.get<CollectionHistory>(`/holds/${holdNumber}/history`)
   return CollectionHistorySchema.parse(data)

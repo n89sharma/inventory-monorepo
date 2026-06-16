@@ -656,6 +656,21 @@ export async function recordHoldUpdate(
   }
 }
 
+export async function recordHoldArchive(
+  holdId: number,
+  archivedAt: Date,
+  userId: number
+): Promise<void> {
+  try {
+    await recordHistory('Hold', holdId, 'UPDATE', userId, {
+      before: { archived_at: null },
+      after: { archived_at: archivedAt }
+    })
+  } catch (error) {
+    logger.error(`History write failed [ARCHIVE Hold ${holdId}]`, { error })
+  }
+}
+
 // ─── Invoice ──────────────────────────────────────────────────────────────────
 
 export async function recordInvoiceCreate(

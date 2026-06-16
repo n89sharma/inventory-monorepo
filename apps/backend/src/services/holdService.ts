@@ -4,7 +4,7 @@ import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from './assetService.js'
-import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordHoldCreate, recordHoldUpdate } from './historyService.js'
+import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordHoldArchive, recordHoldCreate, recordHoldUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
 
@@ -88,9 +88,10 @@ export async function patchHoldMetadata(
 ): Promise<void> {
   const current = await prisma.hold.findUnique({
     where: { hold_number: holdNumber },
-    select: { id: true, created_for_id: true, customer_id: true, notes: true }
+    select: { id: true, created_for_id: true, customer_id: true, notes: true, archived_at: true }
   })
   if (!current) throw new NotFoundError(`Hold ${holdNumber} not found`)
+  if (current.archived_at) throw new ConflictError('Cannot edit an archived hold')
 
   await prisma.hold.update({
     where: { id: current.id },
@@ -118,9 +119,10 @@ export async function patchHoldAssets(
   const [heldStatus, inStockStatus, hold] = await Promise.all([
     prisma.status.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
     prisma.status.findUniqueOrThrow({ where: { status: 'IN_STOCK' }, select: { id: true } }),
-    prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true } })
+    prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true, archived_at: true } })
   ])
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
+  if (hold.archived_at) throw new ConflictError('Cannot edit an archived hold')
 
   await prisma.$transaction(async (tx) => {
     await applyHoldAssetDelta(
@@ -232,6 +234,48 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
     created_at: hold.created_at,
     from_dt: hold.from_dt,
     to_dt: hold.to_dt,
+    archived_at: hold.archived_at,
     assets: assets.map(mapAssetSummary)
+  }
+}
+
+export async function archiveHold(holdNumber: string, userId: number): Promise<void> {
+  const inStockStatus = await prisma.status.findUniqueOrThrow({
+    where: { status: 'IN_STOCK' },
+    select: { id: true }
+  })
+
+  const now = new Date()
+
+  const { holdId, releasedAssetIds } = await prisma.$transaction(async (tx) => {
+    const hold = await tx.hold.findUnique({
+      where: { hold_number: holdNumber },
+      select: { id: true, archived_at: true }
+    })
+    if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
+    if (hold.archived_at) throw new ConflictError('Hold is already archived')
+
+    const heldAssets = await tx.asset.findMany({
+      where: { hold_id: hold.id },
+      select: { id: true }
+    })
+    const releasedAssetIds = heldAssets.map(a => a.id)
+
+    await tx.hold.update({
+      where: { id: hold.id },
+      data: { archived_at: now }
+    })
+
+    if (releasedAssetIds.length > 0) {
+      await applyHoldAssetDelta(tx, hold.id, [], releasedAssetIds, 0, inStockStatus.id)
+    }
+
+    return { holdId: hold.id, releasedAssetIds }
+  })
+
+  await recordHoldArchive(holdId, now, userId)
+  if (releasedAssetIds.length > 0) {
+    await recordCollectionUpdateOnAssets(releasedAssetIds, [], 'hold_id', holdId, userId)
+    await recordAssetUpdateOnCollection('Hold', holdId, [], releasedAssetIds, userId)
   }
 }

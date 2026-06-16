@@ -10,7 +10,8 @@ export const HoldSummarySchema = CollectionSummarySchema.extend({
   customer: z.string(),
   notes: z.string().nullable(),
   from_dt: z.coerce.date().nullable(),
-  to_dt: z.coerce.date().nullable()
+  to_dt: z.coerce.date().nullable(),
+  archived_at: z.coerce.date().nullable()
 })
 export type HoldSummary = z.infer<typeof HoldSummarySchema>;
 
@@ -24,6 +25,7 @@ export const HoldDetailSchema = z.object({
   created_at: z.coerce.date(),
   from_dt: z.coerce.date().nullable(),
   to_dt: z.coerce.date().nullable(),
+  archived_at: z.coerce.date().nullable(),
   assets: z.array(AssetSummarySchema)
 })
 export type HoldDetail = z.infer<typeof HoldDetailSchema>

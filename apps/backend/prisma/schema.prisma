@@ -232,6 +232,7 @@ model Hold {
   created_at     DateTime
   from_dt        DateTime?
   to_dt          DateTime?
+  archived_at    DateTime?
   assets         Asset[]
   created_by     User         @relation("HoldCreatedBy", fields: [created_by_id], references: [id])
   created_for    User         @relation("HoldCreatedFor", fields: [created_for_id], references: [id])
@@ -243,6 +244,7 @@ model Hold {
   @@index([customer_id])
   @@index([from_dt])
   @@index([to_dt])
+  @@index([archived_at])
 }
 
 model Invoice {

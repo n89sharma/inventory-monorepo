@@ -1,4 +1,4 @@
-import { createHold, getHoldDetail, patchHoldAssets, updateHoldMetadata } from '@/data/api/hold-api'
+import { archiveHold, createHold, getHoldDetail, patchHoldAssets, updateHoldMetadata } from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { holdDetailKey, invalidateHoldLists } from '@/hooks/use-hold'
 import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
@@ -57,6 +57,14 @@ async function updateMetadata(holdNumber: string, metadata: HoldMetadataForm) {
   invalidateHoldLists()
 }
 
+async function archive(holdNumber: string) {
+  const releasedBarcodes = (await getHoldDetail(holdNumber)).assets.map(a => a.barcode)
+  await archiveHold(holdNumber)
+  mutate(holdDetailKey(holdNumber))
+  invalidateAssetDetails(releasedBarcodes)
+  invalidateHoldLists()
+}
+
 function removeAsset(holdNumber: string, asset: AssetSummary) {
   scheduleAssetRemoval({
     collectionId: holdNumber,
@@ -81,6 +89,7 @@ const mutations = {
   addAssets,
   addAsset,
   updateMetadata,
+  archive,
   removeAsset,
   bulkRemoveAssets,
   flushPending: flushPendingRemovals,
