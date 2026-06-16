@@ -21,6 +21,7 @@ export type Permission =
   | 'create_update_departure'
   | 'create_update_invoice'
   | 'delete_collection'
+  | 'edit_any_hold'
 
 export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   admin: [
@@ -44,6 +45,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_departure',
     'create_update_invoice',
     'delete_collection',
+    'edit_any_hold',
   ],
   general_manager: [
     'view_asset',
@@ -61,6 +63,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_transfer',
     'create_update_departure',
     'create_update_invoice',
+    'edit_any_hold',
   ],
   inventory_manager: [
     'manage_settings',

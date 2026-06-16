@@ -22,6 +22,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   titleLabel: string
   collectionId: string
   permission: Permission
+  canEditEntity?: boolean
   detail: {
     data: TEntity | undefined
     error: Error | undefined
@@ -48,6 +49,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   titleLabel,
   collectionId,
   permission,
+  canEditEntity,
   detail,
   notFoundLabel,
   refreshKey,
@@ -62,7 +64,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderAddAssetBar,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state } = useLocation()
-  const canEdit = useCan(permission)
+  const hasPermission = useCan(permission)
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -86,6 +88,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   if (!detail.data) return <div>{notFoundLabel}</div>
 
   const entity = detail.data
+  const canEdit = hasPermission && (canEditEntity ?? true)
   const selectedAssets = entity.assets.filter(a => rowSelection[a.barcode])
 
   return (
@@ -98,6 +101,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           <CollectionEditBar
             section={section}
             collectionId={collectionId}
+            canEdit={canEdit}
             assets={entity.assets}
             historyCacheKey={historyCacheKey}
             historyFetcher={historyFetcher}
@@ -119,18 +123,20 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           onOpenChange: setIsMetadataModalOpen,
         })}
         {canEdit && renderAddAssetBar?.(entity)}
-        <BulkEditBar
-          selectedAssets={selectedAssets}
-          onClear={() => setRowSelection({})}
-          refreshKey={refreshKey}
-          currentCollectionType={section}
-          returnTo={`/${section}/${collectionId}`}
-          onBulkRemove={onBulkRemove}
-          totalCount={entity.assets.length}
-          onSelectAll={() =>
-            setRowSelection(Object.fromEntries(entity.assets.map(a => [a.barcode, true])))
-          }
-        />
+        {canEdit && (
+          <BulkEditBar
+            selectedAssets={selectedAssets}
+            onClear={() => setRowSelection({})}
+            refreshKey={refreshKey}
+            currentCollectionType={section}
+            returnTo={`/${section}/${collectionId}`}
+            onBulkRemove={onBulkRemove}
+            totalCount={entity.assets.length}
+            onSelectAll={() =>
+              setRowSelection(Object.fromEntries(entity.assets.map(a => [a.barcode, true])))
+            }
+          />
+        )}
         <DataTable
           columns={columns}
           data={entity.assets}

@@ -2,7 +2,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
 import { DotsThreeVerticalIcon, DownloadSimpleIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
-import { type AssetSummary, type CollectionHistory, type Permission, type ReportVariant } from "shared-types"
+import { type AssetSummary, type CollectionHistory, type ReportVariant } from "shared-types"
 import { toast } from "sonner"
 import { AlertDialogDescription } from "../shadcn/alert-dialog"
 import { Button } from "../shadcn/button"
@@ -12,16 +12,17 @@ import { DeleteEntityDialog } from "./delete-entity-dialog"
 import { ShareButton } from "./share-button"
 
 const SECTION_CONFIG = {
-  arrivals: { permission: 'create_update_arrival', reportVariant: 'arrival_report' },
-  transfers: { permission: 'create_update_transfer', reportVariant: 'transfer_report' },
-  departures: { permission: 'create_update_departure', reportVariant: 'departure_report' },
-  holds: { permission: 'create_update_hold', reportVariant: 'hold_report' },
-  invoices: { permission: 'create_update_invoice', reportVariant: 'invoice_report' },
-} as const satisfies Record<string, { permission: Permission; reportVariant: ReportVariant }>
+  arrivals: { reportVariant: 'arrival_report' },
+  transfers: { reportVariant: 'transfer_report' },
+  departures: { reportVariant: 'departure_report' },
+  holds: { reportVariant: 'hold_report' },
+  invoices: { reportVariant: 'invoice_report' },
+} as const satisfies Record<string, { reportVariant: ReportVariant }>
 
 type CollectionEditBarProps = {
   section: keyof typeof SECTION_CONFIG
   collectionId: string
+  canEdit: boolean
   assets?: AssetSummary[]
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
@@ -31,13 +32,13 @@ type CollectionEditBarProps = {
 export function CollectionEditBar({
   section,
   collectionId,
+  canEdit,
   assets,
   historyCacheKey,
   historyFetcher,
   onEdit,
 }: CollectionEditBarProps): React.JSX.Element {
 
-  const canEdit = useCan(SECTION_CONFIG[section].permission)
   const canDelete = useCan('delete_collection')
 
   const exportAssets = useAssetStore(state => state.exportAssets)

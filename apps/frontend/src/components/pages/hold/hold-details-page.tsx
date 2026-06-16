@@ -4,6 +4,8 @@ import { getHoldHistory } from '@/data/api/hold-api'
 import { formatDate } from '@/lib/formatters'
 import { holdDetailKey, useHoldDetail } from '@/hooks/use-hold'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
+import { useCan } from '@/hooks/use-can'
+import { useAuth } from '@clerk/react'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
@@ -18,11 +20,21 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   const mutations = useHoldMutations()
   const detail = useHoldDetail(holdNumber)
+  const { userId: clerkUserId } = useAuth()
+  const canEditAny = useCan('edit_any_hold')
+
+  const canEditHold = detail.data
+    ? canEditAny ||
+      (clerkUserId != null && detail.data.created_by.clerk_id === clerkUserId)
+    : false
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(assetHref, asset => mutations.removeAsset(holdNumber, asset)),
-    [mutations, holdNumber],
+      createAssetSummaryColumns(
+        assetHref,
+        canEditHold ? asset => mutations.removeAsset(holdNumber, asset) : undefined,
+      ),
+    [mutations, holdNumber, canEditHold],
   )
 
   return (
@@ -31,6 +43,7 @@ export function HoldDetailsPage(): React.JSX.Element {
       titleLabel="Hold"
       collectionId={holdNumber}
       permission="create_update_hold"
+      canEditEntity={canEditHold}
       detail={detail}
       notFoundLabel="Hold not found"
       refreshKey={holdDetailKey(holdNumber)}

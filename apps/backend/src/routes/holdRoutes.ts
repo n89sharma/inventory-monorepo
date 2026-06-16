@@ -1,6 +1,7 @@
 import express from 'express'
 import { createHold, getHoldDetail, getHoldHistory, getHolds, HoldQuerySchema, patchHoldAssets, patchHoldMetadata } from '../controllers/holdController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
+import { requireHoldOwnership } from '../middleware/requireHoldOwnership.js'
 import { requirePermission } from '../middleware/requirePermission.js'
 import { validateQuery } from '../middleware/validation.js'
 
@@ -12,7 +13,7 @@ router.get('/',                    requirePermission('view_collections'),     va
 router.post('/',                   requirePermission('create_update_hold'),   createHold)
 router.get('/:holdNumber/history', requirePermission('view_collections'),     getHoldHistory)
 router.get('/:holdNumber',         requirePermission('view_collections'),     getHoldDetail)
-router.patch('/:holdNumber/assets',requirePermission('create_update_hold'),   patchHoldAssets)
-router.patch('/:holdNumber/metadata',requirePermission('create_update_hold'), patchHoldMetadata)
+router.patch('/:holdNumber/assets',requirePermission('create_update_hold'),   requireHoldOwnership, patchHoldAssets)
+router.patch('/:holdNumber/metadata',requirePermission('create_update_hold'), requireHoldOwnership, patchHoldMetadata)
 
 export default router
