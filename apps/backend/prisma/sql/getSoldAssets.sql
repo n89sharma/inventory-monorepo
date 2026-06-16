@@ -3,6 +3,16 @@
 -- so the Departure.created_at btree is used, instead of seq-scanning every Asset.
 -- The bounds are timestamps (startOfDay/endOfDay applied in the service), NOT ::date casts:
 -- casting the column would defeat the index. Same calendar-day semantics, sargable.
+--
+-- The date window is fenced in a MATERIALIZED CTE: an optimization barrier that forces the
+-- planner to range-scan Departure_created_at_idx first, rather than reordering this ~22-table
+-- join into a plan that builds the full status/asset_type asset set and probes Departure by PK.
+with d as materialized (
+  select id, created_at, destination_id
+  from "Departure"
+  where created_at >= $1
+    and created_at <= $2
+)
 select
   a.id,
   b."name" as brand,
@@ -42,7 +52,7 @@ select
   lc.comment as latest_comment,
   lc.created_at as latest_comment_at,
   lcu."name" as latest_comment_by
-from "Departure" d
+from d
   join "Asset" a on a.departure_id = d.id
   join "TechnicalSpecification" t on t.asset_id = a.id
   left join "Component" cmp on cmp.id = t.component_id
@@ -72,9 +82,7 @@ from "Departure" d
     limit 1
   ) lc on true
   left join "User" lcu on lcu.id = lc.created_by_id
-where d.created_at >= $1
-  and d.created_at <= $2
-  and ($3 = '' or m."name" ilike '%' || $3 || '%')
+where ($3 = '' or m."name" ilike '%' || $3 || '%')
   and (array_length($4::int[], 1) is null or s.id = any($4::int[]))
   and (array_length($5::int[], 1) is null or rd.id = any($5::int[]))
   and (array_length($6::int[], 1) is null or w.id = any($6::int[]))
