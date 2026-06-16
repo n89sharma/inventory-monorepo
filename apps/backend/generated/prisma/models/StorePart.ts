@@ -28,86 +28,56 @@ export type AggregateStorePart = {
 
 export type StorePartAvgAggregateOutputType = {
   id: number | null
-  dealer_price: runtime.Decimal | null
-  sale_price: runtime.Decimal | null
-  cost: runtime.Decimal | null
 }
 
 export type StorePartSumAggregateOutputType = {
   id: number | null
-  dealer_price: runtime.Decimal | null
-  sale_price: runtime.Decimal | null
-  cost: runtime.Decimal | null
 }
 
 export type StorePartMinAggregateOutputType = {
   id: number | null
   part_number: string | null
   description: string | null
-  dealer_price: runtime.Decimal | null
-  sale_price: runtime.Decimal | null
-  cost: runtime.Decimal | null
 }
 
 export type StorePartMaxAggregateOutputType = {
   id: number | null
   part_number: string | null
   description: string | null
-  dealer_price: runtime.Decimal | null
-  sale_price: runtime.Decimal | null
-  cost: runtime.Decimal | null
 }
 
 export type StorePartCountAggregateOutputType = {
   id: number
   part_number: number
   description: number
-  dealer_price: number
-  sale_price: number
-  cost: number
   _all: number
 }
 
 
 export type StorePartAvgAggregateInputType = {
   id?: true
-  dealer_price?: true
-  sale_price?: true
-  cost?: true
 }
 
 export type StorePartSumAggregateInputType = {
   id?: true
-  dealer_price?: true
-  sale_price?: true
-  cost?: true
 }
 
 export type StorePartMinAggregateInputType = {
   id?: true
   part_number?: true
   description?: true
-  dealer_price?: true
-  sale_price?: true
-  cost?: true
 }
 
 export type StorePartMaxAggregateInputType = {
   id?: true
   part_number?: true
   description?: true
-  dealer_price?: true
-  sale_price?: true
-  cost?: true
 }
 
 export type StorePartCountAggregateInputType = {
   id?: true
   part_number?: true
   description?: true
-  dealer_price?: true
-  sale_price?: true
-  cost?: true
   _all?: true
 }
 
@@ -201,9 +171,6 @@ export type StorePartGroupByOutputType = {
   id: number
   part_number: string
   description: string
-  dealer_price: runtime.Decimal
-  sale_price: runtime.Decimal
-  cost: runtime.Decimal
   _count: StorePartCountAggregateOutputType | null
   _avg: StorePartAvgAggregateOutputType | null
   _sum: StorePartSumAggregateOutputType | null
@@ -233,18 +200,16 @@ export type StorePartWhereInput = {
   id?: Prisma.IntFilter<"StorePart"> | number
   part_number?: Prisma.StringFilter<"StorePart"> | string
   description?: Prisma.StringFilter<"StorePart"> | string
-  dealer_price?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
+  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
 }
 
 export type StorePartOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   part_number?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
+  AssetStorePart?: Prisma.AssetStorePartOrderByRelationAggregateInput
+  StoreTransaction?: Prisma.StoreTransactionOrderByRelationAggregateInput
 }
 
 export type StorePartWhereUniqueInput = Prisma.AtLeast<{
@@ -254,18 +219,14 @@ export type StorePartWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.StorePartWhereInput[]
   NOT?: Prisma.StorePartWhereInput | Prisma.StorePartWhereInput[]
   description?: Prisma.StringFilter<"StorePart"> | string
-  dealer_price?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
+  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
 }, "id" | "part_number">
 
 export type StorePartOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   part_number?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
   _count?: Prisma.StorePartCountOrderByAggregateInput
   _avg?: Prisma.StorePartAvgOrderByAggregateInput
   _max?: Prisma.StorePartMaxOrderByAggregateInput
@@ -280,170 +241,284 @@ export type StorePartScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"StorePart"> | number
   part_number?: Prisma.StringWithAggregatesFilter<"StorePart"> | string
   description?: Prisma.StringWithAggregatesFilter<"StorePart"> | string
-  dealer_price?: Prisma.DecimalWithAggregatesFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalWithAggregatesFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalWithAggregatesFilter<"StorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type StorePartCreateInput = {
   part_number: string
   description: string
-  dealer_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStorePartInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutStorePartInput
 }
 
 export type StorePartUncheckedCreateInput = {
   id?: number
   part_number: string
   description: string
-  dealer_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStorePartInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutStorePartInput
 }
 
 export type StorePartUpdateInput = {
   part_number?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  dealer_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStorePartNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutStorePartNestedInput
 }
 
 export type StorePartUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   part_number?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  dealer_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStorePartNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutStorePartNestedInput
 }
 
 export type StorePartCreateManyInput = {
   id?: number
   part_number: string
   description: string
-  dealer_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type StorePartUpdateManyMutationInput = {
   part_number?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  dealer_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type StorePartUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   part_number?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  dealer_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  sale_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type StorePartCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   part_number?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
 }
 
 export type StorePartAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
 }
 
 export type StorePartMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   part_number?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
 }
 
 export type StorePartMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   part_number?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
 }
 
 export type StorePartSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  dealer_price?: Prisma.SortOrder
-  sale_price?: Prisma.SortOrder
-  cost?: Prisma.SortOrder
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+export type StorePartScalarRelationFilter = {
+  is?: Prisma.StorePartWhereInput
+  isNot?: Prisma.StorePartWhereInput
 }
 
+export type StorePartCreateNestedOneWithoutAssetStorePartInput = {
+  create?: Prisma.XOR<Prisma.StorePartCreateWithoutAssetStorePartInput, Prisma.StorePartUncheckedCreateWithoutAssetStorePartInput>
+  connectOrCreate?: Prisma.StorePartCreateOrConnectWithoutAssetStorePartInput
+  connect?: Prisma.StorePartWhereUniqueInput
+}
+
+export type StorePartUpdateOneRequiredWithoutAssetStorePartNestedInput = {
+  create?: Prisma.XOR<Prisma.StorePartCreateWithoutAssetStorePartInput, Prisma.StorePartUncheckedCreateWithoutAssetStorePartInput>
+  connectOrCreate?: Prisma.StorePartCreateOrConnectWithoutAssetStorePartInput
+  upsert?: Prisma.StorePartUpsertWithoutAssetStorePartInput
+  connect?: Prisma.StorePartWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StorePartUpdateToOneWithWhereWithoutAssetStorePartInput, Prisma.StorePartUpdateWithoutAssetStorePartInput>, Prisma.StorePartUncheckedUpdateWithoutAssetStorePartInput>
+}
+
+export type StorePartCreateNestedOneWithoutStoreTransactionInput = {
+  create?: Prisma.XOR<Prisma.StorePartCreateWithoutStoreTransactionInput, Prisma.StorePartUncheckedCreateWithoutStoreTransactionInput>
+  connectOrCreate?: Prisma.StorePartCreateOrConnectWithoutStoreTransactionInput
+  connect?: Prisma.StorePartWhereUniqueInput
+}
+
+export type StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput = {
+  create?: Prisma.XOR<Prisma.StorePartCreateWithoutStoreTransactionInput, Prisma.StorePartUncheckedCreateWithoutStoreTransactionInput>
+  connectOrCreate?: Prisma.StorePartCreateOrConnectWithoutStoreTransactionInput
+  upsert?: Prisma.StorePartUpsertWithoutStoreTransactionInput
+  connect?: Prisma.StorePartWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StorePartUpdateToOneWithWhereWithoutStoreTransactionInput, Prisma.StorePartUpdateWithoutStoreTransactionInput>, Prisma.StorePartUncheckedUpdateWithoutStoreTransactionInput>
+}
+
+export type StorePartCreateWithoutAssetStorePartInput = {
+  part_number: string
+  description: string
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutStorePartInput
+}
+
+export type StorePartUncheckedCreateWithoutAssetStorePartInput = {
+  id?: number
+  part_number: string
+  description: string
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutStorePartInput
+}
+
+export type StorePartCreateOrConnectWithoutAssetStorePartInput = {
+  where: Prisma.StorePartWhereUniqueInput
+  create: Prisma.XOR<Prisma.StorePartCreateWithoutAssetStorePartInput, Prisma.StorePartUncheckedCreateWithoutAssetStorePartInput>
+}
+
+export type StorePartUpsertWithoutAssetStorePartInput = {
+  update: Prisma.XOR<Prisma.StorePartUpdateWithoutAssetStorePartInput, Prisma.StorePartUncheckedUpdateWithoutAssetStorePartInput>
+  create: Prisma.XOR<Prisma.StorePartCreateWithoutAssetStorePartInput, Prisma.StorePartUncheckedCreateWithoutAssetStorePartInput>
+  where?: Prisma.StorePartWhereInput
+}
+
+export type StorePartUpdateToOneWithWhereWithoutAssetStorePartInput = {
+  where?: Prisma.StorePartWhereInput
+  data: Prisma.XOR<Prisma.StorePartUpdateWithoutAssetStorePartInput, Prisma.StorePartUncheckedUpdateWithoutAssetStorePartInput>
+}
+
+export type StorePartUpdateWithoutAssetStorePartInput = {
+  part_number?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutStorePartNestedInput
+}
+
+export type StorePartUncheckedUpdateWithoutAssetStorePartInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  part_number?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutStorePartNestedInput
+}
+
+export type StorePartCreateWithoutStoreTransactionInput = {
+  part_number: string
+  description: string
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStorePartInput
+}
+
+export type StorePartUncheckedCreateWithoutStoreTransactionInput = {
+  id?: number
+  part_number: string
+  description: string
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStorePartInput
+}
+
+export type StorePartCreateOrConnectWithoutStoreTransactionInput = {
+  where: Prisma.StorePartWhereUniqueInput
+  create: Prisma.XOR<Prisma.StorePartCreateWithoutStoreTransactionInput, Prisma.StorePartUncheckedCreateWithoutStoreTransactionInput>
+}
+
+export type StorePartUpsertWithoutStoreTransactionInput = {
+  update: Prisma.XOR<Prisma.StorePartUpdateWithoutStoreTransactionInput, Prisma.StorePartUncheckedUpdateWithoutStoreTransactionInput>
+  create: Prisma.XOR<Prisma.StorePartCreateWithoutStoreTransactionInput, Prisma.StorePartUncheckedCreateWithoutStoreTransactionInput>
+  where?: Prisma.StorePartWhereInput
+}
+
+export type StorePartUpdateToOneWithWhereWithoutStoreTransactionInput = {
+  where?: Prisma.StorePartWhereInput
+  data: Prisma.XOR<Prisma.StorePartUpdateWithoutStoreTransactionInput, Prisma.StorePartUncheckedUpdateWithoutStoreTransactionInput>
+}
+
+export type StorePartUpdateWithoutStoreTransactionInput = {
+  part_number?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStorePartNestedInput
+}
+
+export type StorePartUncheckedUpdateWithoutStoreTransactionInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  part_number?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStorePartNestedInput
+}
+
+
+/**
+ * Count Type StorePartCountOutputType
+ */
+
+export type StorePartCountOutputType = {
+  AssetStorePart: number
+  StoreTransaction: number
+}
+
+export type StorePartCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  AssetStorePart?: boolean | StorePartCountOutputTypeCountAssetStorePartArgs
+  StoreTransaction?: boolean | StorePartCountOutputTypeCountStoreTransactionArgs
+}
+
+/**
+ * StorePartCountOutputType without action
+ */
+export type StorePartCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StorePartCountOutputType
+   */
+  select?: Prisma.StorePartCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * StorePartCountOutputType without action
+ */
+export type StorePartCountOutputTypeCountAssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssetStorePartWhereInput
+}
+
+/**
+ * StorePartCountOutputType without action
+ */
+export type StorePartCountOutputTypeCountStoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoreTransactionWhereInput
+}
 
 
 export type StorePartSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   part_number?: boolean
   description?: boolean
-  dealer_price?: boolean
-  sale_price?: boolean
-  cost?: boolean
+  AssetStorePart?: boolean | Prisma.StorePart$AssetStorePartArgs<ExtArgs>
+  StoreTransaction?: boolean | Prisma.StorePart$StoreTransactionArgs<ExtArgs>
+  _count?: boolean | Prisma.StorePartCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["storePart"]>
 
 export type StorePartSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   part_number?: boolean
   description?: boolean
-  dealer_price?: boolean
-  sale_price?: boolean
-  cost?: boolean
 }, ExtArgs["result"]["storePart"]>
 
 export type StorePartSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   part_number?: boolean
   description?: boolean
-  dealer_price?: boolean
-  sale_price?: boolean
-  cost?: boolean
 }, ExtArgs["result"]["storePart"]>
 
 export type StorePartSelectScalar = {
   id?: boolean
   part_number?: boolean
   description?: boolean
-  dealer_price?: boolean
-  sale_price?: boolean
-  cost?: boolean
 }
 
-export type StorePartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "part_number" | "description" | "dealer_price" | "sale_price" | "cost", ExtArgs["result"]["storePart"]>
+export type StorePartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "part_number" | "description", ExtArgs["result"]["storePart"]>
+export type StorePartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  AssetStorePart?: boolean | Prisma.StorePart$AssetStorePartArgs<ExtArgs>
+  StoreTransaction?: boolean | Prisma.StorePart$StoreTransactionArgs<ExtArgs>
+  _count?: boolean | Prisma.StorePartCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type StorePartIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type StorePartIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $StorePartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StorePart"
-  objects: {}
+  objects: {
+    AssetStorePart: Prisma.$AssetStorePartPayload<ExtArgs>[]
+    StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     part_number: string
     description: string
-    dealer_price: runtime.Decimal
-    sale_price: runtime.Decimal
-    cost: runtime.Decimal
   }, ExtArgs["result"]["storePart"]>
   composites: {}
 }
@@ -838,6 +913,8 @@ readonly fields: StorePartFieldRefs;
  */
 export interface Prisma__StorePartClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  AssetStorePart<T extends Prisma.StorePart$AssetStorePartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePart$AssetStorePartArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetStorePartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  StoreTransaction<T extends Prisma.StorePart$StoreTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePart$StoreTransactionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -870,9 +947,6 @@ export interface StorePartFieldRefs {
   readonly id: Prisma.FieldRef<"StorePart", 'Int'>
   readonly part_number: Prisma.FieldRef<"StorePart", 'String'>
   readonly description: Prisma.FieldRef<"StorePart", 'String'>
-  readonly dealer_price: Prisma.FieldRef<"StorePart", 'Decimal'>
-  readonly sale_price: Prisma.FieldRef<"StorePart", 'Decimal'>
-  readonly cost: Prisma.FieldRef<"StorePart", 'Decimal'>
 }
     
 
@@ -889,6 +963,10 @@ export type StorePartFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the StorePart
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
   /**
    * Filter, which StorePart to fetch.
    */
@@ -909,6 +987,10 @@ export type StorePartFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
+  /**
    * Filter, which StorePart to fetch.
    */
   where: Prisma.StorePartWhereUniqueInput
@@ -927,6 +1009,10 @@ export type StorePartFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the StorePart
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
   /**
    * Filter, which StorePart to fetch.
    */
@@ -977,6 +1063,10 @@ export type StorePartFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
+  /**
    * Filter, which StorePart to fetch.
    */
   where?: Prisma.StorePartWhereInput
@@ -1025,6 +1115,10 @@ export type StorePartFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the StorePart
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
   /**
    * Filter, which StoreParts to fetch.
    */
@@ -1075,6 +1169,10 @@ export type StorePartCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
+  /**
    * The data needed to create a StorePart.
    */
   data: Prisma.XOR<Prisma.StorePartCreateInput, Prisma.StorePartUncheckedCreateInput>
@@ -1123,6 +1221,10 @@ export type StorePartUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the StorePart
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
   /**
    * The data needed to update a StorePart.
    */
@@ -1191,6 +1293,10 @@ export type StorePartUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
+  /**
    * The filter to search for the StorePart to update in case it exists.
    */
   where: Prisma.StorePartWhereUniqueInput
@@ -1218,6 +1324,10 @@ export type StorePartDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
+  /**
    * Filter which StorePart to delete.
    */
   where: Prisma.StorePartWhereUniqueInput
@@ -1239,6 +1349,54 @@ export type StorePartDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
+ * StorePart.AssetStorePart
+ */
+export type StorePart$AssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssetStorePart
+   */
+  select?: Prisma.AssetStorePartSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssetStorePart
+   */
+  omit?: Prisma.AssetStorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssetStorePartInclude<ExtArgs> | null
+  where?: Prisma.AssetStorePartWhereInput
+  orderBy?: Prisma.AssetStorePartOrderByWithRelationInput | Prisma.AssetStorePartOrderByWithRelationInput[]
+  cursor?: Prisma.AssetStorePartWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
+}
+
+/**
+ * StorePart.StoreTransaction
+ */
+export type StorePart$StoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StoreTransaction
+   */
+  select?: Prisma.StoreTransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StoreTransaction
+   */
+  omit?: Prisma.StoreTransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoreTransactionInclude<ExtArgs> | null
+  where?: Prisma.StoreTransactionWhereInput
+  orderBy?: Prisma.StoreTransactionOrderByWithRelationInput | Prisma.StoreTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.StoreTransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
+}
+
+/**
  * StorePart without action
  */
 export type StorePartDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1250,4 +1408,8 @@ export type StorePartDefaultArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the StorePart
    */
   omit?: Prisma.StorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StorePartInclude<ExtArgs> | null
 }

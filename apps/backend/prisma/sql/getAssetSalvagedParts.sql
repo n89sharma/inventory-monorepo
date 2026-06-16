@@ -6,7 +6,7 @@ select
   u.name as fixed_by,
   pt.notes as notes,
   is_exchange as is_exchange
-from "PartTransfer" pt
+from "AssetSalvagedPart" pt
 join "Asset" r on r.id = pt.recipient_asset_id 
 join "Asset" d on d.id = pt.donor_asset_id 
 join "User" u on u.id = pt.fixed_by 

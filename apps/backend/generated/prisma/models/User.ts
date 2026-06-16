@@ -28,10 +28,12 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   id: number | null
+  default_warehouse_id: number | null
 }
 
 export type UserSumAggregateOutputType = {
   id: number | null
+  default_warehouse_id: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -41,6 +43,7 @@ export type UserMinAggregateOutputType = {
   is_active: boolean | null
   clerk_id: string | null
   role: string | null
+  default_warehouse_id: number | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -50,6 +53,7 @@ export type UserMaxAggregateOutputType = {
   is_active: boolean | null
   clerk_id: string | null
   role: string | null
+  default_warehouse_id: number | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -59,16 +63,19 @@ export type UserCountAggregateOutputType = {
   is_active: number
   clerk_id: number
   role: number
+  default_warehouse_id: number
   _all: number
 }
 
 
 export type UserAvgAggregateInputType = {
   id?: true
+  default_warehouse_id?: true
 }
 
 export type UserSumAggregateInputType = {
   id?: true
+  default_warehouse_id?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -78,6 +85,7 @@ export type UserMinAggregateInputType = {
   is_active?: true
   clerk_id?: true
   role?: true
+  default_warehouse_id?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -87,6 +95,7 @@ export type UserMaxAggregateInputType = {
   is_active?: true
   clerk_id?: true
   role?: true
+  default_warehouse_id?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -96,6 +105,7 @@ export type UserCountAggregateInputType = {
   is_active?: true
   clerk_id?: true
   role?: true
+  default_warehouse_id?: true
   _all?: true
 }
 
@@ -192,6 +202,7 @@ export type UserGroupByOutputType = {
   is_active: boolean
   clerk_id: string | null
   role: string | null
+  default_warehouse_id: number | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -224,9 +235,12 @@ export type UserWhereInput = {
   is_active?: Prisma.BoolFilter<"User"> | boolean
   clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
   arrivals?: Prisma.ArrivalListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
   asset_errors_fixed?: Prisma.AssetErrorListRelationFilter
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartListRelationFilter
+  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   departures?: Prisma.DepartureListRelationFilter
   departure_sales_reps?: Prisma.DepartureListRelationFilter
@@ -235,8 +249,9 @@ export type UserWhereInput = {
   holds_created?: Prisma.HoldListRelationFilter
   holds_for?: Prisma.HoldListRelationFilter
   invoices_updated?: Prisma.InvoiceListRelationFilter
-  PartTransfer?: Prisma.PartTransferListRelationFilter
+  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
+  Warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -246,9 +261,12 @@ export type UserOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrderInput | Prisma.SortOrder
   arrivals?: Prisma.ArrivalOrderByRelationAggregateInput
   asset_errors_added?: Prisma.AssetErrorOrderByRelationAggregateInput
   asset_errors_fixed?: Prisma.AssetErrorOrderByRelationAggregateInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartOrderByRelationAggregateInput
+  AssetStorePart?: Prisma.AssetStorePartOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   departures?: Prisma.DepartureOrderByRelationAggregateInput
   departure_sales_reps?: Prisma.DepartureOrderByRelationAggregateInput
@@ -257,8 +275,9 @@ export type UserOrderByWithRelationInput = {
   holds_created?: Prisma.HoldOrderByRelationAggregateInput
   holds_for?: Prisma.HoldOrderByRelationAggregateInput
   invoices_updated?: Prisma.InvoiceOrderByRelationAggregateInput
-  PartTransfer?: Prisma.PartTransferOrderByRelationAggregateInput
+  StoreTransaction?: Prisma.StoreTransactionOrderByRelationAggregateInput
   transfers?: Prisma.TransferOrderByRelationAggregateInput
+  Warehouse?: Prisma.WarehouseOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -271,9 +290,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   is_active?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
   arrivals?: Prisma.ArrivalListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
   asset_errors_fixed?: Prisma.AssetErrorListRelationFilter
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartListRelationFilter
+  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   departures?: Prisma.DepartureListRelationFilter
   departure_sales_reps?: Prisma.DepartureListRelationFilter
@@ -282,8 +304,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   holds_created?: Prisma.HoldListRelationFilter
   holds_for?: Prisma.HoldListRelationFilter
   invoices_updated?: Prisma.InvoiceListRelationFilter
-  PartTransfer?: Prisma.PartTransferListRelationFilter
+  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
+  Warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
 }, "id" | "email" | "name" | "clerk_id">
 
 export type UserOrderByWithAggregationInput = {
@@ -293,6 +316,7 @@ export type UserOrderByWithAggregationInput = {
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -310,6 +334,7 @@ export type UserScalarWhereWithAggregatesInput = {
   is_active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   clerk_id?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  default_warehouse_id?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
 }
 
 export type UserCreateInput = {
@@ -321,6 +346,8 @@ export type UserCreateInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -329,8 +356,9 @@ export type UserCreateInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -340,9 +368,12 @@ export type UserUncheckedCreateInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -351,7 +382,7 @@ export type UserUncheckedCreateInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -364,6 +395,8 @@ export type UserUpdateInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -372,8 +405,9 @@ export type UserUpdateInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -383,9 +417,12 @@ export type UserUncheckedUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -394,7 +431,7 @@ export type UserUncheckedUpdateInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -405,6 +442,7 @@ export type UserCreateManyInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -422,6 +460,7 @@ export type UserUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -434,6 +473,16 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -441,10 +490,12 @@ export type UserCountOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -454,6 +505,7 @@ export type UserMaxOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -463,10 +515,12 @@ export type UserMinOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   clerk_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  default_warehouse_id?: Prisma.SortOrder
 }
 
 export type UserCreateNestedOneWithoutAsset_errors_addedInput = {
@@ -603,6 +657,48 @@ export type UserUpdateOneRequiredWithoutInvoices_updatedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutInvoices_updatedInput, Prisma.UserUpdateWithoutInvoices_updatedInput>, Prisma.UserUncheckedUpdateWithoutInvoices_updatedInput>
 }
 
+export type UserCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput> | Prisma.UserCreateWithoutWarehouseInput[] | Prisma.UserUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarehouseInput | Prisma.UserCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.UserCreateManyWarehouseInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutWarehouseInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput> | Prisma.UserCreateWithoutWarehouseInput[] | Prisma.UserUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarehouseInput | Prisma.UserCreateOrConnectWithoutWarehouseInput[]
+  createMany?: Prisma.UserCreateManyWarehouseInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput> | Prisma.UserCreateWithoutWarehouseInput[] | Prisma.UserUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarehouseInput | Prisma.UserCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.UserUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.UserCreateManyWarehouseInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.UserUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutWarehouseInput | Prisma.UserUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutWarehouseNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput> | Prisma.UserCreateWithoutWarehouseInput[] | Prisma.UserUncheckedCreateWithoutWarehouseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWarehouseInput | Prisma.UserCreateOrConnectWithoutWarehouseInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutWarehouseInput | Prisma.UserUpsertWithWhereUniqueWithoutWarehouseInput[]
+  createMany?: Prisma.UserCreateManyWarehouseInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutWarehouseInput | Prisma.UserUpdateWithWhereUniqueWithoutWarehouseInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutWarehouseInput | Prisma.UserUpdateManyWithWhereWithoutWarehouseInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
 export type UserCreateNestedOneWithoutFilesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutFilesInput, Prisma.UserUncheckedCreateWithoutFilesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutFilesInput
@@ -631,20 +727,6 @@ export type UserUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsInput, Prisma.UserUpdateWithoutCommentsInput>, Prisma.UserUncheckedUpdateWithoutCommentsInput>
 }
 
-export type UserCreateNestedOneWithoutPartTransferInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPartTransferInput, Prisma.UserUncheckedCreateWithoutPartTransferInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPartTransferInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutPartTransferNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPartTransferInput, Prisma.UserUncheckedCreateWithoutPartTransferInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPartTransferInput
-  upsert?: Prisma.UserUpsertWithoutPartTransferInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPartTransferInput, Prisma.UserUpdateWithoutPartTransferInput>, Prisma.UserUncheckedUpdateWithoutPartTransferInput>
-}
-
 export type UserCreateNestedOneWithoutHistoryInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutHistoryInput, Prisma.UserUncheckedCreateWithoutHistoryInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutHistoryInput
@@ -659,6 +741,48 @@ export type UserUpdateOneRequiredWithoutHistoryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutHistoryInput, Prisma.UserUpdateWithoutHistoryInput>, Prisma.UserUncheckedUpdateWithoutHistoryInput>
 }
 
+export type UserCreateNestedOneWithoutAssetSalvagedPartInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedCreateWithoutAssetSalvagedPartInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssetSalvagedPartInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssetSalvagedPartNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedCreateWithoutAssetSalvagedPartInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssetSalvagedPartInput
+  upsert?: Prisma.UserUpsertWithoutAssetSalvagedPartInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssetSalvagedPartInput, Prisma.UserUpdateWithoutAssetSalvagedPartInput>, Prisma.UserUncheckedUpdateWithoutAssetSalvagedPartInput>
+}
+
+export type UserCreateNestedOneWithoutAssetStorePartInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssetStorePartInput, Prisma.UserUncheckedCreateWithoutAssetStorePartInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssetStorePartInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssetStorePartNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssetStorePartInput, Prisma.UserUncheckedCreateWithoutAssetStorePartInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssetStorePartInput
+  upsert?: Prisma.UserUpsertWithoutAssetStorePartInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssetStorePartInput, Prisma.UserUpdateWithoutAssetStorePartInput>, Prisma.UserUncheckedUpdateWithoutAssetStorePartInput>
+}
+
+export type UserCreateNestedOneWithoutStoreTransactionInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoreTransactionInput, Prisma.UserUncheckedCreateWithoutStoreTransactionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoreTransactionInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStoreTransactionNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStoreTransactionInput, Prisma.UserUncheckedCreateWithoutStoreTransactionInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStoreTransactionInput
+  upsert?: Prisma.UserUpsertWithoutStoreTransactionInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStoreTransactionInput, Prisma.UserUpdateWithoutStoreTransactionInput>, Prisma.UserUncheckedUpdateWithoutStoreTransactionInput>
+}
+
 export type UserCreateWithoutAsset_errors_addedInput = {
   email?: string | null
   name: string
@@ -667,6 +791,8 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   role?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -675,8 +801,9 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
@@ -686,8 +813,11 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -696,7 +826,7 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -713,6 +843,8 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   role?: string | null
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -721,8 +853,9 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
@@ -732,8 +865,11 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -742,7 +878,7 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -770,6 +906,8 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -778,8 +916,9 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
@@ -789,8 +928,11 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -799,7 +941,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -822,6 +964,8 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -830,8 +974,9 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
@@ -841,8 +986,11 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -851,7 +999,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -864,6 +1012,8 @@ export type UserCreateWithoutTransfersInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -872,7 +1022,8 @@ export type UserCreateWithoutTransfersInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTransfersInput = {
@@ -882,9 +1033,12 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -893,7 +1047,7 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTransfersInput = {
@@ -921,6 +1075,8 @@ export type UserUpdateWithoutTransfersInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -929,7 +1085,8 @@ export type UserUpdateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransfersInput = {
@@ -939,9 +1096,12 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -950,7 +1110,7 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutArrivalsInput = {
@@ -961,6 +1121,8 @@ export type UserCreateWithoutArrivalsInput = {
   role?: string | null
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -969,8 +1131,9 @@ export type UserCreateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutArrivalsInput = {
@@ -980,8 +1143,11 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -990,7 +1156,7 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1018,6 +1184,8 @@ export type UserUpdateWithoutArrivalsInput = {
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1026,8 +1194,9 @@ export type UserUpdateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArrivalsInput = {
@@ -1037,8 +1206,11 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1047,7 +1219,7 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1060,6 +1232,8 @@ export type UserCreateWithoutDeparturesInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
   files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
@@ -1067,8 +1241,9 @@ export type UserCreateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDeparturesInput = {
@@ -1078,9 +1253,12 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
@@ -1088,7 +1266,7 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1106,6 +1284,8 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
@@ -1113,8 +1293,9 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
@@ -1124,9 +1305,12 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
@@ -1134,7 +1318,7 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1163,6 +1347,8 @@ export type UserUpdateWithoutDeparturesInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
   files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
@@ -1170,8 +1356,9 @@ export type UserUpdateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparturesInput = {
@@ -1181,9 +1368,12 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
@@ -1191,7 +1381,7 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1215,6 +1405,8 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
@@ -1222,8 +1414,9 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
@@ -1233,9 +1426,12 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
@@ -1243,7 +1439,7 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1256,6 +1452,8 @@ export type UserCreateWithoutHolds_createdInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -1263,8 +1461,9 @@ export type UserCreateWithoutHolds_createdInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHolds_createdInput = {
@@ -1274,9 +1473,12 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -1284,7 +1486,7 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1302,6 +1504,8 @@ export type UserCreateWithoutHolds_forInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -1309,8 +1513,9 @@ export type UserCreateWithoutHolds_forInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHolds_forInput = {
@@ -1320,9 +1525,12 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -1330,7 +1538,7 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1359,6 +1567,8 @@ export type UserUpdateWithoutHolds_createdInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1366,8 +1576,9 @@ export type UserUpdateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_createdInput = {
@@ -1377,9 +1588,12 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1387,7 +1601,7 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1411,6 +1625,8 @@ export type UserUpdateWithoutHolds_forInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1418,8 +1634,9 @@ export type UserUpdateWithoutHolds_forInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_forInput = {
@@ -1429,9 +1646,12 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1439,7 +1659,7 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1452,6 +1672,8 @@ export type UserCreateWithoutInvoices_updatedInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -1459,8 +1681,9 @@ export type UserCreateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInvoices_updatedInput = {
@@ -1470,9 +1693,12 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -1480,7 +1706,7 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1509,6 +1735,8 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1516,8 +1744,9 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
@@ -1527,9 +1756,12 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1537,8 +1769,94 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutWarehouseInput = {
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserUncheckedCreateWithoutWarehouseInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserCreateOrConnectWithoutWarehouseInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput>
+}
+
+export type UserCreateManyWarehouseInputEnvelope = {
+  data: Prisma.UserCreateManyWarehouseInput | Prisma.UserCreateManyWarehouseInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWarehouseInput, Prisma.UserUncheckedUpdateWithoutWarehouseInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWarehouseInput, Prisma.UserUncheckedCreateWithoutWarehouseInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutWarehouseInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWarehouseInput, Prisma.UserUncheckedUpdateWithoutWarehouseInput>
+}
+
+export type UserUpdateManyWithWhereWithoutWarehouseInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutWarehouseInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.IntFilter<"User"> | number
+  email?: Prisma.StringNullableFilter<"User"> | string | null
+  name?: Prisma.StringFilter<"User"> | string
+  is_active?: Prisma.BoolFilter<"User"> | boolean
+  clerk_id?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.StringNullableFilter<"User"> | string | null
+  default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
 }
 
 export type UserCreateWithoutFilesInput = {
@@ -1550,6 +1868,8 @@ export type UserCreateWithoutFilesInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -1557,8 +1877,9 @@ export type UserCreateWithoutFilesInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFilesInput = {
@@ -1568,9 +1889,12 @@ export type UserUncheckedCreateWithoutFilesInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -1578,7 +1902,7 @@ export type UserUncheckedCreateWithoutFilesInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1607,6 +1931,8 @@ export type UserUpdateWithoutFilesInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1614,8 +1940,9 @@ export type UserUpdateWithoutFilesInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFilesInput = {
@@ -1625,9 +1952,12 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1635,7 +1965,7 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1648,6 +1978,8 @@ export type UserCreateWithoutCommentsInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
   files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
@@ -1655,8 +1987,9 @@ export type UserCreateWithoutCommentsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -1666,9 +1999,12 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
   files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
@@ -1676,7 +2012,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1705,6 +2041,8 @@ export type UserUpdateWithoutCommentsInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
   files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
@@ -1712,8 +2050,9 @@ export type UserUpdateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -1723,9 +2062,12 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
   files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
@@ -1733,105 +2075,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
-  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
-}
-
-export type UserCreateWithoutPartTransferInput = {
-  email?: string | null
-  name: string
-  is_active?: boolean
-  clerk_id?: string | null
-  role?: string | null
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
-  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
-  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
-  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
-  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
-  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
-  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
-  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
-  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
-  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
-}
-
-export type UserUncheckedCreateWithoutPartTransferInput = {
-  id?: number
-  email?: string | null
-  name: string
-  is_active?: boolean
-  clerk_id?: string | null
-  role?: string | null
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
-  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
-  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
-  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
-  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
-  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
-  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
-  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
-  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
-  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
-}
-
-export type UserCreateOrConnectWithoutPartTransferInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutPartTransferInput, Prisma.UserUncheckedCreateWithoutPartTransferInput>
-}
-
-export type UserUpsertWithoutPartTransferInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutPartTransferInput, Prisma.UserUncheckedUpdateWithoutPartTransferInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutPartTransferInput, Prisma.UserUncheckedCreateWithoutPartTransferInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutPartTransferInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutPartTransferInput, Prisma.UserUncheckedUpdateWithoutPartTransferInput>
-}
-
-export type UserUpdateWithoutPartTransferInput = {
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
-  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
-  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
-  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
-  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
-  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
-  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
-  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
-  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
-  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
-}
-
-export type UserUncheckedUpdateWithoutPartTransferInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
-  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
-  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
-  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
-  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
-  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
-  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
-  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
-  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
-  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -1844,6 +2088,8 @@ export type UserCreateWithoutHistoryInput = {
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
@@ -1851,8 +2097,9 @@ export type UserCreateWithoutHistoryInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHistoryInput = {
@@ -1862,9 +2109,12 @@ export type UserUncheckedCreateWithoutHistoryInput = {
   is_active?: boolean
   clerk_id?: string | null
   role?: string | null
+  default_warehouse_id?: number | null
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
   departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
@@ -1872,7 +2122,7 @@ export type UserUncheckedCreateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
-  PartTransfer?: Prisma.PartTransferUncheckedCreateNestedManyWithoutUserInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -1901,6 +2151,8 @@ export type UserUpdateWithoutHistoryInput = {
   arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
@@ -1908,8 +2160,9 @@ export type UserUpdateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHistoryInput = {
@@ -1919,9 +2172,12 @@ export type UserUncheckedUpdateWithoutHistoryInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
@@ -1929,8 +2185,403 @@ export type UserUncheckedUpdateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
-  PartTransfer?: Prisma.PartTransferUncheckedUpdateManyWithoutUserNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutAssetSalvagedPartInput = {
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssetSalvagedPartInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  default_warehouse_id?: number | null
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserCreateOrConnectWithoutAssetSalvagedPartInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedCreateWithoutAssetSalvagedPartInput>
+}
+
+export type UserUpsertWithoutAssetSalvagedPartInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedUpdateWithoutAssetSalvagedPartInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedCreateWithoutAssetSalvagedPartInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssetSalvagedPartInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssetSalvagedPartInput, Prisma.UserUncheckedUpdateWithoutAssetSalvagedPartInput>
+}
+
+export type UserUpdateWithoutAssetSalvagedPartInput = {
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssetSalvagedPartInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutAssetStorePartInput = {
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssetStorePartInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  default_warehouse_id?: number | null
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserCreateOrConnectWithoutAssetStorePartInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssetStorePartInput, Prisma.UserUncheckedCreateWithoutAssetStorePartInput>
+}
+
+export type UserUpsertWithoutAssetStorePartInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssetStorePartInput, Prisma.UserUncheckedUpdateWithoutAssetStorePartInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssetStorePartInput, Prisma.UserUncheckedCreateWithoutAssetStorePartInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssetStorePartInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssetStorePartInput, Prisma.UserUncheckedUpdateWithoutAssetStorePartInput>
+}
+
+export type UserUpdateWithoutAssetStorePartInput = {
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssetStorePartInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutStoreTransactionInput = {
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutStoreTransactionInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  default_warehouse_id?: number | null
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserCreateOrConnectWithoutStoreTransactionInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoreTransactionInput, Prisma.UserUncheckedCreateWithoutStoreTransactionInput>
+}
+
+export type UserUpsertWithoutStoreTransactionInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStoreTransactionInput, Prisma.UserUncheckedUpdateWithoutStoreTransactionInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStoreTransactionInput, Prisma.UserUncheckedCreateWithoutStoreTransactionInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStoreTransactionInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStoreTransactionInput, Prisma.UserUncheckedUpdateWithoutStoreTransactionInput>
+}
+
+export type UserUpdateWithoutStoreTransactionInput = {
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStoreTransactionInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateManyWarehouseInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+}
+
+export type UserUpdateWithoutWarehouseInput = {
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWarehouseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutWarehouseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1942,6 +2593,8 @@ export type UserCountOutputType = {
   arrivals: number
   asset_errors_added: number
   asset_errors_fixed: number
+  AssetSalvagedPart: number
+  AssetStorePart: number
   comments: number
   departures: number
   departure_sales_reps: number
@@ -1950,7 +2603,7 @@ export type UserCountOutputType = {
   holds_created: number
   holds_for: number
   invoices_updated: number
-  PartTransfer: number
+  StoreTransaction: number
   transfers: number
 }
 
@@ -1958,6 +2611,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   arrivals?: boolean | UserCountOutputTypeCountArrivalsArgs
   asset_errors_added?: boolean | UserCountOutputTypeCountAsset_errors_addedArgs
   asset_errors_fixed?: boolean | UserCountOutputTypeCountAsset_errors_fixedArgs
+  AssetSalvagedPart?: boolean | UserCountOutputTypeCountAssetSalvagedPartArgs
+  AssetStorePart?: boolean | UserCountOutputTypeCountAssetStorePartArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
   departures?: boolean | UserCountOutputTypeCountDeparturesArgs
   departure_sales_reps?: boolean | UserCountOutputTypeCountDeparture_sales_repsArgs
@@ -1966,7 +2621,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   holds_created?: boolean | UserCountOutputTypeCountHolds_createdArgs
   holds_for?: boolean | UserCountOutputTypeCountHolds_forArgs
   invoices_updated?: boolean | UserCountOutputTypeCountInvoices_updatedArgs
-  PartTransfer?: boolean | UserCountOutputTypeCountPartTransferArgs
+  StoreTransaction?: boolean | UserCountOutputTypeCountStoreTransactionArgs
   transfers?: boolean | UserCountOutputTypeCountTransfersArgs
 }
 
@@ -1999,6 +2654,20 @@ export type UserCountOutputTypeCountAsset_errors_addedArgs<ExtArgs extends runti
  */
 export type UserCountOutputTypeCountAsset_errors_fixedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetErrorWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssetSalvagedPartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssetSalvagedPartWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssetStorePartWhereInput
 }
 
 /**
@@ -2060,8 +2729,8 @@ export type UserCountOutputTypeCountInvoices_updatedArgs<ExtArgs extends runtime
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountPartTransferArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PartTransferWhereInput
+export type UserCountOutputTypeCountStoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoreTransactionWhereInput
 }
 
 /**
@@ -2079,9 +2748,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   is_active?: boolean
   clerk_id?: boolean
   role?: boolean
+  default_warehouse_id?: boolean
   arrivals?: boolean | Prisma.User$arrivalsArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
   asset_errors_fixed?: boolean | Prisma.User$asset_errors_fixedArgs<ExtArgs>
+  AssetSalvagedPart?: boolean | Prisma.User$AssetSalvagedPartArgs<ExtArgs>
+  AssetStorePart?: boolean | Prisma.User$AssetStorePartArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   departures?: boolean | Prisma.User$departuresArgs<ExtArgs>
   departure_sales_reps?: boolean | Prisma.User$departure_sales_repsArgs<ExtArgs>
@@ -2090,8 +2762,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   holds_created?: boolean | Prisma.User$holds_createdArgs<ExtArgs>
   holds_for?: boolean | Prisma.User$holds_forArgs<ExtArgs>
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
-  PartTransfer?: boolean | Prisma.User$PartTransferArgs<ExtArgs>
+  StoreTransaction?: boolean | Prisma.User$StoreTransactionArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2102,6 +2775,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   is_active?: boolean
   clerk_id?: boolean
   role?: boolean
+  default_warehouse_id?: boolean
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2111,6 +2786,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   is_active?: boolean
   clerk_id?: boolean
   role?: boolean
+  default_warehouse_id?: boolean
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -2120,13 +2797,16 @@ export type UserSelectScalar = {
   is_active?: boolean
   clerk_id?: boolean
   role?: boolean
+  default_warehouse_id?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "is_active" | "clerk_id" | "role", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "is_active" | "clerk_id" | "role" | "default_warehouse_id", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   arrivals?: boolean | Prisma.User$arrivalsArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
   asset_errors_fixed?: boolean | Prisma.User$asset_errors_fixedArgs<ExtArgs>
+  AssetSalvagedPart?: boolean | Prisma.User$AssetSalvagedPartArgs<ExtArgs>
+  AssetStorePart?: boolean | Prisma.User$AssetStorePartArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   departures?: boolean | Prisma.User$departuresArgs<ExtArgs>
   departure_sales_reps?: boolean | Prisma.User$departure_sales_repsArgs<ExtArgs>
@@ -2135,12 +2815,17 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   holds_created?: boolean | Prisma.User$holds_createdArgs<ExtArgs>
   holds_for?: boolean | Prisma.User$holds_forArgs<ExtArgs>
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
-  PartTransfer?: boolean | Prisma.User$PartTransferArgs<ExtArgs>
+  StoreTransaction?: boolean | Prisma.User$StoreTransactionArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -2148,6 +2833,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     arrivals: Prisma.$ArrivalPayload<ExtArgs>[]
     asset_errors_added: Prisma.$AssetErrorPayload<ExtArgs>[]
     asset_errors_fixed: Prisma.$AssetErrorPayload<ExtArgs>[]
+    AssetSalvagedPart: Prisma.$AssetSalvagedPartPayload<ExtArgs>[]
+    AssetStorePart: Prisma.$AssetStorePartPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     departures: Prisma.$DeparturePayload<ExtArgs>[]
     departure_sales_reps: Prisma.$DeparturePayload<ExtArgs>[]
@@ -2156,8 +2843,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     holds_created: Prisma.$HoldPayload<ExtArgs>[]
     holds_for: Prisma.$HoldPayload<ExtArgs>[]
     invoices_updated: Prisma.$InvoicePayload<ExtArgs>[]
-    PartTransfer: Prisma.$PartTransferPayload<ExtArgs>[]
+    StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>[]
     transfers: Prisma.$TransferPayload<ExtArgs>[]
+    Warehouse: Prisma.$WarehousePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2166,6 +2854,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     is_active: boolean
     clerk_id: string | null
     role: string | null
+    default_warehouse_id: number | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2563,6 +3252,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   arrivals<T extends Prisma.User$arrivalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$arrivalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors_added<T extends Prisma.User$asset_errors_addedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asset_errors_addedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors_fixed<T extends Prisma.User$asset_errors_fixedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asset_errors_fixedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  AssetSalvagedPart<T extends Prisma.User$AssetSalvagedPartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$AssetSalvagedPartArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetSalvagedPartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  AssetStorePart<T extends Prisma.User$AssetStorePartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$AssetStorePartArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetStorePartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   departures<T extends Prisma.User$departuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$departuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   departure_sales_reps<T extends Prisma.User$departure_sales_repsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$departure_sales_repsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2571,8 +3262,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   holds_created<T extends Prisma.User$holds_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$holds_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   holds_for<T extends Prisma.User$holds_forArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$holds_forArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invoices_updated<T extends Prisma.User$invoices_updatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invoices_updatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  PartTransfer<T extends Prisma.User$PartTransferArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$PartTransferArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  StoreTransaction<T extends Prisma.User$StoreTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$StoreTransactionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfers<T extends Prisma.User$transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  Warehouse<T extends Prisma.User$WarehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$WarehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2608,6 +3300,7 @@ export interface UserFieldRefs {
   readonly is_active: Prisma.FieldRef<"User", 'Boolean'>
   readonly clerk_id: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly default_warehouse_id: Prisma.FieldRef<"User", 'Int'>
 }
     
 
@@ -2868,6 +3561,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2939,6 +3636,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -3079,6 +3780,54 @@ export type User$asset_errors_fixedArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
+}
+
+/**
+ * User.AssetSalvagedPart
+ */
+export type User$AssetSalvagedPartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssetSalvagedPart
+   */
+  select?: Prisma.AssetSalvagedPartSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssetSalvagedPart
+   */
+  omit?: Prisma.AssetSalvagedPartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssetSalvagedPartInclude<ExtArgs> | null
+  where?: Prisma.AssetSalvagedPartWhereInput
+  orderBy?: Prisma.AssetSalvagedPartOrderByWithRelationInput | Prisma.AssetSalvagedPartOrderByWithRelationInput[]
+  cursor?: Prisma.AssetSalvagedPartWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssetSalvagedPartScalarFieldEnum | Prisma.AssetSalvagedPartScalarFieldEnum[]
+}
+
+/**
+ * User.AssetStorePart
+ */
+export type User$AssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssetStorePart
+   */
+  select?: Prisma.AssetStorePartSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssetStorePart
+   */
+  omit?: Prisma.AssetStorePartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssetStorePartInclude<ExtArgs> | null
+  where?: Prisma.AssetStorePartWhereInput
+  orderBy?: Prisma.AssetStorePartOrderByWithRelationInput | Prisma.AssetStorePartOrderByWithRelationInput[]
+  cursor?: Prisma.AssetStorePartWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
 }
 
 /**
@@ -3274,27 +4023,27 @@ export type User$invoices_updatedArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * User.PartTransfer
+ * User.StoreTransaction
  */
-export type User$PartTransferArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$StoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the PartTransfer
+   * Select specific fields to fetch from the StoreTransaction
    */
-  select?: Prisma.PartTransferSelect<ExtArgs> | null
+  select?: Prisma.StoreTransactionSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the PartTransfer
+   * Omit specific fields from the StoreTransaction
    */
-  omit?: Prisma.PartTransferOmit<ExtArgs> | null
+  omit?: Prisma.StoreTransactionOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.PartTransferInclude<ExtArgs> | null
-  where?: Prisma.PartTransferWhereInput
-  orderBy?: Prisma.PartTransferOrderByWithRelationInput | Prisma.PartTransferOrderByWithRelationInput[]
-  cursor?: Prisma.PartTransferWhereUniqueInput
+  include?: Prisma.StoreTransactionInclude<ExtArgs> | null
+  where?: Prisma.StoreTransactionWhereInput
+  orderBy?: Prisma.StoreTransactionOrderByWithRelationInput | Prisma.StoreTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.StoreTransactionWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.PartTransferScalarFieldEnum | Prisma.PartTransferScalarFieldEnum[]
+  distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
 }
 
 /**
@@ -3319,6 +4068,25 @@ export type User$transfersArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.TransferScalarFieldEnum | Prisma.TransferScalarFieldEnum[]
+}
+
+/**
+ * User.Warehouse
+ */
+export type User$WarehouseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Warehouse
+   */
+  select?: Prisma.WarehouseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Warehouse
+   */
+  omit?: Prisma.WarehouseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WarehouseInclude<ExtArgs> | null
+  where?: Prisma.WarehouseWhereInput
 }
 
 /**

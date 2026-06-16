@@ -1,6 +1,6 @@
 import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreatePartTransferSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -10,7 +10,7 @@ import { prisma } from '../prisma.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   createComment as createCommentSer,
-  createPartTransfer as createPartTransferSer,
+  createAssetSalvagedPart as createAssetSalvagedPartSer,
   exportAssetReport as exportAssetReportSer,
   getAccessories as getAssetAccessoriesSer,
   getComments as getAssetCommentsSer,
@@ -19,10 +19,10 @@ import {
   getAssetHistory as getAssetHistorySer,
   getAssetPartTransfer as getAssetPartTransferSer,
   getTransfers as getAssetTransfersSer,
-  getAssets as getAssetsSer,
-  getSoldAssets as getSoldAssetsSer,
   getAssetsForSearchInStock as getAssetsForSearchInStockSer,
+  getAssets as getAssetsSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer,
+  getSoldAssets as getSoldAssetsSer,
   mapAssetSummary,
   updateAssetErrors as updateAssetErrorsSer,
   updateAssetLocation as updateAssetLocationSer,
@@ -244,8 +244,8 @@ export const createAssetComment = asyncHandler(async (req, res) => {
 
 export const createPartTransfer = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const validated = CreatePartTransferSchema.parse(req.body)
-  await createPartTransferSer(barcode, validated, res.locals.dbUserId)
+  const validated = CreateSalvagedPartSchema.parse(req.body)
+  await createAssetSalvagedPartSer(barcode, validated, res.locals.dbUserId)
   res.status(201).json(successResponse(null))
 })
 

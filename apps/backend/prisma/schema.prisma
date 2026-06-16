@@ -9,43 +9,44 @@ datasource db {
 }
 
 model Asset {
-  id                                                  Int                     @id @default(autoincrement())
-  barcode                                             String                  @unique @db.VarChar(50)
-  serial_number                                       String                  @db.VarChar(50)
-  model_id                                            Int
-  purchase_invoice_id                                 Int?
-  sales_invoice_id                                    Int?
-  arrival_id                                          Int?
-  departure_id                                        Int?
-  hold_id                                             Int?
-  created_at                                          DateTime
-  location_id                                         Int?
-  barcode_normalized                                  String?                 @default(dbgenerated("lower(regexp_replace((barcode)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
-  serial_normalized                                   String?                 @default(dbgenerated("lower(regexp_replace((serial_number)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
-  readiness_id                                        Int
-  status_id                                           Int
-  is_in_transit                                       Boolean                 @default(false)
-  country_of_origin_id                                Int?
-  manufactured_year                                   Int?
-  arrival                                             Arrival?                @relation(fields: [arrival_id], references: [id])
-  Country                                             Country?                @relation(fields: [country_of_origin_id], references: [id])
-  departure                                           Departure?              @relation(fields: [departure_id], references: [id])
-  hold                                                Hold?                   @relation(fields: [hold_id], references: [id])
-  Location                                            Location?               @relation(fields: [location_id], references: [id])
-  model                                               Model                   @relation(fields: [model_id], references: [id])
-  purchase_invoice                                    Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
-  Readiness                                           Readiness               @relation(fields: [readiness_id], references: [id])
-  sales_invoice                                       Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
-  Status                                              Status                  @relation(fields: [status_id], references: [id])
-  asset_accessories                                   AssetAccessory[]
-  asset_errors                                        AssetError[]
-  asset_transfers                                     AssetTransfer[]
-  comments                                            Comment[]
-  cost                                                Cost?
-  files                                               File[]
-  PartTransfer_PartTransfer_donor_asset_idToAsset     PartTransfer[]          @relation("PartTransfer_donor_asset_idToAsset")
-  PartTransfer_PartTransfer_recipient_asset_idToAsset PartTransfer[]          @relation("PartTransfer_recipient_asset_idToAsset")
-  technical_specification                             TechnicalSpecification?
+  id                                                            Int                     @id @default(autoincrement())
+  barcode                                                       String                  @unique @db.VarChar(50)
+  serial_number                                                 String                  @db.VarChar(50)
+  model_id                                                      Int
+  purchase_invoice_id                                           Int?
+  sales_invoice_id                                              Int?
+  arrival_id                                                    Int?
+  departure_id                                                  Int?
+  hold_id                                                       Int?
+  created_at                                                    DateTime
+  location_id                                                   Int?
+  barcode_normalized                                            String?                 @default(dbgenerated("lower(regexp_replace((barcode)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
+  serial_normalized                                             String?                 @default(dbgenerated("lower(regexp_replace((serial_number)::text, '[^a-zA-Z0-9]'::text, ''::text, 'g'::text))"))
+  readiness_id                                                  Int
+  status_id                                                     Int
+  is_in_transit                                                 Boolean                 @default(false)
+  country_of_origin_id                                          Int?
+  manufactured_year                                             Int?
+  arrival                                                       Arrival?                @relation(fields: [arrival_id], references: [id])
+  Country                                                       Country?                @relation(fields: [country_of_origin_id], references: [id])
+  departure                                                     Departure?              @relation(fields: [departure_id], references: [id])
+  hold                                                          Hold?                   @relation(fields: [hold_id], references: [id])
+  Location                                                      Location?               @relation(fields: [location_id], references: [id])
+  model                                                         Model                   @relation(fields: [model_id], references: [id])
+  purchase_invoice                                              Invoice?                @relation("PurchaseInvoice", fields: [purchase_invoice_id], references: [id])
+  Readiness                                                     Readiness               @relation(fields: [readiness_id], references: [id])
+  sales_invoice                                                 Invoice?                @relation("SalesInvoice", fields: [sales_invoice_id], references: [id])
+  Status                                                        Status                  @relation(fields: [status_id], references: [id])
+  asset_accessories                                             AssetAccessory[]
+  asset_errors                                                  AssetError[]
+  AssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAsset     AssetSalvagedPart[]     @relation("AssetSalvagedPart_donor_asset_idToAsset")
+  AssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAsset AssetSalvagedPart[]     @relation("AssetSalvagedPart_recipient_asset_idToAsset")
+  AssetStorePart                                                AssetStorePart[]
+  asset_transfers                                               AssetTransfer[]
+  comments                                                      Comment[]
+  cost                                                          Cost?
+  files                                                         File[]
+  technical_specification                                       TechnicalSpecification?
 
   @@index([serial_number])
   @@index([model_id])
@@ -199,8 +200,8 @@ model Arrival {
 }
 
 model Departure {
-  id                      Int          @id @default(autoincrement())
-  departure_number        String       @unique @db.VarChar(50)
+  id                      Int                @id @default(autoincrement())
+  departure_number        String             @unique @db.VarChar(50)
   origin_id               Int
   destination_id          Int
   transporter_id          Int
@@ -209,11 +210,12 @@ model Departure {
   notes                   String?
   created_at              DateTime
   assets                  Asset[]
-  created_by              User?        @relation(fields: [created_by_id], references: [id])
-  destination             Organization @relation(fields: [destination_id], references: [id])
-  origin                  Warehouse    @relation(fields: [origin_id], references: [id])
-  sales_representative    User?        @relation("SalesRep", fields: [sales_representative_id], references: [id])
-  transporter             Organization @relation("DepartureTransporter", fields: [transporter_id], references: [id])
+  created_by              User?              @relation(fields: [created_by_id], references: [id])
+  destination             Organization       @relation(fields: [destination_id], references: [id])
+  origin                  Warehouse          @relation(fields: [origin_id], references: [id])
+  sales_representative    User?              @relation("SalesRep", fields: [sales_representative_id], references: [id])
+  transporter             Organization       @relation("DepartureTransporter", fields: [transporter_id], references: [id])
+  StoreTransaction        StoreTransaction[]
 
   @@index([origin_id, created_at(sort: Desc)])
   @@index([created_at(sort: Desc)])
@@ -268,15 +270,17 @@ model Invoice {
 }
 
 model Warehouse {
-  id                    Int         @id @default(autoincrement())
-  city_code             String      @db.Char(3)
+  id                    Int                @id @default(autoincrement())
+  city_code             String             @db.Char(3)
   street                String
-  is_active             Boolean     @default(false)
+  is_active             Boolean            @default(false)
   arrivals              Arrival[]
   departures            Departure[]
   locations             Location[]
-  destination_transfers Transfer[]  @relation("TransferDestination")
-  origin_transfers      Transfer[]  @relation("TransferOrigin")
+  StoreTransaction      StoreTransaction[]
+  destination_transfers Transfer[]         @relation("TransferDestination")
+  origin_transfers      Transfer[]         @relation("TransferOrigin")
+  User                  User[]
 
   @@unique([city_code, street])
 }
@@ -351,25 +355,29 @@ model Comment {
 }
 
 model User {
-  id                   Int            @id @default(autoincrement())
-  email                String?        @unique
-  name                 String         @unique
-  is_active            Boolean        @default(false)
-  clerk_id             String?        @unique
+  id                   Int                 @id @default(autoincrement())
+  email                String?             @unique
+  name                 String              @unique
+  is_active            Boolean             @default(false)
+  clerk_id             String?             @unique
   role                 String?
+  default_warehouse_id Int?
   arrivals             Arrival[]
-  asset_errors_added   AssetError[]   @relation("ErrorAddedBy")
-  asset_errors_fixed   AssetError[]   @relation("ErrorFixedBy")
+  asset_errors_added   AssetError[]        @relation("ErrorAddedBy")
+  asset_errors_fixed   AssetError[]        @relation("ErrorFixedBy")
+  AssetSalvagedPart    AssetSalvagedPart[]
+  AssetStorePart       AssetStorePart[]
   comments             Comment[]
   departures           Departure[]
-  departure_sales_reps Departure[]    @relation("SalesRep")
+  departure_sales_reps Departure[]         @relation("SalesRep")
   files                File[]
   History              History[]
-  holds_created        Hold[]         @relation("HoldCreatedBy")
-  holds_for            Hold[]         @relation("HoldCreatedFor")
+  holds_created        Hold[]              @relation("HoldCreatedBy")
+  holds_for            Hold[]              @relation("HoldCreatedFor")
   invoices_updated     Invoice[]
-  PartTransfer         PartTransfer[]
+  StoreTransaction     StoreTransaction[]
   transfers            Transfer[]
+  Warehouse            Warehouse?          @relation(fields: [default_warehouse_id], references: [id])
 }
 
 model Organization {
@@ -423,29 +431,11 @@ model InvoiceType {
 }
 
 model StorePart {
-  id           Int     @id @default(autoincrement())
-  part_number  String  @unique @db.VarChar(50)
-  description  String
-  dealer_price Decimal @db.Decimal(12, 2)
-  sale_price   Decimal @db.Decimal(12, 2)
-  cost         Decimal @db.Decimal(12, 2)
-}
-
-model PartTransfer {
-  id                                           Int      @id @default(autoincrement())
-  recipient_asset_id                           Int
-  donor_asset_id                               Int
-  fixed_at                                     DateTime
-  fixed_by                                     Int
-  part                                         String
-  notes                                        String?
-  is_exchange                                  Boolean
-  Asset_PartTransfer_donor_asset_idToAsset     Asset    @relation("PartTransfer_donor_asset_idToAsset", fields: [donor_asset_id], references: [id])
-  User                                         User     @relation(fields: [fixed_by], references: [id])
-  Asset_PartTransfer_recipient_asset_idToAsset Asset    @relation("PartTransfer_recipient_asset_idToAsset", fields: [recipient_asset_id], references: [id])
-
-  @@index([donor_asset_id])
-  @@index([recipient_asset_id])
+  id               Int                @id @default(autoincrement())
+  part_number      String             @unique @db.VarChar(50)
+  description      String
+  AssetStorePart   AssetStorePart[]
+  StoreTransaction StoreTransaction[]
 }
 
 model History {
@@ -495,4 +485,73 @@ model Component {
 
   @@unique([brand_id, name])
   @@index([name])
+}
+
+model AssetSalvagedPart {
+  id                                                Int      @id @default(autoincrement())
+  recipient_asset_id                                Int
+  donor_asset_id                                    Int
+  fixed_at                                          DateTime
+  fixed_by                                          Int
+  is_exchange                                       Boolean
+  part                                              String
+  notes                                             String?
+  Asset_AssetSalvagedPart_donor_asset_idToAsset     Asset    @relation("AssetSalvagedPart_donor_asset_idToAsset", fields: [donor_asset_id], references: [id])
+  User                                              User     @relation(fields: [fixed_by], references: [id])
+  Asset_AssetSalvagedPart_recipient_asset_idToAsset Asset    @relation("AssetSalvagedPart_recipient_asset_idToAsset", fields: [recipient_asset_id], references: [id])
+
+  @@index([donor_asset_id])
+  @@index([recipient_asset_id])
+}
+
+model AssetStorePart {
+  id                   Int              @id @default(autoincrement())
+  asset_id             Int
+  store_part_id        Int
+  store_transaction_id Int
+  estimated_cost       Decimal          @db.Decimal(12, 2)
+  created_by_id        Int
+  created_at           DateTime
+  Asset                Asset            @relation(fields: [asset_id], references: [id])
+  User                 User             @relation(fields: [created_by_id], references: [id])
+  StorePart            StorePart        @relation(fields: [store_part_id], references: [id])
+  StoreTransaction     StoreTransaction @relation(fields: [store_transaction_id], references: [id])
+
+  @@index([asset_id])
+  @@index([created_by_id])
+  @@index([store_part_id])
+  @@index([store_transaction_id])
+}
+
+model StoreTransaction {
+  id                       Int                  @id @default(autoincrement())
+  store_part_id            Int
+  transaction_type_id      Int
+  quantity                 Int
+  unit_cost                Decimal?             @db.Decimal(12, 2)
+  departure_id             Int?
+  created_by_id            Int
+  created_at               DateTime
+  notes                    String?
+  store_transaction_number String               @unique @db.VarChar(50)
+  warehouse_id             Int
+  AssetStorePart           AssetStorePart[]
+  User                     User                 @relation(fields: [created_by_id], references: [id])
+  Departure                Departure?           @relation(fields: [departure_id], references: [id])
+  StorePart                StorePart            @relation(fields: [store_part_id], references: [id])
+  StoreTransactionType     StoreTransactionType @relation(fields: [transaction_type_id], references: [id])
+  Warehouse                Warehouse            @relation(fields: [warehouse_id], references: [id])
+
+  @@index([created_at(sort: Desc)])
+  @@index([created_by_id])
+  @@index([departure_id])
+  @@index([store_part_id, created_at(sort: Desc)])
+  @@index([transaction_type_id])
+}
+
+model StoreTransactionType {
+  id               Int                @id @default(autoincrement())
+  type             String             @unique
+  is_inbound       Boolean
+  StoreTransaction StoreTransaction[]
 }

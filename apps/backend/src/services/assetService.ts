@@ -1,5 +1,5 @@
 import { endOfDay, startOfDay } from 'date-fns'
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreatePartTransfer, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreateSalvagedPart, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
@@ -7,7 +7,7 @@ import {
   getAssetDetailsBatch as getAssetDetailsBatchQuery,
   getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
-  getAssetPartTransfer as getAssetPartTransferQuery,
+  getAssetSalvagedParts as getAssetSalvagedPartsQuery,
   getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
   getLocationsByWarehouse as getLocationsByWarehouseQuery,
@@ -328,7 +328,7 @@ export async function getComments(barcode: string): Promise<Comment[]> {
 }
 
 export async function getAssetPartTransfer(barcode: string): Promise<PartTransfer[]> {
-  return prisma.$queryRawTyped(getAssetPartTransferQuery(barcode))
+  return prisma.$queryRawTyped(getAssetSalvagedPartsQuery(barcode))
 }
 
 export async function getTransfers(barcode: string): Promise<AssetTransfer[]> {
@@ -459,9 +459,9 @@ export async function createComment(barcode: string, data: CreateComment, userId
   })
 }
 
-export async function createPartTransfer(
+export async function createAssetSalvagedPart(
   recipientBarcode: string,
-  data: CreatePartTransfer,
+  data: CreateSalvagedPart,
   userId: number
 ): Promise<void> {
   if (data.donor_barcode === recipientBarcode) {
@@ -479,7 +479,7 @@ export async function createPartTransfer(
   })
   if (!donor) throw new NotFoundError(`Donor asset ${data.donor_barcode} not found`)
 
-  await prisma.partTransfer.create({
+  await prisma.assetSalvagedPart.create({
     data: {
       recipient_asset_id: recipient.id,
       donor_asset_id: donor.id,

@@ -143,11 +143,6 @@ export type InvoiceType = Prisma.InvoiceTypeModel
  */
 export type StorePart = Prisma.StorePartModel
 /**
- * Model PartTransfer
- * 
- */
-export type PartTransfer = Prisma.PartTransferModel
-/**
  * Model History
  * 
  */
@@ -177,3 +172,23 @@ export type Country = Prisma.CountryModel
  * 
  */
 export type Component = Prisma.ComponentModel
+/**
+ * Model AssetSalvagedPart
+ * 
+ */
+export type AssetSalvagedPart = Prisma.AssetSalvagedPartModel
+/**
+ * Model AssetStorePart
+ * 
+ */
+export type AssetStorePart = Prisma.AssetStorePartModel
+/**
+ * Model StoreTransaction
+ * 
+ */
+export type StoreTransaction = Prisma.StoreTransactionModel
+/**
+ * Model StoreTransactionType
+ * 
+ */
+export type StoreTransactionType = Prisma.StoreTransactionTypeModel

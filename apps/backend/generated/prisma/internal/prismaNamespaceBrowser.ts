@@ -76,13 +76,16 @@ export const ModelName = {
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
   StorePart: 'StorePart',
-  PartTransfer: 'PartTransfer',
   History: 'History',
   Readiness: 'Readiness',
   Status: 'Status',
   Zone: 'Zone',
   Country: 'Country',
-  Component: 'Component'
+  Component: 'Component',
+  AssetSalvagedPart: 'AssetSalvagedPart',
+  AssetStorePart: 'AssetStorePart',
+  StoreTransaction: 'StoreTransaction',
+  StoreTransactionType: 'StoreTransactionType'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -355,7 +358,8 @@ export const UserScalarFieldEnum = {
   name: 'name',
   is_active: 'is_active',
   clerk_id: 'clerk_id',
-  role: 'role'
+  role: 'role',
+  default_warehouse_id: 'default_warehouse_id'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -416,27 +420,10 @@ export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[key
 export const StorePartScalarFieldEnum = {
   id: 'id',
   part_number: 'part_number',
-  description: 'description',
-  dealer_price: 'dealer_price',
-  sale_price: 'sale_price',
-  cost: 'cost'
+  description: 'description'
 } as const
 
 export type StorePartScalarFieldEnum = (typeof StorePartScalarFieldEnum)[keyof typeof StorePartScalarFieldEnum]
-
-
-export const PartTransferScalarFieldEnum = {
-  id: 'id',
-  recipient_asset_id: 'recipient_asset_id',
-  donor_asset_id: 'donor_asset_id',
-  fixed_at: 'fixed_at',
-  fixed_by: 'fixed_by',
-  part: 'part',
-  notes: 'notes',
-  is_exchange: 'is_exchange'
-} as const
-
-export type PartTransferScalarFieldEnum = (typeof PartTransferScalarFieldEnum)[keyof typeof PartTransferScalarFieldEnum]
 
 
 export const HistoryScalarFieldEnum = {
@@ -491,6 +478,59 @@ export const ComponentScalarFieldEnum = {
 } as const
 
 export type ComponentScalarFieldEnum = (typeof ComponentScalarFieldEnum)[keyof typeof ComponentScalarFieldEnum]
+
+
+export const AssetSalvagedPartScalarFieldEnum = {
+  id: 'id',
+  recipient_asset_id: 'recipient_asset_id',
+  donor_asset_id: 'donor_asset_id',
+  fixed_at: 'fixed_at',
+  fixed_by: 'fixed_by',
+  is_exchange: 'is_exchange',
+  part: 'part',
+  notes: 'notes'
+} as const
+
+export type AssetSalvagedPartScalarFieldEnum = (typeof AssetSalvagedPartScalarFieldEnum)[keyof typeof AssetSalvagedPartScalarFieldEnum]
+
+
+export const AssetStorePartScalarFieldEnum = {
+  id: 'id',
+  asset_id: 'asset_id',
+  store_part_id: 'store_part_id',
+  store_transaction_id: 'store_transaction_id',
+  estimated_cost: 'estimated_cost',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type AssetStorePartScalarFieldEnum = (typeof AssetStorePartScalarFieldEnum)[keyof typeof AssetStorePartScalarFieldEnum]
+
+
+export const StoreTransactionScalarFieldEnum = {
+  id: 'id',
+  store_part_id: 'store_part_id',
+  transaction_type_id: 'transaction_type_id',
+  quantity: 'quantity',
+  unit_cost: 'unit_cost',
+  departure_id: 'departure_id',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at',
+  notes: 'notes',
+  store_transaction_number: 'store_transaction_number',
+  warehouse_id: 'warehouse_id'
+} as const
+
+export type StoreTransactionScalarFieldEnum = (typeof StoreTransactionScalarFieldEnum)[keyof typeof StoreTransactionScalarFieldEnum]
+
+
+export const StoreTransactionTypeScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  is_inbound: 'is_inbound'
+} as const
+
+export type StoreTransactionTypeScalarFieldEnum = (typeof StoreTransactionTypeScalarFieldEnum)[keyof typeof StoreTransactionTypeScalarFieldEnum]
 
 
 export const SortOrder = {
