@@ -8,7 +8,11 @@
 -- planner to range-scan Departure_created_at_idx first, rather than reordering this ~22-table
 -- join into a plan that builds the full status/asset_type asset set and probes Departure by PK.
 with d as materialized (
-  select id, created_at, destination_id
+  select 
+    id, 
+    created_at, 
+    origin_id,
+    destination_id
   from "Departure"
   where created_at >= $1
     and created_at <= $2
@@ -53,6 +57,7 @@ select
   lc.created_at as latest_comment_at,
   lcu."name" as latest_comment_by
 from d
+  join "Warehouse" w on w.id = d.origin_id
   join "Asset" a on a.departure_id = d.id
   join "TechnicalSpecification" t on t.asset_id = a.id
   left join "Component" cmp on cmp.id = t.component_id
@@ -64,7 +69,6 @@ from d
   left join "Cost" c on c.asset_id = a.id
   left join "Country" co on co.id = a.country_of_origin_id
   left join "Location" l on l.id = a.location_id
-  left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
   left join "Hold" h on h.id = a.hold_id
