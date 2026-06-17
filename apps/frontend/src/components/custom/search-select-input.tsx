@@ -82,10 +82,10 @@ export function SearchSelectInput<T>({
     const ranked = substringMatches.length > 0
       ? substringMatches
       : options
-          .map(option => ({ option, score: defaultFilter(getLabel(option), clean) }))
-          .filter(result => result.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .map(result => result.option)
+        .map(option => ({ option, score: defaultFilter(getLabel(option), clean) }))
+        .filter(result => result.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(result => result.option)
 
     setMatches(ranked.slice(0, SUGGESTION_LIMIT))
     setPopoverOpen(true)
@@ -195,7 +195,7 @@ export function SearchSelectInput<T>({
           align="start"
           onOpenAutoFocus={e => { e.preventDefault() }}
           onCloseAutoFocus={e => { e.preventDefault() }}
-          className="w-max min-w-45 max-w-md"
+          className="w-max min-w-45 max-w-md p-1"
         >
           <div className="max-h-72 overflow-y-auto">
             {matches.map((m, i) => (
@@ -213,7 +213,7 @@ export function SearchSelectInput<T>({
                   }
                 }}
                 className={cn(
-                  "block w-full text-left p-2 cursor-pointer rounded-sm whitespace-nowrap",
+                  "block w-full text-left px-2 py-1 cursor-pointer rounded-sm whitespace-nowrap",
                   highlightedIndex === i
                     ? "bg-accent text-accent-foreground"
                     : "hover:bg-accent/50",
