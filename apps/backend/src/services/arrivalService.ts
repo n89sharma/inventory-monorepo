@@ -9,7 +9,9 @@ import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from "../prisma.js"
-import { mapAssetSummary, reconcileAssetErrors, upsertLatestComment } from './assetService.js'
+import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { reconcileAssetErrors } from './assetErrorService.js'
+import { upsertLatestComment } from './assetCommentService.js'
 import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
 
 

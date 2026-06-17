@@ -7,11 +7,8 @@ import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
+import { mapAssetSummary } from '../lib/asset-mappers.js'
 import {
-  bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
-  createComment as createCommentSer,
-  createAssetSalvagedPart as createAssetSalvagedPartSer,
-  exportAssetReport as exportAssetReportSer,
   getAccessories as getAssetAccessoriesSer,
   getComments as getAssetCommentsSer,
   getAssetDetail as getAssetDetailSer,
@@ -21,14 +18,21 @@ import {
   getTransfers as getAssetTransfersSer,
   getAssetsForSearchInStock as getAssetsForSearchInStockSer,
   getAssets as getAssetsSer,
+  getSoldAssets as getSoldAssetsSer
+} from '../services/assetReadService.js'
+import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
+import {
+  bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
+  updateAssetPricing as updateAssetPricingSer
+} from '../services/assetPricingService.js'
+import { updateAssetErrors as updateAssetErrorsSer } from '../services/assetErrorService.js'
+import { createComment as createCommentSer } from '../services/assetCommentService.js'
+import {
   getLocationsByWarehouse as getLocationsByWarehouseSer,
-  getSoldAssets as getSoldAssetsSer,
-  mapAssetSummary,
-  updateAssetErrors as updateAssetErrorsSer,
-  updateAssetLocation as updateAssetLocationSer,
-  updateAssetPricing as updateAssetPricingSer,
-  updateAssetSpecs as updateAssetSpecsSer
-} from '../services/assetService.js'
+  updateAssetLocation as updateAssetLocationSer
+} from '../services/assetLocationService.js'
+import { updateAssetSpecs as updateAssetSpecsSer } from '../services/assetSpecsService.js'
+import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../services/assetPartService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
   q: z.string().min(1).max(50).regex(/^[a-zA-Z0-9\s\-_.]*$/)

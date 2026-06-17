@@ -3,7 +3,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { mapAssetSummary } from './assetService.js'
+import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { prisma } from '../prisma.js'
 
