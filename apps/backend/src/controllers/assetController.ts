@@ -17,7 +17,7 @@ import {
   getAssetDetail as getAssetDetailSer,
   getErrors as getAssetErrorsSer,
   getAssetHistory as getAssetHistorySer,
-  getAssetPartTransfer as getAssetPartTransferSer,
+  getAssetHarvestedParts as getAssetHarvestedPartsSer,
   getTransfers as getAssetTransfersSer,
   getAssetsForSearchInStock as getAssetsForSearchInStockSer,
   getAssets as getAssetsSer,
@@ -210,9 +210,9 @@ export const getAssetComments = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const getAssetPartTransfer = asyncHandler(async (req, res) => {
+export const getAssetHarvestedParts = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const data = await getAssetPartTransferSer(barcode)
+  const data = await getAssetHarvestedPartsSer(barcode)
   res.json(successResponse(data))
 })
 
@@ -242,7 +242,7 @@ export const createAssetComment = asyncHandler(async (req, res) => {
   res.status(201).json(successResponse(null))
 })
 
-export const createPartTransfer = asyncHandler(async (req, res) => {
+export const createAssetHarvestedPart = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = CreateSalvagedPartSchema.parse(req.body)
   await createAssetSalvagedPartSer(barcode, validated, res.locals.dbUserId)

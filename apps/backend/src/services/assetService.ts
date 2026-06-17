@@ -325,7 +325,7 @@ export async function getComments(barcode: string): Promise<Comment[]> {
   return comments.map(c => ({ ...c, initials: getInitials(c.username) }))
 }
 
-export async function getAssetPartTransfer(barcode: string): Promise<AssetHarvestedPart[]> {
+export async function getAssetHarvestedParts(barcode: string): Promise<AssetHarvestedPart[]> {
   return prisma.$queryRawTyped(getAssetSalvagedPartsQuery(barcode))
 }
 

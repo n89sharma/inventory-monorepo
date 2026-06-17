@@ -5,14 +5,14 @@ import {
   LocationsByWarehouseQuerySchema,
   bulkUpdateAssetPricing,
   createAssetComment,
-  createPartTransfer,
+  createAssetHarvestedPart,
   exportAssetReport,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
   getAssetErrors,
   getAssetHistory,
-  getAssetPartTransfer,
+  getAssetHarvestedParts,
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
@@ -50,8 +50,8 @@ router.put('/:barcode/pricing', requirePermission('edit_prices'), updateAssetPri
 router.put('/:barcode/specs', requirePermission('edit_tech_specs'), updateAssetSpecs)
 router.get('/:barcode/comments', requirePermission('view_asset'), getAssetComments)
 router.post('/:barcode/comments', requirePermission('view_asset'), createAssetComment)
-router.get('/:barcode/parts', requirePermission('view_asset'), getAssetPartTransfer)
-router.post('/:barcode/parts', requirePermission('edit_tech_specs'), createPartTransfer)
+router.get('/:barcode/parts', requirePermission('view_asset'), getAssetHarvestedParts)
+router.post('/:barcode/parts', requirePermission('edit_tech_specs'), createAssetHarvestedPart)
 router.get('/:barcode/transfers', requirePermission('view_asset'), getAssetTransfers)
 
 export default router
