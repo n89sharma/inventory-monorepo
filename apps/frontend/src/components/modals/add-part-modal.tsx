@@ -83,7 +83,7 @@ interface TabProps {
 }
 
 function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
-  const createPartTransfer = useAssetStore(state => state.createPartTransfer)
+  const createAssetHarvestedPart = useAssetStore(state => state.createAssetHarvestedPart)
 
   const form = useForm<CreateSalvagedPart>({
     resolver: zodResolver(CreateSalvagedPartSchema),
@@ -102,7 +102,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
       return
     }
     try {
-      await createPartTransfer(recipientBarcode, data)
+      await createAssetHarvestedPart(recipientBarcode, data)
       toast.success('Part transfer recorded.', { position: 'top-center' })
       onClose()
     } catch {

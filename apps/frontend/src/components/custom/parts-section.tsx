@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { AssetDetails, AssetStorePartRow, PartTransfer } from "shared-types";
+import type { AssetDetails, AssetHarvestedPart, AssetStorePartRow } from "shared-types";
 import { Badge } from "../shadcn/badge";
 import { Section, SectionHeader } from "./asset-details/detail-layout";
 import { DataRow } from "./asset-details/detail-row";
@@ -7,30 +7,30 @@ import { OptionalSection } from "./asset-details/optional-section";
 
 type PartSectionProps = {
   asset: AssetDetails
-  partTransfers: PartTransfer[]
+  harvestedParts: AssetHarvestedPart[]
   storeParts: AssetStorePartRow[]
   action?: React.ReactNode
   rowClassName?: string
   className?: string
 }
 export function PartsSection(
-  { asset, partTransfers, storeParts, action, rowClassName, className }: PartSectionProps,
+  { asset, harvestedParts, storeParts, action, rowClassName, className }: PartSectionProps,
 ): React.JSX.Element {
 
-  const hasParts = !!partTransfers?.length || !!storeParts?.length
+  const hasParts = !!harvestedParts?.length || !!storeParts?.length
 
   return (
     <Section className={className}>
       <SectionHeader title="Parts" action={action} />
       <OptionalSection condition={hasParts} fallback="No parts installed">
-        {partTransfers?.map(p => getPartTransferBadge(p, asset.barcode, rowClassName))}
+        {harvestedParts?.map(p => getHarvestedPartBadge(p, asset.barcode, rowClassName))}
         {storeParts?.map(sp => getStorePartBadge(sp, rowClassName))}
       </OptionalSection>
     </Section>
   )
 }
 
-function getPartTransferBadge(transfer: PartTransfer, currentAsset: string, rowClassName?: string) {
+function getHarvestedPartBadge(transfer: AssetHarvestedPart, currentAsset: string, rowClassName?: string) {
   const isDonor = transfer.donor === currentAsset
   const counterpartBarcode = isDonor ? transfer.recipient : transfer.donor
 

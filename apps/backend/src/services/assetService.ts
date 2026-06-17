@@ -1,5 +1,5 @@
 import { endOfDay, startOfDay } from 'date-fns'
-import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreateSalvagedPart, PartTransfer, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
+import { AssetDetails, AssetError, AssetHistory, AssetHistoryRecord, AssetLocation, AssetLocationDetails, AssetSearchRow, AssetSummary, AssetTransfer, BulkUpdateAssetPricing, Comment, CreateComment, CreateSalvagedPart, AssetHarvestedPart, ROLE_PERMISSIONS, UpdateAssetErrors, UpdateAssetLocation, UpdateAssetPricing, UpdateAssetSpecs, UpdateError, type AppRole, type ReportVariant } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
@@ -325,7 +325,7 @@ export async function getComments(barcode: string): Promise<Comment[]> {
   return comments.map(c => ({ ...c, initials: getInitials(c.username) }))
 }
 
-export async function getAssetPartTransfer(barcode: string): Promise<PartTransfer[]> {
+export async function getAssetPartTransfer(barcode: string): Promise<AssetHarvestedPart[]> {
   return prisma.$queryRawTyped(getAssetSalvagedPartsQuery(barcode))
 }
 

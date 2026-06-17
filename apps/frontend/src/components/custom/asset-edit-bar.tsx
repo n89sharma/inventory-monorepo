@@ -38,7 +38,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
   const [editSpecsOpen, setEditSpecsOpen] = useState(false)
-  const [addPartTransferOpen, setAddPartTransferOpen] = useState(false)
+  const [addHarvestedPartOpen, setAddHarvestedPartOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
   const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails) : null
@@ -52,7 +52,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     canEditPrice && { key: 'pricing', label: 'Pricing', onSelect: () => setEditPricingOpen(true) },
     canEditSpecs && { key: 'specs', label: 'Specifications', onSelect: () => setEditSpecsOpen(true) },
     canEditSpecs && { key: 'errors', label: 'Errors', onSelect: () => setEditErrorsOpen(true) },
-    canEditSpecs && { key: 'parts', label: 'Parts', onSelect: () => setAddPartTransferOpen(true) },
+    canEditSpecs && { key: 'parts', label: 'Parts', onSelect: () => setAddHarvestedPartOpen(true) },
     canEditSpecs && { key: 'location', label: 'Location', onSelect: () => setEditLocationOpen(true) },
   ].filter((i): i is MenuItem => i !== false)
 
@@ -139,8 +139,8 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
       />
 
       <AddPartModal
-        open={addPartTransferOpen}
-        onOpenChange={setAddPartTransferOpen}
+        open={addHarvestedPartOpen}
+        onOpenChange={setAddHarvestedPartOpen}
         recipientBarcode={assetDetails?.barcode ?? null}
       />
 

@@ -1,6 +1,6 @@
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingApi,
-  createPartTransfer as createPartTransferApi,
+  createAssetHarvestedPart as createAssetHarvestedPartApi,
   exportAssets as exportAssetsApi,
   getAssetDetail as getAssetDetailApi,
   getLocationsByWarehouse as getLocationsByWarehouseApi,
@@ -34,7 +34,7 @@ import { create } from 'zustand'
 
 interface AssetStore {
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<void>
-  createPartTransfer: (barcode: string, data: CreateSalvagedPart) => Promise<void>
+  createAssetHarvestedPart: (barcode: string, data: CreateSalvagedPart) => Promise<void>
   addStorePartToAsset: (barcode: string, form: AddStorePartForm) => Promise<AddPurchaseResponse>
   createComment: (barcode: string, data: CreateComment) => Promise<void>
   updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<void>
@@ -58,8 +58,8 @@ export const useAssetStore = create<AssetStore>(() => ({
     mutate(assetDetailKey(barcode))
   },
 
-  createPartTransfer: async (barcode, data) => {
-    await createPartTransferApi(barcode, data)
+  createAssetHarvestedPart: async (barcode, data) => {
+    await createAssetHarvestedPartApi(barcode, data)
     invalidateAssetDetails([barcode, data.donor_barcode])
   },
 

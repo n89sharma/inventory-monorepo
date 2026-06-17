@@ -224,7 +224,7 @@ export const AssetTransferSchema = z.object({
 
 export type AssetTransfer = z.infer<typeof AssetTransferSchema>
 
-export const PartTransferSchema = z.object({
+export const AssetHarvestedPartSchema = z.object({
   recipient: z.string(),
   donor: z.string(),
   fixed_at: z.coerce.date(),
@@ -234,7 +234,7 @@ export const PartTransferSchema = z.object({
   is_exchange: z.boolean()
 })
 
-export type PartTransfer = z.infer<typeof PartTransferSchema>
+export type AssetHarvestedPart = z.infer<typeof AssetHarvestedPartSchema>
 
 export const BarcodeSuggestionSchema = z.object({
   barcode: z.string(),

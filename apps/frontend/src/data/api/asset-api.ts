@@ -3,6 +3,7 @@ import { getAssetStoreParts } from '@/data/api/store-part-api'
 import type {
   AssetDetails,
   AssetError,
+  AssetHarvestedPart,
   AssetHistory,
   AssetLocation,
   AssetSearchRow,
@@ -17,7 +18,6 @@ import type {
   CreateComment,
   CreateSalvagedPart,
   OrgSummary,
-  PartTransfer,
   ReportVariant,
   Status,
   UpdateAssetErrors,
@@ -31,6 +31,7 @@ import type {
 import {
   AssetDetailsSchema,
   AssetErrorSchema,
+  AssetHarvestedPartSchema,
   AssetHistorySchema,
   AssetLocationSchema,
   AssetSearchRowSchema,
@@ -41,7 +42,6 @@ import {
   CreateCommentSchema,
   CreateSalvagedPartSchema,
   ExportAssetsSchema,
-  PartTransferSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
   UpdateAssetPricingSchema,
@@ -83,9 +83,9 @@ export async function getAssetTransfers(params: { barcode: string }): Promise<As
   return z.array(AssetTransferSchema).parse(data)
 }
 
-export async function getAssetPartTransfers(params: { barcode: string }): Promise<PartTransfer[]> {
-  const { data } = await api.get<PartTransfer[]>(`/assets/${params.barcode}/parts`)
-  return z.array(PartTransferSchema).parse(data)
+export async function getAssetHarvestedParts(params: { barcode: string }): Promise<AssetHarvestedPart[]> {
+  const { data } = await api.get<AssetHarvestedPart[]>(`/assets/${params.barcode}/parts`)
+  return z.array(AssetHarvestedPartSchema).parse(data)
 }
 
 export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<void> {
@@ -125,9 +125,9 @@ export async function postComment(barcode: string, data: CreateComment): Promise
   await api.post(`/assets/${barcode}/comments`, postCommentBody)
 }
 
-export async function createPartTransfer(recipientBarcode: string, data: CreateSalvagedPart): Promise<void> {
-  const createPartTransferBody = CreateSalvagedPartSchema.parse(data satisfies CreateSalvagedPart)
-  await api.post(`/assets/${recipientBarcode}/parts`, createPartTransferBody)
+export async function createAssetHarvestedPart(recipientBarcode: string, data: CreateSalvagedPart): Promise<void> {
+  const createAssetHarvestedPartBody = CreateSalvagedPartSchema.parse(data satisfies CreateSalvagedPart)
+  await api.post(`/assets/${recipientBarcode}/parts`, createAssetHarvestedPartBody)
 }
 
 export type AssetAllDetails = {
@@ -136,19 +136,19 @@ export type AssetAllDetails = {
   errors: AssetError[]
   comments: Comment[]
   transfers: AssetTransfer[]
-  partTransfers: PartTransfer[]
+  harvestedParts: AssetHarvestedPart[]
   storeParts: AssetStorePartRow[]
 }
 
 export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetails> {
-  const [assetDetails, accessories, errors, comments, transfers, partTransfers, storeParts] =
+  const [assetDetails, accessories, errors, comments, transfers, harvestedParts, storeParts] =
     await Promise.allSettled([
       getAssetDetail({ barcode }),
       getAssetAccessories({ barcode }),
       getAssetErrors({ barcode }),
       getAssetComments({ barcode }),
       getAssetTransfers({ barcode }),
-      getAssetPartTransfers({ barcode }),
+      getAssetHarvestedParts({ barcode }),
       getAssetStoreParts(barcode)
     ])
 
@@ -158,7 +158,7 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
     errors: errors.status === 'fulfilled' ? errors.value : [],
     comments: comments.status === 'fulfilled' ? comments.value : [],
     transfers: transfers.status === 'fulfilled' ? transfers.value : [],
-    partTransfers: partTransfers.status === 'fulfilled' ? partTransfers.value : [],
+    harvestedParts: harvestedParts.status === 'fulfilled' ? harvestedParts.value : [],
     storeParts: storeParts.status === 'fulfilled' ? storeParts.value : [],
   }
 }

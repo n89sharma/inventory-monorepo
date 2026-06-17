@@ -134,7 +134,7 @@ export const AssetDetailsPage = () => {
   const errors = data?.errors ?? []
   const comments = data?.comments ?? []
   const transfers = data?.transfers ?? []
-  const partTransfers = data?.partTransfers ?? []
+  const harvestedParts = data?.harvestedParts ?? []
   const storeParts = data?.storeParts ?? []
 
   const canViewSalePrice = useCan('view_sale_price')
@@ -351,7 +351,7 @@ export const AssetDetailsPage = () => {
 
               <PartsSection
                 asset={assetDetails}
-                partTransfers={partTransfers}
+                harvestedParts={harvestedParts}
                 storeParts={storeParts}
                 action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
                 rowClassName={ROW_GAP}
