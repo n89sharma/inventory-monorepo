@@ -28,7 +28,11 @@ export type SearchSelectInputProps<T> = {
   className?: string
   error?: boolean
   sanitize?: (raw: string) => string
+  onCreateOption?: (query: string) => void
+  createLabel?: (query: string) => string
 }
+
+const defaultCreateLabel = (query: string): string => `Create "${query}"`
 
 function stripDisallowedChars(raw: string): string {
   return raw.replace(DISALLOWED_CHARS_PATTERN, '')
@@ -47,6 +51,8 @@ export function SearchSelectInput<T>({
   className,
   error,
   sanitize = stripDisallowedChars,
+  onCreateOption,
+  createLabel = defaultCreateLabel,
 }: SearchSelectInputProps<T>): React.JSX.Element {
   const [matches, setMatches] = useState<T[]>([])
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -98,6 +104,16 @@ export function SearchSelectInput<T>({
     setHighlightedIndex(-1)
   }
 
+  function handleCreate() {
+    if (!onCreateOption) return
+    const clean = query.trim()
+    if (!clean) return
+    onCreateOption(clean)
+    setPopoverOpen(false)
+    setMatches([])
+    setHighlightedIndex(-1)
+  }
+
   function handleClear() {
     onClear()
     setPopoverOpen(false)
@@ -120,6 +136,9 @@ export function SearchSelectInput<T>({
         if (highlightedIndex >= 0 && highlightedIndex < matches.length) {
           e.preventDefault()
           handleSelect(matches[highlightedIndex])
+        } else if (matches.length === 0 && onCreateOption && query.trim()) {
+          e.preventDefault()
+          handleCreate()
         }
         break
       case 'Escape':
@@ -222,6 +241,16 @@ export function SearchSelectInput<T>({
                 {getLabel(m)}
               </button>
             ))}
+            {matches.length === 0 && onCreateOption && query.trim() && (
+              <button
+                type="button"
+                onClick={handleCreate}
+                onMouseDown={e => { e.preventDefault() }}
+                className="block w-full cursor-pointer rounded-sm px-2 py-1 text-left whitespace-nowrap hover:bg-accent/50"
+              >
+                {createLabel(query.trim())}
+              </button>
+            )}
           </div>
         </PopoverContent>
       </Popover>

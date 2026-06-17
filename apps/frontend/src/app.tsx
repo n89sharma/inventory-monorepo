@@ -24,6 +24,9 @@ const DepartureSummaryPage      = lazy(() => import('./components/pages/departur
 const CreateDeparturePage       = lazy(() => import('./components/pages/departure/create-departure-page').then(m => ({ default: m.CreateDeparturePage })))
 const DepartureDetailsPage      = lazy(() => import('./components/pages/departure/departure-details-page').then(m => ({ default: m.DepartureDetailsPage })))
 
+const StorePartsListPage        = lazy(() => import('./components/pages/store-part/store-parts-list-page').then(m => ({ default: m.StorePartsListPage })))
+const StorePartDetailPage       = lazy(() => import('./components/pages/store-part/store-part-detail-page').then(m => ({ default: m.StorePartDetailPage })))
+
 const HoldSummaryPage           = lazy(() => import('./components/pages/hold/holds-summary-page').then(m => ({ default: m.HoldSummaryPage })))
 const CreateHoldPage            = lazy(() => import('./components/pages/hold/create-hold-page').then(m => ({ default: m.CreateHoldPage })))
 const HoldDetailsPage           = lazy(() => import('./components/pages/hold/hold-details-page').then(m => ({ default: m.HoldDetailsPage })))
@@ -88,6 +91,23 @@ function AppRoutes() {
                     }
                   />
                   <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
+
+                  <Route
+                    path="/store"
+                    element={
+                      <PermissionRoute permission="view_store">
+                        <StorePartsListPage />
+                      </PermissionRoute>
+                    }
+                  />
+                  <Route
+                    path="/store/:partNumber"
+                    element={
+                      <PermissionRoute permission="view_store">
+                        <StorePartDetailPage />
+                      </PermissionRoute>
+                    }
+                  />
 
                   <Route path="/holds" element={<HoldSummaryPage />} />
                   <Route

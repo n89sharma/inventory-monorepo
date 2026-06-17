@@ -19,6 +19,7 @@ import organizationRoutes from './routes/organizationRoutes.js'
 import constantRoutes from './routes/referenceRoutes.js'
 import reportRoutes from './routes/reportRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
+import storePartRoutes from './routes/storePartRoutes.js'
 import transferRoutes from './routes/transferRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
@@ -127,6 +128,7 @@ app.use('/users', userRoutes)
 app.use('/admin', adminRoutes)
 app.use('/search', searchRoutes)
 app.use('/reports', reportRoutes)
+app.use('/store', storePartRoutes)
 
 app.use(errorHandler)
 

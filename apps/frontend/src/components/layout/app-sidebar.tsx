@@ -25,6 +25,7 @@ import {
   LockOpenIcon,
   MagnifyingGlassIcon,
   StackIcon,
+  ToolboxIcon,
   TruckTrailerIcon,
   WarehouseIcon
 } from "@phosphor-icons/react"
@@ -46,6 +47,11 @@ const sidebarItems = [
     title: "Departures",
     url: "/departures",
     icon: <TruckTrailerIcon aria-hidden="true" />
+  },
+  {
+    title: "Store",
+    url: "/store",
+    icon: <ToolboxIcon aria-hidden="true" />
   },
   {
     title: "Holds",

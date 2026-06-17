@@ -35,6 +35,13 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
   standalone, behavior-preserving commit — verify it builds/works — *then* make functional changes.
   Always present the rename as a separate step. Never mix renames with logic changes in one commit.
 
+## Plan format
+
+Write plans in this structure, always: **Context** (why), **Architectural decisions & risks**,
+numbered implementation sections **split Backend / Frontend with `###` subheadings**, **Out of
+scope**, **Verification**. Put a blank line between every bullet, and use subheadings within any
+long section. Optimize for scannability.
+
 ## Commands
 
 Run from the **repo root** after every code change; summarize and fix any errors before

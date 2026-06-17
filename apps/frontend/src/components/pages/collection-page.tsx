@@ -11,9 +11,10 @@ interface CollectionPageProps<TData, TValue> {
   actions?: React.ReactNode
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
+  defaultSort?: { id: string; desc: boolean }
 }
 
-export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions, onRowMouseEnter, getRowHref }: CollectionPageProps<TData, TValue>) {
+export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions, onRowMouseEnter, getRowHref, defaultSort = { id: 'created_at', desc: true } }: CollectionPageProps<TData, TValue>) {
   return (
     <>
       <StickyPageHeader>
@@ -29,7 +30,7 @@ export function CollectionPage<TData, TValue>({ title, columns, data, searchBar,
           data={data}
           onRowMouseEnter={onRowMouseEnter}
           getRowHref={getRowHref}
-          defaultSort={{ id: 'created_at', desc: true }}
+          defaultSort={defaultSort}
         />
       </PageContent>
     </>
