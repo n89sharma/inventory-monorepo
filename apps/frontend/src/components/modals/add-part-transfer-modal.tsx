@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon, ArrowsLeftRightIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { CreatePartTransferSchema, type CreatePartTransfer } from 'shared-types'
+import { CreateSalvagedPartSchema, type CreateSalvagedPart } from 'shared-types'
 import { toast } from 'sonner'
 
 interface AddPartTransferModalProps {
@@ -27,8 +27,8 @@ interface AddPartTransferModalProps {
 export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: AddPartTransferModalProps) {
   const createPartTransfer = useAssetStore(state => state.createPartTransfer)
 
-  const form = useForm<CreatePartTransfer>({
-    resolver: zodResolver(CreatePartTransferSchema),
+  const form = useForm<CreateSalvagedPart>({
+    resolver: zodResolver(CreateSalvagedPartSchema),
     defaultValues: {
       donor_barcode: '',
       part: '',
@@ -45,7 +45,7 @@ export function AddPartTransferModal({ open, onOpenChange, recipientBarcode }: A
 
   if (!recipientBarcode) return null
 
-  async function handleSave(data: CreatePartTransfer) {
+  async function handleSave(data: CreateSalvagedPart) {
     if (data.donor_barcode === recipientBarcode) {
       form.setError('donor_barcode', { message: 'Donor and recipient cannot be the same asset' })
       return

@@ -13,7 +13,7 @@ import type {
   Component,
   Comment,
   CreateComment,
-  CreatePartTransfer,
+  CreateSalvagedPart,
   OrgSummary,
   PartTransfer,
   ReportVariant,
@@ -37,7 +37,7 @@ import {
   BulkUpdateAssetPricingSchema,
   CommentSchema,
   CreateCommentSchema,
-  CreatePartTransferSchema,
+  CreateSalvagedPartSchema,
   ExportAssetsSchema,
   PartTransferSchema,
   UpdateAssetErrorsSchema,
@@ -123,8 +123,8 @@ export async function postComment(barcode: string, data: CreateComment): Promise
   await api.post(`/assets/${barcode}/comments`, postCommentBody)
 }
 
-export async function createPartTransfer(recipientBarcode: string, data: CreatePartTransfer): Promise<void> {
-  const createPartTransferBody = CreatePartTransferSchema.parse(data satisfies CreatePartTransfer)
+export async function createPartTransfer(recipientBarcode: string, data: CreateSalvagedPart): Promise<void> {
+  const createPartTransferBody = CreateSalvagedPartSchema.parse(data satisfies CreateSalvagedPart)
   await api.post(`/assets/${recipientBarcode}/parts`, createPartTransferBody)
 }
 

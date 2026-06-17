@@ -18,7 +18,7 @@ import type {
   AssetSummary,
   BulkUpdateAssetPricing,
   CreateComment,
-  CreatePartTransfer,
+  CreateSalvagedPart,
   ReportVariant,
   UpdateAssetLocation,
   UpdateAssetPricing,
@@ -30,7 +30,7 @@ import { create } from 'zustand'
 
 interface AssetStore {
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<void>
-  createPartTransfer: (barcode: string, data: CreatePartTransfer) => Promise<void>
+  createPartTransfer: (barcode: string, data: CreateSalvagedPart) => Promise<void>
   createComment: (barcode: string, data: CreateComment) => Promise<void>
   updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<void>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
