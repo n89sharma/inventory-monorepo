@@ -290,8 +290,8 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
 })
 
 export const exportAssetReport = asyncHandler(async (req, res) => {
-  const { barcodes, variant } = ExportAssetsSchema.parse(req.body)
-  const csv = await exportAssetReportSer(barcodes, res.locals.dbUserRole, variant)
+  const { barcodes, variant, columnKeys } = ExportAssetsSchema.parse(req.body)
+  const csv = await exportAssetReportSer(barcodes, res.locals.dbUserRole, variant, columnKeys)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)

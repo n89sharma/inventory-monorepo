@@ -38,7 +38,12 @@ interface AssetStore {
   getAssetByBarcode: (barcode: string) => Promise<AssetSummary>
   getAssetDetail: (barcode: string) => Promise<AssetDetails>
   getLocationsByWarehouse: (warehouseId: number) => Promise<AssetLocation[]>
-  exportAssets: (barcodes: string[], filename?: string, variant?: ReportVariant) => Promise<void>
+  exportAssets: (
+    barcodes: string[],
+    filename?: string,
+    variant?: ReportVariant,
+    columnKeys?: string[],
+  ) => Promise<void>
   bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
 
@@ -79,7 +84,8 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   getLocationsByWarehouse: (warehouseId) => getLocationsByWarehouseApi(warehouseId),
 
-  exportAssets: (barcodes, filename, variant) => exportAssetsApi(barcodes, filename, variant),
+  exportAssets: (barcodes, filename, variant, columnKeys) =>
+    exportAssetsApi(barcodes, filename, variant, columnKeys),
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)

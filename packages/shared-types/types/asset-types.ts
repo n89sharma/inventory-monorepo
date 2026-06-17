@@ -147,7 +147,8 @@ export const AssetDetailsSchema = z.object({
   purchase_invoice: z.object({
     invoice_number: z.string(),
     is_cleared: z.boolean()
-  }).nullable()
+  }).nullable(),
+  latest_comment: z.string().nullable()
 })
 
 export type AssetDetails = z.infer<typeof AssetDetailsSchema>

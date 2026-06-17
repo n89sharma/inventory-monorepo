@@ -75,7 +75,7 @@ export function SearchAllPage(): React.JSX.Element {
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
-  const selection = useAssetSelection(assets)
+  const selection = useAssetSelection(assets, visibleColumns)
   const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref('all', a.barcode, searchParams),

@@ -32,7 +32,7 @@ export function AssetSearchPage({
   const [searchParams] = useSearchParams()
   const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
     useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
-  const selection = useAssetSelection(assets)
+  const selection = useAssetSelection(assets, visibleColumns)
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
     [navContext, searchParams],

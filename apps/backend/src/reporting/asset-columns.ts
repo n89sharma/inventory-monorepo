@@ -1,3 +1,4 @@
+import { differenceInCalendarDays } from 'date-fns'
 import type { AssetDetails } from 'shared-types'
 import type { ColumnDescriptor } from './column-descriptor.js'
 
@@ -6,6 +7,9 @@ const formatDate = (val: unknown): string | null => {
   if (val instanceof Date) return val.toISOString()
   return String(val)
 }
+
+const stockDays = (a: AssetDetails): number | null =>
+  a.arrival ? differenceInCalendarDays(new Date(), a.arrival.created_at) : null
 
 export const ASSET_COLUMNS = {
   barcode:         { key: 'barcode',         header: 'barcode',         accessor: (a) => a.barcode },
@@ -71,6 +75,9 @@ export const ASSET_COLUMNS = {
 
   purchase_invoice_invoice_number: { key: 'purchase_invoice_invoice_number', header: 'purchase_invoice_invoice_number', accessor: (a) => a.purchase_invoice?.invoice_number },
   purchase_invoice_is_cleared:     { key: 'purchase_invoice_is_cleared',     header: 'purchase_invoice_is_cleared',     accessor: (a) => a.purchase_invoice?.is_cleared },
+
+  stock_days:     { key: 'stock_days',     header: 'stock_days',     accessor: (a) => stockDays(a) },
+  latest_comment: { key: 'latest_comment', header: 'latest_comment', accessor: (a) => a.latest_comment },
 } as const satisfies Record<string, ColumnDescriptor<AssetDetails>>
 
 export type AssetColumnKey = keyof typeof ASSET_COLUMNS

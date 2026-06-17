@@ -53,7 +53,9 @@ export function CollectionEditBar({
     if (!barcodes || barcodes.length === 0) return
 
     if (barcodes.length > 2000) {
-      toast.error('Please select 2000 assets or less', { position: 'top-center' })
+      toast.error(
+        `Cannot export ${barcodes.length} assets. Please select 2000 assets or less`
+        , { position: 'top-center' })
       return
     }
 

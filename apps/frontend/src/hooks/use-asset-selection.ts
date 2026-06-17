@@ -1,3 +1,4 @@
+import { buildExportColumnKeys } from '@/components/pages/column-defs/asset-table-columns'
 import { useAssetStore } from '@/data/store/asset-store'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
@@ -6,7 +7,10 @@ import { toast } from 'sonner'
 
 const MAX_EXPORT = 2000
 
-export function useAssetSelection(assets: AssetSearchRow[]): {
+export function useAssetSelection(
+  assets: AssetSearchRow[],
+  visibleColumns: Set<string>,
+): {
   rowSelection: RowSelectionState
   setRowSelection: OnChangeFn<RowSelectionState>
   hasSelection: boolean
@@ -31,13 +35,15 @@ export function useAssetSelection(assets: AssetSearchRow[]): {
       : assets.map(a => a.barcode)
 
     if (barcodesToExport.length > MAX_EXPORT) {
-      toast.error(`Please select ${MAX_EXPORT} assets or less`, { position: 'top-center' })
+      toast.error(
+        `Cannot export ${barcodesToExport.length} assets. Please select ${MAX_EXPORT} assets or less`
+        , { position: 'top-center' })
       return
     }
 
     setExportLoading(true)
     try {
-      await exportAssets(barcodesToExport)
+      await exportAssets(barcodesToExport, undefined, undefined, buildExportColumnKeys(visibleColumns))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {

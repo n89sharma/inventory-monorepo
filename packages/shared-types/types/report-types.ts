@@ -15,9 +15,13 @@ export const REPORT_VARIANT_VALUES = [
 export const ReportVariantSchema = z.enum(REPORT_VARIANT_VALUES)
 export type ReportVariant = z.infer<typeof ReportVariantSchema>
 
+const MAX_EXPORT_COLUMNS = 64
+const MAX_COLUMN_KEY_LENGTH = 64
+
 export const ExportAssetsSchema = z.object({
   barcodes: z.array(z.string()).min(1).max(MAX_EXPORT_BARCODES),
   variant: ReportVariantSchema.default(DEFAULT_REPORT_VARIANT),
+  columnKeys: z.array(z.string().max(MAX_COLUMN_KEY_LENGTH)).min(1).max(MAX_EXPORT_COLUMNS).optional(),
 })
 
 export type ExportAssets = z.infer<typeof ExportAssetsSchema>

@@ -3,7 +3,6 @@ import { ROLE_PERMISSIONS, type AppRole, type AssetDetails } from 'shared-types'
 import { ValidationError } from '../lib/errors.js'
 import { ASSET_COLUMNS, type AssetColumnKey } from '../reporting/asset-columns.js'
 import type { ColumnDescriptor } from '../reporting/column-descriptor.js'
-import { REPORT_VARIANTS, type ReportVariant } from '../reporting/report-variants.js'
 
 function resolveAssetColumns(
   keys: readonly string[],
@@ -35,11 +34,10 @@ function flattenRow(
 }
 
 export function generateCsvReport(
-  variant: ReportVariant,
+  columnKeys: readonly string[],
   rows: AssetDetails[],
   role: AppRole | null,
 ): string {
-  const columnKeys = REPORT_VARIANTS[variant]
   const columns = resolveAssetColumns(columnKeys, role)
   const flatRows = rows.map(r => flattenRow(r, columns))
   return stringify(flatRows, {

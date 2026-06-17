@@ -18,6 +18,7 @@ import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
+import { REPORT_VARIANTS } from '../reporting/report-variants.js'
 import { generateCsvReport } from './reportService.js'
 
 type LocationRow = {
@@ -380,7 +381,8 @@ function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     hold: mapHold(r),
     arrival: mapArrival(r),
     departure: mapDeparture(r),
-    purchase_invoice: mapInvoice(r)
+    purchase_invoice: mapInvoice(r),
+    latest_comment: r.latest_comment
   }
 }
 
@@ -437,11 +439,13 @@ function mapInvoice(r: AssetDetailRow) {
 export async function exportAssetReport(
   barcodes: string[],
   role: AppRole | null,
-  variant: ReportVariant
+  variant: ReportVariant,
+  columnKeys?: string[]
 ): Promise<string> {
   const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
   const details = results.map(r => mapAssetDetail(r))
-  return generateCsvReport(variant, details, role)
+  const columns = columnKeys ?? REPORT_VARIANTS[variant]
+  return generateCsvReport(columns, details, role)
 }
 
 export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<void> {

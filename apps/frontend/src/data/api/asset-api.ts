@@ -160,10 +160,11 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
 export async function exportAssets(
   barcodes: string[],
   filename?: string,
-  variant?: ReportVariant
+  variant?: ReportVariant,
+  columnKeys?: string[]
 ): Promise<void> {
   const exportAssetsBody = ExportAssetsSchema.parse(
-    { barcodes, variant } satisfies z.input<typeof ExportAssetsSchema>
+    { barcodes, variant, columnKeys } satisfies z.input<typeof ExportAssetsSchema>
   )
   const response = await api.post('/assets/export', exportAssetsBody, { responseType: 'blob' })
   const disposition = response.headers['content-disposition'] as string | undefined

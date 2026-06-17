@@ -71,7 +71,9 @@ select
   d.created_at as departure_created_at,
   -- invoice
   pi.invoice_number as purchase_invoice_number,
-  pi.is_cleared as purchase_invoice_is_cleared
+  pi.is_cleared as purchase_invoice_is_cleared,
+  -- latest comment
+  lc.comment as latest_comment
 from "Asset" a
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
@@ -100,4 +102,11 @@ from "Asset" a
   left join "Organization" dc on dc.id = d.destination_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
   left join "Country" co on co.id = a.country_of_origin_id
+  left join lateral (
+    select cm.comment
+    from "Comment" cm
+    where cm.asset_id = a.id
+    order by cm.created_at desc
+    limit 1
+  ) lc on true
 where a.barcode = $1
