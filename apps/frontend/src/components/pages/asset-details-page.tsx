@@ -12,7 +12,7 @@ import { ReadinessPill } from '@/components/custom/readiness-pill'
 import { StatusBadge } from '@/components/custom/status-badge'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
-import { AddPartTransferModal } from '@/components/modals/add-part-transfer-modal'
+import { AddPartModal } from '@/components/modals/add-part-modal'
 import { EditErrorsModal } from '@/components/modals/edit-errors-modal'
 import { EditPricingModal } from '@/components/modals/edit-pricing-modal'
 import { EditSpecsModal } from '@/components/modals/edit-specs-modal'
@@ -135,6 +135,7 @@ export const AssetDetailsPage = () => {
   const comments = data?.comments ?? []
   const transfers = data?.transfers ?? []
   const partTransfers = data?.partTransfers ?? []
+  const storeParts = data?.storeParts ?? []
 
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
@@ -351,6 +352,7 @@ export const AssetDetailsPage = () => {
               <PartsSection
                 asset={assetDetails}
                 partTransfers={partTransfers}
+                storeParts={storeParts}
                 action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
                 rowClassName={ROW_GAP}
                 className="flex-1 min-w-0"
@@ -449,7 +451,7 @@ export const AssetDetailsPage = () => {
         assetDetails={assetDetails}
         errors={errors}
       />
-      <AddPartTransferModal
+      <AddPartModal
         open={editPartsOpen}
         onOpenChange={setEditPartsOpen}
         recipientBarcode={assetDetails.barcode}

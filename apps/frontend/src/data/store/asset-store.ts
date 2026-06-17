@@ -10,8 +10,10 @@ import {
   updateAssetPricing as updateAssetPricingApi,
   updateAssetSpecs as updateAssetSpecsApi,
 } from '@/data/api/asset-api'
+import { addStorePartToAsset as addStorePartToAssetApi } from '@/data/api/store-part-api'
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
 import { assetDetailKey, invalidateAssetDetails } from '@/hooks/use-asset-detail'
+import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
   AssetDetails,
   AssetLocation,
@@ -19,18 +21,21 @@ import type {
   BulkUpdateAssetPricing,
   CreateComment,
   CreateSalvagedPart,
+  AddPurchaseResponse,
   ReportVariant,
   UpdateAssetLocation,
   UpdateAssetPricing,
   UpdateAssetSpecs,
   UpdateError,
 } from 'shared-types'
+import type { AddStorePartForm } from '@/ui-types/store-part-form-types'
 import { mutate } from 'swr'
 import { create } from 'zustand'
 
 interface AssetStore {
   updateAssetErrors: (barcode: string, errors: UpdateError[]) => Promise<void>
   createPartTransfer: (barcode: string, data: CreateSalvagedPart) => Promise<void>
+  addStorePartToAsset: (barcode: string, form: AddStorePartForm) => Promise<AddPurchaseResponse>
   createComment: (barcode: string, data: CreateComment) => Promise<void>
   updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<void>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
@@ -56,6 +61,14 @@ export const useAssetStore = create<AssetStore>(() => ({
   createPartTransfer: async (barcode, data) => {
     await createPartTransferApi(barcode, data)
     invalidateAssetDetails([barcode, data.donor_barcode])
+  },
+
+  addStorePartToAsset: async (barcode, form) => {
+    const result = await addStorePartToAssetApi(barcode, form)
+    invalidateAssetDetails([barcode])
+    invalidateStorePartLists()
+    mutate(storePartDetailKey(result.part_number))
+    return result
   },
 
   createComment: async (barcode, data) => {

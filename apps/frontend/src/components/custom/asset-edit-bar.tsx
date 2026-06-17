@@ -3,7 +3,7 @@ import { useCan } from "@/hooks/use-can"
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import { Fragment, useState } from "react"
 import { assetDetailsToSummary, type Permission } from "shared-types"
-import { AddPartTransferModal } from "../modals/add-part-transfer-modal"
+import { AddPartModal } from "../modals/add-part-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
 import { EditLocationModal } from "../modals/edit-location-modal"
@@ -138,7 +138,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         assetDetails={assetDetails}
       />
 
-      <AddPartTransferModal
+      <AddPartModal
         open={addPartTransferOpen}
         onOpenChange={setAddPartTransferOpen}
         recipientBarcode={assetDetails?.barcode ?? null}

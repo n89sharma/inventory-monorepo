@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { AssetDetails, PartTransfer } from "shared-types";
+import type { AssetDetails, AssetStorePartRow, PartTransfer } from "shared-types";
 import { Badge } from "../shadcn/badge";
 import { Section, SectionHeader } from "./asset-details/detail-layout";
 import { DataRow } from "./asset-details/detail-row";
@@ -8,27 +8,29 @@ import { OptionalSection } from "./asset-details/optional-section";
 type PartSectionProps = {
   asset: AssetDetails
   partTransfers: PartTransfer[]
+  storeParts: AssetStorePartRow[]
   action?: React.ReactNode
   rowClassName?: string
   className?: string
 }
 export function PartsSection(
-  { asset, partTransfers, action, rowClassName, className }: PartSectionProps,
+  { asset, partTransfers, storeParts, action, rowClassName, className }: PartSectionProps,
 ): React.JSX.Element {
+
+  const hasParts = !!partTransfers?.length || !!storeParts?.length
 
   return (
     <Section className={className}>
-      <SectionHeader title="Parts Transferred" action={action} />
-      <OptionalSection condition={!!partTransfers?.length} fallback="No parts installed">
-        {
-          partTransfers?.map(p => getPartBadge(p, asset.barcode, rowClassName))
-        }
+      <SectionHeader title="Parts" action={action} />
+      <OptionalSection condition={hasParts} fallback="No parts installed">
+        {partTransfers?.map(p => getPartTransferBadge(p, asset.barcode, rowClassName))}
+        {storeParts?.map(sp => getStorePartBadge(sp, rowClassName))}
       </OptionalSection>
     </Section>
   )
 }
 
-function getPartBadge(transfer: PartTransfer, currentAsset: string, rowClassName?: string) {
+function getPartTransferBadge(transfer: PartTransfer, currentAsset: string, rowClassName?: string) {
   const isDonor = transfer.donor === currentAsset
   const counterpartBarcode = isDonor ? transfer.recipient : transfer.donor
 
@@ -48,6 +50,25 @@ function getPartBadge(transfer: PartTransfer, currentAsset: string, rowClassName
           className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
         >
           {counterpartBarcode}
+        </Link>
+      </div>
+    </DataRow>
+  )
+}
+
+function getStorePartBadge(storePart: AssetStorePartRow, rowClassName?: string) {
+  return (
+    <DataRow
+      key={`store-${storePart.store_part_id}-${storePart.part_number}`}
+      label={`${storePart.part_number} x${storePart.quantity}`}
+      rowClassName={rowClassName}>
+      <div className="flex items-center gap-2">
+        <Badge variant="success">Added</Badge>
+        <Link
+          to={`/store/${storePart.part_number}`}
+          className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
+        >
+          Store
         </Link>
       </div>
     </DataRow>

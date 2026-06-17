@@ -15,6 +15,7 @@ import {
 } from '../../generated/prisma/sql.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
+import { decimalToNumber } from '../lib/decimal.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
@@ -106,10 +107,6 @@ type AssetSearchRowDb = LocationRow & {
   latest_comment: string | null
   latest_comment_by: string | null
   latest_comment_at: Date | null
-}
-
-function decimalToNumber(d: Prisma.Decimal | null): number | null {
-  return d === null ? null : d.toNumber()
 }
 
 function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {

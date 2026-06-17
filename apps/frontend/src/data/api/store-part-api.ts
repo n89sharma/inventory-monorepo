@@ -1,14 +1,18 @@
 import { api } from '@/data/api/axios-client'
-import type { AddPurchaseForm } from '@/ui-types/store-part-form-types'
+import type { AddPurchaseForm, AddStorePartForm } from '@/ui-types/store-part-form-types'
 import type {
   AddPurchase,
   AddPurchaseResponse,
+  AddStorePartToAsset,
+  AssetStorePartRow,
   StorePartDetail,
   StorePartSummary
 } from 'shared-types'
 import {
   AddPurchaseResponseSchema,
   AddPurchaseSchema,
+  AddStorePartToAssetSchema,
+  AssetStorePartRowSchema,
   StorePartDetailSchema,
   StorePartSummarySchema
 } from 'shared-types'
@@ -43,4 +47,27 @@ function buildPartPayload(part: AddPurchaseForm['part']): AddPurchase['part'] {
   if (part === null) throw new Error('No part selected')
   if ('id' in part) return { mode: 'existing', store_part_id: part.id }
   return { mode: 'new', part_number: part.part_number, description: part.description }
+}
+
+export async function getAssetStoreParts(barcode: string): Promise<AssetStorePartRow[]> {
+  const { data } = await api.get<AssetStorePartRow[]>(`/store/asset/${barcode}/parts`)
+  return z.array(AssetStorePartRowSchema).parse(data)
+}
+
+export async function addStorePartToAsset(
+  barcode: string,
+  form: AddStorePartForm
+): Promise<AddPurchaseResponse> {
+  if (form.part === null || form.warehouse === null) throw new Error('Part and warehouse required')
+  const addStorePartToAssetBody = AddStorePartToAssetSchema.parse({
+    store_part_id: form.part.id,
+    warehouse_id: form.warehouse.id,
+    quantity: Number(form.quantity),
+    unit_cost: Number(form.unitCost)
+  } satisfies AddStorePartToAsset)
+  const { data } = await api.post<AddPurchaseResponse>(
+    `/store/asset/${barcode}/parts`,
+    addStorePartToAssetBody
+  )
+  return AddPurchaseResponseSchema.parse(data)
 }

@@ -7,7 +7,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 
 /**
  */
-export const getStoreParts = $runtime.makeTypedQueryFactory("select\nsp.id as id,\nsp.part_number as part_number,\nsp.description as description,\nst.warehouse_id as warehouse_id,\nw.city_code as warehouse_code,\n(\ncoalesce(sum(st.quantity) filter (where stt.is_inbound), 0)\n- coalesce(sum(st.quantity) filter (where not stt.is_inbound), 0)\n)::int as on_hand,\nmax(st.created_at) as last_updated\nfrom \"StoreTransaction\" st\njoin \"StorePart\" sp on sp.id = st.store_part_id\njoin \"StoreTransactionType\" stt on stt.id = st.transaction_type_id\njoin \"Warehouse\" w on w.id = st.warehouse_id\ngroup by sp.id, sp.part_number, sp.description, st.warehouse_id, w.city_code\norder by max(st.created_at) desc") as () => $runtime.TypedSql<getStoreParts.Parameters, getStoreParts.Result>
+export const getStoreParts = $runtime.makeTypedQueryFactory("select\nsp.id as id,\nsp.part_number as part_number,\nsp.description as description,\nst.warehouse_id as warehouse_id,\nw.city_code as warehouse_code,\n(\ncoalesce(sum(st.quantity) filter (where stt.is_inbound), 0)\n- coalesce(sum(st.quantity) filter (where not stt.is_inbound), 0)\n)::int as on_hand,\n(\nselect st2.unit_cost\nfrom \"StoreTransaction\" st2\njoin \"StoreTransactionType\" stt2 on stt2.id = st2.transaction_type_id\nwhere st2.store_part_id = sp.id\nand st2.warehouse_id = st.warehouse_id\nand stt2.is_inbound\norder by st2.created_at desc\nlimit 1\n) as last_purchase_unit_cost,\nmax(st.created_at) as last_updated\nfrom \"StoreTransaction\" st\njoin \"StorePart\" sp on sp.id = st.store_part_id\njoin \"StoreTransactionType\" stt on stt.id = st.transaction_type_id\njoin \"Warehouse\" w on w.id = st.warehouse_id\ngroup by sp.id, sp.part_number, sp.description, st.warehouse_id, w.city_code\norder by max(st.created_at) desc") as () => $runtime.TypedSql<getStoreParts.Parameters, getStoreParts.Result>
 
 export namespace getStoreParts {
   export type Parameters = []
@@ -18,6 +18,7 @@ export namespace getStoreParts {
     warehouse_id: number
     warehouse_code: string
     on_hand: number | null
+    last_purchase_unit_cost: $runtime.Decimal | null
     last_updated: Date | null
   }
 }

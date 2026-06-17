@@ -27,6 +27,7 @@ export type SearchSelectInputProps<T> = {
   clearLabel?: string
   className?: string
   error?: boolean
+  disabled?: boolean
   sanitize?: (raw: string) => string
   onCreateOption?: (query: string) => void
   createLabel?: (query: string) => string
@@ -50,6 +51,7 @@ export function SearchSelectInput<T>({
   clearLabel = 'Clear',
   className,
   error,
+  disabled,
   sanitize = stripDisallowedChars,
   onCreateOption,
   createLabel = defaultCreateLabel,
@@ -195,6 +197,7 @@ export function SearchSelectInput<T>({
                 autoComplete="off"
                 role="combobox"
                 aria-invalid={error}
+                disabled={disabled}
               />
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
@@ -250,6 +253,9 @@ export function SearchSelectInput<T>({
               >
                 {createLabel(query.trim())}
               </button>
+            )}
+            {matches.length === 0 && !onCreateOption && query.trim() && (
+              <p className="px-2 py-1 text-sm text-muted-foreground">No results found</p>
             )}
           </div>
         </PopoverContent>

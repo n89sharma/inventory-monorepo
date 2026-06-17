@@ -1,10 +1,12 @@
 import { api } from '@/data/api/axios-client'
+import { getAssetStoreParts } from '@/data/api/store-part-api'
 import type {
   AssetDetails,
   AssetError,
   AssetHistory,
   AssetLocation,
   AssetSearchRow,
+  AssetStorePartRow,
   AssetTransfer,
   AssetType,
   BarcodeSuggestion,
@@ -135,17 +137,20 @@ export type AssetAllDetails = {
   comments: Comment[]
   transfers: AssetTransfer[]
   partTransfers: PartTransfer[]
+  storeParts: AssetStorePartRow[]
 }
 
 export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetails> {
-  const [assetDetails, accessories, errors, comments, transfers, partTransfers] = await Promise.allSettled([
-    getAssetDetail({ barcode }),
-    getAssetAccessories({ barcode }),
-    getAssetErrors({ barcode }),
-    getAssetComments({ barcode }),
-    getAssetTransfers({ barcode }),
-    getAssetPartTransfers({ barcode })
-  ])
+  const [assetDetails, accessories, errors, comments, transfers, partTransfers, storeParts] =
+    await Promise.allSettled([
+      getAssetDetail({ barcode }),
+      getAssetAccessories({ barcode }),
+      getAssetErrors({ barcode }),
+      getAssetComments({ barcode }),
+      getAssetTransfers({ barcode }),
+      getAssetPartTransfers({ barcode }),
+      getAssetStoreParts(barcode)
+    ])
 
   return {
     assetDetails: assetDetails.status === 'fulfilled' ? assetDetails.value : null,
@@ -154,6 +159,7 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
     comments: comments.status === 'fulfilled' ? comments.value : [],
     transfers: transfers.status === 'fulfilled' ? transfers.value : [],
     partTransfers: partTransfers.status === 'fulfilled' ? partTransfers.value : [],
+    storeParts: storeParts.status === 'fulfilled' ? storeParts.value : [],
   }
 }
 

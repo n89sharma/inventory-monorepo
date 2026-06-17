@@ -25,6 +25,7 @@ export const StorePartSummarySchema = z.object({
   warehouse_id: z.number(),
   warehouse_code: z.string(),
   on_hand: z.number().int(),
+  last_purchase_unit_cost: z.number().nullable(),
   last_updated: z.coerce.date()
 })
 export type StorePartSummary = z.infer<typeof StorePartSummarySchema>
@@ -76,3 +77,22 @@ export const AddPurchaseResponseSchema = z.object({
   part_number: z.string()
 })
 export type AddPurchaseResponse = z.infer<typeof AddPurchaseResponseSchema>
+
+// A store part consumed by an asset — rendered in the asset's Parts section
+export const AssetStorePartRowSchema = z.object({
+  store_part_id: z.number(),
+  part_number: z.string(),
+  description: z.string(),
+  quantity: z.number().int(),
+  estimated_cost: z.number()
+})
+export type AssetStorePartRow = z.infer<typeof AssetStorePartRowSchema>
+
+// POST /assets/:barcode/store-parts — consume a store part onto an asset (USED, outbound)
+export const AddStorePartToAssetSchema = z.object({
+  store_part_id: z.number().int(),
+  warehouse_id: z.number().int(),
+  quantity: z.number().int().positive(),
+  unit_cost: z.number().positive()
+})
+export type AddStorePartToAsset = z.infer<typeof AddStorePartToAssetSchema>
