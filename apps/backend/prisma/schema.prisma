@@ -375,6 +375,7 @@ model User {
   holds_created        Hold[]              @relation("HoldCreatedBy")
   holds_for            Hold[]              @relation("HoldCreatedFor")
   invoices_updated     Invoice[]
+  SavedView            SavedView[]
   StoreTransaction     StoreTransaction[]
   transfers            Transfer[]
   Warehouse            Warehouse?          @relation(fields: [default_warehouse_id], references: [id])
@@ -554,4 +555,17 @@ model StoreTransactionType {
   type             String             @unique
   is_inbound       Boolean
   StoreTransaction StoreTransaction[]
+}
+
+model SavedView {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  page_key      String   @db.VarChar(40)
+  query_string  String
+  created_by_id Int
+  created_at    DateTime @default(now())
+  User          User     @relation(fields: [created_by_id], references: [id])
+
+  @@unique([created_by_id, page_key, name])
+  @@index([created_by_id, page_key])
 }

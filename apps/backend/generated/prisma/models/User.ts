@@ -249,6 +249,7 @@ export type UserWhereInput = {
   holds_created?: Prisma.HoldListRelationFilter
   holds_for?: Prisma.HoldListRelationFilter
   invoices_updated?: Prisma.InvoiceListRelationFilter
+  SavedView?: Prisma.SavedViewListRelationFilter
   StoreTransaction?: Prisma.StoreTransactionListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
   Warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
@@ -275,6 +276,7 @@ export type UserOrderByWithRelationInput = {
   holds_created?: Prisma.HoldOrderByRelationAggregateInput
   holds_for?: Prisma.HoldOrderByRelationAggregateInput
   invoices_updated?: Prisma.InvoiceOrderByRelationAggregateInput
+  SavedView?: Prisma.SavedViewOrderByRelationAggregateInput
   StoreTransaction?: Prisma.StoreTransactionOrderByRelationAggregateInput
   transfers?: Prisma.TransferOrderByRelationAggregateInput
   Warehouse?: Prisma.WarehouseOrderByWithRelationInput
@@ -304,6 +306,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   holds_created?: Prisma.HoldListRelationFilter
   holds_for?: Prisma.HoldListRelationFilter
   invoices_updated?: Prisma.InvoiceListRelationFilter
+  SavedView?: Prisma.SavedViewListRelationFilter
   StoreTransaction?: Prisma.StoreTransactionListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
   Warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
@@ -356,6 +359,7 @@ export type UserCreateInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -382,6 +386,7 @@ export type UserUncheckedCreateInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -405,6 +410,7 @@ export type UserUpdateInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -431,6 +437,7 @@ export type UserUncheckedUpdateInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -783,6 +790,20 @@ export type UserUpdateOneRequiredWithoutStoreTransactionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStoreTransactionInput, Prisma.UserUpdateWithoutStoreTransactionInput>, Prisma.UserUncheckedUpdateWithoutStoreTransactionInput>
 }
 
+export type UserCreateNestedOneWithoutSavedViewInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedViewInput, Prisma.UserUncheckedCreateWithoutSavedViewInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedViewInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavedViewNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedViewInput, Prisma.UserUncheckedCreateWithoutSavedViewInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedViewInput
+  upsert?: Prisma.UserUpsertWithoutSavedViewInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedViewInput, Prisma.UserUpdateWithoutSavedViewInput>, Prisma.UserUncheckedUpdateWithoutSavedViewInput>
+}
+
 export type UserCreateWithoutAsset_errors_addedInput = {
   email?: string | null
   name: string
@@ -801,6 +822,7 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -826,6 +848,7 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -853,6 +876,7 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -878,6 +902,7 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -916,6 +941,7 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -941,6 +967,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -974,6 +1001,7 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -999,6 +1027,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1022,6 +1051,7 @@ export type UserCreateWithoutTransfersInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
@@ -1047,6 +1077,7 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1085,6 +1116,7 @@ export type UserUpdateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
@@ -1110,6 +1142,7 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1131,6 +1164,7 @@ export type UserCreateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1156,6 +1190,7 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1194,6 +1229,7 @@ export type UserUpdateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1219,6 +1255,7 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1241,6 +1278,7 @@ export type UserCreateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1266,6 +1304,7 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1293,6 +1332,7 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1318,6 +1358,7 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1356,6 +1397,7 @@ export type UserUpdateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1381,6 +1423,7 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1414,6 +1457,7 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1439,6 +1483,7 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1461,6 +1506,7 @@ export type UserCreateWithoutHolds_createdInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1486,6 +1532,7 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1513,6 +1560,7 @@ export type UserCreateWithoutHolds_forInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1538,6 +1586,7 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1576,6 +1625,7 @@ export type UserUpdateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1601,6 +1651,7 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1634,6 +1685,7 @@ export type UserUpdateWithoutHolds_forInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1659,6 +1711,7 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1681,6 +1734,7 @@ export type UserCreateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1706,6 +1760,7 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1744,6 +1799,7 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1769,6 +1825,7 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1792,6 +1849,7 @@ export type UserCreateWithoutWarehouseInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
 }
@@ -1816,6 +1874,7 @@ export type UserUncheckedCreateWithoutWarehouseInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1877,6 +1936,7 @@ export type UserCreateWithoutFilesInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -1902,6 +1962,7 @@ export type UserUncheckedCreateWithoutFilesInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -1940,6 +2001,7 @@ export type UserUpdateWithoutFilesInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -1965,6 +2027,7 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -1987,6 +2050,7 @@ export type UserCreateWithoutCommentsInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -2012,6 +2076,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -2050,6 +2115,7 @@ export type UserUpdateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -2075,6 +2141,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -2097,6 +2164,7 @@ export type UserCreateWithoutHistoryInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -2122,6 +2190,7 @@ export type UserUncheckedCreateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -2160,6 +2229,7 @@ export type UserUpdateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -2185,6 +2255,7 @@ export type UserUncheckedUpdateWithoutHistoryInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -2207,6 +2278,7 @@ export type UserCreateWithoutAssetSalvagedPartInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -2232,6 +2304,7 @@ export type UserUncheckedCreateWithoutAssetSalvagedPartInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -2270,6 +2343,7 @@ export type UserUpdateWithoutAssetSalvagedPartInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -2295,6 +2369,7 @@ export type UserUncheckedUpdateWithoutAssetSalvagedPartInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -2317,6 +2392,7 @@ export type UserCreateWithoutAssetStorePartInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
@@ -2342,6 +2418,7 @@ export type UserUncheckedCreateWithoutAssetStorePartInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
@@ -2380,6 +2457,7 @@ export type UserUpdateWithoutAssetStorePartInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
@@ -2405,6 +2483,7 @@ export type UserUncheckedUpdateWithoutAssetStorePartInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -2428,6 +2507,7 @@ export type UserCreateWithoutStoreTransactionInput = {
   holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
 }
@@ -2453,6 +2533,7 @@ export type UserUncheckedCreateWithoutStoreTransactionInput = {
   holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
   holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
   invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  SavedView?: Prisma.SavedViewUncheckedCreateNestedManyWithoutUserInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
@@ -2491,6 +2572,7 @@ export type UserUpdateWithoutStoreTransactionInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
 }
@@ -2516,6 +2598,121 @@ export type UserUncheckedUpdateWithoutStoreTransactionInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutSavedViewInput = {
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  Warehouse?: Prisma.WarehouseCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSavedViewInput = {
+  id?: number
+  email?: string | null
+  name: string
+  is_active?: boolean
+  clerk_id?: string | null
+  role?: string | null
+  default_warehouse_id?: number | null
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  History?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutUserInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+}
+
+export type UserCreateOrConnectWithoutSavedViewInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedViewInput, Prisma.UserUncheckedCreateWithoutSavedViewInput>
+}
+
+export type UserUpsertWithoutSavedViewInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedViewInput, Prisma.UserUncheckedUpdateWithoutSavedViewInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedViewInput, Prisma.UserUncheckedCreateWithoutSavedViewInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavedViewInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedViewInput, Prisma.UserUncheckedUpdateWithoutSavedViewInput>
+}
+
+export type UserUpdateWithoutSavedViewInput = {
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  Warehouse?: Prisma.WarehouseUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavedViewInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  AssetSalvagedPart?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput
+  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  History?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
@@ -2547,6 +2744,7 @@ export type UserUpdateWithoutWarehouseInput = {
   holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
 }
@@ -2571,6 +2769,7 @@ export type UserUncheckedUpdateWithoutWarehouseInput = {
   holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
   holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
   invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  SavedView?: Prisma.SavedViewUncheckedUpdateManyWithoutUserNestedInput
   StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutUserNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
 }
@@ -2603,6 +2802,7 @@ export type UserCountOutputType = {
   holds_created: number
   holds_for: number
   invoices_updated: number
+  SavedView: number
   StoreTransaction: number
   transfers: number
 }
@@ -2621,6 +2821,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   holds_created?: boolean | UserCountOutputTypeCountHolds_createdArgs
   holds_for?: boolean | UserCountOutputTypeCountHolds_forArgs
   invoices_updated?: boolean | UserCountOutputTypeCountInvoices_updatedArgs
+  SavedView?: boolean | UserCountOutputTypeCountSavedViewArgs
   StoreTransaction?: boolean | UserCountOutputTypeCountStoreTransactionArgs
   transfers?: boolean | UserCountOutputTypeCountTransfersArgs
 }
@@ -2729,6 +2930,13 @@ export type UserCountOutputTypeCountInvoices_updatedArgs<ExtArgs extends runtime
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountSavedViewArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedViewWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountStoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.StoreTransactionWhereInput
 }
@@ -2762,6 +2970,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   holds_created?: boolean | Prisma.User$holds_createdArgs<ExtArgs>
   holds_for?: boolean | Prisma.User$holds_forArgs<ExtArgs>
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
+  SavedView?: boolean | Prisma.User$SavedViewArgs<ExtArgs>
   StoreTransaction?: boolean | Prisma.User$StoreTransactionArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
   Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
@@ -2815,6 +3024,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   holds_created?: boolean | Prisma.User$holds_createdArgs<ExtArgs>
   holds_for?: boolean | Prisma.User$holds_forArgs<ExtArgs>
   invoices_updated?: boolean | Prisma.User$invoices_updatedArgs<ExtArgs>
+  SavedView?: boolean | Prisma.User$SavedViewArgs<ExtArgs>
   StoreTransaction?: boolean | Prisma.User$StoreTransactionArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
   Warehouse?: boolean | Prisma.User$WarehouseArgs<ExtArgs>
@@ -2843,6 +3053,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     holds_created: Prisma.$HoldPayload<ExtArgs>[]
     holds_for: Prisma.$HoldPayload<ExtArgs>[]
     invoices_updated: Prisma.$InvoicePayload<ExtArgs>[]
+    SavedView: Prisma.$SavedViewPayload<ExtArgs>[]
     StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>[]
     transfers: Prisma.$TransferPayload<ExtArgs>[]
     Warehouse: Prisma.$WarehousePayload<ExtArgs> | null
@@ -3262,6 +3473,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   holds_created<T extends Prisma.User$holds_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$holds_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   holds_for<T extends Prisma.User$holds_forArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$holds_forArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invoices_updated<T extends Prisma.User$invoices_updatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invoices_updatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  SavedView<T extends Prisma.User$SavedViewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$SavedViewArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   StoreTransaction<T extends Prisma.User$StoreTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$StoreTransactionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfers<T extends Prisma.User$transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   Warehouse<T extends Prisma.User$WarehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$WarehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -4020,6 +4232,30 @@ export type User$invoices_updatedArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.InvoiceScalarFieldEnum | Prisma.InvoiceScalarFieldEnum[]
+}
+
+/**
+ * User.SavedView
+ */
+export type User$SavedViewArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedView
+   */
+  select?: Prisma.SavedViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedView
+   */
+  omit?: Prisma.SavedViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedViewInclude<ExtArgs> | null
+  where?: Prisma.SavedViewWhereInput
+  orderBy?: Prisma.SavedViewOrderByWithRelationInput | Prisma.SavedViewOrderByWithRelationInput[]
+  cursor?: Prisma.SavedViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
 }
 
 /**

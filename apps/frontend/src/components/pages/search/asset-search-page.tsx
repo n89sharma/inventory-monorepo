@@ -1,5 +1,7 @@
 import { ColumnPickerButton } from '@/components/custom/column-picker-button'
 import { ExportAssetsButton } from '@/components/custom/export-assets-button'
+import { SavedViewsButton } from '@/components/custom/saved-views-button'
+import { ShareButton } from '@/components/custom/share-button'
 import { AssetResultsTable } from '@/components/custom/asset-results-table'
 import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
@@ -10,11 +12,12 @@ import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { AssetSearchRow } from 'shared-types'
+import type { AssetSearchRow, SavedViewPageKey } from 'shared-types'
 
 export function AssetSearchPage({
   title,
   navContext,
+  savedViewPageKey,
   assets,
   isLoading,
   onBulkPriceSave,
@@ -23,6 +26,7 @@ export function AssetSearchPage({
 }: {
   title: string
   navContext: SearchList
+  savedViewPageKey: SavedViewPageKey
   assets: AssetSearchRow[]
   isLoading: boolean
   onBulkPriceSave: () => void
@@ -53,6 +57,8 @@ export function AssetSearchPage({
             )}
           </div>
           <div className="flex items-center gap-2">
+            <ShareButton />
+            <SavedViewsButton pageKey={savedViewPageKey} />
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}

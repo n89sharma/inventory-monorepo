@@ -22,6 +22,8 @@ import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
 import { MultiSelectOptionsInline } from '../../custom/multi-select-options'
+import { SavedViewsButton } from '../../custom/saved-views-button'
+import { ShareButton } from '../../custom/share-button'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
@@ -97,6 +99,8 @@ export function SearchAllPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
+            <ShareButton />
+            <SavedViewsButton pageKey="search_all" />
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}

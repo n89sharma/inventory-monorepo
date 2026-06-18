@@ -32,7 +32,7 @@ export function ColumnPickerButton({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='gap-1.5'>
+        <Button variant='outline' size='default' className='gap-1.5'>
           <ColumnsIcon />
           <span>Columns ({visibleCount} / {enabledCount})</span>
         </Button>

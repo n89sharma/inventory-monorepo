@@ -85,7 +85,8 @@ export const ModelName = {
   AssetSalvagedPart: 'AssetSalvagedPart',
   AssetStorePart: 'AssetStorePart',
   StoreTransaction: 'StoreTransaction',
-  StoreTransactionType: 'StoreTransactionType'
+  StoreTransactionType: 'StoreTransactionType',
+  SavedView: 'SavedView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -531,6 +532,18 @@ export const StoreTransactionTypeScalarFieldEnum = {
 } as const
 
 export type StoreTransactionTypeScalarFieldEnum = (typeof StoreTransactionTypeScalarFieldEnum)[keyof typeof StoreTransactionTypeScalarFieldEnum]
+
+
+export const SavedViewScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  page_key: 'page_key',
+  query_string: 'query_string',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
 
 
 export const SortOrder = {

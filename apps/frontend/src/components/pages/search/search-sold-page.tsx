@@ -60,6 +60,7 @@ export function SearchSoldPage(): React.JSX.Element {
     <AssetSearchPage
       title="Sold"
       navContext="sold"
+      savedViewPageKey="search_sold"
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}

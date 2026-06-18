@@ -1,4 +1,6 @@
 import { ModelFilter } from '@/components/filters/model-filter'
+import { SavedViewsButton } from '@/components/custom/saved-views-button'
+import { ShareButton } from '@/components/custom/share-button'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import {
@@ -272,15 +274,21 @@ export function PriceCheckPage(): React.JSX.Element {
   return (
     <>
       <StickyPageHeader>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold">Price Check</h1>
-          {isLoading && (
-            <SpinnerGapIcon
-              className="animate-spin text-muted-foreground"
-              aria-label="Loading"
-              role="status"
-            />
-          )}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">Price Check</h1>
+            {isLoading && (
+              <SpinnerGapIcon
+                className="animate-spin text-muted-foreground"
+                aria-label="Loading"
+                role="status"
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <ShareButton />
+            <SavedViewsButton pageKey="search_price_check" />
+          </div>
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"

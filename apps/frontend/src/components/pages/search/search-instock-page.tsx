@@ -51,6 +51,7 @@ export function SearchInStockPage(): React.JSX.Element {
     <AssetSearchPage
       title="In Stock"
       navContext="instock"
+      savedViewPageKey="search_instock"
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}

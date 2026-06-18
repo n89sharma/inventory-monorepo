@@ -18,5 +18,6 @@ export * from './types/asset-history-types.js'
 export * from './types/collection-history-types.js'
 export * from './types/report-types.js'
 export * from './types/profitability-report-types.js'
+export * from './types/saved-view-types.js'
 export * from './mappers/asset-mappers.js'
 

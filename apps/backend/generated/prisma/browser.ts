@@ -192,3 +192,8 @@ export type StoreTransaction = Prisma.StoreTransactionModel
  * 
  */
 export type StoreTransactionType = Prisma.StoreTransactionTypeModel
+/**
+ * Model SavedView
+ * 
+ */
+export type SavedView = Prisma.SavedViewModel

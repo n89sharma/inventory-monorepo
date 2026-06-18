@@ -418,7 +418,8 @@ export const ModelName = {
   AssetSalvagedPart: 'AssetSalvagedPart',
   AssetStorePart: 'AssetStorePart',
   StoreTransaction: 'StoreTransaction',
-  StoreTransactionType: 'StoreTransactionType'
+  StoreTransactionType: 'StoreTransactionType',
+  SavedView: 'SavedView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "fileType" | "invoiceType" | "storePart" | "history" | "readiness" | "status" | "zone" | "country" | "component" | "assetSalvagedPart" | "assetStorePart" | "storeTransaction" | "storeTransactionType"
+    modelProps: "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "warehouse" | "location" | "brand" | "model" | "file" | "comment" | "user" | "organization" | "accessory" | "assetType" | "fileType" | "invoiceType" | "storePart" | "history" | "readiness" | "status" | "zone" | "country" | "component" | "assetSalvagedPart" | "assetStorePart" | "storeTransaction" | "storeTransactionType" | "savedView"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3028,6 +3029,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SavedView: {
+      payload: Prisma.$SavedViewPayload<ExtArgs>
+      fields: Prisma.SavedViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SavedViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SavedViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        findFirst: {
+          args: Prisma.SavedViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SavedViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        findMany: {
+          args: Prisma.SavedViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        create: {
+          args: Prisma.SavedViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        createMany: {
+          args: Prisma.SavedViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SavedViewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        delete: {
+          args: Prisma.SavedViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        update: {
+          args: Prisma.SavedViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.SavedViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SavedViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SavedViewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>[]
+        }
+        upsert: {
+          args: Prisma.SavedViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedViewPayload>
+        }
+        aggregate: {
+          args: Prisma.SavedViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSavedView>
+        }
+        groupBy: {
+          args: Prisma.SavedViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SavedViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedViewCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3500,6 +3575,18 @@ export const StoreTransactionTypeScalarFieldEnum = {
 export type StoreTransactionTypeScalarFieldEnum = (typeof StoreTransactionTypeScalarFieldEnum)[keyof typeof StoreTransactionTypeScalarFieldEnum]
 
 
+export const SavedViewScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  page_key: 'page_key',
+  query_string: 'query_string',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3795,6 +3882,7 @@ export type GlobalOmitConfig = {
   assetStorePart?: Prisma.AssetStorePartOmit
   storeTransaction?: Prisma.StoreTransactionOmit
   storeTransactionType?: Prisma.StoreTransactionTypeOmit
+  savedView?: Prisma.SavedViewOmit
 }
 
 /* Types for Logging */

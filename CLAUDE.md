@@ -28,6 +28,9 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
   modal solution from a known product.
 - **No fabrication.** Never invent versions, APIs, file contents, benchmarks, or paths.
   Verify by reading the file or the docs. If something is unverified, say so.
+- **Competitor claims need a link, always.** Any claim about another product (UI placement, behavior,
+  which apps do X) must be verified this session and shown with a working link — never from memory.
+  No source, no claim.
 - **Output contract.** Terse and direct. No preamble, no restating my request, no summary of
   what you're about to do. Lead with the answer or the diff.
 - **Simplest sufficient solution.** No abstraction, config, or generality that wasn't asked for.
