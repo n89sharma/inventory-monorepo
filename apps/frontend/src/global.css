@@ -135,3 +135,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  @page {
+    size: portrait;
+    margin: 16mm;
+  }
+
+  [data-slot="sidebar"],
+  header {
+    display: none !important;
+  }
+
+  #main-content .overflow-auto {
+    overflow: visible !important;
+    max-height: none !important;
+    border: none !important;
+  }
+
+  #main-content table {
+    table-layout: auto !important;
+    width: 800px !important;
+    zoom: 1;
+  }
+
+  #main-content th,
+  #main-content td {
+    width: auto !important;
+  }
+}
