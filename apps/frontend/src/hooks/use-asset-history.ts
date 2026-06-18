@@ -1,9 +1,17 @@
 import { getAssetHistory } from '@/data/api/asset-api'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
+
+export const assetHistoryKey = (barcode: string) => `asset-history:${barcode}`
 
 export function useAssetHistory(barcode: string, enabled: boolean) {
   return useSWR(
-    enabled ? `asset-history:${barcode}` : null,
+    enabled ? assetHistoryKey(barcode) : null,
     () => getAssetHistory(barcode)
   )
+}
+
+export function invalidateAssetHistory(barcodes: string[]): void {
+  for (const barcode of barcodes) {
+    mutate(assetHistoryKey(barcode))
+  }
 }

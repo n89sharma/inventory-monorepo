@@ -13,6 +13,7 @@ import {
 import { addStorePartToAsset as addStorePartToAssetApi } from '@/data/api/store-part-api'
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
 import { assetDetailKey, invalidateAssetDetails } from '@/hooks/use-asset-detail'
+import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
   AssetDetails,
@@ -56,6 +57,7 @@ export const useAssetStore = create<AssetStore>(() => ({
   updateAssetErrors: async (barcode, errors) => {
     await updateAssetErrorsApi(barcode, errors)
     mutate(assetDetailKey(barcode))
+    invalidateAssetHistory([barcode])
   },
 
   createAssetHarvestedPart: async (barcode, data) => {
@@ -79,16 +81,19 @@ export const useAssetStore = create<AssetStore>(() => ({
   updateAssetLocation: async (barcode, data) => {
     await updateAssetLocationApi(barcode, data)
     mutate(assetDetailKey(barcode))
+    invalidateAssetHistory([barcode])
   },
 
   updateAssetPricing: async (barcode, data) => {
     await updateAssetPricingApi(barcode, data)
     mutate(assetDetailKey(barcode))
+    invalidateAssetHistory([barcode])
   },
 
   updateAssetSpecs: async (barcode, data) => {
     await updateAssetSpecsApi(barcode, data)
     mutate(assetDetailKey(barcode))
+    invalidateAssetHistory([barcode])
   },
 
   getAssetByBarcode: (barcode) => getAssetByBarcodeApi(barcode),
@@ -102,6 +107,8 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)
-    invalidateAssetDetails(items.map(item => item.barcode))
+    const barcodes = items.map(item => item.barcode)
+    invalidateAssetDetails(barcodes)
+    invalidateAssetHistory(barcodes)
   },
 }))
