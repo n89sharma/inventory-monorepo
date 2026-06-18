@@ -57,13 +57,13 @@ export function AssetSearchPage({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ShareButton />
-            <SavedViewsButton pageKey={savedViewPageKey} />
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}
               onReset={resetColumns}
             />
+            <SavedViewsButton pageKey={savedViewPageKey} />
+            <ShareButton />
             <ExportAssetsButton
               loading={selection.exportLoading}
               disabled={selection.exportDisabled}

@@ -76,8 +76,8 @@ export function CollectionEditBar({
 
   return (
     <div className="flex gap-2">
-      <ShareButton />
       <CollectionHistorySheet cacheKey={historyCacheKey} fetcher={historyFetcher} />
+      <ShareButton />
       {assets !== undefined && (
         <Button
           variant="outline"

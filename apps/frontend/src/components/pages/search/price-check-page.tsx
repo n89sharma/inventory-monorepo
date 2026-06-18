@@ -286,8 +286,8 @@ export function PriceCheckPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ShareButton />
             <SavedViewsButton pageKey="search_price_check" />
+            <ShareButton />
           </div>
         </div>
         <form

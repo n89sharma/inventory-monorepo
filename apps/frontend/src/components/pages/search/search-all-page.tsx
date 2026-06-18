@@ -99,13 +99,13 @@ export function SearchAllPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ShareButton />
-            <SavedViewsButton pageKey="search_all" />
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}
               onReset={resetColumns}
             />
+            <SavedViewsButton pageKey="search_all" />
+            <ShareButton />
             <ExportAssetsButton
               loading={selection.exportLoading}
               disabled={selection.exportDisabled}

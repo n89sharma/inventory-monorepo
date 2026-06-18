@@ -289,8 +289,8 @@ export function ProfitabilityReportPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ShareButton />
             <SavedViewsButton pageKey="report_profitability" />
+            <ShareButton />
           </div>
         </div>
         <ProfitabilityFilterBar filters={filters} options={options} onChange={updateFilters} />
