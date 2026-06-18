@@ -25,6 +25,7 @@ export function useSearchHeld(filters: SearchHeldFilters) {
       f.heldBy,
       f.heldFor,
       f.holdCustomer,
+      f.daysHeldMin,
     ),
     {
       revalidateOnFocus: false,

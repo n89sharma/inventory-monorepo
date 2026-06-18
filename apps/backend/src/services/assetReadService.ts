@@ -60,6 +60,7 @@ export async function getAssets(
   heldByIdParam: number,
   heldForIdParam: number,
   holdCustomerIdParam: number,
+  daysHeldMinParam: number,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
@@ -80,6 +81,7 @@ export async function getAssets(
       heldByIdParam,
       heldForIdParam,
       holdCustomerIdParam,
+      daysHeldMinParam,
     )
   )
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
@@ -157,6 +159,7 @@ export async function getAssetsForSearchInStock(
     -1,
     -1,
     -1,
+    -1,
     role,
   )
 }
@@ -174,6 +177,7 @@ export async function getAssetsForSearchHeld(
   heldByIdParam: number,
   heldForIdParam: number,
   holdCustomerIdParam: number,
+  daysHeldMinParam: number,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
@@ -197,6 +201,7 @@ export async function getAssetsForSearchHeld(
     heldByIdParam,
     heldForIdParam,
     holdCustomerIdParam,
+    daysHeldMinParam,
     role,
   )
 }

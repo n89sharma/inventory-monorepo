@@ -1,6 +1,7 @@
 import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { AssetIdentityFilters } from '@/components/custom/asset-identity-filters'
 import { CustomerFilter } from '@/components/filters/customer-filter'
+import { DaysHeldFilter } from '@/components/filters/days-held-filter'
 import { UserFilter } from '@/components/filters/user-filter'
 import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
@@ -92,6 +93,10 @@ export function SearchHeldPage(): React.JSX.Element {
               selection={draft.holdCustomer}
               onSelectionChange={c => updateImmediate({ ...draft, holdCustomer: c })}
               onClear={() => updateImmediate({ ...draft, holdCustomer: null })}
+            />
+            <DaysHeldFilter
+              value={draft.daysHeldMin}
+              onValueChange={d => updateDebounced({ ...draft, daysHeldMin: d })}
             />
           </>
         }

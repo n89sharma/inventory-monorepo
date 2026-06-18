@@ -4,6 +4,7 @@ import {
   DEFAULT_WAREHOUSE_CODE,
   encodeIds,
   getSharedFilters,
+  parseNonNegativeNumber,
   setSharedFilterParams,
   type SharedAssetFilters,
   type SharedAssetReferenceData,
@@ -14,6 +15,7 @@ const PARAM_TYPE = 'type'
 const PARAM_HELD_BY = 'heldby'
 const PARAM_HELD_FOR = 'heldfor'
 const PARAM_HOLD_CUSTOMER = 'holdcustomer'
+const PARAM_DAYS_HELD_MIN = 'heldmin'
 
 export type SearchHeldFilters = SharedAssetFilters & {
   brand: Brand | null
@@ -21,6 +23,7 @@ export type SearchHeldFilters = SharedAssetFilters & {
   heldBy: User | null
   heldFor: User | null
   holdCustomer: OrgSummary | null
+  daysHeldMin: number | null
 }
 
 export type SearchHeldReferenceData = SharedAssetReferenceData & {
@@ -38,6 +41,7 @@ export function filtersToParams(filters: SearchHeldFilters): URLSearchParams {
   if (filters.heldBy) params.set(PARAM_HELD_BY, String(filters.heldBy.id))
   if (filters.heldFor) params.set(PARAM_HELD_FOR, String(filters.heldFor.id))
   if (filters.holdCustomer) params.set(PARAM_HOLD_CUSTOMER, String(filters.holdCustomer.id))
+  if (filters.daysHeldMin !== null) params.set(PARAM_DAYS_HELD_MIN, String(filters.daysHeldMin))
   return params
 }
 
@@ -72,5 +76,6 @@ export function paramsToFilters(
     heldBy,
     heldFor,
     holdCustomer,
+    daysHeldMin: parseNonNegativeNumber(params.get(PARAM_DAYS_HELD_MIN)),
   }
 }

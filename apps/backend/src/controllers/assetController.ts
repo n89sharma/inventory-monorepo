@@ -101,6 +101,7 @@ export const getAssets = asyncHandler(async (req, res) => {
     -1,
     -1,
     -1,
+    -1,
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))
@@ -206,12 +207,14 @@ export const SearchHeldQuerySchema = z.object({
   heldById: z.string().optional().transform(Number),
   heldForId: z.string().optional().transform(Number),
   holdCustomerId: z.string().optional().transform(Number),
+  daysHeldMin: z.string().optional().transform(Number),
 })
 
 export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
   const {
     warehouseIds, brandIds, assetTypeIds, readinessIds, model,
-    meterMin, meterMax, cassettes, componentId, heldById, heldForId, holdCustomerId
+    meterMin, meterMax, cassettes, componentId, heldById, heldForId, holdCustomerId,
+    daysHeldMin
   } = res.locals.query as z.infer<typeof SearchHeldQuerySchema>
   const data = await getAssetsForSearchHeldSer(
     warehouseIds,
@@ -226,6 +229,7 @@ export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
     isNaN(heldById) ? -1 : heldById,
     isNaN(heldForId) ? -1 : heldForId,
     isNaN(holdCustomerId) ? -1 : holdCustomerId,
+    isNaN(daysHeldMin) ? -1 : daysHeldMin,
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

@@ -292,7 +292,8 @@ export async function getAssetsForSearchHeld(
   component: Component | null,
   heldBy: User | null,
   heldFor: User | null,
-  holdCustomer: OrgSummary | null): Promise<AssetSearchRow[]> {
+  holdCustomer: OrgSummary | null,
+  daysHeldMin: number | null): Promise<AssetSearchRow[]> {
 
   const { data } = await api.get<AssetSearchRow[]>(`/reports/held`, {
     params: {
@@ -308,6 +309,7 @@ export async function getAssetsForSearchHeld(
       heldById: heldBy?.id ?? undefined,
       heldForId: heldFor?.id ?? undefined,
       holdCustomerId: holdCustomer?.id ?? undefined,
+      daysHeldMin: daysHeldMin ?? undefined,
     }
   })
   return z.array(AssetSearchRowSchema).parse(data)
