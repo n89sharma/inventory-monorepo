@@ -22,7 +22,6 @@ export function useSearchInStock(filters: SearchInStockFilters) {
       f.meterMax,
       f.cassettes,
       f.internalFinisher,
-      f.includeHeld,
     ),
     {
       revalidateOnFocus: false,

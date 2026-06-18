@@ -77,6 +77,7 @@ export const ASSET_TABLE_COLUMNS = [
   { id: 'hold_created_for', label: 'Held For',        section: 'hold', defaultColumn: false, enabled: true  },
   { id: 'hold_customer',    label: 'Hold Customer',   section: 'hold', defaultColumn: false, enabled: true  },
   { id: 'hold_created_at',  label: 'Hold Created',    section: 'hold', defaultColumn: false, enabled: true  },
+  { id: 'days_held',        label: 'Days Held',       section: 'hold', defaultColumn: false, enabled: true  },
   { id: 'hold_from_dt',     label: 'Hold From',       section: 'hold', defaultColumn: false, enabled: false },
   { id: 'hold_to_dt',       label: 'Hold To',         section: 'hold', defaultColumn: false, enabled: false },
   { id: 'hold_notes',       label: 'Hold Notes',      section: 'hold', defaultColumn: false, enabled: false },
@@ -102,9 +103,15 @@ const SOLD_DEFAULT_COLUMN_IDS = [
   'status', 'specs_meter_total', 'customer', 'departed_at', 'cost_sale_price',
 ] as const satisfies readonly AssetColumnId[]
 
+const HELD_DEFAULT_COLUMN_IDS = [
+  'serial_number', 'status', 'specs_meter_total', 'hold_hold_number', 'held_by',
+  'hold_created_for', 'hold_customer', 'hold_created_at', 'days_held',
+] as const satisfies readonly AssetColumnId[]
+
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   all:           DEFAULT_VISIBLE_COLUMN_IDS,
   instock:       INSTOCK_DEFAULT_COLUMN_IDS,
+  held:          HELD_DEFAULT_COLUMN_IDS,
   sold:          SOLD_DEFAULT_COLUMN_IDS,
   'price-check': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>

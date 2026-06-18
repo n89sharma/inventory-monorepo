@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const SAVED_VIEW_PAGE_KEYS = [
   'search_all',
   'search_instock',
+  'search_held',
   'search_sold',
   'search_price_check',
   'report_profitability',

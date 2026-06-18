@@ -11,13 +11,10 @@ import {
 
 const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
-const PARAM_HELD = 'held'
-const HELD_ON = '1'
 
 export type SearchInStockFilters = SharedAssetFilters & {
   brand: Brand | null
   assetTypes: AssetType[]
-  includeHeld: boolean
 }
 
 export type SearchInStockReferenceData = SharedAssetReferenceData & {
@@ -30,7 +27,6 @@ export function filtersToParams(filters: SearchInStockFilters): URLSearchParams 
   setSharedFilterParams(params, filters)
   if (filters.brand) params.set(PARAM_BRAND, String(filters.brand.id))
   if (filters.assetTypes.length > 0) params.set(PARAM_TYPE, encodeIds(filters.assetTypes))
-  if (filters.includeHeld) params.set(PARAM_HELD, HELD_ON)
   return params
 }
 
@@ -47,6 +43,5 @@ export function paramsToFilters(
     ...getSharedFilters(params, ref, DEFAULT_WAREHOUSE_CODE),
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
-    includeHeld: params.get(PARAM_HELD) === HELD_ON,
   }
 }

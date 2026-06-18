@@ -1,5 +1,10 @@
 import express from 'express'
-import { SearchInStockQuerySchema, getAssetsForSearchInStock } from '../controllers/assetController.js'
+import {
+  SearchInStockQuerySchema,
+  SearchHeldQuerySchema,
+  getAssetsForSearchInStock,
+  getAssetsForSearchHeld,
+} from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
   getProfitabilityReport,
@@ -13,6 +18,8 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/stock', requirePermission('view_asset'), validateQuery(SearchInStockQuerySchema), getAssetsForSearchInStock)
+
+router.get('/held', requirePermission('view_asset'), validateQuery(SearchHeldQuerySchema), getAssetsForSearchHeld)
 
 router.get(
   '/profitability',

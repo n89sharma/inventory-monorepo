@@ -14,6 +14,9 @@ const HELD_STATUS = 'HELD'
 const stockDays = (arrived: Date | null): number | undefined =>
   arrived ? differenceInCalendarDays(new Date(), arrived) : undefined
 
+const daysHeld = (heldOn: Date | null): number | undefined =>
+  heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
+
 function SortableHeader({
   label,
   onToggle,
@@ -274,6 +277,19 @@ export function createAssetSearchColumns(
     ),
     cell: ({ row }) => formatDate(row.original.hold_created_at),
     size: 100
+  },
+  {
+    id: "days_held",
+    accessorFn: row => daysHeld(row.hold_created_at),
+    header: ({ column }) => (
+      <SortableHeader
+        label="Days Held"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => daysHeld(row.original.hold_created_at) ?? '',
+    sortUndefined: 'last',
+    size: 80
   },
   {
     accessorKey: "vendor",

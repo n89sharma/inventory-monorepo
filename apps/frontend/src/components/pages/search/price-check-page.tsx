@@ -252,7 +252,6 @@ export function PriceCheckPage(): React.JSX.Element {
         model: filters.model,
         brand: null,
         assetTypes: [],
-        includeHeld: false,
       })
       return `/search/instock?${params.toString()}`
     },

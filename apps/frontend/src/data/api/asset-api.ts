@@ -25,6 +25,7 @@ import type {
   UpdateAssetPricing,
   UpdateAssetSpecs,
   UpdateError,
+  User,
   Warehouse
 } from 'shared-types'
 
@@ -261,8 +262,7 @@ export async function getAssetsForSearchInStock(
   meterMin: number | null,
   meterMax: number | null,
   cassettes: number | null,
-  component: Component | null,
-  includeHeld: boolean): Promise<AssetSearchRow[]> {
+  component: Component | null): Promise<AssetSearchRow[]> {
 
   const { data } = await api.get<AssetSearchRow[]>(`/reports/stock`, {
     params: {
@@ -275,7 +275,39 @@ export async function getAssetsForSearchInStock(
       meterMax: meterMax ?? undefined,
       cassettes: cassettes ?? undefined,
       componentId: component?.id ?? undefined,
-      includeHeld: includeHeld ? 'true' : undefined,
+    }
+  })
+  return z.array(AssetSearchRowSchema).parse(data)
+}
+
+export async function getAssetsForSearchHeld(
+  warehouses: Warehouse[],
+  brand: Brand | null,
+  assetTypes: AssetType[],
+  readinesses: Status[],
+  model: string | null,
+  meterMin: number | null,
+  meterMax: number | null,
+  cassettes: number | null,
+  component: Component | null,
+  heldBy: User | null,
+  heldFor: User | null,
+  holdCustomer: OrgSummary | null): Promise<AssetSearchRow[]> {
+
+  const { data } = await api.get<AssetSearchRow[]>(`/reports/held`, {
+    params: {
+      warehouseIds: warehouses.map(w => w.id),
+      brandIds: brand ? [brand.id] : [],
+      assetTypeIds: assetTypes.map(a => a.id),
+      readinessIds: readinesses.map(s => s.id),
+      model: model ?? undefined,
+      meterMin: meterMin ?? undefined,
+      meterMax: meterMax ?? undefined,
+      cassettes: cassettes ?? undefined,
+      componentId: component?.id ?? undefined,
+      heldById: heldBy?.id ?? undefined,
+      heldForId: heldFor?.id ?? undefined,
+      holdCustomerId: holdCustomer?.id ?? undefined,
     }
   })
   return z.array(AssetSearchRowSchema).parse(data)

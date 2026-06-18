@@ -11,6 +11,9 @@ const formatDate = (val: unknown): string | null => {
 const stockDays = (a: AssetDetails): number | null =>
   a.arrival ? differenceInCalendarDays(new Date(), a.arrival.created_at) : null
 
+const daysHeld = (a: AssetDetails): number | null =>
+  a.hold?.created_at ? differenceInCalendarDays(new Date(), a.hold.created_at) : null
+
 export const ASSET_COLUMNS = {
   barcode:         { key: 'barcode',         header: 'barcode',         accessor: (a) => a.barcode },
   serial_number:   { key: 'serial_number',   header: 'serial_number',   accessor: (a) => a.serial_number },
@@ -77,6 +80,7 @@ export const ASSET_COLUMNS = {
   purchase_invoice_is_cleared:     { key: 'purchase_invoice_is_cleared',     header: 'purchase_invoice_is_cleared',     accessor: (a) => a.purchase_invoice?.is_cleared },
 
   stock_days:     { key: 'stock_days',     header: 'stock_days',     accessor: (a) => stockDays(a) },
+  days_held:      { key: 'days_held',      header: 'days_held',      accessor: (a) => daysHeld(a) },
   latest_comment: { key: 'latest_comment', header: 'latest_comment', accessor: (a) => a.latest_comment },
 } as const satisfies Record<string, ColumnDescriptor<AssetDetails>>
 
