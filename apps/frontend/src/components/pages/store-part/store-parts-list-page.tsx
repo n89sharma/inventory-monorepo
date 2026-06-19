@@ -5,6 +5,7 @@ import { storePartTableColumns } from "@/components/pages/column-defs/store-part
 import { Button } from "@/components/shadcn/button"
 import { Input } from "@/components/shadcn/input"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
+import { useDefaultWarehouseSelection } from "@/hooks/use-default-warehouse-selection"
 import { preloadStorePartDetail, useStorePartsList } from "@/hooks/use-store-part"
 import { filtersToParams, paramsToFilters, type StoreFilters } from "@/lib/search-store-params"
 import { PlusIcon } from "@phosphor-icons/react"
@@ -14,10 +15,11 @@ import type { StorePart, StorePartSummary } from "shared-types"
 
 export function StorePartsListPage(): React.JSX.Element {
   const warehouses = useReferenceDataStore(state => state.warehouses)
+  const defaultWarehouses = useDefaultWarehouseSelection()
   const [searchParams, setSearchParams] = useSearchParams()
   const filters = useMemo(
-    () => paramsToFilters(searchParams, warehouses),
-    [searchParams, warehouses],
+    () => paramsToFilters(searchParams, warehouses, defaultWarehouses),
+    [searchParams, warehouses, defaultWarehouses],
   )
 
   const { data: rows = [] } = useStorePartsList()

@@ -7,7 +7,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 
 /**
  */
-export const getUsers = $runtime.makeTypedQueryFactory("select\nu.id,\nu.clerk_id,\nu.name,\nu.email,\nu.role,\nu.is_active\nfrom \"User\" u\norder by u.name") as () => $runtime.TypedSql<getUsers.Parameters, getUsers.Result>
+export const getUsers = $runtime.makeTypedQueryFactory("select\nu.id,\nu.clerk_id,\nu.name,\nu.email,\nu.role,\nu.is_active,\nu.default_warehouse_id\nfrom \"User\" u\norder by u.name") as () => $runtime.TypedSql<getUsers.Parameters, getUsers.Result>
 
 export namespace getUsers {
   export type Parameters = []
@@ -18,5 +18,6 @@ export namespace getUsers {
     email: string | null
     role: string | null
     is_active: boolean
+    default_warehouse_id: number | null
   }
 }

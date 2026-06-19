@@ -1,7 +1,6 @@
-import type { AssetType, Brand } from 'shared-types'
+import type { AssetType, Brand, Warehouse } from 'shared-types'
 import {
   decodeIds,
-  DEFAULT_WAREHOUSE_CODE,
   encodeIds,
   getSharedFilters,
   setSharedFilterParams,
@@ -33,6 +32,7 @@ export function filtersToParams(filters: SearchInStockFilters): URLSearchParams 
 export function paramsToFilters(
   params: URLSearchParams,
   ref: SearchInStockReferenceData,
+  defaultWarehouses: Warehouse[],
 ): SearchInStockFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
@@ -40,7 +40,7 @@ export function paramsToFilters(
     : null
 
   return {
-    ...getSharedFilters(params, ref, DEFAULT_WAREHOUSE_CODE),
+    ...getSharedFilters(params, ref, defaultWarehouses),
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
   }

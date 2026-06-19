@@ -2,8 +2,6 @@ import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
 
-export const DEFAULT_WAREHOUSE_CODE = 'YYZ'
-
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
 const PARAM_WH = 'wh'
@@ -103,16 +101,12 @@ export function setSharedFilterParams(
 export function getSharedFilters(
   params: URLSearchParams,
   ref: SharedAssetReferenceData,
-  defaultWarehouseCode?: string,
+  defaultWarehouses: Warehouse[] = [],
 ): SharedAssetFilters {
   const whRaw = params.get(PARAM_WH)
-  let warehouses: Warehouse[]
-  if (whRaw === null && defaultWarehouseCode) {
-    const defaultWarehouse = ref.warehouses.find(w => w.city_code === defaultWarehouseCode)
-    warehouses = defaultWarehouse ? [defaultWarehouse] : []
-  } else {
-    warehouses = decodeIds(whRaw, ref.warehouses)
-  }
+  const warehouses = whRaw === null && defaultWarehouses.length > 0
+    ? defaultWarehouses
+    : decodeIds(whRaw, ref.warehouses)
 
   const { model, modelQuery } = getModelParams(params, ref.models)
 

@@ -26,16 +26,22 @@ export function filtersToParams(filters: StoreFilters): URLSearchParams {
 
 export function paramsToFilters(
   params: URLSearchParams,
-  warehouses: Warehouse[]
+  warehouses: Warehouse[],
+  defaultWarehouses: Warehouse[]
 ): StoreFilters {
+  const raw = params.get(PARAM_WAREHOUSE)
+  const search = params.get(PARAM_SEARCH) ?? ''
+  if (raw === null && defaultWarehouses.length > 0) {
+    return { warehouses: defaultWarehouses, search }
+  }
   const ids = new Set(
-    (params.get(PARAM_WAREHOUSE) ?? '')
+    (raw ?? '')
       .split(',')
       .map(Number)
       .filter(id => !Number.isNaN(id))
   )
   return {
     warehouses: warehouses.filter(w => ids.has(w.id)),
-    search: params.get(PARAM_SEARCH) ?? ''
+    search
   }
 }

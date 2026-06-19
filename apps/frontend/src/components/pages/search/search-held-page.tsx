@@ -7,6 +7,7 @@ import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
+import { useDefaultWarehouseSelection } from '@/hooks/use-default-warehouse-selection'
 import { useSearchHeld } from '@/hooks/use-search-held'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import {
@@ -32,6 +33,7 @@ export function SearchHeldPage(): React.JSX.Element {
   const allComponents = useReferenceDataStore(state => state.components)
   const allUsers = useUserStore(state => state.users)
   const allCustomers = useOrgStore(state => state.organizations)
+  const defaultWarehouses = useDefaultWarehouseSelection()
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -43,10 +45,10 @@ export function SearchHeldPage(): React.JSX.Element {
       components: allComponents,
       users: allUsers,
       customers: allCustomers,
-    }),
+    }, defaultWarehouses),
     [
       searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
-      allComponents, allUsers, allCustomers,
+      allComponents, allUsers, allCustomers, defaultWarehouses,
     ],
   )
 

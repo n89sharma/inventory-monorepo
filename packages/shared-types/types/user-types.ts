@@ -28,6 +28,7 @@ export const UserSchema = z.object({
   is_active: z.boolean(),
   role: z.enum(AppRoles).nullable(),
   clerk_id: z.string().nullable(),
+  default_warehouse_id: z.int().nullable(),
 });
 
 export type User = z.infer<typeof UserSchema>;

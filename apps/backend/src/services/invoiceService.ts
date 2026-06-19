@@ -144,6 +144,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       is_active: invoice.updated_by.is_active,
       role: invoice.updated_by.role as AppRole | null,
       clerk_id: invoice.updated_by.clerk_id,
+      default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
     customer: invoice.organization,
     assets: assets.map(mapAssetSummary)

@@ -6,6 +6,7 @@ import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useDefaultWarehouseSelection } from '@/hooks/use-default-warehouse-selection'
 import { useSearchAll } from '@/hooks/use-search-all'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import { formatTitleCase } from '@/lib/formatters'
@@ -58,6 +59,7 @@ export function SearchAllPage(): React.JSX.Element {
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const allComponents = useReferenceDataStore(state => state.components)
+  const defaultWarehouses = useDefaultWarehouseSelection()
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -66,8 +68,8 @@ export function SearchAllPage(): React.JSX.Element {
       readinesses: allReadinesses,
       warehouses: allWarehouses,
       components: allComponents,
-    }),
-    [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
+    }, defaultWarehouses),
+    [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents, defaultWarehouses],
   )
 
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(

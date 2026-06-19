@@ -28,7 +28,7 @@ export function WarehouseFilter({
       <Toggle
         variant="outline"
         pressed={isAll}
-        onPressedChange={pressed => onSelectionChange(pressed ? activeWarehouses : [])}
+        onPressedChange={() => onSelectionChange(activeWarehouses)}
         aria-label="Select all warehouses"
       >
         {ALL_LABEL}
@@ -38,7 +38,7 @@ export function WarehouseFilter({
           key={w.id}
           variant="outline"
           pressed={isOnly(w)}
-          onPressedChange={pressed => onSelectionChange(pressed ? [w] : [])}
+          onPressedChange={pressed => onSelectionChange(pressed ? [w] : activeWarehouses)}
           aria-label={`Filter by ${w.city_code} warehouse`}
         >
           {w.city_code}

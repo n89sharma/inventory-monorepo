@@ -151,6 +151,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
       is_active: hold.created_by.is_active,
       role: hold.created_by.role as AppRole | null,
       clerk_id: hold.created_by.clerk_id,
+      default_warehouse_id: hold.created_by.default_warehouse_id,
     },
     created_for: {
       id: hold.created_for.id,
@@ -159,6 +160,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
       is_active: hold.created_for.is_active,
       role: hold.created_for.role as AppRole | null,
       clerk_id: hold.created_for.clerk_id,
+      default_warehouse_id: hold.created_for.default_warehouse_id,
     },
     customer: hold.customer,
     notes: hold.notes,

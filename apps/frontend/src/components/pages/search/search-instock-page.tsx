@@ -2,6 +2,7 @@ import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { AssetIdentityFilters } from '@/components/custom/asset-identity-filters'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useDefaultWarehouseSelection } from '@/hooks/use-default-warehouse-selection'
 import { useSearchInStock } from '@/hooks/use-search-instock'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import {
@@ -24,6 +25,7 @@ export function SearchInStockPage(): React.JSX.Element {
   const allReadinesses = useReferenceDataStore(state => state.readinesses)
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const allComponents = useReferenceDataStore(state => state.components)
+  const defaultWarehouses = useDefaultWarehouseSelection()
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -33,8 +35,11 @@ export function SearchInStockPage(): React.JSX.Element {
       models,
       readinesses: allReadinesses,
       components: allComponents,
-    }),
-    [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses, allComponents],
+    }, defaultWarehouses),
+    [
+      searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
+      allComponents, defaultWarehouses,
+    ],
   )
 
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(
