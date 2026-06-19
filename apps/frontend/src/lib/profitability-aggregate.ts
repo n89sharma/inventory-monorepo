@@ -9,7 +9,6 @@ export type ProfitabilityMetrics = {
   gross_revenue: number
   cogs: number
   gross_margin: number
-  transport_cost: number
 }
 
 export type MonthRow = ProfitabilityMetrics & { month: number }
@@ -36,8 +35,7 @@ function zeroMetrics(): ProfitabilityMetrics {
     asset_count: 0,
     gross_revenue: 0,
     cogs: 0,
-    gross_margin: 0,
-    transport_cost: 0
+    gross_margin: 0
   }
 }
 
@@ -46,7 +44,6 @@ function addMetrics(target: ProfitabilityMetrics, row: ProfitabilityCubeRow): vo
   target.gross_revenue += row.gross_revenue
   target.cogs += row.cogs
   target.gross_margin += row.gross_margin
-  target.transport_cost += row.transport_cost
 }
 
 function matchesDimension(rowId: number | null, filter: DimensionValue): boolean {
