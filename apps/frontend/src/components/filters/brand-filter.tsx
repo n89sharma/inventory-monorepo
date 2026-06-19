@@ -1,6 +1,5 @@
 import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { brandLabel } from '@/lib/reference-labels'
 import { useState } from 'react'
 import type { Brand } from 'shared-types'
 
@@ -30,7 +29,7 @@ export function BrandFilter({
         onClear()
       }}
       options={allBrands}
-      getLabel={brandLabel}
+      getLabel={b => b.name}
       placeholder='Brand'
       clearLabel='Clear brand'
       className='w-35'

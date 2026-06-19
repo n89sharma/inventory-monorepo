@@ -1,7 +1,6 @@
 import { useDepartureStore } from "@/data/store/departure-store"
 import { useOrgStore } from "@/data/store/org-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { organizationLabel } from "@/lib/reference-labels"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { preloadDepartureDetail, useDeparturesList } from "@/hooks/use-departure"
 import type { SearchOptions } from "@/ui-types/search-option-types"
@@ -66,7 +65,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
             selection={customer}
             onChange={setCustomer}
             options={orgs}
-            getLabel={organizationLabel}
+            getLabel={o => o.name}
             placeholder="Customer"
             clearLabel="Clear customer"
             className="w-48"

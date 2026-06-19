@@ -2,7 +2,6 @@ import { useArrivalStore } from "@/data/store/arrival-store"
 import { preloadArrivalDetail, useArrivalsList } from "@/hooks/use-arrival"
 import { useOrgStore } from "@/data/store/org-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { organizationLabel } from "@/lib/reference-labels"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
@@ -66,7 +65,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
             selection={vendor}
             onChange={setVendor}
             options={orgs}
-            getLabel={organizationLabel}
+            getLabel={o => o.name}
             placeholder="Vendor"
             clearLabel="Clear vendor"
             className="w-48"

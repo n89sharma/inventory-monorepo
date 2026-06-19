@@ -1,6 +1,7 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
+import { modelLabel } from '@/lib/reference-labels'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef, useState } from 'react'
@@ -11,7 +12,7 @@ import {
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
-import type { ModelSummary, Status } from 'shared-types'
+import type { Status } from 'shared-types'
 import { AssetErrorsEditor } from '../custom/asset-errors-editor'
 import { ControlledSearchSelectField } from '../custom/controlled-search-select-field'
 import { HorizontalField } from '../custom/horizontal-field'
@@ -222,7 +223,7 @@ export function AssetModal({
                 control={newAssetForm.control}
                 name='model'
                 options={models}
-                getLabel={(m: ModelSummary) => `${m.brand_name} ${m.model_name}`}
+                getLabel={modelLabel}
                 clearLabel='Clear model'
                 className={INPUT_WIDTH}
               />
