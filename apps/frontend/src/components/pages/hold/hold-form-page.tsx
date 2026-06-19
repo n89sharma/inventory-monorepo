@@ -8,7 +8,7 @@ import { DataTable } from '@/components/shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
 import { useOrgStore } from '@/data/store/org-store'
-import { useUserStore } from '@/data/store/user-store'
+import { useActiveUsers } from '@/hooks/use-active-users'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { HoldFormSchema, type HoldForm } from '@/ui-types/hold-form-types'
@@ -47,8 +47,7 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
       assets: []
     }
   })
-  const users = useUserStore(state => state.users)
-  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
+  const activeUsers = useActiveUsers()
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState

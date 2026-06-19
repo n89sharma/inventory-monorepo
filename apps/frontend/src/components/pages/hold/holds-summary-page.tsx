@@ -1,12 +1,11 @@
 import { useHoldStore } from "@/data/store/hold-store"
-import { useUserStore } from "@/data/store/user-store"
+import { useActiveUsers } from "@/hooks/use-active-users"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
 import { preloadHoldDetail, useHoldsList } from "@/hooks/use-hold"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
 import { PlusIcon } from "@phosphor-icons/react"
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
 import { Button } from "../../shadcn/button"
@@ -24,8 +23,7 @@ export function HoldSummaryPage(): React.JSX.Element {
   const setHoldFor = useHoldStore(state => state.setHoldFor)
   const hasSearched = useHoldStore(state => state.hasSearched)
   const setHasSearched = useHoldStore(state => state.setHasSearched)
-  const users = useUserStore(state => state.users)
-  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
+  const activeUsers = useActiveUsers()
 
   const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor)
 

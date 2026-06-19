@@ -1,9 +1,9 @@
 import { useOrgStore } from '@/data/store/org-store'
-import { useUserStore } from '@/data/store/user-store'
+import { useActiveUsers } from '@/hooks/use-active-users'
 import { HoldMetadataFormSchema, type HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { HoldDetail } from 'shared-types'
@@ -28,8 +28,7 @@ export function EditHoldMetadataModal({
   hold,
   onSave,
 }: EditHoldMetadataModalProps): React.JSX.Element {
-  const users = useUserStore(state => state.users)
-  const activeUsers = useMemo(() => users.filter(u => u.is_active), [users])
+  const activeUsers = useActiveUsers()
   const orgs = useOrgStore(state => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
