@@ -28,6 +28,7 @@ import {
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { useUserStore } from '@/data/store/user-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
   aggregateCube,
@@ -120,10 +121,7 @@ function ProfitabilityFilterBar({
   const organizations = useOrgStore(state => state.organizations)
   const users = useUserStore(state => state.users)
 
-  const activeWarehouses = useMemo(
-    () => warehouses.filter(warehouse => warehouse.is_active),
-    [warehouses],
-  )
+  const activeWarehouses = useActiveWarehouses()
   const warehouseSelection = filters.warehouseIds.length === 0
     ? activeWarehouses
     : warehouses.filter(warehouse => filters.warehouseIds.includes(warehouse.id))

@@ -1,6 +1,5 @@
 import { Toggle } from '@/components/shadcn/toggle'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useMemo } from 'react'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import type { Warehouse } from 'shared-types'
 
 const ALL_LABEL = 'All Warehouses'
@@ -12,11 +11,7 @@ export function WarehouseFilter({
   selection: Warehouse[]
   onSelectionChange: (warehouses: Warehouse[]) => void
 }): React.JSX.Element {
-  const allWarehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(
-    () => allWarehouses.filter(w => w.is_active),
-    [allWarehouses],
-  )
+  const activeWarehouses = useActiveWarehouses()
 
   const isAll = activeWarehouses.length > 0
     && selection.length === activeWarehouses.length

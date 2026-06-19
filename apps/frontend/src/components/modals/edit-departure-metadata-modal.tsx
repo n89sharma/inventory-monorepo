@@ -1,9 +1,9 @@
 import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { DepartureMetadataFormSchema, type DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { DepartureDetail } from 'shared-types'
@@ -28,8 +28,7 @@ export function EditDepartureMetadataModal({
   departure,
   onSave,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const activeWarehouses = useActiveWarehouses()
   const orgs = useOrgStore(state => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 

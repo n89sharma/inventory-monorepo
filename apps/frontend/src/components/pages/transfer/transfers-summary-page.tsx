@@ -1,12 +1,11 @@
 import { Button } from "@/components/shadcn/button"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
 import { useTransferStore } from "@/data/store/transfer-store"
+import { useActiveWarehouses } from "@/hooks/use-active-warehouses"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { useCan } from "@/hooks/use-can"
 import { preloadTransferDetail, useTransfersList } from "@/hooks/use-transfer"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { PlusIcon } from "@phosphor-icons/react"
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptionsInline } from "../../custom/select-options"
@@ -24,8 +23,7 @@ export function TransferSummaryPage(): React.JSX.Element {
   const setDestination = useTransferStore(state => state.setDestination)
   const hasSearched = useTransferStore(state => state.hasSearched)
   const setHasSearched = useTransferStore(state => state.setHasSearched)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const activeWarehouses = useActiveWarehouses()
 
   const { data: transfers = [] } = useTransfersList(fromDate, toDate, origin, destination)
 

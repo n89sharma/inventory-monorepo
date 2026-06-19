@@ -10,6 +10,7 @@ import { Field, FieldLabel } from "@/components/shadcn/field"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
+import { useActiveWarehouses } from "@/hooks/use-active-warehouses"
 import { formatTitleCase } from "@/lib/formatters"
 import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
@@ -35,7 +36,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const getLocationsByWarehouse = useAssetStore(state => state.getLocationsByWarehouse)
   const warehouses = useReferenceDataStore(state => state.warehouses)
   const zones = useReferenceDataStore(state => state.zones)
-  const activeWarehouses = warehouses.filter(w => w.is_active)
+  const activeWarehouses = useActiveWarehouses()
 
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null)
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null)

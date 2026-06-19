@@ -1,12 +1,11 @@
 import { useDepartureStore } from "@/data/store/departure-store"
 import { useOrgStore } from "@/data/store/org-store"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
+import { useActiveWarehouses } from "@/hooks/use-active-warehouses"
 import { useAutoSearch } from "@/hooks/use-auto-search"
 import { preloadDepartureDetail, useDeparturesList } from "@/hooks/use-departure"
 import type { SearchOptions } from "@/ui-types/search-option-types"
 import { SearchSelectOptionFilter } from "../../custom/search-select-option-filter"
 import { PlusIcon } from "@phosphor-icons/react"
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { SearchBar } from "../../custom/search-bar"
 import { SelectOptionsInline } from "../../custom/select-options"
@@ -26,8 +25,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
   const setCustomer = useDepartureStore(state => state.setCustomer)
   const hasSearched = useDepartureStore(state => state.hasSearched)
   const setHasSearched = useDepartureStore(state => state.setHasSearched)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const activeWarehouses = useActiveWarehouses()
   const orgs = useOrgStore(state => state.organizations)
 
   const { data: departures = [] } = useDeparturesList(fromDate, toDate, origin, customer)

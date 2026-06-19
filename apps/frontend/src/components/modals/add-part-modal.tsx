@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/ta
 import { Textarea } from '@/components/shadcn/textarea'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useStorePartsList } from '@/hooks/use-store-part'
 import { cn } from '@/lib/utils'
 import {
@@ -409,8 +409,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
 function WarehouseChips(
   { selected, onSelect }: { selected: Warehouse | null; onSelect: (w: Warehouse | null) => void },
 ) {
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const activeWarehouses = useActiveWarehouses()
 
   return (
     <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Select warehouse">

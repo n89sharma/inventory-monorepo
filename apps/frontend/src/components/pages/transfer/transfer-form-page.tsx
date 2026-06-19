@@ -1,5 +1,5 @@
 import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { UNSELECTED } from '@/ui-types/select-option-types'
@@ -36,8 +36,7 @@ export function TransferFormPage({ defaultValues, pageConfig, breadcrumbs, onVal
     resolver: zodResolver(TransferFormSchema),
     defaultValues: defaultValues ?? getDefaultTransfer()
   })
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const activeWarehouses = useMemo(() => warehouses.filter(w => w.is_active), [warehouses])
+  const activeWarehouses = useActiveWarehouses()
   const orgs = useOrgStore(state => state.organizations)
   const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState
