@@ -1,5 +1,6 @@
 import { getAssetsForSearchAll } from '@/data/api/asset-api'
-import { MIN_MODEL_INPUT_QUERY_LENGTH } from '@/lib/asset-filter-params'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { MIN_MODEL_INPUT_QUERY_LENGTH, resolveWarehouseScope } from '@/lib/asset-filter-params'
 import type { SearchAllFilters } from '@/lib/search-all-params'
 import type { AssetSearchRow } from 'shared-types'
 import useSWR from 'swr'
@@ -12,8 +13,11 @@ function hasSearchTarget(f: SearchAllFilters): boolean {
 }
 
 export function useSearchAll(filters: SearchAllFilters) {
+  const activeWarehouses = useActiveWarehouses()
+  const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)
+
   return useSWR<AssetSearchRow[]>(
-    hasSearchTarget(filters) ? [SEARCH_ALL_KEY, filters] : null,
+    hasSearchTarget(filters) ? [SEARCH_ALL_KEY, { ...filters, warehouses }] : null,
     ([, f]: [string, SearchAllFilters]) => {
       const modelName = f.model?.model_name ?? f.modelQuery!
       return getAssetsForSearchAll(

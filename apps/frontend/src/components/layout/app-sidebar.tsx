@@ -16,6 +16,10 @@ import {
   SidebarRail
 } from "@/components/shadcn/sidebar"
 import { useCan } from '@/hooks/use-can'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
+import { buildAssetSearchPath } from '@/lib/asset-filter-params'
+import { buildProfitabilityReportPath } from '@/lib/profitability-report-url-params'
+import { buildStoreListPath } from '@/lib/search-store-params'
 import {
   CaretDownIcon,
   ChartLineUpIcon,
@@ -31,6 +35,9 @@ import {
 } from "@phosphor-icons/react"
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+
+const STORE_PATH = '/store'
+const PROFITABILITY_PATH = '/reports/profitability'
 
 const sidebarItems = [
   {
@@ -50,7 +57,7 @@ const sidebarItems = [
   },
   {
     title: "Store",
-    url: "/store",
+    url: STORE_PATH,
     icon: <ToolboxIcon aria-hidden="true" />
   },
   {
@@ -78,7 +85,7 @@ const SETTINGS_SUB_ITEMS = [
 ]
 
 const REPORTS_SUB_ITEMS = [
-  { title: 'Profitability', url: '/reports/profitability' },
+  { title: 'Profitability', url: PROFITABILITY_PATH },
   { title: 'Held Assets', url: '/reports/holds-by-salesperson' },
 ]
 
@@ -88,6 +95,7 @@ const PRICE_CHECK_ITEM = { title: 'Price Check', url: '/search/price-check' }
 
 export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
+  const defaultWarehouse = useProfileDefaultWarehouse()
 
   const canManageSettings = useCan('manage_settings')
   const canManageUsers = useCan('manage_users')
@@ -139,10 +147,13 @@ export function AppSidebar(): React.JSX.Element {
             <SidebarMenu>
               {sidebarItems.map((item) => {
                 const isActive = location.pathname.startsWith(item.url)
+                const to = item.url === STORE_PATH
+                  ? buildStoreListPath(defaultWarehouse)
+                  : item.url
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
-                      <Link to={item.url}>
+                      <Link to={to}>
                         {item.icon}
                         <span>{item.title}</span>
                       </Link>
@@ -172,7 +183,7 @@ export function AppSidebar(): React.JSX.Element {
                       {SEARCH_ASSETS_SUB_ITEMS.map(item => (
                         <SidebarMenuSubItem key={item.title}>
                           <SidebarMenuSubButton asChild isActive={location.pathname.startsWith(item.url) ? true : undefined}>
-                            <Link to={item.url}>{item.title}</Link>
+                            <Link to={buildAssetSearchPath(item.url, defaultWarehouse)}>{item.title}</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -211,13 +222,18 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {REPORTS_SUB_ITEMS.map(item => (
-                          <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
-                              <Link to={item.url}>{item.title}</Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {REPORTS_SUB_ITEMS.map(item => {
+                          const to = item.url === PROFITABILITY_PATH
+                            ? buildProfitabilityReportPath(defaultWarehouse)
+                            : item.url
+                          return (
+                            <SidebarMenuSubItem key={item.title}>
+                              <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
+                                <Link to={to}>{item.title}</Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )
+                        })}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>

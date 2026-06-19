@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useHoldsBySalespersonReport } from '@/hooks/use-holds-by-salesperson-report'
 import {
   aggregateHolds,
@@ -121,10 +120,9 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
 }
 
 function HoldsReportBody({ table }: { table: HoldsBySalespersonTable }): React.JSX.Element {
-  const activeWarehouses = useActiveWarehouses()
   const rows = useMemo(
-    () => toHoldsReportRows(table.salespeople, activeWarehouses),
-    [table.salespeople, activeWarehouses],
+    () => toHoldsReportRows(table.salespeople),
+    [table.salespeople],
   )
 
   if (rows.length === 0) {

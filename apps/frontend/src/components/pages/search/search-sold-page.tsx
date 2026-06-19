@@ -6,7 +6,6 @@ import { Toggle } from '@/components/shadcn/toggle'
 import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useDefaultWarehouseSelection } from '@/hooks/use-default-warehouse-selection'
 import { useSearchSold } from '@/hooks/use-search-sold'
 import { useUrlFilters } from '@/hooks/use-url-filters'
 import {
@@ -31,7 +30,6 @@ export function SearchSoldPage(): React.JSX.Element {
   const allWarehouses = useReferenceDataStore(state => state.warehouses)
   const allComponents = useReferenceDataStore(state => state.components)
   const allCustomers = useOrgStore(state => state.organizations)
-  const defaultWarehouses = useDefaultWarehouseSelection()
 
   const urlFilters = useMemo(
     () => paramsToFilters(searchParams, {
@@ -42,10 +40,10 @@ export function SearchSoldPage(): React.JSX.Element {
       readinesses: allReadinesses,
       components: allComponents,
       customers: allCustomers,
-    }, defaultWarehouses),
+    }),
     [
       searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
-      allComponents, allCustomers, defaultWarehouses,
+      allComponents, allCustomers,
     ],
   )
 

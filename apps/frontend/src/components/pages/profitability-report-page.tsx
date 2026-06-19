@@ -28,7 +28,6 @@ import {
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { useUserStore } from '@/data/store/user-store'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
   aggregateCube,
@@ -121,10 +120,8 @@ function ProfitabilityFilterBar({
   const organizations = useOrgStore(state => state.organizations)
   const users = useUserStore(state => state.users)
 
-  const activeWarehouses = useActiveWarehouses()
-  const warehouseSelection = filters.warehouseIds.length === 0
-    ? activeWarehouses
-    : warehouses.filter(warehouse => filters.warehouseIds.includes(warehouse.id))
+  const warehouseSelection =
+    warehouses.filter(warehouse => filters.warehouseIds.includes(warehouse.id))
   const salesRepSelection = users.find(user => user.id === filters.salesRepId) ?? null
   const vendorSelection = organizations.find(org => org.id === filters.vendorId) ?? null
   const brandSelection = brands.find(brand => brand.id === filters.brandId) ?? null
@@ -153,9 +150,7 @@ function ProfitabilityFilterBar({
         selection={warehouseSelection}
         onSelectionChange={selected => onChange({
           ...filters,
-          warehouseIds: selected.length === activeWarehouses.length
-            ? []
-            : selected.map(warehouse => warehouse.id),
+          warehouseIds: selected.map(warehouse => warehouse.id),
         })}
       />
 

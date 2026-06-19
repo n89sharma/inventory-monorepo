@@ -5,6 +5,7 @@ const PARAM_VENDOR = 'vendor'
 const PARAM_BRAND = 'brand'
 
 const LIST_SEPARATOR = ','
+const PROFITABILITY_REPORT_PATH = '/reports/profitability'
 
 export type ProfitabilityFilters = {
   year: number
@@ -26,6 +27,13 @@ function parseNumberList(raw: string | null): number[] {
     .split(LIST_SEPARATOR)
     .map(part => Number.parseInt(part, 10))
     .filter(value => !Number.isNaN(value))
+}
+
+export function buildProfitabilityReportPath(warehouse: { id: number } | null): string {
+  if (!warehouse) return PROFITABILITY_REPORT_PATH
+  const params = new URLSearchParams()
+  params.set(PARAM_WAREHOUSE, String(warehouse.id))
+  return `${PROFITABILITY_REPORT_PATH}?${params}`
 }
 
 export function filtersToParams(filters: ProfitabilityFilters): URLSearchParams {

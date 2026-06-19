@@ -4,7 +4,6 @@ import { buildSearchHeldUrl } from '@/lib/search-held-params'
 import { cn } from '@/lib/utils'
 import { CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row } from '@tanstack/react-table'
-import type { Warehouse } from 'shared-types'
 import { Link } from 'react-router-dom'
 
 const DAYS_SUFFIX = 'd'
@@ -22,7 +21,6 @@ export type HoldsReportRow = {
 
 export function toHoldsReportRows(
   salespeople: SalespersonHoldsGroup[],
-  warehouses: Warehouse[],
 ): HoldsReportRow[] {
   return salespeople.map(rep => ({
     rowId: `rep-${rep.salesRepId}`,
@@ -30,7 +28,7 @@ export function toHoldsReportRows(
     assetCount: rep.assetCount,
     holdCount: rep.holdCount,
     medianHeldDays: rep.medianHeldDays,
-    href: buildSearchHeldUrl({ heldForId: rep.salesRepId, warehouses }),
+    href: buildSearchHeldUrl({ heldForId: rep.salesRepId }),
     subRows: rep.customers.map(customer => ({
       rowId: `rep-${rep.salesRepId}-customer-${customer.customerId}`,
       label: formatTitleCase(customer.customerName),
@@ -40,7 +38,6 @@ export function toHoldsReportRows(
       href: buildSearchHeldUrl({
         heldForId: rep.salesRepId,
         holdCustomerId: customer.customerId,
-        warehouses,
       }),
     })),
   }))

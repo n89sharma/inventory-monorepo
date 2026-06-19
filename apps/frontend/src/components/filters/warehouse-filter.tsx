@@ -13,8 +13,7 @@ export function WarehouseFilter({
 }): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
 
-  const isAll = activeWarehouses.length > 0
-    && selection.length === activeWarehouses.length
+  const isAll = selection.length === 0
   const isOnly = (w: Warehouse) =>
     selection.length === 1 && selection[0].id === w.id
 
@@ -23,7 +22,7 @@ export function WarehouseFilter({
       <Toggle
         variant="outline"
         pressed={isAll}
-        onPressedChange={() => onSelectionChange(activeWarehouses)}
+        onPressedChange={() => onSelectionChange([])}
         aria-label="Select all warehouses"
       >
         {ALL_LABEL}
@@ -33,7 +32,7 @@ export function WarehouseFilter({
           key={w.id}
           variant="outline"
           pressed={isOnly(w)}
-          onPressedChange={pressed => onSelectionChange(pressed ? [w] : activeWarehouses)}
+          onPressedChange={pressed => onSelectionChange(pressed ? [w] : [])}
           aria-label={`Filter by ${w.city_code} warehouse`}
         >
           {w.city_code}

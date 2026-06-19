@@ -98,15 +98,25 @@ export function setSharedFilterParams(
   if (filters.internalFinisher) params.set(PARAM_FIN, String(filters.internalFinisher.id))
 }
 
+export function resolveWarehouseScope(
+  selected: Warehouse[],
+  activeWarehouses: Warehouse[],
+): Warehouse[] {
+  return selected.length > 0 ? selected : activeWarehouses
+}
+
+export function buildAssetSearchPath(path: string, warehouse: Warehouse | null): string {
+  if (!warehouse) return path
+  const params = new URLSearchParams()
+  params.set(PARAM_WH, String(warehouse.id))
+  return `${path}?${params}`
+}
+
 export function getSharedFilters(
   params: URLSearchParams,
   ref: SharedAssetReferenceData,
-  defaultWarehouses: Warehouse[] = [],
 ): SharedAssetFilters {
-  const whRaw = params.get(PARAM_WH)
-  const warehouses = whRaw === null && defaultWarehouses.length > 0
-    ? defaultWarehouses
-    : decodeIds(whRaw, ref.warehouses)
+  const warehouses = decodeIds(params.get(PARAM_WH), ref.warehouses)
 
   const { model, modelQuery } = getModelParams(params, ref.models)
 

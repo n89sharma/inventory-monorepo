@@ -1,4 +1,4 @@
-import type { Status, Warehouse } from 'shared-types'
+import type { Status } from 'shared-types'
 import {
   decodeIds,
   encodeIds,
@@ -36,10 +36,9 @@ export function filtersToParams(filters: SearchAllFilters): URLSearchParams {
 export function paramsToFilters(
   params: URLSearchParams,
   ref: SearchAllReferenceData,
-  defaultWarehouses: Warehouse[],
 ): SearchAllFilters {
   return {
-    ...getSharedFilters(params, ref, defaultWarehouses),
+    ...getSharedFilters(params, ref),
     statuses: decodeIds(params.get(PARAM_STATUS), ref.statuses),
   }
 }

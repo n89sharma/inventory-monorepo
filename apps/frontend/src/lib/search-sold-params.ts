@@ -1,4 +1,4 @@
-import type { AssetType, Brand, OrgSummary, Status, Warehouse } from 'shared-types'
+import type { AssetType, Brand, OrgSummary, Status } from 'shared-types'
 import {
   isAfter,
   isBefore,
@@ -79,7 +79,6 @@ export function filtersToParams(filters: SearchSoldFilters): URLSearchParams {
 export function paramsToFilters(
   params: URLSearchParams,
   ref: SearchSoldReferenceData,
-  defaultWarehouses: Warehouse[],
 ): SearchSoldFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
@@ -102,7 +101,7 @@ export function paramsToFilters(
     : null
 
   return {
-    ...getSharedFilters(params, ref, defaultWarehouses),
+    ...getSharedFilters(params, ref),
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
     showOther: params.get(PARAM_OTHER) === OTHER_ON,

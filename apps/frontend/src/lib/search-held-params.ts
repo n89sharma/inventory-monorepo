@@ -1,8 +1,7 @@
-import type { AssetType, Brand, OrgSummary, User, Warehouse } from 'shared-types'
+import type { AssetType, Brand, OrgSummary, User } from 'shared-types'
 import {
   decodeIds,
   encodeIds,
-  EMPTY_SHARED_FILTERS,
   getSharedFilters,
   parseNonNegativeNumber,
   setSharedFilterParams,
@@ -34,12 +33,9 @@ export type SearchHeldReferenceData = SharedAssetReferenceData & {
 }
 
 export function buildSearchHeldUrl(
-  selection: { heldForId?: number; holdCustomerId?: number; warehouses?: Warehouse[] },
+  selection: { heldForId?: number; holdCustomerId?: number },
 ): string {
   const params = new URLSearchParams()
-  if (selection.warehouses && selection.warehouses.length > 0) {
-    setSharedFilterParams(params, { ...EMPTY_SHARED_FILTERS, warehouses: selection.warehouses })
-  }
   if (selection.heldForId !== undefined) params.set(PARAM_HELD_FOR, String(selection.heldForId))
   if (selection.holdCustomerId !== undefined) {
     params.set(PARAM_HOLD_CUSTOMER, String(selection.holdCustomerId))
@@ -62,7 +58,6 @@ export function filtersToParams(filters: SearchHeldFilters): URLSearchParams {
 export function paramsToFilters(
   params: URLSearchParams,
   ref: SearchHeldReferenceData,
-  defaultWarehouses: Warehouse[],
 ): SearchHeldFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
@@ -85,7 +80,7 @@ export function paramsToFilters(
     : null
 
   return {
-    ...getSharedFilters(params, ref, defaultWarehouses),
+    ...getSharedFilters(params, ref),
     brand,
     assetTypes: decodeIds(params.get(PARAM_TYPE), ref.assetTypes),
     heldBy,

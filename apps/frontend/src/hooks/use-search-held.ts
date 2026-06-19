@@ -1,17 +1,18 @@
 import { getAssetsForSearchHeld } from '@/data/api/asset-api'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { resolveWarehouseScope } from '@/lib/asset-filter-params'
 import type { SearchHeldFilters } from '@/lib/search-held-params'
 import type { AssetSearchRow } from 'shared-types'
 import useSWR from 'swr'
 
 const SEARCH_HELD_KEY = 'search-held-assets'
 
-function hasWarehouse(f: SearchHeldFilters): boolean {
-  return f.warehouses.length > 0
-}
-
 export function useSearchHeld(filters: SearchHeldFilters) {
+  const activeWarehouses = useActiveWarehouses()
+  const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)
+
   return useSWR<AssetSearchRow[]>(
-    hasWarehouse(filters) ? [SEARCH_HELD_KEY, filters] : null,
+    warehouses.length > 0 ? [SEARCH_HELD_KEY, { ...filters, warehouses }] : null,
     ([, f]: [string, SearchHeldFilters]) => getAssetsForSearchHeld(
       f.warehouses,
       f.brand,

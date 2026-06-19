@@ -1,5 +1,7 @@
 import { getAssetsForSold } from '@/data/api/asset-api'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { resolveWarehouseScope } from '@/lib/asset-filter-params'
 import {
   isValidSoldDateRange,
   resolveSoldStatuses,
@@ -13,12 +15,14 @@ const SEARCH_SOLD_KEY = 'search-sold-assets'
 export function useSearchSold(filters: SearchSoldFilters) {
   const allStatuses = useReferenceDataStore(state => state.statuses)
   const statuses = resolveSoldStatuses(filters.showOther, allStatuses)
-  const ready = filters.warehouses.length > 0
+  const activeWarehouses = useActiveWarehouses()
+  const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)
+  const ready = warehouses.length > 0
     && statuses.length > 0
     && isValidSoldDateRange(filters.fromDate, filters.toDate)
 
   return useSWR<AssetSearchRow[]>(
-    ready ? [SEARCH_SOLD_KEY, filters] : null,
+    ready ? [SEARCH_SOLD_KEY, { ...filters, warehouses }] : null,
     ([, f]: [string, SearchSoldFilters]) => getAssetsForSold(
       f.warehouses,
       f.brand,

@@ -2,6 +2,7 @@ import type { Warehouse } from 'shared-types'
 
 const PARAM_WAREHOUSE = 'warehouse'
 const PARAM_SEARCH = 'search'
+const STORE_LIST_PATH = '/store'
 
 export type StoreFilters = {
   warehouses: Warehouse[]
@@ -24,18 +25,22 @@ export function filtersToParams(filters: StoreFilters): URLSearchParams {
   return params
 }
 
+export function buildStoreListPath(warehouse: Warehouse | null): string {
+  if (!warehouse) return STORE_LIST_PATH
+  const params = new URLSearchParams()
+  params.set(PARAM_WAREHOUSE, String(warehouse.id))
+  return `${STORE_LIST_PATH}?${params}`
+}
+
 export function paramsToFilters(
   params: URLSearchParams,
   warehouses: Warehouse[],
-  defaultWarehouses: Warehouse[]
 ): StoreFilters {
   const raw = params.get(PARAM_WAREHOUSE)
   const search = params.get(PARAM_SEARCH) ?? ''
-  if (raw === null && defaultWarehouses.length > 0) {
-    return { warehouses: defaultWarehouses, search }
-  }
+  if (raw === null) return { warehouses: [], search }
   const ids = new Set(
-    (raw ?? '')
+    raw
       .split(',')
       .map(Number)
       .filter(id => !Number.isNaN(id))
