@@ -44,9 +44,15 @@ interface DataTableProps<TData, TValue> {
   defaultSort?: { id: string; desc: boolean }
   pinLeft?: string[]
   getRowHref?: (row: TData) => string
+  getRowClassName?: (row: TData) => string | undefined
   columnVisibility?: VisibilityState
   scrollMaxHeight?: string
 }
+
+const CELL_BG =
+  'bg-[var(--row-bg,var(--color-background))] ' +
+  'group-hover/row:bg-[var(--row-bg-hover,var(--color-muted))] ' +
+  'group-data-[state=selected]/row:bg-[var(--row-bg-hover,var(--color-muted))]'
 
 function pinStyle<TData>(column: Column<TData>): CSSProperties {
   if (column.getIsPinned() !== 'left') return {}
@@ -79,12 +85,11 @@ function pinHeaderClass<TData>(column: Column<TData>): string {
   return `bg-muted ${shadow}`.trim()
 }
 
-function pinCellClass<TData>(column: Column<TData>): string {
+function pinShadowClass<TData>(column: Column<TData>): string {
   if (column.getIsPinned() !== 'left') return ''
-  const shadow = column.getIsLastColumn('left')
+  return column.getIsLastColumn('left')
     ? 'shadow-[inset_-1px_0_0_var(--border)]'
     : ''
-  return `bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted ${shadow}`.trim()
 }
 
 export function DataTable<TData, TValue>({
@@ -98,6 +103,7 @@ export function DataTable<TData, TValue>({
   defaultSort,
   pinLeft,
   getRowHref,
+  getRowClassName,
   columnVisibility,
   scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
 }: DataTableProps<TData, TValue>) {
@@ -178,6 +184,7 @@ export function DataTable<TData, TValue>({
                     isSelected={row.getIsSelected()}
                     onRowMouseEnter={onRowMouseEnter}
                     getRowHref={getRowHref}
+                    getRowClassName={getRowClassName}
                     columnVisibility={columnVisibility}
                   />
                 )))
@@ -245,18 +252,20 @@ function DataRowImpl<TData>({
   isSelected,
   onRowMouseEnter,
   getRowHref,
+  getRowClassName,
 }: {
   row: Row<TData>
   isSelected: boolean
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
+  getRowClassName?: (row: TData) => string | undefined
   columnVisibility?: VisibilityState
 }) {
   const navigate = useNavigate()
   return (
     <TableRow
       data-state={isSelected && "selected"}
-      className={`group/row ${getRowHref ? 'cursor-pointer' : ''}`.trim()}
+      className={`group/row ${getRowHref ? 'cursor-pointer' : ''} ${getRowClassName?.(row.original) ?? ''}`.trim()}
       onMouseEnter={() => onRowMouseEnter?.(row.original)}
       onClick={(e) => {
         if (!getRowHref) return
@@ -276,7 +285,7 @@ function DataRowImpl<TData>({
         <TableCell
           key={cell.id}
           style={{ width: cell.column.getSize(), ...pinStyle(cell.column) }}
-          className={`relative whitespace-normal text-center ${pinCellClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
+          className={`relative whitespace-normal text-center ${CELL_BG} ${pinShadowClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>

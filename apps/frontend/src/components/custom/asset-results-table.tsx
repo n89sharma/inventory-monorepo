@@ -35,6 +35,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave,
   columnVisibility,
   getRowHref,
+  getRowClassName,
   defaultSort = STOCK_DAYS_ASC_SORT,
 }: {
   assets: AssetSearchRow[]
@@ -43,6 +44,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave: () => void
   columnVisibility: VisibilityState
   getRowHref: (asset: AssetSearchRow) => string
+  getRowClassName?: (asset: AssetSearchRow) => string | undefined
   defaultSort?: { id: string; desc: boolean }
 }) {
   const columns = useMemo(
@@ -78,6 +80,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         defaultSort={defaultSort}
         pinLeft={PIN_LEFT}
         getRowHref={getRowHref}
+        getRowClassName={getRowClassName}
         columnVisibility={columnVisibility}
       />
     </>

@@ -6,15 +6,18 @@ import { formatDate, formatLocation, formatThousandsK, formatTitleCase, formatUS
 import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { differenceInCalendarDays } from "date-fns"
+import { Link } from "react-router-dom"
 import type { AssetSearchRow } from 'shared-types'
 import { createIdColumn } from './shared-columns'
 
 const HELD_STATUS = 'HELD'
 
+const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
+
 const stockDays = (arrived: Date | null): number | undefined =>
   arrived ? differenceInCalendarDays(new Date(), arrived) : undefined
 
-const daysHeld = (heldOn: Date | null): number | undefined =>
+export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
 
 function SortableHeader({
@@ -130,6 +133,19 @@ export function createAssetSearchColumns(
     size: 80
   },
   {
+    id: "days_held",
+    accessorFn: row => daysHeld(row.hold_created_at),
+    header: ({ column }) => (
+      <SortableHeader
+        label="Days Held"
+        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      />
+    ),
+    cell: ({ row }) => daysHeld(row.original.hold_created_at) ?? '',
+    sortUndefined: 'last',
+    size: 80
+  },
+  {
     accessorKey: "specs_cassettes",
     header: ({ column }) => (
       <SortableHeader
@@ -231,7 +247,18 @@ export function createAssetSearchColumns(
   {
     accessorKey: "hold_hold_number",
     header: "Hold #",
-    cell: ({ row }) => row.original.hold_hold_number ?? '',
+    cell: ({ row }) => {
+      const { hold_hold_number } = row.original
+      if (!hold_hold_number) return ''
+      return (
+        <Link
+          to={holdDetailHref(hold_hold_number)}
+          className="font-mono text-foreground hover:underline"
+        >
+          {hold_hold_number}
+        </Link>
+      )
+    },
     size: 100
   },
   {
@@ -277,19 +304,6 @@ export function createAssetSearchColumns(
     ),
     cell: ({ row }) => formatDate(row.original.hold_created_at),
     size: 100
-  },
-  {
-    id: "days_held",
-    accessorFn: row => daysHeld(row.hold_created_at),
-    header: ({ column }) => (
-      <SortableHeader
-        label="Days Held"
-        onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      />
-    ),
-    cell: ({ row }) => daysHeld(row.original.hold_created_at) ?? '',
-    sortUndefined: 'last',
-    size: 80
   },
   {
     accessorKey: "vendor",

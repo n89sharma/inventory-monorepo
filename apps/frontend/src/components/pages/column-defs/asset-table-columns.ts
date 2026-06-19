@@ -104,8 +104,8 @@ const SOLD_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 const HELD_DEFAULT_COLUMN_IDS = [
-  'serial_number', 'status', 'specs_meter_total', 'hold_hold_number', 'held_by',
-  'hold_created_for', 'hold_customer', 'hold_created_at', 'days_held',
+  'serial_number', 'specs_meter_total', 'days_held', 'hold_hold_number',
+  'held_by', 'hold_created_for', 'hold_customer',
 ] as const satisfies readonly AssetColumnId[]
 
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {

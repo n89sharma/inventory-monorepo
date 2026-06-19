@@ -17,10 +17,20 @@ import {
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
+import { daysHeld } from '@/components/pages/column-defs/asset-search-columns'
 import { AssetSearchPage } from './asset-search-page'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DAYS_HELD_DESC_SORT = { id: 'days_held', desc: true } as const
+const DAYS_HELD_WARNING_THRESHOLD = 30
+const ROW_WARNING_CLASS = 'data-row-warning'
+
+function heldRowClassName(asset: AssetSearchRow): string | undefined {
+  const days = daysHeld(asset.hold_created_at)
+  return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD
+    ? ROW_WARNING_CLASS
+    : undefined
+}
 
 export function SearchHeldPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -70,6 +80,7 @@ export function SearchHeldPage(): React.JSX.Element {
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
       defaultSort={DAYS_HELD_DESC_SORT}
+      getRowClassName={heldRowClassName}
     >
       <AssetFilterBar
         draft={draft}
