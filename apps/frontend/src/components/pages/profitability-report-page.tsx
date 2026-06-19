@@ -1,8 +1,11 @@
 import { MetricCard } from '@/components/custom/cards/metric-card'
 import { SavedViewsButton } from '@/components/custom/saved-views-button'
-import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { ShareButton } from '@/components/custom/share-button'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
+import { BrandFilter } from '@/components/filters/brand-filter'
+import { CustomerFilter } from '@/components/filters/customer-filter'
+import { UserFilter } from '@/components/filters/user-filter'
+import { WarehouseFilter } from '@/components/filters/warehouse-filter'
 import { PageContent } from '@/components/layout/page-content'
 import { Button } from '@/components/shadcn/button'
 import {
@@ -22,34 +25,31 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useOrgStore } from '@/data/store/org-store'
+import { useUserStore } from '@/data/store/user-store'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
   aggregateCube,
-  deriveFilterOptions,
-  type DimensionOption,
   type MonthRow,
   type ProfitabilityMetrics,
   type ProfitabilityTable,
 } from '@/lib/profitability-aggregate'
 import {
   filtersToParams,
-  NONE_FILTER,
   paramsToFilters,
-  type DimensionValue,
   type ProfitabilityFilters,
 } from '@/lib/profitability-report-url-params'
 import { formatUSD } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
-
-const ALL_VALUE = 'all'
 
 const NO_VALUE = '—'
 const MARGIN_PCT_HEADER = 'Margin %'
@@ -101,155 +101,86 @@ function monthHasActivity(row: MonthRow): boolean {
 
 function countActiveFilters(filters: ProfitabilityFilters): number {
   let count = 0
-  if (filters.warehouseId !== null) count += 1
+  if (filters.warehouseIds.length > 0) count += 1
   if (filters.salesRepId !== null) count += 1
   if (filters.vendorId !== null) count += 1
   if (filters.brandId !== null) count += 1
   return count
 }
 
-function dimensionToSelectValue(value: DimensionValue): string {
-  if (value === null) return ALL_VALUE
-  if (value === NONE_FILTER) return NONE_FILTER
-  return String(value)
-}
-
-function selectValueToDimension(raw: string): DimensionValue {
-  if (raw === ALL_VALUE) return null
-  if (raw === NONE_FILTER) return NONE_FILTER
-  return Number.parseInt(raw, 10)
-}
-
-function DimensionSelect({
-  label,
-  value,
-  options,
+function ProfitabilityFilterBar({
+  filters,
   onChange,
 }: {
-  label: string
-  value: DimensionValue
-  options: DimensionOption[]
-  onChange: (next: DimensionValue) => void
+  filters: ProfitabilityFilters
+  onChange: (next: ProfitabilityFilters) => void
 }): React.JSX.Element {
+  const brands = useReferenceDataStore(state => state.brands)
+  const warehouses = useReferenceDataStore(state => state.warehouses)
+  const organizations = useOrgStore(state => state.organizations)
+  const users = useUserStore(state => state.users)
+
+  const activeWarehouses = useMemo(
+    () => warehouses.filter(warehouse => warehouse.is_active),
+    [warehouses],
+  )
+  const warehouseSelection = filters.warehouseIds.length === 0
+    ? activeWarehouses
+    : warehouses.filter(warehouse => filters.warehouseIds.includes(warehouse.id))
+  const salesRepSelection = users.find(user => user.id === filters.salesRepId) ?? null
+  const vendorSelection = organizations.find(org => org.id === filters.vendorId) ?? null
+  const brandSelection = brands.find(brand => brand.id === filters.brandId) ?? null
+
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs text-muted-foreground">{label}</span>
+    <div className="flex flex-row flex-wrap gap-2 items-center">
       <Select
-        value={dimensionToSelectValue(value)}
-        onValueChange={raw => onChange(selectValueToDimension(raw))}
+        value={String(filters.year)}
+        onValueChange={raw => onChange({ ...filters, year: Number.parseInt(raw, 10) })}
       >
-        <SelectTrigger className="w-45">
+        <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>
         <SelectContent position="popper">
           <SelectGroup>
-            <SelectItem value={ALL_VALUE}>All</SelectItem>
-            {options.map(option => (
-              <SelectItem key={option.value} value={String(option.value)}>
-                {option.label}
+            {YEARS.map(year => (
+              <SelectItem key={year} value={String(year)}>
+                {year}
               </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
-    </div>
-  )
-}
 
-function DimensionSearch({
-  label,
-  placeholder,
-  value,
-  options,
-  onChange,
-}: {
-  label: string
-  placeholder: string
-  value: DimensionValue
-  options: DimensionOption[]
-  onChange: (next: DimensionValue) => void
-}): React.JSX.Element {
-  const [query, setQuery] = useState('')
-  const selection = value === null
-    ? null
-    : options.find(option => option.value === value) ?? null
+      <WarehouseFilter
+        selection={warehouseSelection}
+        onSelectionChange={selected => onChange({
+          ...filters,
+          warehouseIds: selected.length === activeWarehouses.length
+            ? []
+            : selected.map(warehouse => warehouse.id),
+        })}
+      />
 
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <SearchSelectInput
-        selection={selection}
-        query={query}
-        onSelectionChange={option => { setQuery(''); onChange(option.value) }}
-        onQueryChange={setQuery}
-        onClear={() => { setQuery(''); onChange(null) }}
-        options={options}
-        getLabel={option => option.label}
-        placeholder={placeholder}
-        clearLabel={`Clear ${label.toLowerCase()}`}
-        className="w-45"
+      <UserFilter
+        selection={salesRepSelection}
+        onSelectionChange={user => onChange({ ...filters, salesRepId: user.id })}
+        onClear={() => onChange({ ...filters, salesRepId: null })}
+        placeholder="Salesperson"
+        clearLabel="Clear salesperson"
       />
-    </div>
-  )
-}
 
-function ProfitabilityFilterBar({
-  filters,
-  options,
-  onChange,
-}: {
-  filters: ProfitabilityFilters
-  options: ReturnType<typeof deriveFilterOptions>
-  onChange: (next: ProfitabilityFilters) => void
-}): React.JSX.Element {
-  return (
-    <div className="flex flex-row flex-wrap gap-2 items-end">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">Year</span>
-        <Select
-          value={String(filters.year)}
-          onValueChange={raw => onChange({ ...filters, year: Number.parseInt(raw, 10) })}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent position="popper">
-            <SelectGroup>
-              {YEARS.map(year => (
-                <SelectItem key={year} value={String(year)}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      <CustomerFilter
+        selection={vendorSelection}
+        onSelectionChange={vendor => onChange({ ...filters, vendorId: vendor.id })}
+        onClear={() => onChange({ ...filters, vendorId: null })}
+        placeholder="Vendor"
+        clearLabel="Clear vendor"
+      />
 
-      <DimensionSelect
-        label="Warehouse"
-        value={filters.warehouseId}
-        options={options.warehouses}
-        onChange={next => onChange({ ...filters, warehouseId: next === NONE_FILTER ? null : next })}
-      />
-      <DimensionSelect
-        label="Salesperson"
-        value={filters.salesRepId}
-        options={options.salespeople}
-        onChange={next => onChange({ ...filters, salesRepId: next })}
-      />
-      <DimensionSearch
-        label="Vendor"
-        placeholder="All vendors"
-        value={filters.vendorId}
-        options={options.vendors}
-        onChange={next => onChange({ ...filters, vendorId: next })}
-      />
-      <DimensionSearch
-        label="Brand"
-        placeholder="All brands"
-        value={filters.brandId}
-        options={options.brands}
-        onChange={next => onChange({ ...filters, brandId: next === NONE_FILTER ? null : next })}
+      <BrandFilter
+        selection={brandSelection}
+        onSelectionChange={brand => onChange({ ...filters, brandId: brand.id })}
+        onClear={() => onChange({ ...filters, brandId: null })}
       />
     </div>
   )
@@ -402,7 +333,6 @@ export function ProfitabilityReportPage(): React.JSX.Element {
   )
 
   const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(filters.year)
-  const options = useMemo(() => deriveFilterOptions(cube), [cube])
   const table = useMemo(() => aggregateCube(cube, filters), [cube, filters])
 
   const activeFilterCount = countActiveFilters(filters)
@@ -414,7 +344,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
   function clearFilters() {
     updateFilters({
       year: filters.year,
-      warehouseId: null,
+      warehouseIds: [],
       salesRepId: null,
       vendorId: null,
       brandId: null,
@@ -440,7 +370,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
             <ShareButton />
           </div>
         </div>
-        <ProfitabilityFilterBar filters={filters} options={options} onChange={updateFilters} />
+        <ProfitabilityFilterBar filters={filters} onChange={updateFilters} />
         {activeFilterCount > 0
           ? <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
           : null}

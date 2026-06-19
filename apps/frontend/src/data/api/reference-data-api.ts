@@ -7,6 +7,10 @@ export async function getReferenceData(): Promise<ReferenceData> {
   const referenceData = ReferenceDataSchema.parse(data)
   return {
     ...referenceData,
+    brands: referenceData.brands.map(brand => ({
+      ...brand,
+      name: formatTitleCase(brand.name),
+    })),
     assetTypes: referenceData.assetTypes.map(assetType => ({
       ...assetType,
       asset_type: formatTitleCase(assetType.asset_type),

@@ -1,8 +1,7 @@
 import type { ProfitabilityCubeRow } from 'shared-types'
-import { NONE_FILTER, type DimensionValue, type ProfitabilityFilters } from './profitability-report-url-params'
+import type { ProfitabilityFilters } from './profitability-report-url-params'
 
 const MONTHS_IN_YEAR = 12
-const NONE_LABEL = '— None —'
 
 export type ProfitabilityMetrics = {
   asset_count: number
@@ -16,18 +15,6 @@ export type MonthRow = ProfitabilityMetrics & { month: number }
 export type ProfitabilityTable = {
   months: MonthRow[]
   totals: ProfitabilityMetrics
-}
-
-export type DimensionOption = {
-  value: number | typeof NONE_FILTER
-  label: string
-}
-
-export type FilterOptions = {
-  warehouses: DimensionOption[]
-  salespeople: DimensionOption[]
-  vendors: DimensionOption[]
-  brands: DimensionOption[]
 }
 
 function zeroMetrics(): ProfitabilityMetrics {
@@ -46,49 +33,14 @@ function addMetrics(target: ProfitabilityMetrics, row: ProfitabilityCubeRow): vo
   target.gross_margin += row.gross_margin
 }
 
-function matchesDimension(rowId: number | null, filter: DimensionValue): boolean {
+function matchesDimension(rowId: number | null, filter: number | null): boolean {
   if (filter === null) return true
-  if (filter === NONE_FILTER) return rowId === null
   return rowId === filter
 }
 
-function sortOptions(options: DimensionOption[]): DimensionOption[] {
-  return [...options].sort((a, b) => {
-    if (a.value === NONE_FILTER) return 1
-    if (b.value === NONE_FILTER) return -1
-    return a.label.localeCompare(b.label)
-  })
-}
-
-export function deriveFilterOptions(rows: ProfitabilityCubeRow[]): FilterOptions {
-  const warehouses = new Map<number, string>()
-  const salespeople = new Map<number, string>()
-  const vendors = new Map<number, string>()
-  const brands = new Map<number, string>()
-  let salesRepHasNone = false
-  let vendorHasNone = false
-
-  for (const row of rows) {
-    warehouses.set(row.warehouse_id, row.warehouse_code)
-    brands.set(row.brand_id, row.brand_name)
-    if (row.sales_rep_id === null) salesRepHasNone = true
-    else salespeople.set(row.sales_rep_id, row.sales_rep_name ?? String(row.sales_rep_id))
-    if (row.vendor_id === null) vendorHasNone = true
-    else vendors.set(row.vendor_id, row.vendor_name ?? String(row.vendor_id))
-  }
-
-  const toOptions = (entries: Map<number, string>, hasNone: boolean): DimensionOption[] => {
-    const options: DimensionOption[] = [...entries].map(([value, label]) => ({ value, label }))
-    if (hasNone) options.push({ value: NONE_FILTER, label: NONE_LABEL })
-    return sortOptions(options)
-  }
-
-  return {
-    warehouses: sortOptions([...warehouses].map(([value, label]) => ({ value, label }))),
-    salespeople: toOptions(salespeople, salesRepHasNone),
-    vendors: toOptions(vendors, vendorHasNone),
-    brands: sortOptions([...brands].map(([value, label]) => ({ value, label }))),
-  }
+function matchesWarehouse(rowId: number, filterIds: number[]): boolean {
+  if (filterIds.length === 0) return true
+  return filterIds.includes(rowId)
 }
 
 export function aggregateCube(
@@ -102,7 +54,7 @@ export function aggregateCube(
   const totals = zeroMetrics()
 
   for (const row of rows) {
-    if (!matchesDimension(row.warehouse_id, filters.warehouseId)) continue
+    if (!matchesWarehouse(row.warehouse_id, filters.warehouseIds)) continue
     if (!matchesDimension(row.sales_rep_id, filters.salesRepId)) continue
     if (!matchesDimension(row.vendor_id, filters.vendorId)) continue
     if (!matchesDimension(row.brand_id, filters.brandId)) continue
