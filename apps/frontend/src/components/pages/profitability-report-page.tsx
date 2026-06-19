@@ -44,7 +44,7 @@ import {
 import { formatUSD } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
@@ -329,6 +329,14 @@ export function ProfitabilityReportPage(): React.JSX.Element {
     () => paramsToFilters(searchParams, CURRENT_YEAR),
     [searchParams],
   )
+
+  const canonicalParams = useMemo(() => filtersToParams(filters).toString(), [filters])
+
+  useEffect(() => {
+    if (canonicalParams !== searchParams.toString()) {
+      setSearchParams(canonicalParams, { replace: true })
+    }
+  }, [canonicalParams, searchParams, setSearchParams])
 
   const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(filters.year)
   const table = useMemo(() => aggregateCube(cube, filters), [cube, filters])
