@@ -40,6 +40,7 @@ const SearchInStockPage         = lazy(() => import('./components/pages/search/s
 const SearchHeldPage            = lazy(() => import('./components/pages/search/search-held-page').then(m => ({ default: m.SearchHeldPage })))
 const SearchSoldPage            = lazy(() => import('./components/pages/search/search-sold-page').then(m => ({ default: m.SearchSoldPage })))
 const ProfitabilityReportPage   = lazy(() => import('./components/pages/profitability-report-page').then(m => ({ default: m.ProfitabilityReportPage })))
+const HoldsBySalespersonReportPage = lazy(() => import('./components/pages/holds-by-salesperson-report-page').then(m => ({ default: m.HoldsBySalespersonReportPage })))
 const SearchAllPage             = lazy(() => import('./components/pages/search/search-all-page').then(m => ({ default: m.SearchAllPage })))
 const PriceCheckPage            = lazy(() => import('./components/pages/search/price-check-page').then(m => ({ default: m.PriceCheckPage })))
 const CatalogSettingsPage       = lazy(() => import('./components/pages/settings/catalog-settings-page').then(m => ({ default: m.CatalogSettingsPage })))
@@ -138,6 +139,14 @@ function AppRoutes() {
                     element={
                       <PermissionRoute permission="view_reports">
                         <ProfitabilityReportPage />
+                      </PermissionRoute>
+                    }
+                  />
+                  <Route
+                    path="/reports/holds-by-salesperson"
+                    element={
+                      <PermissionRoute permission="view_reports">
+                        <HoldsBySalespersonReportPage />
                       </PermissionRoute>
                     }
                   />

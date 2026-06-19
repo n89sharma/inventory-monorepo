@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
 
@@ -12,6 +13,7 @@ export function useUrlFilters<TFilters>(
   updateImmediate: (next: TFilters) => void
   updateDebounced: (next: TFilters) => void
 } {
+  const [searchParams] = useSearchParams()
   const [draft, setDraft] = useState<TFilters>(urlFilters)
   const [prevUrlFilters, setPrevUrlFilters] = useState(urlFilters)
   const debounceTimerRef = useRef<number | null>(null)
@@ -25,6 +27,14 @@ export function useUrlFilters<TFilters>(
       lastCommittedKeyRef.current = urlKey
     }
   }
+
+  useEffect(() => {
+    const canonical = filtersToParams(urlFilters)
+    if (canonical.toString() !== searchParams.toString()) {
+      lastCommittedKeyRef.current = canonical.toString()
+      setSearchParams(canonical, { replace: true })
+    }
+  }, [urlFilters, searchParams, filtersToParams, setSearchParams])
 
   useEffect(() => {
     return () => {

@@ -2,6 +2,7 @@ import type { AssetType, Brand, OrgSummary, User, Warehouse } from 'shared-types
 import {
   decodeIds,
   encodeIds,
+  EMPTY_SHARED_FILTERS,
   getSharedFilters,
   parseNonNegativeNumber,
   setSharedFilterParams,
@@ -30,6 +31,20 @@ export type SearchHeldReferenceData = SharedAssetReferenceData & {
   assetTypes: AssetType[]
   users: User[]
   customers: OrgSummary[]
+}
+
+export function buildSearchHeldUrl(
+  selection: { heldForId?: number; holdCustomerId?: number; warehouses?: Warehouse[] },
+): string {
+  const params = new URLSearchParams()
+  if (selection.warehouses && selection.warehouses.length > 0) {
+    setSharedFilterParams(params, { ...EMPTY_SHARED_FILTERS, warehouses: selection.warehouses })
+  }
+  if (selection.heldForId !== undefined) params.set(PARAM_HELD_FOR, String(selection.heldForId))
+  if (selection.holdCustomerId !== undefined) {
+    params.set(PARAM_HOLD_CUSTOMER, String(selection.holdCustomerId))
+  }
+  return `/search/held?${params.toString()}`
 }
 
 export function filtersToParams(filters: SearchHeldFilters): URLSearchParams {

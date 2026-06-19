@@ -124,7 +124,7 @@ export async function getSoldAssets(
 }
 
 const IN_STOCK_STATUS = 'IN_STOCK'
-const HELD_STATUS = 'HELD'
+export const HELD_STATUS = 'HELD'
 
 export async function getAssetsForSearchInStock(
   warehouseIds: number[],

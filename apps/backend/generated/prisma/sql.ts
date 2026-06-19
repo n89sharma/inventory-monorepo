@@ -39,6 +39,8 @@ export * from "./sql/getDepartures.js"
 
 export * from "./sql/getHolds.js"
 
+export * from "./sql/getHoldsBySalesperson.js"
+
 export * from "./sql/getInvoices.js"
 
 export * from "./sql/getLocationsByWarehouse.js"

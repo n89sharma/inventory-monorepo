@@ -1,6 +1,7 @@
 import { successResponse } from 'shared-types'
 import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
+import { getHoldsBySalespersonReport as getHoldsBySalespersonReportSer } from '../services/holdsReportService.js'
 import { getProfitabilityCube as getProfitabilityCubeSer } from '../services/profitabilityService.js'
 
 const MIN_YEAR = 2000
@@ -13,5 +14,10 @@ export const ProfitabilityReportQuerySchema = z.object({
 export const getProfitabilityReport = asyncHandler(async (req, res) => {
   const { year } = res.locals.query as z.infer<typeof ProfitabilityReportQuerySchema>
   const data = await getProfitabilityCubeSer(year)
+  res.json(successResponse(data))
+})
+
+export const getHoldsBySalespersonReport = asyncHandler(async (req, res) => {
+  const data = await getHoldsBySalespersonReportSer()
   res.json(successResponse(data))
 })

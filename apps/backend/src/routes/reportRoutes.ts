@@ -7,6 +7,7 @@ import {
 } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
+  getHoldsBySalespersonReport,
   getProfitabilityReport,
 } from '../controllers/reportController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -26,6 +27,12 @@ router.get(
   requirePermission('view_reports'),
   validateQuery(ProfitabilityReportQuerySchema),
   getProfitabilityReport,
+)
+
+router.get(
+  '/holds-by-salesperson',
+  requirePermission('view_reports'),
+  getHoldsBySalespersonReport,
 )
 
 export default router
