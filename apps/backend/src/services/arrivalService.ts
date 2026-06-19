@@ -12,7 +12,8 @@ import { prisma } from "../prisma.js"
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { reconcileAssetErrors } from './assetErrorService.js'
 import { upsertLatestComment } from './assetCommentService.js'
-import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate, recordCollectionUpdateOnAssets } from './historyService.js'
+import { recordArrivalCreate, recordArrivalUpdate, recordAssetUpdate, recordAssetUpdateOnCollection, recordBatchAssetCreate } from './historyService.js'
+import { addRemoveCollectionFromAssets, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 
 
 const arrivalZone = 'SHIPPING_AND_RECEIVING'
@@ -324,57 +325,26 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   })
   if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
 
-  await prisma.$transaction(async (tx) => {
-    await applyArrivalAssetDelta(tx, arrival.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
-  })
+  await prisma.$transaction(tx =>
+    addRemoveCollectionFromAssets(tx, {
+      assetsToAdd: delta.assetIdsToAdd,
+      assetsToRemove: delta.assetIdsToRemove,
+      assetInCollectionWhere: { arrival_id: { not: null } },
+      assetInCollectionError: (barcodes) =>
+        new ConflictError(`Assets already assigned to an arrival: ${barcodes.join(', ')}`),
+      add: { arrival_id: arrival.id },
+      remove: { arrival_id: null }
+    })
+  )
 
-  await recordCollectionUpdateOnAssets(
-    delta.assetIdsToRemove,
-    delta.assetIdsToAdd,
+  await recordCollectionAssetDelta(
+    'Arrival',
     'arrival_id',
     arrival.id,
-    userId
-  )
-  await recordAssetUpdateOnCollection(
-    'Arrival',
-    arrival.id,
     delta.assetIdsToAdd,
     delta.assetIdsToRemove,
     userId
   )
-}
-
-async function applyArrivalAssetDelta(
-  tx: Prisma.TransactionClient,
-  arrivalId: number,
-  assetIdsToAdd: number[],
-  assetIdsToRemove: number[]
-): Promise<void> {
-  if (assetIdsToAdd.length > 0) {
-    const conflicts = await tx.asset.findMany({
-      where: { id: { in: assetIdsToAdd }, arrival_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (conflicts.length > 0) {
-      throw new ConflictError(
-        `Assets already assigned to an arrival: ${conflicts.map(a => a.barcode).join(', ')}`
-      )
-    }
-  }
-
-  if (assetIdsToRemove.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToRemove } },
-      data: { arrival_id: null }
-    })
-  }
-
-  if (assetIdsToAdd.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToAdd } },
-      data: { arrival_id: arrivalId }
-    })
-  }
 }
 
 async function updateArrivalAssetCoreFields(

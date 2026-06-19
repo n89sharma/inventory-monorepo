@@ -1,10 +1,10 @@
 import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
-import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordAssetUpdate, recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordHoldArchive, recordHoldCreate, recordHoldUpdate } from './historyService.js'
+import { recordHoldArchive, recordHoldCreate, recordHoldUpdate } from './historyService.js'
+import { addRemoveCollectionFromAssets, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
 
 
@@ -19,24 +19,8 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   const now = new Date()
   const holdNumber = await getNewHoldNumber()
 
-  const { hold, assetStateMap } = await prisma.$transaction(async (tx) => {
-    const conflicting = await tx.asset.findMany({
-      where: { id: { in: assetIds }, hold_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (conflicting.length > 0) {
-      throw new ConflictError(
-        `The following assets already have an active hold: ${conflicting.map(a => a.barcode).join(', ')}`
-      )
-    }
-
-    const currentAssets = await tx.asset.findMany({
-      where: { id: { in: assetIds } },
-      select: { id: true, hold_id: true }
-    })
-    const assetStateMap = new Map(currentAssets.map(a => [a.id, { hold_id: a.hold_id }]))
-
-    const hold = await tx.hold.create({
+  const hold = await prisma.$transaction(async (tx) => {
+    const created = await tx.hold.create({
       data: {
         hold_number: holdNumber,
         created_by: { connect: { id: userId } },
@@ -45,18 +29,22 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
         notes: data.notes ?? null,
         created_at: now,
         from_dt: now,
-        to_dt: null,
-        assets: { connect: assetIds.map(id => ({ id })) }
+        to_dt: null
       },
       select: { id: true }
     })
 
-    await tx.asset.updateMany({
-      where: { id: { in: assetIds } },
-      data: { status_id: heldStatus.id }
+    await addRemoveCollectionFromAssets(tx, {
+      assetsToAdd: assetIds,
+      assetsToRemove: [],
+      assetInCollectionWhere: { hold_id: { not: null } },
+      assetInCollectionError: (barcodes) =>
+        new ConflictError(`The following assets already have an active hold: ${barcodes.join(', ')}`),
+      add: { hold_id: created.id, status_id: heldStatus.id },
+      remove: { hold_id: null }
     })
 
-    return { hold, assetStateMap }
+    return created
   })
 
   await recordHoldCreate(hold.id, {
@@ -66,12 +54,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
     created_at: now
   }, userId)
 
-  for (const assetId of assetIds) {
-    const prev = assetStateMap.get(assetId)
-    await recordAssetUpdate(assetId, { hold_id: prev?.hold_id ?? null }, { hold_id: hold.id }, userId)
-  }
-
-  await recordAssetUpdateOnCollection('Hold', hold.id, assetIds, [], userId)
+  await recordCollectionAssetDelta('Hold', 'hold_id', hold.id, assetIds, [], userId)
 
   return holdNumber
 }
@@ -124,78 +107,26 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
   if (hold.archived_at) throw new ConflictError('Cannot edit an archived hold')
 
-  await prisma.$transaction(async (tx) => {
-    await applyHoldAssetDelta(
-      tx,
-      hold.id,
-      delta.assetIdsToAdd,
-      delta.assetIdsToRemove,
-      heldStatus.id,
-      inStockStatus.id
-    )
-  })
+  await prisma.$transaction(tx =>
+    addRemoveCollectionFromAssets(tx, {
+      assetsToAdd: delta.assetIdsToAdd,
+      assetsToRemove: delta.assetIdsToRemove,
+      assetInCollectionWhere: { hold_id: { not: null } },
+      assetInCollectionError: (barcodes) =>
+        new ConflictError(`The following assets already have an active hold: ${barcodes.join(', ')}`),
+      add: { hold_id: hold.id, status_id: heldStatus.id },
+      remove: { hold_id: null, status_id: inStockStatus.id }
+    })
+  )
 
-  await recordCollectionUpdateOnAssets(
-    delta.assetIdsToRemove,
-    delta.assetIdsToAdd,
+  await recordCollectionAssetDelta(
+    'Hold',
     'hold_id',
     hold.id,
-    userId
-  )
-  await recordAssetUpdateOnCollection(
-    'Hold',
-    hold.id,
     delta.assetIdsToAdd,
     delta.assetIdsToRemove,
     userId
   )
-}
-
-async function applyHoldAssetDelta(
-  tx: Prisma.TransactionClient,
-  holdId: number,
-  assetIdsToAdd: number[],
-  assetIdsToRemove: number[],
-  heldStatusId: number,
-  inStockStatusId: number
-): Promise<void> {
-  if (assetIdsToAdd.length > 0) {
-    const conflicts = await tx.asset.findMany({
-      where: { id: { in: assetIdsToAdd }, hold_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (conflicts.length > 0) {
-      throw new ConflictError(
-        `The following assets already have an active hold: ${conflicts.map(a => a.barcode).join(', ')}`
-      )
-    }
-  }
-
-  if (assetIdsToAdd.length > 0 || assetIdsToRemove.length > 0) {
-    await tx.hold.update({
-      where: { id: holdId },
-      data: {
-        assets: {
-          disconnect: assetIdsToRemove.map(id => ({ id })),
-          connect: assetIdsToAdd.map(id => ({ id }))
-        }
-      }
-    })
-  }
-
-  if (assetIdsToRemove.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToRemove } },
-      data: { status_id: inStockStatusId }
-    })
-  }
-
-  if (assetIdsToAdd.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToAdd } },
-      data: { status_id: heldStatusId }
-    })
-  }
 }
 
 export async function getHold(holdNumber: string): Promise<HoldDetail> {
@@ -267,7 +198,15 @@ export async function archiveHold(holdNumber: string, userId: number): Promise<v
     })
 
     if (releasedAssetIds.length > 0) {
-      await applyHoldAssetDelta(tx, hold.id, [], releasedAssetIds, 0, inStockStatus.id)
+      await addRemoveCollectionFromAssets(tx, {
+        assetsToAdd: [],
+        assetsToRemove: releasedAssetIds,
+        assetInCollectionWhere: { hold_id: { not: null } },
+        assetInCollectionError: (barcodes) =>
+          new ConflictError(`The following assets already have an active hold: ${barcodes.join(', ')}`),
+        add: { hold_id: hold.id },
+        remove: { hold_id: null, status_id: inStockStatus.id }
+      })
     }
 
     return { holdId: hold.id, releasedAssetIds }
@@ -275,7 +214,6 @@ export async function archiveHold(holdNumber: string, userId: number): Promise<v
 
   await recordHoldArchive(holdId, now, userId)
   if (releasedAssetIds.length > 0) {
-    await recordCollectionUpdateOnAssets(releasedAssetIds, [], 'hold_id', holdId, userId)
-    await recordAssetUpdateOnCollection('Hold', holdId, [], releasedAssetIds, userId)
+    await recordCollectionAssetDelta('Hold', 'hold_id', holdId, [], releasedAssetIds, userId)
   }
 }

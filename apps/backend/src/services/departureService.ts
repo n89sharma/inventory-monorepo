@@ -1,10 +1,10 @@
 import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDepartureMetadata } from 'shared-types'
-import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
 
 
@@ -37,15 +37,12 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   const assetIds = departure.assets.map(a => a.id)
 
   const newDeparture = await prisma.$transaction(async (tx) => {
-    const assetsAlreadyOnDeparture = await tx.asset.findMany({
-      where: { id: { in: assetIds }, departure_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (assetsAlreadyOnDeparture.length > 0) {
-      throw new ConflictError(
-        `Assets already assigned to a departure: ${assetsAlreadyOnDeparture.map(a => a.barcode).join(', ')}`
-      )
-    }
+    await assertAssetsNotInCollection(
+      tx,
+      assetIds,
+      { departure_id: { not: null } },
+      (barcodes) => new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`)
+    )
 
     const created = await tx.departure.create({
       data: {
@@ -74,8 +71,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     created_at: currentDateTime
   }, userId)
 
-  await recordCollectionUpdateOnAssets([], assetIds, 'departure_id', newDeparture.id, userId)
-  await recordAssetUpdateOnCollection('Departure', newDeparture.id, assetIds, [], userId)
+  await recordCollectionAssetDelta('Departure', 'departure_id', newDeparture.id, assetIds, [], userId)
 
   return departureNumber
 }
@@ -123,57 +119,26 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   })
   if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
 
-  await prisma.$transaction(async (tx) => {
-    await applyAssetDelta(tx, departure.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
-  })
+  await prisma.$transaction(tx =>
+    addRemoveCollectionFromAssets(tx, {
+      assetsToAdd: delta.assetIdsToAdd,
+      assetsToRemove: delta.assetIdsToRemove,
+      assetInCollectionWhere: { departure_id: { not: null } },
+      assetInCollectionError: (barcodes) =>
+        new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
+      add: { departure_id: departure.id },
+      remove: { departure_id: null }
+    })
+  )
 
-  await recordCollectionUpdateOnAssets(
-    delta.assetIdsToRemove,
-    delta.assetIdsToAdd,
+  await recordCollectionAssetDelta(
+    'Departure',
     'departure_id',
     departure.id,
-    userId
-  )
-  await recordAssetUpdateOnCollection(
-    'Departure',
-    departure.id,
     delta.assetIdsToAdd,
     delta.assetIdsToRemove,
     userId
   )
-}
-
-async function applyAssetDelta(
-  tx: Prisma.TransactionClient,
-  departureId: number,
-  assetIdsToAdd: number[],
-  assetIdsToRemove: number[]
-): Promise<void> {
-  if (assetIdsToAdd.length > 0) {
-    const conflicts = await tx.asset.findMany({
-      where: { id: { in: assetIdsToAdd }, departure_id: { not: null } },
-      select: { barcode: true }
-    })
-    if (conflicts.length > 0) {
-      throw new ConflictError(
-        `Assets already assigned to a departure: ${conflicts.map(a => a.barcode).join(', ')}`
-      )
-    }
-  }
-
-  if (assetIdsToRemove.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToRemove } },
-      data: { departure_id: null }
-    })
-  }
-
-  if (assetIdsToAdd.length > 0) {
-    await tx.asset.updateMany({
-      where: { id: { in: assetIdsToAdd } },
-      data: { departure_id: departureId }
-    })
-  }
 }
 
 async function getNewDepartureNumber(originCode: string): Promise<string> {
