@@ -112,7 +112,7 @@ export async function patchDepartureMetadata(
   }, userId)
 }
 
-export async function patchDepartureAssets(
+export async function addRemoveCollectionFromAssetsAndRecord(
   departureNumber: string,
   delta: AssetDelta,
   userId: number

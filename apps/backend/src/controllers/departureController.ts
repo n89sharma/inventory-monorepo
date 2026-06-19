@@ -9,7 +9,7 @@ import { prisma } from '../prisma.js'
 import {
   createDeparture as createDepartureSer,
   getDeparture as getDepartureSer,
-  patchDepartureAssets as patchDepartureAssetsSer,
+  addRemoveCollectionFromAssetsAndRecord as patchDepartureAssetsSer,
   patchDepartureMetadata as patchDepartureMetadataSer
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'

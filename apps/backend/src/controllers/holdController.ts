@@ -11,7 +11,7 @@ import {
   archiveHold as archiveHoldSer,
   createHold as createHoldSer,
   getHold as getHoldSer,
-  patchHoldAssets as patchHoldAssetsSer,
+  addRemoveCollectionFromAssetsAndRecord as patchHoldAssetsSer,
   patchHoldMetadata as patchHoldMetadataSer
 } from '../services/holdService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'

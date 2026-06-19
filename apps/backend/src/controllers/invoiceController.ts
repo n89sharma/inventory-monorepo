@@ -7,7 +7,7 @@ import { prisma } from '../prisma.js'
 import {
   createInvoice as createInvoiceSer,
   getInvoice as getInvoiceSer,
-  patchInvoiceAssets as patchInvoiceAssetsSer,
+  addRemoveCollectionFromAssetsAndRecord as patchInvoiceAssetsSer,
   patchInvoiceMetadata as patchInvoiceMetadataSer
 } from '../services/invoiceService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'

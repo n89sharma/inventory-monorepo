@@ -111,7 +111,7 @@ export async function patchHoldMetadata(
   }, userId)
 }
 
-export async function patchHoldAssets(
+export async function addRemoveCollectionFromAssetsAndRecord(
   holdNumber: string,
   delta: AssetDelta,
   userId: number

@@ -313,7 +313,7 @@ export async function patchArrivalMetadata(
   }, userId)
 }
 
-export async function patchArrivalAssets(
+export async function addRemoveCollectionFromAssetsAndRecord(
   arrivalNumber: string,
   delta: AssetDelta,
   userId: number

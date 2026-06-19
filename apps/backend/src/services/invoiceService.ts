@@ -86,7 +86,7 @@ export async function patchInvoiceMetadata(
   }, userId)
 }
 
-export async function patchInvoiceAssets(
+export async function addRemoveCollectionFromAssetsAndRecord(
   invoiceNumber: string,
   delta: AssetDelta,
   userId: number

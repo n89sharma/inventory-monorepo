@@ -11,7 +11,7 @@ import {
   createSingleArrivalAsset as createSingleArrivalAssetSer,
   getArrivalAssetForUpdate as getArrivalAssetForUpdateSer,
   getArrival as getArrivalSer,
-  patchArrivalAssets as patchArrivalAssetsSer,
+  addRemoveCollectionFromAssetsAndRecord as patchArrivalAssetsSer,
   patchArrivalMetadata as patchArrivalMetadataSer,
   updateArrivalAsset as updateArrivalAssetSer
 } from '../services/arrivalService.js'
