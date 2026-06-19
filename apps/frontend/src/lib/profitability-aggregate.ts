@@ -7,11 +7,9 @@ const NONE_LABEL = '— None —'
 export type ProfitabilityMetrics = {
   asset_count: number
   gross_revenue: number
-  cogs_base: number
-  cogs_total: number
-  freight_cost: number
-  gross_margin_base: number
+  cogs: number
   gross_margin: number
+  transport_cost: number
 }
 
 export type MonthRow = ProfitabilityMetrics & { month: number }
@@ -37,22 +35,18 @@ function zeroMetrics(): ProfitabilityMetrics {
   return {
     asset_count: 0,
     gross_revenue: 0,
-    cogs_base: 0,
-    cogs_total: 0,
-    freight_cost: 0,
-    gross_margin_base: 0,
+    cogs: 0,
     gross_margin: 0,
+    transport_cost: 0
   }
 }
 
 function addMetrics(target: ProfitabilityMetrics, row: ProfitabilityCubeRow): void {
   target.asset_count += row.asset_count
   target.gross_revenue += row.gross_revenue
-  target.cogs_base += row.cogs_base
-  target.cogs_total += row.cogs_total
-  target.freight_cost += row.freight_cost
-  target.gross_margin_base += row.gross_margin_base
+  target.cogs += row.cogs
   target.gross_margin += row.gross_margin
+  target.transport_cost += row.transport_cost
 }
 
 function matchesDimension(rowId: number | null, filter: DimensionValue): boolean {

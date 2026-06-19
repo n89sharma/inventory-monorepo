@@ -5,16 +5,20 @@ select
   u."name"                                       as sales_rep_name,
   org.id                                         as vendor_id,
   org."name"                                     as vendor_name,
-  b.id                                            as brand_id,
-  b."name"                                        as brand_name,
+  b.id                                           as brand_id,
+  b."name"                                       as brand_name,
   extract(month from dep.created_at)::int        as month,
   count(*)::int                                  as asset_count,
-  coalesce(sum(c.sale_price), 0)::float8                     as gross_revenue,
-  coalesce(sum(c.purchase_cost), 0)::float8                  as cogs_base,
-  coalesce(sum(c.total_cost), 0)::float8                     as cogs_total,
-  coalesce(sum(c.transport_cost), 0)::float8                 as freight_cost,
-  coalesce(sum(c.sale_price - c.purchase_cost), 0)::float8   as gross_margin_base,
-  coalesce(sum(c.sale_price - c.total_cost), 0)::float8      as gross_margin
+
+  coalesce(sum(c.transport_cost), 0)::float8     as transport_cost,
+  coalesce(sum(c.processing_cost), 0)::float8    as processing_cost,
+  coalesce(sum(c.parts_cost), 0)::float8         as parts_cost,
+  coalesce(sum(c.other_cost), 0)::float8         as other_cost,
+  
+  coalesce(sum(c.total_cost), 0)::float8                    as cogs,
+  coalesce(sum(c.sale_price), 0)::float8                    as gross_revenue,
+  coalesce(sum(c.sale_price - c.total_cost), 0)::float8     as gross_margin
+  
 from "Asset" a
 join "Cost" c on c.asset_id = a.id
 join "Departure" dep on dep.id = a.departure_id
@@ -27,8 +31,8 @@ left join "Organization" org on org.id = arr.origin_id
 where extract(year from dep.created_at)::int = $1
   and c.purchase_cost is not null
   and c.transport_cost is not null
-  and c.total_cost is not null
-  and c.sale_price is not null
+  and c.total_cost is not null and c.total_cost > 0
+  and c.sale_price is not null and c.sale_price > 0
 group by
   dep.origin_id,
   w.city_code,

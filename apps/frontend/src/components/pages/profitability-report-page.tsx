@@ -55,11 +55,9 @@ const MONTH_LABELS = [
 const METRIC_COLUMNS = [
   { key: 'asset_count', header: 'Asset Count', format: 'count' },
   { key: 'gross_revenue', header: 'Gross Revenue', format: 'money' },
-  { key: 'cogs_base', header: 'COGS (base)', format: 'money' },
-  { key: 'cogs_total', header: 'COGS (total)', format: 'money' },
-  { key: 'freight_cost', header: 'Freight Cost', format: 'money' },
-  { key: 'gross_margin_base', header: 'Gross Margin (base)', format: 'money' },
+  { key: 'cogs', header: 'COGS (total)', format: 'money' },
   { key: 'gross_margin', header: 'Gross Margin', format: 'money' },
+  { key: 'transport_cost', header: 'Transport Cost', format: 'money' }
 ] as const satisfies readonly {
   key: keyof ProfitabilityMetrics
   header: string
