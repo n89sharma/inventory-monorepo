@@ -9,6 +9,8 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     asset_type: assetDetails.asset_type,
     serial_number: assetDetails.serial_number,
     meter_total: assetDetails.specs.meter_total,
+    weight: assetDetails.weight,
+    size: assetDetails.size,
     status: assetDetails.status,
     readiness: assetDetails.readiness,
     location: assetDetails.location,

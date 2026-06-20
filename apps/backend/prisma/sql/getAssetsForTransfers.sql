@@ -6,6 +6,8 @@ select
   a.barcode as barcode,
   a.serial_number as serial_number,
   s.meter_total as meter_total,
+  m.weight as weight,
+  m.size as size,
   w.city_code as warehouse_code,
   w.street as warehouse_street,
   z.zone as zone,

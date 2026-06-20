@@ -33,6 +33,8 @@ type AssetSummaryRow = LocationRow & {
   asset_type: string
   serial_number: string
   meter_total: number | null
+  weight: number
+  size: number
   status: string
   readiness: string
   hold_number?: string | null
@@ -49,6 +51,8 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     asset_type: r.asset_type,
     serial_number: r.serial_number,
     meter_total: r.meter_total,
+    weight: r.weight,
+    size: r.size,
     status: r.status,
     readiness: r.readiness,
     location: buildLocation(r),
@@ -157,6 +161,8 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     is_in_transit: r.is_in_transit,
     country_of_origin: r.country_of_origin,
     manufactured_year: r.manufactured_year,
+    weight: r.weight,
+    size: r.size,
     location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,

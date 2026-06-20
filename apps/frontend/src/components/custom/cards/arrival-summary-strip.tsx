@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { ArrivalDetail, AssetSummary } from 'shared-types'
 import { AssetCompositionField } from './asset-composition-field'
+import { AssetTotalsField } from './asset-totals-field'
 import { SummaryField } from './summary-field'
 
 type InvoiceBucket = { invoice_number: string | null; count: number }
@@ -36,6 +37,7 @@ export function ArrivalSummaryStrip({ arrival }: { arrival: ArrivalDetail }) {
       <SummaryField label="By" value={arrival.created_by} />
       {arrival.comment && <SummaryField label="Note" value={arrival.comment} />}
       <AssetCompositionField assets={arrival.assets} />
+      <AssetTotalsField assets={arrival.assets} />
       {invoiceBuckets.length > 0 && (
         <div className="flex items-baseline gap-1.5">
           <span className="text-muted-foreground">Invoices</span>

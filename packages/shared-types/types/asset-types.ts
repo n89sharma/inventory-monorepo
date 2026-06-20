@@ -28,6 +28,8 @@ export type AssetIdentity = z.infer<typeof AssetIdentitySchema>
 
 export const AssetSummarySchema = AssetIdentitySchema.extend({
   meter_total: z.number().nullable(),
+  weight: z.number(),
+  size: z.number(),
   status: z.string(),
   readiness: z.string(),
   location: AssetLocationDetailsSchema.nullable(),
@@ -88,6 +90,8 @@ export const AssetDetailsSchema = z.object({
   is_in_transit: z.boolean(),
   country_of_origin: z.string().nullable(),
   manufactured_year: z.number().nullable(),
+  weight: z.number(),
+  size: z.number(),
   location: AssetLocationDetailsSchema.nullable(),
   cost: z.object({
     purchase_cost: z.number().nullable(),

@@ -19,6 +19,8 @@ function toAssetSummary(r: AssetSearchRow): AssetSummary {
     asset_type: r.asset_type,
     serial_number: r.serial_number,
     meter_total: r.specs_meter_total,
+    weight: 0,
+    size: 0,
     status: r.status,
     readiness: r.readiness,
     location: r.location,

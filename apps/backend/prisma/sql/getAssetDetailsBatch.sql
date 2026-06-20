@@ -16,6 +16,8 @@ select
   a.is_in_transit as is_in_transit,
   co."name" as country_of_origin,
   a.manufactured_year as manufactured_year,
+  m.weight as weight,
+  m.size as size,
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,

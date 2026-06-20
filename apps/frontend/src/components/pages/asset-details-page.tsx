@@ -21,7 +21,7 @@ import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDate, formatDateWithTime, formatLocation, formatTitleCase, formatThousandsK } from '@/lib/formatters'
+import { formatDate, formatDateWithTime, formatLocation, formatTitleCase, formatThousandsK, formatWeightKg } from '@/lib/formatters'
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -305,6 +305,12 @@ export const AssetDetailsPage = () => {
                     value={assetDetails.manufactured_year}
                     rowClassName={ROW_GAP}
                   />
+                  <DataValueRow
+                    label="Weight"
+                    value={formatWeightKg(assetDetails.weight)}
+                    rowClassName={ROW_GAP}
+                  />
+                  <DataValueRow label="Size" value={assetDetails.size} rowClassName={ROW_GAP} />
                 </DataRowContainer>
                 <DataRowContainer className="flex-1 min-w-0">
                   <DataValueRow label="Cassettes" value={specs.cassettes} rowClassName={ROW_GAP} />

@@ -1,5 +1,6 @@
 import type { TransferDetail } from 'shared-types'
 import { AssetCompositionField } from './asset-composition-field'
+import { AssetTotalsField } from './asset-totals-field'
 import { SummaryField } from './summary-field'
 
 export function TransferSummaryStrip({ transfer }: { transfer: TransferDetail }) {
@@ -9,6 +10,7 @@ export function TransferSummaryStrip({ transfer }: { transfer: TransferDetail })
       {transfer.created_by && <SummaryField label="By" value={transfer.created_by} />}
       {transfer.notes && <SummaryField label="Note" value={transfer.notes} />}
       <AssetCompositionField assets={transfer.assets} />
+      <AssetTotalsField assets={transfer.assets} />
     </div>
   )
 }

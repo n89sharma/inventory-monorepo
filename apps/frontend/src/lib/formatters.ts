@@ -11,6 +11,11 @@ export function formatLocation(location: AssetLocationDetails | null): string {
   return `${location.warehouse_code} | ${formatTitleCase(location.zone)}`
 }
 
+export function formatWeightKg(value: number): string {
+  const safeValue = Number.isFinite(value) ? value : 0
+  return `${new Intl.NumberFormat('en-US').format(Math.round(safeValue))} kg`
+}
+
 export function formatThousandsK(value: number | null): string {
   if (value === null || value === undefined || Number.isNaN(value)) return ''
   if (value < 1000) return value.toString()
