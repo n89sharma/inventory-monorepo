@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getAssetsForInvoice = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nm.weight as weight,\nm.size as size,\nw.city_code as warehouse_code,\nw.street as warehouse_street,\nz.zone as zone,\nl.bin as bin,\ns.status as status,\nrd.status as readiness,\na.is_in_transit as is_in_transit,\ni.invoice_number as purchase_invoice_number\nfrom \"Invoice\" i\njoin \"Asset\" a on i.id = a.purchase_invoice_id\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"Status\" s on s.id = a.status_id\njoin \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nleft join \"Zone\" z on z.id = l.zone_id\nwhere i.invoice_number  = $1") as (text: string) => $runtime.TypedSql<getAssetsForInvoice.Parameters, getAssetsForInvoice.Result>
+export const getAssetsForInvoice = $runtime.makeTypedQueryFactory("select\na.id as id,\nb.\"name\" as brand,\nm.\"name\" as model,\nat.asset_type as asset_type,\na.barcode as barcode,\na.serial_number as serial_number,\nt.meter_total as meter_total,\nm.weight as weight,\nm.size as size,\nw.city_code as warehouse_code,\nw.street as warehouse_street,\nz.zone as zone,\nl.bin as bin,\ns.status as status,\nrd.status as readiness,\na.is_in_transit as is_in_transit,\npi.invoice_number as purchase_invoice_number,\nsi.invoice_number as sales_invoice_number\nfrom \"Invoice\" i\njoin \"Asset\" a on (i.id = a.purchase_invoice_id or i.id = a.sales_invoice_id)\njoin \"TechnicalSpecification\" t on t.asset_id = a.id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\njoin \"AssetType\" at on at.id = m.asset_type_id\njoin \"Status\" s on s.id = a.status_id\njoin \"Readiness\" rd on rd.id = a.readiness_id\nleft join \"Location\" l on l.id = a.location_id\nleft join \"Warehouse\" w on w.id = l.warehouse_id\nleft join \"Zone\" z on z.id = l.zone_id\nleft join \"Invoice\" pi on pi.id = a.purchase_invoice_id\nleft join \"Invoice\" si on si.id = a.sales_invoice_id\nwhere i.invoice_number  = $1") as (text: string) => $runtime.TypedSql<getAssetsForInvoice.Parameters, getAssetsForInvoice.Result>
 
 export namespace getAssetsForInvoice {
   export type Parameters = [text: string]
@@ -30,5 +30,6 @@ export namespace getAssetsForInvoice {
     readiness: string
     is_in_transit: boolean
     purchase_invoice_number: string
+    sales_invoice_number: string
   }
 }

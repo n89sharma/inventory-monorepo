@@ -44,7 +44,7 @@ export const getInvoiceDetail = asyncHandler(async (req: Request, res: Response<
 
 export const getInvoiceHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
   const { invoiceNumber } = req.params
-  const invoice = await prisma.invoice.findFirst({
+  const invoice = await prisma.invoice.findUnique({
     where: { invoice_number: invoiceNumber }, select: { id: true }
   })
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)

@@ -1,6 +1,5 @@
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import type { InvoiceForm } from '@/ui-types/invoice-form-types'
-import { UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { InvoiceFormPage } from './invoice-form-page'
@@ -25,10 +24,6 @@ export function CreateInvoicePage(): React.JSX.Element {
     { label: 'Create' },
   ]
 
-  const defaultValues: InvoiceForm | undefined = preloadedAssets?.length
-    ? { invoice_number: '', organization: null, invoice_type: UNSELECTED, is_cleared: false, assets: preloadedAssets }
-    : undefined
-
   async function onValidInvoiceCreateSubmit(data: InvoiceForm) {
     try {
       const { invoiceNumber } = await mutations.create(data)
@@ -44,7 +39,7 @@ export function CreateInvoicePage(): React.JSX.Element {
       pageConfig={pageConfig}
       breadcrumbs={breadcrumbs}
       onValidSubmit={onValidInvoiceCreateSubmit}
-      defaultValues={defaultValues}
+      defaultAssets={preloadedAssets}
     />
   )
 }

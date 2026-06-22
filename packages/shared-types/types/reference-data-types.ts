@@ -23,6 +23,11 @@ const InvoiceTypeSchema = z.object({
   type: z.string()
 });
 
+export const INVOICE_TYPE = {
+  purchase: 'PURCHASE',
+  sales: 'SALE',
+} as const;
+
 export const WarehouseSchema = z.object({
   id: z.number(),
   city_code: z.string(),

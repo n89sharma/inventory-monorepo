@@ -48,6 +48,7 @@ export type InvoiceMinAggregateOutputType = {
   is_cleared: boolean | null
   created_at: Date | null
   invoice_type_id: number | null
+  invoice_reference: string | null
 }
 
 export type InvoiceMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type InvoiceMaxAggregateOutputType = {
   is_cleared: boolean | null
   created_at: Date | null
   invoice_type_id: number | null
+  invoice_reference: string | null
 }
 
 export type InvoiceCountAggregateOutputType = {
@@ -68,6 +70,7 @@ export type InvoiceCountAggregateOutputType = {
   is_cleared: number
   created_at: number
   invoice_type_id: number
+  invoice_reference: number
   _all: number
 }
 
@@ -94,6 +97,7 @@ export type InvoiceMinAggregateInputType = {
   is_cleared?: true
   created_at?: true
   invoice_type_id?: true
+  invoice_reference?: true
 }
 
 export type InvoiceMaxAggregateInputType = {
@@ -104,6 +108,7 @@ export type InvoiceMaxAggregateInputType = {
   is_cleared?: true
   created_at?: true
   invoice_type_id?: true
+  invoice_reference?: true
 }
 
 export type InvoiceCountAggregateInputType = {
@@ -114,6 +119,7 @@ export type InvoiceCountAggregateInputType = {
   is_cleared?: true
   created_at?: true
   invoice_type_id?: true
+  invoice_reference?: true
   _all?: true
 }
 
@@ -211,6 +217,7 @@ export type InvoiceGroupByOutputType = {
   is_cleared: boolean
   created_at: Date
   invoice_type_id: number
+  invoice_reference: string
   _count: InvoiceCountAggregateOutputType | null
   _avg: InvoiceAvgAggregateOutputType | null
   _sum: InvoiceSumAggregateOutputType | null
@@ -244,6 +251,7 @@ export type InvoiceWhereInput = {
   is_cleared?: Prisma.BoolFilter<"Invoice"> | boolean
   created_at?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   invoice_type_id?: Prisma.IntFilter<"Invoice"> | number
+  invoice_reference?: Prisma.StringFilter<"Invoice"> | string
   purchase_assets?: Prisma.AssetListRelationFilter
   sales_assets?: Prisma.AssetListRelationFilter
   InvoiceType?: Prisma.XOR<Prisma.InvoiceTypeScalarRelationFilter, Prisma.InvoiceTypeWhereInput>
@@ -259,6 +267,7 @@ export type InvoiceOrderByWithRelationInput = {
   is_cleared?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   invoice_type_id?: Prisma.SortOrder
+  invoice_reference?: Prisma.SortOrder
   purchase_assets?: Prisma.AssetOrderByRelationAggregateInput
   sales_assets?: Prisma.AssetOrderByRelationAggregateInput
   InvoiceType?: Prisma.InvoiceTypeOrderByWithRelationInput
@@ -268,22 +277,22 @@ export type InvoiceOrderByWithRelationInput = {
 
 export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  organization_id_invoice_number?: Prisma.InvoiceOrganization_idInvoice_numberCompoundUniqueInput
+  invoice_number?: string
   AND?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
   OR?: Prisma.InvoiceWhereInput[]
   NOT?: Prisma.InvoiceWhereInput | Prisma.InvoiceWhereInput[]
-  invoice_number?: Prisma.StringFilter<"Invoice"> | string
   organization_id?: Prisma.IntFilter<"Invoice"> | number
   updated_by_id?: Prisma.IntFilter<"Invoice"> | number
   is_cleared?: Prisma.BoolFilter<"Invoice"> | boolean
   created_at?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   invoice_type_id?: Prisma.IntFilter<"Invoice"> | number
+  invoice_reference?: Prisma.StringFilter<"Invoice"> | string
   purchase_assets?: Prisma.AssetListRelationFilter
   sales_assets?: Prisma.AssetListRelationFilter
   InvoiceType?: Prisma.XOR<Prisma.InvoiceTypeScalarRelationFilter, Prisma.InvoiceTypeWhereInput>
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   updated_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "organization_id_invoice_number">
+}, "id" | "invoice_number">
 
 export type InvoiceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -293,6 +302,7 @@ export type InvoiceOrderByWithAggregationInput = {
   is_cleared?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   invoice_type_id?: Prisma.SortOrder
+  invoice_reference?: Prisma.SortOrder
   _count?: Prisma.InvoiceCountOrderByAggregateInput
   _avg?: Prisma.InvoiceAvgOrderByAggregateInput
   _max?: Prisma.InvoiceMaxOrderByAggregateInput
@@ -311,12 +321,14 @@ export type InvoiceScalarWhereWithAggregatesInput = {
   is_cleared?: Prisma.BoolWithAggregatesFilter<"Invoice"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Invoice"> | Date | string
   invoice_type_id?: Prisma.IntWithAggregatesFilter<"Invoice"> | number
+  invoice_reference?: Prisma.StringWithAggregatesFilter<"Invoice"> | string
 }
 
 export type InvoiceCreateInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetCreateNestedManyWithoutSales_invoiceInput
   InvoiceType: Prisma.InvoiceTypeCreateNestedOneWithoutInvoiceInput
@@ -332,6 +344,7 @@ export type InvoiceUncheckedCreateInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
   purchase_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutSales_invoiceInput
 }
@@ -340,6 +353,7 @@ export type InvoiceUpdateInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUpdateManyWithoutSales_invoiceNestedInput
   InvoiceType?: Prisma.InvoiceTypeUpdateOneRequiredWithoutInvoiceNestedInput
@@ -355,6 +369,7 @@ export type InvoiceUncheckedUpdateInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUncheckedUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUncheckedUpdateManyWithoutSales_invoiceNestedInput
 }
@@ -367,12 +382,14 @@ export type InvoiceCreateManyInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
 }
 
 export type InvoiceUpdateManyMutationInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type InvoiceUncheckedUpdateManyInput = {
@@ -383,16 +400,12 @@ export type InvoiceUncheckedUpdateManyInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type InvoiceNullableScalarRelationFilter = {
   is?: Prisma.InvoiceWhereInput | null
   isNot?: Prisma.InvoiceWhereInput | null
-}
-
-export type InvoiceOrganization_idInvoice_numberCompoundUniqueInput = {
-  organization_id: number
-  invoice_number: string
 }
 
 export type InvoiceCountOrderByAggregateInput = {
@@ -403,6 +416,7 @@ export type InvoiceCountOrderByAggregateInput = {
   is_cleared?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   invoice_type_id?: Prisma.SortOrder
+  invoice_reference?: Prisma.SortOrder
 }
 
 export type InvoiceAvgOrderByAggregateInput = {
@@ -420,6 +434,7 @@ export type InvoiceMaxOrderByAggregateInput = {
   is_cleared?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   invoice_type_id?: Prisma.SortOrder
+  invoice_reference?: Prisma.SortOrder
 }
 
 export type InvoiceMinOrderByAggregateInput = {
@@ -430,6 +445,7 @@ export type InvoiceMinOrderByAggregateInput = {
   is_cleared?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   invoice_type_id?: Prisma.SortOrder
+  invoice_reference?: Prisma.SortOrder
 }
 
 export type InvoiceSumOrderByAggregateInput = {
@@ -611,6 +627,7 @@ export type InvoiceCreateWithoutPurchase_assetsInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   sales_assets?: Prisma.AssetCreateNestedManyWithoutSales_invoiceInput
   InvoiceType: Prisma.InvoiceTypeCreateNestedOneWithoutInvoiceInput
   organization: Prisma.OrganizationCreateNestedOneWithoutInvoicesInput
@@ -625,6 +642,7 @@ export type InvoiceUncheckedCreateWithoutPurchase_assetsInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
   sales_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutSales_invoiceInput
 }
 
@@ -637,6 +655,7 @@ export type InvoiceCreateWithoutSales_assetsInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetCreateNestedManyWithoutPurchase_invoiceInput
   InvoiceType: Prisma.InvoiceTypeCreateNestedOneWithoutInvoiceInput
   organization: Prisma.OrganizationCreateNestedOneWithoutInvoicesInput
@@ -651,6 +670,7 @@ export type InvoiceUncheckedCreateWithoutSales_assetsInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
   purchase_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutPurchase_invoiceInput
 }
 
@@ -674,6 +694,7 @@ export type InvoiceUpdateWithoutPurchase_assetsInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   sales_assets?: Prisma.AssetUpdateManyWithoutSales_invoiceNestedInput
   InvoiceType?: Prisma.InvoiceTypeUpdateOneRequiredWithoutInvoiceNestedInput
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
@@ -688,6 +709,7 @@ export type InvoiceUncheckedUpdateWithoutPurchase_assetsInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   sales_assets?: Prisma.AssetUncheckedUpdateManyWithoutSales_invoiceNestedInput
 }
 
@@ -706,6 +728,7 @@ export type InvoiceUpdateWithoutSales_assetsInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUpdateManyWithoutPurchase_invoiceNestedInput
   InvoiceType?: Prisma.InvoiceTypeUpdateOneRequiredWithoutInvoiceNestedInput
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
@@ -720,6 +743,7 @@ export type InvoiceUncheckedUpdateWithoutSales_assetsInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUncheckedUpdateManyWithoutPurchase_invoiceNestedInput
 }
 
@@ -727,6 +751,7 @@ export type InvoiceCreateWithoutUpdated_byInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetCreateNestedManyWithoutSales_invoiceInput
   InvoiceType: Prisma.InvoiceTypeCreateNestedOneWithoutInvoiceInput
@@ -740,6 +765,7 @@ export type InvoiceUncheckedCreateWithoutUpdated_byInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
   purchase_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutSales_invoiceInput
 }
@@ -781,12 +807,14 @@ export type InvoiceScalarWhereInput = {
   is_cleared?: Prisma.BoolFilter<"Invoice"> | boolean
   created_at?: Prisma.DateTimeFilter<"Invoice"> | Date | string
   invoice_type_id?: Prisma.IntFilter<"Invoice"> | number
+  invoice_reference?: Prisma.StringFilter<"Invoice"> | string
 }
 
 export type InvoiceCreateWithoutOrganizationInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetCreateNestedManyWithoutSales_invoiceInput
   InvoiceType: Prisma.InvoiceTypeCreateNestedOneWithoutInvoiceInput
@@ -800,6 +828,7 @@ export type InvoiceUncheckedCreateWithoutOrganizationInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
   purchase_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutSales_invoiceInput
 }
@@ -834,6 +863,7 @@ export type InvoiceCreateWithoutInvoiceTypeInput = {
   invoice_number: string
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetCreateNestedManyWithoutSales_invoiceInput
   organization: Prisma.OrganizationCreateNestedOneWithoutInvoicesInput
@@ -847,6 +877,7 @@ export type InvoiceUncheckedCreateWithoutInvoiceTypeInput = {
   updated_by_id: number
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
   purchase_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutPurchase_invoiceInput
   sales_assets?: Prisma.AssetUncheckedCreateNestedManyWithoutSales_invoiceInput
 }
@@ -884,12 +915,14 @@ export type InvoiceCreateManyUpdated_byInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
 }
 
 export type InvoiceUpdateWithoutUpdated_byInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUpdateManyWithoutSales_invoiceNestedInput
   InvoiceType?: Prisma.InvoiceTypeUpdateOneRequiredWithoutInvoiceNestedInput
@@ -903,6 +936,7 @@ export type InvoiceUncheckedUpdateWithoutUpdated_byInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUncheckedUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUncheckedUpdateManyWithoutSales_invoiceNestedInput
 }
@@ -914,6 +948,7 @@ export type InvoiceUncheckedUpdateManyWithoutUpdated_byInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type InvoiceCreateManyOrganizationInput = {
@@ -923,12 +958,14 @@ export type InvoiceCreateManyOrganizationInput = {
   is_cleared: boolean
   created_at: Date | string
   invoice_type_id: number
+  invoice_reference: string
 }
 
 export type InvoiceUpdateWithoutOrganizationInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUpdateManyWithoutSales_invoiceNestedInput
   InvoiceType?: Prisma.InvoiceTypeUpdateOneRequiredWithoutInvoiceNestedInput
@@ -942,6 +979,7 @@ export type InvoiceUncheckedUpdateWithoutOrganizationInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUncheckedUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUncheckedUpdateManyWithoutSales_invoiceNestedInput
 }
@@ -953,6 +991,7 @@ export type InvoiceUncheckedUpdateManyWithoutOrganizationInput = {
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invoice_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type InvoiceCreateManyInvoiceTypeInput = {
@@ -962,12 +1001,14 @@ export type InvoiceCreateManyInvoiceTypeInput = {
   updated_by_id: number
   is_cleared: boolean
   created_at: Date | string
+  invoice_reference: string
 }
 
 export type InvoiceUpdateWithoutInvoiceTypeInput = {
   invoice_number?: Prisma.StringFieldUpdateOperationsInput | string
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUpdateManyWithoutSales_invoiceNestedInput
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutInvoicesNestedInput
@@ -981,6 +1022,7 @@ export type InvoiceUncheckedUpdateWithoutInvoiceTypeInput = {
   updated_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
   purchase_assets?: Prisma.AssetUncheckedUpdateManyWithoutPurchase_invoiceNestedInput
   sales_assets?: Prisma.AssetUncheckedUpdateManyWithoutSales_invoiceNestedInput
 }
@@ -992,6 +1034,7 @@ export type InvoiceUncheckedUpdateManyWithoutInvoiceTypeInput = {
   updated_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   is_cleared?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  invoice_reference?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1042,6 +1085,7 @@ export type InvoiceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   is_cleared?: boolean
   created_at?: boolean
   invoice_type_id?: boolean
+  invoice_reference?: boolean
   purchase_assets?: boolean | Prisma.Invoice$purchase_assetsArgs<ExtArgs>
   sales_assets?: boolean | Prisma.Invoice$sales_assetsArgs<ExtArgs>
   InvoiceType?: boolean | Prisma.InvoiceTypeDefaultArgs<ExtArgs>
@@ -1058,6 +1102,7 @@ export type InvoiceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_cleared?: boolean
   created_at?: boolean
   invoice_type_id?: boolean
+  invoice_reference?: boolean
   InvoiceType?: boolean | Prisma.InvoiceTypeDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   updated_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1071,6 +1116,7 @@ export type InvoiceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_cleared?: boolean
   created_at?: boolean
   invoice_type_id?: boolean
+  invoice_reference?: boolean
   InvoiceType?: boolean | Prisma.InvoiceTypeDefaultArgs<ExtArgs>
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   updated_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1084,9 +1130,10 @@ export type InvoiceSelectScalar = {
   is_cleared?: boolean
   created_at?: boolean
   invoice_type_id?: boolean
+  invoice_reference?: boolean
 }
 
-export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoice_number" | "organization_id" | "updated_by_id" | "is_cleared" | "created_at" | "invoice_type_id", ExtArgs["result"]["invoice"]>
+export type InvoiceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoice_number" | "organization_id" | "updated_by_id" | "is_cleared" | "created_at" | "invoice_type_id" | "invoice_reference", ExtArgs["result"]["invoice"]>
 export type InvoiceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase_assets?: boolean | Prisma.Invoice$purchase_assetsArgs<ExtArgs>
   sales_assets?: boolean | Prisma.Invoice$sales_assetsArgs<ExtArgs>
@@ -1123,6 +1170,7 @@ export type $InvoicePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     is_cleared: boolean
     created_at: Date
     invoice_type_id: number
+    invoice_reference: string
   }, ExtArgs["result"]["invoice"]>
   composites: {}
 }
@@ -1558,6 +1606,7 @@ export interface InvoiceFieldRefs {
   readonly is_cleared: Prisma.FieldRef<"Invoice", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Invoice", 'DateTime'>
   readonly invoice_type_id: Prisma.FieldRef<"Invoice", 'Int'>
+  readonly invoice_reference: Prisma.FieldRef<"Invoice", 'String'>
 }
     
 

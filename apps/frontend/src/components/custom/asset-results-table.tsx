@@ -26,6 +26,7 @@ function toAssetSummary(r: AssetSearchRow): AssetSummary {
     location: r.location,
     hold_number: r.hold_hold_number,
     purchase_invoice_number: r.purchase_invoice_invoice_number,
+    sales_invoice_number: null,
     is_in_transit: r.is_in_transit,
   }
 }

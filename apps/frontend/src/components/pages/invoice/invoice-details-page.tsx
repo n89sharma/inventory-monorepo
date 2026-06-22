@@ -1,12 +1,12 @@
 import { InvoiceSummaryStrip } from '@/components/custom/cards/invoice-summary-strip'
 import { SummaryField } from '@/components/custom/cards/summary-field'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
-import { formatDate } from '@/lib/formatters'
+import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import { INVOICE_TYPE, type AssetSummary } from 'shared-types'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { EditInvoiceMetadataModal } from '../../modals/edit-invoice-metadata-modal'
 import { CollectionDetailPage } from '../collection-detail-page'
@@ -42,9 +42,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       renderSummaryStrip={invoice => <InvoiceSummaryStrip invoice={invoice} />}
       renderSubtitle={invoice => (
         <>
-          <SummaryField label="Customer" value={invoice.customer.name} />
+          <SummaryField
+            label={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
+            value={invoice.customer.name}
+          />
+          <SummaryField label="Reference" value={invoice.invoice_reference} />
           <SummaryField label="Date" value={formatDate(invoice.created_at)} />
-          <SummaryField label="Type" value={invoice.invoice_type.type} />
+          <SummaryField label="Type" value={formatTitleCase(invoice.invoice_type.type)} />
         </>
       )}
       renderMetadataModal={(invoice, control) => (

@@ -250,20 +250,20 @@ model Hold {
 }
 
 model Invoice {
-  id              Int          @id @default(autoincrement())
-  invoice_number  String
-  organization_id Int
-  updated_by_id   Int
-  is_cleared      Boolean
-  created_at      DateTime
-  invoice_type_id Int
-  purchase_assets Asset[]      @relation("PurchaseInvoice")
-  sales_assets    Asset[]      @relation("SalesInvoice")
-  InvoiceType     InvoiceType  @relation(fields: [invoice_type_id], references: [id])
-  organization    Organization @relation(fields: [organization_id], references: [id])
-  updated_by      User         @relation(fields: [updated_by_id], references: [id])
+  id                Int          @id @default(autoincrement())
+  invoice_number    String       @unique @db.VarChar(50)
+  organization_id   Int
+  updated_by_id     Int
+  is_cleared        Boolean
+  created_at        DateTime
+  invoice_type_id   Int
+  invoice_reference String
+  purchase_assets   Asset[]      @relation("PurchaseInvoice")
+  sales_assets      Asset[]      @relation("SalesInvoice")
+  InvoiceType       InvoiceType  @relation(fields: [invoice_type_id], references: [id])
+  organization      Organization @relation(fields: [organization_id], references: [id])
+  updated_by        User         @relation(fields: [updated_by_id], references: [id])
 
-  @@unique([organization_id, invoice_number])
   @@index([created_at(sort: Desc)])
   @@index([invoice_number])
   @@index([invoice_type_id])

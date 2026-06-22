@@ -1,6 +1,7 @@
 select
   i.id as id,
   i.invoice_number,
+  i.invoice_reference,
   o."name" as organization,
   u."name" as created_by,
   i.created_at as created_at,

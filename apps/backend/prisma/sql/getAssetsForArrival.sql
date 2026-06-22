@@ -15,7 +15,8 @@ select
   s.status as status,
   rd.status as readiness,
   a.is_in_transit as is_in_transit,
-  pi.invoice_number as purchase_invoice_number
+  pi.invoice_number as purchase_invoice_number,
+  si.invoice_number as sales_invoice_number
 from "Arrival" ar
   join "Asset" a on ar.id = a.arrival_id
   join "TechnicalSpecification" t on t.asset_id = a.id
@@ -28,4 +29,5 @@ from "Arrival" ar
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
+  left join "Invoice" si on si.id = a.sales_invoice_id
 where ar.arrival_number  = $1

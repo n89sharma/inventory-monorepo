@@ -74,6 +74,8 @@ select
   -- invoice
   pi.invoice_number as purchase_invoice_number,
   pi.is_cleared as purchase_invoice_is_cleared,
+  si.invoice_number as sales_invoice_number,
+  si.is_cleared as sales_invoice_is_cleared,
   -- latest comment
   lc.comment as latest_comment
 from "Asset" a
@@ -103,6 +105,7 @@ from "Asset" a
   left join "Organization" dt on dt.id = d.transporter_id
   left join "Organization" dc on dc.id = d.destination_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
+  left join "Invoice" si on si.id = a.sales_invoice_id
   left join "Country" co on co.id = a.country_of_origin_id
   left join lateral (
     select cm.comment

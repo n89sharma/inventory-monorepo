@@ -1,15 +1,13 @@
 import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { InvoiceMetadataFormSchema, type InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
-import { getSelectOption } from '@/ui-types/select-option-types'
+import { formatTitleCase } from '@/lib/formatters'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { InvoiceDetail } from 'shared-types'
+import { INVOICE_TYPE, type InvoiceDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
-import { SelectOptions } from '../custom/select-options'
 import { Button } from '../shadcn/button'
 import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -30,7 +28,6 @@ export function EditInvoiceMetadataModal({
   onSave,
 }: EditInvoiceMetadataModalProps): React.JSX.Element {
   const orgs = useOrgStore(state => state.organizations)
-  const invoiceTypes = useReferenceDataStore(state => state.invoiceTypes)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<InvoiceMetadataForm>({
@@ -74,29 +71,21 @@ export function EditInvoiceMetadataModal({
               <FieldLabel>Invoice Number</FieldLabel>
               <Input value={invoice.invoice_number} disabled readOnly />
             </Field>
+            <Field>
+              <FieldLabel>Invoice Reference</FieldLabel>
+              <Input value={invoice.invoice_reference} disabled readOnly />
+            </Field>
+            <Field>
+              <FieldLabel>Invoice Type</FieldLabel>
+              <Input value={formatTitleCase(invoice.invoice_type.type)} disabled readOnly />
+            </Field>
             <ControlledSearchSelectInput
               control={form.control}
               name='organization'
               options={orgs}
               getLabel={o => o.name}
-              fieldLabel='Organization'
+              fieldLabel={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
               fieldRequired={true}
-            />
-            <Controller
-              control={form.control}
-              name='invoice_type'
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={invoiceTypes}
-                  getLabel={t => t.type}
-                  fieldLabel='Invoice Type'
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
             />
             <Controller
               control={form.control}
@@ -130,7 +119,6 @@ export function EditInvoiceMetadataModal({
 function toFormValues(i: InvoiceDetail): InvoiceMetadataForm {
   return {
     organization: { id: i.customer.id, account_number: i.customer.account_number, name: i.customer.name },
-    invoice_type: getSelectOption(i.invoice_type),
     is_cleared: i.is_cleared
   }
 }

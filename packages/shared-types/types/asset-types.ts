@@ -35,6 +35,7 @@ export const AssetSummarySchema = AssetIdentitySchema.extend({
   location: AssetLocationDetailsSchema.nullable(),
   hold_number: z.string().nullable().optional(),
   purchase_invoice_number: z.string().nullable(),
+  sales_invoice_number: z.string().nullable(),
   is_in_transit: z.boolean()
 })
 
@@ -149,6 +150,10 @@ export const AssetDetailsSchema = z.object({
     created_at: z.coerce.date()
   }).nullable(),
   purchase_invoice: z.object({
+    invoice_number: z.string(),
+    is_cleared: z.boolean()
+  }).nullable(),
+  sales_invoice: z.object({
     invoice_number: z.string(),
     is_cleared: z.boolean()
   }).nullable(),

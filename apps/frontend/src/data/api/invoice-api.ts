@@ -10,7 +10,7 @@ type CreateInvoiceResponse = z.infer<typeof CreateInvoiceResponseSchema>
 
 export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceResponse> {
   const createInvoiceBody = CreateInvoiceSchema.parse({
-    invoice_number: d.invoice_number,
+    invoice_reference: d.invoice_reference,
     organization_id: d.organization!.id,
     invoice_type_id: getIdOrNullFromSelection(d.invoice_type)!,
     is_cleared: d.is_cleared,
@@ -49,7 +49,6 @@ export async function updateInvoiceMetadata(
 ): Promise<void> {
   const updateInvoiceMetadataBody = UpdateInvoiceMetadataSchema.parse({
     organization: metadata.organization!,
-    invoice_type: getSelectedOrNull(metadata.invoice_type)!,
     is_cleared: metadata.is_cleared
   } satisfies UpdateInvoiceMetadata)
   await api.patch(`/invoices/${invoiceNumber}/metadata`, updateInvoiceMetadataBody)

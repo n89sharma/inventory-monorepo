@@ -9,6 +9,7 @@ type CollectionForeignKey =
   | 'arrival_id'
   | 'departure_id'
   | 'purchase_invoice_id'
+  | 'sales_invoice_id'
   | 'hold_id'
 
 export async function assertAssetsNotInCollection(

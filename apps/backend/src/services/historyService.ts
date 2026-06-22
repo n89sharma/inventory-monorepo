@@ -45,6 +45,7 @@ type HoldCreateState = {
 
 type InvoiceCreateState = {
   invoice_number: string
+  invoice_reference: string
   organization_id: number
   invoice_type_id: number
   created_at: Date
@@ -70,6 +71,7 @@ type AssetUpdateFields = Partial<{
   departure_id: number | null
   hold_id: number | null
   purchase_invoice_id: number | null
+  sales_invoice_id: number | null
   location_id: number | null
   model_id: number
   serial_number: string
@@ -121,7 +123,6 @@ type HoldUpdateFields = Partial<{
 
 type InvoiceUpdateFields = Partial<{
   organization_id: number
-  invoice_type_id: number
   is_cleared: boolean
 }>
 
@@ -371,6 +372,7 @@ const ASSET_UPDATE_SPEC: FieldSpec[] = [
   { field: 'departure_id', out: 'departure_number', resolve: 'departure' },
   { field: 'hold_id', out: 'hold_number', resolve: 'hold' },
   { field: 'purchase_invoice_id', out: 'invoice_number', resolve: 'invoice' },
+  { field: 'sales_invoice_id', out: 'invoice_number', resolve: 'invoice' },
   { field: 'location_id', expand: 'location' },
   { field: 'model_id', out: 'model_name', resolve: 'model', bothRequired: true },
   { field: 'readiness_id', out: 'readiness', resolve: 'readiness' },
@@ -401,7 +403,6 @@ const HOLD_UPDATE_SPEC: FieldSpec[] = [
 
 const INVOICE_UPDATE_SPEC: FieldSpec[] = [
   { field: 'organization_id', out: 'organization_name', resolve: 'organization', bothRequired: true },
-  { field: 'invoice_type_id', out: 'invoice_type', resolve: 'invoiceType', bothRequired: true },
   { field: 'is_cleared' }
 ]
 
@@ -437,6 +438,7 @@ const HOLD_CREATE_SPEC: CreateFieldSpec<HoldCreateState>[] = [
 
 const INVOICE_CREATE_SPEC: CreateFieldSpec<InvoiceCreateState>[] = [
   { out: 'invoice_number', value: s => s.invoice_number },
+  { out: 'invoice_reference', value: s => s.invoice_reference },
   { out: 'customer_name', resolve: 'organization', id: s => s.organization_id },
   { out: 'invoice_type', resolve: 'invoiceType', id: s => s.invoice_type_id },
   { out: 'created_at', value: s => s.created_at }

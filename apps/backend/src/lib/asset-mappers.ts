@@ -39,6 +39,7 @@ type AssetSummaryRow = LocationRow & {
   readiness: string
   hold_number?: string | null
   purchase_invoice_number: string | null
+  sales_invoice_number: string | null
   is_in_transit: boolean
 }
 
@@ -58,6 +59,7 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     location: buildLocation(r),
     hold_number: r.hold_number ?? null,
     purchase_invoice_number: r.purchase_invoice_number,
+    sales_invoice_number: r.sales_invoice_number,
     is_in_transit: r.is_in_transit
   }
 }
@@ -149,20 +151,20 @@ type AssetDetailRow = getAssetDetailsBatchQuery.Result
 
 export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
   return {
-    id: r.id,
-    barcode: r.barcode,
-    serial_number: r.serial_number,
-    model: r.model,
-    is_colour: r.is_colour,
-    brand: r.brand,
-    asset_type: r.asset_type,
-    status: r.status,
-    readiness: r.readiness,
-    is_in_transit: r.is_in_transit,
+    id: r.id!,
+    barcode: r.barcode!,
+    serial_number: r.serial_number!,
+    model: r.model!,
+    is_colour: r.is_colour!,
+    brand: r.brand!,
+    asset_type: r.asset_type!,
+    status: r.status!,
+    readiness: r.readiness!,
+    is_in_transit: r.is_in_transit!,
     country_of_origin: r.country_of_origin,
     manufactured_year: r.manufactured_year,
-    weight: r.weight,
-    size: r.size,
+    weight: r.weight!,
+    size: r.size!,
     location: buildLocation(r),
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,
@@ -188,11 +190,12 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
       toner_life_y: r.toner_life_y,
       toner_life_k: r.toner_life_k,
     },
-    created_at: r.created_at,
+    created_at: r.created_at!,
     hold: mapHold(r),
     arrival: mapArrival(r),
     departure: mapDeparture(r),
     purchase_invoice: mapInvoice(r),
+    sales_invoice: mapSalesInvoice(r),
     latest_comment: r.latest_comment
   }
 }
@@ -244,5 +247,13 @@ function mapInvoice(r: AssetDetailRow) {
   return {
     invoice_number: r.purchase_invoice_number,
     is_cleared: r.purchase_invoice_is_cleared!
+  }
+}
+
+function mapSalesInvoice(r: AssetDetailRow) {
+  if (!r.sales_invoice_number) return null
+  return {
+    invoice_number: r.sales_invoice_number,
+    is_cleared: r.sales_invoice_is_cleared!
   }
 }

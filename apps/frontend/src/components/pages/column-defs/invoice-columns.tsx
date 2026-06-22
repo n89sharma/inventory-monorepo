@@ -11,6 +11,11 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
     href: row => `/invoices/${row.invoice_number}`,
     value: row => row.invoice_number,
   }),
+  {
+    accessorKey: "invoice_reference",
+    header: "Reference",
+    cell: ({ row }) => row.original.invoice_reference,
+  },
   createdAtColumn as ColumnDef<InvoiceSummary>,
   createdByColumn as ColumnDef<InvoiceSummary>,
   {
