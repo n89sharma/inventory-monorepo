@@ -10,7 +10,7 @@ import type { AssetSummary } from 'shared-types'
 import { AddAssetBar } from '../../custom/add-asset-bar'
 import { EditDepartureMetadataModal } from '../../modals/edit-departure-metadata-modal'
 import { CollectionDetailPage } from '../collection-detail-page'
-import { createAssetSummaryColumns } from '../column-defs/asset-summary-columns'
+import { createDepartureAssetSummaryColumns } from '../column-defs/asset-summary-columns'
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
@@ -21,7 +21,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(assetHref, asset => mutations.removeAsset(departureNumber, asset)),
+      createDepartureAssetSummaryColumns(assetHref, asset => mutations.removeAsset(departureNumber, asset)),
     [mutations, departureNumber],
   )
 

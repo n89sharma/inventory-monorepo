@@ -3,6 +3,11 @@ import { StatusBadge } from "@/components/custom/status-badge"
 import { Button } from "@/components/shadcn/button"
 import { formatLocation, formatThousandsK, formatTitleCase } from "@/lib/formatters"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
+import type { AssetInvoiceSelector } from "@/components/custom/cards/invoice-summary-field"
+import {
+  selectPurchaseInvoiceNumber,
+  selectSalesInvoiceNumber
+} from "@/components/custom/cards/invoice-summary-field"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSummary } from 'shared-types'
@@ -109,18 +114,15 @@ export function createAssetSummaryColumns(
   return columns
 }
 
-export function createArrivalAssetSummaryColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
+function createInvoiceColumn(
+  accessorKey: string,
+  getInvoiceNumber: AssetInvoiceSelector): ColumnDef<AssetSummary> {
 
-  const baseColumns = createAssetSummaryColumns(getHref, onDelete, onEdit, disabledRowId)
-  const invoiceColumn: ColumnDef<AssetSummary> = {
-    accessorKey: 'purchase_invoice_number',
+  return {
+    accessorKey,
     header: 'Invoice',
     cell: ({ row }) => {
-      const invoiceNumber = row.original.purchase_invoice_number ?? null
+      const invoiceNumber = getInvoiceNumber(row.original) ?? null
       if (invoiceNumber === null) return null
       return (
         <Link to={`/invoices/${invoiceNumber}`} className="text-primary hover:underline">
@@ -130,7 +132,37 @@ export function createArrivalAssetSummaryColumns(
     },
     size: 70
   }
+}
+
+function createAssetSummaryColumnsWithInvoice(
+  invoiceColumn: ColumnDef<AssetSummary>,
+  getHref: (asset: AssetSummary) => string,
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
+
+  const baseColumns = createAssetSummaryColumns(getHref, onDelete, onEdit, disabledRowId)
   const serialIndex = baseColumns.findIndex(c => 'accessorKey' in c && c.accessorKey === 'serial_number')
   baseColumns.splice(serialIndex + 1, 0, invoiceColumn)
   return baseColumns
+}
+
+export function createArrivalAssetSummaryColumns(
+  getHref: (asset: AssetSummary) => string,
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
+
+  const invoiceColumn = createInvoiceColumn('purchase_invoice_number', selectPurchaseInvoiceNumber)
+  return createAssetSummaryColumnsWithInvoice(invoiceColumn, getHref, onDelete, onEdit, disabledRowId)
+}
+
+export function createDepartureAssetSummaryColumns(
+  getHref: (asset: AssetSummary) => string,
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
+
+  const invoiceColumn = createInvoiceColumn('sales_invoice_number', selectSalesInvoiceNumber)
+  return createAssetSummaryColumnsWithInvoice(invoiceColumn, getHref, onDelete, onEdit, disabledRowId)
 }
