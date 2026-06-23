@@ -1,5 +1,6 @@
 -- @param {Int} $1:modelId
 -- @param {DateTime} $2:fromDate
+-- @param {Int} $3:soldStatusId
 select
   a.barcode as barcode,
   d.created_at as departed_at,
@@ -24,6 +25,7 @@ from "Asset" a
     where aa.asset_id = a.id
   ) acc on true
 where a.model_id = $1
+  and a.status_id = $3
   and c.sale_price is not null
   and d.created_at >= $2
 order by d.created_at desc

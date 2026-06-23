@@ -8,6 +8,7 @@ import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
 const IN_STOCK_STATUS = 'IN_STOCK'
+const SOLD_STATUS = 'SOLD'
 const SALES_WINDOW_MONTHS = 12
 
 function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
@@ -26,10 +27,14 @@ function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
 
 export async function getModelSales(modelId: number): Promise<ModelSalesResult> {
   const fromDate = subMonths(new Date(), SALES_WINDOW_MONTHS)
+  const soldStatus = await prisma.status.findUniqueOrThrow({
+    where: { status: SOLD_STATUS },
+    select: { id: true },
+  })
   const [model, sales, lastSaleRows, in_stock_count] = await Promise.all([
     prisma.model.findUnique({ where: { id: modelId }, select: { id: true } }),
-    prisma.$queryRawTyped(getModelSalesQuery(modelId, fromDate)),
-    prisma.$queryRawTyped(getModelLastSaleQuery(modelId)),
+    prisma.$queryRawTyped(getModelSalesQuery(modelId, fromDate, soldStatus.id)),
+    prisma.$queryRawTyped(getModelLastSaleQuery(modelId, soldStatus.id)),
     prisma.asset.count({
       where: { model_id: modelId, Status: { status: IN_STOCK_STATUS } },
     }),
