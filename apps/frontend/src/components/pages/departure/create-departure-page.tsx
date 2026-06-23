@@ -2,7 +2,7 @@ import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import { DEFAULT_OUTGOING_STATUS, type AssetSummary } from 'shared-types'
 import { DepartureFormPage } from './departure-form-page'
 
 export function CreateDeparturePage(): React.JSX.Element {
@@ -26,7 +26,13 @@ export function CreateDeparturePage(): React.JSX.Element {
   ]
 
   const defaultValues: DepartureForm | undefined = preloadedAssets?.length
-    ? { origin: UNSELECTED, customer: null, transporter: null, comment: '', assets: preloadedAssets }
+    ? {
+        origin: UNSELECTED,
+        customer: null,
+        transporter: null,
+        comment: '',
+        assets: preloadedAssets.map(a => ({ ...a, outgoing_status: DEFAULT_OUTGOING_STATUS }))
+      }
     : undefined
 
   async function onValidDepartureCreateSubmit(data: DepartureForm) {

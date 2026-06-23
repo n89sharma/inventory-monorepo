@@ -2,11 +2,13 @@ import { StatusBadge } from "@/components/custom/status-badge"
 import { ReadinessIcon } from "@/components/custom/readiness-icon"
 import { Button } from "@/components/shadcn/button"
 import { formatLocation, formatThousandsK, formatTitleCase } from "@/lib/formatters"
+import type { DepartureFormAsset } from "@/ui-types/departure-form-types"
 import { TrashIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import type { AssetSummary } from 'shared-types'
+import { createSelectColumn } from "./shared-columns"
 
-export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDef<AssetSummary>[] {
+function getCommonLeadingColumns<T extends AssetSummary>(): ColumnDef<T>[] {
   return [
     {
       accessorKey: "barcode",
@@ -34,39 +36,75 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
       header: "Total Meter",
       cell: ({ row }) => formatThousandsK(row.getValue('meter_total')),
       size: 60
-    },
+    }
+  ]
+}
+
+function getReadinessColumn<T extends AssetSummary>(): ColumnDef<T> {
+  return {
+    accessorKey: "readiness",
+    header: "Readiness",
+    cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
+    size: 80
+  }
+}
+
+function getLocationColumn<T extends AssetSummary>(): ColumnDef<T> {
+  return {
+    id: "location",
+    header: "Location",
+    cell: ({ row }) => formatLocation(row.original.location),
+    size: 140
+  }
+}
+
+function getDeleteColumn<T>(onDelete: (index: number) => void): ColumnDef<T> {
+  return {
+    id: "delete",
+    cell: ({ row }) => (
+      <Button
+        variant="outline"
+        size="icon"
+        type="button"
+        aria-label="Remove asset"
+        onClick={() => onDelete(row.index)}
+      >
+        <TrashIcon />
+      </Button>
+    ),
+    size: 50
+  }
+}
+
+export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDef<AssetSummary>[] {
+  return [
+    ...getCommonLeadingColumns<AssetSummary>(),
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
       size: 80
     },
+    getReadinessColumn<AssetSummary>(),
+    getLocationColumn<AssetSummary>(),
+    getDeleteColumn<AssetSummary>(onDelete)
+  ]
+}
+
+export function getDepartureFormAssetColumns(
+  onDelete: (index: number) => void
+): ColumnDef<DepartureFormAsset>[] {
+  return [
+    createSelectColumn<DepartureFormAsset>(),
+    ...getCommonLeadingColumns<DepartureFormAsset>(),
     {
-      accessorKey: "readiness",
-      header: "Readiness",
-      cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
-      size: 80
+      accessorKey: "outgoing_status",
+      header: "Outgoing Status",
+      cell: ({ row }) => <StatusBadge status={row.original.outgoing_status} />,
+      size: 120
     },
-    {
-      id: "location",
-      header: "Location",
-      cell: ({ row }) => formatLocation(row.original.location),
-      size: 140
-    },
-    {
-      id: "delete",
-      cell: ({ row }) => (
-        <Button
-          variant="outline"
-          size="icon"
-          type="button"
-          aria-label="Remove asset"
-          onClick={() => onDelete(row.index)}
-        >
-          <TrashIcon />
-        </Button>
-      ),
-      size: 50
-    }
+    getReadinessColumn<DepartureFormAsset>(),
+    getLocationColumn<DepartureFormAsset>(),
+    getDeleteColumn<DepartureFormAsset>(onDelete)
   ]
 }

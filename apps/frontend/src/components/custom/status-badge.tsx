@@ -6,6 +6,8 @@ function getBadgeClass(status: string): string {
     case 'IN_STOCK': return 'bg-lime-300 text-gray-700'
     case 'SOLD': return 'bg-cyan-100 text-gray-700'
     case 'RELEASED': return 'bg-gray-300 text-gray-700'
+    case 'HARVESTED': return 'bg-amber-200 text-gray-700'
+    case 'SCRAPPED': return 'bg-rose-300 text-gray-700'
     default: return 'bg-rose-300 text-gray-700'
   }
 }

@@ -26,13 +26,31 @@ export const DepartureDetailSchema = z.object({
 })
 export type DepartureDetail = z.infer<typeof DepartureDetailSchema>
 
+// Per-asset outcome chosen when departing; persisted as the asset's new status.
+export const OutgoingStatusSchema = z.enum(['SOLD', 'HARVESTED', 'SCRAPPED'])
+export type OutgoingStatus = z.infer<typeof OutgoingStatusSchema>
+
+export const DEFAULT_OUTGOING_STATUS: OutgoingStatus = 'SOLD'
+
+export const OUTGOING_STATUS_LABELS = {
+  SOLD: 'Sold',
+  HARVESTED: 'Harvested',
+  SCRAPPED: 'Scrapped'
+} as const satisfies Record<OutgoingStatus, string>
+
+export const DepartureAssetInputSchema = z.object({
+  id: z.number(),
+  outgoing_status: OutgoingStatusSchema
+})
+export type DepartureAssetInput = z.infer<typeof DepartureAssetInputSchema>
+
 // POST /departures
 export const CreateDepartureSchema = z.object({
   origin: WarehouseSchema,
   customer: OrgSummarySchema,
   transporter: OrgSummarySchema,
   comment: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty("No assets in the departure").max(2000)
+  assets: z.array(DepartureAssetInputSchema).nonempty("No assets in the departure").max(2000)
 })
 export type CreateDeparture = z.infer<typeof CreateDepartureSchema>
 

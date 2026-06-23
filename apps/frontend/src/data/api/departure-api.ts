@@ -41,7 +41,7 @@ export async function createDeparture(d: DepartureForm): Promise<CreateDeparture
     customer: d.customer!,
     transporter: d.transporter!,
     comment: d.comment,
-    assets: d.assets as CreateDeparture['assets']
+    assets: d.assets.map(a => ({ id: a.id, outgoing_status: a.outgoing_status })) as CreateDeparture['assets']
   } satisfies CreateDeparture)
   const { data } = await api.post<CreateDepartureResponse>('/departures', createDepartureBody)
   return CreateDepartureResponseSchema.parse(data)

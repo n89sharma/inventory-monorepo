@@ -1,11 +1,11 @@
-import { AssetDelta, CreateDeparture, DepartureDetail, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, UpdateDepartureMetadata } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
-import { getNextSequence } from '../lib/db-utils.js'
-import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
+import { getNextSequence } from '../lib/db-utils.js'
+import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 
 
 
@@ -35,6 +35,15 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   const currentDateTime = new Date()
   const departureNumber = await getNewDepartureNumber(originCode)
   const assetIds = departure.assets.map(a => a.id)
+  const assetsPerOutgoingStatus = Object.groupBy(departure.assets, asset => asset.outgoing_status)
+
+  const statuses = await prisma.status.findMany()
+  const statusIdRecord = Object.groupBy(statuses, status => status.status)
+  const availableStatuses = new Set(Object.keys(statusIdRecord))
+  const outgoingStatuses = new Set(Object.keys(assetsPerOutgoingStatus))
+  const missingStatuses = outgoingStatuses.difference(availableStatuses)
+  if (missingStatuses.size > 0)
+    throw new ValidationError(`Outgoing statuses not found: ${[...missingStatuses].join(', ')}`)
 
   const newDeparture = await prisma.$transaction(async (tx) => {
     await assertAssetsNotInCollection(
@@ -56,10 +65,16 @@ export async function createDeparture(departure: CreateDeparture, userId: number
       }
     })
 
-    await tx.asset.updateMany({
-      where: { id: { in: assetIds } },
-      data: { departure_id: created.id }
-    })
+    for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
+      if (!assetsForStatus) continue
+      await tx.asset.updateMany({
+        where: { id: { in: assetsForStatus.map(a => a.id) } },
+        data: {
+          departure_id: created.id,
+          status_id: statusIdRecord[outgoingStatus]![0].id
+        }
+      })
+    }
 
     return created
   })

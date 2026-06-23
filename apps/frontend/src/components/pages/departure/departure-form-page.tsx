@@ -2,14 +2,17 @@ import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
-import { DepartureFormSchema, type DepartureForm } from '@/ui-types/departure-form-types'
+import { DepartureFormSchema, type DepartureForm, type DepartureFormAsset } from '@/ui-types/departure-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
+import type { RowSelectionState } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
+import { DEFAULT_OUTGOING_STATUS, type AssetSummary, type OutgoingStatus } from 'shared-types'
 import { toast } from 'sonner'
 import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to-create-form'
 import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
+import { DepartureOutgoingStatusBar } from '../../custom/departure-outgoing-status-bar'
 import { SelectOptions } from '../../custom/select-options'
 import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
@@ -17,7 +20,9 @@ import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { DataTable } from '../../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
-import { getFormAssetColumns } from '../column-defs/form-asset-columns'
+import { getDepartureFormAssetColumns } from '../column-defs/form-asset-columns'
+
+const getAssetRowId = (asset: DepartureFormAsset) => asset.barcode
 
 interface DepartureFormPageProps {
   defaultValues?: DepartureForm
@@ -38,11 +43,29 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
   })
   const activeWarehouses = useActiveWarehouses()
   const orgs = useOrgStore(state => state.organizations)
-  const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
+  const { fields: assets, append: addAsset, remove: deleteAsset, replace: replaceAssets } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(() => getDepartureFormAssetColumns(deleteAsset), [deleteAsset])
+
+  const selectedCount = assets.filter(a => rowSelection[a.barcode]).length
+
+  function addDepartureAsset(asset: AssetSummary) {
+    addAsset({ ...asset, outgoing_status: DEFAULT_OUTGOING_STATUS })
+  }
+
+  function applyOutgoingStatus(status: OutgoingStatus) {
+    const updated = form.getValues('assets')
+      .map(asset => rowSelection[asset.barcode] ? { ...asset, outgoing_status: status } : asset)
+    replaceAssets(updated)
+    setRowSelection({})
+  }
+
+  function selectAllAssets() {
+    setRowSelection(Object.fromEntries(assets.map(a => [a.barcode, true])))
+  }
 
   function getDefaultDeparture(): DepartureForm {
     return {
@@ -157,18 +180,31 @@ export function DepartureFormPage({ defaultValues, pageConfig, breadcrumbs, onVa
           <h2 className='text-lg font-semibold'>Assets</h2>
           <AddFromHoldButton
             getAssets={() => form.getValues('assets')}
-            onAddAsset={addAsset}
+            onAddAsset={addDepartureAsset}
             disabled={isSubmitting}
           />
         </div>
         <AddAssetByBarcode
           getAssets={() => form.getValues('assets')}
-          onAddAsset={addAsset}
+          onAddAsset={addDepartureAsset}
           entityName='departure'
           disabled={isSubmitting}
           className='max-w-xl'
         />
-        <DataTable columns={assetTableColumns} data={assets} />
+        <DataTable
+          columns={assetTableColumns}
+          data={assets}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          getRowId={getAssetRowId}
+        />
+        <DepartureOutgoingStatusBar
+          selectedCount={selectedCount}
+          totalCount={assets.length}
+          onSelectAll={selectAllAssets}
+          onClear={() => setRowSelection({})}
+          onApply={applyOutgoingStatus}
+        />
       </div>
 
       <UnsavedChangesDialog
