@@ -85,7 +85,7 @@ const SETTINGS_SUB_ITEMS = [
 
 const REPORTS_SUB_ITEMS = [
   { title: 'Profitability', url: PROFITABILITY_PATH },
-  { title: 'Held Assets', url: '/reports/holds-by-salesperson' },
+  { title: 'Held Assets', url: '/reports/holds-by-user' },
   { title: 'Export Assets', url: '/reports/serial-number' },
 ]
 

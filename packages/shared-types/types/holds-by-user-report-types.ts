@@ -10,5 +10,5 @@ export const ActiveHoldRowSchema = z.object({
 })
 export type ActiveHoldRow = z.infer<typeof ActiveHoldRowSchema>
 
-export const HoldsBySalespersonReportSchema = z.array(ActiveHoldRowSchema)
-export type HoldsBySalespersonReport = z.infer<typeof HoldsBySalespersonReportSchema>
+export const HoldsByUserReportSchema = z.array(ActiveHoldRowSchema)
+export type HoldsByUserReport = z.infer<typeof HoldsByUserReportSchema>

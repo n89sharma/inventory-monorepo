@@ -24,7 +24,7 @@ export type HoldsTotals = {
   medianHeldDays: number
 }
 
-export type HoldsBySalespersonTable = {
+export type HoldsByUserTable = {
   totals: HoldsTotals
   salespeople: SalespersonHoldsGroup[]
 }
@@ -57,7 +57,7 @@ type RepAccumulator = {
   customers: Map<number, CustomerAccumulator>
 }
 
-export function aggregateHolds(rows: ActiveHoldRow[]): HoldsBySalespersonTable {
+export function aggregateHolds(rows: ActiveHoldRow[]): HoldsByUserTable {
   const reps = new Map<number, RepAccumulator>()
   let totalAssetCount = 0
 

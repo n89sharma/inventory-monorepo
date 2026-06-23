@@ -40,7 +40,7 @@ const SearchInStockPage         = lazy(() => import('./components/pages/search/s
 const SearchHeldPage            = lazy(() => import('./components/pages/search/search-held-page').then(m => ({ default: m.SearchHeldPage })))
 const SearchSoldPage            = lazy(() => import('./components/pages/search/search-sold-page').then(m => ({ default: m.SearchSoldPage })))
 const ProfitabilityReportPage   = lazy(() => import('./components/pages/profitability-report-page').then(m => ({ default: m.ProfitabilityReportPage })))
-const HoldsBySalespersonReportPage = lazy(() => import('./components/pages/holds-by-salesperson-report-page').then(m => ({ default: m.HoldsBySalespersonReportPage })))
+const HoldsByUserReportPage = lazy(() => import('./components/pages/holds-by-user-report-page').then(m => ({ default: m.HoldsByUserReportPage })))
 const ExportAssetsPage = lazy(() => import('./components/pages/reports/export-assets-page').then(m => ({ default: m.ExportAssetsPage })))
 const SearchAllPage             = lazy(() => import('./components/pages/search/search-all-page').then(m => ({ default: m.SearchAllPage })))
 const PriceCheckPage            = lazy(() => import('./components/pages/search/price-check-page').then(m => ({ default: m.PriceCheckPage })))
@@ -144,10 +144,10 @@ function AppRoutes() {
                     }
                   />
                   <Route
-                    path="/reports/holds-by-salesperson"
+                    path="/reports/holds-by-user"
                     element={
                       <PermissionRoute permission="view_reports">
-                        <HoldsBySalespersonReportPage />
+                        <HoldsByUserReportPage />
                       </PermissionRoute>
                     }
                   />

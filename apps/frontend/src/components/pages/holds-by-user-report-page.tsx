@@ -2,10 +2,10 @@ import { MetricCard } from '@/components/custom/cards/metric-card'
 import { ShareButton } from '@/components/custom/share-button'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import {
-  HOLDS_BY_SALESPERSON_COLUMNS,
+  HOLDS_BY_USER_COLUMNS,
   toHoldsReportRows,
   type HoldsReportRow,
-} from '@/components/pages/column-defs/holds-by-salesperson-columns'
+} from '@/components/pages/column-defs/holds-by-user-columns'
 import { PageContent } from '@/components/layout/page-content'
 import {
   Table,
@@ -15,11 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import { useHoldsBySalespersonReport } from '@/hooks/use-holds-by-salesperson-report'
+import { useHoldsByUserReport } from '@/hooks/use-holds-by-user-report'
 import {
   aggregateHolds,
-  type HoldsBySalespersonTable,
-} from '@/lib/holds-by-salesperson-aggregate'
+  type HoldsByUserTable,
+} from '@/lib/holds-by-user-aggregate'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import {
@@ -48,7 +48,7 @@ function formatDays(value: number): string {
   return `${Math.round(value)}${DAYS_SUFFIX}`
 }
 
-function HoldsSummaryCards({ totals }: { totals: HoldsBySalespersonTable['totals'] }): React.JSX.Element {
+function HoldsSummaryCards({ totals }: { totals: HoldsByUserTable['totals'] }): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-3">
       <MetricCard label="Assets Held" value={String(totals.assetCount)} />
@@ -64,7 +64,7 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
 
   const table = useReactTable({
     data: rows,
-    columns: HOLDS_BY_SALESPERSON_COLUMNS,
+    columns: HOLDS_BY_USER_COLUMNS,
     state: { expanded },
     onExpandedChange: setExpanded,
     getRowId: row => row.rowId,
@@ -119,7 +119,7 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
   )
 }
 
-function HoldsReportBody({ table }: { table: HoldsBySalespersonTable }): React.JSX.Element {
+function HoldsReportBody({ table }: { table: HoldsByUserTable }): React.JSX.Element {
   const rows = useMemo(
     () => toHoldsReportRows(table.salespeople),
     [table.salespeople],
@@ -139,8 +139,8 @@ function HoldsReportBody({ table }: { table: HoldsBySalespersonTable }): React.J
   return <HoldsReportTable rows={rows} />
 }
 
-export function HoldsBySalespersonReportPage(): React.JSX.Element {
-  const { data: rows = EMPTY_ROWS, isLoading } = useHoldsBySalespersonReport()
+export function HoldsByUserReportPage(): React.JSX.Element {
+  const { data: rows = EMPTY_ROWS, isLoading } = useHoldsByUserReport()
   const table = useMemo(() => aggregateHolds(rows), [rows])
 
   return (

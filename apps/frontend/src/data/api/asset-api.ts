@@ -268,7 +268,7 @@ export async function getAssetsForSearchInStock(
   cassettes: number | null,
   component: Component | null): Promise<AssetSearchRow[]> {
 
-  const { data } = await api.get<AssetSearchRow[]>(`/reports/stock`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/search/instock`, {
     params: {
       warehouseIds: warehouses.map(w => w.id),
       brandIds: brand ? [brand.id] : [],
@@ -290,7 +290,7 @@ export async function getAssetsBySerialNumber(
   const getAssetsBySerialNumberBody = AssetsBySerialNumberRequestSchema.parse(
     { serialNumbers } satisfies AssetsBySerialNumberRequest,
   )
-  const { data } = await api.post('/reports/assets-by-serial-number', getAssetsBySerialNumberBody)
+  const { data } = await api.post('/reports/serial-number', getAssetsBySerialNumberBody)
   return AssetsBySerialNumberResultSchema.parse(data)
 }
 
@@ -309,7 +309,7 @@ export async function getAssetsForSearchHeld(
   holdCustomer: OrgSummary | null,
   daysHeldMin: number | null): Promise<AssetSearchRow[]> {
 
-  const { data } = await api.get<AssetSearchRow[]>(`/reports/held`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/search/held`, {
     params: {
       warehouseIds: warehouses.map(w => w.id),
       brandIds: brand ? [brand.id] : [],

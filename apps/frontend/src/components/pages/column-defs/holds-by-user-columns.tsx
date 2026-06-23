@@ -1,4 +1,4 @@
-import type { SalespersonHoldsGroup } from '@/lib/holds-by-salesperson-aggregate'
+import type { SalespersonHoldsGroup } from '@/lib/holds-by-user-aggregate'
 import { formatTitleCase } from '@/lib/formatters'
 import { buildSearchHeldUrl } from '@/lib/search-held-params'
 import { cn } from '@/lib/utils'
@@ -79,7 +79,7 @@ function LabelCell({ row }: { row: Row<HoldsReportRow> }): React.JSX.Element {
   )
 }
 
-export const HOLDS_BY_SALESPERSON_COLUMNS: ColumnDef<HoldsReportRow>[] = [
+export const HOLDS_BY_USER_COLUMNS: ColumnDef<HoldsReportRow>[] = [
   {
     id: 'label',
     header: 'Salesperson / Customer',

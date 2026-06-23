@@ -1,14 +1,10 @@
 import express from 'express'
 import {
-  SearchInStockQuerySchema,
-  SearchHeldQuerySchema,
-  getAssetsForSearchInStock,
-  getAssetsForSearchHeld,
   getAssetsBySerialNumber,
 } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
-  getHoldsBySalespersonReport,
+  getHoldsByUserReport,
   getProfitabilityReport,
 } from '../controllers/reportController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -19,11 +15,7 @@ const router = express.Router()
 
 router.use(requireAuth)
 
-router.get('/stock', requirePermission('view_asset'), validateQuery(SearchInStockQuerySchema), getAssetsForSearchInStock)
-
-router.get('/held', requirePermission('view_asset'), validateQuery(SearchHeldQuerySchema), getAssetsForSearchHeld)
-
-router.post('/assets-by-serial-number', requirePermission('view_reports'), getAssetsBySerialNumber)
+router.post('/serial-number', requirePermission('view_reports'), getAssetsBySerialNumber)
 
 router.get(
   '/profitability',
@@ -33,9 +25,9 @@ router.get(
 )
 
 router.get(
-  '/holds-by-salesperson',
+  '/holds-by-user',
   requirePermission('view_reports'),
-  getHoldsBySalespersonReport,
+  getHoldsByUserReport,
 )
 
 export default router
