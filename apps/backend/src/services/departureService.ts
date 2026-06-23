@@ -1,9 +1,9 @@
-import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { ConflictError, NotFoundError, ValidationError } from '../lib/errors.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 
@@ -37,13 +37,15 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   const assetIds = departure.assets.map(a => a.id)
   const assetsPerOutgoingStatus = Object.groupBy(departure.assets, asset => asset.outgoing_status)
 
-  const statuses = await prisma.status.findMany()
-  const statusIdRecord = Object.groupBy(statuses, status => status.status)
-  const availableStatuses = new Set(Object.keys(statusIdRecord))
-  const outgoingStatuses = new Set(Object.keys(assetsPerOutgoingStatus))
-  const missingStatuses = outgoingStatuses.difference(availableStatuses)
-  if (missingStatuses.size > 0)
-    throw new ValidationError(`Outgoing statuses not found: ${[...missingStatuses].join(', ')}`)
+  const outgoingStatusRows = await prisma.status.findMany({
+    where: { status: { in: [...OutgoingStatusSchema.options] } }
+  })
+  const statusIdByName = new Map(outgoingStatusRows.map(s => [s.status, s.id]))
+
+  const referencedStatuses = Object.keys(assetsPerOutgoingStatus)
+  const unseededStatuses = referencedStatuses.filter(s => !statusIdByName.has(s))
+  if (unseededStatuses.length > 0)
+    throw new Error(`Outgoing statuses not seeded in DB: ${unseededStatuses.join(', ')}`)
 
   const newDeparture = await prisma.$transaction(async (tx) => {
     await assertAssetsNotInCollection(
@@ -71,7 +73,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
         where: { id: { in: assetsForStatus.map(a => a.id) } },
         data: {
           departure_id: created.id,
-          status_id: statusIdRecord[outgoingStatus]![0].id
+          status_id: statusIdByName.get(outgoingStatus)!
         }
       })
     }
