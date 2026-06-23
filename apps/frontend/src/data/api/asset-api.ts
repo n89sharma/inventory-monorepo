@@ -7,6 +7,8 @@ import type {
   AssetHistory,
   AssetLocation,
   AssetSearchRow,
+  AssetsBySerialNumberRequest,
+  AssetsBySerialNumberResult,
   AssetStorePartRow,
   AssetTransfer,
   AssetType,
@@ -36,6 +38,8 @@ import {
   AssetHistorySchema,
   AssetLocationSchema,
   AssetSearchRowSchema,
+  AssetsBySerialNumberRequestSchema,
+  AssetsBySerialNumberResultSchema,
   AssetTransferSchema,
   BarcodeSuggestionSchema,
   BulkUpdateAssetPricingSchema,
@@ -278,6 +282,16 @@ export async function getAssetsForSearchInStock(
     }
   })
   return z.array(AssetSearchRowSchema).parse(data)
+}
+
+export async function getAssetsBySerialNumber(
+  serialNumbers: string[],
+): Promise<AssetsBySerialNumberResult> {
+  const getAssetsBySerialNumberBody = AssetsBySerialNumberRequestSchema.parse(
+    { serialNumbers } satisfies AssetsBySerialNumberRequest,
+  )
+  const { data } = await api.post('/reports/assets-by-serial-number', getAssetsBySerialNumberBody)
+  return AssetsBySerialNumberResultSchema.parse(data)
 }
 
 export async function getAssetsForSearchHeld(

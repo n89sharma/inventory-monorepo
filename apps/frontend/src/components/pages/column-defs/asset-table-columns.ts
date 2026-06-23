@@ -108,6 +108,10 @@ const HELD_DEFAULT_COLUMN_IDS = [
   'held_by', 'hold_created_for', 'hold_customer',
 ] as const satisfies readonly AssetColumnId[]
 
+export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
+  'serial_number', 'status', 'arrival_created_at',
+] as const satisfies readonly AssetColumnId[]
+
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   all:           DEFAULT_VISIBLE_COLUMN_IDS,
   instock:       INSTOCK_DEFAULT_COLUMN_IDS,

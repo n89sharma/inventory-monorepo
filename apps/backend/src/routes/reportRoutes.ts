@@ -4,6 +4,7 @@ import {
   SearchHeldQuerySchema,
   getAssetsForSearchInStock,
   getAssetsForSearchHeld,
+  getAssetsBySerialNumber,
 } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
@@ -21,6 +22,8 @@ router.use(requireAuth)
 router.get('/stock', requirePermission('view_asset'), validateQuery(SearchInStockQuerySchema), getAssetsForSearchInStock)
 
 router.get('/held', requirePermission('view_asset'), validateQuery(SearchHeldQuerySchema), getAssetsForSearchHeld)
+
+router.post('/assets-by-serial-number', requirePermission('view_reports'), getAssetsBySerialNumber)
 
 router.get(
   '/profitability',

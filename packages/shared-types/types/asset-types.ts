@@ -78,6 +78,25 @@ export const AssetSearchRowSchema = z.object({
 
 export type AssetSearchRow = z.infer<typeof AssetSearchRowSchema>
 
+const MAX_SERIAL_NUMBERS = 1000
+const MAX_SERIAL_NUMBER_LENGTH = 50
+
+export const AssetsBySerialNumberRequestSchema = z.object({
+  serialNumbers: z
+    .array(z.string().max(MAX_SERIAL_NUMBER_LENGTH))
+    .min(1)
+    .max(MAX_SERIAL_NUMBERS),
+})
+
+export type AssetsBySerialNumberRequest = z.infer<typeof AssetsBySerialNumberRequestSchema>
+
+export const AssetsBySerialNumberResultSchema = z.object({
+  assets: z.array(AssetSearchRowSchema),
+  notFound: z.array(z.string()),
+})
+
+export type AssetsBySerialNumberResult = z.infer<typeof AssetsBySerialNumberResultSchema>
+
 export const AssetDetailsSchema = z.object({
   id: z.number(),
   barcode: z.string(),

@@ -86,6 +86,7 @@ const SETTINGS_SUB_ITEMS = [
 const REPORTS_SUB_ITEMS = [
   { title: 'Profitability', url: PROFITABILITY_PATH },
   { title: 'Held Assets', url: '/reports/holds-by-salesperson' },
+  { title: 'Export Assets', url: '/reports/serial-number' },
 ]
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }

@@ -21,6 +21,8 @@ export * from "./sql/getAssets.js"
 
 export * from "./sql/getAssetSalvagedParts.js"
 
+export * from "./sql/getAssetsBySerialNumber.js"
+
 export * from "./sql/getAssetsForArrival.js"
 
 export * from "./sql/getAssetsForDepartures.js"

@@ -4,6 +4,7 @@ import {
   AssetHistory,
   AssetHistoryRecord,
   AssetSearchRow,
+  AssetsBySerialNumberResult,
   AssetTransfer,
   Comment,
   AssetHarvestedPart,
@@ -18,11 +19,13 @@ import {
   getAssetErrors as getAssetErrorsQuery,
   getAssetSalvagedParts as getAssetSalvagedPartsQuery,
   getAssets as getAssetsQuery,
+  getAssetsBySerialNumber as getAssetsBySerialNumberQuery,
   getAssetTransfers as getAssetTransfersQuery,
   getSoldAssets as getSoldAssetsQuery
 } from '../../generated/prisma/sql.js'
 import { getInitials, mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { NotFoundError } from '../lib/errors.js'
+import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 
 function redactSearchRowCost(
@@ -85,6 +88,26 @@ export async function getAssets(
     )
   )
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+}
+
+export async function getAssetsBySerialNumber(
+  serialNumbers: string[],
+  role: AppRole | null,
+): Promise<AssetsBySerialNumberResult> {
+  const normalizedInput = serialNumbers.map(raw => ({ raw, normalized: normalizeForSearch(raw) }))
+  const uniqueNormalized = [
+    ...new Set(normalizedInput.map(s => s.normalized).filter(n => n.length > 0)),
+  ]
+
+  const rows = await prisma.$queryRawTyped(getAssetsBySerialNumberQuery(uniqueNormalized))
+  const assets = rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+
+  const foundNormalized = new Set(assets.map(a => normalizeForSearch(a.serial_number)))
+  const notFound = normalizedInput
+    .filter(s => !foundNormalized.has(s.normalized))
+    .map(s => s.raw)
+
+  return { assets, notFound }
 }
 
 export async function getSoldAssets(

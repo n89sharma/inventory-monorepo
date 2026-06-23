@@ -1,6 +1,6 @@
 import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetsBySerialNumberRequestSchema, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -19,6 +19,7 @@ import {
   getAssetsForSearchInStock as getAssetsForSearchInStockSer,
   getAssetsForSearchHeld as getAssetsForSearchHeldSer,
   getAssets as getAssetsSer,
+  getAssetsBySerialNumber as getAssetsBySerialNumberSer,
   getSoldAssets as getSoldAssetsSer
 } from '../services/assetReadService.js'
 import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
@@ -232,6 +233,12 @@ export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
     isNaN(daysHeldMin) ? -1 : daysHeldMin,
     res.locals.dbUserRole,
   )
+  res.json(successResponse(data))
+})
+
+export const getAssetsBySerialNumber = asyncHandler(async (req, res) => {
+  const { serialNumbers } = AssetsBySerialNumberRequestSchema.parse(req.body)
+  const data = await getAssetsBySerialNumberSer(serialNumbers, res.locals.dbUserRole)
   res.json(successResponse(data))
 })
 
