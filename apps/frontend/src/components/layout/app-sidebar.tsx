@@ -73,7 +73,6 @@ const sidebarItems = [
 ]
 
 const SEARCH_ASSETS_SUB_ITEMS = [
-  { title: 'All', url: '/search/all' },
   { title: 'In Stock', url: '/search/instock' },
   { title: 'Held', url: '/search/held' },
   { title: 'Sold', url: '/search/sold' },
