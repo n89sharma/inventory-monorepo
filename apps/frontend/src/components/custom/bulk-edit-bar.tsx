@@ -26,6 +26,7 @@ type BulkEditBarProps = {
   totalCount?: number
   onSelectAll?: () => void
   onBulkRemove?: (assets: AssetSummary[]) => void
+  extraActions?: React.ReactNode
 }
 
 export function BulkEditBar({
@@ -38,6 +39,7 @@ export function BulkEditBar({
   totalCount,
   onSelectAll,
   onBulkRemove,
+  extraActions,
 }: BulkEditBarProps): React.JSX.Element {
   const navigate = useNavigate()
   const [addToOpen, setAddToOpen] = useState(false)
@@ -94,6 +96,7 @@ export function BulkEditBar({
         onSelectAll={onSelectAll}
         onClear={onClear}
       >
+        {extraActions}
         {canCreateAnyCollection && (
           <DropdownMenu>
             <Button asChild variant="default">

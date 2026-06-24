@@ -1,9 +1,8 @@
-import { createDeparture, getDepartureDetail, patchDepartureAssets, updateDepartureMetadata } from '@/data/api/departure-api'
+import { createDeparture, getDepartureDetail, patchDepartureAssets, setDepartureOutgoingStatus, updateDepartureMetadata } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
-import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import type { AssetSummary, DepartureDetail } from 'shared-types'
+import type { AssetSummary, DepartureDetail, OutgoingStatus } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: DepartureForm) {
@@ -79,22 +78,15 @@ async function updateMetadata(departureNumber: string, metadata: DepartureMetada
   invalidateDepartureLists()
 }
 
-function removeAsset(departureNumber: string, asset: AssetSummary) {
-  scheduleAssetRemoval({
-    collectionId: departureNumber,
-    detailCacheKey: departureDetailKey(departureNumber),
-    patchAssets: delta => patchDepartureAssets(departureNumber, delta),
-    invalidateLists: invalidateDepartureLists,
-  }, asset)
-}
-
-function bulkRemoveAssets(departureNumber: string, assets: AssetSummary[]) {
-  scheduleBulkAssetRemoval({
-    collectionId: departureNumber,
-    detailCacheKey: departureDetailKey(departureNumber),
-    patchAssets: delta => patchDepartureAssets(departureNumber, delta),
-    invalidateLists: invalidateDepartureLists,
-  }, assets)
+async function setOutgoingStatus(
+  departureNumber: string,
+  assetIds: number[],
+  status: OutgoingStatus
+) {
+  if (assetIds.length === 0) return
+  await setDepartureOutgoingStatus(departureNumber, assetIds, status)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
 }
 
 const mutations = {
@@ -104,9 +96,7 @@ const mutations = {
   addAsset,
   addAssetBatch,
   updateMetadata,
-  removeAsset,
-  bulkRemoveAssets,
-  flushPending: flushPendingRemovals,
+  setOutgoingStatus,
 } as const
 
 export function useDepartureMutations() {

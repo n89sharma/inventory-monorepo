@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateDepartureSchema, DepartureDetail, SetDepartureOutgoingStatusSchema, UpdateDepartureMetadataSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DepartureListQuerySchema } from '../middleware/validation.js'
@@ -9,7 +9,8 @@ import { prisma } from '../prisma.js'
 import {
   createDeparture as createDepartureSer,
   getDeparture as getDepartureSer,
-  addRemoveCollectionFromAssetsAndRecord as patchDepartureAssetsSer,
+  addAssetsToDepartureAndRecord as patchDepartureAssetsSer,
+  setDepartureOutgoingStatus as setDepartureOutgoingStatusSer,
   patchDepartureMetadata as patchDepartureMetadataSer
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -38,6 +39,12 @@ export const createDeparture = asyncHandler(async (req, res) => {
 export const patchDepartureAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchDepartureAssetsSer(req.params.departureNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const setDepartureOutgoingStatus = asyncHandler(async (req, res) => {
+  const { assetIds, outgoing_status } = SetDepartureOutgoingStatusSchema.parse(req.body)
+  await setDepartureOutgoingStatusSer(req.params.departureNumber, assetIds, outgoing_status, res.locals.dbUserId)
   res.status(204).send()
 })
 

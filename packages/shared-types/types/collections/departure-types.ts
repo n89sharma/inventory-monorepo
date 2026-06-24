@@ -44,6 +44,13 @@ export const DepartureAssetInputSchema = z.object({
 })
 export type DepartureAssetInput = z.infer<typeof DepartureAssetInputSchema>
 
+// PATCH /departures/:departureNumber/assets/outgoing-status
+export const SetDepartureOutgoingStatusSchema = z.object({
+  assetIds: z.array(z.number().int()).nonempty(),
+  outgoing_status: OutgoingStatusSchema
+})
+export type SetDepartureOutgoingStatus = z.infer<typeof SetDepartureOutgoingStatusSchema>
+
 // POST /departures
 export const CreateDepartureSchema = z.object({
   origin: WarehouseSchema,

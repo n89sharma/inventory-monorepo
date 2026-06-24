@@ -1,4 +1,4 @@
-import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, OutgoingStatus, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
@@ -6,6 +6,8 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+
+const DEFAULT_ADD_STATUS: OutgoingStatus = 'SOLD'
 
 
 
@@ -125,26 +127,34 @@ export async function patchDepartureMetadata(
   }, userId)
 }
 
-export async function addRemoveCollectionFromAssetsAndRecord(
+export async function addAssetsToDepartureAndRecord(
   departureNumber: string,
   delta: AssetDelta,
   userId: number
 ): Promise<void> {
+  if (delta.assetIdsToRemove.length > 0)
+    throw new ConflictError('Assets cannot be removed from a departure')
+
   const departure = await prisma.departure.findUnique({
     where: { departure_number: departureNumber },
     select: { id: true }
   })
   if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
 
+  const addStatus = await prisma.status.findUniqueOrThrow({
+    where: { status: DEFAULT_ADD_STATUS },
+    select: { id: true }
+  })
+
   await prisma.$transaction(tx =>
     addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
-      assetsToRemove: delta.assetIdsToRemove,
+      assetsToRemove: [],
       assetInCollectionWhere: { departure_id: { not: null } },
       assetInCollectionError: (barcodes) =>
         new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
-      add: { departure_id: departure.id },
-      remove: { departure_id: null }
+      add: { departure_id: departure.id, status_id: addStatus.id },
+      remove: {}
     })
   )
 
@@ -153,9 +163,40 @@ export async function addRemoveCollectionFromAssetsAndRecord(
     'departure_id',
     departure.id,
     delta.assetIdsToAdd,
-    delta.assetIdsToRemove,
+    [],
     userId
   )
+}
+
+export async function setDepartureOutgoingStatus(
+  departureNumber: string,
+  assetIds: number[],
+  outgoingStatus: OutgoingStatus,
+  userId: number
+): Promise<void> {
+  const departure = await prisma.departure.findUnique({
+    where: { departure_number: departureNumber },
+    select: { id: true }
+  })
+  if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+
+  const status = await prisma.status.findUniqueOrThrow({
+    where: { status: outgoingStatus },
+    select: { id: true }
+  })
+
+  await prisma.$transaction(async (tx) => {
+    const belonging = await tx.asset.count({
+      where: { id: { in: assetIds }, departure_id: departure.id }
+    })
+    if (belonging !== assetIds.length)
+      throw new ConflictError('Some assets do not belong to this departure')
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds }, departure_id: departure.id },
+      data: { status_id: status.id }
+    })
+  })
 }
 
 async function getNewDepartureNumber(originCode: string): Promise<string> {

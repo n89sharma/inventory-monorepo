@@ -8,6 +8,7 @@ import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { AddAssetBar } from '../../custom/add-asset-bar'
+import { DepartureOutgoingStatusToggle } from '../../custom/departure-outgoing-status-toggle'
 import { EditDepartureMetadataModal } from '../../modals/edit-departure-metadata-modal'
 import { CollectionDetailPage } from '../collection-detail-page'
 import { createDepartureAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -21,8 +22,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createDepartureAssetSummaryColumns(assetHref, asset => mutations.removeAsset(departureNumber, asset)),
-    [mutations, departureNumber],
+      createDepartureAssetSummaryColumns(assetHref),
+    [],
   )
 
   return (
@@ -36,8 +37,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
       refreshKey={departureDetailKey(departureNumber)}
       historyCacheKey={`departure-history:${departureNumber}`}
       historyFetcher={() => getDepartureHistory(departureNumber)}
-      onBulkRemove={assets => mutations.bulkRemoveAssets(departureNumber, assets)}
-      onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
       renderSummaryStrip={departure => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={departure => (
@@ -60,6 +59,14 @@ export function DepartureDetailsPage(): React.JSX.Element {
           entityName='departure'
           onAddSingle={asset => mutations.addAsset(departureNumber, asset)}
           onAddBatchFromHold={assets => mutations.addAssetBatch(departureNumber, assets)}
+        />
+      )}
+      renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
+        <DepartureOutgoingStatusToggle
+          onApply={status => {
+            mutations.setOutgoingStatus(departureNumber, selectedAssets.map(a => a.id), status)
+            clearSelection()
+          }}
         />
       )}
     />

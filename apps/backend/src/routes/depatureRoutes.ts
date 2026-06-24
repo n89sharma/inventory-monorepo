@@ -1,5 +1,5 @@
 import express from 'express'
-import { createDeparture, getDepartureDetail, getDepartureHistory, getDepartures, patchDepartureAssets, patchDepartureMetadata } from '../controllers/departureController.js'
+import { createDeparture, getDepartureDetail, getDepartureHistory, getDepartures, patchDepartureAssets, patchDepartureMetadata, setDepartureOutgoingStatus } from '../controllers/departureController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
 import { DepartureListQuerySchema, validateQuery } from '../middleware/validation.js'
@@ -13,6 +13,7 @@ router.post('/',                        requirePermission('create_update_departu
 router.get('/:departureNumber/history', requirePermission('view_collections'),          getDepartureHistory)
 router.get('/:departureNumber',         requirePermission('view_collections'),          getDepartureDetail)
 router.patch('/:departureNumber/assets',requirePermission('create_update_departure'),   patchDepartureAssets)
+router.patch('/:departureNumber/assets/outgoing-status', requirePermission('create_update_departure'), setDepartureOutgoingStatus)
 router.patch('/:departureNumber/metadata',requirePermission('create_update_departure'), patchDepartureMetadata)
 
 export default router

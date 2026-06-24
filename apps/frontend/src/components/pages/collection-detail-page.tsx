@@ -32,8 +32,8 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   refreshKey: string
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
-  onBulkRemove: (assets: AssetSummary[]) => void
-  onFlushPending: (collectionId: string) => void
+  onBulkRemove?: (assets: AssetSummary[]) => void
+  onFlushPending?: (collectionId: string) => void
   buildColumns: (assetHref: (asset: AssetSummary) => string) => ColumnDef<AssetSummary>[]
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
@@ -42,6 +42,10 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
     control: { open: boolean; onOpenChange: (open: boolean) => void },
   ) => React.ReactNode
   renderAddAssetBar?: (entity: TEntity) => React.ReactNode
+  renderBulkExtraActions?: (args: {
+    selectedAssets: AssetSummary[]
+    clearSelection: () => void
+  }) => React.ReactNode
   onRelease?: () => void
 }
 
@@ -63,6 +67,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderSubtitle,
   renderMetadataModal,
   renderAddAssetBar,
+  renderBulkExtraActions,
   onRelease,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state } = useLocation()
@@ -82,7 +87,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   }, [])
 
   useEffect(() => {
-    return () => onFlushPending(collectionId)
+    return () => onFlushPending?.(collectionId)
   }, [collectionId, onFlushPending])
 
   if (detail.isLoading) return <div role="status" aria-live="polite">Loading…</div>
@@ -139,6 +144,10 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             onSelectAll={() =>
               setRowSelection(Object.fromEntries(entity.assets.map(a => [a.barcode, true])))
             }
+            extraActions={renderBulkExtraActions?.({
+              selectedAssets,
+              clearSelection: () => setRowSelection({}),
+            })}
           />
         )}
         <DataTable
