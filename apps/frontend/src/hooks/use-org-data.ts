@@ -24,7 +24,7 @@ export function useOrgData() {
 
     getOrgs()
     return () => controller.abort()
-  }, [])
+  }, [setOrganizations])
 
   return { loading, error }
 }

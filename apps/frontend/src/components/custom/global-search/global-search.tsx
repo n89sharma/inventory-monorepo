@@ -50,7 +50,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
       if (firstWithResults) setActiveTab(firstWithResults)
     }, 150)
     return () => clearTimeout(t)
-  }, [query])
+  }, [query, searchGlobal])
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()

@@ -39,7 +39,7 @@ export function EditDepartureMetadataModal({
 
   useEffect(() => {
     if (open) form.reset(toFormValues(departure))
-  }, [open, departure])
+  }, [open, departure, form])
 
   async function onValid(values: DepartureMetadataForm) {
     setIsSubmitting(true)

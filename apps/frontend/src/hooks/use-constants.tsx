@@ -24,7 +24,7 @@ export function useReferenceData() {
 
     getReferenceData()
     return () => controller.abort()
-  }, [])
+  }, [setReferenceData])
 
   return { loading, error }
 }

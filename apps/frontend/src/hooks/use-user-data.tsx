@@ -24,7 +24,7 @@ export function useUserData() {
     }
     fetchUsers()
     return () => controller.abort()
-  }, [])
+  }, [setUsers])
 
   return { loading, error }
 }

@@ -25,7 +25,7 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
 
   useEffect(() => {
     if (open) form.reset(getDefaultValues())
-  }, [open])
+  }, [open, form])
 
   function getDefaultValues(): OrgForm {
     return {

@@ -34,7 +34,7 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
 
   useEffect(() => {
     if (open) form.reset(getDefaultValues())
-  }, [open])
+  }, [open, form])
 
   function getDefaultValues(): ModelForm {
     return {

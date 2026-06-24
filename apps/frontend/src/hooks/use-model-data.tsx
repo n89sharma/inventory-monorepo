@@ -24,7 +24,7 @@ export function useModelData() {
 
     getModels()
     return () => controller.abort()
-  }, [])
+  }, [setModels])
 
   return { loading, error }
 }

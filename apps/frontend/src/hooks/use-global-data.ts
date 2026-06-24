@@ -28,7 +28,7 @@ export function useGlobalData(enabled = false) {
         setIsReady(true)
       })
       .catch(err => setError(err))
-  }, [enabled])
+  }, [enabled, setModels, setOrganizations, setReferenceData, setUsers])
 
   return { isReady, error }
 }

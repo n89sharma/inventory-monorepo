@@ -39,7 +39,7 @@ export function EditTransferMetadataModal({
 
   useEffect(() => {
     if (open) form.reset(toFormValues(transfer))
-  }, [open, transfer])
+  }, [open, transfer, form])
 
   async function onValid(values: TransferMetadataForm) {
     setIsSubmitting(true)

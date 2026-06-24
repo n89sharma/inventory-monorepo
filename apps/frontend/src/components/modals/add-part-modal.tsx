@@ -94,7 +94,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
 
   useEffect(() => {
     if (open) form.reset()
-  }, [open])
+  }, [open, form])
 
   async function handleSave(data: CreateSalvagedPart) {
     if (data.donor_barcode === recipientBarcode) {

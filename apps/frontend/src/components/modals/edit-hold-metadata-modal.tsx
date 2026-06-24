@@ -39,7 +39,7 @@ export function EditHoldMetadataModal({
 
   useEffect(() => {
     if (open) form.reset(toFormValues(hold))
-  }, [open, hold])
+  }, [open, hold, form])
 
   async function onValid(values: HoldMetadataForm) {
     setIsSubmitting(true)

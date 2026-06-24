@@ -55,7 +55,7 @@ export function AddAssetByBarcode({
       setPopoverOpen(res.assets.length > 0)
     }, SUGGESTION_DEBOUNCE_MS)
     return () => clearTimeout(t)
-  }, [searchQuery])
+  }, [searchQuery, searchGlobal])
 
   async function addByBarcode(barcode: string) {
     setAssetError(null)

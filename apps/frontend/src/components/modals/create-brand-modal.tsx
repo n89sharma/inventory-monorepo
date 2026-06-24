@@ -25,7 +25,7 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
 
   useEffect(() => {
     if (open) form.reset({ name: '' })
-  }, [open])
+  }, [open, form])
 
   async function onValidSubmit(data: BrandForm) {
     try {

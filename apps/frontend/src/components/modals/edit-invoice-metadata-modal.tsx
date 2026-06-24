@@ -37,7 +37,7 @@ export function EditInvoiceMetadataModal({
 
   useEffect(() => {
     if (open) form.reset(toFormValues(invoice))
-  }, [open, invoice])
+  }, [open, invoice, form])
 
   async function onValid(values: InvoiceMetadataForm) {
     setIsSubmitting(true)
