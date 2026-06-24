@@ -31,7 +31,7 @@ import { useUserStore } from '@/data/store/user-store'
 import { formatTitleCase } from '@/lib/formatters'
 import { useUser } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AppRoles, type AppRole, type User } from 'shared-types'
 import { toast } from 'sonner'
 import { createUserPermissionTableColumns } from '../column-defs/user-permission-table-columns'
@@ -58,23 +58,23 @@ export function UserManagementPage() {
     (!showClerkOnly || u.clerk_id !== null)
   )
 
-  function handleEditRole(user: User) {
+  const handleEditRole = useCallback((user: User) => {
     setSelectedRole('')
     setEditRoleTarget(user)
-  }
+  }, [])
 
-  function handleDeactivate(user: User) {
+  const handleDeactivate = useCallback((user: User) => {
     setDeactivateTarget(user)
-  }
+  }, [])
 
-  async function handleReactivate(user: User) {
+  const handleReactivate = useCallback(async (user: User) => {
     try {
       await toggleUserActive(user.id, true)
       toast.success(`${user.name} reactivated.`, { position: 'top-center' })
     } catch {
       // apiErrorHandler already toasted
     }
-  }
+  }, [toggleUserActive])
 
   async function handleSaveRole() {
     if (!editRoleTarget || !selectedRole) return
@@ -102,7 +102,7 @@ export function UserManagementPage() {
 
   const columns = useMemo(
     () => createUserPermissionTableColumns(currentUserEmail, handleEditRole, handleDeactivate, handleReactivate),
-    [currentUserEmail, users],
+    [currentUserEmail, handleEditRole, handleDeactivate, handleReactivate],
   )
 
   return (

@@ -13,28 +13,31 @@ export function useAutoSearch(
   const callbackRef = useRef(onSearchSetData)
   callbackRef.current = onSearchSetData
 
+  const setSearchOptionsRef = useRef(setSearchOptions)
+  setSearchOptionsRef.current = setSearchOptions
+
   useEffect(() => {
-    if (!hasSearched) {
-      const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy } = setSearchOptions
+    if (hasSearched) return
 
-      const from = getSelectOption(subDays(new Date(), defaultDays))
-      const to = getSelectOption(new Date())
-      setFromDate(from)
-      setToDate(to)
+    const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy } = setSearchOptionsRef.current
 
-      if (setOrigin) setOrigin(ANY_OPTION)
-      if (setDestination) setDestination(ANY_OPTION)
-      if (setHoldBy) setHoldBy(ANY_OPTION)
-      if (setHoldFor) setHoldFor(ANY_OPTION)
+    const from = getSelectOption(subDays(new Date(), defaultDays))
+    const to = getSelectOption(new Date())
+    setFromDate(from)
+    setToDate(to)
 
-      callbackRef.current({
-        fromDate: getSelectOption(subDays(new Date(), defaultDays)),
-        toDate: getSelectOption(new Date()),
-        origin: ANY_OPTION,
-        destination: ANY_OPTION,
-        holdBy: ANY_OPTION,
-        holdFor: ANY_OPTION
-      })
-    }
-  }, [])
+    if (setOrigin) setOrigin(ANY_OPTION)
+    if (setDestination) setDestination(ANY_OPTION)
+    if (setHoldBy) setHoldBy(ANY_OPTION)
+    if (setHoldFor) setHoldFor(ANY_OPTION)
+
+    callbackRef.current({
+      fromDate: getSelectOption(subDays(new Date(), defaultDays)),
+      toDate: getSelectOption(new Date()),
+      origin: ANY_OPTION,
+      destination: ANY_OPTION,
+      holdBy: ANY_OPTION,
+      holdFor: ANY_OPTION
+    })
+  }, [hasSearched, defaultDays])
 }

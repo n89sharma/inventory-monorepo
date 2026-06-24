@@ -84,7 +84,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   useEffect(() => {
     const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
     if (payload) showEntityCreatedToast(payload)
-  }, [])
+  }, [state])
 
   useEffect(() => {
     return () => onFlushPending?.(collectionId)
