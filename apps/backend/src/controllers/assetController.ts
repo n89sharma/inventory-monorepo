@@ -1,6 +1,6 @@
 import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetsBySerialNumberRequestSchema, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import { ApiResponse, AssetsBySerialNumberRequestSchema, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, PrintBarcodesSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -23,6 +23,7 @@ import {
   getSoldAssets as getSoldAssetsSer
 } from '../services/assetReadService.js'
 import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
+import { generateBarcodePdf as generateBarcodePdfSer } from '../services/barcodePrintService.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   updateAssetPricing as updateAssetPricingSer
@@ -352,6 +353,15 @@ export const exportAssetReport = asyncHandler(async (req, res) => {
   res.setHeader('Content-Type', 'text/csv')
   res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
   res.send(csv)
+})
+
+export const printAssetBarcodes = asyncHandler(async (req, res) => {
+  const { barcodes } = PrintBarcodesSchema.parse(req.body)
+  const pdf = await generateBarcodePdfSer(barcodes)
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', `attachment; filename="barcodes-${timestamp}.pdf"`)
+  res.send(pdf)
 })
 
 export const getBarcodeSuggestions = asyncHandler(async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {

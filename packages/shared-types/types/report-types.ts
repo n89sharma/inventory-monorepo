@@ -25,3 +25,9 @@ export const ExportAssetsSchema = z.object({
 })
 
 export type ExportAssets = z.infer<typeof ExportAssetsSchema>
+
+export const PrintBarcodesSchema = z.object({
+  barcodes: z.array(z.string()).min(1).max(MAX_EXPORT_BARCODES),
+})
+
+export type PrintBarcodes = z.infer<typeof PrintBarcodesSchema>

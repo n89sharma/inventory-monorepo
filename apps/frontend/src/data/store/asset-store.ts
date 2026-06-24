@@ -2,6 +2,7 @@ import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingApi,
   createAssetHarvestedPart as createAssetHarvestedPartApi,
   exportAssets as exportAssetsApi,
+  printBarcodes as printBarcodesApi,
   getAssetDetail as getAssetDetailApi,
   getLocationsByWarehouse as getLocationsByWarehouseApi,
   postComment as postCommentApi,
@@ -50,6 +51,7 @@ interface AssetStore {
     variant?: ReportVariant,
     columnKeys?: string[],
   ) => Promise<void>
+  printBarcodes: (barcodes: string[], filename?: string) => Promise<void>
   bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
 
@@ -104,6 +106,8 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   exportAssets: (barcodes, filename, variant, columnKeys) =>
     exportAssetsApi(barcodes, filename, variant, columnKeys),
+
+  printBarcodes: (barcodes, filename) => printBarcodesApi(barcodes, filename),
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)

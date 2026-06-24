@@ -47,6 +47,7 @@ import {
   CreateCommentSchema,
   CreateSalvagedPartSchema,
   ExportAssetsSchema,
+  PrintBarcodesSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
   UpdateAssetPricingSchema,
@@ -181,6 +182,27 @@ export async function exportAssets(
   const disposition = response.headers['content-disposition'] as string | undefined
   const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
   const blob = new Blob([response.data], { type: 'text/csv' })
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = resolvedFilename
+  document.body.append(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
+export async function printBarcodes(barcodes: string[], filename?: string): Promise<void> {
+  const printBarcodesBody = PrintBarcodesSchema.parse(
+    { barcodes } satisfies z.input<typeof PrintBarcodesSchema>
+  )
+  const response = await api.post('/assets/barcodes/print', printBarcodesBody, {
+    responseType: 'blob',
+  })
+  const disposition = response.headers['content-disposition'] as string | undefined
+  const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'barcodes.pdf'
+  const blob = new Blob([response.data], { type: 'application/pdf' })
 
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

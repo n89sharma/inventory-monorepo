@@ -1,6 +1,6 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
-import { DotsThreeVerticalIcon, DownloadSimpleIcon, LockSimpleOpenIcon, PencilSimpleIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
+import { DotsThreeVerticalIcon, DownloadSimpleIcon, LockSimpleOpenIcon, PencilSimpleIcon, PrinterIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { useState } from "react"
 import { type AssetSummary, type CollectionHistory, type ReportVariant } from "shared-types"
 import { toast } from "sonner"
@@ -19,11 +19,14 @@ const SECTION_CONFIG = {
   invoices: { reportVariant: 'invoice_report' },
 } as const satisfies Record<string, { reportVariant: ReportVariant }>
 
+const BARCODE_PRINT_SECTION = 'arrivals'
+
 type CollectionEditBarProps = {
   section: keyof typeof SECTION_CONFIG
   collectionId: string
   canEdit: boolean
   assets?: AssetSummary[]
+  selectedAssets?: AssetSummary[]
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
@@ -35,6 +38,7 @@ export function CollectionEditBar({
   collectionId,
   canEdit,
   assets,
+  selectedAssets,
   historyCacheKey,
   historyFetcher,
   onEdit,
@@ -44,10 +48,13 @@ export function CollectionEditBar({
   const canDelete = useCan('delete_collection')
 
   const exportAssets = useAssetStore(state => state.exportAssets)
+  const printBarcodes = useAssetStore(state => state.printBarcodes)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
+  const [printLoading, setPrintLoading] = useState(false)
 
   const barcodes = assets?.map(a => a.barcode)
+  const printableBarcodes = (selectedAssets?.length ? selectedAssets : assets)?.map(a => a.barcode)
 
   async function handleExport() {
     if (!barcodes || barcodes.length === 0) return
@@ -69,7 +76,29 @@ export function CollectionEditBar({
     }
   }
 
+  async function handlePrint() {
+    if (!printableBarcodes || printableBarcodes.length === 0) return
+
+    if (printableBarcodes.length > 2000) {
+      toast.error(
+        `Cannot print ${printableBarcodes.length} barcodes. Please select 2000 assets or less`
+        , { position: 'top-center' })
+      return
+    }
+
+    setPrintLoading(true)
+    try {
+      await printBarcodes(printableBarcodes, `${section}-${collectionId}-barcodes.pdf`)
+    } catch {
+      toast.error('Failed to print barcodes', { position: 'top-center' })
+    } finally {
+      setPrintLoading(false)
+    }
+  }
+
   const exportDisabled = !barcodes || barcodes.length === 0 || exportLoading
+  const showPrint = section === BARCODE_PRINT_SECTION
+  const printDisabled = !printableBarcodes || printableBarcodes.length === 0 || printLoading
 
   const showRelease = canEdit && Boolean(onRelease)
   const showDelete = !onRelease && canDelete
@@ -89,6 +118,19 @@ export function CollectionEditBar({
           {exportLoading
             ? <SpinnerGapIcon className="animate-spin" />
             : <DownloadSimpleIcon />}
+        </Button>
+      )}
+      {showPrint && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrint}
+          disabled={printDisabled}
+          aria-label="Print barcodes"
+        >
+          {printLoading
+            ? <SpinnerGapIcon className="animate-spin" />
+            : <PrinterIcon />}
         </Button>
       )}
       {canEdit && (

@@ -105,6 +105,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             collectionId={collectionId}
             canEdit={canEdit}
             assets={entity.assets}
+            selectedAssets={selectedAssets}
             historyCacheKey={historyCacheKey}
             historyFetcher={historyFetcher}
             onEdit={() => setIsMetadataModalOpen(true)}
