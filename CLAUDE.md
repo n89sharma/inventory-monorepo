@@ -3,16 +3,18 @@
 Guidance for Claude Code when working in this repository.
 
 ## Tone
- Be direct and straightforward. 
- No cheerleading phrases like "that's absolutely right" or "great question." 
- Tell me when my ideas are flawed, incomplete, or poorly thought through. 
- Always be professional. Take the tone of a professional in an office.
- Focus on practical problems and realistic solutions rather than being overly positive or encouraging.
+
+Be direct and straightforward.
+No cheerleading phrases like "that's absolutely right" or "great question."
+Tell me when my ideas are flawed, incomplete, or poorly thought through.
+Always be professional. Take the tone of a professional in an office.
+Focus on practical problems and realistic solutions rather than being overly positive or encouraging.
 
 ## Project
 
 **Loon** — lightweight real-time inventory management for small businesses.
 TypeScript monorepo (npm workspaces):
+
 - `apps/backend` — Express REST API, Prisma + PostgreSQL
 - `apps/frontend` — React 19 SPA, Vite
 - `packages/shared-types` — Zod schemas + inferred types (single source of truth for entity shapes)
@@ -47,7 +49,7 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
   owns entity-specifics. If a helper needs a string key/enum to reconstruct typed objects (computed
   keys, `Pick<…, K>`, `as`), that's the smell — invert it and pass the literal.
 - **Rename as its own step.** When a refactor includes a naming change, do the rename first as a
-  standalone, behavior-preserving commit — verify it builds/works — *then* make functional changes.
+  standalone, behavior-preserving commit — verify it builds/works — _then_ make functional changes.
   Always present the rename as a separate step. Never mix renames with logic changes in one commit.
 
 ## Plan format
@@ -61,11 +63,13 @@ long section. Optimize for scannability.
 
 Run from the **repo root** after every code change; summarize and fix any errors before
 considering the task complete. **Lint first, then build** — never run a build before the linter:
+
 ```bash
 npm run tlint                    # lint shared-types (also run for any shared-types change)
 npm run blint && npm run bbuild  # backend: lint, then build
 npm run flint && npm run fbuild  # frontend: lint, then build (fbuild compiles shared-types first)
 ```
+
 **Under NO CIRCUMSTANCES** leave a code change without running the linter, and never build
 without linting first. Zero tolerance: **no errors and no warnings** may remain after a change —
 fix them (don't suppress) before the task is complete.
@@ -84,6 +88,7 @@ first — even for APIs you think you know, since versions drift:
 
 **Before recommending a NEW library** (not already in `package.json`) — applies to Claude and
 every sub-agent — verify in the current session and report:
+
 1. Not deprecated; no unpatched security advisories.
 2. Compatible with our installed peer/runtime versions (read `package.json` first).
 3. Last release within ~12 months (`https://registry.npmjs.org/<package>` → `time["<latest>"]`).
@@ -96,8 +101,9 @@ A stale or unverified recommendation is worse than none.
 
 ## Code style (all TS)
 
-- **Line length < 100.** Wrap signatures one param per line, return type on its own line;
-  wrap long object args (e.g. Prisma queries) when the single line exceeds 100.
+- **Formatting is owned by Prettier** (`.prettierrc`: no semicolons, single quotes, 100-col,
+  trailing commas). Run `npm run format`; a husky pre-commit hook formats staged files on commit.
+  Don't hand-format or fight the formatter — the rules below are _semantic_, not layout.
 - **Static values as top-of-file `const`** — never inline magic strings, event names, or
   defaults. One place to change. e.g. `const DEFAULT_ROLE = 'member'`.
 - **Constant maps:** `const X = {...} as const satisfies Record<...>` with **no variable

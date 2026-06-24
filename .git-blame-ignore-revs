@@ -1,0 +1,5 @@
+# Revisions listed here are skipped by `git blame` (bulk, non-semantic changes).
+# Enable locally once:  git config blame.ignoreRevsFile .git-blame-ignore-revs
+# (GitHub honours this file automatically.)
+
+# style: prettier baseline — append the commit SHA below after committing the reformat

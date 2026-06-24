@@ -14,6 +14,17 @@
     "bstart": "npm run start -w apps/backend",
     "tlint": "npm run lint -w packages/shared-types",
     "blint": "npm run lint -w apps/backend",
-    "flint": "npm run lint -w apps/frontend"
+    "flint": "npm run lint -w apps/frontend",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,css}": "prettier --write"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.4"
   }
 }
