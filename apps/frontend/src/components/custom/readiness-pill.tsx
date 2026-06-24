@@ -1,10 +1,8 @@
 import { cn } from '@/lib/utils'
-import { getReadinessIconConfig } from './readiness-icon'
+import { getReadinessIconConfig } from './readiness-config'
 
-export const readinessPillClasses = cn(
-  'inline-flex items-center gap-1 rounded-full border border-input bg-transparent',
-  'h-5 px-2 py-0.5 text-xs font-medium'
-)
+export const readinessPillClasses =
+  'inline-flex items-center gap-1 rounded-full border border-input bg-transparent h-5 px-2 py-0.5 text-xs font-medium'
 
 export function ReadinessPillContent({ status }: { status: string }) {
   const { Icon, className, weight, display } = getReadinessIconConfig(status)

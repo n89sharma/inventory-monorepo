@@ -1,8 +1,7 @@
+import type { BreadcrumbSegment } from '@/components/custom/breadcrumb-segments'
 import { CopyButton } from '@/components/custom/copy-button'
 import { PageBreadcrumbToTitle } from '@/components/custom/page-breadcrumb'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
-
-type BreadcrumbSegment = { label: string; href?: string }
 
 type StickyDetailsPageHeaderProps = {
   breadcrumbSegments: BreadcrumbSegment[]

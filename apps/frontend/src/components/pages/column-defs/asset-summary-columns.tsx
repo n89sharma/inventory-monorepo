@@ -4,10 +4,6 @@ import { Button } from "@/components/shadcn/button"
 import { formatLocation, formatThousandsK, formatTitleCase } from "@/lib/formatters"
 import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
 import type { AssetInvoiceSelector } from "@/components/custom/cards/invoice-summary-field"
-import {
-  selectPurchaseInvoiceNumber,
-  selectSalesInvoiceNumber
-} from "@/components/custom/cards/invoice-summary-field"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Link } from "react-router-dom"
 import type { AssetSummary } from 'shared-types'
@@ -153,7 +149,7 @@ export function createArrivalAssetSummaryColumns(
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
 
-  const invoiceColumn = createInvoiceColumn('purchase_invoice_number', selectPurchaseInvoiceNumber)
+  const invoiceColumn = createInvoiceColumn('purchase_invoice_number', a => a.purchase_invoice_number)
   return createAssetSummaryColumnsWithInvoice(invoiceColumn, getHref, onDelete, onEdit, disabledRowId)
 }
 
@@ -163,6 +159,6 @@ export function createDepartureAssetSummaryColumns(
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null): ColumnDef<AssetSummary>[] {
 
-  const invoiceColumn = createInvoiceColumn('sales_invoice_number', selectSalesInvoiceNumber)
+  const invoiceColumn = createInvoiceColumn('sales_invoice_number', a => a.sales_invoice_number)
   return createAssetSummaryColumnsWithInvoice(invoiceColumn, getHref, onDelete, onEdit, disabledRowId)
 }

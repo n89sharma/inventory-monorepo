@@ -1,5 +1,5 @@
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
-import { getReadinessDisplay } from './readiness-icon'
+import { getReadinessDisplay } from './readiness-config'
 import {
   EntryHeader,
   FieldDiffRow,

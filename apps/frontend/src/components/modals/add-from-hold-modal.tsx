@@ -4,10 +4,11 @@ import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
 import type { AssetSummary, HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
-import { EntityLink } from '@/lib/success-toast'
+import { EntityLink } from '@/components/custom/entity-link'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { DetailGrid, emptyResults, SearchView, type CollectionResults } from './collection-search'
+import { DetailGrid, SearchView } from './collection-search'
+import { emptyResults, type CollectionResults } from './collection-search-types'
 
 function holdDetailFields(h: HoldSuggestion): { label: string; value: string | null }[] {
   return [

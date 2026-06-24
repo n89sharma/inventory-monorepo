@@ -1,4 +1,4 @@
-import { getBreadcrumbForAssetSummary } from '@/components/custom/page-breadcrumb'
+import { getBreadcrumbForAssetSummary } from '@/components/custom/breadcrumb-segments'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'

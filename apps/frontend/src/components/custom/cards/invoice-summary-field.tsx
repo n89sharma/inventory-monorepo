@@ -6,9 +6,6 @@ export type AssetInvoiceSelector = (asset: AssetSummary) => string | null
 
 type InvoiceBucket = { invoice_number: string | null; count: number }
 
-export const selectPurchaseInvoiceNumber: AssetInvoiceSelector = a => a.purchase_invoice_number
-export const selectSalesInvoiceNumber: AssetInvoiceSelector = a => a.sales_invoice_number
-
 function groupAssetsByInvoice(
   assets: AssetSummary[],
   getInvoiceNumber: AssetInvoiceSelector

@@ -8,15 +8,17 @@ import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
-import { EntityLink, entityLabel, type LinkableEntity } from '@/lib/success-toast'
+import { EntityLink } from '@/components/custom/entity-link'
+import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/success-toast'
 import { mutate } from 'swr'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { DetailGrid, emptyResults, SearchView, type CollectionResults, type SelectedCollection } from './collection-search'
+import { DetailGrid, SearchView } from './collection-search'
+import { emptyResults, type CollectionResults, type SelectedCollection } from './collection-search-types'
 
 function collectionLabel(s: SelectedCollection): string {
   const { entity, id } = collectionRef(s)
-  return `${entityLabel(entity)} ${id}`
+  return `${ENTITY_CONFIG[entity].label} ${id}`
 }
 
 function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: string } {
@@ -199,7 +201,7 @@ export function AddToCollectionModal({
       const ref = collectionRef(selected)
       const msg = skipped > 0
         ? <>{added!} {assetNoun} added. {skipped} already present and skipped.</>
-        : <>{added!} {assetNoun} added to {entityLabel(ref.entity)} <EntityLink entity={ref.entity} id={ref.id} />.</>
+        : <>{added!} {assetNoun} added to {ENTITY_CONFIG[ref.entity].label} <EntityLink entity={ref.entity} id={ref.id} />.</>
       toast.success(msg, { position: 'top-center' })
       if (refreshKey) mutate(refreshKey)
       onConfirmSuccess()

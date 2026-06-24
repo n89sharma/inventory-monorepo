@@ -1,6 +1,6 @@
 import { formatHistoryTimestamp } from '@/lib/formatters';
 
-export function formatHistoryValue(value: unknown): string {
+function formatHistoryValue(value: unknown): string {
   if (value === null || value === undefined) return ''
   if (Array.isArray(value)) return (value as string[]).join(', ')
   return String(value)

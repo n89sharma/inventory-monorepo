@@ -1,28 +1,6 @@
-import type {
-  DepartureSuggestion,
-  HoldSuggestion,
-  InvoiceSuggestion,
-  TransferSuggestion,
-} from 'shared-types';
 import { Button } from '../shadcn/button';
 import { Input } from '../shadcn/input';
-
-export type SelectedCollection =
-  | { kind: 'departure'; data: DepartureSuggestion }
-  | { kind: 'transfer'; data: TransferSuggestion }
-  | { kind: 'hold'; data: HoldSuggestion }
-  | { kind: 'invoice'; data: InvoiceSuggestion }
-
-export type CollectionResults = {
-  departures: DepartureSuggestion[]
-  transfers: TransferSuggestion[]
-  holds: HoldSuggestion[]
-  invoices: InvoiceSuggestion[]
-}
-
-export const emptyResults: CollectionResults = {
-  departures: [], transfers: [], holds: [], invoices: [],
-}
+import type { CollectionResults, SelectedCollection } from './collection-search-types';
 
 function hasAnyResults(r: CollectionResults): boolean {
   return r.departures.length > 0 || r.transfers.length > 0 ||
