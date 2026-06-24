@@ -27,6 +27,29 @@ type SelectOptionsProps<T> = {
   className?: string
 }
 
+function getKeyFromEntity<T>(entity: T, getKey?: (entity: T) => string): string {
+  return getKey ? getKey(entity) : String((entity as { id: number }).id)
+}
+
+function getValueFromSelection<T>(
+  selection: SelectOption<T>,
+  getKey?: (entity: T) => string,
+): string {
+  if (isSelected(selection)) return getKeyFromEntity(selection.selected, getKey)
+  return selection.state
+}
+
+function getSelectionFromKey<T>(
+  key: string,
+  options: T[],
+  getKey?: (entity: T) => string,
+): SelectOption<T> {
+  if (key === 'ANY') return ANY_OPTION
+  const found = options.find(o => getKeyFromEntity(o, getKey) === key)
+  if (found) return getSelectOption(found)
+  return UNSELECTED
+}
+
 export function SelectOptions<T>({
   fieldLabel,
   selection,
@@ -38,26 +61,6 @@ export function SelectOptions<T>({
   fieldRequired,
   error,
   className }: SelectOptionsProps<T>): React.JSX.Element {
-
-  function getKeyFromEntity(entity: T): string {
-    return getKey ? getKey(entity) : String((entity as { id: number }).id)
-  }
-
-  function getValueFromSelection(selection: SelectOption<T>) {
-    if (isSelected(selection))
-      return getKeyFromEntity(selection.selected)
-    return selection.state
-  }
-
-  function getSelectionFromKey(key: string): SelectOption<T> {
-    if (key === 'ANY')
-      return ANY_OPTION
-    const found = options.find(o => getKeyFromEntity(o) === key)
-    if (found)
-      return getSelectOption(found)
-    return UNSELECTED
-  }
-
   return (
     <Field className={className} data-invalid={error}>
       <FieldLabel>
@@ -65,8 +68,8 @@ export function SelectOptions<T>({
         {fieldRequired && <span className="text-destructive">*</span>}
       </FieldLabel>
       <Select
-        value={getValueFromSelection(selection)}
-        onValueChange={key => onSelectionChange(getSelectionFromKey(key))}
+        value={getValueFromSelection(selection, getKey)}
+        onValueChange={key => onSelectionChange(getSelectionFromKey(key, options, getKey))}
       >
         <SelectTrigger aria-invalid={error}>
           <SelectValue />
@@ -75,7 +78,7 @@ export function SelectOptions<T>({
           <SelectGroup>
             {anyAllowed && <SelectItem key="ANY" value="ANY">Any</SelectItem>}
             {options?.map(o => (
-              <SelectItem key={getKeyFromEntity(o)} value={getKeyFromEntity(o)}>{getLabel(o)}</SelectItem>
+              <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>{getLabel(o)}</SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
@@ -95,25 +98,6 @@ export function SelectOptionsInline<T>({
   className,
 }: SelectOptionsProps<T>): React.JSX.Element {
 
-  function getKeyFromEntity(entity: T): string {
-    return getKey ? getKey(entity) : String((entity as { id: number }).id)
-  }
-
-  function getValueFromSelection(sel: SelectOption<T>) {
-    if (isSelected(sel))
-      return getKeyFromEntity(sel.selected)
-    return sel.state
-  }
-
-  function getSelectionFromKey(key: string): SelectOption<T> {
-    if (key === 'ANY')
-      return ANY_OPTION
-    const found = options.find(o => getKeyFromEntity(o) === key)
-    if (found)
-      return getSelectOption(found)
-    return UNSELECTED
-  }
-
   function getTriggerLabel() {
     if (isSelected(selection)) return `${fieldLabel}: ${getLabel(selection.selected)}`
     if (selection.state === 'ANY') return `${fieldLabel}: Any`
@@ -122,8 +106,8 @@ export function SelectOptionsInline<T>({
 
   return (
     <Select
-      value={getValueFromSelection(selection)}
-      onValueChange={key => onSelectionChange(getSelectionFromKey(key))}
+      value={getValueFromSelection(selection, getKey)}
+      onValueChange={key => onSelectionChange(getSelectionFromKey(key, options, getKey))}
     >
       <SelectTrigger className={cn("font-normal gap-2", className)}>
         {getTriggerLabel()}
@@ -132,7 +116,7 @@ export function SelectOptionsInline<T>({
         <SelectGroup>
           {anyAllowed && <SelectItem key="ANY" value="ANY">Any</SelectItem>}
           {options?.map(o => (
-            <SelectItem key={getKeyFromEntity(o)} value={getKeyFromEntity(o)}>{getLabel(o)}</SelectItem>
+            <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>{getLabel(o)}</SelectItem>
           ))}
         </SelectGroup>
       </SelectContent>

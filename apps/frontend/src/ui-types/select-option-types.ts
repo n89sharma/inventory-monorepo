@@ -26,14 +26,16 @@ export function getIdOrNullFromSelection(
   return null
 }
 
-export function getSelectedOrNull(selection: SelectOption<any>) {
+export function getSelectedOrNull<T>(selection: SelectOption<T>): T | null {
   if (selection.state === 'SELECTED') {
     return selection.selected
   }
   return null
 }
 
-export function isSelected(selection: SelectOption<any>) {
+// Return type intentionally left to inference so TypeScript derives a type
+// predicate (`selection is …SELECTED`), which call sites rely on for narrowing.
+export function isSelected<T>(selection: SelectOption<T>) {
   return selection.state === 'SELECTED'
 }
 

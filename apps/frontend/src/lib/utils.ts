@@ -6,6 +6,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+function collectArrayFieldErrors(
+  key: string,
+  value: unknown[],
+  excludeKeys: string[],
+  messages: string[]): void {
+  for (const [index, itemErrors] of value.entries()) {
+    if (!itemErrors) continue
+    for (const [fieldName, fieldError] of Object.entries(itemErrors)) {
+      if (excludeKeys.includes(fieldName)) continue
+      if (fieldError && typeof fieldError === 'object' && 'message' in fieldError && fieldError.message) {
+        messages.push(`${key}${index} ${fieldName}: ${fieldError.message}`)
+      }
+    }
+  }
+}
+
 export function flattenFieldErrors<T extends FieldValues>(
   errors: FieldErrors<T>,
   excludeKeys: string[] = []): string {
@@ -16,15 +32,7 @@ export function flattenFieldErrors<T extends FieldValues>(
     if (!value) continue
 
     if (Array.isArray(value)) {
-      for (const [index, itemErrors] of value.entries()) {
-        if (!itemErrors) continue
-        for (const [fieldName, fieldError] of Object.entries(itemErrors)) {
-          if (excludeKeys.includes(fieldName)) continue
-          if (fieldError && typeof fieldError === 'object' && 'message' in fieldError && fieldError.message) {
-            messages.push(`${key}${index} ${fieldName}: ${fieldError.message}`)
-          }
-        }
-      }
+      collectArrayFieldErrors(key, value, excludeKeys, messages)
     } else if (typeof value === 'object' && 'message' in value && value.message) {
       messages.push(String(value.message))
     }

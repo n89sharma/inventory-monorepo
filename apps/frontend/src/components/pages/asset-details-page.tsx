@@ -26,7 +26,7 @@ import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { isFromGlobalSearch } from '@/ui-types/navigation-context'
-import type { AssetHistory } from 'shared-types'
+import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
 
@@ -118,6 +118,121 @@ function RailField({ label, children }: { label: string; children: React.ReactNo
   )
 }
 
+type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
+
+function buildAssetLifecycle(
+  assetDetails: AssetDetails,
+  transfers: AssetTransfer[],
+): { populated: LifecycleItem[]; empty: string[] } {
+  const { hold, arrival, departure } = assetDetails
+  const populated: LifecycleItem[] = []
+  const empty: string[] = []
+
+  if (hold) {
+    populated.push({
+      key: 'hold',
+      date: hold.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Hold"
+            id={hold.hold_number}
+            idHref={`/holds/${hold.hold_number}`}
+            date={hold.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="For">{hold.created_for}</RailField>
+            <RailField label="By">{hold.created_by}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    empty.push('Hold')
+  }
+
+  if (arrival) {
+    populated.push({
+      key: 'arrival',
+      date: arrival.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Arrival"
+            id={arrival.arrival_number}
+            idHref={`/arrivals/${arrival.arrival_number}`}
+            date={arrival.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="Vendor">{arrival.origin}</RailField>
+            <RailField label="Warehouse">{arrival.destination_code}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    empty.push('Arrival')
+  }
+
+  if (transfers.length > 0) {
+    for (const t of transfers) {
+      populated.push({
+        key: `transfer-${t.transfer_number}`,
+        date: t.created_at,
+        node: (
+          <>
+            <RailCardHeader
+              entity="Transfer"
+              id={t.transfer_number}
+              idHref={`/transfers/${t.transfer_number}`}
+              date={t.created_at}
+            />
+            <div className="text-xs flex items-center gap-1">
+              <span>{t.source_code}</span>
+              <span className="text-muted-foreground">→</span>
+              <span>{t.destination_code}</span>
+            </div>
+          </>
+        ),
+      })
+    }
+  } else {
+    empty.push('Transfer')
+  }
+
+  if (departure) {
+    populated.push({
+      key: 'departure',
+      date: departure.created_at,
+      node: (
+        <>
+          <RailCardHeader
+            entity="Departure"
+            id={departure.departure_number}
+            idHref={`/departures/${departure.departure_number}`}
+            date={departure.created_at}
+          />
+          <div className="flex flex-col gap-2">
+            <RailField label="Warehouse">{departure.origin_code}</RailField>
+            <RailField label="Customer">{departure.destination}</RailField>
+          </div>
+        </>
+      ),
+    })
+  } else {
+    empty.push('Departure')
+  }
+
+  populated.sort((a, b) => {
+    if (a.date === null && b.date === null) return 0
+    if (a.date === null) return 1
+    if (b.date === null) return -1
+    return compareDesc(a.date, b.date)
+  })
+
+  return { populated, empty }
+}
+
 export const AssetDetailsPage = () => {
 
   const { section, collectionId, assetId, searchList } = useAssetDetailsParams()
@@ -151,114 +266,11 @@ export const AssetDetailsPage = () => {
   if (detailError) return <div>{detailError.message}</div>
   if (!assetDetails) return null
 
-  const { cost, hold, specs, arrival, departure } = assetDetails
+  const { cost, specs } = assetDetails
   const sortedComments = [...(comments ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
-  const populatedLifecycleItems: LifecycleItem[] = []
-  const emptyLifecycleEntities: string[] = []
-
-  if (hold) {
-    populatedLifecycleItems.push({
-      key: 'hold',
-      date: hold.created_at,
-      node: (
-        <>
-          <RailCardHeader
-            entity="Hold"
-            id={hold.hold_number}
-            idHref={`/holds/${hold.hold_number}`}
-            date={hold.created_at}
-          />
-          <div className="flex flex-col gap-2">
-            <RailField label="For">{hold.created_for}</RailField>
-            <RailField label="By">{hold.created_by}</RailField>
-          </div>
-        </>
-      ),
-    })
-  } else {
-    emptyLifecycleEntities.push('Hold')
-  }
-
-  if (arrival) {
-    populatedLifecycleItems.push({
-      key: 'arrival',
-      date: arrival.created_at,
-      node: (
-        <>
-          <RailCardHeader
-            entity="Arrival"
-            id={arrival.arrival_number}
-            idHref={`/arrivals/${arrival.arrival_number}`}
-            date={arrival.created_at}
-          />
-          <div className="flex flex-col gap-2">
-            <RailField label="Vendor">{arrival.origin}</RailField>
-            <RailField label="Warehouse">{arrival.destination_code}</RailField>
-          </div>
-        </>
-      ),
-    })
-  } else {
-    emptyLifecycleEntities.push('Arrival')
-  }
-
-  if (transfers.length > 0) {
-    for (const t of transfers) {
-      populatedLifecycleItems.push({
-        key: `transfer-${t.transfer_number}`,
-        date: t.created_at,
-        node: (
-          <>
-            <RailCardHeader
-              entity="Transfer"
-              id={t.transfer_number}
-              idHref={`/transfers/${t.transfer_number}`}
-              date={t.created_at}
-            />
-            <div className="text-xs flex items-center gap-1">
-              <span>{t.source_code}</span>
-              <span className="text-muted-foreground">→</span>
-              <span>{t.destination_code}</span>
-            </div>
-          </>
-        ),
-      })
-    }
-  } else {
-    emptyLifecycleEntities.push('Transfer')
-  }
-
-  if (departure) {
-    populatedLifecycleItems.push({
-      key: 'departure',
-      date: departure.created_at,
-      node: (
-        <>
-          <RailCardHeader
-            entity="Departure"
-            id={departure.departure_number}
-            idHref={`/departures/${departure.departure_number}`}
-            date={departure.created_at}
-          />
-          <div className="flex flex-col gap-2">
-            <RailField label="Warehouse">{departure.origin_code}</RailField>
-            <RailField label="Customer">{departure.destination}</RailField>
-          </div>
-        </>
-      ),
-    })
-  } else {
-    emptyLifecycleEntities.push('Departure')
-  }
-
-  populatedLifecycleItems.sort((a, b) => {
-    if (a.date === null && b.date === null) return 0
-    if (a.date === null) return 1
-    if (b.date === null) return -1
-    return compareDesc(a.date, b.date)
-  })
+  const { populated: populatedLifecycleItems, empty: emptyLifecycleEntities } =
+    buildAssetLifecycle(assetDetails, transfers)
 
   return (
     <>

@@ -117,6 +117,35 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
     setSaving(false)
   }
 
+  function renderBinField() {
+    if (fetchingLocations) {
+      return <div className="flex items-center gap-2 text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading bins…</div>
+    }
+    if (binLocations.length === 0) {
+      return <p className="text-muted-foreground">No bins available for this warehouse</p>
+    }
+    return (
+      <Field>
+        <FieldLabel>
+          Bin
+          <span className="text-destructive">*</span>
+        </FieldLabel>
+        <SearchSelectInput
+          selection={selectedBin}
+          query={binQuery}
+          onSelectionChange={loc => { setSelectedBin(loc); setBinQuery('') }}
+          onQueryChange={setBinQuery}
+          onClear={() => { setSelectedBin(null); setBinQuery('') }}
+          options={binLocations}
+          getLabel={l => l.bin}
+          sanitize={filterBinInput}
+          placeholder=""
+          clearLabel="Clear bin"
+        />
+      </Field>
+    )
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
@@ -168,30 +197,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
             </Select>
           </Field>
 
-          {isBinZone && (
-            fetchingLocations
-              ? <div className="flex items-center gap-2 text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading bins…</div>
-              : binLocations.length === 0
-                ? <p className="text-muted-foreground">No bins available for this warehouse</p>
-                : <Field>
-                    <FieldLabel>
-                      Bin
-                      <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <SearchSelectInput
-                      selection={selectedBin}
-                      query={binQuery}
-                      onSelectionChange={loc => { setSelectedBin(loc); setBinQuery('') }}
-                      onQueryChange={setBinQuery}
-                      onClear={() => { setSelectedBin(null); setBinQuery('') }}
-                      options={binLocations}
-                      getLabel={l => l.bin}
-                      sanitize={filterBinInput}
-                      placeholder=""
-                      clearLabel="Clear bin"
-                    />
-                  </Field>
-          )}
+          {isBinZone && renderBinField()}
         </div>
 
         <DialogFooter>

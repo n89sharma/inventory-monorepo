@@ -22,6 +22,12 @@ const ENTITY_LABEL: Record<string, string> = {
   invoices: 'Invoice',
 }
 
+function deriveSearchTitle(id: string | undefined, sub: string | undefined): string {
+  const view = id === 'instock' ? 'In Stock' : 'All'
+  if (sub) return `Asset ${sub} | ${view} | Search Assets | ${APP_NAME}`
+  return `${view} | Search Assets | ${APP_NAME}`
+}
+
 function deriveTitle(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean)
 
@@ -31,27 +37,11 @@ function deriveTitle(pathname: string): string {
   const sectionLabel = SECTION_LABEL[section]
   const entityLabel = ENTITY_LABEL[section]
 
-  // /search/all, /search/instock (+ /:assetId)
-  if (section === 'search') {
-    const view = id === 'instock' ? 'In Stock' : 'All'
-    return sub
-      ? `Asset ${sub} | ${view} | Search Assets | ${APP_NAME}`
-      : `${view} | Search Assets | ${APP_NAME}`
-  }
-
-  // /section/:id/edit
+  if (section === 'search') return deriveSearchTitle(id, sub)
   if (sub === 'edit') return sectionLabel ? `Edit ${id} | ${sectionLabel} | ${APP_NAME}` : APP_NAME
-
-  // /:section/:collectionId/:assetId
   if (sub) return `Asset ${sub} | ${id} | ${APP_NAME}`
-
-  // /section/new
   if (id === 'new') return entityLabel ? `New ${entityLabel} | ${APP_NAME}` : APP_NAME
-
-  // /section/:id
   if (id) return sectionLabel ? `${id} | ${sectionLabel} | ${APP_NAME}` : `${id} | ${APP_NAME}`
-
-  // /section
   return sectionLabel ? `${sectionLabel} | ${APP_NAME}` : APP_NAME
 }
 

@@ -47,9 +47,9 @@ export function DatePickerField({
         <PopoverContent className="w-auto p-1" align="start">
           <Calendar
             mode="single"
-            selected={getSelectedOrNull(date)}
+            selected={getSelectedOrNull(date) ?? undefined}
             onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
-            defaultMonth={getSelectedOrNull(date)}
+            defaultMonth={getSelectedOrNull(date) ?? undefined}
             disabled={disabled}
             startMonth={startMonth}
             endMonth={endMonth}
@@ -87,9 +87,9 @@ export function DatePickerFieldInline({
       <PopoverContent className="w-auto p-1" align="start">
         <Calendar
           mode="single"
-          selected={getSelectedOrNull(date)}
+          selected={getSelectedOrNull(date) ?? undefined}
           onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
-          defaultMonth={getSelectedOrNull(date)}
+          defaultMonth={getSelectedOrNull(date) ?? undefined}
           disabled={disabled}
           startMonth={startMonth}
           endMonth={endMonth}
