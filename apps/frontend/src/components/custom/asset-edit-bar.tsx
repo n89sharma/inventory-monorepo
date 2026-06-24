@@ -1,8 +1,10 @@
+import { useAssetStore } from "@/data/store/asset-store"
 import { useAssetDetail } from "@/hooks/use-asset-detail"
 import { useCan } from "@/hooks/use-can"
-import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
+import { DotsThreeVerticalIcon, PencilSimpleIcon, PrinterIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
 import { Fragment, useState } from "react"
 import { assetDetailsToSummary, type Permission } from "shared-types"
+import { toast } from "sonner"
 import { AddPartModal } from "../modals/add-part-modal"
 import { AddToCollectionModal } from "../modals/add-to-collection-modal"
 import { EditErrorsModal } from "../modals/edit-errors-modal"
@@ -41,8 +43,22 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [addHarvestedPartOpen, setAddHarvestedPartOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
+  const printBarcodes = useAssetStore(state => state.printBarcodes)
+  const [printLoading, setPrintLoading] = useState(false)
+
   const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails) : null
   const can = useCan()
+
+  async function handlePrint() {
+    setPrintLoading(true)
+    try {
+      await printBarcodes([barcode], `${barcode}-barcode.pdf`)
+    } catch {
+      toast.error('Failed to print barcode', { position: 'top-center' })
+    } finally {
+      setPrintLoading(false)
+    }
+  }
 
   const canEditPrice = can('edit_prices')
   const canEditSpecs = can('edit_tech_specs')
@@ -72,6 +88,17 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   return (
     <div className="flex gap-2">
       <ShareButton />
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={handlePrint}
+        disabled={printLoading}
+        aria-label="Print barcode"
+      >
+        {printLoading
+          ? <SpinnerGapIcon className="animate-spin" />
+          : <PrinterIcon />}
+      </Button>
       {showEditMenu &&
         <DropdownMenu>
           <Button asChild>
