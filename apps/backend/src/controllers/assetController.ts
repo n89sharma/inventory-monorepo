@@ -72,7 +72,7 @@ const toNumberArray = (val: unknown) => {
 export const AssetQuerySchema = z.object({
   model: z
     .string()
-    .min(4)
+    .min(3)
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
@@ -149,7 +149,7 @@ export const getAssets = asyncHandler(async (req, res) => {
 export const SoldAssetQuerySchema = z.object({
   model: z
     .string()
-    .min(4)
+    .min(3)
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
@@ -221,7 +221,7 @@ export const SearchInStockQuerySchema = z.object({
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   model: z
     .string()
-    .min(4)
+    .min(3)
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
@@ -267,7 +267,7 @@ export const SearchHeldQuerySchema = z.object({
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   model: z
     .string()
-    .min(4)
+    .min(3)
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),

@@ -1,6 +1,6 @@
 import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
-export const MIN_MODEL_INPUT_QUERY_LENGTH = 4
+export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 
 const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
