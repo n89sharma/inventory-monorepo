@@ -38,8 +38,9 @@ export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetSummary): vo
 
   mutate<HasAssets>(
     spec.detailCacheKey,
-    current => current ? { ...current, assets: current.assets.filter(a => a.id !== asset.id) } : current,
-    { revalidate: false }
+    (current) =>
+      current ? { ...current, assets: current.assets.filter((a) => a.id !== asset.id) } : current,
+    { revalidate: false },
   )
 
   const commit = async () => {
@@ -53,27 +54,30 @@ export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetSummary): vo
     }
   }
 
-  const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+  const timer = setTimeout(() => {
+    void commit()
+  }, UNDO_WINDOW_MS)
   pendingRemovals.set(key, { timer, commit })
 
   toast.success(`Asset ${asset.barcode} removed`, {
     position: 'top-center',
     duration: UNDO_WINDOW_MS,
-    action: { label: 'Undo', onClick: buildUndo(key, spec.detailCacheKey) }
+    action: { label: 'Undo', onClick: buildUndo(key, spec.detailCacheKey) },
   })
 }
 
 export function scheduleBulkAssetRemoval(spec: RemovalSpec, assets: AssetSummary[]): void {
   if (assets.length === 0) return
-  const ids = assets.map(a => a.id)
+  const ids = assets.map((a) => a.id)
   const idSet = new Set(ids)
-  const barcodes = assets.map(a => a.barcode)
+  const barcodes = assets.map((a) => a.barcode)
   const key = makeKey(spec.collectionId, `bulk:${Date.now()}`)
 
   mutate<HasAssets>(
     spec.detailCacheKey,
-    current => current ? { ...current, assets: current.assets.filter(a => !idSet.has(a.id)) } : current,
-    { revalidate: false }
+    (current) =>
+      current ? { ...current, assets: current.assets.filter((a) => !idSet.has(a.id)) } : current,
+    { revalidate: false },
   )
 
   const commit = async () => {
@@ -87,14 +91,16 @@ export function scheduleBulkAssetRemoval(spec: RemovalSpec, assets: AssetSummary
     }
   }
 
-  const timer = setTimeout(() => { void commit() }, UNDO_WINDOW_MS)
+  const timer = setTimeout(() => {
+    void commit()
+  }, UNDO_WINDOW_MS)
   pendingRemovals.set(key, { timer, commit })
 
   const label = assets.length === 1 ? 'Removed 1 asset' : `Removed ${assets.length} assets`
   toast.success(label, {
     position: 'top-center',
     duration: UNDO_WINDOW_MS,
-    action: { label: 'Undo', onClick: buildUndo(key, spec.detailCacheKey) }
+    action: { label: 'Undo', onClick: buildUndo(key, spec.detailCacheKey) },
   })
 }
 

@@ -13,7 +13,10 @@ export function DepartureSummaryStrip({ departure }: { departure: DepartureDetai
       {departure.notes && <SummaryField label="Note" value={departure.notes} />}
       <AssetCompositionField assets={departure.assets} />
       <AssetTotalsField assets={departure.assets} />
-      <InvoiceSummaryField assets={departure.assets} getInvoiceNumber={a => a.sales_invoice_number} />
+      <InvoiceSummaryField
+        assets={departure.assets}
+        getInvoiceNumber={(a) => a.sales_invoice_number}
+      />
     </div>
   )
 }

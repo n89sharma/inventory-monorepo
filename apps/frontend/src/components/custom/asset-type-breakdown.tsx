@@ -1,4 +1,4 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import type { CollectionSummarySchema } from 'shared-types'
 
 const ASSET_TYPE_LABELS = {
@@ -22,9 +22,7 @@ export function AssetTypeBreakdown({
     <Tooltip>
       <TooltipTrigger asChild>
         <span className="inline-block cursor-default tabular-nums">
-          <span className={copiers > 0 ? "font-medium" : "text-muted-foreground"}>
-            {copiers}
-          </span>
+          <span className={copiers > 0 ? 'font-medium' : 'text-muted-foreground'}>{copiers}</span>
           <span className="text-muted-foreground"> / {total}</span>
         </span>
       </TooltipTrigger>

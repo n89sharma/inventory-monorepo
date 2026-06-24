@@ -13,11 +13,12 @@ export async function getLocationsByWarehouse(warehouseId: number): Promise<Asse
 export async function updateAssetLocation(
   barcode: string,
   data: UpdateAssetLocation,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const { assetId, beforeLocationId, afterLocationId } = await prisma.$transaction(async (tx) => {
     const asset = await tx.asset.findUnique({
-      where: { barcode }, select: { id: true, location_id: true }
+      where: { barcode },
+      select: { id: true, location_id: true },
     })
     if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
@@ -25,7 +26,8 @@ export async function updateAssetLocation(
     if (!zone) throw new NotFoundError('Zone not found')
 
     const warehouse = await tx.warehouse.findUnique({
-      where: { id: data.warehouse_id }, select: { id: true }
+      where: { id: data.warehouse_id },
+      select: { id: true },
     })
     if (!warehouse) throw new NotFoundError('Warehouse not found')
 
@@ -36,11 +38,11 @@ export async function updateAssetLocation(
         warehouse_id_zone_id_bin: {
           warehouse_id: data.warehouse_id,
           zone_id: data.zone_id,
-          bin
-        }
+          bin,
+        },
       },
       create: { warehouse_id: data.warehouse_id, zone_id: data.zone_id, bin },
-      update: {}
+      update: {},
     })
 
     await tx.asset.update({ where: { barcode }, data: { location_id: location.id } })
@@ -48,5 +50,10 @@ export async function updateAssetLocation(
     return { assetId: asset.id, beforeLocationId: asset.location_id, afterLocationId: location.id }
   })
 
-  await recordAssetUpdate(assetId, { location_id: beforeLocationId }, { location_id: afterLocationId }, userId)
+  await recordAssetUpdate(
+    assetId,
+    { location_id: beforeLocationId },
+    { location_id: afterLocationId },
+    userId,
+  )
 }

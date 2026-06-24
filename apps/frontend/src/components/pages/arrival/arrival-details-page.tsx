@@ -53,8 +53,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     (assetHref: (asset: AssetSummary) => string) =>
       createArrivalAssetSummaryColumns(
         assetHref,
-        asset => mutations.removeAsset(arrivalNumber, asset),
-        canEditArrival ? asset => handleEditAsset(asset.id) : undefined,
+        (asset) => mutations.removeAsset(arrivalNumber, asset),
+        canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
         editingAssetId,
       ),
     [mutations, arrivalNumber, canEditArrival, editingAssetId, handleEditAsset],
@@ -71,11 +71,11 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       refreshKey={arrivalDetailKey(arrivalNumber)}
       historyCacheKey={`arrival-history:${arrivalNumber}`}
       historyFetcher={() => getArrivalHistory(arrivalNumber)}
-      onBulkRemove={assets => mutations.bulkRemoveAssets(arrivalNumber, assets)}
+      onBulkRemove={(assets) => mutations.bulkRemoveAssets(arrivalNumber, assets)}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
-      renderSummaryStrip={arrival => <ArrivalSummaryStrip arrival={arrival} />}
-      renderSubtitle={arrival => (
+      renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
+      renderSubtitle={(arrival) => (
         <>
           <SummaryField label="Vendor" value={arrival.vendor.name} />
           <SummaryField label="Arrived" value={formatDate(arrival.created_at)} />
@@ -86,7 +86,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
           open={control.open}
           onOpenChange={control.onOpenChange}
           arrival={arrival}
-          onSave={metadata => mutations.updateMetadata(arrivalNumber, metadata)}
+          onSave={(metadata) => mutations.updateMetadata(arrivalNumber, metadata)}
         />
       )}
       renderAddAssetBar={() => (
@@ -96,8 +96,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             open={isAssetModalOpen}
             onOpenChange={handleModalOpenChange}
             editingAsset={editingAssetForm}
-            onCreateAsset={asset => mutations.createAsset(arrivalNumber, asset)}
-            onUpdateAsset={asset => mutations.updateAsset(arrivalNumber, editingAssetId!, asset)}
+            onCreateAsset={(asset) => mutations.createAsset(arrivalNumber, asset)}
+            onUpdateAsset={(asset) => mutations.updateAsset(arrivalNumber, editingAssetId!, asset)}
           />
         </>
       )}

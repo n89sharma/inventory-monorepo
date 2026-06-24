@@ -19,17 +19,15 @@ export type HoldsReportRow = {
   subRows?: HoldsReportRow[]
 }
 
-export function toHoldsReportRows(
-  salespeople: SalespersonHoldsGroup[],
-): HoldsReportRow[] {
-  return salespeople.map(rep => ({
+export function toHoldsReportRows(salespeople: SalespersonHoldsGroup[]): HoldsReportRow[] {
+  return salespeople.map((rep) => ({
     rowId: `rep-${rep.salesRepId}`,
     label: rep.salesRepName,
     assetCount: rep.assetCount,
     holdCount: rep.holdCount,
     medianHeldDays: rep.medianHeldDays,
     href: buildSearchHeldUrl({ heldForId: rep.salesRepId }),
-    subRows: rep.customers.map(customer => ({
+    subRows: rep.customers.map((customer) => ({
       rowId: `rep-${rep.salesRepId}-customer-${customer.customerId}`,
       label: formatTitleCase(customer.customerName),
       assetCount: customer.assetCount,
@@ -53,22 +51,20 @@ function LabelCell({ row }: { row: Row<HoldsReportRow> }): React.JSX.Element {
       className="flex min-w-0 items-center gap-1"
       style={{ paddingLeft: `${row.depth * INDENT_PER_DEPTH_REM}rem` }}
     >
-      {row.getCanExpand()
-        ? (
-          <button
-            type="button"
-            onClick={row.getToggleExpandedHandler()}
-            aria-label={row.getIsExpanded() ? 'Collapse' : 'Expand'}
-            aria-expanded={row.getIsExpanded()}
-            className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted"
-          >
-            <CaretRightIcon
-              className={cn('transition-transform', row.getIsExpanded() && 'rotate-90')}
-              aria-hidden="true"
-            />
-          </button>
-        )
-        : null}
+      {row.getCanExpand() ? (
+        <button
+          type="button"
+          onClick={row.getToggleExpandedHandler()}
+          aria-label={row.getIsExpanded() ? 'Collapse' : 'Expand'}
+          aria-expanded={row.getIsExpanded()}
+          className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted"
+        >
+          <CaretRightIcon
+            className={cn('transition-transform', row.getIsExpanded() && 'rotate-90')}
+            aria-hidden="true"
+          />
+        </button>
+      ) : null}
       <Link
         to={row.original.href}
         className={cn('truncate hover:underline', row.depth === 0 && 'font-medium')}

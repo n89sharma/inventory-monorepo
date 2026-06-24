@@ -31,11 +31,6 @@
       "Bash(npx eslint *)"
     ]
   },
-  "enabledMcpjsonServers": [
-    "clerk",
-    "context7",
-    "vercel",
-    "chrome-devtools"
-  ],
+  "enabledMcpjsonServers": ["clerk", "context7", "vercel", "chrome-devtools"],
   "outputStyle": "default"
 }

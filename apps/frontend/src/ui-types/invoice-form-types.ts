@@ -8,10 +8,13 @@ const InvoiceTypeSelectOptionSchema = SelectOptionSchema(InvoiceTypeZod)
 
 export const InvoiceFormSchema = z.object({
   invoice_reference: z.string().min(1, 'Invoice reference is required'),
-  organization: OrgSummarySchema.nullable().refine(val => !!val, 'Organization is required'),
-  invoice_type: InvoiceTypeSelectOptionSchema.refine(val => isSelected(val), 'Invoice type is required'),
+  organization: OrgSummarySchema.nullable().refine((val) => !!val, 'Organization is required'),
+  invoice_type: InvoiceTypeSelectOptionSchema.refine(
+    (val) => isSelected(val),
+    'Invoice type is required',
+  ),
   is_cleared: z.boolean(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice')
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice'),
 })
 
 export type InvoiceForm = {
@@ -23,8 +26,8 @@ export type InvoiceForm = {
 }
 
 export const InvoiceMetadataFormSchema = z.object({
-  organization: OrgSummarySchema.nullable().refine(val => !!val, 'Organization is required'),
-  is_cleared: z.boolean()
+  organization: OrgSummarySchema.nullable().refine((val) => !!val, 'Organization is required'),
+  is_cleared: z.boolean(),
 })
 
 export type InvoiceMetadataForm = {

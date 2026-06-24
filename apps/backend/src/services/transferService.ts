@@ -4,18 +4,20 @@ import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordAssetUpdateOnCollection, recordTransferCreate, recordTransferUpdate } from './historyService.js'
+import {
+  recordAssetUpdateOnCollection,
+  recordTransferCreate,
+  recordTransferUpdate,
+} from './historyService.js'
 import { prisma } from '../prisma.js'
-
-
 
 export async function getTransfer(transferNumber: string): Promise<TransferDetail> {
   const [transfer, assets] = await Promise.all([
     prisma.transfer.findUnique({
       where: { transfer_number: transferNumber },
-      include: { origin: true, destination: true, transporter: true, created_by: true }
+      include: { origin: true, destination: true, transporter: true, created_by: true },
     }),
-    prisma.$queryRawTyped(getAssetsForTransfers(transferNumber))
+    prisma.$queryRawTyped(getAssetsForTransfers(transferNumber)),
   ])
   if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
   return {
@@ -26,7 +28,7 @@ export async function getTransfer(transferNumber: string): Promise<TransferDetai
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets: assets.map(mapAssetSummary)
+    assets: assets.map(mapAssetSummary),
   }
 }
 
@@ -45,19 +47,29 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
       notes: transfer.comment,
       created_at: currentDateTime,
       asset_transfers: {
-        create: transfer.assets.map(a => ({ asset_id: a.id }))
-      }
-    }
+        create: transfer.assets.map((a) => ({ asset_id: a.id })),
+      },
+    },
   })
 
-  await recordTransferCreate(newTransfer.id, {
-    transfer_number: transferNumber,
-    origin_id: transfer.origin.id,
-    destination_id: transfer.destination.id,
-    created_at: currentDateTime
-  }, userId)
+  await recordTransferCreate(
+    newTransfer.id,
+    {
+      transfer_number: transferNumber,
+      origin_id: transfer.origin.id,
+      destination_id: transfer.destination.id,
+      created_at: currentDateTime,
+    },
+    userId,
+  )
 
-  await recordAssetUpdateOnCollection('Transfer', newTransfer.id, transfer.assets.map(a => a.id), [], userId)
+  await recordAssetUpdateOnCollection(
+    'Transfer',
+    newTransfer.id,
+    transfer.assets.map((a) => a.id),
+    [],
+    userId,
+  )
 
   return transferNumber
 }
@@ -65,11 +77,11 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
 export async function patchTransferMetadata(
   transferNumber: string,
   metadata: UpdateTransferMetadata,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const current = await prisma.transfer.findUnique({
     where: { transfer_number: transferNumber },
-    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true }
+    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true },
   })
   if (!current) throw new NotFoundError(`Transfer ${transferNumber} not found`)
 
@@ -79,29 +91,34 @@ export async function patchTransferMetadata(
       origin_id: metadata.origin.id,
       destination_id: metadata.destination.id,
       transporter_id: metadata.transporter.id,
-      notes: metadata.comment
-    }
+      notes: metadata.comment,
+    },
   })
 
-  await recordTransferUpdate(current.id, {
-    origin_id: current.origin_id,
-    destination_id: current.destination_id,
-    transporter_id: current.transporter_id
-  }, {
-    origin_id: metadata.origin.id,
-    destination_id: metadata.destination.id,
-    transporter_id: metadata.transporter.id
-  }, userId)
+  await recordTransferUpdate(
+    current.id,
+    {
+      origin_id: current.origin_id,
+      destination_id: current.destination_id,
+      transporter_id: current.transporter_id,
+    },
+    {
+      origin_id: metadata.origin.id,
+      destination_id: metadata.destination.id,
+      transporter_id: metadata.transporter.id,
+    },
+    userId,
+  )
 }
 
 export async function patchTransferAssets(
   transferNumber: string,
   delta: AssetDelta,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const transfer = await prisma.transfer.findUnique({
     where: { transfer_number: transferNumber },
-    select: { id: true }
+    select: { id: true },
   })
   if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
 
@@ -114,7 +131,7 @@ export async function patchTransferAssets(
     transfer.id,
     delta.assetIdsToAdd,
     delta.assetIdsToRemove,
-    userId
+    userId,
   )
 }
 
@@ -122,17 +139,17 @@ async function applyTransferAssetDelta(
   tx: Prisma.TransactionClient,
   transferId: number,
   assetIdsToAdd: number[],
-  assetIdsToRemove: number[]
+  assetIdsToRemove: number[],
 ): Promise<void> {
   if (assetIdsToRemove.length > 0) {
     await tx.assetTransfer.deleteMany({
-      where: { transfer_id: transferId, asset_id: { in: assetIdsToRemove } }
+      where: { transfer_id: transferId, asset_id: { in: assetIdsToRemove } },
     })
   }
 
   if (assetIdsToAdd.length > 0) {
     await tx.assetTransfer.createMany({
-      data: assetIdsToAdd.map(assetId => ({ transfer_id: transferId, asset_id: assetId }))
+      data: assetIdsToAdd.map((assetId) => ({ transfer_id: transferId, asset_id: assetId })),
     })
   }
 }

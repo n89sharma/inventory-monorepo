@@ -18,7 +18,7 @@ export function ModelFilter({
   onClear: () => void
   placeholder?: string
 }): React.JSX.Element {
-  const models = useModelStore(state => state.models)
+  const models = useModelStore((state) => state.models)
   return (
     <SearchSelectInput
       selection={selection}
@@ -29,8 +29,8 @@ export function ModelFilter({
       options={models}
       getLabel={modelLabel}
       placeholder={placeholder}
-      clearLabel='Clear model'
-      className='w-35'
+      clearLabel="Clear model"
+      className="w-35"
     />
   )
 }

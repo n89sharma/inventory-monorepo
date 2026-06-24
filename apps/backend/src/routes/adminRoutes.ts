@@ -8,6 +8,6 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.put('/users/:userId/role', requirePermission('assign_roles'), setUserRole)
-router.patch('/users/:userId',    requirePermission('manage_users'), toggleUserActive)
+router.patch('/users/:userId', requirePermission('manage_users'), toggleUserActive)
 
 export default router

@@ -10,14 +10,21 @@ import { useNavigate } from 'react-router-dom'
 import type { GlobalSearchResult } from 'shared-types'
 import { SearchPopoverContent, type FlatResult } from './search-popover-content'
 
-const emptyResults: GlobalSearchResult = { assets: [], arrivals: [], departures: [], transfers: [], holds: [], invoices: [] }
+const emptyResults: GlobalSearchResult = {
+  assets: [],
+  arrivals: [],
+  departures: [],
+  transfers: [],
+  holds: [],
+  invoices: [],
+}
 
 const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoices'] as const
-type Tab = typeof tabs[number]
+type Tab = (typeof tabs)[number]
 
 export const GlobalSearch = ({ className }: { className?: string }) => {
-  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
-  const [query, setQuery] = useState("")
+  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
+  const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<GlobalSearchResult>(emptyResults)
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -26,7 +33,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
-  const hasResults = tabs.some(tab => results[tab].length > 0)
+  const hasResults = tabs.some((tab) => results[tab].length > 0)
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -46,7 +53,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
       const res = await searchGlobal(query)
       setResults(res)
       setIsLoading(false)
-      const firstWithResults = tabs.find(tab => res[tab].length > 0)
+      const firstWithResults = tabs.find((tab) => res[tab].length > 0)
       if (firstWithResults) setActiveTab(firstWithResults)
     }, 150)
     return () => clearTimeout(t)
@@ -67,7 +74,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
 
   function navigateTo(item: FlatResult) {
     setPopoverOpen(false)
-    setQuery("")
+    setQuery('')
     if (item.kind === 'asset') {
       navigate(`/search/all/${item.data.barcode}`, { state: FROM_GLOBAL_SEARCH_STATE })
     } else if (item.kind === 'arrival') {
@@ -84,7 +91,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   }
 
   function clearSearch() {
-    setQuery("")
+    setQuery('')
     setPopoverOpen(false)
     setIsLoading(false)
     setResults(emptyResults)
@@ -101,9 +108,11 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   }
 
   return (
-    <div className={cn("flex flex-row gap-2", className)}>
+    <div className={cn('flex flex-row gap-2', className)}>
       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger asChild><div /></PopoverTrigger>
+        <PopoverTrigger asChild>
+          <div />
+        </PopoverTrigger>
         <PopoverAnchor asChild>
           <div className="relative w-96">
             <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
@@ -129,16 +138,20 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
               </button>
             ) : (
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
-                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">Ctrl</kbd>
-                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">K</kbd>
+                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
+                  Ctrl
+                </kbd>
+                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
+                  K
+                </kbd>
               </div>
             )}
           </div>
         </PopoverAnchor>
         <PopoverContent
           align="start"
-          onOpenAutoFocus={e => e.preventDefault()}
-          onCloseAutoFocus={e => e.preventDefault()}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
           className="w-[--radix-popover-anchor-width] min-w-100"
         >
           <SearchPopoverContent
@@ -146,7 +159,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
             hasResults={hasResults}
             results={results}
             activeTab={activeTab}
-            onTabChange={tab => setActiveTab(tab as Tab)}
+            onTabChange={(tab) => setActiveTab(tab as Tab)}
             onSelect={navigateTo}
             onHover={handlePrefetch}
           />

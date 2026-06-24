@@ -9,26 +9,26 @@ export const CollectionHistoryRecordSchema = z.discriminatedUnion('action_type',
   z.object({
     action_type: z.literal('CREATE'),
     ...RecordBase,
-    changes: z.record(z.string(), z.unknown())
+    changes: z.record(z.string(), z.unknown()),
   }),
   z.object({
     action_type: z.literal('UPDATE'),
     ...RecordBase,
     changes: z.object({
       before: z.record(z.string(), z.unknown()),
-      after: z.record(z.string(), z.unknown())
-    })
+      after: z.record(z.string(), z.unknown()),
+    }),
   }),
   z.object({
     action_type: z.literal('ASSETS_ADDED'),
     ...RecordBase,
-    changes: z.object({ barcodes: z.array(z.string()) })
+    changes: z.object({ barcodes: z.array(z.string()) }),
   }),
   z.object({
     action_type: z.literal('ASSETS_REMOVED'),
     ...RecordBase,
-    changes: z.object({ barcodes: z.array(z.string()) })
-  })
+    changes: z.object({ barcodes: z.array(z.string()) }),
+  }),
 ])
 
 export const CollectionHistorySchema = z.array(CollectionHistoryRecordSchema)

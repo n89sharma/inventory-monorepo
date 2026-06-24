@@ -14,6 +14,8 @@ export async function setUserRole(userId: number, role: AppRole): Promise<void> 
 }
 
 export async function toggleUserActive(userId: number, isActive: boolean): Promise<void> {
-  const toggleUserActiveBody = ToggleActiveSchema.parse({ is_active: isActive } satisfies ToggleActive)
+  const toggleUserActiveBody = ToggleActiveSchema.parse({
+    is_active: isActive,
+  } satisfies ToggleActive)
   await api.patch(`/admin/users/${userId}`, toggleUserActiveBody)
 }

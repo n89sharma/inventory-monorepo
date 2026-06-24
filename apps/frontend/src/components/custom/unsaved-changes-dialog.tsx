@@ -18,11 +18,11 @@ interface UnsavedChangesDialogProps {
 export function UnsavedChangesDialog({
   open,
   onOpenChange,
-  onDiscard
+  onDiscard,
 }: UnsavedChangesDialogProps): React.JSX.Element {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent size='sm'>
+      <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogTitle>Discard unsaved changes?</AlertDialogTitle>
           <AlertDialogDescription>
@@ -30,8 +30,8 @@ export function UnsavedChangesDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel variant='outline'>Keep editing</AlertDialogCancel>
-          <AlertDialogAction variant='destructive' onClick={onDiscard}>
+          <AlertDialogCancel variant="outline">Keep editing</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={onDiscard}>
             Discard
           </AlertDialogAction>
         </AlertDialogFooter>

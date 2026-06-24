@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { Controller, type Control, type FieldValues, type Path } from "react-hook-form"
-import { SearchSelectInput } from "./search-select-input"
+import { useState } from 'react'
+import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
+import { SearchSelectInput } from './search-select-input'
 
 /**
  * Bare react-hook-form binding for {@link SearchSelectInput}: no label of its
@@ -36,9 +36,15 @@ export function ControlledSearchSelectField<T, TForm extends FieldValues>({
         <SearchSelectInput
           selection={field.value as T | null}
           query={query}
-          onSelectionChange={val => { field.onChange(val); setQuery('') }}
+          onSelectionChange={(val) => {
+            field.onChange(val)
+            setQuery('')
+          }}
           onQueryChange={setQuery}
-          onClear={() => { field.onChange(null); setQuery('') }}
+          onClear={() => {
+            field.onChange(null)
+            setQuery('')
+          }}
           options={options}
           getLabel={getLabel}
           placeholder={placeholder}

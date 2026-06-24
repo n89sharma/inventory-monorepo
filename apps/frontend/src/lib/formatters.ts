@@ -19,7 +19,7 @@ export function formatWeightKg(value: number): string {
 export function formatThousandsK(value: number | null): string {
   if (value === null || value === undefined || Number.isNaN(value)) return ''
   if (value < 1000) return value.toString()
-  return (value / 1000).toFixed(0) + " K"
+  return (value / 1000).toFixed(0) + ' K'
 }
 
 export function formatUSD(value: number | null): string {
@@ -36,7 +36,7 @@ export function formatTitleCase(str: string): string {
   return str
     .toLowerCase()
     .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase())
+    .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 export function formatDateWithTime(rawDate: Date | null): string {

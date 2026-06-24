@@ -3,7 +3,11 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
-export async function createComment(barcode: string, data: CreateComment, userId: number): Promise<void> {
+export async function createComment(
+  barcode: string,
+  data: CreateComment,
+  userId: number,
+): Promise<void> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
   const now = new Date()
@@ -13,8 +17,8 @@ export async function createComment(barcode: string, data: CreateComment, userId
       created_by_id: userId,
       comment: data.comment,
       created_at: now,
-      updated_at: now
-    }
+      updated_at: now,
+    },
   })
 }
 
@@ -29,12 +33,12 @@ export async function upsertLatestComment(
   assetId: number,
   text: string | null,
   userId: number,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): Promise<void> {
   const latest = await tx.comment.findFirst({
     where: { asset_id: assetId },
     orderBy: { created_at: 'desc' },
-    select: { id: true, comment: true }
+    select: { id: true, comment: true },
   })
 
   const trimmed = text?.trim() ?? ''
@@ -47,7 +51,7 @@ export async function upsertLatestComment(
     if (latest.comment === trimmed) return
     await tx.comment.update({
       where: { id: latest.id },
-      data: { comment: trimmed, updated_at: now }
+      data: { comment: trimmed, updated_at: now },
     })
     return
   }
@@ -58,7 +62,7 @@ export async function upsertLatestComment(
       created_by_id: userId,
       comment: trimmed,
       created_at: now,
-      updated_at: now
-    }
+      updated_at: now,
+    },
   })
 }

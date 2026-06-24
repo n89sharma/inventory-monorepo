@@ -21,7 +21,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(assetHref, asset => mutations.removeAsset(transferNumber, asset)),
+      createAssetSummaryColumns(assetHref, (asset) => mutations.removeAsset(transferNumber, asset)),
     [mutations, transferNumber],
   )
 
@@ -36,11 +36,11 @@ export function TransferDetailsPage(): React.JSX.Element {
       refreshKey={transferDetailKey(transferNumber)}
       historyCacheKey={`transfer-history:${transferNumber}`}
       historyFetcher={() => getTransferHistory(transferNumber)}
-      onBulkRemove={assets => mutations.bulkRemoveAssets(transferNumber, assets)}
+      onBulkRemove={(assets) => mutations.bulkRemoveAssets(transferNumber, assets)}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
-      renderSummaryStrip={transfer => <TransferSummaryStrip transfer={transfer} />}
-      renderSubtitle={transfer => (
+      renderSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
+      renderSubtitle={(transfer) => (
         <>
           <SummaryField label="From" value={transfer.origin.city_code} />
           <SummaryField label="To" value={transfer.destination.city_code} />
@@ -52,15 +52,15 @@ export function TransferDetailsPage(): React.JSX.Element {
           open={control.open}
           onOpenChange={control.onOpenChange}
           transfer={transfer}
-          onSave={metadata => mutations.updateMetadata(transferNumber, metadata)}
+          onSave={(metadata) => mutations.updateMetadata(transferNumber, metadata)}
         />
       )}
-      renderAddAssetBar={transfer => (
+      renderAddAssetBar={(transfer) => (
         <AddAssetBar
           existingAssets={transfer.assets}
-          entityName='transfer'
-          onAddSingle={asset => mutations.addAsset(transferNumber, asset)}
-          onAddBatchFromHold={assets => mutations.addAssetBatch(transferNumber, assets)}
+          entityName="transfer"
+          onAddSingle={(asset) => mutations.addAsset(transferNumber, asset)}
+          onAddBatchFromHold={(assets) => mutations.addAssetBatch(transferNumber, assets)}
         />
       )}
     />

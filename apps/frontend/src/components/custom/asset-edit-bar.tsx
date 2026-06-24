@@ -1,20 +1,32 @@
-import { useAssetStore } from "@/data/store/asset-store"
-import { useAssetDetail } from "@/hooks/use-asset-detail"
-import { useCan } from "@/hooks/use-can"
-import { DotsThreeVerticalIcon, PencilSimpleIcon, PrinterIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
-import { Fragment, useState } from "react"
-import { assetDetailsToSummary, type Permission } from "shared-types"
-import { toast } from "sonner"
-import { AddPartModal } from "../modals/add-part-modal"
-import { AddToCollectionModal } from "../modals/add-to-collection-modal"
-import { EditErrorsModal } from "../modals/edit-errors-modal"
-import { EditLocationModal } from "../modals/edit-location-modal"
-import { EditPricingModal } from "../modals/edit-pricing-modal"
-import { EditSpecsModal } from "../modals/edit-specs-modal"
-import { Button } from "../shadcn/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
-import { DeleteEntityDialog } from "./delete-entity-dialog"
-import { ShareButton } from "./share-button"
+import { useAssetStore } from '@/data/store/asset-store'
+import { useAssetDetail } from '@/hooks/use-asset-detail'
+import { useCan } from '@/hooks/use-can'
+import {
+  DotsThreeVerticalIcon,
+  PencilSimpleIcon,
+  PrinterIcon,
+  SpinnerGapIcon,
+  TrashIcon,
+} from '@phosphor-icons/react'
+import { Fragment, useState } from 'react'
+import { assetDetailsToSummary, type Permission } from 'shared-types'
+import { toast } from 'sonner'
+import { AddPartModal } from '../modals/add-part-modal'
+import { AddToCollectionModal } from '../modals/add-to-collection-modal'
+import { EditErrorsModal } from '../modals/edit-errors-modal'
+import { EditLocationModal } from '../modals/edit-location-modal'
+import { EditPricingModal } from '../modals/edit-pricing-modal'
+import { EditSpecsModal } from '../modals/edit-specs-modal'
+import { Button } from '../shadcn/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../shadcn/dropdown-menu'
+import { DeleteEntityDialog } from './delete-entity-dialog'
+import { ShareButton } from './share-button'
 
 const COLLECTION_PERMISSIONS: Permission[] = [
   'create_update_transfer',
@@ -43,7 +55,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [addHarvestedPartOpen, setAddHarvestedPartOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
 
-  const printBarcodes = useAssetStore(state => state.printBarcodes)
+  const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [printLoading, setPrintLoading] = useState(false)
 
   const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails) : null
@@ -62,26 +74,36 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
 
   const canEditPrice = can('edit_prices')
   const canEditSpecs = can('edit_tech_specs')
-  const canCreateSomeCollections = COLLECTION_PERMISSIONS.some(p => can(p))
+  const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p))
 
   const editGroup: MenuItem[] = [
     canEditPrice && { key: 'pricing', label: 'Pricing', onSelect: () => setEditPricingOpen(true) },
-    canEditSpecs && { key: 'specs', label: 'Specifications', onSelect: () => setEditSpecsOpen(true) },
+    canEditSpecs && {
+      key: 'specs',
+      label: 'Specifications',
+      onSelect: () => setEditSpecsOpen(true),
+    },
     canEditSpecs && { key: 'errors', label: 'Errors', onSelect: () => setEditErrorsOpen(true) },
     canEditSpecs && { key: 'parts', label: 'Parts', onSelect: () => setAddHarvestedPartOpen(true) },
-    canEditSpecs && { key: 'location', label: 'Location', onSelect: () => setEditLocationOpen(true) },
+    canEditSpecs && {
+      key: 'location',
+      label: 'Location',
+      onSelect: () => setEditLocationOpen(true),
+    },
   ].filter((i): i is MenuItem => i !== false)
 
   const collectionGroup: MenuItem[] = canCreateSomeCollections
-    ? [{
-      key: 'add-to-collection',
-      label: 'Add to Collection',
-      onSelect: () => setAddToCollectionOpen(true),
-      disabled: !assetSummaries,
-    }]
+    ? [
+        {
+          key: 'add-to-collection',
+          label: 'Add to Collection',
+          onSelect: () => setAddToCollectionOpen(true),
+          disabled: !assetSummaries,
+        },
+      ]
     : []
 
-  const groups = [editGroup, collectionGroup].filter(g => g.length > 0)
+  const groups = [editGroup, collectionGroup].filter((g) => g.length > 0)
   const showEditMenu = groups.length > 0
   const canDelete = can('delete_asset')
 
@@ -95,22 +117,21 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         disabled={printLoading}
         aria-label="Print barcode"
       >
-        {printLoading
-          ? <SpinnerGapIcon className="animate-spin" />
-          : <PrinterIcon />}
+        {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <PrinterIcon />}
       </Button>
-      {showEditMenu &&
+      {showEditMenu && (
         <DropdownMenu>
           <Button asChild>
             <DropdownMenuTrigger>
-              <PencilSimpleIcon />Edit
+              <PencilSimpleIcon />
+              Edit
             </DropdownMenuTrigger>
           </Button>
           <DropdownMenuContent>
             {groups.map((group, groupIdx) => (
               <Fragment key={groupIdx}>
                 {groupIdx > 0 && <DropdownMenuSeparator />}
-                {group.map(item => (
+                {group.map((item) => (
                   <DropdownMenuItem
                     key={item.key}
                     disabled={item.disabled}
@@ -123,8 +144,8 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      }
-      {canDelete &&
+      )}
+      {canDelete && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -133,11 +154,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-              <TrashIcon />Delete
+              <TrashIcon />
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      }
+      )}
 
       <EditPricingModal
         open={editPricingOpen}
@@ -175,7 +197,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         open={addToCollectionOpen}
         onOpenChange={setAddToCollectionOpen}
         selectedAssets={assetSummaries ? [assetSummaries] : []}
-        onConfirmSuccess={() => { }}
+        onConfirmSuccess={() => {}}
       />
 
       <DeleteEntityDialog

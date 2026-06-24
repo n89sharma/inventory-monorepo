@@ -9,10 +9,10 @@ export async function exportAssetReport(
   barcodes: string[],
   role: AppRole | null,
   variant: ReportVariant,
-  columnKeys?: string[]
+  columnKeys?: string[],
 ): Promise<string> {
   const results = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
-  const details = results.map(r => mapAssetDetail(r))
+  const details = results.map((r) => mapAssetDetail(r))
   const columns = columnKeys ?? REPORT_VARIANTS[variant]
   return generateCsvReport(columns, details, role)
 }

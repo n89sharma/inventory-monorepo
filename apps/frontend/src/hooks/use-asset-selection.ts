@@ -18,7 +18,7 @@ export function useAssetSelection(
   exportDisabled: boolean
   handleExport: () => Promise<void>
 } {
-  const exportAssets = useAssetStore(state => state.exportAssets)
+  const exportAssets = useAssetStore((state) => state.exportAssets)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [exportLoading, setExportLoading] = useState(false)
   const [prevAssets, setPrevAssets] = useState(assets)
@@ -30,20 +30,25 @@ export function useAssetSelection(
 
   async function handleExport() {
     const selectedBarcodes = Object.keys(rowSelection)
-    const barcodesToExport = selectedBarcodes.length > 0
-      ? selectedBarcodes
-      : assets.map(a => a.barcode)
+    const barcodesToExport =
+      selectedBarcodes.length > 0 ? selectedBarcodes : assets.map((a) => a.barcode)
 
     if (barcodesToExport.length > MAX_EXPORT) {
       toast.error(
-        `Cannot export ${barcodesToExport.length} assets. Please select ${MAX_EXPORT} assets or less`
-        , { position: 'top-center' })
+        `Cannot export ${barcodesToExport.length} assets. Please select ${MAX_EXPORT} assets or less`,
+        { position: 'top-center' },
+      )
       return
     }
 
     setExportLoading(true)
     try {
-      await exportAssets(barcodesToExport, undefined, undefined, buildExportColumnKeys(visibleColumns))
+      await exportAssets(
+        barcodesToExport,
+        undefined,
+        undefined,
+        buildExportColumnKeys(visibleColumns),
+      )
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {

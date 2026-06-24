@@ -4,15 +4,17 @@ import { getOrganizations as getOrganizationsDb } from '../../generated/prisma/s
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { prisma } from '../prisma.js'
 
-export const getOrganizations = asyncHandler(async (req: Request, res: Response<ApiResponse<OrgSummary[]>>) => {
-  const orgs = await prisma.$queryRawTyped(getOrganizationsDb())
-  res.json(successResponse(orgs))
-})
+export const getOrganizations = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<OrgSummary[]>>) => {
+    const orgs = await prisma.$queryRawTyped(getOrganizationsDb())
+    res.json(successResponse(orgs))
+  },
+)
 
 export async function createOrganization(
   req: Request,
   res: Response<ApiResponse<{ id: number }>>,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const body = CreateOrgSchema.parse(req.body)
@@ -27,8 +29,8 @@ export async function createOrganization(
         address: body.address,
         city: body.city,
         province: body.province,
-        country: body.country
-      }
+        country: body.country,
+      },
     })
     res.status(201).json(successResponse({ id: org.id }))
   } catch (error) {

@@ -5,45 +5,51 @@ import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 
 export function validateBarcode(req: Request, res: Response, next: NextFunction) {
   const barcode = req.body.barcode || req.params.barcode || req.query.barcode
-  
+
   if (!barcode) {
     return res.status(400).json({ error: 'Barcode is required' })
   }
-  
+
   if (!/^[A-Z]{3}-[A-Z]{2}-\d{6}$/.test(barcode)) {
     return res.status(400).json({ error: 'Invalid barcode format' })
   }
-  
+
   next()
 }
 
-export const ArrivalListQuerySchema = z.object({
-  fromDate: z.string(),
-  toDate: z.string().optional(),
-  warehouse: z.coerce.number().int().optional(),
-  vendor: z.coerce.number().int().optional(),
-}).transform((data) => ({
-  fromDate: normalizeFromDate(data.fromDate),
-  toDate: normalizeToDate(data.toDate),
-  warehouse: data.warehouse,
-  vendor: data.vendor,
-})).refine((data) => !isAfter(data.fromDate, data.toDate), {
-  message: 'fromDate must be before toDate',
-})
+export const ArrivalListQuerySchema = z
+  .object({
+    fromDate: z.string(),
+    toDate: z.string().optional(),
+    warehouse: z.coerce.number().int().optional(),
+    vendor: z.coerce.number().int().optional(),
+  })
+  .transform((data) => ({
+    fromDate: normalizeFromDate(data.fromDate),
+    toDate: normalizeToDate(data.toDate),
+    warehouse: data.warehouse,
+    vendor: data.vendor,
+  }))
+  .refine((data) => !isAfter(data.fromDate, data.toDate), {
+    message: 'fromDate must be before toDate',
+  })
 
-export const DepartureListQuerySchema = z.object({
-  fromDate: z.string(),
-  toDate: z.string().optional(),
-  warehouse: z.coerce.number().int().optional(),
-  customer: z.coerce.number().int().optional(),
-}).transform((data) => ({
-  fromDate: normalizeFromDate(data.fromDate),
-  toDate: normalizeToDate(data.toDate),
-  warehouse: data.warehouse,
-  customer: data.customer,
-})).refine((data) => !isAfter(data.fromDate, data.toDate), {
-  message: 'fromDate must be before toDate',
-})
+export const DepartureListQuerySchema = z
+  .object({
+    fromDate: z.string(),
+    toDate: z.string().optional(),
+    warehouse: z.coerce.number().int().optional(),
+    customer: z.coerce.number().int().optional(),
+  })
+  .transform((data) => ({
+    fromDate: normalizeFromDate(data.fromDate),
+    toDate: normalizeToDate(data.toDate),
+    warehouse: data.warehouse,
+    customer: data.customer,
+  }))
+  .refine((data) => !isAfter(data.fromDate, data.toDate), {
+    message: 'fromDate must be before toDate',
+  })
 
 export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -58,20 +64,20 @@ export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
 
 export function validateDateRange(req: Request, res: Response, next: NextFunction) {
   if (!req.query.fromDate) {
-    return res.status(400).json({ error: "fromDate not provided" })
+    return res.status(400).json({ error: 'fromDate not provided' })
   }
 
   const fromDate = normalizeFromDate(String(req.query.fromDate))
   const toDate = normalizeToDate(req.query.toDate ? String(req.query.toDate) : undefined)
 
   if (isAfter(fromDate, toDate)) {
-    return res.status(400).json({ error: "fromDate must be before toDate" })
+    return res.status(400).json({ error: 'fromDate must be before toDate' })
   }
 
   res.locals.parsedDates = {
     fromDate: fromDate,
-    toDate: toDate
+    toDate: toDate,
   }
-  
+
   next()
 }

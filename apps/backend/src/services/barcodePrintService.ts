@@ -17,9 +17,7 @@ const PNG_WIDTH_OFFSET = 16
 const PNG_HEIGHT_OFFSET = 20
 
 export async function generateBarcodePdf(barcodes: string[]): Promise<Buffer> {
-  const images = await Promise.all(
-    barcodes.map(text => toBuffer({ ...BARCODE_OPTIONS, text })),
-  )
+  const images = await Promise.all(barcodes.map((text) => toBuffer({ ...BARCODE_OPTIONS, text })))
 
   return await new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({
@@ -33,7 +31,7 @@ export async function generateBarcodePdf(barcodes: string[]): Promise<Buffer> {
     })
 
     const chunks: Buffer[] = []
-    doc.on('data', chunk => chunks.push(chunk))
+    doc.on('data', (chunk) => chunks.push(chunk))
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 

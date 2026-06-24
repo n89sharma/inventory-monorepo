@@ -7,17 +7,14 @@ import { logger } from './logger.js'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
-export function errorHandler(
-  err: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void {
+export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
   if (err instanceof ZodError) {
     const details = isDev
       ? err.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ')
       : (() => {
-          const fields = [...new Set(err.issues.map((e) => e.path.join('.')).filter(Boolean))].join(', ')
+          const fields = [...new Set(err.issues.map((e) => e.path.join('.')).filter(Boolean))].join(
+            ', ',
+          )
           return fields ? `Invalid fields: ${fields}` : 'Invalid request'
         })()
     res.status(400).json(response400('Validation failed', details))
@@ -35,10 +32,7 @@ export function errorHandler(
     res.status(400).json(response400(err.message))
     return
   }
-  if (
-    err instanceof Prisma.PrismaClientKnownRequestError &&
-    err.code === 'P2002'
-  ) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
     res.status(400).json(response400('A record with these details already exists'))
     return
   }

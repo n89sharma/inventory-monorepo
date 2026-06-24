@@ -1,11 +1,27 @@
-import { AppRole, AssetDelta, CreateInvoice, INVOICE_TYPE, InvoiceDetail, UpdateInvoiceMetadata } from 'shared-types'
+import {
+  AppRole,
+  AssetDelta,
+  CreateInvoice,
+  INVOICE_TYPE,
+  InvoiceDetail,
+  UpdateInvoiceMetadata,
+} from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordAssetUpdateOnCollection, recordCollectionUpdateOnAssets, recordInvoiceCreate, recordInvoiceUpdate } from './historyService.js'
-import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
+import {
+  recordAssetUpdateOnCollection,
+  recordCollectionUpdateOnAssets,
+  recordInvoiceCreate,
+  recordInvoiceUpdate,
+} from './historyService.js'
+import {
+  addRemoveCollectionFromAssets,
+  assertAssetsNotInCollection,
+  recordCollectionAssetDelta,
+} from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
 
 const INVOICE_NUMBER_PREFIX = 'I-'
@@ -29,27 +45,27 @@ function invoiceAssetLink(invoiceTypeName: string, invoiceId: number): InvoiceAs
       field: 'sales_invoice_id',
       add: { sales_invoice_id: invoiceId },
       remove: { sales_invoice_id: null },
-      inCollectionWhere: { sales_invoice_id: { not: null } }
+      inCollectionWhere: { sales_invoice_id: { not: null } },
     }
   }
   return {
     field: 'purchase_invoice_id',
     add: { purchase_invoice_id: invoiceId },
     remove: { purchase_invoice_id: null },
-    inCollectionWhere: { purchase_invoice_id: { not: null } }
+    inCollectionWhere: { purchase_invoice_id: { not: null } },
   }
 }
 
 export async function createInvoice(
   data: CreateInvoice,
-  userId: number
+  userId: number,
 ): Promise<{ invoiceNumber: string }> {
-  const assetIds = data.assets.map(a => a.id)
+  const assetIds = data.assets.map((a) => a.id)
   const now = new Date()
 
   const invoiceType = await prisma.invoiceType.findUniqueOrThrow({
     where: { id: data.invoice_type_id },
-    select: { type: true }
+    select: { type: true },
   })
   const invoiceNumber = await getNewInvoiceNumber()
 
@@ -62,8 +78,8 @@ export async function createInvoice(
         updated_by_id: userId,
         is_cleared: data.is_cleared,
         invoice_type_id: data.invoice_type_id,
-        created_at: now
-      }
+        created_at: now,
+      },
     })
 
     const link = invoiceAssetLink(invoiceType.type, created.id)
@@ -71,12 +87,12 @@ export async function createInvoice(
       tx,
       assetIds,
       link.inCollectionWhere,
-      (barcodes) => new ConflictError(`Assets already in another invoice: ${barcodes.join(', ')}`)
+      (barcodes) => new ConflictError(`Assets already in another invoice: ${barcodes.join(', ')}`),
     )
 
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
-      data: link.add
+      data: link.add,
     })
 
     return created
@@ -84,13 +100,17 @@ export async function createInvoice(
 
   const link = invoiceAssetLink(invoiceType.type, invoice.id)
 
-  await recordInvoiceCreate(invoice.id, {
-    invoice_number: invoice.invoice_number,
-    invoice_reference: data.invoice_reference,
-    organization_id: data.organization_id,
-    invoice_type_id: data.invoice_type_id,
-    created_at: now
-  }, userId)
+  await recordInvoiceCreate(
+    invoice.id,
+    {
+      invoice_number: invoice.invoice_number,
+      invoice_reference: data.invoice_reference,
+      organization_id: data.organization_id,
+      invoice_type_id: data.invoice_type_id,
+      created_at: now,
+    },
+    userId,
+  )
 
   await recordCollectionUpdateOnAssets([], assetIds, link.field, invoice.id, userId)
   await recordAssetUpdateOnCollection('Invoice', invoice.id, assetIds, [], userId)
@@ -101,11 +121,11 @@ export async function createInvoice(
 export async function patchInvoiceMetadata(
   invoiceNumber: string,
   metadata: UpdateInvoiceMetadata,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const current = await prisma.invoice.findUnique({
     where: { invoice_number: invoiceNumber },
-    select: { id: true, organization_id: true, is_cleared: true }
+    select: { id: true, organization_id: true, is_cleared: true },
   })
   if (!current) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
 
@@ -113,33 +133,38 @@ export async function patchInvoiceMetadata(
     where: { id: current.id },
     data: {
       organization_id: metadata.organization.id,
-      is_cleared: metadata.is_cleared
-    }
+      is_cleared: metadata.is_cleared,
+    },
   })
 
-  await recordInvoiceUpdate(current.id, {
-    organization_id: current.organization_id,
-    is_cleared: current.is_cleared
-  }, {
-    organization_id: metadata.organization.id,
-    is_cleared: metadata.is_cleared
-  }, userId)
+  await recordInvoiceUpdate(
+    current.id,
+    {
+      organization_id: current.organization_id,
+      is_cleared: current.is_cleared,
+    },
+    {
+      organization_id: metadata.organization.id,
+      is_cleared: metadata.is_cleared,
+    },
+    userId,
+  )
 }
 
 export async function addRemoveCollectionFromAssetsAndRecord(
   invoiceNumber: string,
   delta: AssetDelta,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const invoice = await prisma.invoice.findUnique({
     where: { invoice_number: invoiceNumber },
-    select: { id: true, InvoiceType: { select: { type: true } } }
+    select: { id: true, InvoiceType: { select: { type: true } } },
   })
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
 
   const link = invoiceAssetLink(invoice.InvoiceType.type, invoice.id)
 
-  await prisma.$transaction(tx =>
+  await prisma.$transaction((tx) =>
     addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
       assetsToRemove: delta.assetIdsToRemove,
@@ -147,8 +172,8 @@ export async function addRemoveCollectionFromAssetsAndRecord(
       assetInCollectionError: (barcodes) =>
         new ConflictError(`Assets already in another invoice: ${barcodes.join(', ')}`),
       add: link.add,
-      remove: link.remove
-    })
+      remove: link.remove,
+    }),
   )
 
   await recordCollectionAssetDelta(
@@ -157,7 +182,7 @@ export async function addRemoveCollectionFromAssetsAndRecord(
     invoice.id,
     delta.assetIdsToAdd,
     delta.assetIdsToRemove,
-    userId
+    userId,
   )
 }
 
@@ -168,10 +193,10 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       include: {
         updated_by: true,
         organization: true,
-        InvoiceType: true
-      }
+        InvoiceType: true,
+      },
     }),
-    prisma.$queryRawTyped(getAssetsForInvoice(invoiceNumber))
+    prisma.$queryRawTyped(getAssetsForInvoice(invoiceNumber)),
   ])
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
   return {
@@ -190,6 +215,6 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
     customer: invoice.organization,
-    assets: assets.map(mapAssetSummary)
+    assets: assets.map(mapAssetSummary),
   }
 }

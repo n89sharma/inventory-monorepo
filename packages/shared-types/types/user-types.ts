@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const AppRoles = [
   'admin',
@@ -14,12 +14,12 @@ export const AppRoles = [
   'member',
 ] as const
 
-export type AppRole = typeof AppRoles[number]
+export type AppRole = (typeof AppRoles)[number]
 
 export const SetRoleSchema = z.object({
   role: z.enum(AppRoles),
 })
-export type SetRole = z.infer<typeof SetRoleSchema>;
+export type SetRole = z.infer<typeof SetRoleSchema>
 
 export const UserSchema = z.object({
   id: z.int(),
@@ -29,11 +29,11 @@ export const UserSchema = z.object({
   role: z.enum(AppRoles).nullable(),
   clerk_id: z.string().nullable(),
   default_warehouse_id: z.int().nullable(),
-});
+})
 
-export type User = z.infer<typeof UserSchema>;
+export type User = z.infer<typeof UserSchema>
 
 export const ToggleActiveSchema = z.object({
   is_active: z.boolean(),
 })
-export type ToggleActive = z.infer<typeof ToggleActiveSchema>;
+export type ToggleActive = z.infer<typeof ToggleActiveSchema>

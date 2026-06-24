@@ -16,10 +16,7 @@ import {
   TableRow,
 } from '@/components/shadcn/table'
 import { useHoldsByUserReport } from '@/hooks/use-holds-by-user-report'
-import {
-  aggregateHolds,
-  type HoldsByUserTable,
-} from '@/lib/holds-by-user-aggregate'
+import { aggregateHolds, type HoldsByUserTable } from '@/lib/holds-by-user-aggregate'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import {
@@ -67,8 +64,8 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
     columns: HOLDS_BY_USER_COLUMNS,
     state: { expanded },
     onExpandedChange: setExpanded,
-    getRowId: row => row.rowId,
-    getSubRows: row => row.subRows,
+    getRowId: (row) => row.rowId,
+    getSubRows: (row) => row.subRows,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
   })
@@ -76,9 +73,9 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
   return (
     <Table className="table-fixed" style={{ width: table.getCenterTotalSize() }}>
       <TableHeader>
-        {table.getHeaderGroups().map(headerGroup => (
+        {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map(header => (
+            {headerGroup.headers.map((header) => (
               <TableHead
                 key={header.id}
                 style={{ width: header.getSize() }}
@@ -91,19 +88,19 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows.map(row => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow
             key={row.id}
             className={cn(
               row.getCanExpand() && 'cursor-pointer',
               row.original.medianHeldDays > MEDIAN_HELD_WARNING_THRESHOLD && ROW_WARNING_CLASS,
             )}
-            onClick={event => {
+            onClick={(event) => {
               if ((event.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return
               if (row.getCanExpand()) row.toggleExpanded()
             }}
           >
-            {row.getVisibleCells().map(cell => (
+            {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
                 style={{ width: cell.column.getSize() }}
@@ -120,10 +117,7 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
 }
 
 function HoldsReportBody({ table }: { table: HoldsByUserTable }): React.JSX.Element {
-  const rows = useMemo(
-    () => toHoldsReportRows(table.salespeople),
-    [table.salespeople],
-  )
+  const rows = useMemo(() => toHoldsReportRows(table.salespeople), [table.salespeople])
 
   if (rows.length === 0) {
     return (
@@ -149,13 +143,13 @@ export function HoldsByUserReportPage(): React.JSX.Element {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">Held Assets by Salesperson</h1>
-            {isLoading
-              ? <SpinnerGapIcon
-                  className="animate-spin text-muted-foreground"
-                  aria-label="Loading"
-                  role="status"
-                />
-              : null}
+            {isLoading ? (
+              <SpinnerGapIcon
+                className="animate-spin text-muted-foreground"
+                aria-label="Loading"
+                role="status"
+              />
+            ) : null}
           </div>
           <ShareButton />
         </div>

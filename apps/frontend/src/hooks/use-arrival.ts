@@ -28,7 +28,7 @@ function arrivalListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   destination: SelectOption<Warehouse>,
-  vendor: SelectOption<OrgSummary>
+  vendor: SelectOption<OrgSummary>,
 ): ArrivalListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -46,18 +46,15 @@ export function useArrivalsList(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   destination: SelectOption<Warehouse>,
-  vendor: SelectOption<OrgSummary>
+  vendor: SelectOption<OrgSummary>,
 ) {
-  return useSWR(
-    arrivalListKey(fromDate, toDate, destination, vendor),
-    () => getArrivals(fromDate, toDate, destination, vendor)
+  return useSWR(arrivalListKey(fromDate, toDate, destination, vendor), () =>
+    getArrivals(fromDate, toDate, destination, vendor),
   )
 }
 
 export function invalidateArrivalLists() {
-  return mutate(
-    key => Array.isArray(key) && key[0] === ARRIVAL_LIST_KEY_PREFIX,
-    undefined,
-    { revalidate: true }
-  )
+  return mutate((key) => Array.isArray(key) && key[0] === ARRIVAL_LIST_KEY_PREFIX, undefined, {
+    revalidate: true,
+  })
 }

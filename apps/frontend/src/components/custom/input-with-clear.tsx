@@ -1,6 +1,11 @@
-import { XIcon } from "@phosphor-icons/react"
-import { Field, FieldLabel } from "../shadcn/field"
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "../shadcn/input-group"
+import { XIcon } from '@phosphor-icons/react'
+import { Field, FieldLabel } from '../shadcn/field'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '../shadcn/input-group'
 
 export type InputWithClearProps = {
   inputType: 'string' | 'number'
@@ -28,7 +33,6 @@ function InputWithClearBody({
   header,
   suffix,
 }: InputWithClearBodyProps): React.JSX.Element {
-
   const resolvedInputType = inputType ?? 'string'
 
   function coerce(raw: string): string | number | null {
@@ -52,16 +56,13 @@ function InputWithClearBody({
         <InputGroupInput
           type={resolvedInputType}
           value={value ?? ''}
-          onChange={e => onValueChange(coerce(e.target.value))}
+          onChange={(e) => onValueChange(coerce(e.target.value))}
           placeholder={placeholder}
           aria-invalid={error}
-        >
-        </InputGroupInput>
+        ></InputGroupInput>
 
         <InputGroupAddon align="inline-end">
-          {suffix ? (
-            <span className="text-muted-foreground pr-1">{suffix}</span>
-          ) : null}
+          {suffix ? <span className="text-muted-foreground pr-1">{suffix}</span> : null}
           <InputGroupButton
             size="icon-sm"
             aria-label="Clear"
@@ -100,11 +101,5 @@ export function InputWithClearInline({
   ...rest
 }: InputWithClearProps): React.JSX.Element {
   const placeholder = fieldRequired ? `${fieldLabel} *` : fieldLabel
-  return (
-    <InputWithClearBody
-      {...rest}
-      placeholder={placeholder}
-      header={null}
-    />
-  )
+  return <InputWithClearBody {...rest} placeholder={placeholder} header={null} />
 }

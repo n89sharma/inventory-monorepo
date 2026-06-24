@@ -1,6 +1,12 @@
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { Button } from '@/components/shadcn/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/shadcn/dialog'
 import { Input } from '@/components/shadcn/input'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
 import { useAssetStore } from '@/data/store/asset-store'
@@ -34,7 +40,12 @@ type PricingRow = {
   sale_price: string
 }
 
-type EditablePriceField = 'purchase_cost' | 'transport_cost' | 'processing_cost' | 'other_cost' | 'sale_price'
+type EditablePriceField =
+  | 'purchase_cost'
+  | 'transport_cost'
+  | 'processing_cost'
+  | 'other_cost'
+  | 'sale_price'
 
 type TableMeta = {
   updateField: (barcode: string, field: EditablePriceField, value: string) => void
@@ -50,10 +61,12 @@ function sanitize(value: string): string {
 function PriceCell({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+      <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+        $
+      </span>
       <Input
         value={value}
-        onChange={e => onChange(sanitize(e.target.value))}
+        onChange={(e) => onChange(sanitize(e.target.value))}
         inputMode="decimal"
         placeholder="0.00"
         className="h-8 pl-5"
@@ -69,10 +82,12 @@ function makeEditableColumn(field: EditablePriceField, header: string): ColumnDe
     cell: ({ row, table }: CellContext<PricingRow, unknown>) => (
       <PriceCell
         value={row.original[field]}
-        onChange={v => (table.options.meta as TableMeta).updateField(row.original.barcode, field, v)}
+        onChange={(v) =>
+          (table.options.meta as TableMeta).updateField(row.original.barcode, field, v)
+        }
       />
     ),
-    size: 100
+    size: 100,
   }
 }
 
@@ -80,7 +95,9 @@ const columns: ColumnDef<PricingRow>[] = [
   {
     accessorKey: 'brand',
     header: () => <div className="text-center">Brand</div>,
-    cell: ({ getValue }) => <div className="text-center text-muted-foreground">{getValue() as string}</div>,
+    cell: ({ getValue }) => (
+      <div className="text-center text-muted-foreground">{getValue() as string}</div>
+    ),
     size: 90,
   },
   {
@@ -104,7 +121,9 @@ const columns: ColumnDef<PricingRow>[] = [
   {
     id: 'meter',
     header: () => <div className="text-center">Meter</div>,
-    cell: ({ row }) => <div className="text-center">{formatThousandsK(row.original.meter_total)}</div>,
+    cell: ({ row }) => (
+      <div className="text-center">{formatThousandsK(row.original.meter_total)}</div>
+    ),
     size: 80,
   },
   makeEditableColumn('purchase_cost', 'Purchase Cost'),
@@ -114,19 +133,30 @@ const columns: ColumnDef<PricingRow>[] = [
   makeEditableColumn('sale_price', 'Sale Price'),
 ]
 
-const PRICE_FIELDS: EditablePriceField[] = ['purchase_cost', 'transport_cost', 'processing_cost', 'other_cost', 'sale_price']
+const PRICE_FIELDS: EditablePriceField[] = [
+  'purchase_cost',
+  'transport_cost',
+  'processing_cost',
+  'other_cost',
+  'sale_price',
+]
 
 function checkDirty(rows: PricingRow[], initial: PricingRow[]): boolean {
   return rows.some((row, i) => {
     const init = initial[i]
     if (!init) return false
-    return [...PRICE_FIELDS, 'parts_cost' as const].some(f => row[f] !== init[f])
+    return [...PRICE_FIELDS, 'parts_cost' as const].some((f) => row[f] !== init[f])
   })
 }
 
-export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSaveSuccess }: BulkEditPricingModalProps) {
-  const getAssetDetail = useAssetStore(state => state.getAssetDetail)
-  const bulkUpdatePricing = useAssetStore(state => state.bulkUpdatePricing)
+export function BulkEditPricingModal({
+  open,
+  onOpenChange,
+  selectedAssets,
+  onSaveSuccess,
+}: BulkEditPricingModalProps) {
+  const getAssetDetail = useAssetStore((state) => state.getAssetDetail)
+  const bulkUpdatePricing = useAssetStore((state) => state.bulkUpdatePricing)
   const [rows, setRows] = useState<PricingRow[]>([])
   const [initialRows, setInitialRows] = useState<PricingRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -141,7 +171,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
     if (!open) return
     const assets = selectedAssetsRef.current
     setLoading(true)
-    Promise.allSettled(assets.map(a => getAssetDetail(a.barcode))).then(results => {
+    Promise.allSettled(assets.map((a) => getAssetDetail(a.barcode))).then((results) => {
       const loaded: PricingRow[] = results.map((r, i) => {
         const asset = assets[i]
         if (r.status === 'fulfilled') {
@@ -181,7 +211,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
   }, [open, getAssetDetail])
 
   function updateField(barcode: string, field: EditablePriceField, value: string) {
-    setRows(prev => prev.map(r => r.barcode === barcode ? { ...r, [field]: value } : r))
+    setRows((prev) => prev.map((r) => (r.barcode === barcode ? { ...r, [field]: value } : r)))
   }
 
   const table = useReactTable({
@@ -195,7 +225,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
     setSaving(true)
     try {
       await bulkUpdatePricing(
-        rows.map(r => ({
+        rows.map((r) => ({
           barcode: r.barcode,
           purchase_cost: parseFloat(r.purchase_cost) || 0,
           transport_cost: parseFloat(r.transport_cost) || 0,
@@ -203,7 +233,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
           other_cost: parseFloat(r.other_cost) || 0,
           parts_cost: parseFloat(r.parts_cost) || 0,
           sale_price: parseFloat(r.sale_price) || 0,
-        }))
+        })),
       )
       toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
@@ -224,16 +254,21 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
 
           {loading ? (
             <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              <CircleNotchIcon className="mr-2 animate-spin" />Loading pricing…
+              <CircleNotchIcon className="mr-2 animate-spin" />
+              Loading pricing…
             </div>
           ) : (
             <div className="overflow-auto min-h-0 flex-1 rounded-md border">
               <table className="w-full caption-bottom text-sm table-fixed">
                 <TableHeader>
-                  {table.getHeaderGroups().map(hg => (
+                  {table.getHeaderGroups().map((hg) => (
                     <TableRow key={hg.id}>
-                      {hg.headers.map(header => (
-                        <TableHead key={header.id} style={{ width: header.getSize() }} className="sticky top-0 bg-background z-10">
+                      {hg.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          style={{ width: header.getSize() }}
+                          className="sticky top-0 bg-background z-10"
+                        >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
                       ))}
@@ -241,9 +276,9 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {table.getRowModel().rows.map(row => (
+                  {table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
-                      {row.getVisibleCells().map(cell => (
+                      {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
                           style={{ width: cell.column.getSize() }}
@@ -260,11 +295,23 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button" disabled={saving}>
+            <Button
+              variant="outline"
+              onClick={() => guard.onOpenChange(false)}
+              type="button"
+              disabled={saving}
+            >
               Cancel
             </Button>
             <Button onClick={handleSave} type="button" disabled={saving || loading}>
-              {saving ? <><CircleNotchIcon className="animate-spin" />Saving…</> : 'Save'}
+              {saving ? (
+                <>
+                  <CircleNotchIcon className="animate-spin" />
+                  Saving…
+                </>
+              ) : (
+                'Save'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

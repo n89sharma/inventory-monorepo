@@ -1,28 +1,28 @@
-import { HorizontalField } from "@/components/custom/horizontal-field"
-import { SearchSelectInput } from "@/components/custom/search-select-input"
-import { Button } from "@/components/shadcn/button"
+import { HorizontalField } from '@/components/custom/horizontal-field'
+import { SearchSelectInput } from '@/components/custom/search-select-input'
+import { Button } from '@/components/shadcn/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/shadcn/dialog"
-import { FieldError } from "@/components/shadcn/field"
-import { Input } from "@/components/shadcn/input"
-import { Textarea } from "@/components/shadcn/textarea"
-import { useStorePartMutations } from "@/hooks/use-store-part-mutations"
+} from '@/components/shadcn/dialog'
+import { FieldError } from '@/components/shadcn/field'
+import { Input } from '@/components/shadcn/input'
+import { Textarea } from '@/components/shadcn/textarea'
+import { useStorePartMutations } from '@/hooks/use-store-part-mutations'
 import {
   AddPurchaseFormSchema,
   EMPTY_ADD_PURCHASE_FORM,
   type AddPurchaseForm,
-} from "@/ui-types/store-part-form-types"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CircleNotchIcon } from "@phosphor-icons/react"
-import { useEffect, useState } from "react"
-import { Controller, useForm, type FieldErrors } from "react-hook-form"
-import type { StorePart } from "shared-types"
-import { toast } from "sonner"
+} from '@/ui-types/store-part-form-types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CircleNotchIcon } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
+import { Controller, useForm, type FieldErrors } from 'react-hook-form'
+import type { StorePart } from 'shared-types'
+import { toast } from 'sonner'
 
 interface AddPurchaseModalProps {
   open: boolean
@@ -49,11 +49,10 @@ export function AddPurchaseModal({
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch } =
-    useForm<AddPurchaseForm>({
-      resolver: zodResolver(AddPurchaseFormSchema),
-      defaultValues: EMPTY_ADD_PURCHASE_FORM,
-    })
+  const { control, handleSubmit, reset, setValue, watch } = useForm<AddPurchaseForm>({
+    resolver: zodResolver(AddPurchaseFormSchema),
+    defaultValues: EMPTY_ADD_PURCHASE_FORM,
+  })
 
   useEffect(() => {
     if (open) {
@@ -77,9 +76,10 @@ export function AddPurchaseModal({
   }
 
   function onInvalid(formErrors: FieldErrors<AddPurchaseForm>) {
-    const message = formErrors.part?.message
-      ?? formErrors.quantity?.message
-      ?? 'Please fix the highlighted fields'
+    const message =
+      formErrors.part?.message ??
+      formErrors.quantity?.message ??
+      'Please fix the highlighted fields'
     toast.error(message, { position: 'top-center' })
   }
 
@@ -112,12 +112,21 @@ export function AddPurchaseModal({
                       selection={field.value}
                       query={partQuery}
                       onQueryChange={setPartQuery}
-                      onSelectionChange={value => { field.onChange(value); setPartQuery('') }}
-                      onClear={() => { field.onChange(null); setPartQuery('') }}
-                      onCreateOption={query => { field.onChange({ part_number: query, description: '' }); setPartQuery('') }}
-                      createLabel={query => `Create part "${query}"`}
+                      onSelectionChange={(value) => {
+                        field.onChange(value)
+                        setPartQuery('')
+                      }}
+                      onClear={() => {
+                        field.onChange(null)
+                        setPartQuery('')
+                      }}
+                      onCreateOption={(query) => {
+                        field.onChange({ part_number: query, description: '' })
+                        setPartQuery('')
+                      }}
+                      createLabel={(query) => `Create part "${query}"`}
                       options={allParts}
-                      getLabel={p => p.part_number}
+                      getLabel={(p) => p.part_number}
                       placeholder="Search part number or description"
                       clearLabel="Clear part"
                       error={fieldState.invalid}
@@ -133,9 +142,13 @@ export function AddPurchaseModal({
             <HorizontalField label="Description" required>
               <Input
                 value={part && !('id' in part) ? part.description : ''}
-                onChange={e => {
+                onChange={(e) => {
                   if (part && !('id' in part)) {
-                    setValue('part', { ...part, description: e.target.value }, { shouldValidate: true })
+                    setValue(
+                      'part',
+                      { ...part, description: e.target.value },
+                      { shouldValidate: true },
+                    )
                   }
                 }}
                 placeholder="Part description"
@@ -167,7 +180,9 @@ export function AddPurchaseModal({
               name="unitCost"
               render={({ field }) => (
                 <div className="relative max-w-[160px]">
-                  <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                  <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+                    $
+                  </span>
                   <Input
                     type="number"
                     min={0}
@@ -186,19 +201,29 @@ export function AddPurchaseModal({
             <Controller
               control={control}
               name="notes"
-              render={({ field }) => (
-                <Textarea {...field} placeholder="Optional" rows={2} />
-              )}
+              render={({ field }) => <Textarea {...field} placeholder="Optional" rows={2} />}
             />
           </HorizontalField>
         </form>
 
         <DialogFooter>
-          <Button variant="outline" type="button" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
             Cancel
           </Button>
           <Button type="submit" form="add-purchase-form" disabled={saving}>
-            {saving ? <><CircleNotchIcon className="animate-spin" />Adding...</> : 'Add Part'}
+            {saving ? (
+              <>
+                <CircleNotchIcon className="animate-spin" />
+                Adding...
+              </>
+            ) : (
+              'Add Part'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

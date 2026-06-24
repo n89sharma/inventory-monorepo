@@ -8,8 +8,10 @@ import useSWR from 'swr'
 const SEARCH_ALL_KEY = 'search-all-assets'
 
 function hasSearchTarget(f: SearchAllFilters): boolean {
-  return f.model !== null
-    || (f.modelQuery !== null && f.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH)
+  return (
+    f.model !== null ||
+    (f.modelQuery !== null && f.modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH)
+  )
 }
 
 export function useSearchAll(filters: SearchAllFilters) {

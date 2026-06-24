@@ -3,7 +3,7 @@ import {
   type NavigationSection,
   type SearchList,
 } from '@/ui-types/navigation-context'
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useParams } from 'react-router-dom'
 
 interface AssetDetailsParams {
   section: NavigationSection
@@ -25,7 +25,7 @@ export function useAssetDetailsParams(): AssetDetailsParams {
 
   // url:/arrivals/123/789
   if (assetId && section && collectionId) {
-    return { section: section as NavigationSection, collectionId, assetId, searchList: null };
+    return { section: section as NavigationSection, collectionId, assetId, searchList: null }
   }
 
   return {
@@ -34,5 +34,4 @@ export function useAssetDetailsParams(): AssetDetailsParams {
     assetId,
     searchList: getSearchList(pathname),
   }
-
 }

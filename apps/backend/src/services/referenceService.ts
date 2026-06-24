@@ -13,7 +13,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     zones,
     errors,
     components,
-    countries
+    countries,
   ] = await Promise.all([
     prisma.accessory.findMany(),
     prisma.assetType.findMany(),
@@ -25,7 +25,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
     prisma.zone.findMany({ orderBy: { zone: 'asc' } }),
     prisma.error.findMany(),
     prisma.component.findMany({ include: { Brand: { select: { name: true } } } }),
-    prisma.country.findMany({ orderBy: { name: 'asc' } })
+    prisma.country.findMany({ orderBy: { name: 'asc' } }),
   ])
 
   return {
@@ -38,12 +38,12 @@ export async function getReferenceData(): Promise<ReferenceData> {
     warehouses,
     zones,
     errors,
-    components: components.map(c => ({
+    components: components.map((c) => ({
       id: c.id,
       brand_id: c.brand_id,
       brand_name: c.Brand.name,
-      name: c.name
+      name: c.name,
     })),
-    countries
+    countries,
   }
 }

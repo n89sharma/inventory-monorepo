@@ -5,7 +5,7 @@ export const AssetCreateSnapshotSchema = z.object({
   serial_number: z.string(),
   brand_name: z.string().optional(),
   model_name: z.string().optional(),
-  arrival_number: z.string().nullable().optional()
+  arrival_number: z.string().nullable().optional(),
 })
 
 export const AssetUpdateDiffSchema = z.object({
@@ -39,25 +39,25 @@ export const AssetUpdateDiffSchema = z.object({
   parts_cost: z.number().nullable().optional(),
   total_cost: z.number().nullable().optional(),
   sale_price: z.number().nullable().optional(),
-  error_codes: z.array(z.string()).optional()
+  error_codes: z.array(z.string()).optional(),
 })
 
 const AssetRecordBase = {
   user_name: z.string(),
-  changed_on: z.coerce.date()
+  changed_on: z.coerce.date(),
 }
 
 export const AssetHistoryRecordSchema = z.discriminatedUnion('action_type', [
   z.object({
     action_type: z.literal('CREATE'),
     ...AssetRecordBase,
-    changes: z.object({ after: AssetCreateSnapshotSchema })
+    changes: z.object({ after: AssetCreateSnapshotSchema }),
   }),
   z.object({
     action_type: z.literal('UPDATE'),
     ...AssetRecordBase,
-    changes: z.object({ before: AssetUpdateDiffSchema, after: AssetUpdateDiffSchema })
-  })
+    changes: z.object({ before: AssetUpdateDiffSchema, after: AssetUpdateDiffSchema }),
+  }),
 ])
 
 export const AssetHistorySchema = z.array(AssetHistoryRecordSchema)

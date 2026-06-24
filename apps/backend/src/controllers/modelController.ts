@@ -4,15 +4,17 @@ import { getModels as getModelsDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { prisma } from '../prisma.js'
 
-export const getModels = asyncHandler(async (req: Request, res: Response<ApiResponse<ModelSummary[]>>) => {
-  const models = await prisma.$queryRawTyped(getModelsDb())
-  res.json(successResponse(models))
-})
+export const getModels = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<ModelSummary[]>>) => {
+    const models = await prisma.$queryRawTyped(getModelsDb())
+    res.json(successResponse(models))
+  },
+)
 
 export async function createModel(
   req: Request,
   res: Response<ApiResponse<{ id: number }>>,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const body = CreateModelSchema.parse(req.body)
@@ -23,8 +25,8 @@ export async function createModel(
         size: body.size,
         brand_id: body.brand_id,
         asset_type_id: body.asset_type_id,
-        is_colour: body.is_colour
-      }
+        is_colour: body.is_colour,
+      },
     })
     res.status(201).json(successResponse({ id: model.id }))
   } catch (error) {
@@ -34,8 +36,7 @@ export async function createModel(
 
 export async function mapDbModelToSummaryModel(modelId: number): Promise<ModelSummary> {
   const model = await prisma.model.findUnique({ where: { id: modelId } })
-  if (model === null)
-    throw new Error(`Model with ID ${modelId} not found`)
+  if (model === null) throw new Error(`Model with ID ${modelId} not found`)
 
   const brand = await prisma.brand.findUnique({ where: { id: model.brand_id } })
   if (brand === null)
@@ -52,6 +53,6 @@ export async function mapDbModelToSummaryModel(modelId: number): Promise<ModelSu
     asset_type: assetType.asset_type,
     weight: model.weight,
     size: model.size,
-    is_colour: model.is_colour
+    is_colour: model.is_colour,
   }
 }

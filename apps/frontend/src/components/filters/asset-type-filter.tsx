@@ -9,16 +9,16 @@ export function AssetTypeFilter({
   selection: AssetType[]
   onSelectionChange: (assetTypes: AssetType[]) => void
 }): React.JSX.Element {
-  const allAssetTypes = useReferenceDataStore(state => state.assetTypes)
+  const allAssetTypes = useReferenceDataStore((state) => state.assetTypes)
 
   return (
     <MultiSelectOptionsInline
       selection={selection}
       onSelectionChange={onSelectionChange}
       options={allAssetTypes}
-      getLabel={a => a.asset_type}
-      fieldLabel='Asset Type'
-      className='w-35'
+      getLabel={(a) => a.asset_type}
+      fieldLabel="Asset Type"
+      className="w-35"
     />
   )
 }

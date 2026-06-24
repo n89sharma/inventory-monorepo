@@ -1,81 +1,88 @@
-import { ReadinessPill } from "@/components/custom/readiness-pill"
-import { Badge } from "@/components/shadcn/badge"
-import { Button } from "@/components/shadcn/button"
-import { formatThousandsK, formatTitleCase } from "@/lib/formatters"
-import type { AssetForm } from "@/ui-types/arrival-form-types"
-import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react"
-import { getSelectedOrNull } from "@/ui-types/select-option-types"
-import type { ColumnDef } from "@tanstack/react-table"
+import { ReadinessPill } from '@/components/custom/readiness-pill'
+import { Badge } from '@/components/shadcn/badge'
+import { Button } from '@/components/shadcn/button'
+import { formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import type { AssetForm } from '@/ui-types/arrival-form-types'
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
+import { getSelectedOrNull } from '@/ui-types/select-option-types'
+import type { ColumnDef } from '@tanstack/react-table'
 import type { CoreFunction } from 'shared-types'
 
 interface GetNewAssetTableColumnProps {
   onDelete: (index: number) => void
   onEdit: (index: number) => void
 }
-export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableColumnProps): ColumnDef<AssetForm>[] {
+export function getNewAssetTableColumns({
+  onDelete,
+  onEdit,
+}: GetNewAssetTableColumnProps): ColumnDef<AssetForm>[] {
   return [
     {
-      accessorKey: "model.brand_name",
-      header: "Brand",
+      accessorKey: 'model.brand_name',
+      header: 'Brand',
       cell: ({ row }) => formatTitleCase(row.original.model?.brand_name ?? ''),
-      size: 80
+      size: 80,
     },
     {
-      accessorKey: "model.model_name",
-      header: "Model",
-      size: 120
+      accessorKey: 'model.model_name',
+      header: 'Model',
+      size: 120,
     },
     {
-      accessorKey: "serialNumber",
-      header: "Serial Number",
-      size: 100
+      accessorKey: 'serialNumber',
+      header: 'Serial Number',
+      size: 100,
     },
     {
-      accessorKey: "meterBlack",
-      header: "Meter Black",
+      accessorKey: 'meterBlack',
+      header: 'Meter Black',
       cell: ({ row }) => formatThousandsK(row.getValue('meterBlack')),
-      size: 70
+      size: 70,
     },
     {
-      accessorKey: "meterColour",
-      header: "Meter Colour",
+      accessorKey: 'meterColour',
+      header: 'Meter Colour',
       cell: ({ row }) => formatThousandsK(row.getValue('meterColour')),
-      size: 70
+      size: 70,
     },
     {
-      id: "component",
-      header: "Internal Finisher",
-      accessorFn: row => formatTitleCase(row.component?.name ?? ''),
-      size: 70
+      id: 'component',
+      header: 'Internal Finisher',
+      accessorFn: (row) => formatTitleCase(row.component?.name ?? ''),
+      size: 70,
     },
     {
-      accessorKey: "cassettes",
-      header: "Cassettes",
-      size: 70
+      accessorKey: 'cassettes',
+      header: 'Cassettes',
+      size: 70,
     },
     {
-      accessorKey: "readiness.selected.status",
-      header: "Readiness",
+      accessorKey: 'readiness.selected.status',
+      header: 'Readiness',
       cell: ({ row }) => (
         <ReadinessPill status={getSelectedOrNull(row.original.readiness)?.status} />
       ),
-      size: 100
+      size: 100,
     },
     {
-      accessorKey: "coreFunctions",
-      header: "Core Functions",
+      accessorKey: 'coreFunctions',
+      header: 'Core Functions',
       cell: ({ row }) => {
         const functions: CoreFunction[] = row.original.coreFunctions
         return (
           <div className="flex flex-wrap gap-1 max-w-60">
-            {functions.map(f => (<Badge key={f.accessory} variant="outline">{f.accessory}</Badge>))}
+            {functions.map((f) => (
+              <Badge key={f.accessory} variant="outline">
+                {f.accessory}
+              </Badge>
+            ))}
           </div>
         )
       },
-      size: 140
+      size: 140,
     },
     {
-      header: "Edit",
+      header: 'Edit',
       cell: ({ row }) => (
         <Button
           variant="outline"
@@ -87,10 +94,10 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
           <PencilSimpleIcon />
         </Button>
       ),
-      size: 50
+      size: 50,
     },
     {
-      header: "Remove",
+      header: 'Remove',
       cell: ({ row }) => (
         <Button
           variant="outline"
@@ -101,7 +108,7 @@ export function getNewAssetTableColumns({ onDelete, onEdit }: GetNewAssetTableCo
           <TrashIcon />
         </Button>
       ),
-      size: 50
-    }
+      size: 50,
+    },
   ]
 }

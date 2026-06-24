@@ -8,7 +8,11 @@ interface RoleGateProps {
   fallback?: React.ReactNode
 }
 
-export function RoleGate({ allow, children, fallback = <Navigate to="/" replace /> }: RoleGateProps) {
+export function RoleGate({
+  allow,
+  children,
+  fallback = <Navigate to="/" replace />,
+}: RoleGateProps) {
   const hasRole = useHasRole(...allow)
   return hasRole ? <>{children}</> : <>{fallback}</>
 }

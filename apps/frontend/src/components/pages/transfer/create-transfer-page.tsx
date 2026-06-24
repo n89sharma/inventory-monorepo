@@ -8,8 +8,10 @@ import { TransferFormPage } from './transfer-form-page'
 export function CreateTransferPage(): React.JSX.Element {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { preloadedAssets, returnTo } =
-    (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
+  const { preloadedAssets, returnTo } = (state ?? {}) as {
+    preloadedAssets?: AssetSummary[]
+    returnTo?: string
+  }
 
   const mutations = useTransferMutations()
 
@@ -20,13 +22,16 @@ export function CreateTransferPage(): React.JSX.Element {
     cancelNavUrl: '/transfers',
   }
 
-  const breadcrumbs = [
-    { label: 'Transfers', href: '/transfers' },
-    { label: 'Create' },
-  ]
+  const breadcrumbs = [{ label: 'Transfers', href: '/transfers' }, { label: 'Create' }]
 
   const defaultValues: TransferForm | undefined = preloadedAssets?.length
-    ? { origin: UNSELECTED, destination: UNSELECTED, transporter: null, comment: '', assets: preloadedAssets }
+    ? {
+        origin: UNSELECTED,
+        destination: UNSELECTED,
+        transporter: null,
+        comment: '',
+        assets: preloadedAssets,
+      }
     : undefined
 
   async function onValidTransferCreateSubmit(data: TransferForm) {

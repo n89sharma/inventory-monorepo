@@ -5,18 +5,18 @@ import z from 'zod'
 import { isSelected, WarehouseSelectOptionSchema, type SelectOption } from './select-option-types'
 
 export const DepartureFormAssetSchema = AssetSummarySchema.extend({
-  outgoing_status: OutgoingStatusSchema
+  outgoing_status: OutgoingStatusSchema,
 })
 
 export type DepartureFormAsset = AssetSummary & { outgoing_status: OutgoingStatus }
 
 export const DepartureFormSchema = z.object({
   id: z.number().optional(),
-  origin: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Origin required"),
-  customer: OrgSummarySchema.nullable().refine(val => !!val, "Customer required"),
-  transporter: OrgSummarySchema.nullable().refine(val => !!val, "Transporter required"),
+  origin: WarehouseSelectOptionSchema.refine((val) => isSelected(val), 'Origin required'),
+  customer: OrgSummarySchema.nullable().refine((val) => !!val, 'Customer required'),
+  transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
   comment: z.string(),
-  assets: z.array(DepartureFormAssetSchema).nonempty("No assets in the departure")
+  assets: z.array(DepartureFormAssetSchema).nonempty('No assets in the departure'),
 })
 
 export type DepartureForm = {
@@ -29,10 +29,10 @@ export type DepartureForm = {
 }
 
 export const DepartureMetadataFormSchema = z.object({
-  origin: WarehouseSelectOptionSchema.refine(val => isSelected(val), "Origin required"),
-  customer: OrgSummarySchema.nullable().refine(val => !!val, "Customer required"),
-  transporter: OrgSummarySchema.nullable().refine(val => !!val, "Transporter required"),
-  comment: z.string()
+  origin: WarehouseSelectOptionSchema.refine((val) => isSelected(val), 'Origin required'),
+  customer: OrgSummarySchema.nullable().refine((val) => !!val, 'Customer required'),
+  transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
+  comment: z.string(),
 })
 
 export type DepartureMetadataForm = {

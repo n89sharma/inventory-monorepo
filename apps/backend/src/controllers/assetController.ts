@@ -1,6 +1,21 @@
 import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetsBySerialNumberRequestSchema, AssetSummary, BarcodeSuggestion, BulkUpdateAssetPricingSchema, CreateCommentSchema, CreateSalvagedPartSchema, ExportAssetsSchema, PrintBarcodesSchema, UpdateAssetErrorsSchema, UpdateAssetLocationSchema, UpdateAssetPricingSchema, UpdateAssetSpecsSchema, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  AssetsBySerialNumberRequestSchema,
+  AssetSummary,
+  BarcodeSuggestion,
+  BulkUpdateAssetPricingSchema,
+  CreateCommentSchema,
+  CreateSalvagedPartSchema,
+  ExportAssetsSchema,
+  PrintBarcodesSchema,
+  UpdateAssetErrorsSchema,
+  UpdateAssetLocationSchema,
+  UpdateAssetPricingSchema,
+  UpdateAssetSpecsSchema,
+  successResponse,
+} from 'shared-types'
 import { z } from 'zod'
 import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -20,29 +35,33 @@ import {
   getAssetsForSearchHeld as getAssetsForSearchHeldSer,
   getAssets as getAssetsSer,
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
-  getSoldAssets as getSoldAssetsSer
+  getSoldAssets as getSoldAssetsSer,
 } from '../services/assetReadService.js'
 import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
 import { generateBarcodePdf as generateBarcodePdfSer } from '../services/barcodePrintService.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
-  updateAssetPricing as updateAssetPricingSer
+  updateAssetPricing as updateAssetPricingSer,
 } from '../services/assetPricingService.js'
 import { updateAssetErrors as updateAssetErrorsSer } from '../services/assetErrorService.js'
 import { createComment as createCommentSer } from '../services/assetCommentService.js'
 import {
   getLocationsByWarehouse as getLocationsByWarehouseSer,
-  updateAssetLocation as updateAssetLocationSer
+  updateAssetLocation as updateAssetLocationSer,
 } from '../services/assetLocationService.js'
 import { updateAssetSpecs as updateAssetSpecsSer } from '../services/assetSpecsService.js'
 import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../services/assetPartService.js'
 
 export const BarcodeSuggestionsQuerySchema = z.object({
-  q: z.string().min(1).max(50).regex(/^[a-zA-Z0-9\s\-_.]*$/)
+  q: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(/^[a-zA-Z0-9\s\-_.]*$/),
 })
 
 export const LocationsByWarehouseQuerySchema = z.object({
-  warehouseId: z.string().transform(Number)
+  warehouseId: z.string().transform(Number),
 })
 
 const toNumberArray = (val: unknown) => {
@@ -51,7 +70,12 @@ const toNumberArray = (val: unknown) => {
 }
 
 export const AssetQuerySchema = z.object({
-  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  model: z
+    .string()
+    .min(4)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/)
+    .optional(),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -63,7 +87,7 @@ export const AssetQuerySchema = z.object({
   componentId: z.string().optional().transform(Number),
   customerId: z.string().optional().transform(Number),
   fromDate: z.coerce.date().optional(),
-  toDate: z.coerce.date().optional()
+  toDate: z.coerce.date().optional(),
 })
 
 const MAX_DEPARTED_WINDOW_MONTHS = 18
@@ -84,8 +108,19 @@ function resolveDepartedRange(
 
 export const getAssets = asyncHandler(async (req, res) => {
   const {
-    model, statusIds, readinessIds, warehouseIds, brandIds, assetTypeIds,
-    meterMin, meterMax, cassettes, componentId, customerId, fromDate, toDate
+    model,
+    statusIds,
+    readinessIds,
+    warehouseIds,
+    brandIds,
+    assetTypeIds,
+    meterMin,
+    meterMax,
+    cassettes,
+    componentId,
+    customerId,
+    fromDate,
+    toDate,
   } = res.locals.query as z.infer<typeof AssetQuerySchema>
   const { departedFrom, departedTo } = resolveDepartedRange(fromDate, toDate)
   const data = await getAssetsSer(
@@ -112,7 +147,12 @@ export const getAssets = asyncHandler(async (req, res) => {
 })
 
 export const SoldAssetQuerySchema = z.object({
-  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  model: z
+    .string()
+    .min(4)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/)
+    .optional(),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -124,13 +164,10 @@ export const SoldAssetQuerySchema = z.object({
   componentId: z.string().optional().transform(Number),
   customerId: z.string().optional().transform(Number),
   fromDate: z.coerce.date(),
-  toDate: z.coerce.date()
+  toDate: z.coerce.date(),
 })
 
-function resolveSoldRange(
-  fromDate: Date,
-  toDate: Date,
-): { departedFrom: Date; departedTo: Date } {
+function resolveSoldRange(fromDate: Date, toDate: Date): { departedFrom: Date; departedTo: Date } {
   const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
   const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
   if (isAfter(departedFrom, toDate)) {
@@ -141,8 +178,19 @@ function resolveSoldRange(
 
 export const getSoldAssets = asyncHandler(async (req, res) => {
   const {
-    model, statusIds, readinessIds, warehouseIds, brandIds, assetTypeIds,
-    meterMin, meterMax, cassettes, componentId, customerId, fromDate, toDate
+    model,
+    statusIds,
+    readinessIds,
+    warehouseIds,
+    brandIds,
+    assetTypeIds,
+    meterMin,
+    meterMax,
+    cassettes,
+    componentId,
+    customerId,
+    fromDate,
+    toDate,
   } = res.locals.query as z.infer<typeof SoldAssetQuerySchema>
   const { departedFrom, departedTo } = resolveSoldRange(fromDate, toDate)
   const data = await getSoldAssetsSer(
@@ -165,12 +213,18 @@ export const getSoldAssets = asyncHandler(async (req, res) => {
 })
 
 export const SearchInStockQuerySchema = z.object({
-  warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number)))
-    .refine(ids => ids.length > 0, { message: 'At least one warehouse is required' }),
+  warehouseIds: z
+    .preprocess(toNumberArray, z.array(z.string().transform(Number)))
+    .refine((ids) => ids.length > 0, { message: 'At least one warehouse is required' }),
   brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
-  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  model: z
+    .string()
+    .min(4)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/)
+    .optional(),
   meterMin: z.string().optional().transform(Number),
   meterMax: z.string().optional().transform(Number),
   cassettes: z.string().optional().transform(Number),
@@ -179,8 +233,15 @@ export const SearchInStockQuerySchema = z.object({
 
 export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
   const {
-    warehouseIds, brandIds, assetTypeIds, readinessIds, model,
-    meterMin, meterMax, cassettes, componentId
+    warehouseIds,
+    brandIds,
+    assetTypeIds,
+    readinessIds,
+    model,
+    meterMin,
+    meterMax,
+    cassettes,
+    componentId,
   } = res.locals.query as z.infer<typeof SearchInStockQuerySchema>
   const data = await getAssetsForSearchInStockSer(
     warehouseIds,
@@ -198,12 +259,18 @@ export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
 })
 
 export const SearchHeldQuerySchema = z.object({
-  warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number)))
-    .refine(ids => ids.length > 0, { message: 'At least one warehouse is required' }),
+  warehouseIds: z
+    .preprocess(toNumberArray, z.array(z.string().transform(Number)))
+    .refine((ids) => ids.length > 0, { message: 'At least one warehouse is required' }),
   brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
-  model: z.string().min(4).max(100).regex(/^[a-zA-Z0-9\s\-_.]+$/).optional(),
+  model: z
+    .string()
+    .min(4)
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/)
+    .optional(),
   meterMin: z.string().optional().transform(Number),
   meterMax: z.string().optional().transform(Number),
   cassettes: z.string().optional().transform(Number),
@@ -216,9 +283,19 @@ export const SearchHeldQuerySchema = z.object({
 
 export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
   const {
-    warehouseIds, brandIds, assetTypeIds, readinessIds, model,
-    meterMin, meterMax, cassettes, componentId, heldById, heldForId, holdCustomerId,
-    daysHeldMin
+    warehouseIds,
+    brandIds,
+    assetTypeIds,
+    readinessIds,
+    model,
+    meterMin,
+    meterMax,
+    cassettes,
+    componentId,
+    heldById,
+    heldForId,
+    holdCustomerId,
+    daysHeldMin,
   } = res.locals.query as z.infer<typeof SearchHeldQuerySchema>
   const data = await getAssetsForSearchHeldSer(
     warehouseIds,
@@ -287,12 +364,14 @@ export const getAssetHistory = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const getAssetSummaryByBarcode = asyncHandler(async (req: Request, res: Response<ApiResponse<AssetSummary>>) => {
-  const { barcode } = req.params
-  const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
-  if (results.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
-  res.json(successResponse(mapAssetSummary(results[0])))
-})
+export const getAssetSummaryByBarcode = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<AssetSummary>>) => {
+    const { barcode } = req.params
+    const results = await prisma.$queryRawTyped(getAssetByBarcode(barcode))
+    if (results.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
+    res.json(successResponse(mapAssetSummary(results[0])))
+  },
+)
 
 export const createAssetComment = asyncHandler(async (req, res) => {
   const { barcode } = req.params
@@ -366,13 +445,15 @@ export const printAssetBarcodes = asyncHandler(async (req, res) => {
   res.send(pdf)
 })
 
-export const getBarcodeSuggestions = asyncHandler(async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {
-  const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
-  const normalized = normalizeForSearch(q)
-  if (!normalized) {
-    res.json(successResponse([]))
-    return
-  }
-  const results = await prisma.$queryRawTyped(searchBarcodes(normalized))
-  res.json(successResponse(results))
-})
+export const getBarcodeSuggestions = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {
+    const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
+    const normalized = normalizeForSearch(q)
+    if (!normalized) {
+      res.json(successResponse([]))
+      return
+    }
+    const results = await prisma.$queryRawTyped(searchBarcodes(normalized))
+    res.json(successResponse(results))
+  },
+)

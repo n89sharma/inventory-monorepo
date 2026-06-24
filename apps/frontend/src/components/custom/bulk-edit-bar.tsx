@@ -58,13 +58,14 @@ export function BulkEditBar({
     departures: canCreateDeparture,
     holds: canCreateHold,
     invoices: canCreateInvoice,
-    arrivals: canCreateArrival
+    arrivals: canCreateArrival,
   } as const satisfies Record<CollectionType, boolean>
 
-  const canRemoveFromCollection = currentCollectionType !== undefined
-    && collectionPermissionMap[currentCollectionType]
+  const canRemoveFromCollection =
+    currentCollectionType !== undefined && collectionPermissionMap[currentCollectionType]
   const showBulkRemove = onBulkRemove !== undefined && canRemoveFromCollection
-  const canCreateAnyCollection = canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
+  const canCreateAnyCollection =
+    canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
 
   function handleBulkRemove() {
     if (!onBulkRemove) return
@@ -101,28 +102,58 @@ export function BulkEditBar({
           <DropdownMenu>
             <Button asChild variant="default">
               <DropdownMenuTrigger>
-                <PlusIcon />Create
+                <PlusIcon />
+                Create
               </DropdownMenuTrigger>
             </Button>
             <DropdownMenuContent className="w-max" side="top" align="end">
-              {currentCollectionType !== 'transfers' && canCreateTransfer && <DropdownMenuItem key='transfers' onSelect={() => createNewCollection('/transfers/new')}>Transfer</DropdownMenuItem>}
-              {currentCollectionType !== 'departures' && canCreateDeparture && <DropdownMenuItem key='departures' onSelect={() => createNewCollection('/departures/new')}>Departure</DropdownMenuItem>}
-              {currentCollectionType !== 'holds' && canCreateHold && <DropdownMenuItem key='holds' onSelect={() => createNewCollection('/holds/new')}>Hold</DropdownMenuItem>}
-              {currentCollectionType !== 'invoices' && canCreateInvoice && <DropdownMenuItem key='invoices' onSelect={() => createNewCollection('/invoices/new')}>Invoice</DropdownMenuItem>}
+              {currentCollectionType !== 'transfers' && canCreateTransfer && (
+                <DropdownMenuItem
+                  key="transfers"
+                  onSelect={() => createNewCollection('/transfers/new')}
+                >
+                  Transfer
+                </DropdownMenuItem>
+              )}
+              {currentCollectionType !== 'departures' && canCreateDeparture && (
+                <DropdownMenuItem
+                  key="departures"
+                  onSelect={() => createNewCollection('/departures/new')}
+                >
+                  Departure
+                </DropdownMenuItem>
+              )}
+              {currentCollectionType !== 'holds' && canCreateHold && (
+                <DropdownMenuItem key="holds" onSelect={() => createNewCollection('/holds/new')}>
+                  Hold
+                </DropdownMenuItem>
+              )}
+              {currentCollectionType !== 'invoices' && canCreateInvoice && (
+                <DropdownMenuItem
+                  key="invoices"
+                  onSelect={() => createNewCollection('/invoices/new')}
+                >
+                  Invoice
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
         {canCreateAnyCollection && (
-          <Button variant="secondary" onClick={openAddTo}>Add to</Button>
+          <Button variant="secondary" onClick={openAddTo}>
+            Add to
+          </Button>
         )}
         {canEditPrices && (
           <Button variant="secondary" onClick={openBulkPricing}>
-            <CurrencyDollarIcon />Edit prices
+            <CurrencyDollarIcon />
+            Edit prices
           </Button>
         )}
         {showBulkRemove && (
           <Button variant="destructive" className="ml-6" onClick={handleBulkRemove}>
-            <TrashIcon />Remove
+            <TrashIcon />
+            Remove
           </Button>
         )}
       </BulkActionBar>
@@ -137,7 +168,10 @@ export function BulkEditBar({
         open={bulkPricingOpen}
         onOpenChange={setBulkPricingOpen}
         selectedAssets={assets}
-        onSaveSuccess={() => { onClear(); onPriceSaveSuccess?.() }}
+        onSaveSuccess={() => {
+          onClear()
+          onPriceSaveSuccess?.()
+        }}
       />
     </>
   )

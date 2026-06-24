@@ -8,8 +8,10 @@ import { HoldFormPage } from './hold-form-page'
 export function CreateHoldPage(): React.JSX.Element {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { preloadedAssets, returnTo } =
-    (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
+  const { preloadedAssets, returnTo } = (state ?? {}) as {
+    preloadedAssets?: AssetSummary[]
+    returnTo?: string
+  }
 
   const mutations = useHoldMutations()
 
@@ -20,10 +22,7 @@ export function CreateHoldPage(): React.JSX.Element {
     cancelNavUrl: '/holds',
   }
 
-  const breadcrumbs = [
-    { label: 'Holds', href: '/holds' },
-    { label: 'Create' },
-  ]
+  const breadcrumbs = [{ label: 'Holds', href: '/holds' }, { label: 'Create' }]
 
   const defaultValues: HoldForm | undefined = preloadedAssets?.length
     ? { created_for: UNSELECTED, customer: null, notes: '', assets: preloadedAssets }

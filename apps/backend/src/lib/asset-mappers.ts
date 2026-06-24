@@ -1,9 +1,4 @@
-import {
-  AssetDetails,
-  AssetLocationDetails,
-  AssetSearchRow,
-  AssetSummary
-} from 'shared-types'
+import { AssetDetails, AssetLocationDetails, AssetSearchRow, AssetSummary } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generated/prisma/sql.js'
 import { decimalToNumber } from './decimal.js'
@@ -21,7 +16,7 @@ export function buildLocation(r: LocationRow): AssetLocationDetails | null {
     warehouse_code: r.warehouse_code,
     warehouse_street: r.warehouse_street,
     zone: r.zone,
-    bin: r.bin ?? ''
+    bin: r.bin ?? '',
   }
 }
 
@@ -60,7 +55,7 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     hold_number: r.hold_number ?? null,
     purchase_invoice_number: r.purchase_invoice_number,
     sales_invoice_number: r.sales_invoice_number,
-    is_in_transit: r.is_in_transit
+    is_in_transit: r.is_in_transit,
   }
 }
 
@@ -144,7 +139,11 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
 export function getInitials(name: string): string {
   const words = name.trim().split(/\s+/)
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
-  return words.slice(0, 2).map(word => word[0]).join('').toUpperCase()
+  return words
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
 }
 
 type AssetDetailRow = getAssetDetailsBatchQuery.Result
@@ -173,7 +172,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
       other_cost: r.other_cost?.toNumber() ?? null,
       parts_cost: r.parts_cost?.toNumber() ?? null,
       total_cost: r.total_cost?.toNumber() ?? null,
-      sale_price: r.sale_price?.toNumber() ?? null
+      sale_price: r.sale_price?.toNumber() ?? null,
     },
     specs: {
       cassettes: r.ts_cassettes,
@@ -196,7 +195,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     departure: mapDeparture(r),
     purchase_invoice: mapInvoice(r),
     sales_invoice: mapSalesInvoice(r),
-    latest_comment: r.latest_comment
+    latest_comment: r.latest_comment,
   }
 }
 
@@ -210,7 +209,7 @@ function mapHold(r: AssetDetailRow) {
     from_dt: r.hold_from,
     to_dt: r.hold_to,
     notes: r.hold_notes,
-    hold_number: r.hold_number
+    hold_number: r.hold_number,
   }
 }
 
@@ -224,7 +223,7 @@ function mapArrival(r: AssetDetailRow) {
     transporter: r.arrival_transporter!,
     created_by: r.arrival_created_by_name!,
     notes: r.arrival_notes,
-    created_at: r.arrival_created_at!
+    created_at: r.arrival_created_at!,
   }
 }
 
@@ -238,7 +237,7 @@ function mapDeparture(r: AssetDetailRow) {
     transporter: r.departure_transporter!,
     created_by: r.departure_created_by_name ?? '',
     notes: r.departure_notes,
-    created_at: r.departure_created_at!
+    created_at: r.departure_created_at!,
   }
 }
 
@@ -246,7 +245,7 @@ function mapInvoice(r: AssetDetailRow) {
   if (!r.purchase_invoice_number) return null
   return {
     invoice_number: r.purchase_invoice_number,
-    is_cleared: r.purchase_invoice_is_cleared!
+    is_cleared: r.purchase_invoice_is_cleared!,
   }
 }
 
@@ -254,6 +253,6 @@ function mapSalesInvoice(r: AssetDetailRow) {
   if (!r.sales_invoice_number) return null
   return {
     invoice_number: r.sales_invoice_number,
-    is_cleared: r.sales_invoice_is_cleared!
+    is_cleared: r.sales_invoice_is_cleared!,
   }
 }

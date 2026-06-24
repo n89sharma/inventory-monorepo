@@ -32,21 +32,26 @@ interface AssetErrorsEditorProps {
   renderSearch: (props: AssetErrorsSearchSlotProps) => ReactNode
 }
 
-export function AssetErrorsEditor(
-  { value, onChange, brandId, disabled = false, invalid = false, renderSearch }: AssetErrorsEditorProps
-) {
-  const allErrors = useReferenceDataStore(state => state.errors)
+export function AssetErrorsEditor({
+  value,
+  onChange,
+  brandId,
+  disabled = false,
+  invalid = false,
+  renderSearch,
+}: AssetErrorsEditorProps) {
+  const allErrors = useReferenceDataStore((state) => state.errors)
   const [query, setQuery] = useState('')
 
-  const selectedIds = new Set(value.map(e => e.error_id))
+  const selectedIds = new Set(value.map((e) => e.error_id))
   // When no brand is known (no model picked yet), search across every brand's
   // errors rather than blocking the user. The backend re-checks brand/error
   // consistency on submit, so an off-brand pick gets surfaced as a toast.
-  const availableErrors = allErrors.filter(e => {
+  const availableErrors = allErrors.filter((e) => {
     const brandOk = brandId == null || e.brand_id === brandId
     return brandOk && !selectedIds.has(e.id)
   })
-  const errorById = new Map(allErrors.map(e => [e.id, e]))
+  const errorById = new Map(allErrors.map((e) => [e.id, e]))
 
   function handleSelect(error: ReferenceErrorType) {
     onChange([...value, { error_id: error.id, is_fixed: false }])
@@ -54,11 +59,11 @@ export function AssetErrorsEditor(
   }
 
   function handleToggleFixed(errorId: number) {
-    onChange(value.map(e => e.error_id === errorId ? { ...e, is_fixed: !e.is_fixed } : e))
+    onChange(value.map((e) => (e.error_id === errorId ? { ...e, is_fixed: !e.is_fixed } : e)))
   }
 
   function handleRemove(errorId: number) {
-    onChange(value.filter(e => e.error_id !== errorId))
+    onChange(value.filter((e) => e.error_id !== errorId))
   }
 
   const searchSlotProps: AssetErrorsSearchSlotProps = {
@@ -68,7 +73,7 @@ export function AssetErrorsEditor(
     onSelectionChange: handleSelect,
     onClear: () => setQuery(''),
     options: availableErrors,
-    getLabel: e => e.description ? `${e.code} — ${e.description}` : e.code,
+    getLabel: (e) => (e.description ? `${e.code} — ${e.description}` : e.code),
     error: invalid,
   }
 
@@ -78,7 +83,7 @@ export function AssetErrorsEditor(
 
       {value.length > 0 && (
         <div className="rounded-md border">
-          {value.map(e => {
+          {value.map((e) => {
             const ref = errorById.get(e.error_id)
             const code = ref?.code ?? `#${e.error_id}`
             const description = ref?.description

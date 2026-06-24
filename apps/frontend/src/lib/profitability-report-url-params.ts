@@ -25,8 +25,8 @@ function parseNumberList(raw: string | null): number[] {
   if (raw === null) return []
   return raw
     .split(LIST_SEPARATOR)
-    .map(part => Number.parseInt(part, 10))
-    .filter(value => !Number.isNaN(value))
+    .map((part) => Number.parseInt(part, 10))
+    .filter((value) => !Number.isNaN(value))
 }
 
 export function buildProfitabilityReportPath(warehouse: { id: number } | null): string {

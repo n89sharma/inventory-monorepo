@@ -41,16 +41,16 @@ export const EMPTY_SHARED_FILTERS: SharedAssetFilters = {
 }
 
 export function encodeIds(items: { id: number }[]): string {
-  return items.map(i => i.id).join(',')
+  return items.map((i) => i.id).join(',')
 }
 
 export function decodeIds<T extends { id: number }>(raw: string | null, lookup: T[]): T[] {
   if (!raw) return []
-  const byId = new Map(lookup.map(item => [item.id, item]))
+  const byId = new Map(lookup.map((item) => [item.id, item]))
   return raw
     .split(',')
-    .map(s => Number.parseInt(s, 10))
-    .map(id => byId.get(id))
+    .map((s) => Number.parseInt(s, 10))
+    .map((id) => byId.get(id))
     .filter((item): item is T => item !== undefined)
 }
 
@@ -77,18 +77,13 @@ export function getModelParams(
   models: ModelSummary[],
 ): { model: ModelSummary | null; modelQuery: string | null } {
   const modelId = params.get(PARAM_MODEL)
-  const model = modelId
-    ? models.find(m => m.id === Number.parseInt(modelId, 10)) ?? null
-    : null
+  const model = modelId ? (models.find((m) => m.id === Number.parseInt(modelId, 10)) ?? null) : null
   const qRaw = params.get(PARAM_Q)
   const modelQuery = !model && qRaw && qRaw.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? qRaw : null
   return { model, modelQuery }
 }
 
-export function setSharedFilterParams(
-  params: URLSearchParams,
-  filters: SharedAssetFilters,
-): void {
+export function setSharedFilterParams(params: URLSearchParams, filters: SharedAssetFilters): void {
   if (filters.warehouses.length > 0) params.set(PARAM_WH, encodeIds(filters.warehouses))
   setModelParams(params, filters.model, filters.modelQuery)
   if (filters.readinesses.length > 0) params.set(PARAM_READINESS, encodeIds(filters.readinesses))
@@ -122,7 +117,7 @@ export function getSharedFilters(
 
   const finisherRaw = params.get(PARAM_FIN)
   const internalFinisher = finisherRaw
-    ? ref.components.find(c => c.id === Number.parseInt(finisherRaw, 10)) ?? null
+    ? (ref.components.find((c) => c.id === Number.parseInt(finisherRaw, 10)) ?? null)
     : null
 
   const cassettesRaw = params.get(PARAM_CAS)

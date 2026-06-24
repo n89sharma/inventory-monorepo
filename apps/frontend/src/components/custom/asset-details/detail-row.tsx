@@ -1,82 +1,72 @@
-import { Badge } from "@/components/shadcn/badge"
-import { formatUSD } from "@/lib/formatters"
-import { cn } from "@/lib/utils"
-import { CurrencyDollarIcon } from "@phosphor-icons/react"
+import { Badge } from '@/components/shadcn/badge'
+import { formatUSD } from '@/lib/formatters'
+import { cn } from '@/lib/utils'
+import { CurrencyDollarIcon } from '@phosphor-icons/react'
 
 type CMYKDataProps = {
-  label: string,
-  c_value: number | undefined | null,
-  m_value: number | undefined | null,
-  y_value: number | undefined | null,
-  k_value: number | undefined | null,
+  label: string
+  c_value: number | undefined | null
+  m_value: number | undefined | null
+  y_value: number | undefined | null
+  k_value: number | undefined | null
   rowClassName?: string
 }
 
 type AccessoryDataProps = {
-  label: string,
-  accessories: string[],
+  label: string
+  accessories: string[]
   rowClassName?: string
 }
 
 type DataRowProps = {
-  label: string,
-  children: React.ReactNode,
-  rowClassName?: string,
+  label: string
+  children: React.ReactNode
+  rowClassName?: string
   labelClassName?: string
 }
 
 type DataValueRowProps = {
-  label: string,
-  value: string | number | undefined | null,
-  rowClassName?: string,
-  labelClassName?: string,
+  label: string
+  value: string | number | undefined | null
+  rowClassName?: string
+  labelClassName?: string
   valueClassName?: string
 }
 
 type DataCurrencyRowProps = {
-  label: string,
-  value: number | null | undefined,
+  label: string
+  value: number | null | undefined
   rowClassName?: string
 }
 
 type LabelProps = {
-  label: string,
+  label: string
   className?: string
 }
 
 type ValueProps = {
-  value: string | number | undefined | null,
+  value: string | number | undefined | null
   className?: string
 }
 
 function DataLabel({ label, className }: LabelProps): React.JSX.Element {
-  return (
-    <dt className={cn("text-left text-muted-foreground min-w-26", className)}>
-      {label}
-    </dt>
-  )
+  return <dt className={cn('text-left text-muted-foreground min-w-26', className)}>{label}</dt>
 }
 
 function DataValue({ value, className }: ValueProps): React.JSX.Element {
-  const valuePresent =
-    (typeof value === 'string' && value.length > 0) ||
-    (value)
+  const valuePresent = (typeof value === 'string' && value.length > 0) || value
 
-  return (
-    <dd className={cn("min-w-0 wrap-break-words", className)}>
-      {valuePresent ? value : '-'}
-    </dd>
-  )
+  return <dd className={cn('min-w-0 wrap-break-words', className)}>{valuePresent ? value : '-'}</dd>
 }
 
 export function DataRow({
   label,
   children,
   rowClassName,
-  labelClassName
+  labelClassName,
 }: DataRowProps): React.JSX.Element {
   return (
-    <div className={cn("flex items-start gap-4 py-1", rowClassName)}>
+    <div className={cn('flex items-start gap-4 py-1', rowClassName)}>
       <DataLabel label={label} className={labelClassName} />
       {children}
     </div>
@@ -88,7 +78,7 @@ export function DataValueRow({
   value,
   rowClassName,
   labelClassName,
-  valueClassName
+  valueClassName,
 }: DataValueRowProps): React.JSX.Element {
   return (
     <DataRow label={label} rowClassName={rowClassName} labelClassName={labelClassName}>
@@ -100,12 +90,16 @@ export function DataValueRow({
 export function DataCurrencyRow({
   label,
   value,
-  rowClassName
+  rowClassName,
 }: DataCurrencyRowProps): React.JSX.Element {
   return (
     <DataRow label={label} rowClassName={rowClassName}>
       <dd className="flex min-w-0 items-center gap-1">
-        {value != null && <span><CurrencyDollarIcon /></span>}
+        {value != null && (
+          <span>
+            <CurrencyDollarIcon />
+          </span>
+        )}
         <span className="tabular-nums text-right w-20">
           {value != null ? formatUSD(value) : '-'}
         </span>
@@ -120,7 +114,7 @@ export function CMYKRow({
   m_value,
   y_value,
   k_value,
-  rowClassName
+  rowClassName,
 }: CMYKDataProps): React.JSX.Element {
   return (
     <DataRow label={label} rowClassName={rowClassName}>
@@ -149,13 +143,15 @@ export function CMYKRow({
 export function AccessoryRow({
   label,
   accessories,
-  rowClassName
+  rowClassName,
 }: AccessoryDataProps): React.JSX.Element {
   return (
     <DataRow label={label} rowClassName={rowClassName}>
       <div className="flex flex-wrap gap-1">
-        {accessories.map(a => (
-          <Badge variant="outline" key={a}>{a}</Badge>
+        {accessories.map((a) => (
+          <Badge variant="outline" key={a}>
+            {a}
+          </Badge>
         ))}
       </div>
     </DataRow>

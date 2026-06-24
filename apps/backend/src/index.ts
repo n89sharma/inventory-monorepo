@@ -26,9 +26,11 @@ import userRoutes from './routes/userRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
 
 const isDev = process.env.NODE_ENV !== 'production'
-if (isDev) { await import('dotenv/config') }
+if (isDev) {
+  await import('dotenv/config')
+}
 
-const app = express();
+const app = express()
 app.disable('x-powered-by')
 
 morgan.token('id', (req: Request) => req.id)
@@ -47,7 +49,7 @@ const corsOptions = {
     'http://localhost:5173',
     'http://localhost:4173',
     'https://shiva-inv.vercel.app',
-    'https://instock.copierexports.com'
+    'https://instock.copierexports.com',
   ],
 }
 
@@ -60,7 +62,10 @@ app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }))
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(helmet.crossOriginOpenerPolicy({ policy: 'same-origin' }))
 app.use((_req, res, next) => {
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()')
+  res.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+  )
   next()
 })
 app.use(clerkMiddleware())
@@ -88,42 +93,46 @@ function colorForTime(ms: number): string {
 }
 
 if (isDev) {
-  app.use(morgan((tokens, req: Request, res: Response) => {
-    const status = Number(tokens['status'](req, res))
-    const ms = Math.round(parseFloat(tokens['response-time'](req, res) ?? '0'))
-    return `${req.id} ${tokens['method'](req, res)} ${tokens['url'](req, res)} ${colorForStatus(status)} ${colorForTime(ms)}`
-  }))
+  app.use(
+    morgan((tokens, req: Request, res: Response) => {
+      const status = Number(tokens['status'](req, res))
+      const ms = Math.round(parseFloat(tokens['response-time'](req, res) ?? '0'))
+      return `${req.id} ${tokens['method'](req, res)} ${tokens['url'](req, res)} ${colorForStatus(status)} ${colorForTime(ms)}`
+    }),
+  )
 } else {
-  app.use(morgan((tokens, req: Request, res: Response) =>
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      level: 'info',
-      message:
-        `${tokens['method'](req, res)} ${tokens['url'](req, res)} ` +
-        `${tokens['status'](req, res)} ${tokens['response-time'](req, res)}ms`,
-      requestId: req.id,
-      method: tokens['method'](req, res),
-      url: tokens['url'](req, res),
-      status: Number(tokens['status'](req, res)),
-      responseTime: Number(tokens['response-time'](req, res)),
-      service: 'loon-backend',
-      env: process.env.NODE_ENV ?? 'development',
-    })
-  ))
+  app.use(
+    morgan((tokens, req: Request, res: Response) =>
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        level: 'info',
+        message:
+          `${tokens['method'](req, res)} ${tokens['url'](req, res)} ` +
+          `${tokens['status'](req, res)} ${tokens['response-time'](req, res)}ms`,
+        requestId: req.id,
+        method: tokens['method'](req, res),
+        url: tokens['url'](req, res),
+        status: Number(tokens['status'](req, res)),
+        responseTime: Number(tokens['response-time'](req, res)),
+        service: 'loon-backend',
+        env: process.env.NODE_ENV ?? 'development',
+      }),
+    ),
+  )
 }
 
 app.get('/', (req, res) => {
-  res.send('Inventory API');
+  res.send('Inventory API')
 })
 
-app.use('/reference', constantRoutes);
-app.use('/brands', brandRoutes);
-app.use('/assets', assetRoutes);
-app.use('/arrivals', arrivalRoutes);
-app.use('/departures', departureRoutes);
-app.use('/transfers', transferRoutes);
-app.use('/holds', holdRoutes);
-app.use('/invoices', invoiceRoutes);
+app.use('/reference', constantRoutes)
+app.use('/brands', brandRoutes)
+app.use('/assets', assetRoutes)
+app.use('/arrivals', arrivalRoutes)
+app.use('/departures', departureRoutes)
+app.use('/transfers', transferRoutes)
+app.use('/holds', holdRoutes)
+app.use('/invoices', invoiceRoutes)
 app.use('/models', modelRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
@@ -135,7 +144,7 @@ app.use('/store', storePartRoutes)
 
 app.use(errorHandler)
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`)
 })

@@ -36,8 +36,12 @@ export function AssetSearchPage({
   children: React.ReactNode
 }): React.JSX.Element {
   const [searchParams] = useSearchParams()
-  const { visibleColumns, setVisibleColumns, columnVisibility, reset: resetColumns } =
-    useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
+  const {
+    visibleColumns,
+    setVisibleColumns,
+    columnVisibility,
+    reset: resetColumns,
+  } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
   const selection = useAssetSelection(assets, visibleColumns)
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
@@ -75,7 +79,7 @@ export function AssetSearchPage({
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
-          onSubmit={e => e.preventDefault()}
+          onSubmit={(e) => e.preventDefault()}
         >
           {children}
         </form>

@@ -8,7 +8,7 @@ type InvoiceBucket = { invoice_number: string | null; count: number }
 
 function groupAssetsByInvoice(
   assets: AssetSummary[],
-  getInvoiceNumber: AssetInvoiceSelector
+  getInvoiceNumber: AssetInvoiceSelector,
 ): InvoiceBucket[] {
   const counts = new Map<string | null, number>()
   for (const asset of assets) {
@@ -29,14 +29,14 @@ function groupAssetsByInvoice(
 
 export function InvoiceSummaryField({
   assets,
-  getInvoiceNumber
+  getInvoiceNumber,
 }: {
   assets: AssetSummary[]
   getInvoiceNumber: AssetInvoiceSelector
 }) {
   const invoiceBuckets = useMemo(
     () => groupAssetsByInvoice(assets, getInvoiceNumber),
-    [assets, getInvoiceNumber]
+    [assets, getInvoiceNumber],
   )
   if (invoiceBuckets.length === 0) return null
   return (

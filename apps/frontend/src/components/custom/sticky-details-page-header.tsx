@@ -12,15 +12,13 @@ type StickyDetailsPageHeaderProps = {
   | { titleNode: React.ReactNode; title?: never; copyValue?: never }
 )
 
-export function StickyDetailsPageHeader(
-  props: StickyDetailsPageHeaderProps,
-): React.JSX.Element {
+export function StickyDetailsPageHeader(props: StickyDetailsPageHeaderProps): React.JSX.Element {
   const { breadcrumbSegments, actions, subtitle } = props
   return (
     <StickyPageHeader>
-      {breadcrumbSegments.length > 0
-        ? <PageBreadcrumbToTitle segments={breadcrumbSegments} />
-        : null}
+      {breadcrumbSegments.length > 0 ? (
+        <PageBreadcrumbToTitle segments={breadcrumbSegments} />
+      ) : null}
       <div className="flex items-center justify-between gap-4">
         {props.titleNode ?? (
           <h1 className="text-2xl font-semibold group flex items-center gap-2">

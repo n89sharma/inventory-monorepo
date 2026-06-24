@@ -1,8 +1,27 @@
 import { api } from '@/data/api/axios-client'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
-import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateHold, HoldDetail, UpdateHoldMetadata, User } from 'shared-types'
-import { AssetDeltaSchema, CollectionHistorySchema, CreateHoldSchema, HoldDetailSchema, HoldSummarySchema, UpdateHoldMetadataSchema, type HoldSummary } from 'shared-types'
+import {
+  getIdOrNullFromSelection,
+  getSelectedOrNull,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import type {
+  AssetDelta,
+  CollectionHistory,
+  CreateHold,
+  HoldDetail,
+  UpdateHoldMetadata,
+  User,
+} from 'shared-types'
+import {
+  AssetDeltaSchema,
+  CollectionHistorySchema,
+  CreateHoldSchema,
+  HoldDetailSchema,
+  HoldSummarySchema,
+  UpdateHoldMetadataSchema,
+  type HoldSummary,
+} from 'shared-types'
 import { z } from 'zod'
 
 const CreateHoldResponseSchema = z.object({ holdNumber: z.string() })
@@ -12,15 +31,15 @@ export async function getHolds(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
-  holdFor: SelectOption<User>
+  holdFor: SelectOption<User>,
 ): Promise<HoldSummary[]> {
   const { data } = await api.get<HoldSummary[]>(`/holds`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       holdBy: getIdOrNullFromSelection(holdBy),
-      holdFor: getIdOrNullFromSelection(holdFor)
-    }
+      holdFor: getIdOrNullFromSelection(holdFor),
+    },
   })
   return z.array(HoldSummarySchema).parse(data)
 }
@@ -30,7 +49,7 @@ export async function createHold(d: HoldForm): Promise<CreateHoldResponse> {
     created_for_id: getIdOrNullFromSelection(d.created_for)!,
     customer_id: d.customer!.id,
     notes: d.notes || null,
-    assets: d.assets as CreateHold['assets']
+    assets: d.assets as CreateHold['assets'],
   } satisfies CreateHold)
   const { data } = await api.post<CreateHoldResponse>('/holds', createHoldBody)
   return CreateHoldResponseSchema.parse(data)
@@ -52,20 +71,17 @@ export async function getHoldHistory(holdNumber: string): Promise<CollectionHist
 
 export async function updateHoldMetadata(
   holdNumber: string,
-  metadata: HoldMetadataForm
+  metadata: HoldMetadataForm,
 ): Promise<void> {
   const updateHoldMetadataBody = UpdateHoldMetadataSchema.parse({
     created_for: getSelectedOrNull(metadata.created_for)!,
     customer: metadata.customer!,
-    notes: metadata.notes === '' ? null : metadata.notes
+    notes: metadata.notes === '' ? null : metadata.notes,
   } satisfies UpdateHoldMetadata)
   await api.patch(`/holds/${holdNumber}/metadata`, updateHoldMetadataBody)
 }
 
-export async function patchHoldAssets(
-  holdNumber: string,
-  delta: AssetDelta
-): Promise<void> {
+export async function patchHoldAssets(holdNumber: string, delta: AssetDelta): Promise<void> {
   const patchHoldAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/holds/${holdNumber}/assets`, patchHoldAssetsBody)
 }

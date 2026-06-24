@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 const PART_NUMBER_PATTERN = /^[a-zA-Z0-9\-_.]+$/
 
@@ -6,14 +6,14 @@ const PART_NUMBER_PATTERN = /^[a-zA-Z0-9\-_.]+$/
 export const StorePartSchema = z.object({
   id: z.number(),
   part_number: z.string(),
-  description: z.string()
+  description: z.string(),
 })
 export type StorePart = z.infer<typeof StorePartSchema>
 
 // StorePart without its id — a part to be created on first purchase
 export const CreateStorePartSchema = z.object({
   part_number: z.string().min(1).max(50).regex(PART_NUMBER_PATTERN, 'Invalid part number'),
-  description: z.string().min(1)
+  description: z.string().min(1),
 })
 export type CreateStorePart = z.infer<typeof CreateStorePartSchema>
 
@@ -26,7 +26,7 @@ export const StorePartSummarySchema = z.object({
   warehouse_code: z.string(),
   on_hand: z.number().int(),
   last_purchase_unit_cost: z.number().nullable(),
-  last_updated: z.coerce.date()
+  last_updated: z.coerce.date(),
 })
 export type StorePartSummary = z.infer<typeof StorePartSummarySchema>
 
@@ -46,7 +46,7 @@ export const StoreTransactionRowSchema = z.object({
   asset_id: z.number().nullable(),
   asset_barcode: z.string().nullable(),
   created_by: z.string(),
-  notes: z.string().nullable()
+  notes: z.string().nullable(),
 })
 export type StoreTransactionRow = z.infer<typeof StoreTransactionRowSchema>
 
@@ -55,7 +55,7 @@ export const StorePartDetailSchema = z.object({
   id: z.number(),
   part_number: z.string(),
   description: z.string(),
-  transactions: z.array(StoreTransactionRowSchema)
+  transactions: z.array(StoreTransactionRowSchema),
 })
 export type StorePartDetail = z.infer<typeof StorePartDetailSchema>
 
@@ -63,18 +63,18 @@ export type StorePartDetail = z.infer<typeof StorePartDetailSchema>
 export const AddPurchaseSchema = z.object({
   part: z.discriminatedUnion('mode', [
     z.object({ mode: z.literal('existing'), store_part_id: z.number().int() }),
-    z.object({ mode: z.literal('new') }).merge(CreateStorePartSchema)
+    z.object({ mode: z.literal('new') }).merge(CreateStorePartSchema),
   ]),
   warehouse_id: z.number().int(),
   quantity: z.number().int().positive(),
   unit_cost: z.number().nonnegative().nullable(),
-  notes: z.string().nullable()
+  notes: z.string().nullable(),
 })
 export type AddPurchase = z.infer<typeof AddPurchaseSchema>
 
 export const AddPurchaseResponseSchema = z.object({
   store_transaction_number: z.string(),
-  part_number: z.string()
+  part_number: z.string(),
 })
 export type AddPurchaseResponse = z.infer<typeof AddPurchaseResponseSchema>
 
@@ -84,7 +84,7 @@ export const AssetStorePartRowSchema = z.object({
   part_number: z.string(),
   description: z.string(),
   quantity: z.number().int(),
-  estimated_cost: z.number()
+  estimated_cost: z.number(),
 })
 export type AssetStorePartRow = z.infer<typeof AssetStorePartRowSchema>
 
@@ -93,6 +93,6 @@ export const AddStorePartToAssetSchema = z.object({
   store_part_id: z.number().int(),
   warehouse_id: z.number().int(),
   quantity: z.number().int().positive(),
-  unit_cost: z.number().positive()
+  unit_cost: z.number().positive(),
 })
 export type AddStorePartToAsset = z.infer<typeof AddStorePartToAssetSchema>

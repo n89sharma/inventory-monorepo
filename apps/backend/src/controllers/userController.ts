@@ -10,14 +10,17 @@ import { prisma } from '../prisma.js'
 const DEFAULT_ROLE = 'member'
 
 export const UserQuerySchema = z.object({
-  filterActive: z.string().optional().transform(v => v === 'true'),
+  filterActive: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true'),
 })
 
 export const getUsers = asyncHandler(async (req, res) => {
   const { filterActive } = res.locals.query as z.infer<typeof UserQuerySchema>
   const users = await prisma.$queryRawTyped(getUsersDb())
   if (filterActive) {
-    res.json(successResponse(users.filter(u => u.is_active)))
+    res.json(successResponse(users.filter((u) => u.is_active)))
   } else {
     res.json(successResponse(users))
   }
@@ -36,7 +39,7 @@ export const setUserRole = asyncHandler(async (req, res) => {
 
   await Promise.all([
     prisma.user.update({ where: { id: targetDbUserId }, data: { role } }),
-    clerkClient.users.updateUserMetadata(user.clerk_id, { publicMetadata: { role } })
+    clerkClient.users.updateUserMetadata(user.clerk_id, { publicMetadata: { role } }),
   ])
 
   res.json(successResponse({ userId: targetDbUserId, role }))
@@ -57,7 +60,7 @@ export const toggleUserActive = asyncHandler(async (req, res) => {
 
   await Promise.all([
     prisma.user.update({ where: { id: targetDbUserId }, data: { is_active, role } }),
-    clerkClient.users.updateUserMetadata(user.clerk_id, { publicMetadata: { role } })
+    clerkClient.users.updateUserMetadata(user.clerk_id, { publicMetadata: { role } }),
   ])
 
   if (!is_active) userIdCache.delete(user.clerk_id)

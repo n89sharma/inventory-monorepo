@@ -32,9 +32,10 @@ export type SearchHeldReferenceData = SharedAssetReferenceData & {
   customers: OrgSummary[]
 }
 
-export function buildSearchHeldUrl(
-  selection: { heldForId?: number; holdCustomerId?: number },
-): string {
+export function buildSearchHeldUrl(selection: {
+  heldForId?: number
+  holdCustomerId?: number
+}): string {
   const params = new URLSearchParams()
   if (selection.heldForId !== undefined) params.set(PARAM_HELD_FOR, String(selection.heldForId))
   if (selection.holdCustomerId !== undefined) {
@@ -61,22 +62,22 @@ export function paramsToFilters(
 ): SearchHeldFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
-    ? ref.brands.find(b => b.id === Number.parseInt(brandId, 10)) ?? null
+    ? (ref.brands.find((b) => b.id === Number.parseInt(brandId, 10)) ?? null)
     : null
 
   const heldById = params.get(PARAM_HELD_BY)
   const heldBy = heldById
-    ? ref.users.find(u => u.id === Number.parseInt(heldById, 10)) ?? null
+    ? (ref.users.find((u) => u.id === Number.parseInt(heldById, 10)) ?? null)
     : null
 
   const heldForId = params.get(PARAM_HELD_FOR)
   const heldFor = heldForId
-    ? ref.users.find(u => u.id === Number.parseInt(heldForId, 10)) ?? null
+    ? (ref.users.find((u) => u.id === Number.parseInt(heldForId, 10)) ?? null)
     : null
 
   const holdCustomerId = params.get(PARAM_HOLD_CUSTOMER)
   const holdCustomer = holdCustomerId
-    ? ref.customers.find(c => c.id === Number.parseInt(holdCustomerId, 10)) ?? null
+    ? (ref.customers.find((c) => c.id === Number.parseInt(holdCustomerId, 10)) ?? null)
     : null
 
   return {

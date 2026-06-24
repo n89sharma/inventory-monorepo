@@ -14,9 +14,13 @@ export function ReadinessPillContent({ status }: { status: string }) {
   )
 }
 
-export function ReadinessPill(
-  { status, className }: { status: string | null | undefined; className?: string }
-) {
+export function ReadinessPill({
+  status,
+  className,
+}: {
+  status: string | null | undefined
+  className?: string
+}) {
   if (!status) return null
   return (
     <span className={cn(readinessPillClasses, className)}>

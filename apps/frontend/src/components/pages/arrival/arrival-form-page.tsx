@@ -16,7 +16,14 @@ import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { AssetModal } from '../../modals/create-asset-modal'
 import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
-import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../../shadcn/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '../../shadcn/field'
 import { Textarea } from '../../shadcn/textarea'
 import { getNewAssetTableColumns } from '../column-defs/form-new-asset-columns'
 
@@ -32,23 +39,41 @@ interface ArrivalFormPageProps {
   onValidSubmit: (data: ArrivalForm) => Promise<void>
 }
 
-export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: ArrivalFormPageProps): React.JSX.Element {
+export function ArrivalFormPage({
+  defaultValues,
+  pageConfig,
+  breadcrumbs,
+  onValidSubmit,
+}: ArrivalFormPageProps): React.JSX.Element {
   const form = useForm<ArrivalForm>({
     resolver: zodResolver(ArrivalFormSchema),
-    defaultValues: defaultValues ?? getDefaultArrival()
+    defaultValues: defaultValues ?? getDefaultArrival(),
   })
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore(state => state.organizations)
-  const { fields: assets, append: addAsset, remove: deleteAsset, update: updateAsset } = useFieldArray({ control: form.control, name: 'assets' })
+  const orgs = useOrgStore((state) => state.organizations)
+  const {
+    fields: assets,
+    append: addAsset,
+    remove: deleteAsset,
+    update: updateAsset,
+  } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetIndex, setEditingAssetIndex] = useState<number | null>(null)
-  const assetTableColumns = useMemo(() => getNewAssetTableColumns({
-    onDelete: id => deleteAsset(id),
-    onEdit: index => { setEditingAssetIndex(index); setIsAssetModalOpen(true) }
-  }), [deleteAsset])
-  const editingAsset = editingAssetIndex !== null ? form.getValues('assets')[editingAssetIndex] : null
+  const assetTableColumns = useMemo(
+    () =>
+      getNewAssetTableColumns({
+        onDelete: (id) => deleteAsset(id),
+        onEdit: (index) => {
+          setEditingAssetIndex(index)
+          setIsAssetModalOpen(true)
+        },
+      }),
+    [deleteAsset],
+  )
+  const editingAsset =
+    editingAssetIndex !== null ? form.getValues('assets')[editingAssetIndex] : null
 
   function getDefaultArrival() {
     return {
@@ -56,7 +81,7 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
       transporter: null,
       warehouse: UNSELECTED,
       assets: [],
-      comment: ''
+      comment: '',
     }
   }
 
@@ -65,7 +90,9 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
   }
 
   function onInvalidArrival(errors: FieldErrors<ArrivalForm>) {
-    toast.error(`Form has errors: ${flattenFieldErrors(errors, ['id'])}`, { position: 'top-center' })
+    toast.error(`Form has errors: ${flattenFieldErrors(errors, ['id'])}`, {
+      position: 'top-center',
+    })
   }
 
   return (
@@ -81,114 +108,109 @@ export function ArrivalFormPage({ defaultValues, pageConfig, breadcrumbs, onVali
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitArrival}
       />
-      <PageContent className='flex flex-col gap-4'>
-      <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
-        <fieldset disabled={isSubmitting} className='contents'>
-          <FieldSet>
-            <FieldLegend>General Arrival Information</FieldLegend>
-            <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
+      <PageContent className="flex flex-col gap-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="border rounded-md p-2 flex flex-col gap-2"
+        >
+          <fieldset disabled={isSubmitting} className="contents">
+            <FieldSet>
+              <FieldLegend>General Arrival Information</FieldLegend>
+              <FieldGroup className="grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl">
+                <ControlledSearchSelectInput
+                  control={form.control}
+                  name="vendor"
+                  options={orgs}
+                  getLabel={(o) => o.name}
+                  fieldLabel="Vendor"
+                  fieldRequired={true}
+                  className="max-w-60"
+                />
 
-              <ControlledSearchSelectInput
-                control={form.control}
-                name='vendor'
-                options={orgs}
-                getLabel={o => o.name}
-                fieldLabel='Vendor'
-                fieldRequired={true}
-                className='max-w-60'
-              />
+                <ControlledSearchSelectInput
+                  control={form.control}
+                  name="transporter"
+                  options={orgs}
+                  getLabel={(o) => o.name}
+                  fieldLabel="Transporter"
+                  fieldRequired={true}
+                  className="max-w-60"
+                />
 
-              <ControlledSearchSelectInput
+                <Controller
+                  control={form.control}
+                  name="warehouse"
+                  render={({ field: { onChange, value: warehouse }, fieldState }) => (
+                    <SelectOptions
+                      selection={warehouse}
+                      onSelectionChange={onChange}
+                      options={activeWarehouses}
+                      getLabel={(w) => w.city_code}
+                      fieldLabel="Warehouse"
+                      anyAllowed={false}
+                      fieldRequired={true}
+                      error={fieldState.invalid}
+                      className="max-w-60"
+                    />
+                  )}
+                />
+              </FieldGroup>
+
+              <Controller
                 control={form.control}
-                name='transporter'
-                options={orgs}
-                getLabel={o => o.name}
-                fieldLabel='Transporter'
-                fieldRequired={true}
-                className='max-w-60'
+                name="comment"
+                render={({ field }) => (
+                  <Field className="max-w-xl">
+                    <FieldLabel>Comments</FieldLabel>
+                    <Textarea placeholder="Arrival notes…" className="resize-none" {...field} />
+                  </Field>
+                )}
               />
 
               <Controller
                 control={form.control}
-                name='warehouse'
-                render={({ field: { onChange, value: warehouse }, fieldState }) => (
-                  <SelectOptions
-                    selection={warehouse}
-                    onSelectionChange={onChange}
-                    options={activeWarehouses}
-                    getLabel={w => w.city_code}
-                    fieldLabel='Warehouse'
-                    anyAllowed={false}
-                    fieldRequired={true}
-                    error={fieldState.invalid}
-                    className='max-w-60'
-                  />
+                name="assets"
+                render={({ fieldState }) => (
+                  <div aria-live="polite">
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </div>
                 )}
               />
-            </FieldGroup>
+            </FieldSet>
+          </fieldset>
+        </form>
+        <AssetModal
+          open={isAssetModalOpen}
+          onOpenChange={setIsAssetModalOpen}
+          addNewAsset={addAsset}
+          updateAsset={updateAsset}
+          editingAsset={editingAsset}
+          editingIndex={editingAssetIndex}
+        />
 
-            <Controller
-              control={form.control}
-              name='comment'
-              render={({ field }) => (
-                <Field className='max-w-xl'>
-                  <FieldLabel>
-                    Comments
-                  </FieldLabel>
-                  <Textarea
-                    placeholder='Arrival notes…'
-                    className='resize-none'
-                    {...field}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              control={form.control}
-              name='assets'
-              render={({ fieldState }) => (
-                <div aria-live="polite">
-                  {
-                    fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )
-                  }
-                </div>
-              )}
-            />
-          </FieldSet>
-        </fieldset>
-      </form>
-      <AssetModal
-        open={isAssetModalOpen}
-        onOpenChange={setIsAssetModalOpen}
-        addNewAsset={addAsset}
-        updateAsset={updateAsset}
-        editingAsset={editingAsset}
-        editingIndex={editingAssetIndex}
-      />
-
-      <div className='flex flex-col gap-2'>
-        <div className='flex items-center justify-between'>
-          <h2 className='text-lg font-semibold'>Assets</h2>
-          <Button
-            variant='secondary'
-            type='button'
-            disabled={isSubmitting}
-            onClick={() => { setEditingAssetIndex(null); setIsAssetModalOpen(true) }}
-          >
-            Add Asset
-          </Button>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Assets</h2>
+            <Button
+              variant="secondary"
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => {
+                setEditingAssetIndex(null)
+                setIsAssetModalOpen(true)
+              }}
+            >
+              Add Asset
+            </Button>
+          </div>
+          <DataTable columns={assetTableColumns} data={assets} />
         </div>
-        <DataTable columns={assetTableColumns} data={assets} />
-      </div>
 
-      <UnsavedChangesDialog
-        open={guard.isBlocked}
-        onOpenChange={guard.onOpenChange}
-        onDiscard={guard.onDiscard}
-      />
+        <UnsavedChangesDialog
+          open={guard.isBlocked}
+          onOpenChange={guard.onOpenChange}
+          onDiscard={guard.onDiscard}
+        />
       </PageContent>
     </>
   )

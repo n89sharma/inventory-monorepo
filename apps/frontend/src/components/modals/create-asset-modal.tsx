@@ -18,22 +18,20 @@ import { AssetErrorsEditor } from '../custom/asset-errors-editor'
 import { ControlledSearchSelectField } from '../custom/controlled-search-select-field'
 import { HorizontalField } from '../custom/horizontal-field'
 import { SearchSelectInput } from '../custom/search-select-input'
-import { ControlledTextInput, INPUT_WIDTH, TechnicalSpecsFields } from '../custom/technical-specs-fields'
+import {
+  ControlledTextInput,
+  INPUT_WIDTH,
+  TechnicalSpecsFields,
+} from '../custom/technical-specs-fields'
 import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { Button } from '../shadcn/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../shadcn/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Textarea } from '../shadcn/textarea'
 
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 
 function getDefaultNewAsset(allReadinesses: Status[] = []): AssetForm {
-  const untested = allReadinesses.find(r => r.status === 'UNTESTED')
+  const untested = allReadinesses.find((r) => r.status === 'UNTESTED')
   return {
     serialNumber: '',
     model: null,
@@ -87,9 +85,9 @@ export function AssetModal({
     submitLabel: isEditMode ? 'Update Asset' : 'Save Asset',
   }
 
-  const readinesses = useReferenceDataStore(state => state.readinesses)
-  const brands = useReferenceDataStore(state => state.brands)
-  const models = useModelStore(state => state.models)
+  const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const brands = useReferenceDataStore((state) => state.brands)
+  const models = useModelStore((state) => state.models)
 
   const values = useMemo(
     () => editingAsset ?? getDefaultNewAsset(readinesses),
@@ -100,10 +98,8 @@ export function AssetModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    newAssetForm.formState.isDirty,
-    onOpenChange,
-    () => newAssetForm.reset(),
+  const guard = useUnsavedChangesGuard(newAssetForm.formState.isDirty, onOpenChange, () =>
+    newAssetForm.reset(),
   )
 
   // Watch readiness + model to (a) drive the errors editor's enabled/brand state
@@ -118,7 +114,7 @@ export function AssetModal({
   const currentBrandName = modelSelection?.brand_name ?? null
   const isColourModel = modelSelection?.is_colour ?? false
   const brandId = currentBrandName
-    ? brands.find(b => b.name === currentBrandName)?.id ?? null
+    ? (brands.find((b) => b.name === currentBrandName)?.id ?? null)
     : null
   const isHasErrors = currentReadinessStatus === HAS_ERRORS_READINESS
 
@@ -197,30 +193,29 @@ export function AssetModal({
 
   return (
     <Dialog open={open} onOpenChange={guard.onOpenChange}>
-      <DialogContent className='md:max-w-175 max-h-[90vh] flex flex-col'>
+      <DialogContent className="md:max-w-175 max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
         </DialogHeader>
         <form
-          onSubmit={e => e.preventDefault()}
-          className='flex flex-col gap-6 flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-1 pt-2 pb-1'
+          onSubmit={(e) => e.preventDefault()}
+          className="flex flex-col gap-6 flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-1 pt-2 pb-1"
         >
-
-          <div className='flex flex-col gap-2'>
-            <HorizontalField label='Model' required>
+          <div className="flex flex-col gap-2">
+            <HorizontalField label="Model" required>
               <ControlledSearchSelectField
                 control={newAssetForm.control}
-                name='model'
+                name="model"
                 options={models}
                 getLabel={modelLabel}
-                clearLabel='Clear model'
+                clearLabel="Clear model"
                 className={INPUT_WIDTH}
               />
             </HorizontalField>
-            <HorizontalField label='Serial Number' required>
+            <HorizontalField label="Serial Number" required>
               <ControlledTextInput
                 control={newAssetForm.control}
-                name='serialNumber'
+                name="serialNumber"
                 className={INPUT_WIDTH}
               />
             </HorizontalField>
@@ -231,10 +226,10 @@ export function AssetModal({
             isColour={isColourModel}
             brandName={currentBrandName}
             renderAfterReadiness={
-              <HorizontalField label='Errors' required={isHasErrors}>
+              <HorizontalField label="Errors" required={isHasErrors}>
                 <Controller
                   control={newAssetForm.control}
-                  name='errors'
+                  name="errors"
                   render={({ field, fieldState }) => (
                     <AssetErrorsEditor
                       value={field.value}
@@ -242,7 +237,9 @@ export function AssetModal({
                       brandId={brandId}
                       disabled={!isHasErrors}
                       invalid={fieldState.invalid}
-                      renderSearch={slot => <SearchSelectInput {...slot} placeholder="" className={INPUT_WIDTH} />}
+                      renderSearch={(slot) => (
+                        <SearchSelectInput {...slot} placeholder="" className={INPUT_WIDTH} />
+                      )}
                     />
                   )}
                 />
@@ -250,32 +247,31 @@ export function AssetModal({
             }
           />
 
-          <HorizontalField label='Comment'>
+          <HorizontalField label="Comment">
             <Controller
               control={newAssetForm.control}
-              name='comment'
+              name="comment"
               render={({ field }) => (
                 <Textarea
                   value={field.value ?? ''}
-                  onChange={e => field.onChange(e.target.value === '' ? null : e.target.value)}
+                  onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
                   maxLength={2000}
                   rows={3}
                 />
               )}
             />
           </HorizontalField>
-
         </form>
         <DialogFooter>
           <Button
-            variant='outline'
+            variant="outline"
             onClick={() => guard.onOpenChange(false)}
-            type='button'
+            type="button"
             disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button onClick={submitAsset} type='button' disabled={isSubmitting}>
+          <Button onClick={submitAsset} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : modalConfig.submitLabel}
           </Button>
         </DialogFooter>

@@ -9,7 +9,7 @@ const CreateOrgResponseSchema = z.object({ id: z.number() })
 export async function getOrgs(): Promise<OrgSummary[]> {
   const { data } = await api.get<OrgSummary[]>('/organizations')
   const organizations = z.array(OrgSummarySchema).parse(data)
-  return organizations.map(org => ({ ...org, name: formatTitleCase(org.name) }))
+  return organizations.map((org) => ({ ...org, name: formatTitleCase(org.name) }))
 }
 
 export async function createOrg(form: OrgForm): Promise<{ id: number }> {
@@ -23,7 +23,7 @@ export async function createOrg(form: OrgForm): Promise<{ id: number }> {
     address: form.address || null,
     city: form.city || null,
     province: form.province || null,
-    country: form.country || null
+    country: form.country || null,
   } satisfies CreateOrg)
   const { data } = await api.post<{ id: number }>('/organizations', createOrgBody)
   return CreateOrgResponseSchema.parse(data)

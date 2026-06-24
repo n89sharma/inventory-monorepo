@@ -34,20 +34,14 @@ export async function createSavedView(
     })
     return { id: view.id }
   } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw new ConflictError('A view with that name already exists')
     }
     throw error
   }
 }
 
-export async function deleteSavedView(
-  userId: number,
-  id: number,
-): Promise<void> {
+export async function deleteSavedView(userId: number, id: number): Promise<void> {
   const { count } = await prisma.savedView.deleteMany({
     where: { id, created_by_id: userId },
   })

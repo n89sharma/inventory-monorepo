@@ -28,20 +28,20 @@ export function MeterRangeInput({
     <div className={`flex items-center gap-1 ${className ?? ''}`}>
       <InputWithClearInline
         value={rawToThousands(min)}
-        onValueChange={val => onMinChange(thousandsToRaw(val))}
-        fieldLabel='Meter min'
-        inputType='number'
-        suffix='K'
-        className='flex-1 min-w-0'
+        onValueChange={(val) => onMinChange(thousandsToRaw(val))}
+        fieldLabel="Meter min"
+        inputType="number"
+        suffix="K"
+        className="flex-1 min-w-0"
       />
-      <span className='text-muted-foreground shrink-0'>–</span>
+      <span className="text-muted-foreground shrink-0">–</span>
       <InputWithClearInline
         value={rawToThousands(max)}
-        onValueChange={val => onMaxChange(thousandsToRaw(val))}
-        fieldLabel='Meter max'
-        inputType='number'
-        suffix='K'
-        className='flex-1 min-w-0'
+        onValueChange={(val) => onMaxChange(thousandsToRaw(val))}
+        fieldLabel="Meter max"
+        inputType="number"
+        suffix="K"
+        className="flex-1 min-w-0"
       />
     </div>
   )

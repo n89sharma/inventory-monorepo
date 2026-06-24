@@ -16,14 +16,14 @@ export function UserFilter({
   placeholder: string
   clearLabel: string
 }): React.JSX.Element {
-  const allUsers = useUserStore(state => state.users)
+  const allUsers = useUserStore((state) => state.users)
   const [query, setQuery] = useState('')
 
   return (
     <SearchSelectInput
       selection={selection}
       query={query}
-      onSelectionChange={u => {
+      onSelectionChange={(u) => {
         setQuery('')
         onSelectionChange(u)
       }}
@@ -33,10 +33,10 @@ export function UserFilter({
         onClear()
       }}
       options={allUsers}
-      getLabel={u => u.name}
+      getLabel={(u) => u.name}
       placeholder={placeholder}
       clearLabel={clearLabel}
-      className='w-35'
+      className="w-35"
     />
   )
 }

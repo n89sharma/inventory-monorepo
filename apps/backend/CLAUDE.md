@@ -5,14 +5,14 @@ Loads when you work in this tree. Root `CLAUDE.md` rules still apply.
 
 ## Layers
 
-| Layer | Path | Responsibility |
-|---|---|---|
-| Server setup | `src/index.ts` | Express, CORS (`localhost:5173` dev, `shiva-inv.vercel.app` prod — confirm this domain is current), middleware, route registration |
-| DB schema | `prisma/schema.prisma` | Single source of truth for tables, relations, field types. Generated client: `generated/prisma`. Config: `prisma.config.ts`. Preview: `relationJoins`, `typedSql` |
-| Typed SQL | `prisma/sql/getSomething.sql` | Raw SQL for reads, camelCase names; run `npm run pgen` after any change |
-| Service | `src/services/xyzService.ts` | Pure DB logic — Prisma, conflict checks, business rules. No HTTP |
-| Controller | `src/controllers/xyzController.ts` | HTTP only — parse `req.body` with `XyzSchema.parse(...)`, call service, return status |
-| Route | `src/routes/xyzRoutes.ts` | Wire paths to controllers; register in `src/index.ts` |
+| Layer        | Path                               | Responsibility                                                                                                                                                    |
+| ------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Server setup | `src/index.ts`                     | Express, CORS (`localhost:5173` dev, `shiva-inv.vercel.app` prod — confirm this domain is current), middleware, route registration                                |
+| DB schema    | `prisma/schema.prisma`             | Single source of truth for tables, relations, field types. Generated client: `generated/prisma`. Config: `prisma.config.ts`. Preview: `relationJoins`, `typedSql` |
+| Typed SQL    | `prisma/sql/getSomething.sql`      | Raw SQL for reads, camelCase names; run `npm run pgen` after any change                                                                                           |
+| Service      | `src/services/xyzService.ts`       | Pure DB logic — Prisma, conflict checks, business rules. No HTTP                                                                                                  |
+| Controller   | `src/controllers/xyzController.ts` | HTTP only — parse `req.body` with `XyzSchema.parse(...)`, call service, return status                                                                             |
+| Route        | `src/routes/xyzRoutes.ts`          | Wire paths to controllers; register in `src/index.ts`                                                                                                             |
 
 **Controller vs service:** controllers own HTTP only (parse params, call a service, set status).
 All DB logic lives in the service. Never call `prisma` directly from a controller.
@@ -22,6 +22,7 @@ All DB logic lives in the service. Never call `prisma` directly from a controlle
 Any service that does a conflict/uniqueness check before a write must use the **interactive**
 form `prisma.$transaction(async (tx) => {...})` so check and write are atomic. Never use the
 array form when conditional logic is involved.
+
 - Reference-data lookups (statuses, warehouses) and sequence-number generation may run **outside**
   the tx — immutable or atomically generated.
 - All conflict checks, diff pre-reads, and writes go **inside**, using `tx.*`.

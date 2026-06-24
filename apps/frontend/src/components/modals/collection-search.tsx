@@ -1,13 +1,22 @@
-import { Button } from '../shadcn/button';
-import { Input } from '../shadcn/input';
-import type { CollectionResults, SelectedCollection } from './collection-search-types';
+import { Button } from '../shadcn/button'
+import { Input } from '../shadcn/input'
+import type { CollectionResults, SelectedCollection } from './collection-search-types'
 
 function hasAnyResults(r: CollectionResults): boolean {
-  return r.departures.length > 0 || r.transfers.length > 0 ||
-    r.holds.length > 0 || r.invoices.length > 0
+  return (
+    r.departures.length > 0 || r.transfers.length > 0 || r.holds.length > 0 || r.invoices.length > 0
+  )
 }
 
-function ResultButton({ label, sub, onClick }: { label: string; sub: string; onClick: () => void }) {
+function ResultButton({
+  label,
+  sub,
+  onClick,
+}: {
+  label: string
+  sub: string
+  onClick: () => void
+}) {
   return (
     <button
       type="button"
@@ -20,42 +29,77 @@ function ResultButton({ label, sub, onClick }: { label: string; sub: string; onC
   )
 }
 
-function ResultsList({ results, onSelect }: { results: CollectionResults; onSelect: (c: SelectedCollection) => void }) {
+function ResultsList({
+  results,
+  onSelect,
+}: {
+  results: CollectionResults
+  onSelect: (c: SelectedCollection) => void
+}) {
   return (
     <div className="flex flex-col">
-      {results.departures.map(d => (
-        <ResultButton key={d.id} label={`Departure ${d.departure_number}`} sub={`${d.origin_code} → ${d.destination}`}
-          onClick={() => onSelect({ kind: 'departure', data: d })} />
+      {results.departures.map((d) => (
+        <ResultButton
+          key={d.id}
+          label={`Departure ${d.departure_number}`}
+          sub={`${d.origin_code} → ${d.destination}`}
+          onClick={() => onSelect({ kind: 'departure', data: d })}
+        />
       ))}
-      {results.transfers.map(t => (
-        <ResultButton key={t.id} label={`Transfer ${t.transfer_number}`} sub={`${t.origin_code} → ${t.destination_code}`}
-          onClick={() => onSelect({ kind: 'transfer', data: t })} />
+      {results.transfers.map((t) => (
+        <ResultButton
+          key={t.id}
+          label={`Transfer ${t.transfer_number}`}
+          sub={`${t.origin_code} → ${t.destination_code}`}
+          onClick={() => onSelect({ kind: 'transfer', data: t })}
+        />
       ))}
-      {results.holds.map(h => (
-        <ResultButton key={h.id} label={`Hold ${h.hold_number}`} sub={h.customer}
-          onClick={() => onSelect({ kind: 'hold', data: h })} />
+      {results.holds.map((h) => (
+        <ResultButton
+          key={h.id}
+          label={`Hold ${h.hold_number}`}
+          sub={h.customer}
+          onClick={() => onSelect({ kind: 'hold', data: h })}
+        />
       ))}
-      {results.invoices.map(i => (
-        <ResultButton key={i.id} label={`Invoice ${i.invoice_number}`} sub={i.organization}
-          onClick={() => onSelect({ kind: 'invoice', data: i })} />
+      {results.invoices.map((i) => (
+        <ResultButton
+          key={i.id}
+          label={`Invoice ${i.invoice_number}`}
+          sub={i.organization}
+          onClick={() => onSelect({ kind: 'invoice', data: i })}
+        />
       ))}
     </div>
   )
 }
 
-function SearchContent({ query, isLoading, results, onSelect }: {
+function SearchContent({
+  query,
+  isLoading,
+  results,
+  onSelect,
+}: {
   query: string
   isLoading: boolean
   results: CollectionResults
   onSelect: (c: SelectedCollection) => void
 }) {
-  if (!query) return <p className="px-3 py-2 text-muted-foreground">Start typing above to see suggestions…</p>
+  if (!query)
+    return <p className="px-3 py-2 text-muted-foreground">Start typing above to see suggestions…</p>
   if (isLoading) return <p className="px-3 py-2 text-muted-foreground">Searching…</p>
   if (!hasAnyResults(results)) return <p className="px-3 py-2 text-muted-foreground">No results.</p>
   return <ResultsList results={results} onSelect={onSelect} />
 }
 
-export function SearchView({ query, onQueryChange, isLoading, results, onSelect, label = 'Collection' }: {
+export function SearchView({
+  query,
+  onQueryChange,
+  isLoading,
+  results,
+  onSelect,
+  label = 'Collection',
+}: {
   query: string
   onQueryChange: (v: string) => void
   isLoading: boolean
@@ -71,7 +115,7 @@ export function SearchView({ query, onQueryChange, isLoading, results, onSelect,
           autoFocus
           placeholder="Search by ID…"
           value={query}
-          onChange={e => onQueryChange(e.target.value)}
+          onChange={(e) => onQueryChange(e.target.value)}
         />
       </div>
       <div className="h-80 overflow-y-auto rounded-md border">
@@ -81,7 +125,11 @@ export function SearchView({ query, onQueryChange, isLoading, results, onSelect,
   )
 }
 
-export function DetailGrid({ title, fields, onClear }: {
+export function DetailGrid({
+  title,
+  fields,
+  onClear,
+}: {
   title: string
   fields: { label: string; value: string | null }[]
   onClear: () => void
@@ -90,7 +138,9 @@ export function DetailGrid({ title, fields, onClear }: {
     <div className="flex flex-col gap-3 rounded-md border p-2">
       <div className="flex items-center justify-between">
         <p className="font-medium px-1">{title}</p>
-        <Button variant="secondary" size="sm" onClick={onClear}>Change</Button>
+        <Button variant="secondary" size="sm" onClick={onClear}>
+          Change
+        </Button>
       </div>
       <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-1">
         {fields.map(({ label, value }) => (

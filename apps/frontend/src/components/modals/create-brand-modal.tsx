@@ -16,11 +16,11 @@ interface CreateBrandModalProps {
 }
 
 export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps): React.JSX.Element {
-  const createBrand = useReferenceDataStore(state => state.createBrand)
+  const createBrand = useReferenceDataStore((state) => state.createBrand)
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(BrandFormSchema),
-    defaultValues: { name: '' }
+    defaultValues: { name: '' },
   })
 
   useEffect(() => {
@@ -47,26 +47,26 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-sm'>
+      <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Create Brand</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
+        <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup>
             <ControlledInputWithClear
               control={form.control}
-              name='name'
-              fieldLabel='Name'
+              name="name"
+              fieldLabel="Name"
               fieldRequired={true}
-              inputType='string'
+              inputType="string"
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='secondary' onClick={submitForm} type='button'>
+          <Button variant="secondary" onClick={submitForm} type="button">
             Save Brand
           </Button>
-          <Button variant='outline' onClick={() => onOpenChange(false)} type='button'>
+          <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel
           </Button>
         </DialogFooter>

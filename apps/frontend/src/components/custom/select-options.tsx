@@ -1,7 +1,4 @@
-import {
-  Field,
-  FieldLabel
-} from "@/components/shadcn/field"
+import { Field, FieldLabel } from '@/components/shadcn/field'
 import {
   Select,
   SelectContent,
@@ -9,10 +6,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/shadcn/select"
-import { ANY_OPTION, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
-import { cn } from "@/lib/utils"
-import type React from "react"
+} from '@/components/shadcn/select'
+import {
+  ANY_OPTION,
+  getSelectOption,
+  isSelected,
+  UNSELECTED,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import { cn } from '@/lib/utils'
+import type React from 'react'
 
 type SelectOptionsProps<T> = {
   selection: SelectOption<T>
@@ -45,7 +48,7 @@ function getSelectionFromKey<T>(
   getKey?: (entity: T) => string,
 ): SelectOption<T> {
   if (key === 'ANY') return ANY_OPTION
-  const found = options.find(o => getKeyFromEntity(o, getKey) === key)
+  const found = options.find((o) => getKeyFromEntity(o, getKey) === key)
   if (found) return getSelectOption(found)
   return UNSELECTED
 }
@@ -60,7 +63,8 @@ export function SelectOptions<T>({
   anyAllowed,
   fieldRequired,
   error,
-  className }: SelectOptionsProps<T>): React.JSX.Element {
+  className,
+}: SelectOptionsProps<T>): React.JSX.Element {
   return (
     <Field className={className} data-invalid={error}>
       <FieldLabel>
@@ -69,16 +73,22 @@ export function SelectOptions<T>({
       </FieldLabel>
       <Select
         value={getValueFromSelection(selection, getKey)}
-        onValueChange={key => onSelectionChange(getSelectionFromKey(key, options, getKey))}
+        onValueChange={(key) => onSelectionChange(getSelectionFromKey(key, options, getKey))}
       >
         <SelectTrigger aria-invalid={error}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent position="popper">
           <SelectGroup>
-            {anyAllowed && <SelectItem key="ANY" value="ANY">Any</SelectItem>}
-            {options?.map(o => (
-              <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>{getLabel(o)}</SelectItem>
+            {anyAllowed && (
+              <SelectItem key="ANY" value="ANY">
+                Any
+              </SelectItem>
+            )}
+            {options?.map((o) => (
+              <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>
+                {getLabel(o)}
+              </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
@@ -97,7 +107,6 @@ export function SelectOptionsInline<T>({
   anyAllowed,
   className,
 }: SelectOptionsProps<T>): React.JSX.Element {
-
   function getTriggerLabel() {
     if (isSelected(selection)) return `${fieldLabel}: ${getLabel(selection.selected)}`
     if (selection.state === 'ANY') return `${fieldLabel}: Any`
@@ -107,16 +116,22 @@ export function SelectOptionsInline<T>({
   return (
     <Select
       value={getValueFromSelection(selection, getKey)}
-      onValueChange={key => onSelectionChange(getSelectionFromKey(key, options, getKey))}
+      onValueChange={(key) => onSelectionChange(getSelectionFromKey(key, options, getKey))}
     >
-      <SelectTrigger className={cn("font-normal gap-2", className)}>
+      <SelectTrigger className={cn('font-normal gap-2', className)}>
         {getTriggerLabel()}
       </SelectTrigger>
       <SelectContent position="popper">
         <SelectGroup>
-          {anyAllowed && <SelectItem key="ANY" value="ANY">Any</SelectItem>}
-          {options?.map(o => (
-            <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>{getLabel(o)}</SelectItem>
+          {anyAllowed && (
+            <SelectItem key="ANY" value="ANY">
+              Any
+            </SelectItem>
+          )}
+          {options?.map((o) => (
+            <SelectItem key={getKeyFromEntity(o, getKey)} value={getKeyFromEntity(o, getKey)}>
+              {getLabel(o)}
+            </SelectItem>
           ))}
         </SelectGroup>
       </SelectContent>

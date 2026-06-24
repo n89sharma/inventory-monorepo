@@ -23,13 +23,13 @@ interface CreateModelModalProps {
 }
 
 export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps): React.JSX.Element {
-  const brands = useReferenceDataStore(state => state.brands)
-  const assetTypes = useReferenceDataStore(state => state.assetTypes)
-  const createModel = useModelStore(state => state.createModel)
+  const brands = useReferenceDataStore((state) => state.brands)
+  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const createModel = useModelStore((state) => state.createModel)
 
   const form = useForm<ModelForm>({
     resolver: zodResolver(ModelFormSchema),
-    defaultValues: getDefaultValues()
+    defaultValues: getDefaultValues(),
   })
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
       size: 0,
       brand: null,
       assetType: UNSELECTED,
-      is_colour: false
+      is_colour: false,
     }
   }
 
@@ -67,40 +67,39 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create Model</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
-
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <ControlledInputWithClear
               control={form.control}
-              name='name'
-              fieldLabel='Name'
+              name="name"
+              fieldLabel="Name"
               fieldRequired={true}
-              inputType='string'
+              inputType="string"
             />
 
             <ControlledSearchSelectInput
               control={form.control}
-              name='brand'
+              name="brand"
               options={brands}
               getLabel={(b: Brand) => b.name}
-              fieldLabel='Brand'
+              fieldLabel="Brand"
               fieldRequired={true}
             />
 
             <Controller
               control={form.control}
-              name='assetType'
+              name="assetType"
               render={({ field: { onChange, value }, fieldState }) => (
                 <SelectOptions
                   selection={value}
                   onSelectionChange={onChange}
                   options={assetTypes}
                   getLabel={(a: AssetType) => a.asset_type}
-                  fieldLabel='Asset Type'
+                  fieldLabel="Asset Type"
                   fieldRequired={true}
                   anyAllowed={false}
                   error={fieldState.invalid}
@@ -110,42 +109,41 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
 
             <ControlledInputWithClear
               control={form.control}
-              name='weight'
-              fieldLabel='Weight'
+              name="weight"
+              fieldLabel="Weight"
               fieldRequired={true}
-              inputType='number'
+              inputType="number"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='size'
-              fieldLabel='Size'
+              name="size"
+              fieldLabel="Size"
               fieldRequired={true}
-              inputType='number'
+              inputType="number"
             />
 
             <Controller
               control={form.control}
-              name='is_colour'
+              name="is_colour"
               render={({ field: { onChange, value } }) => (
-                <div className='flex items-center gap-2 self-end pb-2'>
+                <div className="flex items-center gap-2 self-end pb-2">
                   <Checkbox
-                    id='is_colour'
+                    id="is_colour"
                     checked={value}
-                    onCheckedChange={checked => onChange(checked === true)}
+                    onCheckedChange={(checked) => onChange(checked === true)}
                   />
-                  <Label htmlFor='is_colour'>Colour</Label>
+                  <Label htmlFor="is_colour">Colour</Label>
                 </div>
               )}
             />
-
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='secondary' onClick={submitForm} type='button'>
+          <Button variant="secondary" onClick={submitForm} type="button">
             Save Model
           </Button>
-          <Button variant='outline' onClick={() => onOpenChange(false)} type='button'>
+          <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel
           </Button>
         </DialogFooter>

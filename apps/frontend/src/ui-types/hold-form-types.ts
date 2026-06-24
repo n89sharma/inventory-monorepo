@@ -7,10 +7,10 @@ const UserSelectOptionSchema = SelectOptionSchema(UserSchema)
 
 export const HoldFormSchema = z.object({
   id: z.number().optional(),
-  created_for: UserSelectOptionSchema.refine(val => isSelected(val), 'Created For is required'),
-  customer: OrgSummarySchema.nullable().refine(val => !!val, 'Customer is required'),
+  created_for: UserSelectOptionSchema.refine((val) => isSelected(val), 'Created For is required'),
+  customer: OrgSummarySchema.nullable().refine((val) => !!val, 'Customer is required'),
   notes: z.string(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold')
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold'),
 })
 
 export type HoldForm = {
@@ -22,9 +22,9 @@ export type HoldForm = {
 }
 
 export const HoldMetadataFormSchema = z.object({
-  created_for: UserSelectOptionSchema.refine(val => isSelected(val), 'Created For is required'),
-  customer: OrgSummarySchema.nullable().refine(val => !!val, 'Customer is required'),
-  notes: z.string()
+  created_for: UserSelectOptionSchema.refine((val) => isSelected(val), 'Created For is required'),
+  customer: OrgSummarySchema.nullable().refine((val) => !!val, 'Customer is required'),
+  notes: z.string(),
 })
 
 export type HoldMetadataForm = {

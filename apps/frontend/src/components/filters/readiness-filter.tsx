@@ -10,15 +10,15 @@ export function ReadinessFilter({
   selection: Status[]
   onSelectionChange: (readinesses: Status[]) => void
 }): React.JSX.Element {
-  const readinesses = useReferenceDataStore(state => state.readinesses)
+  const readinesses = useReferenceDataStore((state) => state.readinesses)
   return (
     <MultiSelectOptionsInline
       selection={selection}
       onSelectionChange={onSelectionChange}
       options={readinesses}
-      getLabel={s => getReadinessDisplay(s.status)}
-      fieldLabel='Readiness'
-      className='w-35'
+      getLabel={(s) => getReadinessDisplay(s.status)}
+      fieldLabel="Readiness"
+      className="w-35"
     />
   )
 }

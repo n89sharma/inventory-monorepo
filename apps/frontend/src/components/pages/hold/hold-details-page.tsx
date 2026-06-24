@@ -35,8 +35,7 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   const canEditHold = detail.data
     ? !isArchived &&
-      (canEditAny ||
-        (clerkUserId != null && detail.data.created_by.clerk_id === clerkUserId))
+      (canEditAny || (clerkUserId != null && detail.data.created_by.clerk_id === clerkUserId))
     : false
 
   const handleRelease = async () => {
@@ -56,7 +55,7 @@ export function HoldDetailsPage(): React.JSX.Element {
     (assetHref: (asset: AssetSummary) => string) =>
       createAssetSummaryColumns(
         assetHref,
-        canEditHold ? asset => mutations.removeAsset(holdNumber, asset) : undefined,
+        canEditHold ? (asset) => mutations.removeAsset(holdNumber, asset) : undefined,
       ),
     [mutations, holdNumber, canEditHold],
   )
@@ -74,12 +73,12 @@ export function HoldDetailsPage(): React.JSX.Element {
         refreshKey={holdDetailKey(holdNumber)}
         historyCacheKey={`hold-history:${holdNumber}`}
         historyFetcher={() => getHoldHistory(holdNumber)}
-        onBulkRemove={assets => mutations.bulkRemoveAssets(holdNumber, assets)}
+        onBulkRemove={(assets) => mutations.bulkRemoveAssets(holdNumber, assets)}
         onFlushPending={mutations.flushPending}
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}
-        renderSummaryStrip={hold => <HoldSummaryStrip hold={hold} />}
-        renderSubtitle={hold => (
+        renderSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
+        renderSubtitle={(hold) => (
           <>
             <SummaryField label="Customer" value={hold.customer.name} />
             <SummaryField label="For" value={hold.created_for.name} />
@@ -92,15 +91,17 @@ export function HoldDetailsPage(): React.JSX.Element {
             open={control.open}
             onOpenChange={control.onOpenChange}
             hold={hold}
-            onSave={metadata => mutations.updateMetadata(holdNumber, metadata)}
+            onSave={(metadata) => mutations.updateMetadata(holdNumber, metadata)}
           />
         )}
-        renderAddAssetBar={hold => (
+        renderAddAssetBar={(hold) => (
           <AddAssetBar
             existingAssets={hold.assets}
-            entityName='hold'
-            onAddSingle={asset => mutations.addAsset(holdNumber, asset)}
-            validateAsset={asset => asset.hold_number ? `Asset ${asset.barcode} is already on a hold.` : null}
+            entityName="hold"
+            onAddSingle={(asset) => mutations.addAsset(holdNumber, asset)}
+            validateAsset={(asset) =>
+              asset.hold_number ? `Asset ${asset.barcode} is already on a hold.` : null
+            }
           />
         )}
       />
@@ -113,8 +114,8 @@ export function HoldDetailsPage(): React.JSX.Element {
         onConfirm={handleRelease}
       >
         <AlertDialogDescription>
-          Releasing returns all {assetCount} asset{assetCount !== 1 ? 's' : ''} to stock
-          and closes this hold. This cannot be undone.
+          Releasing returns all {assetCount} asset{assetCount !== 1 ? 's' : ''} to stock and closes
+          this hold. This cannot be undone.
         </AlertDialogDescription>
       </ConfirmActionDialog>
     </>

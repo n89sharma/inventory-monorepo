@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
-import { CheckIcon, ShareNetworkIcon } from "@phosphor-icons/react"
-import { useState } from "react"
-import { Button } from "../shadcn/button"
+import { cn } from '@/lib/utils'
+import { CheckIcon, ShareNetworkIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { Button } from '../shadcn/button'
 
 type ShareButtonProps = {
   className?: string

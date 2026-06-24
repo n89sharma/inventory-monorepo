@@ -1,25 +1,25 @@
-import { TechnicalSpecsFields } from "@/components/custom/technical-specs-fields"
-import { Button } from "@/components/shadcn/button"
+import { TechnicalSpecsFields } from '@/components/custom/technical-specs-fields'
+import { Button } from '@/components/shadcn/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/shadcn/dialog"
-import { UnsavedChangesDialog } from "@/components/custom/unsaved-changes-dialog"
-import { useAssetStore } from "@/data/store/asset-store"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard"
-import { flattenFieldErrors } from "@/lib/utils"
-import { SpecsFormSchema, type SpecsForm } from "@/ui-types/arrival-form-types"
-import { getSelectOption, isSelected, UNSELECTED } from "@/ui-types/select-option-types"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CircleNotchIcon } from "@phosphor-icons/react"
-import { useMemo } from "react"
-import { useForm, type FieldErrors } from "react-hook-form"
-import type { AssetDetails } from "shared-types"
-import { toast } from "sonner"
+} from '@/components/shadcn/dialog'
+import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
+import { useAssetStore } from '@/data/store/asset-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { flattenFieldErrors } from '@/lib/utils'
+import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
+import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CircleNotchIcon } from '@phosphor-icons/react'
+import { useMemo } from 'react'
+import { useForm, type FieldErrors } from 'react-hook-form'
+import type { AssetDetails } from 'shared-types'
+import { toast } from 'sonner'
 
 interface EditSpecsModalProps {
   open: boolean
@@ -48,28 +48,34 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   isColour: false,
 }
 
-export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }: EditSpecsModalProps) {
-  const updateAssetSpecs = useAssetStore(state => state.updateAssetSpecs)
-  const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
-  const readinesses = useReferenceDataStore(state => state.readinesses)
-  const countries = useReferenceDataStore(state => state.countries)
-  const components = useReferenceDataStore(state => state.components)
+export function EditSpecsModal({
+  open,
+  onOpenChange,
+  assetDetails,
+  accessories,
+}: EditSpecsModalProps) {
+  const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
+  const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
+  const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const countries = useReferenceDataStore((state) => state.countries)
+  const components = useReferenceDataStore((state) => state.components)
 
   const values = useMemo<SpecsForm>(() => {
     if (!assetDetails) return EMPTY_SPECS_FORM
     const { specs } = assetDetails
-    const readiness = readinesses.find(r => r.status === assetDetails.readiness)
+    const readiness = readinesses.find((r) => r.status === assetDetails.readiness)
     return {
       readiness: readiness ? getSelectOption(readiness) : UNSELECTED,
-      countryOfOrigin: countries.find(c => c.name === assetDetails.country_of_origin) ?? null,
+      countryOfOrigin: countries.find((c) => c.name === assetDetails.country_of_origin) ?? null,
       manufacturedYear: assetDetails.manufactured_year,
       meterBlack: specs.meter_black,
       meterColour: specs.meter_colour,
       cassettes: specs.cassettes,
-      component: components.find(
-        c => c.brand_name === assetDetails.brand && c.name === specs.internal_finisher,
-      ) ?? null,
-      coreFunctions: coreFunctions.filter(cf => accessories.includes(cf.accessory)),
+      component:
+        components.find(
+          (c) => c.brand_name === assetDetails.brand && c.name === specs.internal_finisher,
+        ) ?? null,
+      coreFunctions: coreFunctions.filter((cf) => accessories.includes(cf.accessory)),
       drumLifeC: specs.drum_life_c,
       drumLifeM: specs.drum_life_m,
       drumLifeY: specs.drum_life_y,
@@ -88,11 +94,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
   })
   const isSubmitting = form.formState.isSubmitting
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   if (!assetDetails) return null
 
@@ -115,7 +117,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         toner_life_m: formValues.tonerLifeM,
         toner_life_y: formValues.tonerLifeY,
         toner_life_k: formValues.tonerLifeK,
-        accessory_names: formValues.coreFunctions.map(cf => cf.accessory),
+        accessory_names: formValues.coreFunctions.map((cf) => cf.accessory),
       })
       form.reset(formValues)
       toast.success('Specifications updated.', { position: 'top-center' })
@@ -141,7 +143,7 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         </DialogHeader>
 
         <form
-          onSubmit={e => e.preventDefault()}
+          onSubmit={(e) => e.preventDefault()}
           className="flex flex-col gap-6 flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-1 pt-2 pb-1"
         >
           <TechnicalSpecsFields
@@ -152,11 +154,23 @@ export function EditSpecsModal({ open, onOpenChange, assetDetails, accessories }
         </form>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button" disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button onClick={submit} type="button" disabled={isSubmitting}>
-            {isSubmitting ? <><CircleNotchIcon className="animate-spin" />Saving...</> : 'Save'}
+            {isSubmitting ? (
+              <>
+                <CircleNotchIcon className="animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

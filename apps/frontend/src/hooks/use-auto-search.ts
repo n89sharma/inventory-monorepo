@@ -3,12 +3,11 @@ import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
 import { subDays } from 'date-fns'
 import { useEffect, useRef } from 'react'
 
-
 export function useAutoSearch(
   hasSearched: boolean,
   onSearchSetData: (searchOptions: SearchOptions) => Promise<void>,
   setSearchOptions: SetSearchOptions,
-  defaultDays: number = 60
+  defaultDays: number = 60,
 ) {
   const callbackRef = useRef(onSearchSetData)
   callbackRef.current = onSearchSetData
@@ -19,7 +18,8 @@ export function useAutoSearch(
   useEffect(() => {
     if (hasSearched) return
 
-    const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy } = setSearchOptionsRef.current
+    const { setFromDate, setToDate, setOrigin, setDestination, setHoldFor, setHoldBy } =
+      setSearchOptionsRef.current
 
     const from = getSelectOption(subDays(new Date(), defaultDays))
     const to = getSelectOption(new Date())
@@ -37,7 +37,7 @@ export function useAutoSearch(
       origin: ANY_OPTION,
       destination: ANY_OPTION,
       holdBy: ANY_OPTION,
-      holdFor: ANY_OPTION
+      holdFor: ANY_OPTION,
     })
   }, [hasSearched, defaultDays])
 }

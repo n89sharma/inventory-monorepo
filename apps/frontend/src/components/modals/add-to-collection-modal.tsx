@@ -14,7 +14,11 @@ import { mutate } from 'swr'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { DetailGrid, SearchView } from './collection-search'
-import { emptyResults, type CollectionResults, type SelectedCollection } from './collection-search-types'
+import {
+  emptyResults,
+  type CollectionResults,
+  type SelectedCollection,
+} from './collection-search-types'
 
 function collectionLabel(s: SelectedCollection): string {
   const { entity, id } = collectionRef(s)
@@ -23,10 +27,14 @@ function collectionLabel(s: SelectedCollection): string {
 
 function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: string } {
   switch (s.kind) {
-    case 'departure': return { entity: 'departure', id: s.data.departure_number }
-    case 'transfer': return { entity: 'transfer', id: s.data.transfer_number }
-    case 'hold': return { entity: 'hold', id: s.data.hold_number }
-    case 'invoice': return { entity: 'invoice', id: s.data.invoice_number }
+    case 'departure':
+      return { entity: 'departure', id: s.data.departure_number }
+    case 'transfer':
+      return { entity: 'transfer', id: s.data.transfer_number }
+    case 'hold':
+      return { entity: 'hold', id: s.data.hold_number }
+    case 'invoice':
+      return { entity: 'invoice', id: s.data.invoice_number }
   }
 }
 
@@ -63,7 +71,12 @@ function getDetailFields(s: SelectedCollection): { label: string; value: string 
   }
 }
 
-function InformationSection({ assetCount, selected, duplicateCount, isLoadingDetail }: {
+function InformationSection({
+  assetCount,
+  selected,
+  duplicateCount,
+  isLoadingDetail,
+}: {
   assetCount: number
   selected: SelectedCollection | null
   duplicateCount: number
@@ -76,7 +89,12 @@ function InformationSection({ assetCount, selected, duplicateCount, isLoadingDet
     if (isLoadingDetail) {
       secondLine = <p className="text-muted-foreground">Checking for duplicates…</p>
     } else if (duplicateCount > 0) {
-      secondLine = <p className="text-amber-600">Found {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}. Duplicates will be skipped</p>
+      secondLine = (
+        <p className="text-amber-600">
+          Found {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}. Duplicates will be
+          skipped
+        </p>
+      )
     }
   }
 
@@ -89,7 +107,6 @@ function InformationSection({ assetCount, selected, duplicateCount, isLoadingDet
     </div>
   )
 }
-
 
 interface AddToCollectionModalProps {
   open: boolean
@@ -134,7 +151,7 @@ export function AddToCollectionModal({
         departures: canCreateDeparture ? res.departures : [],
         transfers: canCreateTransfer ? res.transfers : [],
         holds: canCreateHold ? res.holds : [],
-        invoices: canCreateInvoice ? res.invoices : []
+        invoices: canCreateInvoice ? res.invoices : [],
       })
       setIsLoading(false)
     }, 150)
@@ -158,13 +175,21 @@ export function AddToCollectionModal({
     try {
       let existing: AssetSummary[]
       switch (collection.kind) {
-        case 'hold': existing = await holdMutations.getAssets(collection.data.hold_number); break
-        case 'departure': existing = await departureMutations.getAssets(collection.data.departure_number); break
-        case 'transfer': existing = await transferMutations.getAssets(collection.data.transfer_number); break
-        case 'invoice': existing = await invoiceMutations.getAssets(collection.data.invoice_number); break
+        case 'hold':
+          existing = await holdMutations.getAssets(collection.data.hold_number)
+          break
+        case 'departure':
+          existing = await departureMutations.getAssets(collection.data.departure_number)
+          break
+        case 'transfer':
+          existing = await transferMutations.getAssets(collection.data.transfer_number)
+          break
+        case 'invoice':
+          existing = await invoiceMutations.getAssets(collection.data.invoice_number)
+          break
       }
-      const existingIds = new Set(existing.map(a => a.id))
-      setDuplicateCount(selectedAssets.filter(a => existingIds.has(a.id)).length)
+      const existingIds = new Set(existing.map((a) => a.id))
+      setDuplicateCount(selectedAssets.filter((a) => existingIds.has(a.id)).length)
     } catch {
       toast.error('Failed to load collection details', { position: 'top-center' })
       setSelected(null)
@@ -181,33 +206,55 @@ export function AddToCollectionModal({
       let skipped: number
       switch (selected.kind) {
         case 'hold': {
-          ({ added, skipped } = await holdMutations.addAssets(selected.data.hold_number, selectedAssets))
+          ;({ added, skipped } = await holdMutations.addAssets(
+            selected.data.hold_number,
+            selectedAssets,
+          ))
           break
         }
         case 'departure': {
-          ({ added, skipped } = await departureMutations.addAssets(selected.data.departure_number, selectedAssets))
+          ;({ added, skipped } = await departureMutations.addAssets(
+            selected.data.departure_number,
+            selectedAssets,
+          ))
           break
         }
         case 'transfer': {
-          ({ added, skipped } = await transferMutations.addAssets(selected.data.transfer_number, selectedAssets))
+          ;({ added, skipped } = await transferMutations.addAssets(
+            selected.data.transfer_number,
+            selectedAssets,
+          ))
           break
         }
         case 'invoice': {
-          ({ added, skipped } = await invoiceMutations.addAssets(selected.data.invoice_number, selectedAssets))
+          ;({ added, skipped } = await invoiceMutations.addAssets(
+            selected.data.invoice_number,
+            selectedAssets,
+          ))
           break
         }
       }
       const assetNoun = `asset${added! !== 1 ? 's' : ''}`
       const ref = collectionRef(selected)
-      const msg = skipped > 0
-        ? <>{added!} {assetNoun} added. {skipped} already present and skipped.</>
-        : <>{added!} {assetNoun} added to {ENTITY_CONFIG[ref.entity].label} <EntityLink entity={ref.entity} id={ref.id} />.</>
+      const msg =
+        skipped > 0 ? (
+          <>
+            {added!} {assetNoun} added. {skipped} already present and skipped.
+          </>
+        ) : (
+          <>
+            {added!} {assetNoun} added to {ENTITY_CONFIG[ref.entity].label}{' '}
+            <EntityLink entity={ref.entity} id={ref.id} />.
+          </>
+        )
       toast.success(msg, { position: 'top-center' })
       if (refreshKey) mutate(refreshKey)
       onConfirmSuccess()
       handleOpenChange(false)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to add assets', { position: 'top-center' })
+      toast.error(err instanceof Error ? err.message : 'Failed to add assets', {
+        position: 'top-center',
+      })
       setIsConfirming(false)
     }
   }
@@ -240,16 +287,37 @@ export function AddToCollectionModal({
           <DialogTitle>Add to Collection</DialogTitle>
         </DialogHeader>
 
-        <InformationSection assetCount={assetCount} selected={selected} duplicateCount={duplicateCount} isLoadingDetail={isLoadingDetail} />
+        <InformationSection
+          assetCount={assetCount}
+          selected={selected}
+          duplicateCount={duplicateCount}
+          isLoadingDetail={isLoadingDetail}
+        />
 
-        {selected !== null
-          ? <DetailGrid title={collectionLabel(selected)} fields={getDetailFields(selected)} onClear={handleClearSelection} />
-          : <SearchView query={query} onQueryChange={handleQueryChange} isLoading={isLoading} results={results} onSelect={handleSelect} />
-        }
+        {selected !== null ? (
+          <DetailGrid
+            title={collectionLabel(selected)}
+            fields={getDetailFields(selected)}
+            onClear={handleClearSelection}
+          />
+        ) : (
+          <SearchView
+            query={query}
+            onQueryChange={handleQueryChange}
+            isLoading={isLoading}
+            results={results}
+            onSelect={handleSelect}
+          />
+        )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-          <Button disabled={selected === null || isLoadingDetail || isConfirming} onClick={handleConfirm}>
+          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={selected === null || isLoadingDetail || isConfirming}
+            onClick={handleConfirm}
+          >
             {isConfirming ? 'Adding…' : 'Confirm'}
           </Button>
         </DialogFooter>

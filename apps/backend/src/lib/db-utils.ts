@@ -1,12 +1,12 @@
 import { prisma } from '../prisma.js'
 
 const SEQ_NAMES: Record<string, string> = {
-  asset:     'seq_asset',
-  arrival:   'seq_arrival',
+  asset: 'seq_asset',
+  arrival: 'seq_arrival',
   departure: 'seq_departure',
-  transfer:  'seq_transfer',
-  hold:      'seq_hold',
-  invoice:   'seq_invoice',
+  transfer: 'seq_transfer',
+  hold: 'seq_hold',
+  invoice: 'seq_invoice',
   store_transaction: 'seq_store_transaction',
 }
 

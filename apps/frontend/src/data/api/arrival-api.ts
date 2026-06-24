@@ -1,9 +1,36 @@
 import { api } from '@/data/api/axios-client'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ArrivalDetail, ArrivalSummary, AssetDelta, AssetSummary, CollectionHistory, CreateArrival, CreateAsset, OrgSummary, UpdateArrivalMetadata, UpdateAsset, Warehouse } from 'shared-types'
-import { ArrivalDetailSchema, ArrivalSummarySchema, AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema } from 'shared-types'
+import {
+  type SelectOption,
+  getIdOrNullFromSelection,
+  getSelectOption,
+  getSelectedOrNull,
+} from '@/ui-types/select-option-types'
+import type {
+  ArrivalDetail,
+  ArrivalSummary,
+  AssetDelta,
+  AssetSummary,
+  CollectionHistory,
+  CreateArrival,
+  CreateAsset,
+  OrgSummary,
+  UpdateArrivalMetadata,
+  UpdateAsset,
+  Warehouse,
+} from 'shared-types'
+import {
+  ArrivalDetailSchema,
+  ArrivalSummarySchema,
+  AssetDeltaSchema,
+  AssetSummarySchema,
+  CollectionHistorySchema,
+  CreateArrivalSchema,
+  CreateAssetSchema,
+  UpdateArrivalMetadataSchema,
+  UpdateAssetSchema,
+} from 'shared-types'
 import { z } from 'zod'
 
 const CreateArrivalResponseSchema = z.object({ arrivalNumber: z.string() })
@@ -13,15 +40,15 @@ export async function getArrivals(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   destination: SelectOption<Warehouse>,
-  vendor: SelectOption<OrgSummary>
+  vendor: SelectOption<OrgSummary>,
 ): Promise<ArrivalSummary[]> {
   const { data } = await api.get<ArrivalSummary[]>(`/arrivals`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(destination),
-      vendor: getIdOrNullFromSelection(vendor)
-    }
+      vendor: getIdOrNullFromSelection(vendor),
+    },
   })
   return z.array(ArrivalSummarySchema).parse(data)
 }
@@ -37,7 +64,7 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
     transporter: a.transporter!,
     warehouse: getSelectedOrNull(a.warehouse)!,
     comment: a.comment,
-    assets: a.assets.map(s => ({
+    assets: a.assets.map((s) => ({
       model: s.model!,
       serialNumber: s.serialNumber,
       meterBlack: s.meterBlack!,
@@ -57,8 +84,8 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       tonerLifeY: s.tonerLifeY!,
       tonerLifeK: s.tonerLifeK!,
       errors: s.errors,
-      comment: s.comment
-    })) as CreateArrival['assets']
+      comment: s.comment,
+    })) as CreateArrival['assets'],
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
   return CreateArrivalResponseSchema.parse(data)
@@ -71,28 +98,25 @@ export async function getArrivalHistory(arrivalNumber: string): Promise<Collecti
 
 export async function updateArrivalMetadata(
   arrivalNumber: string,
-  metadata: ArrivalMetadataForm
+  metadata: ArrivalMetadataForm,
 ): Promise<void> {
   const updateArrivalMetadataBody = UpdateArrivalMetadataSchema.parse({
     vendor: metadata.vendor!,
     transporter: metadata.transporter!,
     warehouse: getSelectedOrNull(metadata.warehouse)!,
-    comment: metadata.comment === '' ? null : metadata.comment
+    comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateArrivalMetadata)
   await api.patch(`/arrivals/${arrivalNumber}/metadata`, updateArrivalMetadataBody)
 }
 
-export async function patchArrivalAssets(
-  arrivalNumber: string,
-  delta: AssetDelta
-): Promise<void> {
+export async function patchArrivalAssets(arrivalNumber: string, delta: AssetDelta): Promise<void> {
   const patchArrivalAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/arrivals/${arrivalNumber}/assets`, patchArrivalAssetsBody)
 }
 
 export async function createSingleArrivalAsset(
   arrivalNumber: string,
-  asset: AssetForm
+  asset: AssetForm,
 ): Promise<AssetSummary> {
   const createSingleArrivalAssetBody = CreateAssetSchema.parse({
     model: asset.model!,
@@ -114,15 +138,18 @@ export async function createSingleArrivalAsset(
     tonerLifeY: asset.tonerLifeY!,
     tonerLifeK: asset.tonerLifeK!,
     errors: asset.errors,
-    comment: asset.comment
+    comment: asset.comment,
   } satisfies CreateAsset)
-  const { data } = await api.post<AssetSummary>(`/arrivals/${arrivalNumber}/assets`, createSingleArrivalAssetBody)
+  const { data } = await api.post<AssetSummary>(
+    `/arrivals/${arrivalNumber}/assets`,
+    createSingleArrivalAssetBody,
+  )
   return AssetSummarySchema.parse(data)
 }
 
 export async function getArrivalAssetForUpdate(
   arrivalNumber: string,
-  assetId: number
+  assetId: number,
 ): Promise<AssetForm> {
   const { data } = await api.get<UpdateAsset>(`/arrivals/${arrivalNumber}/assets/${assetId}/edit`)
   return mapUpdateAssetToAssetForm(UpdateAssetSchema.parse(data))
@@ -139,7 +166,8 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     readiness: getSelectOption(asset.readiness),
     countryOfOrigin: asset.countryOfOrigin,
     manufacturedYear: asset.manufacturedYear,
-    component: useReferenceDataStore.getState().components.find(c => c.id === asset.componentId) ?? null,
+    component:
+      useReferenceDataStore.getState().components.find((c) => c.id === asset.componentId) ?? null,
     coreFunctions: asset.coreFunctions,
     drumLifeC: asset.drumLifeC,
     drumLifeM: asset.drumLifeM,
@@ -150,14 +178,14 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     tonerLifeY: asset.tonerLifeY,
     tonerLifeK: asset.tonerLifeK,
     errors: asset.errors,
-    comment: asset.comment
+    comment: asset.comment,
   }
 }
 
 export async function updateArrivalAsset(
   arrivalNumber: string,
   assetId: number,
-  asset: AssetForm
+  asset: AssetForm,
 ): Promise<AssetSummary> {
   const updateArrivalAssetBody = UpdateAssetSchema.parse({
     id: assetId,
@@ -180,8 +208,11 @@ export async function updateArrivalAsset(
     tonerLifeY: asset.tonerLifeY!,
     tonerLifeK: asset.tonerLifeK!,
     errors: asset.errors,
-    comment: asset.comment
+    comment: asset.comment,
   } satisfies UpdateAsset)
-  const { data } = await api.patch<AssetSummary>(`/arrivals/${arrivalNumber}/assets/${assetId}`, updateArrivalAssetBody)
+  const { data } = await api.patch<AssetSummary>(
+    `/arrivals/${arrivalNumber}/assets/${assetId}`,
+    updateArrivalAssetBody,
+  )
   return AssetSummarySchema.parse(data)
 }

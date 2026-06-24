@@ -11,7 +11,7 @@ export const getBrands = asyncHandler(async (req: Request, res: Response<ApiResp
 export async function createBrand(
   req: Request,
   res: Response<ApiResponse<{ id: number }>>,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const body = CreateBrandSchema.parse(req.body)

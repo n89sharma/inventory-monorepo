@@ -7,9 +7,9 @@ export const ModelFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   weight: z.number().min(0),
   size: z.number().min(0),
-  brand: BrandSchema.nullable().refine(val => !!val, 'Brand is required'),
-  assetType: AssetTypeSelectOptionSchema.refine(val => isSelected(val), 'Asset type is required'),
-  is_colour: z.boolean()
+  brand: BrandSchema.nullable().refine((val) => !!val, 'Brand is required'),
+  assetType: AssetTypeSelectOptionSchema.refine((val) => isSelected(val), 'Asset type is required'),
+  is_colour: z.boolean(),
 })
 
 export type ModelForm = {

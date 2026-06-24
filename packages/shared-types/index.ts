@@ -21,4 +21,3 @@ export * from './types/profitability-report-types.js'
 export * from './types/holds-by-user-report-types.js'
 export * from './types/saved-view-types.js'
 export * from './mappers/asset-mappers.js'
-

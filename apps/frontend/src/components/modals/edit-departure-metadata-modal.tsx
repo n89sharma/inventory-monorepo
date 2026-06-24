@@ -1,6 +1,9 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { DepartureMetadataFormSchema, type DepartureMetadataForm } from '@/ui-types/departure-form-types'
+import {
+  DepartureMetadataFormSchema,
+  type DepartureMetadataForm,
+} from '@/ui-types/departure-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
@@ -31,7 +34,7 @@ export function EditDepartureMetadataModal({
   onSave,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore(state => state.organizations)
+  const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(departure), [departure])
@@ -40,11 +43,7 @@ export function EditDepartureMetadataModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   async function onValid(values: DepartureMetadataForm) {
     setIsSubmitting(true)
@@ -69,22 +68,22 @@ export function EditDepartureMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Departure</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <Controller
               control={form.control}
-              name='origin'
+              name="origin"
               render={({ field: { onChange, value }, fieldState }) => (
                 <SelectOptions
                   selection={value}
                   onSelectionChange={onChange}
                   options={activeWarehouses}
-                  getLabel={w => w.city_code}
-                  fieldLabel='Origin'
+                  getLabel={(w) => w.city_code}
+                  fieldLabel="Origin"
                   anyAllowed={false}
                   fieldRequired={true}
                   error={fieldState.invalid}
@@ -93,41 +92,42 @@ export function EditDepartureMetadataModal({
             />
             <ControlledSearchSelectInput
               control={form.control}
-              name='customer'
+              name="customer"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Customer'
+              getLabel={(o) => o.name}
+              fieldLabel="Customer"
               fieldRequired={true}
             />
             <ControlledSearchSelectInput
               control={form.control}
-              name='transporter'
+              name="transporter"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Transporter'
+              getLabel={(o) => o.name}
+              fieldLabel="Transporter"
               fieldRequired={true}
             />
             <Controller
               control={form.control}
-              name='comment'
+              name="comment"
               render={({ field }) => (
-                <Field className='col-span-2'>
+                <Field className="col-span-2">
                   <FieldLabel>Comments</FieldLabel>
-                  <Textarea
-                    placeholder='Departure notes…'
-                    className='resize-none'
-                    {...field}
-                  />
+                  <Textarea placeholder="Departure notes…" className="resize-none" {...field} />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} type='button' disabled={isSubmitting}>
+          <Button onClick={submit} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </Button>
         </DialogFooter>
@@ -144,8 +144,16 @@ export function EditDepartureMetadataModal({
 function toFormValues(d: DepartureDetail): DepartureMetadataForm {
   return {
     origin: getSelectOption(d.origin),
-    customer: { id: d.customer.id, account_number: d.customer.account_number, name: d.customer.name },
-    transporter: { id: d.transporter.id, account_number: d.transporter.account_number, name: d.transporter.name },
-    comment: d.notes ?? ''
+    customer: {
+      id: d.customer.id,
+      account_number: d.customer.account_number,
+      name: d.customer.name,
+    },
+    transporter: {
+      id: d.transporter.id,
+      account_number: d.transporter.account_number,
+      name: d.transporter.name,
+    },
+    comment: d.notes ?? '',
   }
 }

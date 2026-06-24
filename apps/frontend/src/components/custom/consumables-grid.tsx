@@ -11,26 +11,24 @@ const CMYK_CHANNELS = [
 
 const CELLS_TEMPLATE = 'grid-cols-[repeat(4,minmax(0,72px))_auto]'
 
-export function ConsumablesGrid(
-  {
-    children,
-    requiredChannels = [],
-  }: {
-    children: React.ReactNode
-    requiredChannels?: Array<'C' | 'M' | 'Y' | 'K'>
-  }
-) {
+export function ConsumablesGrid({
+  children,
+  requiredChannels = [],
+}: {
+  children: React.ReactNode
+  requiredChannels?: Array<'C' | 'M' | 'Y' | 'K'>
+}) {
   return (
-    <div className='flex flex-col gap-2'>
-      <HorizontalField label=''>
+    <div className="flex flex-col gap-2">
+      <HorizontalField label="">
         <div className={cn('grid items-center gap-2 px-1', CELLS_TEMPLATE)}>
-          {CMYK_CHANNELS.map(c => (
-            <div key={c.letter} className='flex items-center justify-center gap-1.5'>
+          {CMYK_CHANNELS.map((c) => (
+            <div key={c.letter} className="flex items-center justify-center gap-1.5">
               <span className={cn('size-2 rounded-full', c.dotClass)} />
-              <span className='text-xs font-medium text-muted-foreground'>
+              <span className="text-xs font-medium text-muted-foreground">
                 {c.letter}
                 {requiredChannels.includes(c.letter) && (
-                  <span className='text-destructive ml-0.5'>*</span>
+                  <span className="text-destructive ml-0.5">*</span>
                 )}
               </span>
             </div>
@@ -43,48 +41,44 @@ export function ConsumablesGrid(
   )
 }
 
-export function ConsumablesRow(
-  { label, children }: { label: string; children: React.ReactNode }
-) {
+export function ConsumablesRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <HorizontalField label={label}>
       <div className={cn('grid items-center gap-2', CELLS_TEMPLATE)}>
         {children}
-        <span className='text-xs text-muted-foreground'>%</span>
+        <span className="text-xs text-muted-foreground">%</span>
       </div>
     </HorizontalField>
   )
 }
 
-export function ConsumablesCell(
-  {
-    value,
-    onChange,
-    invalid,
-    ariaLabel,
-  }: {
-    value: number | null
-    onChange: (value: number | null) => void
-    invalid?: boolean
-    ariaLabel: string
-  }
-) {
+export function ConsumablesCell({
+  value,
+  onChange,
+  invalid,
+  ariaLabel,
+}: {
+  value: number | null
+  onChange: (value: number | null) => void
+  invalid?: boolean
+  ariaLabel: string
+}) {
   return (
     <Input
-      type='number'
+      type="number"
       min={0}
       value={value ?? ''}
-      onChange={e => {
+      onChange={(e) => {
         const raw = e.target.value
         if (raw === '') return onChange(null)
         const n = Number(raw)
         if (isNaN(n)) return onChange(null)
         onChange(Math.max(0, n))
       }}
-      placeholder=''
+      placeholder=""
       aria-invalid={invalid}
       aria-label={ariaLabel}
-      className='h-8 text-center tabular-nums'
+      className="h-8 text-center tabular-nums"
     />
   )
 }

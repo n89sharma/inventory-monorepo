@@ -16,21 +16,21 @@ export async function reconcileAssetErrors(
   assetId: number,
   next: UpdateError[],
   userId: number,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): Promise<{ prevErrorIds: number[]; nextErrorIds: number[] }> {
   const currentRows = await tx.assetError.findMany({
     where: { asset_id: assetId },
-    select: { error_id: true, is_fixed: true }
+    select: { error_id: true, is_fixed: true },
   })
-  const currentIdMap = new Map(currentRows.map(ae => [ae.error_id, ae.is_fixed]))
-  const inputIdMap = new Map(next.map(e => [e.error_id, e.is_fixed]))
+  const currentIdMap = new Map(currentRows.map((ae) => [ae.error_id, ae.is_fixed]))
+  const inputIdMap = new Map(next.map((e) => [e.error_id, e.is_fixed]))
 
   const errorIdsToDelete = currentRows
-    .filter(ae => !inputIdMap.has(ae.error_id))
-    .map(ae => ae.error_id)
+    .filter((ae) => !inputIdMap.has(ae.error_id))
+    .map((ae) => ae.error_id)
   if (errorIdsToDelete.length > 0) {
     await tx.assetError.deleteMany({
-      where: { asset_id: assetId, error_id: { in: errorIdsToDelete } }
+      where: { asset_id: assetId, error_id: { in: errorIdsToDelete } },
     })
   }
 
@@ -43,7 +43,7 @@ export async function reconcileAssetErrors(
       added_by: userId,
       added_at: now,
       fixed_at: is_fixed ? now : null,
-      fixed_by: is_fixed ? userId : null
+      fixed_by: is_fixed ? userId : null,
     }))
   if (rowsToCreate.length > 0) {
     await tx.assetError.createMany({ data: rowsToCreate })
@@ -56,36 +56,39 @@ export async function reconcileAssetErrors(
         data: {
           is_fixed,
           fixed_at: is_fixed ? now : null,
-          fixed_by: is_fixed ? userId : null
-        }
+          fixed_by: is_fixed ? userId : null,
+        },
       })
     }
   }
 
   return {
-    prevErrorIds: currentRows.map(r => r.error_id).sort(),
-    nextErrorIds: [...inputIdMap.keys()].sort()
+    prevErrorIds: currentRows.map((r) => r.error_id).sort(),
+    nextErrorIds: [...inputIdMap.keys()].sort(),
   }
 }
 
 export async function updateAssetErrors(
   barcode: string,
   data: UpdateAssetErrors,
-  userId: number
+  userId: number,
 ): Promise<void> {
   const { assetId, prevErrorIds, nextErrorIds } = await prisma.$transaction(async (tx) => {
     const asset = await tx.asset.findUnique({
       where: { barcode },
-      select: { id: true, model: { select: { brand_id: true } } }
+      select: { id: true, model: { select: { brand_id: true } } },
     })
     if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
     await validateErrorBrands(
       tx,
-      data.errors.map(e => ({ errorId: e.error_id, expectedBrandId: asset.model.brand_id }))
+      data.errors.map((e) => ({ errorId: e.error_id, expectedBrandId: asset.model.brand_id })),
     )
     const { prevErrorIds, nextErrorIds } = await reconcileAssetErrors(
-      tx, asset.id, data.errors, userId
+      tx,
+      asset.id,
+      data.errors,
+      userId,
     )
     return { assetId: asset.id, prevErrorIds, nextErrorIds }
   })

@@ -6,18 +6,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/shadcn/alert-dialog"
-import { TrashIcon } from "@phosphor-icons/react"
-import type { ReactNode } from "react"
+  AlertDialogTitle,
+} from '@/components/shadcn/alert-dialog'
+import { TrashIcon } from '@phosphor-icons/react'
+import type { ReactNode } from 'react'
 
 type DeleteEntityDialogProps = {
-  entity: string,
-  entityId: string | undefined,
-  children?: ReactNode,
-  open?: boolean,
-  onOpenChange?: (open: boolean) => void,
-  onConfirm?: () => void,
+  entity: string
+  entityId: string | undefined
+  children?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  onConfirm?: () => void
 }
 
 export function DeleteEntityDialog({
@@ -28,7 +28,6 @@ export function DeleteEntityDialog({
   onOpenChange,
   onConfirm,
 }: DeleteEntityDialogProps) {
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent size="sm">
@@ -41,7 +40,9 @@ export function DeleteEntityDialog({
         {children}
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>Delete</AlertDialogAction>
+          <AlertDialogAction variant="destructive" onClick={onConfirm}>
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

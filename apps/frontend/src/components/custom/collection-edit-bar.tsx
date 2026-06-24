@@ -1,15 +1,28 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
-import { DotsThreeVerticalIcon, DownloadSimpleIcon, LockSimpleOpenIcon, PencilSimpleIcon, PrinterIcon, SpinnerGapIcon, TrashIcon } from "@phosphor-icons/react"
-import { useState } from "react"
-import { type AssetSummary, type CollectionHistory, type ReportVariant } from "shared-types"
-import { toast } from "sonner"
-import { AlertDialogDescription } from "../shadcn/alert-dialog"
-import { Button } from "../shadcn/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../shadcn/dropdown-menu"
-import { CollectionHistorySheet } from "./collection-history-sheet"
-import { DeleteEntityDialog } from "./delete-entity-dialog"
-import { ShareButton } from "./share-button"
+import {
+  DotsThreeVerticalIcon,
+  DownloadSimpleIcon,
+  LockSimpleOpenIcon,
+  PencilSimpleIcon,
+  PrinterIcon,
+  SpinnerGapIcon,
+  TrashIcon,
+} from '@phosphor-icons/react'
+import { useState } from 'react'
+import { type AssetSummary, type CollectionHistory, type ReportVariant } from 'shared-types'
+import { toast } from 'sonner'
+import { AlertDialogDescription } from '../shadcn/alert-dialog'
+import { Button } from '../shadcn/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../shadcn/dropdown-menu'
+import { CollectionHistorySheet } from './collection-history-sheet'
+import { DeleteEntityDialog } from './delete-entity-dialog'
+import { ShareButton } from './share-button'
 
 const SECTION_CONFIG = {
   arrivals: { reportVariant: 'arrival_report' },
@@ -44,31 +57,36 @@ export function CollectionEditBar({
   onEdit,
   onRelease,
 }: CollectionEditBarProps): React.JSX.Element {
-
   const canDelete = useCan('delete_collection')
 
-  const exportAssets = useAssetStore(state => state.exportAssets)
-  const printBarcodes = useAssetStore(state => state.printBarcodes)
+  const exportAssets = useAssetStore((state) => state.exportAssets)
+  const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
   const [printLoading, setPrintLoading] = useState(false)
 
-  const barcodes = assets?.map(a => a.barcode)
-  const printableBarcodes = (selectedAssets?.length ? selectedAssets : assets)?.map(a => a.barcode)
+  const barcodes = assets?.map((a) => a.barcode)
+  const printableBarcodes = (selectedAssets?.length ? selectedAssets : assets)?.map(
+    (a) => a.barcode,
+  )
 
   async function handleExport() {
     if (!barcodes || barcodes.length === 0) return
 
     if (barcodes.length > 2000) {
-      toast.error(
-        `Cannot export ${barcodes.length} assets. Please select 2000 assets or less`
-        , { position: 'top-center' })
+      toast.error(`Cannot export ${barcodes.length} assets. Please select 2000 assets or less`, {
+        position: 'top-center',
+      })
       return
     }
 
     setExportLoading(true)
     try {
-      await exportAssets(barcodes, `${section}-${collectionId}.csv`, SECTION_CONFIG[section].reportVariant)
+      await exportAssets(
+        barcodes,
+        `${section}-${collectionId}.csv`,
+        SECTION_CONFIG[section].reportVariant,
+      )
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {
@@ -81,8 +99,9 @@ export function CollectionEditBar({
 
     if (printableBarcodes.length > 2000) {
       toast.error(
-        `Cannot print ${printableBarcodes.length} barcodes. Please select 2000 assets or less`
-        , { position: 'top-center' })
+        `Cannot print ${printableBarcodes.length} barcodes. Please select 2000 assets or less`,
+        { position: 'top-center' },
+      )
       return
     }
 
@@ -115,9 +134,7 @@ export function CollectionEditBar({
           disabled={exportDisabled}
           aria-label="Export to CSV"
         >
-          {exportLoading
-            ? <SpinnerGapIcon className="animate-spin" />
-            : <DownloadSimpleIcon />}
+          {exportLoading ? <SpinnerGapIcon className="animate-spin" /> : <DownloadSimpleIcon />}
         </Button>
       )}
       {showPrint && (
@@ -128,13 +145,14 @@ export function CollectionEditBar({
           disabled={printDisabled}
           aria-label="Print barcodes"
         >
-          {printLoading
-            ? <SpinnerGapIcon className="animate-spin" />
-            : <PrinterIcon />}
+          {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <PrinterIcon />}
         </Button>
       )}
       {canEdit && (
-        <Button onClick={onEdit}><PencilSimpleIcon />Edit</Button>
+        <Button onClick={onEdit}>
+          <PencilSimpleIcon />
+          Edit
+        </Button>
       )}
       {(showRelease || showDelete) && (
         <DropdownMenu>
@@ -146,12 +164,14 @@ export function CollectionEditBar({
           <DropdownMenuContent>
             {showRelease && (
               <DropdownMenuItem variant="destructive" onSelect={onRelease}>
-                <LockSimpleOpenIcon />Release
+                <LockSimpleOpenIcon />
+                Release
               </DropdownMenuItem>
             )}
             {showDelete && (
               <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-                <TrashIcon />Delete
+                <TrashIcon />
+                Delete
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

@@ -24,31 +24,31 @@ export function StickyEditPageHeader({
   isDirty,
   submittingText,
   saveButtonText,
-  onSave
+  onSave,
 }: StickyEditPageHeaderProps): React.JSX.Element {
   return (
     <StickyPageHeader>
       <PageBreadcrumb segments={breadcrumbs} onNavigate={onNavigate} />
-      <div className='flex items-center justify-between gap-4'>
-        <h1 className='text-2xl font-semibold'>{pageHeading}</h1>
-        <div className='flex gap-2'>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">{pageHeading}</h1>
+        <div className="flex gap-2">
           <Button
-            variant='outline'
-            type='button'
+            variant="outline"
+            type="button"
             disabled={isSubmitting}
             onClick={() => onNavigate(cancelNavUrl)}
           >
             Cancel
           </Button>
-          <Button
-            type='button'
-            onClick={onSave}
-            disabled={!isDirty || isSubmitting}
-          >
-            {isSubmitting
-              ? <><CircleNotchIcon className='animate-spin mr-1' size={16} />{submittingText}</>
-              : saveButtonText
-            }
+          <Button type="button" onClick={onSave} disabled={!isDirty || isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <CircleNotchIcon className="animate-spin mr-1" size={16} />
+                {submittingText}
+              </>
+            ) : (
+              saveButtonText
+            )}
           </Button>
         </div>
       </div>

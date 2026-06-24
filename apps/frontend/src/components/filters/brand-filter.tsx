@@ -12,14 +12,14 @@ export function BrandFilter({
   onSelectionChange: (brand: Brand) => void
   onClear: () => void
 }): React.JSX.Element {
-  const allBrands = useReferenceDataStore(state => state.brands)
+  const allBrands = useReferenceDataStore((state) => state.brands)
   const [query, setQuery] = useState('')
 
   return (
     <SearchSelectInput
       selection={selection}
       query={query}
-      onSelectionChange={b => {
+      onSelectionChange={(b) => {
         setQuery('')
         onSelectionChange(b)
       }}
@@ -29,10 +29,10 @@ export function BrandFilter({
         onClear()
       }}
       options={allBrands}
-      getLabel={b => b.name}
-      placeholder='Brand'
-      clearLabel='Clear brand'
-      className='w-35'
+      getLabel={(b) => b.name}
+      placeholder="Brand"
+      clearLabel="Clear brand"
+      className="w-35"
     />
   )
 }

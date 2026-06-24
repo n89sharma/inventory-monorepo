@@ -1,6 +1,6 @@
-import type { InvoiceType, OrgSummary, Status, User, Warehouse } from 'shared-types';
-import { AssetTypeSchema, StatusSchema, WarehouseSchema } from 'shared-types';
-import { z } from 'zod';
+import type { InvoiceType, OrgSummary, Status, User, Warehouse } from 'shared-types'
+import { AssetTypeSchema, StatusSchema, WarehouseSchema } from 'shared-types'
+import { z } from 'zod'
 
 export type SelectOption<T> =
   | { state: 'SELECTED'; selected: T }
@@ -18,7 +18,7 @@ export const ANY_OPTION: SelectOption<never> = { state: 'ANY' }
 export const UNSELECTED: SelectOption<never> = { state: 'UNSELECTED' }
 
 export function getIdOrNullFromSelection(
-  selection: SelectOption<Warehouse | User | Status | InvoiceType | OrgSummary>
+  selection: SelectOption<Warehouse | User | Status | InvoiceType | OrgSummary>,
 ) {
   if (selection.state === 'SELECTED') {
     return selection.selected.id
@@ -42,7 +42,7 @@ export function isSelected<T>(selection: SelectOption<T>) {
 export function getSelectOption<T>(v: T): SelectOption<T> {
   return {
     state: 'SELECTED',
-    selected: v
+    selected: v,
   }
 }
 

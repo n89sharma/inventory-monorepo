@@ -6,7 +6,7 @@ import { mutate } from 'swr'
 
 async function addPurchase(
   warehouseId: number,
-  form: AddPurchaseForm
+  form: AddPurchaseForm,
 ): Promise<AddPurchaseResponse> {
   const result = await addPurchaseApi(warehouseId, form)
   invalidateStorePartLists()
@@ -15,7 +15,7 @@ async function addPurchase(
 }
 
 const mutations = {
-  addPurchase
+  addPurchase,
 } as const
 
 export function useStorePartMutations() {

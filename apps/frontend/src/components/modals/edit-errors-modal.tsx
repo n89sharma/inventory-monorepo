@@ -1,21 +1,21 @@
-import { Button } from "@/components/shadcn/button"
+import { Button } from '@/components/shadcn/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/shadcn/dialog"
-import { useAssetStore } from "@/data/store/asset-store"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard"
-import { useMemo, useState } from "react"
-import { useForm, useWatch } from "react-hook-form"
-import type { AssetDetails, AssetError, UpdateError } from "shared-types"
-import { toast } from "sonner"
-import { AssetErrorsEditor } from "../custom/asset-errors-editor"
-import { SearchSelectInput } from "../custom/search-select-input"
-import { UnsavedChangesDialog } from "../custom/unsaved-changes-dialog"
+} from '@/components/shadcn/dialog'
+import { useAssetStore } from '@/data/store/asset-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { useMemo, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import type { AssetDetails, AssetError, UpdateError } from 'shared-types'
+import { toast } from 'sonner'
+import { AssetErrorsEditor } from '../custom/asset-errors-editor'
+import { SearchSelectInput } from '../custom/search-select-input'
+import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 
 interface EditErrorsModalProps {
   open: boolean
@@ -29,12 +29,17 @@ interface ErrorsForm {
 }
 
 function toErrorsForm(errors: AssetError[]): ErrorsForm {
-  return { errors: errors.map(e => ({ error_id: e.error_id, is_fixed: e.is_fixed })) }
+  return { errors: errors.map((e) => ({ error_id: e.error_id, is_fixed: e.is_fixed })) }
 }
 
-export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: EditErrorsModalProps) {
-  const brands = useReferenceDataStore(state => state.brands)
-  const updateAssetErrors = useAssetStore(state => state.updateAssetErrors)
+export function EditErrorsModal({
+  open,
+  onOpenChange,
+  assetDetails,
+  errors,
+}: EditErrorsModalProps) {
+  const brands = useReferenceDataStore((state) => state.brands)
+  const updateAssetErrors = useAssetStore((state) => state.updateAssetErrors)
 
   const [saving, setSaving] = useState(false)
 
@@ -42,15 +47,11 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
   const form = useForm<ErrorsForm>({ values })
   const localErrors = useWatch({ control: form.control, name: 'errors' })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   if (!assetDetails) return null
 
-  const brandId = brands.find(b => b.name === assetDetails.brand)?.id ?? null
+  const brandId = brands.find((b) => b.name === assetDetails.brand)?.id ?? null
 
   function handleChange(next: UpdateError[]) {
     form.setValue('errors', next, { shouldDirty: true })
@@ -82,7 +83,7 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
           value={localErrors}
           onChange={handleChange}
           brandId={brandId}
-          renderSearch={slot => <SearchSelectInput {...slot} placeholder="Add error" />}
+          renderSearch={(slot) => <SearchSelectInput {...slot} placeholder="Add error" />}
         />
 
         {localErrors.length === 0 && (

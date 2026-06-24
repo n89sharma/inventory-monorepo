@@ -1,7 +1,7 @@
-import { StickyPageHeader } from "@/components/custom/sticky-page-header"
-import { PageContent } from "@/components/layout/page-content"
-import { DataTable } from "@/components/shadcn/data-table"
-import type { ColumnDef } from "@tanstack/react-table"
+import { StickyPageHeader } from '@/components/custom/sticky-page-header'
+import { PageContent } from '@/components/layout/page-content'
+import { DataTable } from '@/components/shadcn/data-table'
+import type { ColumnDef } from '@tanstack/react-table'
 
 interface CollectionPageProps<TData, TValue> {
   title: string
@@ -14,7 +14,16 @@ interface CollectionPageProps<TData, TValue> {
   defaultSort?: { id: string; desc: boolean }
 }
 
-export function CollectionPage<TData, TValue>({ title, columns, data, searchBar, actions, onRowMouseEnter, getRowHref, defaultSort = { id: 'created_at', desc: true } }: CollectionPageProps<TData, TValue>) {
+export function CollectionPage<TData, TValue>({
+  title,
+  columns,
+  data,
+  searchBar,
+  actions,
+  onRowMouseEnter,
+  getRowHref,
+  defaultSort = { id: 'created_at', desc: true },
+}: CollectionPageProps<TData, TValue>) {
   return (
     <>
       <StickyPageHeader>

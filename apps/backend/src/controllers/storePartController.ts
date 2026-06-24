@@ -5,7 +5,7 @@ import {
   addStorePartToAsset as addStorePartToAssetSer,
   getAssetStoreParts as getAssetStorePartsSer,
   getStorePart as getStorePartSer,
-  getStoreParts as getStorePartsSer
+  getStoreParts as getStorePartsSer,
 } from '../services/storePartService.js'
 
 export const getStoreParts = asyncHandler(async (_req, res) => {

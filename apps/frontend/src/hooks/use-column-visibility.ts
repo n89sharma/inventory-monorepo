@@ -8,20 +8,15 @@ export function useColumnVisibility(defaultColumnIds: readonly string[]): {
   columnVisibility: VisibilityState
   reset: () => void
 } {
-  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    () => new Set(defaultColumnIds),
-  )
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(() => new Set(defaultColumnIds))
 
-  const columnVisibility = useMemo<VisibilityState>(
-    () => {
-      const out: VisibilityState = {}
-      for (const col of ASSET_TABLE_COLUMNS) {
-        out[col.id] = visibleColumns.has(col.id)
-      }
-      return out
-    },
-    [visibleColumns],
-  )
+  const columnVisibility = useMemo<VisibilityState>(() => {
+    const out: VisibilityState = {}
+    for (const col of ASSET_TABLE_COLUMNS) {
+      out[col.id] = visibleColumns.has(col.id)
+    }
+    return out
+  }, [visibleColumns])
 
   function reset() {
     setVisibleColumns(new Set(defaultColumnIds))

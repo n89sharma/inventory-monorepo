@@ -2,7 +2,14 @@ import { api } from '@/data/api/axios-client'
 import type { GlobalSearchResult } from 'shared-types'
 import { GlobalSearchResultSchema } from 'shared-types'
 
-const emptyResult: GlobalSearchResult = { assets: [], arrivals: [], departures: [], transfers: [], holds: [], invoices: [] }
+const emptyResult: GlobalSearchResult = {
+  assets: [],
+  arrivals: [],
+  departures: [],
+  transfers: [],
+  holds: [],
+  invoices: [],
+}
 
 export async function getGlobalSearchResults(q: string): Promise<GlobalSearchResult> {
   try {

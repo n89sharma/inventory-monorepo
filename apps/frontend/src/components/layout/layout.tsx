@@ -1,7 +1,7 @@
-import { AppSidebar } from "@/components/layout/app-sidebar"
-import { Header } from "@/components/layout/header"
-import { SidebarProvider } from "@/components/shadcn/sidebar"
-import { Toaster } from "sonner"
+import { AppSidebar } from '@/components/layout/app-sidebar'
+import { Header } from '@/components/layout/header'
+import { SidebarProvider } from '@/components/shadcn/sidebar'
+import { Toaster } from 'sonner'
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (

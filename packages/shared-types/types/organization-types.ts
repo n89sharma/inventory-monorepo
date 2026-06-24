@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const OrgSummarySchema = z.object({
   id: z.number(),
   account_number: z.string(),
-  name: z.string()
-});
+  name: z.string(),
+})
 
 export const OrgDetailSchema = z.object({
   id: z.number(),
@@ -18,10 +18,10 @@ export const OrgDetailSchema = z.object({
   city: z.string().nullable(),
   province: z.string().nullable(),
   country: z.string().nullable(),
-});
+})
 
-export type OrgSummary = z.infer<typeof OrgSummarySchema>;
-export type OrgDetail = z.infer<typeof OrgDetailSchema>;
+export type OrgSummary = z.infer<typeof OrgSummarySchema>
+export type OrgDetail = z.infer<typeof OrgDetailSchema>
 
 export const CreateOrgSchema = z.object({
   account_number: z.string().min(1),

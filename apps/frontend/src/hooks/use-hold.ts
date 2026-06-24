@@ -28,7 +28,7 @@ function holdListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
-  holdFor: SelectOption<User>
+  holdFor: SelectOption<User>,
 ): HoldListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -46,18 +46,15 @@ export function useHoldsList(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
-  holdFor: SelectOption<User>
+  holdFor: SelectOption<User>,
 ) {
-  return useSWR(
-    holdListKey(fromDate, toDate, holdBy, holdFor),
-    () => getHolds(fromDate, toDate, holdBy, holdFor)
+  return useSWR(holdListKey(fromDate, toDate, holdBy, holdFor), () =>
+    getHolds(fromDate, toDate, holdBy, holdFor),
   )
 }
 
 export function invalidateHoldLists() {
-  return mutate(
-    key => Array.isArray(key) && key[0] === HOLD_LIST_KEY_PREFIX,
-    undefined,
-    { revalidate: true }
-  )
+  return mutate((key) => Array.isArray(key) && key[0] === HOLD_LIST_KEY_PREFIX, undefined, {
+    revalidate: true,
+  })
 }

@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import { AssetSummarySchema, CreateAssetSchema } from '../asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
-import { CountrySchema, WarehouseSchema } from '../reference-data-types.js';
-import { CollectionSummarySchema } from './collection-types.js';
+import { z } from 'zod'
+import { AssetSummarySchema, CreateAssetSchema } from '../asset-types.js'
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
+import { CountrySchema, WarehouseSchema } from '../reference-data-types.js'
+import { CollectionSummarySchema } from './collection-types.js'
 
 // GET /arrivals?fromDate...&toDate...&warehouse...
 export const ArrivalSummarySchema = CollectionSummarySchema.extend({
@@ -11,7 +11,7 @@ export const ArrivalSummarySchema = CollectionSummarySchema.extend({
   transporter: z.string(),
   destination_code: z.string(),
   destination_street: z.string(),
-  created_by: z.string()
+  created_by: z.string(),
 })
 export type ArrivalSummary = z.infer<typeof ArrivalSummarySchema>
 
@@ -24,16 +24,16 @@ export const ArrivalDetailSchema = z.object({
   comment: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string(),
-  assets: z.array(AssetSummarySchema)
+  assets: z.array(AssetSummarySchema),
 })
 export type ArrivalDetail = z.infer<typeof ArrivalDetailSchema>
 
 export const CreateArrivalSchema = z.object({
-  vendor: OrgSummarySchema.refine(val => !!val, "Vendor required"),
-  transporter: OrgSummarySchema.refine(val => !!val, "Transporter required"),
-  warehouse: WarehouseSchema.refine(val => !!val, "Warehouse required"),
+  vendor: OrgSummarySchema.refine((val) => !!val, 'Vendor required'),
+  transporter: OrgSummarySchema.refine((val) => !!val, 'Transporter required'),
+  warehouse: WarehouseSchema.refine((val) => !!val, 'Warehouse required'),
   comment: z.string().nullable(),
-  assets: z.array(CreateAssetSchema).nonempty("No assets in the arrival").max(2000)
+  assets: z.array(CreateAssetSchema).nonempty('No assets in the arrival').max(2000),
 })
 export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 
@@ -44,7 +44,7 @@ export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 // the frontend form layer so the user must pick a country when editing.
 export const UpdateAssetSchema = CreateAssetSchema.extend({
   id: z.number().optional(),
-  countryOfOrigin: CountrySchema.nullable()
+  countryOfOrigin: CountrySchema.nullable(),
 })
 export type UpdateAsset = z.infer<typeof UpdateAssetSchema>
 
@@ -53,6 +53,6 @@ export const UpdateArrivalMetadataSchema = z.object({
   vendor: OrgSummarySchema,
   transporter: OrgSummarySchema,
   warehouse: WarehouseSchema,
-  comment: z.string().nullable()
+  comment: z.string().nullable(),
 })
 export type UpdateArrivalMetadata = z.infer<typeof UpdateArrivalMetadataSchema>

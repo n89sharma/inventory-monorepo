@@ -4,10 +4,7 @@ import useSWR, { mutate } from 'swr'
 export const assetHistoryKey = (barcode: string) => `asset-history:${barcode}`
 
 export function useAssetHistory(barcode: string, enabled: boolean) {
-  return useSWR(
-    enabled ? assetHistoryKey(barcode) : null,
-    () => getAssetHistory(barcode)
-  )
+  return useSWR(enabled ? assetHistoryKey(barcode) : null, () => getAssetHistory(barcode))
 }
 
 export function invalidateAssetHistory(barcodes: string[]): void {

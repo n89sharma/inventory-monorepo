@@ -8,8 +8,10 @@ import { DepartureFormPage } from './departure-form-page'
 export function CreateDeparturePage(): React.JSX.Element {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { preloadedAssets, returnTo } =
-    (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
+  const { preloadedAssets, returnTo } = (state ?? {}) as {
+    preloadedAssets?: AssetSummary[]
+    returnTo?: string
+  }
 
   const mutations = useDepartureMutations()
 
@@ -20,10 +22,7 @@ export function CreateDeparturePage(): React.JSX.Element {
     cancelNavUrl: '/departures',
   }
 
-  const breadcrumbs = [
-    { label: 'Departures', href: '/departures' },
-    { label: 'Create' },
-  ]
+  const breadcrumbs = [{ label: 'Departures', href: '/departures' }, { label: 'Create' }]
 
   const defaultValues: DepartureForm | undefined = preloadedAssets?.length
     ? {
@@ -31,7 +30,7 @@ export function CreateDeparturePage(): React.JSX.Element {
         customer: null,
         transporter: null,
         comment: '',
-        assets: preloadedAssets.map(a => ({ ...a, outgoing_status: DEFAULT_OUTGOING_STATUS }))
+        assets: preloadedAssets.map((a) => ({ ...a, outgoing_status: DEFAULT_OUTGOING_STATUS })),
       }
     : undefined
 
@@ -39,7 +38,9 @@ export function CreateDeparturePage(): React.JSX.Element {
     try {
       const { departureNumber } = await mutations.create(data)
       const destination = returnTo ?? `/departures/${departureNumber}`
-      navigate(destination, { state: { successToast: { entity: 'departure', id: departureNumber } } })
+      navigate(destination, {
+        state: { successToast: { entity: 'departure', id: departureNumber } },
+      })
     } catch {
       // interceptor already showed the error toast
     }

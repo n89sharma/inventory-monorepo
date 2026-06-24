@@ -7,17 +7,21 @@ interface AddAssetBarForArrivalProps {
   disabled?: boolean
 }
 
-export function AddAssetBarForArrival({ onCreate, disabled }: AddAssetBarForArrivalProps): React.JSX.Element {
+export function AddAssetBarForArrival({
+  onCreate,
+  disabled,
+}: AddAssetBarForArrivalProps): React.JSX.Element {
   return (
-    <AddAssetBarShell label='New asset'>
+    <AddAssetBarShell label="New asset">
       <Button
-        type='button'
-        variant='secondary'
+        type="button"
+        variant="secondary"
         onClick={onCreate}
         disabled={disabled}
-        className='ml-auto'
+        className="ml-auto"
       >
-        <PlusIcon />Create Asset
+        <PlusIcon />
+        Create Asset
       </Button>
     </AddAssetBarShell>
   )

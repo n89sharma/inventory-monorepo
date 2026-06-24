@@ -56,7 +56,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   )
 
   const selectedAssets: AssetSummary[] = assets
-    .filter(a => rowSelection[a.barcode])
+    .filter((a) => rowSelection[a.barcode])
     .map(toAssetSummary)
 
   function selectAllAssets() {

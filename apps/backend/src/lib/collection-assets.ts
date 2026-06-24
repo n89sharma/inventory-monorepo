@@ -23,7 +23,7 @@ export async function assertAssetsNotInCollection(
     where: { id: { in: assetIds }, ...assetInCollectionWhere },
     select: { barcode: true },
   })
-  if (inCollection.length > 0) throw assetInCollectionError(inCollection.map(a => a.barcode))
+  if (inCollection.length > 0) throw assetInCollectionError(inCollection.map((a) => a.barcode))
 }
 
 export type AssetCollectionTransaction = {

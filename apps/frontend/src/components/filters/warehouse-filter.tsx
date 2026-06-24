@@ -14,11 +14,14 @@ export function WarehouseFilter({
   const activeWarehouses = useActiveWarehouses()
 
   const isAll = selection.length === 0
-  const isOnly = (w: Warehouse) =>
-    selection.length === 1 && selection[0].id === w.id
+  const isOnly = (w: Warehouse) => selection.length === 1 && selection[0].id === w.id
 
   return (
-    <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Filter by warehouse">
+    <div
+      className="flex flex-wrap items-center gap-1"
+      role="group"
+      aria-label="Filter by warehouse"
+    >
       <Toggle
         variant="outline"
         pressed={isAll}
@@ -27,12 +30,12 @@ export function WarehouseFilter({
       >
         {ALL_LABEL}
       </Toggle>
-      {activeWarehouses.map(w => (
+      {activeWarehouses.map((w) => (
         <Toggle
           key={w.id}
           variant="outline"
           pressed={isOnly(w)}
-          onPressedChange={pressed => onSelectionChange(pressed ? [w] : [])}
+          onPressedChange={(pressed) => onSelectionChange(pressed ? [w] : [])}
           aria-label={`Filter by ${w.city_code} warehouse`}
         >
           {w.city_code}

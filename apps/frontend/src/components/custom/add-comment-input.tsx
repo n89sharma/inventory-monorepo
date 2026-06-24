@@ -12,7 +12,7 @@ type AddCommentInputProps = {
 export function AddCommentInput({ barcode }: AddCommentInputProps) {
   const [text, setText] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const createComment = useAssetStore(state => state.createComment)
+  const createComment = useAssetStore((state) => state.createComment)
 
   async function handleSubmit() {
     if (!text.trim() || isSubmitting) return
@@ -35,17 +35,13 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
         <Textarea
           placeholder="Add a comment..."
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           className="min-h-18 resize-none"
           maxLength={2000}
           disabled={isSubmitting}
         />
         <div className="flex flex-row gap-2">
-          <Button
-            size="sm"
-            disabled={!text.trim() || isSubmitting}
-            onClick={handleSubmit}
-          >
+          <Button size="sm" disabled={!text.trim() || isSubmitting} onClick={handleSubmit}>
             {isSubmitting && <CircleNotchIcon className="animate-spin" size={16} />}
             Comment
           </Button>

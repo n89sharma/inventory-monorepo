@@ -4,23 +4,24 @@ React 19 SPA, Vite. Path alias `@/` → `src/`. Loads when you work in this tree
 Root `CLAUDE.md` rules still apply.
 
 **Load the relevant skill first:**
+
 - Editing any frontend file → `/vercel-react-best-practices`
 - Complex refactor of a UI component → `/vercel-composition-patterns`
 
 ## Layers
 
-| Layer | Path | Responsibility |
-|---|---|---|
-| Form types | `ui-types/entityFormTypes.ts` | Zod schema + inferred type for react-hook-form; UI shape (e.g. `SelectOption<User>`) |
-| API | `data/api/entity-api.ts` | Axios calls; maps form payload ↔ request body. No SWR, no cache logic |
-| Store | `data/store/entity-store.ts` | Zustand — **client state only** (filter selections, `hasSearched`, UI flags). ~30 lines |
-| Query hooks | `hooks/use-entity.ts` | SWR reads: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` until `fromDate` is set; `invalidateXLists()` is a matcher revalidating every cached filter variant |
-| Mutation hooks | `hooks/use-entity-mutations.ts` | All writes for an entity (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`…); returns a stable object. Imports keys/invalidators from `use-entity.ts` only — no cross-sibling imports |
-| Pages | `components/pages/entity/` | Form page holds all field UI; create/details pages are thin wrappers (config + navigation) |
-| Column defs | `components/pages/column-defs/entity-columns.tsx` | TanStack columns, kept out of page components |
-| Components | `components/custom/descriptive-name.tsx` | Reusable UI not tied to one entity |
-| Hooks | `hooks/use-kebab-case.ts` | Custom hooks (see below) |
-| Lib | `lib/*.ts` | Pure utils / cross-cutting helpers |
+| Layer          | Path                                              | Responsibility                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Form types     | `ui-types/entityFormTypes.ts`                     | Zod schema + inferred type for react-hook-form; UI shape (e.g. `SelectOption<User>`)                                                                                                                                           |
+| API            | `data/api/entity-api.ts`                          | Axios calls; maps form payload ↔ request body. No SWR, no cache logic                                                                                                                                                          |
+| Store          | `data/store/entity-store.ts`                      | Zustand — **client state only** (filter selections, `hasSearched`, UI flags). ~30 lines                                                                                                                                        |
+| Query hooks    | `hooks/use-entity.ts`                             | SWR reads: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` until `fromDate` is set; `invalidateXLists()` is a matcher revalidating every cached filter variant          |
+| Mutation hooks | `hooks/use-entity-mutations.ts`                   | All writes for an entity (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`…); returns a stable object. Imports keys/invalidators from `use-entity.ts` only — no cross-sibling imports |
+| Pages          | `components/pages/entity/`                        | Form page holds all field UI; create/details pages are thin wrappers (config + navigation)                                                                                                                                     |
+| Column defs    | `components/pages/column-defs/entity-columns.tsx` | TanStack columns, kept out of page components                                                                                                                                                                                  |
+| Components     | `components/custom/descriptive-name.tsx`          | Reusable UI not tied to one entity                                                                                                                                                                                             |
+| Hooks          | `hooks/use-kebab-case.ts`                         | Custom hooks (see below)                                                                                                                                                                                                       |
+| Lib            | `lib/*.ts`                                        | Pure utils / cross-cutting helpers                                                                                                                                                                                             |
 
 Reading one file per layer for an existing entity (~9 files: form types, API, store, query hook,
 mutations hook, form page, create page, details page, columns) gives the full end-to-end pattern.
@@ -29,6 +30,7 @@ mutations hook, form page, create page, details page, columns) gives the full en
 
 The reason Zustand is **not** a data layer here: copying server data into Zustand creates two
 sources of truth. Don't do it.
+
 - **Server state → SWR.** Anything from the network is owned by an SWR hook; cache keys colocated
   with the hook.
 - **Client state → Zustand.** Filter selections, UI toggles, `hasSearched`. Stores never call
@@ -37,8 +39,8 @@ sources of truth. Don't do it.
   (client state), a `useEntityDetail` / `useEntitiesList` hook (reads), or a `useEntityMutations`
   hook (writes).
 - **Every mutation invalidates the caches it affects** — typically `mutate(entityDetailKey(id))`
-  + `invalidateEntityLists()`. Optimistic: `mutate(key, updater, { revalidate: false })` then a
-  final `mutate(key)` in `finally`.
+  - `invalidateEntityLists()`. Optimistic: `mutate(key, updater, { revalidate: false })` then a
+    final `mutate(key)` in `finally`.
 
 ## API layer parsing & typing
 
@@ -70,7 +72,7 @@ nullable fields start `null`). The `*-api.ts` file bridges them.
   scanner and asset table sit outside the `FieldSet`. Read an existing page (e.g.
   `create-hold-page.tsx`) for the exact shape. Validation errors:
   `toast.error(flattenFieldErrors(errors, []))` in `onInvalid`. Asset errors: `<Controller
-  name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
+name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
 - **Routing (`app.tsx`):** specific routes before param routes — `/holds/new` before
   `/holds/:collectionId`.
 - **`SelectOption<T>`** (`ui-types/select-option-types.ts`): states `SELECTED { selected: T }` /

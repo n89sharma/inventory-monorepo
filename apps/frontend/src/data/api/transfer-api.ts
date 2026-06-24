@@ -1,8 +1,29 @@
 import { api } from '@/data/api/axios-client'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, AssetSummary, CollectionHistory, CreateTransfer, TransferDetail, TransferSummary, UpdateTransferMetadata, Warehouse } from 'shared-types'
-import { AssetDeltaSchema, AssetSummarySchema, CollectionHistorySchema, CreateTransferSchema, TransferDetailSchema, TransferSummarySchema, UpdateTransferMetadataSchema } from 'shared-types'
+import {
+  type SelectOption,
+  getIdOrNullFromSelection,
+  getSelectedOrNull,
+} from '@/ui-types/select-option-types'
+import type {
+  AssetDelta,
+  AssetSummary,
+  CollectionHistory,
+  CreateTransfer,
+  TransferDetail,
+  TransferSummary,
+  UpdateTransferMetadata,
+  Warehouse,
+} from 'shared-types'
+import {
+  AssetDeltaSchema,
+  AssetSummarySchema,
+  CollectionHistorySchema,
+  CreateTransferSchema,
+  TransferDetailSchema,
+  TransferSummarySchema,
+  UpdateTransferMetadataSchema,
+} from 'shared-types'
 import { z } from 'zod'
 
 const CreateTransferResponseSchema = z.object({ transferNumber: z.string() })
@@ -12,14 +33,15 @@ export async function getTransfers(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  destination: SelectOption<Warehouse>): Promise<TransferSummary[]> {
+  destination: SelectOption<Warehouse>,
+): Promise<TransferSummary[]> {
   const { data } = await api.get<TransferSummary[]>(`/transfers`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
       origin: getIdOrNullFromSelection(origin),
       destination: getIdOrNullFromSelection(destination),
-    }
+    },
   })
   return z.array(TransferSummarySchema).parse(data)
 }
@@ -40,7 +62,7 @@ export async function createTransfer(t: TransferForm): Promise<CreateTransferRes
     destination: getSelectedOrNull(t.destination)!,
     transporter: t.transporter!,
     comment: t.comment,
-    assets: t.assets as CreateTransfer['assets']
+    assets: t.assets as CreateTransfer['assets'],
   } satisfies CreateTransfer)
   const { data } = await api.post<CreateTransferResponse>('/transfers', createTransferBody)
   return CreateTransferResponseSchema.parse(data)
@@ -53,20 +75,20 @@ export async function getAssetByBarcode(barcode: string): Promise<AssetSummary> 
 
 export async function updateTransferMetadata(
   transferNumber: string,
-  metadata: TransferMetadataForm
+  metadata: TransferMetadataForm,
 ): Promise<void> {
   const updateTransferMetadataBody = UpdateTransferMetadataSchema.parse({
     origin: getSelectedOrNull(metadata.origin)!,
     destination: getSelectedOrNull(metadata.destination)!,
     transporter: metadata.transporter!,
-    comment: metadata.comment === '' ? null : metadata.comment
+    comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateTransferMetadata)
   await api.patch(`/transfers/${transferNumber}/metadata`, updateTransferMetadataBody)
 }
 
 export async function patchTransferAssets(
   transferNumber: string,
-  delta: AssetDelta
+  delta: AssetDelta,
 ): Promise<void> {
   const patchTransferAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/transfers/${transferNumber}/assets`, patchTransferAssetsBody)

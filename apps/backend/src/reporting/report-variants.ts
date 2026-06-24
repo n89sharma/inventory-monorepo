@@ -80,34 +80,34 @@ const GENERAL_REPORT_COLUMNS = [
   ...COST_SECTION,
   ...SPECS_SECTION,
   ...ARRIVAL_SECTION,
-  ...DEPARTURE_SECTION
+  ...DEPARTURE_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 const ARRIVAL_REPORT_COLUMNS = [
   ...BASE_SECTION,
   ...SPECS_SECTION,
-  ...ARRIVAL_SECTION
+  ...ARRIVAL_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 const TRANSFER_REPORT_COLUMNS = [
   ...BASE_SECTION,
-  ...COST_SECTION
+  ...COST_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 const DEPARTURE_REPORT_COLUMNS = [
   ...BASE_SECTION,
   ...COST_SECTION,
-  ...DEPARTURE_SECTION
+  ...DEPARTURE_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 const INVOICE_REPORT_COLUMNS = [
   ...BASE_SECTION,
-  ...INVOICE_SECTION
+  ...INVOICE_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 const HOLD_REPORT_COLUMNS = [
   ...BASE_SECTION,
-  ...HOLD_SECTION
+  ...HOLD_SECTION,
 ] as const satisfies readonly AssetColumnKey[]
 
 export const REPORT_VARIANTS = {
@@ -116,5 +116,5 @@ export const REPORT_VARIANTS = {
   transfer_report: TRANSFER_REPORT_COLUMNS,
   departure_report: DEPARTURE_REPORT_COLUMNS,
   invoice_report: INVOICE_REPORT_COLUMNS,
-  hold_report: HOLD_REPORT_COLUMNS
+  hold_report: HOLD_REPORT_COLUMNS,
 } as const satisfies Record<ReportVariant, readonly AssetColumnKey[]>

@@ -21,8 +21,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const detail = useDepartureDetail(departureNumber)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
-      createDepartureAssetSummaryColumns(assetHref),
+    (assetHref: (asset: AssetSummary) => string) => createDepartureAssetSummaryColumns(assetHref),
     [],
   )
 
@@ -38,8 +37,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
       historyCacheKey={`departure-history:${departureNumber}`}
       historyFetcher={() => getDepartureHistory(departureNumber)}
       buildColumns={buildColumns}
-      renderSummaryStrip={departure => <DepartureSummaryStrip departure={departure} />}
-      renderSubtitle={departure => (
+      renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
+      renderSubtitle={(departure) => (
         <>
           <SummaryField label="Customer" value={departure.customer.name} />
           <SummaryField label="Departed" value={formatDate(departure.created_at)} />
@@ -50,21 +49,25 @@ export function DepartureDetailsPage(): React.JSX.Element {
           open={control.open}
           onOpenChange={control.onOpenChange}
           departure={departure}
-          onSave={metadata => mutations.updateMetadata(departureNumber, metadata)}
+          onSave={(metadata) => mutations.updateMetadata(departureNumber, metadata)}
         />
       )}
-      renderAddAssetBar={departure => (
+      renderAddAssetBar={(departure) => (
         <AddAssetBar
           existingAssets={departure.assets}
-          entityName='departure'
-          onAddSingle={asset => mutations.addAsset(departureNumber, asset)}
-          onAddBatchFromHold={assets => mutations.addAssetBatch(departureNumber, assets)}
+          entityName="departure"
+          onAddSingle={(asset) => mutations.addAsset(departureNumber, asset)}
+          onAddBatchFromHold={(assets) => mutations.addAssetBatch(departureNumber, assets)}
         />
       )}
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
         <DepartureOutgoingStatusToggle
-          onApply={status => {
-            mutations.setOutgoingStatus(departureNumber, selectedAssets.map(a => a.id), status)
+          onApply={(status) => {
+            mutations.setOutgoingStatus(
+              departureNumber,
+              selectedAssets.map((a) => a.id),
+              status,
+            )
             clearSelection()
           }}
         />

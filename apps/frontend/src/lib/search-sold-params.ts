@@ -1,4 +1,10 @@
-import { OUTGOING_STATUS, type AssetType, type Brand, type OrgSummary, type Status } from 'shared-types'
+import {
+  OUTGOING_STATUS,
+  type AssetType,
+  type Brand,
+  type OrgSummary,
+  type Status,
+} from 'shared-types'
 import {
   isAfter,
   isBefore,
@@ -55,11 +61,9 @@ export type SearchSoldReferenceData = SharedAssetReferenceData & {
 
 export function resolveSoldStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
   const wanted = new Set<string>(
-    showOther
-      ? [OUTGOING_STATUS.HARVESTED, OUTGOING_STATUS.SCRAPPED]
-      : [OUTGOING_STATUS.SOLD],
+    showOther ? [OUTGOING_STATUS.HARVESTED, OUTGOING_STATUS.SCRAPPED] : [OUTGOING_STATUS.SOLD],
   )
-  return allStatuses.filter(s => wanted.has(s.status))
+  return allStatuses.filter((s) => wanted.has(s.status))
 }
 
 export function filtersToParams(filters: SearchSoldFilters): URLSearchParams {
@@ -80,14 +84,15 @@ export function paramsToFilters(
 ): SearchSoldFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
-    ? ref.brands.find(b => b.id === Number.parseInt(brandId, 10)) ?? null
+    ? (ref.brands.find((b) => b.id === Number.parseInt(brandId, 10)) ?? null)
     : null
 
   const fromRaw = params.get(PARAM_FROM)
   const parsedFrom = fromRaw ? parseISO(fromRaw) : null
-  const fromDate = parsedFrom && isValid(parsedFrom)
-    ? parsedFrom
-    : startOfDay(subDays(new Date(), DEFAULT_FROM_DAYS))
+  const fromDate =
+    parsedFrom && isValid(parsedFrom)
+      ? parsedFrom
+      : startOfDay(subDays(new Date(), DEFAULT_FROM_DAYS))
 
   const toRaw = params.get(PARAM_TO)
   const parsedTo = toRaw ? parseISO(toRaw) : null
@@ -95,7 +100,7 @@ export function paramsToFilters(
 
   const customerId = params.get(PARAM_CUSTOMER)
   const customer = customerId
-    ? ref.customers.find(c => c.id === Number.parseInt(customerId, 10)) ?? null
+    ? (ref.customers.find((c) => c.id === Number.parseInt(customerId, 10)) ?? null)
     : null
 
   return {

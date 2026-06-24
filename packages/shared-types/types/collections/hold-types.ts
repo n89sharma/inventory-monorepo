@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import { AssetSummarySchema } from '../asset-types.js';
-import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
-import { UserSchema } from '../user-types.js';
-import { CollectionSummarySchema } from './collection-types.js';
+import { z } from 'zod'
+import { AssetSummarySchema } from '../asset-types.js'
+import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
+import { UserSchema } from '../user-types.js'
+import { CollectionSummarySchema } from './collection-types.js'
 
 export const HoldSummarySchema = CollectionSummarySchema.extend({
   hold_number: z.string(),
@@ -11,9 +11,9 @@ export const HoldSummarySchema = CollectionSummarySchema.extend({
   notes: z.string().nullable(),
   from_dt: z.coerce.date().nullable(),
   to_dt: z.coerce.date().nullable(),
-  archived_at: z.coerce.date().nullable()
+  archived_at: z.coerce.date().nullable(),
 })
-export type HoldSummary = z.infer<typeof HoldSummarySchema>;
+export type HoldSummary = z.infer<typeof HoldSummarySchema>
 
 // GET /holds/:holdNumber
 export const HoldDetailSchema = z.object({
@@ -26,7 +26,7 @@ export const HoldDetailSchema = z.object({
   from_dt: z.coerce.date().nullable(),
   to_dt: z.coerce.date().nullable(),
   archived_at: z.coerce.date().nullable(),
-  assets: z.array(AssetSummarySchema)
+  assets: z.array(AssetSummarySchema),
 })
 export type HoldDetail = z.infer<typeof HoldDetailSchema>
 
@@ -35,7 +35,7 @@ export const CreateHoldSchema = z.object({
   created_for_id: z.number().int(),
   customer_id: z.number().int(),
   notes: z.string().nullable(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold').max(2000)
+  assets: z.array(AssetSummarySchema).nonempty('No assets in the hold').max(2000),
 })
 export type CreateHold = z.infer<typeof CreateHoldSchema>
 
@@ -43,6 +43,6 @@ export type CreateHold = z.infer<typeof CreateHoldSchema>
 export const UpdateHoldMetadataSchema = z.object({
   created_for: UserSchema,
   customer: OrgSummarySchema,
-  notes: z.string().nullable()
+  notes: z.string().nullable(),
 })
 export type UpdateHoldMetadata = z.infer<typeof UpdateHoldMetadataSchema>

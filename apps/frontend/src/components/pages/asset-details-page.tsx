@@ -1,5 +1,16 @@
-import { ActivitySection, DataRowContainer, Section, SectionHeader } from '@/components/custom/asset-details/detail-layout'
-import { AccessoryRow, CMYKRow, DataCurrencyRow, DataRow, DataValueRow } from '@/components/custom/asset-details/detail-row'
+import {
+  ActivitySection,
+  DataRowContainer,
+  Section,
+  SectionHeader,
+} from '@/components/custom/asset-details/detail-layout'
+import {
+  AccessoryRow,
+  CMYKRow,
+  DataCurrencyRow,
+  DataRow,
+  DataValueRow,
+} from '@/components/custom/asset-details/detail-row'
 import { Badge } from '@/components/shadcn/badge'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { SectionEditButton } from '@/components/custom/asset-details/section-edit-button'
@@ -16,12 +27,19 @@ import { AddPartModal } from '@/components/modals/add-part-modal'
 import { EditErrorsModal } from '@/components/modals/edit-errors-modal'
 import { EditPricingModal } from '@/components/modals/edit-pricing-modal'
 import { EditSpecsModal } from '@/components/modals/edit-specs-modal'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
 import { useAssetHistory } from '@/hooks/use-asset-history'
 import { useCan } from '@/hooks/use-can'
-import { formatDate, formatDateWithTime, formatLocation, formatTitleCase, formatThousandsK, formatWeightKg } from '@/lib/formatters'
+import {
+  formatDate,
+  formatDateWithTime,
+  formatLocation,
+  formatTitleCase,
+  formatThousandsK,
+  formatWeightKg,
+} from '@/lib/formatters'
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -30,9 +48,7 @@ import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
 
-function AssetHistoryTabContent(
-  { barcode, enabled }: { barcode: string; enabled: boolean }
-) {
+function AssetHistoryTabContent({ barcode, enabled }: { barcode: string; enabled: boolean }) {
   const { data, isLoading } = useAssetHistory(barcode, enabled)
   if (!enabled || isLoading) {
     return <p className="text-sm text-muted-foreground">Loading…</p>
@@ -47,22 +63,27 @@ const RAIL_STICKY_TOP = 'calc(var(--app-header-height) + var(--details-header-he
 const ROW_GAP = 'gap-8'
 
 function RailCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="bg-card border rounded-md shadow-sm p-3">
-      {children}
-    </div>
-  )
+  return <div className="bg-card border rounded-md shadow-sm p-3">{children}</div>
 }
 
-function RailCardHeader(
-  { entity, id, idHref, date }:
-    { entity: string; id: string; idHref: string; date: Date | null },
-) {
+function RailCardHeader({
+  entity,
+  id,
+  idHref,
+  date,
+}: {
+  entity: string
+  id: string
+  idHref: string
+  date: Date | null
+}) {
   return (
     <div className="flex flex-col gap-0.5 border-b pb-2 mb-2">
       <div className="flex items-center gap-1.5 min-w-0">
         <span className="text-xs text-muted-foreground shrink-0">{entity}</span>
-        <Link to={idHref} className="text-xs font-medium hover:underline truncate">{id}</Link>
+        <Link to={idHref} className="text-xs font-medium hover:underline truncate">
+          {id}
+        </Link>
       </div>
       {date && <span className="text-xs text-muted-foreground">{formatDate(date)}</span>}
     </div>
@@ -78,23 +99,31 @@ function RailEmpty({ entity }: { entity: string }) {
   )
 }
 
-function AssetSummaryStrip(
-  { status, assetType, serialNumber, location }:
-    { status: string; assetType: string | null; serialNumber: string | null; location: string },
-) {
+function AssetSummaryStrip({
+  status,
+  assetType,
+  serialNumber,
+  location,
+}: {
+  status: string
+  assetType: string | null
+  serialNumber: string | null
+  location: string
+}) {
   const tokens: { key: string; node: React.ReactNode }[] = [
     { key: 'status', node: <StatusBadge status={status} /> },
   ]
   if (assetType) tokens.push({ key: 'type', node: <span>{assetType}</span> })
-  if (serialNumber) tokens.push({
-    key: 'serial',
-    node: (
-      <span>
-        <span className="text-muted-foreground">S/N</span>{' '}
-        <span className="font-mono">{serialNumber}</span>
-      </span>
-    ),
-  })
+  if (serialNumber)
+    tokens.push({
+      key: 'serial',
+      node: (
+        <span>
+          <span className="text-muted-foreground">S/N</span>{' '}
+          <span className="font-mono">{serialNumber}</span>
+        </span>
+      ),
+    })
   if (location) tokens.push({ key: 'location', node: <span>{location}</span> })
 
   return (
@@ -234,7 +263,6 @@ function buildAssetLifecycle(
 }
 
 export const AssetDetailsPage = () => {
-
   const { section, collectionId, assetId, searchList } = useAssetDetailsParams()
   const location = useLocation()
   const listSearch = location.search
@@ -262,15 +290,24 @@ export const AssetDetailsPage = () => {
   const canEditPrices = useCan('edit_prices')
   const canEditTechSpecs = useCan('edit_tech_specs')
 
-  if (detailLoading) return <div role="status" aria-live="polite">Loading…</div>
+  if (detailLoading)
+    return (
+      <div role="status" aria-live="polite">
+        Loading…
+      </div>
+    )
   if (detailError) return <div>{detailError.message}</div>
   if (!assetDetails) return null
 
   const { cost, specs } = assetDetails
-  const sortedComments = [...(comments ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const sortedComments = [...(comments ?? [])].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )
 
-  const { populated: populatedLifecycleItems, empty: emptyLifecycleEntities } =
-    buildAssetLifecycle(assetDetails, transfers)
+  const { populated: populatedLifecycleItems, empty: emptyLifecycleEntities } = buildAssetLifecycle(
+    assetDetails,
+    transfers,
+  )
 
   return (
     <>
@@ -278,9 +315,7 @@ export const AssetDetailsPage = () => {
         breadcrumbSegments={breadcrumbSegments}
         titleNode={
           <h1 className="text-xl flex items-center gap-6">
-            <span className="font-semibold">
-              {`${assetDetails.brand} ${assetDetails.model}`}
-            </span>
+            <span className="font-semibold">{`${assetDetails.brand} ${assetDetails.model}`}</span>
             <span className="group flex items-center gap-2 font-mono">
               {assetDetails.barcode}
               <CopyButton value={assetDetails.barcode} />
@@ -300,21 +335,30 @@ export const AssetDetailsPage = () => {
       <PageContent>
         <div className="flex gap-8">
           <div className="flex-1 min-w-0 flex flex-col gap-8">
-
             <Section className="w-full">
               <SectionHeader
                 title="Specifications"
-                action={canEditTechSpecs && <SectionEditButton onClick={() => setEditSpecsOpen(true)} />}
+                action={
+                  canEditTechSpecs && <SectionEditButton onClick={() => setEditSpecsOpen(true)} />
+                }
               />
               <div className="flex flex-row gap-x-8">
                 <DataRowContainer className="flex-1 min-w-0">
                   <DataRow label="Readiness" rowClassName={ROW_GAP}>
                     <ReadinessPill status={assetDetails.readiness} />
                   </DataRow>
-                  <DataValueRow label="Total Meter" value={formatThousandsK(specs.meter_total)} rowClassName={ROW_GAP} />
+                  <DataValueRow
+                    label="Total Meter"
+                    value={formatThousandsK(specs.meter_total)}
+                    rowClassName={ROW_GAP}
+                  />
                   <DataValueRow
                     label="Country of Origin"
-                    value={assetDetails.country_of_origin ? formatTitleCase(assetDetails.country_of_origin) : null}
+                    value={
+                      assetDetails.country_of_origin
+                        ? formatTitleCase(assetDetails.country_of_origin)
+                        : null
+                    }
                     rowClassName={ROW_GAP}
                   />
                   <DataValueRow
@@ -331,7 +375,11 @@ export const AssetDetailsPage = () => {
                 </DataRowContainer>
                 <DataRowContainer className="flex-1 min-w-0">
                   <DataValueRow label="Cassettes" value={specs.cassettes} rowClassName={ROW_GAP} />
-                  <DataValueRow label="Internal Finisher" value={specs.internal_finisher} rowClassName={ROW_GAP} />
+                  <DataValueRow
+                    label="Internal Finisher"
+                    value={specs.internal_finisher}
+                    rowClassName={ROW_GAP}
+                  />
                   <CMYKRow
                     label="Drum Life"
                     c_value={specs.drum_life_c}
@@ -348,7 +396,11 @@ export const AssetDetailsPage = () => {
                     k_value={specs.toner_life_k}
                     rowClassName={ROW_GAP}
                   />
-                  <AccessoryRow label="Core Functions" accessories={accessories ?? []} rowClassName={ROW_GAP} />
+                  <AccessoryRow
+                    label="Core Functions"
+                    accessories={accessories ?? []}
+                    rowClassName={ROW_GAP}
+                  />
                 </DataRowContainer>
               </div>
             </Section>
@@ -357,15 +409,25 @@ export const AssetDetailsPage = () => {
               <Section className="flex-1 min-w-0">
                 <SectionHeader
                   title="Errors"
-                  action={canEditTechSpecs && <SectionEditButton onClick={() => setEditErrorsOpen(true)} />}
+                  action={
+                    canEditTechSpecs && (
+                      <SectionEditButton onClick={() => setEditErrorsOpen(true)} />
+                    )
+                  }
                 />
                 <OptionalSection condition={!!errors?.length} fallback="No errors on record">
                   <DataRowContainer>
-                    {errors?.map(e => (
-                      <DataRow key={`${e.code}-${e.added_at}`} label={e.code} rowClassName={ROW_GAP}>
-                        {e.is_fixed
-                          ? <Badge variant="success">Fixed</Badge>
-                          : <Badge variant="destructive">Open</Badge>}
+                    {errors?.map((e) => (
+                      <DataRow
+                        key={`${e.code}-${e.added_at}`}
+                        label={e.code}
+                        rowClassName={ROW_GAP}
+                      >
+                        {e.is_fixed ? (
+                          <Badge variant="success">Fixed</Badge>
+                        ) : (
+                          <Badge variant="destructive">Open</Badge>
+                        )}
                       </DataRow>
                     ))}
                   </DataRowContainer>
@@ -376,70 +438,112 @@ export const AssetDetailsPage = () => {
                 asset={assetDetails}
                 harvestedParts={harvestedParts}
                 storeParts={storeParts}
-                action={canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />}
+                action={
+                  canEditTechSpecs && <SectionEditButton onClick={() => setEditPartsOpen(true)} />
+                }
                 rowClassName={ROW_GAP}
                 className="flex-1 min-w-0"
               />
             </div>
 
-            {(canViewPurchasePrice || canViewSalePrice) &&
+            {(canViewPurchasePrice || canViewSalePrice) && (
               <Section className="w-full">
                 <SectionHeader
                   title="Pricing"
-                  action={canEditPrices && <SectionEditButton onClick={() => setEditPricingOpen(true)} />}
+                  action={
+                    canEditPrices && <SectionEditButton onClick={() => setEditPricingOpen(true)} />
+                  }
                 />
                 <div className="flex flex-row gap-x-8">
                   <DataRowContainer className="flex-1 min-w-0">
                     {canViewPurchasePrice && (
                       <>
-                        <DataCurrencyRow label="Purchase Cost" value={cost.purchase_cost} rowClassName={ROW_GAP} />
-                        <DataCurrencyRow label="Total Cost" value={cost.total_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow
+                          label="Purchase Cost"
+                          value={cost.purchase_cost}
+                          rowClassName={ROW_GAP}
+                        />
+                        <DataCurrencyRow
+                          label="Total Cost"
+                          value={cost.total_cost}
+                          rowClassName={ROW_GAP}
+                        />
                       </>
                     )}
-                    {canViewSalePrice && <DataCurrencyRow label="Sale Price" value={cost.sale_price} rowClassName={ROW_GAP} />}
+                    {canViewSalePrice && (
+                      <DataCurrencyRow
+                        label="Sale Price"
+                        value={cost.sale_price}
+                        rowClassName={ROW_GAP}
+                      />
+                    )}
                   </DataRowContainer>
                   <DataRowContainer className="flex-1 min-w-0">
                     {canViewPurchasePrice && (
                       <>
-                        <DataCurrencyRow label="Transport Cost" value={cost.transport_cost} rowClassName={ROW_GAP} />
-                        <DataCurrencyRow label="Processing Cost" value={cost.processing_cost} rowClassName={ROW_GAP} />
-                        <DataCurrencyRow label="Other Cost" value={cost.other_cost} rowClassName={ROW_GAP} />
-                        <DataCurrencyRow label="Parts Cost" value={cost.parts_cost} rowClassName={ROW_GAP} />
+                        <DataCurrencyRow
+                          label="Transport Cost"
+                          value={cost.transport_cost}
+                          rowClassName={ROW_GAP}
+                        />
+                        <DataCurrencyRow
+                          label="Processing Cost"
+                          value={cost.processing_cost}
+                          rowClassName={ROW_GAP}
+                        />
+                        <DataCurrencyRow
+                          label="Other Cost"
+                          value={cost.other_cost}
+                          rowClassName={ROW_GAP}
+                        />
+                        <DataCurrencyRow
+                          label="Parts Cost"
+                          value={cost.parts_cost}
+                          rowClassName={ROW_GAP}
+                        />
                       </>
                     )}
                   </DataRowContainer>
                 </div>
               </Section>
-            }
+            )}
 
             <ActivitySection className="min-w-0">
               <Tabs
                 defaultValue="comments"
-                onValueChange={(value) => { if (value === 'history') setHistoryEnabled(true) }}
+                onValueChange={(value) => {
+                  if (value === 'history') setHistoryEnabled(true)
+                }}
               >
                 <TabsList variant="line">
-                  <TabsTrigger value="comments"><SectionHeader title="Comments" className="px-2 mb-0" /></TabsTrigger>
-                  <TabsTrigger value="history"><SectionHeader title="History" className="px-2 mb-0" /></TabsTrigger>
+                  <TabsTrigger value="comments">
+                    <SectionHeader title="Comments" className="px-2 mb-0" />
+                  </TabsTrigger>
+                  <TabsTrigger value="history">
+                    <SectionHeader title="History" className="px-2 mb-0" />
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="comments" className="space-y-3 py-3 min-h-96">
                   <AddCommentInput barcode={assetDetails.barcode} />
-                  {
-                    sortedComments.map(c => (<Comment
+                  {sortedComments.map((c) => (
+                    <Comment
                       key={`${c.username}-${c.created_at}`}
                       user={c.username}
                       date={formatDateWithTime(c.created_at)}
                       avatarFallback={c.initials}
                       comment={c.comment}
                       tags={EMPTY_TAGS}
-                    />))
-                  }
+                    />
+                  ))}
                 </TabsContent>
-                <TabsContent value="history" className="py-3 overflow-x-hidden break-words min-h-96">
+                <TabsContent
+                  value="history"
+                  className="py-3 overflow-x-hidden break-words min-h-96"
+                >
                   <AssetHistoryTabContent barcode={assetDetails.barcode} enabled={historyEnabled} />
                 </TabsContent>
               </Tabs>
             </ActivitySection>
-
           </div>
 
           <aside
@@ -447,11 +551,13 @@ export const AssetDetailsPage = () => {
             style={{ top: RAIL_STICKY_TOP }}
             aria-label="Lifecycle"
           >
-            {populatedLifecycleItems.map(item => (
+            {populatedLifecycleItems.map((item) => (
               <RailCard key={item.key}>{item.node}</RailCard>
             ))}
-            {emptyLifecycleEntities.map(entity => (
-              <RailCard key={`empty-${entity}`}><RailEmpty entity={entity} /></RailCard>
+            {emptyLifecycleEntities.map((entity) => (
+              <RailCard key={`empty-${entity}`}>
+                <RailEmpty entity={entity} />
+              </RailCard>
             ))}
           </aside>
         </div>

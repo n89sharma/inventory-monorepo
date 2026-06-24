@@ -1,5 +1,11 @@
 export type NavigationSection =
-  | 'arrivals' | 'departures' | 'transfers' | 'invoices' | 'holds' | 'search' | 'home'
+  | 'arrivals'
+  | 'departures'
+  | 'transfers'
+  | 'invoices'
+  | 'holds'
+  | 'search'
+  | 'home'
 
 export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
@@ -7,7 +13,7 @@ export function isCollection(navigationSection: NavigationSection) {
 
 const SEARCH_LISTS = ['instock', 'held', 'all', 'price-check', 'sold'] as const
 
-export type SearchList = typeof SEARCH_LISTS[number]
+export type SearchList = (typeof SEARCH_LISTS)[number]
 
 export const SEARCH_LIST_LABELS = {
   instock: 'In Stock',
@@ -21,9 +27,7 @@ const SEARCH_LIST_PATH_INDEX = 2
 
 export function getSearchList(pathname: string): SearchList | null {
   const candidate = pathname.split('/')[SEARCH_LIST_PATH_INDEX]
-  return SEARCH_LISTS.includes(candidate as SearchList)
-    ? (candidate as SearchList)
-    : null
+  return SEARCH_LISTS.includes(candidate as SearchList) ? (candidate as SearchList) : null
 }
 
 export const FROM_GLOBAL_SEARCH_STATE = { fromGlobalSearch: true } as const

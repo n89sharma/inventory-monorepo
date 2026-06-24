@@ -6,8 +6,10 @@ const SAVED_VIEWS_KEY_PREFIX = 'saved-views'
 
 type SavedViewsKey = readonly [typeof SAVED_VIEWS_KEY_PREFIX, SavedViewPageKey]
 
-const savedViewsKey = (pageKey: SavedViewPageKey): SavedViewsKey =>
-  [SAVED_VIEWS_KEY_PREFIX, pageKey]
+const savedViewsKey = (pageKey: SavedViewPageKey): SavedViewsKey => [
+  SAVED_VIEWS_KEY_PREFIX,
+  pageKey,
+]
 
 export function useSavedViews(pageKey: SavedViewPageKey) {
   return useSWR(savedViewsKey(pageKey), () => getSavedViews(pageKey))

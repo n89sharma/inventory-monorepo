@@ -5,7 +5,7 @@ import { useUserStore } from '@/data/store/user-store'
 export function useUserData() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const setUsers = useUserStore(state => state.setUsers)
+  const setUsers = useUserStore((state) => state.setUsers)
 
   useEffect(() => {
     const controller = new AbortController()

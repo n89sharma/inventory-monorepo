@@ -1,11 +1,10 @@
 import { Button } from '@/components/shadcn/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/shadcn/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import { useCan } from '@/hooks/use-can'
-import { ASSET_TABLE_COLUMNS, type AssetTableColumn } from '@/components/pages/column-defs/asset-table-columns'
+import {
+  ASSET_TABLE_COLUMNS,
+  type AssetTableColumn,
+} from '@/components/pages/column-defs/asset-table-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'
@@ -23,21 +22,25 @@ export function ColumnPickerButton({
 }: ColumnPickerButtonProps): React.JSX.Element {
   const can = useCan()
   const permittedColumns = useMemo<readonly AssetTableColumn[]>(
-    () => (ASSET_TABLE_COLUMNS as readonly AssetTableColumn[])
-      .filter(c => !c.permission || can(c.permission)),
+    () =>
+      (ASSET_TABLE_COLUMNS as readonly AssetTableColumn[]).filter(
+        (c) => !c.permission || can(c.permission),
+      ),
     [can],
   )
-  const enabledCount = permittedColumns.filter(c => c.enabled).length
-  const visibleCount = permittedColumns.filter(c => visible.has(c.id)).length
+  const enabledCount = permittedColumns.filter((c) => c.enabled).length
+  const visibleCount = permittedColumns.filter((c) => visible.has(c.id)).length
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='default' className='gap-1.5'>
+        <Button variant="outline" size="default" className="gap-1.5">
           <ColumnsIcon />
-          <span>Columns ({visibleCount} / {enabledCount})</span>
+          <span>
+            Columns ({visibleCount} / {enabledCount})
+          </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align='end' className='w-72 p-2'>
+      <PopoverContent align="end" className="w-72 p-2">
         <ColumnPicker
           visibleColSet={visible}
           onVisibleChange={onVisibleChange}

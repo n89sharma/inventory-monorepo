@@ -24,5 +24,5 @@ export const useOrgStore = create<OrgStore>((set) => ({
     set({ organizations: await getOrgsApi() })
     return result
   },
-  clearOrganizations: () => set({ organizations: [] })
+  clearOrganizations: () => set({ organizations: [] }),
 }))

@@ -5,20 +5,20 @@ import { prisma } from '../prisma.js'
 export async function createAssetSalvagedPart(
   recipientBarcode: string,
   data: CreateSalvagedPart,
-  userId: number
+  userId: number,
 ): Promise<void> {
   if (data.donor_barcode === recipientBarcode) {
     throw new ValidationError('Donor and recipient cannot be the same asset')
   }
   const recipient = await prisma.asset.findUnique({
     where: { barcode: recipientBarcode },
-    select: { id: true }
+    select: { id: true },
   })
   if (!recipient) throw new NotFoundError(`Asset ${recipientBarcode} not found`)
 
   const donor = await prisma.asset.findUnique({
     where: { barcode: data.donor_barcode },
-    select: { id: true }
+    select: { id: true },
   })
   if (!donor) throw new NotFoundError(`Donor asset ${data.donor_barcode} not found`)
 
@@ -30,7 +30,7 @@ export async function createAssetSalvagedPart(
       is_exchange: data.is_exchange,
       notes: data.notes,
       fixed_at: new Date(),
-      fixed_by: userId
-    }
+      fixed_by: userId,
+    },
   })
 }

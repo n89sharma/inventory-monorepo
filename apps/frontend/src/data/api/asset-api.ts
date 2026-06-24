@@ -28,7 +28,7 @@ import type {
   UpdateAssetSpecs,
   UpdateError,
   User,
-  Warehouse
+  Warehouse,
 } from 'shared-types'
 
 import {
@@ -51,7 +51,7 @@ import {
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
   UpdateAssetPricingSchema,
-  UpdateAssetSpecsSchema
+  UpdateAssetSpecsSchema,
 } from 'shared-types'
 import { z } from 'zod'
 
@@ -89,13 +89,17 @@ export async function getAssetTransfers(params: { barcode: string }): Promise<As
   return z.array(AssetTransferSchema).parse(data)
 }
 
-export async function getAssetHarvestedParts(params: { barcode: string }): Promise<AssetHarvestedPart[]> {
+export async function getAssetHarvestedParts(params: {
+  barcode: string
+}): Promise<AssetHarvestedPart[]> {
   const { data } = await api.get<AssetHarvestedPart[]>(`/assets/${params.barcode}/parts`)
   return z.array(AssetHarvestedPartSchema).parse(data)
 }
 
 export async function updateAssetErrors(barcode: string, errors: UpdateError[]): Promise<void> {
-  const updateAssetErrorsBody = UpdateAssetErrorsSchema.parse({ errors } satisfies UpdateAssetErrors)
+  const updateAssetErrorsBody = UpdateAssetErrorsSchema.parse({
+    errors,
+  } satisfies UpdateAssetErrors)
   await api.put(`/assets/${barcode}/errors`, updateAssetErrorsBody)
 }
 
@@ -104,8 +108,12 @@ export async function updateAssetPricing(barcode: string, data: UpdateAssetPrici
   await api.put(`/assets/${barcode}/pricing`, updateAssetPricingBody)
 }
 
-export async function bulkUpdateAssetPricing(items: BulkUpdateAssetPricing['items']): Promise<void> {
-  const bulkUpdateAssetPricingBody = BulkUpdateAssetPricingSchema.parse({ items } satisfies BulkUpdateAssetPricing)
+export async function bulkUpdateAssetPricing(
+  items: BulkUpdateAssetPricing['items'],
+): Promise<void> {
+  const bulkUpdateAssetPricingBody = BulkUpdateAssetPricingSchema.parse({
+    items,
+  } satisfies BulkUpdateAssetPricing)
   await api.put('/assets/bulk/pricing', bulkUpdateAssetPricingBody)
 }
 
@@ -115,14 +123,17 @@ export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs):
 }
 
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
-  const { data } = await api.get<AssetLocation[]>(
-    '/assets/locations', { params: { warehouseId } }
-  )
+  const { data } = await api.get<AssetLocation[]>('/assets/locations', { params: { warehouseId } })
   return z.array(AssetLocationSchema).parse(data)
 }
 
-export async function updateAssetLocation(barcode: string, data: UpdateAssetLocation): Promise<void> {
-  const updateAssetLocationBody = UpdateAssetLocationSchema.parse(data satisfies UpdateAssetLocation)
+export async function updateAssetLocation(
+  barcode: string,
+  data: UpdateAssetLocation,
+): Promise<void> {
+  const updateAssetLocationBody = UpdateAssetLocationSchema.parse(
+    data satisfies UpdateAssetLocation,
+  )
   await api.put(`/assets/${barcode}/location`, updateAssetLocationBody)
 }
 
@@ -131,8 +142,13 @@ export async function postComment(barcode: string, data: CreateComment): Promise
   await api.post(`/assets/${barcode}/comments`, postCommentBody)
 }
 
-export async function createAssetHarvestedPart(recipientBarcode: string, data: CreateSalvagedPart): Promise<void> {
-  const createAssetHarvestedPartBody = CreateSalvagedPartSchema.parse(data satisfies CreateSalvagedPart)
+export async function createAssetHarvestedPart(
+  recipientBarcode: string,
+  data: CreateSalvagedPart,
+): Promise<void> {
+  const createAssetHarvestedPartBody = CreateSalvagedPartSchema.parse(
+    data satisfies CreateSalvagedPart,
+  )
   await api.post(`/assets/${recipientBarcode}/parts`, createAssetHarvestedPartBody)
 }
 
@@ -155,7 +171,7 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
       getAssetComments({ barcode }),
       getAssetTransfers({ barcode }),
       getAssetHarvestedParts({ barcode }),
-      getAssetStoreParts(barcode)
+      getAssetStoreParts(barcode),
     ])
 
   return {
@@ -173,14 +189,17 @@ export async function exportAssets(
   barcodes: string[],
   filename?: string,
   variant?: ReportVariant,
-  columnKeys?: string[]
+  columnKeys?: string[],
 ): Promise<void> {
-  const exportAssetsBody = ExportAssetsSchema.parse(
-    { barcodes, variant, columnKeys } satisfies z.input<typeof ExportAssetsSchema>
-  )
+  const exportAssetsBody = ExportAssetsSchema.parse({
+    barcodes,
+    variant,
+    columnKeys,
+  } satisfies z.input<typeof ExportAssetsSchema>)
   const response = await api.post('/assets/export', exportAssetsBody, { responseType: 'blob' })
   const disposition = response.headers['content-disposition'] as string | undefined
-  const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
+  const resolvedFilename =
+    filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
   const blob = new Blob([response.data], { type: 'text/csv' })
 
   const url = URL.createObjectURL(blob)
@@ -194,14 +213,15 @@ export async function exportAssets(
 }
 
 export async function printBarcodes(barcodes: string[], filename?: string): Promise<void> {
-  const printBarcodesBody = PrintBarcodesSchema.parse(
-    { barcodes } satisfies z.input<typeof PrintBarcodesSchema>
-  )
+  const printBarcodesBody = PrintBarcodesSchema.parse({ barcodes } satisfies z.input<
+    typeof PrintBarcodesSchema
+  >)
   const response = await api.post('/assets/barcodes/print', printBarcodesBody, {
     responseType: 'blob',
   })
   const disposition = response.headers['content-disposition'] as string | undefined
-  const resolvedFilename = filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'barcodes.pdf'
+  const resolvedFilename =
+    filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'barcodes.pdf'
   const blob = new Blob([response.data], { type: 'application/pdf' })
 
   const url = URL.createObjectURL(blob)
@@ -227,8 +247,8 @@ export async function getAssetsForSearchAll(
   component: Component | null,
   statuses: Status[],
   readinesses: Status[],
-  warehouses: Warehouse[]): Promise<AssetSearchRow[]> {
-
+  warehouses: Warehouse[],
+): Promise<AssetSearchRow[]> {
   const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
     params: {
       model: modelName,
@@ -236,10 +256,10 @@ export async function getAssetsForSearchAll(
       meterMax: meterMax ?? undefined,
       cassettes: cassettes ?? undefined,
       componentId: component?.id ?? undefined,
-      statusIds: statuses.map(s => s.id),
-      readinessIds: readinesses.map(s => s.id),
-      warehouseIds: warehouses.map(w => w.id),
-    }
+      statusIds: statuses.map((s) => s.id),
+      readinessIds: readinesses.map((s) => s.id),
+      warehouseIds: warehouses.map((w) => w.id),
+    },
   })
   return z.array(AssetSearchRowSchema).parse(data)
 }
@@ -257,15 +277,15 @@ export async function getAssetsForSold(
   customer: OrgSummary | null,
   statuses: Status[],
   fromDate: Date,
-  toDate: Date): Promise<AssetSearchRow[]> {
-
+  toDate: Date,
+): Promise<AssetSearchRow[]> {
   const { data } = await api.get<AssetSearchRow[]>(`/assets/sold`, {
     params: {
-      warehouseIds: warehouses.map(w => w.id),
+      warehouseIds: warehouses.map((w) => w.id),
       brandIds: brand ? [brand.id] : [],
-      assetTypeIds: assetTypes.map(a => a.id),
-      readinessIds: readinesses.map(s => s.id),
-      statusIds: statuses.map(s => s.id),
+      assetTypeIds: assetTypes.map((a) => a.id),
+      readinessIds: readinesses.map((s) => s.id),
+      statusIds: statuses.map((s) => s.id),
       model: model ?? undefined,
       meterMin: meterMin ?? undefined,
       meterMax: meterMax ?? undefined,
@@ -274,7 +294,7 @@ export async function getAssetsForSold(
       customerId: customer?.id ?? undefined,
       fromDate: fromDate.toISOString(),
       toDate: toDate.toISOString(),
-    }
+    },
   })
   return z.array(AssetSearchRowSchema).parse(data)
 }
@@ -288,20 +308,20 @@ export async function getAssetsForSearchInStock(
   meterMin: number | null,
   meterMax: number | null,
   cassettes: number | null,
-  component: Component | null): Promise<AssetSearchRow[]> {
-
+  component: Component | null,
+): Promise<AssetSearchRow[]> {
   const { data } = await api.get<AssetSearchRow[]>(`/search/instock`, {
     params: {
-      warehouseIds: warehouses.map(w => w.id),
+      warehouseIds: warehouses.map((w) => w.id),
       brandIds: brand ? [brand.id] : [],
-      assetTypeIds: assetTypes.map(a => a.id),
-      readinessIds: readinesses.map(s => s.id),
+      assetTypeIds: assetTypes.map((a) => a.id),
+      readinessIds: readinesses.map((s) => s.id),
       model: model ?? undefined,
       meterMin: meterMin ?? undefined,
       meterMax: meterMax ?? undefined,
       cassettes: cassettes ?? undefined,
       componentId: component?.id ?? undefined,
-    }
+    },
   })
   return z.array(AssetSearchRowSchema).parse(data)
 }
@@ -309,9 +329,9 @@ export async function getAssetsForSearchInStock(
 export async function getAssetsBySerialNumber(
   serialNumbers: string[],
 ): Promise<AssetsBySerialNumberResult> {
-  const getAssetsBySerialNumberBody = AssetsBySerialNumberRequestSchema.parse(
-    { serialNumbers } satisfies AssetsBySerialNumberRequest,
-  )
+  const getAssetsBySerialNumberBody = AssetsBySerialNumberRequestSchema.parse({
+    serialNumbers,
+  } satisfies AssetsBySerialNumberRequest)
   const { data } = await api.post('/reports/serial-number', getAssetsBySerialNumberBody)
   return AssetsBySerialNumberResultSchema.parse(data)
 }
@@ -329,14 +349,14 @@ export async function getAssetsForSearchHeld(
   heldBy: User | null,
   heldFor: User | null,
   holdCustomer: OrgSummary | null,
-  daysHeldMin: number | null): Promise<AssetSearchRow[]> {
-
+  daysHeldMin: number | null,
+): Promise<AssetSearchRow[]> {
   const { data } = await api.get<AssetSearchRow[]>(`/search/held`, {
     params: {
-      warehouseIds: warehouses.map(w => w.id),
+      warehouseIds: warehouses.map((w) => w.id),
       brandIds: brand ? [brand.id] : [],
-      assetTypeIds: assetTypes.map(a => a.id),
-      readinessIds: readinesses.map(s => s.id),
+      assetTypeIds: assetTypes.map((a) => a.id),
+      readinessIds: readinesses.map((s) => s.id),
       model: model ?? undefined,
       meterMin: meterMin ?? undefined,
       meterMax: meterMax ?? undefined,
@@ -346,7 +366,7 @@ export async function getAssetsForSearchHeld(
       heldForId: heldFor?.id ?? undefined,
       holdCustomerId: holdCustomer?.id ?? undefined,
       daysHeldMin: daysHeldMin ?? undefined,
-    }
+    },
   })
   return z.array(AssetSearchRowSchema).parse(data)
 }

@@ -12,10 +12,10 @@ export function useGlobalData(enabled = false) {
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  const setModels = useModelStore(state => state.setModels)
-  const setOrganizations = useOrgStore(state => state.setOrganizations)
-  const setReferenceData = useReferenceDataStore(state => state.setReferenceData)
-  const setUsers = useUserStore(state => state.setUsers)
+  const setModels = useModelStore((state) => state.setModels)
+  const setOrganizations = useOrgStore((state) => state.setOrganizations)
+  const setReferenceData = useReferenceDataStore((state) => state.setReferenceData)
+  const setUsers = useUserStore((state) => state.setUsers)
 
   useEffect(() => {
     if (!enabled) return
@@ -27,7 +27,7 @@ export function useGlobalData(enabled = false) {
         setUsers(users)
         setIsReady(true)
       })
-      .catch(err => setError(err))
+      .catch((err) => setError(err))
   }, [enabled, setModels, setOrganizations, setReferenceData, setUsers])
 
   return { isReady, error }

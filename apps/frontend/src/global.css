@@ -1,11 +1,11 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @import '@fontsource-variable/geist';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Geist Variable", sans-serif;
+  --font-sans: 'Geist Variable', sans-serif;
   --text-sm: 0.8125rem;
   --text-sm--line-height: calc(1.25 / 0.8125);
   --text-base: 0.875rem;
@@ -153,7 +153,7 @@
     margin: 16mm;
   }
 
-  [data-slot="sidebar"],
+  [data-slot='sidebar'],
   header {
     display: none !important;
   }

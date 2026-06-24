@@ -1,8 +1,4 @@
-import {
-  CheckCircleIcon,
-  QuestionIcon,
-  WarningOctagonIcon,
-} from '@phosphor-icons/react'
+import { CheckCircleIcon, QuestionIcon, WarningOctagonIcon } from '@phosphor-icons/react'
 
 type IconConfig = {
   Icon: React.ElementType

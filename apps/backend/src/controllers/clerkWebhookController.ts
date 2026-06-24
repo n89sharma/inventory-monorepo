@@ -5,17 +5,17 @@ import { userIdCache } from '../middleware/requireAuth.js'
 import { prisma } from '../prisma.js'
 import { logger } from '../lib/logger.js'
 
-const CLERK_USER_CREATED  = 'user.created'
-const CLERK_USER_UPDATED  = 'user.updated'
-const CLERK_USER_DELETED  = 'user.deleted'
-const DEFAULT_ROLE        = 'member'
+const CLERK_USER_CREATED = 'user.created'
+const CLERK_USER_UPDATED = 'user.updated'
+const CLERK_USER_DELETED = 'user.deleted'
+const DEFAULT_ROLE = 'member'
 
 function getPrimaryEmail(
   emailAddresses: { id: string; email_address: string }[],
   primaryEmailAddressId: string | null | undefined,
 ): string | null {
   if (primaryEmailAddressId) {
-    const primary = emailAddresses.find(e => e.id === primaryEmailAddressId)
+    const primary = emailAddresses.find((e) => e.id === primaryEmailAddressId)
     if (primary) return primary.email_address
   }
   return emailAddresses[0]?.email_address ?? null
@@ -39,9 +39,7 @@ export async function handleClerkWebhook(req: Request, res: Response) {
       const email = getPrimaryEmail(email_addresses, primary_email_address_id)
       const name = buildName(first_name, last_name, email?.split('@')[0] ?? id)
 
-      const existingUser = email
-        ? await prisma.user.findUnique({ where: { email } })
-        : null
+      const existingUser = email ? await prisma.user.findUnique({ where: { email } }) : null
 
       if (existingUser) {
         await prisma.user.update({

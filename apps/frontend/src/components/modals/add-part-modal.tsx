@@ -83,7 +83,7 @@ interface TabProps {
 }
 
 function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
-  const createAssetHarvestedPart = useAssetStore(state => state.createAssetHarvestedPart)
+  const createAssetHarvestedPart = useAssetStore((state) => state.createAssetHarvestedPart)
 
   const form = useForm<CreateSalvagedPart>({
     resolver: zodResolver(CreateSalvagedPartSchema),
@@ -120,38 +120,36 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
               name="donor_barcode"
               render={({ field, fieldState }) => (
                 <div className="flex-1">
-                  {field.value
-                    ? (
-                      <div className="flex h-8 items-center gap-2 rounded-lg border bg-transparent pl-2.5 pr-1 text-sm">
-                        <span className="font-mono flex-1">{field.value}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label="Clear donor asset"
-                          onClick={() => field.onChange('')}
-                          className="size-6"
-                        >
-                          <XIcon aria-hidden="true" />
-                        </Button>
-                      </div>
-                    )
-                    : (
-                      <AddAssetByBarcode
-                        getAssets={() => []}
-                        onAddAsset={(asset) => {
-                          field.onChange(asset.barcode)
-                          form.clearErrors('donor_barcode')
-                        }}
-                        entityName="part transfer"
-                        validateAsset={(asset) =>
-                          asset.barcode === recipientBarcode
-                            ? 'Donor and recipient cannot be the same asset'
-                            : null
-                        }
-                        showLeadingIcon
-                      />
-                    )}
+                  {field.value ? (
+                    <div className="flex h-8 items-center gap-2 rounded-lg border bg-transparent pl-2.5 pr-1 text-sm">
+                      <span className="font-mono flex-1">{field.value}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label="Clear donor asset"
+                        onClick={() => field.onChange('')}
+                        className="size-6"
+                      >
+                        <XIcon aria-hidden="true" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <AddAssetByBarcode
+                      getAssets={() => []}
+                      onAddAsset={(asset) => {
+                        field.onChange(asset.barcode)
+                        form.clearErrors('donor_barcode')
+                      }}
+                      entityName="part transfer"
+                      validateAsset={(asset) =>
+                        asset.barcode === recipientBarcode
+                          ? 'Donor and recipient cannot be the same asset'
+                          : null
+                      }
+                      showLeadingIcon
+                    />
+                  )}
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </div>
               )}
@@ -231,16 +229,15 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
 }
 
 function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
-  const addStorePartToAsset = useAssetStore(state => state.addStorePartToAsset)
+  const addStorePartToAsset = useAssetStore((state) => state.addStorePartToAsset)
   const { data: allRows = [] } = useStorePartsList()
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch } =
-    useForm<AddStorePartForm>({
-      resolver: zodResolver(AddStorePartFormSchema),
-      defaultValues: EMPTY_ADD_STORE_PART_FORM,
-    })
+  const { control, handleSubmit, reset, setValue, watch } = useForm<AddStorePartForm>({
+    resolver: zodResolver(AddStorePartFormSchema),
+    defaultValues: EMPTY_ADD_STORE_PART_FORM,
+  })
 
   useEffect(() => {
     if (open) {
@@ -255,7 +252,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   const unitCost = watch('unitCost')
 
   const partOptions = useMemo(
-    () => (warehouse ? allRows.filter(row => row.warehouse_id === warehouse.id) : []),
+    () => (warehouse ? allRows.filter((row) => row.warehouse_id === warehouse.id) : []),
     [allRows, warehouse],
   )
 
@@ -270,13 +267,13 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   const quantityIsInt = /^\d+$/.test(quantity)
   const exceedsStock = part !== null && quantityIsInt && Number(quantity) > onHand
   const canSubmit =
-    warehouse !== null
-    && part !== null
-    && quantityIsInt
-    && Number(quantity) > 0
-    && !exceedsStock
-    && unitCost.trim() !== ''
-    && Number(unitCost) > 0
+    warehouse !== null &&
+    part !== null &&
+    quantityIsInt &&
+    Number(quantity) > 0 &&
+    !exceedsStock &&
+    unitCost.trim() !== '' &&
+    Number(unitCost) > 0
 
   async function onValid(values: AddStorePartForm) {
     setSaving(true)
@@ -291,11 +288,12 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   }
 
   function onInvalid(formErrors: FieldErrors<AddStorePartForm>) {
-    const message = formErrors.warehouse?.message
-      ?? formErrors.part?.message
-      ?? formErrors.quantity?.message
-      ?? formErrors.unitCost?.message
-      ?? 'Please fix the highlighted fields'
+    const message =
+      formErrors.warehouse?.message ??
+      formErrors.part?.message ??
+      formErrors.quantity?.message ??
+      formErrors.unitCost?.message ??
+      'Please fix the highlighted fields'
     toast.error(message, { position: 'top-center' })
   }
 
@@ -320,7 +318,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
                   selection={field.value}
                   query={partQuery}
                   onQueryChange={setPartQuery}
-                  onSelectionChange={value => {
+                  onSelectionChange={(value) => {
                     field.onChange(value)
                     setValue(
                       'unitCost',
@@ -331,9 +329,12 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
                     )
                     setPartQuery('')
                   }}
-                  onClear={() => { field.onChange(null); setPartQuery('') }}
+                  onClear={() => {
+                    field.onChange(null)
+                    setPartQuery('')
+                  }}
                   options={partOptions}
-                  getLabel={p => p.part_number}
+                  getLabel={(p) => p.part_number}
                   placeholder={warehouse ? 'Search part number' : 'Select a warehouse first'}
                   clearLabel="Clear part"
                   error={fieldState.invalid}
@@ -378,7 +379,9 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
             name="unitCost"
             render={({ field }) => (
               <div className="relative max-w-[160px]">
-                <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+                  $
+                </span>
                 <Input
                   type="number"
                   min={0}
@@ -399,26 +402,37 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
           Cancel
         </Button>
         <Button type="submit" form="add-store-part-form" disabled={saving || !canSubmit}>
-          {saving ? <><CircleNotchIcon className="animate-spin" />Adding…</> : 'Add Part'}
+          {saving ? (
+            <>
+              <CircleNotchIcon className="animate-spin" />
+              Adding…
+            </>
+          ) : (
+            'Add Part'
+          )}
         </Button>
       </DialogFooter>
     </>
   )
 }
 
-function WarehouseChips(
-  { selected, onSelect }: { selected: Warehouse | null; onSelect: (w: Warehouse | null) => void },
-) {
+function WarehouseChips({
+  selected,
+  onSelect,
+}: {
+  selected: Warehouse | null
+  onSelect: (w: Warehouse | null) => void
+}) {
   const activeWarehouses = useActiveWarehouses()
 
   return (
     <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Select warehouse">
-      {activeWarehouses.map(w => (
+      {activeWarehouses.map((w) => (
         <Toggle
           key={w.id}
           variant="outline"
           pressed={selected?.id === w.id}
-          onPressedChange={pressed => onSelect(pressed ? w : null)}
+          onPressedChange={(pressed) => onSelect(pressed ? w : null)}
           aria-label={`Warehouse ${w.city_code}`}
         >
           {w.city_code}

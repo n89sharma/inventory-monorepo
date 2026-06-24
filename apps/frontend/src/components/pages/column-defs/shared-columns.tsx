@@ -1,23 +1,17 @@
-import { Button } from "@/components/shadcn/button"
-import { Checkbox } from "@/components/shadcn/checkbox"
-import { AssetTypeBreakdown } from "@/components/custom/asset-type-breakdown"
-import { formatDate } from "@/lib/formatters"
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
-import type { ColumnDef } from "@tanstack/react-table"
-import type { ReactNode } from "react"
-import { Link } from "react-router-dom"
+import { Button } from '@/components/shadcn/button'
+import { Checkbox } from '@/components/shadcn/checkbox'
+import { AssetTypeBreakdown } from '@/components/custom/asset-type-breakdown'
+import { formatDate } from '@/lib/formatters'
+import { ArrowsDownUpIcon } from '@phosphor-icons/react'
+import type { ColumnDef } from '@tanstack/react-table'
+import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import type { CollectionSummarySchema } from 'shared-types'
 
 const ID_COLUMN_SIZE = 120
 const SELECT_COLUMN_SIZE = 44
 
-function SelectHitArea({
-  onActivate,
-  children,
-}: {
-  onActivate: () => void
-  children: ReactNode
-}) {
+function SelectHitArea({ onActivate, children }: { onActivate: () => void; children: ReactNode }) {
   return (
     <div
       className="absolute inset-0 flex cursor-pointer items-center justify-center"
@@ -50,9 +44,7 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
     meta: { cellClassName: 'p-0' },
     header: ({ table }) => (
       <SelectHitArea
-        onActivate={() =>
-          table.toggleAllPageRowsSelected(!table.getIsAllPageRowsSelected())
-        }
+        onActivate={() => table.toggleAllPageRowsSelected(!table.getIsAllPageRowsSelected())}
       >
         <Checkbox
           checked={getHeaderCheckboxState(
@@ -92,10 +84,7 @@ export function createIdColumn<TData>({
     header,
     size: ID_COLUMN_SIZE,
     cell: ({ row }) => (
-      <Link
-        to={href(row.original)}
-        className="font-mono text-foreground hover:underline"
-      >
+      <Link to={href(row.original)} className="font-mono text-foreground hover:underline">
         {value(row.original)}
       </Link>
     ),
@@ -103,32 +92,29 @@ export function createIdColumn<TData>({
 }
 
 export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: "created_at",
+  accessorKey: 'created_at',
   cell: ({ getValue }) => {
     const date = getValue<Date>()
-    return date ? formatDate(date) : "-"
+    return date ? formatDate(date) : '-'
   },
   header: ({ column }) => (
-    <Button
-      variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    >
+    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
       Date
       <ArrowsDownUpIcon />
     </Button>
   ),
-  size: 140
+  size: 140,
 }
 
 export const createdByColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: "created_by",
-  header: "Created By",
-  size: 120
+  accessorKey: 'created_by',
+  header: 'Created By',
+  size: 120,
 }
 
 export const assetCountColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: "asset_count",
-  header: "Copiers / Total",
+  accessorKey: 'asset_count',
+  header: 'Copiers / Total',
   size: 110,
   cell: ({ row }) => <AssetTypeBreakdown summary={row.original} />,
 }

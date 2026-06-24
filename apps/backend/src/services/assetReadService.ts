@@ -10,7 +10,7 @@ import {
   AssetHarvestedPart,
   ASSET_STATUS,
   ROLE_PERMISSIONS,
-  type AppRole
+  type AppRole,
 } from 'shared-types'
 import { startOfDay, endOfDay } from 'date-fns'
 import {
@@ -22,17 +22,14 @@ import {
   getAssets as getAssetsQuery,
   getAssetsBySerialNumber as getAssetsBySerialNumberQuery,
   getAssetTransfers as getAssetTransfersQuery,
-  getSoldAssets as getSoldAssetsQuery
+  getSoldAssets as getSoldAssetsQuery,
 } from '../../generated/prisma/sql.js'
 import { getInitials, mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 
-function redactSearchRowCost(
-  row: AssetSearchRow,
-  role: AppRole | null,
-): AssetSearchRow {
+function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSearchRow {
   const permissions = role ? ROLE_PERMISSIONS[role] : []
   const canViewPurchase = permissions.includes('view_purchase_price')
   const canViewSale = permissions.includes('view_sale_price')
@@ -86,27 +83,27 @@ export async function getAssets(
       heldForIdParam,
       holdCustomerIdParam,
       daysHeldMinParam,
-    )
+    ),
   )
-  return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
 }
 
 export async function getAssetsBySerialNumber(
   serialNumbers: string[],
   role: AppRole | null,
 ): Promise<AssetsBySerialNumberResult> {
-  const normalizedInput = serialNumbers.map(raw => ({ raw, normalized: normalizeForSearch(raw) }))
+  const normalizedInput = serialNumbers.map((raw) => ({ raw, normalized: normalizeForSearch(raw) }))
   const uniqueNormalized = [
-    ...new Set(normalizedInput.map(s => s.normalized).filter(n => n.length > 0)),
+    ...new Set(normalizedInput.map((s) => s.normalized).filter((n) => n.length > 0)),
   ]
 
   const rows = await prisma.$queryRawTyped(getAssetsBySerialNumberQuery(uniqueNormalized))
-  const assets = rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+  const assets = rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
 
-  const foundNormalized = new Set(assets.map(a => normalizeForSearch(a.serial_number)))
+  const foundNormalized = new Set(assets.map((a) => normalizeForSearch(a.serial_number)))
   const notFound = normalizedInput
-    .filter(s => !foundNormalized.has(s.normalized))
-    .map(s => s.raw)
+    .filter((s) => !foundNormalized.has(s.normalized))
+    .map((s) => s.raw)
 
   return { assets, notFound }
 }
@@ -142,11 +139,10 @@ export async function getSoldAssets(
       brandIds,
       assetTypeIds,
       customerIdParam,
-    )
+    ),
   )
-  return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
+  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
 }
-
 
 export async function getAssetsForSearchInStock(
   warehouseIds: number[],
@@ -166,7 +162,7 @@ export async function getAssetsForSearchInStock(
   })
   return getAssets(
     model,
-    statuses.map(s => s.id),
+    statuses.map((s) => s.id),
     readinessIds,
     warehouseIds,
     meterMinParam,
@@ -208,7 +204,7 @@ export async function getAssetsForSearchHeld(
   })
   return getAssets(
     model,
-    statuses.map(s => s.id),
+    statuses.map((s) => s.id),
     readinessIds,
     warehouseIds,
     meterMinParam,
@@ -228,10 +224,7 @@ export async function getAssetsForSearchHeld(
   )
 }
 
-export async function getAssetDetail(
-  barcode: string,
-  role: AppRole | null
-): Promise<AssetDetails> {
+export async function getAssetDetail(barcode: string, role: AppRole | null): Promise<AssetDetails> {
   const assets = await prisma.$queryRawTyped(getAssetDetailsQuery(barcode))
   if (!assets || assets.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
   return redactCost(mapAssetDetail(assets[0]), role)
@@ -250,14 +243,14 @@ function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
       other_cost: canViewPurchase ? detail.cost.other_cost : null,
       parts_cost: canViewPurchase ? detail.cost.parts_cost : null,
       total_cost: canViewPurchase ? detail.cost.total_cost : null,
-      sale_price: canViewSale ? detail.cost.sale_price : null
-    }
+      sale_price: canViewSale ? detail.cost.sale_price : null,
+    },
   }
 }
 
 export async function getAccessories(barcode: string): Promise<string[]> {
   const accessories = await prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
-  return accessories.map(a => a.accessory)
+  return accessories.map((a) => a.accessory)
 }
 
 export async function getErrors(barcode: string): Promise<AssetError[]> {
@@ -266,7 +259,7 @@ export async function getErrors(barcode: string): Promise<AssetError[]> {
 
 export async function getComments(barcode: string): Promise<Comment[]> {
   const comments = await prisma.$queryRawTyped(getAssetCommentsQuery(barcode))
-  return comments.map(c => ({ ...c, initials: getInitials(c.username) }))
+  return comments.map((c) => ({ ...c, initials: getInitials(c.username) }))
 }
 
 export async function getAssetHarvestedParts(barcode: string): Promise<AssetHarvestedPart[]> {
@@ -279,7 +272,7 @@ export async function getTransfers(barcode: string): Promise<AssetTransfer[]> {
 
 export async function getAssetHistory(
   barcode: string,
-  role: AppRole | null
+  role: AppRole | null,
 ): Promise<AssetHistory> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
@@ -292,13 +285,16 @@ export async function getAssetHistory(
   const rows = await prisma.history.findMany({
     where: { entity_type: { in: entityTypes }, entity_id: asset.id },
     include: { User: { select: { name: true } } },
-    orderBy: { changed_on: 'desc' }
+    orderBy: { changed_on: 'desc' },
   })
 
-  return rows.map(row => ({
-    action_type: row.action_type as 'CREATE' | 'UPDATE',
-    user_name: row.User.name,
-    changed_on: row.changed_on,
-    changes: row.changes as AssetHistoryRecord['changes']
-  }) as AssetHistoryRecord)
+  return rows.map(
+    (row) =>
+      ({
+        action_type: row.action_type as 'CREATE' | 'UPDATE',
+        user_name: row.User.name,
+        changed_on: row.changed_on,
+        changes: row.changes as AssetHistoryRecord['changes'],
+      }) as AssetHistoryRecord,
+  )
 }

@@ -1,5 +1,14 @@
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateArrivalSchema, CreateAssetSchema, UpdateArrivalMetadataSchema, UpdateAssetSchema, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  AssetDeltaSchema,
+  CollectionHistory,
+  CreateArrivalSchema,
+  CreateAssetSchema,
+  UpdateArrivalMetadataSchema,
+  UpdateAssetSchema,
+  successResponse,
+} from 'shared-types'
 import { z } from 'zod'
 import { getArrivals as getArrivalsDb } from '../../generated/prisma/sql.js'
 import { ArrivalListQuerySchema } from '../middleware/validation.js'
@@ -13,15 +22,16 @@ import {
   getArrival as getArrivalSer,
   addRemoveCollectionFromAssetsAndRecord as patchArrivalAssetsSer,
   patchArrivalMetadata as patchArrivalMetadataSer,
-  updateArrivalAsset as updateArrivalAssetSer
+  updateArrivalAsset as updateArrivalAssetSer,
 } from '../services/arrivalService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
 export const getArrivals = asyncHandler(async (req, res) => {
-  const { fromDate, toDate, warehouse, vendor } =
-    res.locals.query as z.infer<typeof ArrivalListQuerySchema>
+  const { fromDate, toDate, warehouse, vendor } = res.locals.query as z.infer<
+    typeof ArrivalListQuerySchema
+  >
   const arrivals = await prisma.$queryRawTyped(
-    getArrivalsDb(fromDate, toDate, warehouse ?? 0, vendor ?? 0)
+    getArrivalsDb(fromDate, toDate, warehouse ?? 0, vendor ?? 0),
   )
   res.json(successResponse(arrivals))
 })
@@ -52,7 +62,11 @@ export const patchArrivalAssets = asyncHandler(async (req, res) => {
 
 export const createSingleArrivalAsset = asyncHandler(async (req, res) => {
   const validated = CreateAssetSchema.parse(req.body)
-  const asset = await createSingleArrivalAssetSer(req.params.arrivalNumber, validated, res.locals.dbUserId)
+  const asset = await createSingleArrivalAssetSer(
+    req.params.arrivalNumber,
+    validated,
+    res.locals.dbUserId,
+  )
   res.status(201).json(successResponse(asset))
 })
 
@@ -65,16 +79,24 @@ export const getArrivalAssetForUpdate = asyncHandler(async (req, res) => {
 export const updateArrivalAsset = asyncHandler(async (req, res) => {
   const assetId = Number(req.params.assetId)
   const validated = UpdateAssetSchema.parse(req.body)
-  const asset = await updateArrivalAssetSer(req.params.arrivalNumber, assetId, validated, res.locals.dbUserId)
+  const asset = await updateArrivalAssetSer(
+    req.params.arrivalNumber,
+    assetId,
+    validated,
+    res.locals.dbUserId,
+  )
   res.json(successResponse(asset))
 })
 
-export const getArrivalHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
-  const { arrivalNumber } = req.params
-  const arrival = await prisma.arrival.findUnique({
-    where: { arrival_number: arrivalNumber }, select: { id: true }
-  })
-  if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
-  const history = await getCollectionHistorySer('Arrival', arrival.id)
-  res.json(successResponse(history))
-})
+export const getArrivalHistory = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
+    const { arrivalNumber } = req.params
+    const arrival = await prisma.arrival.findUnique({
+      where: { arrival_number: arrivalNumber },
+      select: { id: true },
+    })
+    if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+    const history = await getCollectionHistorySer('Arrival', arrival.id)
+    res.json(successResponse(history))
+  },
+)

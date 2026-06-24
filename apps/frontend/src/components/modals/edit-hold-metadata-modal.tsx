@@ -31,7 +31,7 @@ export function EditHoldMetadataModal({
   onSave,
 }: EditHoldMetadataModalProps): React.JSX.Element {
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore(state => state.organizations)
+  const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(hold), [hold])
@@ -40,11 +40,7 @@ export function EditHoldMetadataModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   async function onValid(values: HoldMetadataForm) {
     setIsSubmitting(true)
@@ -69,49 +65,50 @@ export function EditHoldMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Hold</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <ControlledSelectOptionSearchSelect
               control={form.control}
-              name='created_for'
+              name="created_for"
               options={activeUsers}
-              getLabel={u => u.name}
-              fieldLabel='Created For'
+              getLabel={(u) => u.name}
+              fieldLabel="Created For"
               fieldRequired={true}
             />
             <ControlledSearchSelectInput
               control={form.control}
-              name='customer'
+              name="customer"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Customer'
+              getLabel={(o) => o.name}
+              fieldLabel="Customer"
               fieldRequired={true}
             />
             <Controller
               control={form.control}
-              name='notes'
+              name="notes"
               render={({ field }) => (
-                <Field className='col-span-2'>
+                <Field className="col-span-2">
                   <FieldLabel>Notes</FieldLabel>
-                  <Textarea
-                    placeholder='Hold notes…'
-                    className='resize-none'
-                    {...field}
-                  />
+                  <Textarea placeholder="Hold notes…" className="resize-none" {...field} />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} type='button' disabled={isSubmitting}>
+          <Button onClick={submit} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </Button>
         </DialogFooter>
@@ -128,7 +125,11 @@ export function EditHoldMetadataModal({
 function toFormValues(h: HoldDetail): HoldMetadataForm {
   return {
     created_for: getSelectOption(h.created_for),
-    customer: { id: h.customer.id, account_number: h.customer.account_number, name: h.customer.name },
-    notes: h.notes ?? ''
+    customer: {
+      id: h.customer.id,
+      account_number: h.customer.account_number,
+      name: h.customer.name,
+    },
+    notes: h.notes ?? '',
   }
 }

@@ -1,15 +1,15 @@
-import { Button } from "@/components/shadcn/button"
+import { Button } from '@/components/shadcn/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/shadcn/dropdown-menu"
-import { Field, FieldLabel } from "@/components/shadcn/field"
-import { cn } from "@/lib/utils"
-import { CaretDownIcon } from "@phosphor-icons/react"
-import React from "react"
+} from '@/components/shadcn/dropdown-menu'
+import { Field, FieldLabel } from '@/components/shadcn/field'
+import { cn } from '@/lib/utils'
+import { CaretDownIcon } from '@phosphor-icons/react'
+import React from 'react'
 
 type MultiSelectMenuProps<T extends { id: number }> = {
   selection: T[]
@@ -33,7 +33,7 @@ function MultiSelectMenu<T extends { id: number }>({
 
   function toggle(option: T, checked: boolean) {
     if (checked) onSelectionChange([...selection, option])
-    else onSelectionChange(selection.filter(s => s.id !== option.id))
+    else onSelectionChange(selection.filter((s) => s.id !== option.id))
   }
 
   function toggleAll(checked: boolean) {
@@ -47,17 +47,17 @@ function MultiSelectMenu<T extends { id: number }>({
         <DropdownMenuCheckboxItem
           checked={allSelected}
           onCheckedChange={toggleAll}
-          onSelect={e => e.preventDefault()}
+          onSelect={(e) => e.preventDefault()}
         >
           Select all
         </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
-        {options.map(option => (
+        {options.map((option) => (
           <React.Fragment key={option.id}>
             <DropdownMenuCheckboxItem
-              checked={selection.some(s => s.id === option.id)}
-              onCheckedChange={checked => toggle(option, checked)}
-              onSelect={e => e.preventDefault()}
+              checked={selection.some((s) => s.id === option.id)}
+              onCheckedChange={(checked) => toggle(option, checked)}
+              onSelect={(e) => e.preventDefault()}
             >
               {getLabel(option)}
             </DropdownMenuCheckboxItem>
@@ -118,9 +118,7 @@ export function MultiSelectOptionsInline<T extends { id: number }>({
   className,
   dividerAfterIds,
 }: MultiSelectOptionsProps<T>): React.JSX.Element {
-  const triggerLabel = selection.length === 0
-    ? fieldLabel
-    : `${fieldLabel}: ${selection.length}`
+  const triggerLabel = selection.length === 0 ? fieldLabel : `${fieldLabel}: ${selection.length}`
   return (
     <MultiSelectMenu
       selection={selection}
@@ -129,10 +127,7 @@ export function MultiSelectOptionsInline<T extends { id: number }>({
       getLabel={getLabel}
       dividerAfterIds={dividerAfterIds}
       trigger={
-        <Button
-          variant="outline"
-          className={cn("justify-between font-normal gap-2", className)}
-        >
+        <Button variant="outline" className={cn('justify-between font-normal gap-2', className)}>
           {triggerLabel}
           <CaretDownIcon />
         </Button>

@@ -33,16 +33,16 @@ function SearchBar({
   onQueryChange: (next: string) => void
 }): React.JSX.Element {
   return (
-    <div className='relative'>
+    <div className="relative">
       <MagnifyingGlassIcon
-        className='absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground'
+        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
         size={14}
       />
       <Input
         value={query}
-        onChange={e => onQueryChange(e.target.value)}
+        onChange={(e) => onQueryChange(e.target.value)}
         placeholder={SEARCH_PLACEHOLDER}
-        className='h-8 pl-7 text-sm'
+        className="h-8 pl-7 text-sm"
       />
     </div>
   )
@@ -62,19 +62,19 @@ function SectionHeader({
   const isInteractive = enabledCount > 0
   return (
     <button
-      type='button'
+      type="button"
       onClick={onToggle}
       disabled={!isInteractive}
       className={cn(
         'flex w-full items-center justify-between rounded px-2 py-1.5',
         'text-xs font-medium uppercase tracking-wide text-muted-foreground',
-        isInteractive
-          ? 'hover:bg-accent hover:text-accent-foreground'
-          : 'cursor-default',
+        isInteractive ? 'hover:bg-accent hover:text-accent-foreground' : 'cursor-default',
       )}
     >
       <span>{label}</span>
-      <span className='tabular-nums'>{visibleCount}/{enabledCount}</span>
+      <span className="tabular-nums">
+        {visibleCount}/{enabledCount}
+      </span>
     </button>
   )
 }
@@ -100,21 +100,21 @@ function ColumnRow({
       <Checkbox
         checked={isOn}
         disabled={!column.enabled}
-        onCheckedChange={checked => onToggle(!!checked)}
+        onCheckedChange={(checked) => onToggle(!!checked)}
       />
-      <span className='truncate'>{column.label}</span>
+      <span className="truncate">{column.label}</span>
     </label>
   )
 }
 
 function ResetFooter({ onReset }: { onReset: () => void }): React.JSX.Element {
   return (
-    <div className='border-t pt-1.5 -mx-0.5 px-1.5'>
+    <div className="border-t pt-1.5 -mx-0.5 px-1.5">
       <Button
-        variant='ghost'
-        size='sm'
+        variant="ghost"
+        size="sm"
         onClick={onReset}
-        className='h-7 w-full justify-start px-2 text-xs text-muted-foreground'
+        className="h-7 w-full justify-start px-2 text-xs text-muted-foreground"
       >
         {RESET_LABEL}
       </Button>
@@ -131,14 +131,15 @@ export function ColumnPicker({
   const [query, setQuery] = useState('')
 
   const groupedSections = useMemo(
-    () => COLUMN_SECTIONS.map(section => {
-      const columns = allColumns.filter(
-        c => c.section === section.id && c.enabled && matchesQuery(c, query),
-      )
-      const enabled = columns.filter(c => c.enabled)
-      const visibleEnabled = enabled.filter(c => visibleColSet.has(c.id))
-      return { section, columns, enabled, visibleEnabled }
-    }).filter(g => g.columns.length > 0),
+    () =>
+      COLUMN_SECTIONS.map((section) => {
+        const columns = allColumns.filter(
+          (c) => c.section === section.id && c.enabled && matchesQuery(c, query),
+        )
+        const enabled = columns.filter((c) => c.enabled)
+        const visibleEnabled = enabled.filter((c) => visibleColSet.has(c.id))
+        return { section, columns, enabled, visibleEnabled }
+      }).filter((g) => g.columns.length > 0),
     [query, visibleColSet, allColumns],
   )
 
@@ -162,38 +163,35 @@ export function ColumnPicker({
   }
 
   return (
-    <div className='flex flex-col gap-2 -m-0.5'>
+    <div className="flex flex-col gap-2 -m-0.5">
       <SearchBar query={query} onQueryChange={setQuery} />
 
-      <div className='max-h-[440px] overflow-y-auto -mx-0.5 px-0.5'>
+      <div className="max-h-[440px] overflow-y-auto -mx-0.5 px-0.5">
         {hasAnyMatch ? (
           groupedSections.map(({ section, columns, enabled, visibleEnabled }) => {
-            const allEnabledOn =
-              enabled.length > 0 && visibleEnabled.length === enabled.length
-            const enabledIds = enabled.map(c => c.id)
+            const allEnabledOn = enabled.length > 0 && visibleEnabled.length === enabled.length
+            const enabledIds = enabled.map((c) => c.id)
             return (
-              <div key={section.id} className='mb-1 last:mb-0'>
+              <div key={section.id} className="mb-1 last:mb-0">
                 <SectionHeader
                   label={section.label}
                   visibleCount={visibleEnabled.length}
                   enabledCount={enabled.length}
                   onToggle={() => toggleSection(enabledIds, allEnabledOn)}
                 />
-                {columns.map(col => (
+                {columns.map((col) => (
                   <ColumnRow
                     key={col.id}
                     column={col}
                     isOn={visibleColSet.has(col.id)}
-                    onToggle={checked => toggleColumn(col.id, checked)}
+                    onToggle={(checked) => toggleColumn(col.id, checked)}
                   />
                 ))}
               </div>
             )
           })
         ) : (
-          <div className='px-2 py-4 text-sm text-muted-foreground'>
-            {EMPTY_RESULT_TEXT}
-          </div>
+          <div className="px-2 py-4 text-sm text-muted-foreground">{EMPTY_RESULT_TEXT}</div>
         )}
       </div>
 

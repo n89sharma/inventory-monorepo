@@ -36,15 +36,15 @@ import { AppRoles, type AppRole, type User } from 'shared-types'
 import { toast } from 'sonner'
 import { createUserPermissionTableColumns } from '../column-defs/user-permission-table-columns'
 
-const ASSIGNABLE_ROLES = AppRoles.filter(r => r !== 'admin')
+const ASSIGNABLE_ROLES = AppRoles.filter((r) => r !== 'admin')
 
 export function UserManagementPage() {
   const { user: clerkUser } = useUser()
   const currentUserEmail = clerkUser?.primaryEmailAddress?.emailAddress
 
-  const users = useUserStore(state => state.users)
-  const setUserRole = useUserStore(state => state.setUserRole)
-  const toggleUserActive = useUserStore(state => state.toggleUserActive)
+  const users = useUserStore((state) => state.users)
+  const setUserRole = useUserStore((state) => state.setUserRole)
+  const toggleUserActive = useUserStore((state) => state.toggleUserActive)
 
   const [showActiveOnly, setShowActiveOnly] = useState(true)
   const [showClerkOnly, setShowClerkOnly] = useState(true)
@@ -53,9 +53,8 @@ export function UserManagementPage() {
   const [roleSaving, setRoleSaving] = useState(false)
   const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null)
 
-  const displayedUsers = users.filter(u =>
-    (!showActiveOnly || u.is_active) &&
-    (!showClerkOnly || u.clerk_id !== null)
+  const displayedUsers = users.filter(
+    (u) => (!showActiveOnly || u.is_active) && (!showClerkOnly || u.clerk_id !== null),
   )
 
   const handleEditRole = useCallback((user: User) => {
@@ -67,14 +66,17 @@ export function UserManagementPage() {
     setDeactivateTarget(user)
   }, [])
 
-  const handleReactivate = useCallback(async (user: User) => {
-    try {
-      await toggleUserActive(user.id, true)
-      toast.success(`${user.name} reactivated.`, { position: 'top-center' })
-    } catch {
-      // apiErrorHandler already toasted
-    }
-  }, [toggleUserActive])
+  const handleReactivate = useCallback(
+    async (user: User) => {
+      try {
+        await toggleUserActive(user.id, true)
+        toast.success(`${user.name} reactivated.`, { position: 'top-center' })
+      } catch {
+        // apiErrorHandler already toasted
+      }
+    },
+    [toggleUserActive],
+  )
 
   async function handleSaveRole() {
     if (!editRoleTarget || !selectedRole) return
@@ -101,7 +103,13 @@ export function UserManagementPage() {
   }
 
   const columns = useMemo(
-    () => createUserPermissionTableColumns(currentUserEmail, handleEditRole, handleDeactivate, handleReactivate),
+    () =>
+      createUserPermissionTableColumns(
+        currentUserEmail,
+        handleEditRole,
+        handleDeactivate,
+        handleReactivate,
+      ),
     [currentUserEmail, handleEditRole, handleDeactivate, handleReactivate],
   )
 
@@ -133,20 +141,25 @@ export function UserManagementPage() {
       <DataTable columns={columns} data={displayedUsers} initialPageSize={25} />
 
       {/* Edit Role modal */}
-      <Dialog open={!!editRoleTarget} onOpenChange={open => { if (!open) setEditRoleTarget(null) }}>
+      <Dialog
+        open={!!editRoleTarget}
+        onOpenChange={(open) => {
+          if (!open) setEditRoleTarget(null)
+        }}
+      >
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Edit Role — {editRoleTarget?.name}</DialogTitle>
           </DialogHeader>
           <Field>
             <FieldLabel>New Role</FieldLabel>
-            <Select value={selectedRole} onValueChange={val => setSelectedRole(val as AppRole)}>
+            <Select value={selectedRole} onValueChange={(val) => setSelectedRole(val as AppRole)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent position="popper">
                 <SelectGroup>
-                  {ASSIGNABLE_ROLES.map(role => (
+                  {ASSIGNABLE_ROLES.map((role) => (
                     <SelectItem key={role} value={role}>
                       {formatTitleCase(role)}
                     </SelectItem>
@@ -156,22 +169,30 @@ export function UserManagementPage() {
             </Select>
           </Field>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditRoleTarget(null)}
-              disabled={roleSaving}
-            >
+            <Button variant="outline" onClick={() => setEditRoleTarget(null)} disabled={roleSaving}>
               Cancel
             </Button>
             <Button onClick={handleSaveRole} disabled={!selectedRole || roleSaving}>
-              {roleSaving ? <><CircleNotchIcon className="animate-spin" />Saving…</> : 'Save'}
+              {roleSaving ? (
+                <>
+                  <CircleNotchIcon className="animate-spin" />
+                  Saving…
+                </>
+              ) : (
+                'Save'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Deactivate confirmation */}
-      <AlertDialog open={!!deactivateTarget} onOpenChange={open => { if (!open) setDeactivateTarget(null) }}>
+      <AlertDialog
+        open={!!deactivateTarget}
+        onOpenChange={(open) => {
+          if (!open) setDeactivateTarget(null)
+        }}
+      >
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
             <AlertDialogTitle>Deactivate {deactivateTarget?.name}?</AlertDialogTitle>

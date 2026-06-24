@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 export const ModelSaleRowSchema = z.object({
   barcode: z.string(),
@@ -10,12 +10,12 @@ export const ModelSaleRowSchema = z.object({
   cassettes: z.number().nullable(),
   internal_finisher: z.string().nullable(),
   core_functions: z.array(z.string()),
-});
-export type ModelSaleRow = z.infer<typeof ModelSaleRowSchema>;
+})
+export type ModelSaleRow = z.infer<typeof ModelSaleRowSchema>
 
 export const ModelSalesResultSchema = z.object({
   sales: z.array(ModelSaleRowSchema),
   last_sale: ModelSaleRowSchema.nullable(),
   in_stock_count: z.number(),
-});
-export type ModelSalesResult = z.infer<typeof ModelSalesResultSchema>;
+})
+export type ModelSalesResult = z.infer<typeof ModelSalesResultSchema>

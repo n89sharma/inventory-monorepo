@@ -1,8 +1,19 @@
-import { getSelectOption, getSelectedOrNull, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
-import { useState } from "react"
-import { useController, useFormState, type Control, type FieldValues, type Path } from "react-hook-form"
-import { Field, FieldLabel } from "../shadcn/field"
-import { SearchSelectInput } from "./search-select-input"
+import {
+  getSelectOption,
+  getSelectedOrNull,
+  UNSELECTED,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import { useState } from 'react'
+import {
+  useController,
+  useFormState,
+  type Control,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form'
+import { Field, FieldLabel } from '../shadcn/field'
+import { SearchSelectInput } from './search-select-input'
 
 type ControlledSelectOptionSearchSelectProps<T, TForm extends FieldValues> = {
   control: Control<TForm>
@@ -23,7 +34,6 @@ export function ControlledSelectOptionSearchSelect<T, TForm extends FieldValues>
   fieldRequired,
   className,
 }: ControlledSelectOptionSearchSelectProps<T, TForm>): React.JSX.Element {
-
   const { field } = useController({ control, name })
   const { errors } = useFormState({ control, name })
   const error = !!errors[name]
@@ -40,9 +50,15 @@ export function ControlledSelectOptionSearchSelect<T, TForm extends FieldValues>
       <SearchSelectInput
         selection={getSelectedOrNull(selection)}
         query={query}
-        onSelectionChange={val => { field.onChange(getSelectOption(val)); setQuery('') }}
+        onSelectionChange={(val) => {
+          field.onChange(getSelectOption(val))
+          setQuery('')
+        }}
         onQueryChange={setQuery}
-        onClear={() => { field.onChange(UNSELECTED); setQuery('') }}
+        onClear={() => {
+          field.onChange(UNSELECTED)
+          setQuery('')
+        }}
         options={options}
         getLabel={getLabel}
         placeholder=""
@@ -51,5 +67,4 @@ export function ControlledSelectOptionSearchSelect<T, TForm extends FieldValues>
       />
     </Field>
   )
-
 }

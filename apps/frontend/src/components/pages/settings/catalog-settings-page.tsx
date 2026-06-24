@@ -10,12 +10,12 @@ export function CatalogSettingsPage(): React.JSX.Element {
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
 
   return (
-    <PageContent className='flex flex-col gap-2'>
-      <h1 className='text-2xl font-semibold p-2'>Catalog</h1>
-      <Button variant='secondary' onClick={() => setIsBrandModalOpen(true)} className='w-fit'>
+    <PageContent className="flex flex-col gap-2">
+      <h1 className="text-2xl font-semibold p-2">Catalog</h1>
+      <Button variant="secondary" onClick={() => setIsBrandModalOpen(true)} className="w-fit">
         <PlusIcon /> Add Brand
       </Button>
-      <Button variant='secondary' onClick={() => setIsModelModalOpen(true)} className='w-fit'>
+      <Button variant="secondary" onClick={() => setIsModelModalOpen(true)} className="w-fit">
         <PlusIcon /> Add Model
       </Button>
       <CreateBrandModal open={isBrandModalOpen} onOpenChange={setIsBrandModalOpen} />

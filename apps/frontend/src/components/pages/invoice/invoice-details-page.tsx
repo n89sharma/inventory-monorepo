@@ -21,7 +21,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(assetHref, asset => mutations.removeAsset(invoiceNumber, asset)),
+      createAssetSummaryColumns(assetHref, (asset) => mutations.removeAsset(invoiceNumber, asset)),
     [mutations, invoiceNumber],
   )
 
@@ -36,11 +36,11 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       refreshKey={invoiceDetailKey(invoiceNumber)}
       historyCacheKey={`invoice-history:${invoiceNumber}`}
       historyFetcher={() => getInvoiceHistory(invoiceNumber)}
-      onBulkRemove={assets => mutations.bulkRemoveAssets(invoiceNumber, assets)}
+      onBulkRemove={(assets) => mutations.bulkRemoveAssets(invoiceNumber, assets)}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
-      renderSummaryStrip={invoice => <InvoiceSummaryStrip invoice={invoice} />}
-      renderSubtitle={invoice => (
+      renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
+      renderSubtitle={(invoice) => (
         <>
           <SummaryField
             label={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
@@ -56,14 +56,14 @@ export function InvoiceDetailsPage(): React.JSX.Element {
           open={control.open}
           onOpenChange={control.onOpenChange}
           invoice={invoice}
-          onSave={metadata => mutations.updateMetadata(invoiceNumber, metadata)}
+          onSave={(metadata) => mutations.updateMetadata(invoiceNumber, metadata)}
         />
       )}
-      renderAddAssetBar={invoice => (
+      renderAddAssetBar={(invoice) => (
         <AddAssetBar
           existingAssets={invoice.assets}
-          entityName='invoice'
-          onAddSingle={asset => mutations.addAsset(invoiceNumber, asset)}
+          entityName="invoice"
+          onAddSingle={(asset) => mutations.addAsset(invoiceNumber, asset)}
         />
       )}
     />

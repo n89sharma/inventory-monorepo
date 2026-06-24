@@ -1,5 +1,11 @@
-import { useController, useFormState, type Control, type FieldValues, type Path } from "react-hook-form"
-import { InputWithClear } from "./input-with-clear"
+import {
+  useController,
+  useFormState,
+  type Control,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form'
+import { InputWithClear } from './input-with-clear'
 
 export type ControlledInputWithClearProps<TForm extends FieldValues> = {
   control: Control<TForm>
@@ -15,7 +21,6 @@ export function ControlledInputWithClear<TForm extends FieldValues>({
   name,
   ...props
 }: ControlledInputWithClearProps<TForm>): React.JSX.Element {
-
   const { field } = useController({ control, name })
   const { errors } = useFormState({ control, name })
   const error = !!errors[name]
@@ -23,10 +28,9 @@ export function ControlledInputWithClear<TForm extends FieldValues>({
   return (
     <InputWithClear
       value={field.value}
-      onValueChange={val => field.onChange(val)}
+      onValueChange={(val) => field.onChange(val)}
       error={error}
       {...props}
     />
   )
 }
-

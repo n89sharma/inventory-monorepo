@@ -1,20 +1,25 @@
-import { formatTitleCase } from "@/lib/formatters"
-import type { ColumnDef } from "@tanstack/react-table"
+import { formatTitleCase } from '@/lib/formatters'
+import type { ColumnDef } from '@tanstack/react-table'
 import type { HoldSummary } from 'shared-types'
-import { assetCountColumn, createdAtColumn, createdByColumn, createIdColumn } from './shared-columns'
+import {
+  assetCountColumn,
+  createdAtColumn,
+  createdByColumn,
+  createIdColumn,
+} from './shared-columns'
 
 export const holdTableColumns: ColumnDef<HoldSummary>[] = [
   createIdColumn<HoldSummary>({
-    accessorKey: "hold_number",
-    header: "Hold Number",
-    href: row => `/holds/${row.hold_number}`,
-    value: row => row.hold_number,
+    accessorKey: 'hold_number',
+    header: 'Hold Number',
+    href: (row) => `/holds/${row.hold_number}`,
+    value: (row) => row.hold_number,
   }),
   createdByColumn as ColumnDef<HoldSummary>,
-  { accessorKey: "created_for", header: "Created For" },
+  { accessorKey: 'created_for', header: 'Created For' },
   {
-    accessorKey: "customer",
-    header: "Customer",
+    accessorKey: 'customer',
+    header: 'Customer',
     cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
   },
   createdAtColumn as ColumnDef<HoldSummary>,

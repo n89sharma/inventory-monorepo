@@ -1,25 +1,32 @@
-import { UnsavedChangesDialog } from "@/components/custom/unsaved-changes-dialog"
-import { Button } from "@/components/shadcn/button"
+import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
+import { Button } from '@/components/shadcn/button'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/shadcn/dialog"
-import { Field, FieldLabel } from "@/components/shadcn/field"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
-import { useAssetStore } from "@/data/store/asset-store"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { useActiveWarehouses } from "@/hooks/use-active-warehouses"
-import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard"
-import { formatTitleCase } from "@/lib/formatters"
-import { CircleNotchIcon } from "@phosphor-icons/react"
-import { useEffect, useMemo, useState } from "react"
-import { useForm, useWatch } from "react-hook-form"
-import type { AssetDetails, AssetLocation, Warehouse, Zone } from "shared-types"
-import { toast } from "sonner"
-import { SearchSelectInput } from "../custom/search-select-input"
+} from '@/components/shadcn/dialog'
+import { Field, FieldLabel } from '@/components/shadcn/field'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/shadcn/select'
+import { useAssetStore } from '@/data/store/asset-store'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { formatTitleCase } from '@/lib/formatters'
+import { CircleNotchIcon } from '@phosphor-icons/react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import type { AssetDetails, AssetLocation, Warehouse, Zone } from 'shared-types'
+import { toast } from 'sonner'
+import { SearchSelectInput } from '../custom/search-select-input'
 
 interface EditLocationModalProps {
   open: boolean
@@ -41,17 +48,21 @@ function filterBinInput(val: string): string {
 }
 
 export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLocationModalProps) {
-  const updateAssetLocation = useAssetStore(state => state.updateAssetLocation)
-  const getLocationsByWarehouse = useAssetStore(state => state.getLocationsByWarehouse)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const zones = useReferenceDataStore(state => state.zones)
+  const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
+  const getLocationsByWarehouse = useAssetStore((state) => state.getLocationsByWarehouse)
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const zones = useReferenceDataStore((state) => state.zones)
   const activeWarehouses = useActiveWarehouses()
 
-  const values = useMemo<LocationForm>(() => ({
-    warehouse: warehouses.find(w => w.city_code === assetDetails?.location?.warehouse_code) ?? null,
-    zone: null,
-    bin: null,
-  }), [assetDetails, warehouses])
+  const values = useMemo<LocationForm>(
+    () => ({
+      warehouse:
+        warehouses.find((w) => w.city_code === assetDetails?.location?.warehouse_code) ?? null,
+      zone: null,
+      bin: null,
+    }),
+    [assetDetails, warehouses],
+  )
 
   const form = useForm<LocationForm>({ values })
   const selectedWarehouse = useWatch({ control: form.control, name: 'warehouse' })
@@ -63,11 +74,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const [fetchingLocations, setFetchingLocations] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   useEffect(() => {
     if (!selectedWarehouse) {
@@ -78,10 +85,18 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
     setFetchingLocations(true)
     setBinLocations([])
     getLocationsByWarehouse(selectedWarehouse.id)
-      .then(all => { if (!cancelled) setBinLocations(all.filter(l => l.zone === BIN_ZONE)) })
-      .catch(() => { /* interceptor already showed the error toast */ })
-      .finally(() => { if (!cancelled) setFetchingLocations(false) })
-    return () => { cancelled = true }
+      .then((all) => {
+        if (!cancelled) setBinLocations(all.filter((l) => l.zone === BIN_ZONE))
+      })
+      .catch(() => {
+        /* interceptor already showed the error toast */
+      })
+      .finally(() => {
+        if (!cancelled) setFetchingLocations(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [selectedWarehouse, getLocationsByWarehouse])
 
   if (!assetDetails) return null
@@ -90,13 +105,13 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const canSave = !!selectedWarehouse && !!selectedZone && (!isBinZone || !!selectedBin)
 
   function handleWarehouseChange(id: string) {
-    const found = activeWarehouses.find(w => String(w.id) === id) ?? null
+    const found = activeWarehouses.find((w) => String(w.id) === id) ?? null
     form.setValue('warehouse', found, { shouldDirty: true })
     form.setValue('bin', null, { shouldDirty: true })
   }
 
   function handleZoneChange(id: string) {
-    const found = zones.find(z => String(z.id) === id) ?? null
+    const found = zones.find((z) => String(z.id) === id) ?? null
     form.setValue('zone', found, { shouldDirty: true })
     form.setValue('bin', null, { shouldDirty: true })
   }
@@ -115,7 +130,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
       await updateAssetLocation(assetDetails!.barcode, {
         warehouse_id: selectedWarehouse.id,
         zone_id: selectedZone.id,
-        bin: isBinZone ? selectedBin!.bin : ''
+        bin: isBinZone ? selectedBin!.bin : '',
       })
       form.reset(form.getValues())
       toast.success('Location updated.', { position: 'top-center' })
@@ -128,7 +143,12 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
 
   function renderBinField() {
     if (fetchingLocations) {
-      return <div className="flex items-center gap-2 text-muted-foreground"><CircleNotchIcon className="animate-spin" />Loading bins…</div>
+      return (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <CircleNotchIcon className="animate-spin" />
+          Loading bins…
+        </div>
+      )
     }
     if (binLocations.length === 0) {
       return <p className="text-muted-foreground">No bins available for this warehouse</p>
@@ -142,11 +162,17 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
         <SearchSelectInput
           selection={selectedBin}
           query={binQuery}
-          onSelectionChange={loc => { form.setValue('bin', loc, { shouldDirty: true }); setBinQuery('') }}
+          onSelectionChange={(loc) => {
+            form.setValue('bin', loc, { shouldDirty: true })
+            setBinQuery('')
+          }}
           onQueryChange={setBinQuery}
-          onClear={() => { form.setValue('bin', null, { shouldDirty: true }); setBinQuery('') }}
+          onClear={() => {
+            form.setValue('bin', null, { shouldDirty: true })
+            setBinQuery('')
+          }}
           options={binLocations}
-          getLabel={l => l.bin}
+          getLabel={(l) => l.bin}
           sanitize={filterBinInput}
           placeholder=""
           clearLabel="Clear bin"
@@ -174,7 +200,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
               </SelectTrigger>
               <SelectContent position="popper">
                 <SelectGroup>
-                  {activeWarehouses.map(w => (
+                  {activeWarehouses.map((w) => (
                     <SelectItem key={w.id} value={String(w.id)}>
                       {w.city_code} — {w.street}
                     </SelectItem>
@@ -196,7 +222,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
               </SelectTrigger>
               <SelectContent position="popper">
                 <SelectGroup>
-                  {zones.map(z => (
+                  {zones.map((z) => (
                     <SelectItem key={z.id} value={String(z.id)}>
                       {formatTitleCase(z.zone)}
                     </SelectItem>
@@ -210,11 +236,23 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button" disabled={saving}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={saving}
+          >
             Cancel
           </Button>
           <Button onClick={handleSave} type="button" disabled={saving || !canSave}>
-            {saving ? <><CircleNotchIcon className="animate-spin" />Saving…</> : 'Save'}
+            {saving ? (
+              <>
+                <CircleNotchIcon className="animate-spin" />
+                Saving…
+              </>
+            ) : (
+              'Save'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

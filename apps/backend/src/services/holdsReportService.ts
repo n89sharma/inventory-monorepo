@@ -7,5 +7,5 @@ export async function getHoldsByUserReport() {
     where: { status: ASSET_STATUS.HELD },
     select: { id: true },
   })
-  return prisma.$queryRawTyped(getHoldsByUserQuery(statuses.map(s => s.id)))
+  return prisma.$queryRawTyped(getHoldsByUserQuery(statuses.map((s) => s.id)))
 }

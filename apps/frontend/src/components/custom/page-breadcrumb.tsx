@@ -26,13 +26,20 @@ function BreadcrumbBase({
 }: BreadcrumbBaseProps): React.JSX.Element {
   function renderLink(href: string, label: string) {
     if (!onNavigate) {
-      return <BreadcrumbLink asChild><Link to={href}>{label}</Link></BreadcrumbLink>
+      return (
+        <BreadcrumbLink asChild>
+          <Link to={href}>{label}</Link>
+        </BreadcrumbLink>
+      )
     }
     return (
       <BreadcrumbLink asChild>
         <Link
           to={href}
-          onClick={e => { e.preventDefault(); onNavigate(href) }}
+          onClick={(e) => {
+            e.preventDefault()
+            onNavigate(href)
+          }}
         >
           {label}
         </Link>
@@ -47,10 +54,11 @@ function BreadcrumbBase({
           <React.Fragment key={i}>
             {i > 0 ? <BreadcrumbSeparator /> : null}
             <BreadcrumbItem>
-              {seg.href
-                ? renderLink(seg.href, seg.label)
-                : <BreadcrumbPage>{seg.label}</BreadcrumbPage>
-              }
+              {seg.href ? (
+                renderLink(seg.href, seg.label)
+              ) : (
+                <BreadcrumbPage>{seg.label}</BreadcrumbPage>
+              )}
             </BreadcrumbItem>
           </React.Fragment>
         ))}

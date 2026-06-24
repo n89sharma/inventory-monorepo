@@ -1,14 +1,16 @@
-import { Button } from "@/components/shadcn/button"
-import { Calendar } from "@/components/shadcn/calendar"
-import { Field, FieldLabel } from "@/components/shadcn/field"
+import { Button } from '@/components/shadcn/button'
+import { Calendar } from '@/components/shadcn/calendar'
+import { Field, FieldLabel } from '@/components/shadcn/field'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/shadcn/popover"
-import { getSelectedOrNull, getSelectOption, isSelected, UNSELECTED, type SelectOption } from "@/ui-types/select-option-types"
-import { format } from "date-fns"
-import type { Matcher } from "react-day-picker"
+  getSelectedOrNull,
+  getSelectOption,
+  isSelected,
+  UNSELECTED,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import { format } from 'date-fns'
+import type { Matcher } from 'react-day-picker'
 
 interface DatePickerFieldProps {
   label: string
@@ -41,14 +43,14 @@ export function DatePickerField({
             id={id}
             className="justify-start text-muted-foreground text-xs rounded-md"
           >
-            {isSelected(date) ? format(date.selected, "PPP") : <span>Select</span>}
+            {isSelected(date) ? format(date.selected, 'PPP') : <span>Select</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-1" align="start">
           <Calendar
             mode="single"
             selected={getSelectedOrNull(date) ?? undefined}
-            onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
+            onSelect={(d) => (d ? setDate(getSelectOption(d)) : setDate(UNSELECTED))}
             defaultMonth={getSelectedOrNull(date) ?? undefined}
             disabled={disabled}
             startMonth={startMonth}
@@ -70,9 +72,7 @@ export function DatePickerFieldInline({
   startMonth,
   endMonth,
 }: DatePickerFieldProps): React.JSX.Element {
-  const triggerLabel = isSelected(date)
-    ? `${label}: ${format(date.selected, "PPP")}`
-    : label
+  const triggerLabel = isSelected(date) ? `${label}: ${format(date.selected, 'PPP')}` : label
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -88,7 +88,7 @@ export function DatePickerFieldInline({
         <Calendar
           mode="single"
           selected={getSelectedOrNull(date) ?? undefined}
-          onSelect={d => d ? setDate(getSelectOption(d)) : setDate(UNSELECTED)}
+          onSelect={(d) => (d ? setDate(getSelectOption(d)) : setDate(UNSELECTED))}
           defaultMonth={getSelectedOrNull(date) ?? undefined}
           disabled={disabled}
           startMonth={startMonth}

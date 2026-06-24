@@ -1,4 +1,4 @@
-import { TooltipProvider } from "@/components/shadcn/tooltip.tsx"
+import { TooltipProvider } from '@/components/shadcn/tooltip.tsx'
 import { ClerkProvider } from '@clerk/react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -16,5 +16,5 @@ createRoot(document.getElementById('root')!).render(
         <App />
       </ClerkProvider>
     </TooltipProvider>
-  </StrictMode>
+  </StrictMode>,
 )

@@ -1,7 +1,5 @@
 import express from 'express'
-import {
-  getAssetsBySerialNumber,
-} from '../controllers/assetController.js'
+import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
   getHoldsByUserReport,
@@ -24,10 +22,6 @@ router.get(
   getProfitabilityReport,
 )
 
-router.get(
-  '/holds-by-user',
-  requirePermission('view_reports'),
-  getHoldsByUserReport,
-)
+router.get('/holds-by-user', requirePermission('view_reports'), getHoldsByUserReport)
 
 export default router

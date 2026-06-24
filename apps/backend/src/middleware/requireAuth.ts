@@ -24,7 +24,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
   const user = await prisma.user.findUnique({
     where: { clerk_id: userId, is_active: true },
-    select: { id: true }
+    select: { id: true },
   })
 
   if (!user) {

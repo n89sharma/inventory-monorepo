@@ -1,14 +1,24 @@
-import { archiveHold, createHold, getHoldDetail, patchHoldAssets, updateHoldMetadata } from '@/data/api/hold-api'
+import {
+  archiveHold,
+  createHold,
+  getHoldDetail,
+  patchHoldAssets,
+  updateHoldMetadata,
+} from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { holdDetailKey, invalidateHoldLists } from '@/hooks/use-hold'
-import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
+import {
+  flushPendingRemovals,
+  scheduleAssetRemoval,
+  scheduleBulkAssetRemoval,
+} from '@/lib/asset-removal-undo'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import type { AssetSummary, HoldDetail } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: HoldForm) {
   const result = await createHold(data)
-  invalidateAssetDetails(data.assets.map(a => a.barcode))
+  invalidateAssetDetails(data.assets.map((a) => a.barcode))
   invalidateHoldLists()
   return result
 }
@@ -19,14 +29,17 @@ async function getAssets(holdNumber: string): Promise<AssetSummary[]> {
 
 async function addAssets(holdNumber: string, assets: AssetSummary[]) {
   const existing = (await getHoldDetail(holdNumber)).assets
-  const existingIds = new Set(existing.map(a => a.id))
-  const newOnly = assets.filter(a => !existingIds.has(a.id))
+  const existingIds = new Set(existing.map((a) => a.id))
+  const newOnly = assets.filter((a) => !existingIds.has(a.id))
   const added = newOnly.length
   const skipped = assets.length - added
   if (added > 0) {
-    await patchHoldAssets(holdNumber, { assetIdsToAdd: newOnly.map(a => a.id), assetIdsToRemove: [] })
+    await patchHoldAssets(holdNumber, {
+      assetIdsToAdd: newOnly.map((a) => a.id),
+      assetIdsToRemove: [],
+    })
     mutate(holdDetailKey(holdNumber))
-    invalidateAssetDetails(newOnly.map(a => a.barcode))
+    invalidateAssetDetails(newOnly.map((a) => a.barcode))
     invalidateHoldLists()
   }
   return { added, skipped }
@@ -36,8 +49,8 @@ async function addAsset(holdNumber: string, asset: AssetSummary) {
   const cacheKey = holdDetailKey(holdNumber)
   mutate<HoldDetail>(
     cacheKey,
-    current => current ? { ...current, assets: [...current.assets, asset] } : current,
-    { revalidate: false }
+    (current) => (current ? { ...current, assets: [...current.assets, asset] } : current),
+    { revalidate: false },
   )
   try {
     await patchHoldAssets(holdNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
@@ -58,7 +71,7 @@ async function updateMetadata(holdNumber: string, metadata: HoldMetadataForm) {
 }
 
 async function archive(holdNumber: string) {
-  const releasedBarcodes = (await getHoldDetail(holdNumber)).assets.map(a => a.barcode)
+  const releasedBarcodes = (await getHoldDetail(holdNumber)).assets.map((a) => a.barcode)
   await archiveHold(holdNumber)
   mutate(holdDetailKey(holdNumber))
   invalidateAssetDetails(releasedBarcodes)
@@ -66,21 +79,27 @@ async function archive(holdNumber: string) {
 }
 
 function removeAsset(holdNumber: string, asset: AssetSummary) {
-  scheduleAssetRemoval({
-    collectionId: holdNumber,
-    detailCacheKey: holdDetailKey(holdNumber),
-    patchAssets: delta => patchHoldAssets(holdNumber, delta),
-    invalidateLists: invalidateHoldLists,
-  }, asset)
+  scheduleAssetRemoval(
+    {
+      collectionId: holdNumber,
+      detailCacheKey: holdDetailKey(holdNumber),
+      patchAssets: (delta) => patchHoldAssets(holdNumber, delta),
+      invalidateLists: invalidateHoldLists,
+    },
+    asset,
+  )
 }
 
 function bulkRemoveAssets(holdNumber: string, assets: AssetSummary[]) {
-  scheduleBulkAssetRemoval({
-    collectionId: holdNumber,
-    detailCacheKey: holdDetailKey(holdNumber),
-    patchAssets: delta => patchHoldAssets(holdNumber, delta),
-    invalidateLists: invalidateHoldLists,
-  }, assets)
+  scheduleBulkAssetRemoval(
+    {
+      collectionId: holdNumber,
+      detailCacheKey: holdDetailKey(holdNumber),
+      patchAssets: (delta) => patchHoldAssets(holdNumber, delta),
+      invalidateLists: invalidateHoldLists,
+    },
+    assets,
+  )
 }
 
 const mutations = {

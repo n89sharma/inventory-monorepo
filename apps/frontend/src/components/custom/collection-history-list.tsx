@@ -1,32 +1,33 @@
 import type { CollectionHistory, CollectionHistoryRecord } from 'shared-types'
-import {
-  EntryHeader,
-  FieldChip,
-  FieldDiffRow,
-  HistoryTimeline
-} from './history/history-primitives'
+import { EntryHeader, FieldChip, FieldDiffRow, HistoryTimeline } from './history/history-primitives'
 
-type AssetsChangedRecord = Extract<CollectionHistoryRecord, { action_type: 'ASSETS_ADDED' | 'ASSETS_REMOVED' }>
+type AssetsChangedRecord = Extract<
+  CollectionHistoryRecord,
+  { action_type: 'ASSETS_ADDED' | 'ASSETS_REMOVED' }
+>
 type CreateRecord = Extract<CollectionHistoryRecord, { action_type: 'CREATE' }>
 type UpdateRecord = Extract<CollectionHistoryRecord, { action_type: 'UPDATE' }>
 
 function formatKey(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function AssetsChangedEntry({ record }: { record: AssetsChangedRecord }) {
   const { barcodes } = record.changes
   const count = barcodes.length
   const plural = count !== 1 ? 's' : ''
-  const verb = record.action_type === 'ASSETS_ADDED'
-    ? `added ${count} asset${plural}`
-    : `removed ${count} asset${plural}`
+  const verb =
+    record.action_type === 'ASSETS_ADDED'
+      ? `added ${count} asset${plural}`
+      : `removed ${count} asset${plural}`
   return (
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb={verb} />
       <div className="flex flex-wrap gap-1">
-        {barcodes.map(b => (
-          <span key={b} className="text-xs font-mono bg-muted/50 rounded px-2 py-0.5">{b}</span>
+        {barcodes.map((b) => (
+          <span key={b} className="text-xs font-mono bg-muted/50 rounded px-2 py-0.5">
+            {b}
+          </span>
         ))}
       </div>
     </div>
@@ -35,8 +36,9 @@ function AssetsChangedEntry({ record }: { record: AssetsChangedRecord }) {
 
 function CreateEntry({ record }: { record: CreateRecord }) {
   const after = record.changes as Record<string, unknown>
-  const fields = Object.entries(after.after as Record<string, unknown>)
-    .filter(([k]) => k !== 'created_at')
+  const fields = Object.entries(after.after as Record<string, unknown>).filter(
+    ([k]) => k !== 'created_at',
+  )
   return (
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="created" />
@@ -55,13 +57,8 @@ function UpdateEntry({ record }: { record: UpdateRecord }) {
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="updated" />
       <div className="flex flex-col gap-0.5">
-        {Object.keys(after).map(key => (
-          <FieldDiffRow
-            key={key}
-            label={formatKey(key)}
-            before={before[key]}
-            after={after[key]}
-          />
+        {Object.keys(after).map((key) => (
+          <FieldDiffRow key={key} label={formatKey(key)} before={before[key]} after={after[key]} />
         ))}
       </div>
     </div>

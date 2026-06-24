@@ -10,7 +10,7 @@ export function DaysHeldFilter({
   return (
     <InputWithClearInline
       value={value}
-      onValueChange={val => {
+      onValueChange={(val) => {
         if (typeof val === 'string' || val === null) {
           onValueChange(null)
           return
@@ -18,9 +18,9 @@ export function DaysHeldFilter({
         const next = Number.isInteger(val) && val >= 0 ? val : null
         onValueChange(next)
       }}
-      fieldLabel='Days held'
-      inputType='number'
-      className='w-35'
+      fieldLabel="Days held"
+      inputType="number"
+      className="w-35"
     />
   )
 }

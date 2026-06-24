@@ -13,21 +13,22 @@ export function useSearchHeld(filters: SearchHeldFilters) {
 
   return useSWR<AssetSearchRow[]>(
     warehouses.length > 0 ? [SEARCH_HELD_KEY, { ...filters, warehouses }] : null,
-    ([, f]: [string, SearchHeldFilters]) => getAssetsForSearchHeld(
-      f.warehouses,
-      f.brand,
-      f.assetTypes,
-      f.readinesses,
-      f.model?.model_name ?? f.modelQuery,
-      f.meterMin,
-      f.meterMax,
-      f.cassettes,
-      f.internalFinisher,
-      f.heldBy,
-      f.heldFor,
-      f.holdCustomer,
-      f.daysHeldMin,
-    ),
+    ([, f]: [string, SearchHeldFilters]) =>
+      getAssetsForSearchHeld(
+        f.warehouses,
+        f.brand,
+        f.assetTypes,
+        f.readinesses,
+        f.model?.model_name ?? f.modelQuery,
+        f.meterMin,
+        f.meterMax,
+        f.cassettes,
+        f.internalFinisher,
+        f.heldBy,
+        f.heldFor,
+        f.holdCustomer,
+        f.daysHeldMin,
+      ),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,

@@ -17,11 +17,7 @@ import {
 } from '@/components/shadcn/dropdown-menu'
 import { Input } from '@/components/shadcn/input'
 import { Label } from '@/components/shadcn/label'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/shadcn/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { useSavedViews } from '@/hooks/use-saved-view'
 import { useSavedViewMutations } from '@/hooks/use-saved-view-mutations'
 import { BookmarksIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
@@ -43,17 +39,14 @@ function SavedViewRow({
   onDelete: (view: SavedViewSummary) => void
 }): React.JSX.Element {
   return (
-    <DropdownMenuItem
-      onSelect={() => onApply(view)}
-      className="justify-between gap-2"
-    >
+    <DropdownMenuItem onSelect={() => onApply(view)} className="justify-between gap-2">
       <span className="truncate">{view.name}</span>
       <Button
         variant="ghost"
         size="icon-xs"
         className="shrink-0 text-muted-foreground hover:text-destructive"
         aria-label={`Delete ${view.name}`}
-        onClick={event => {
+        onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
           onDelete(view)
@@ -99,16 +92,14 @@ function SaveViewDialog({
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Save as new view</DialogTitle>
-            <DialogDescription>
-              Name this filter configuration to reuse it later.
-            </DialogDescription>
+            <DialogDescription>Name this filter configuration to reuse it later.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-2 py-4">
             <Label htmlFor="saved-view-name">View name</Label>
             <Input
               id="saved-view-name"
               value={name}
-              onChange={event => setName(event.target.value)}
+              onChange={(event) => setName(event.target.value)}
               placeholder="e.g. Toronto in-stock copiers"
               maxLength={100}
               autoFocus
@@ -128,11 +119,7 @@ function SaveViewDialog({
   )
 }
 
-export function SavedViewsButton({
-  pageKey,
-}: {
-  pageKey: SavedViewPageKey
-}): React.JSX.Element {
+export function SavedViewsButton({ pageKey }: { pageKey: SavedViewPageKey }): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const { data: views = EMPTY_VIEWS } = useSavedViews(pageKey)
   const { create, remove } = useSavedViewMutations()
@@ -175,13 +162,8 @@ export function SavedViewsButton({
               No saved views yet
             </DropdownMenuLabel>
           ) : (
-            views.map(view => (
-              <SavedViewRow
-                key={view.id}
-                view={view}
-                onApply={applyView}
-                onDelete={deleteView}
-              />
+            views.map((view) => (
+              <SavedViewRow key={view.id} view={view} onApply={applyView} onDelete={deleteView} />
             ))
           )}
           <DropdownMenuSeparator />
@@ -192,11 +174,7 @@ export function SavedViewsButton({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <SaveViewDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSave={saveView}
-      />
+      <SaveViewDialog open={dialogOpen} onOpenChange={setDialogOpen} onSave={saveView} />
     </>
   )
 }

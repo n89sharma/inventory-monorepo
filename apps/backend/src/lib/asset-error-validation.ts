@@ -17,26 +17,29 @@ import { ValidationError } from './errors.js'
  */
 export async function validateErrorBrands(
   tx: Prisma.TransactionClient,
-  pairs: Array<{ errorId: number; expectedBrandId: number }>
+  pairs: Array<{ errorId: number; expectedBrandId: number }>,
 ): Promise<void> {
   if (pairs.length === 0) return
 
-  const uniqueIds = [...new Set(pairs.map(p => p.errorId))]
+  const uniqueIds = [...new Set(pairs.map((p) => p.errorId))]
   const found = await tx.error.findMany({
     where: { id: { in: uniqueIds } },
-    select: { id: true, brand_id: true }
+    select: { id: true, brand_id: true },
   })
 
   if (found.length !== uniqueIds.length) {
-    const foundSet = new Set(found.map(f => f.id))
-    const missing = uniqueIds.filter(id => !foundSet.has(id))
+    const foundSet = new Set(found.map((f) => f.id))
+    const missing = uniqueIds.filter((id) => !foundSet.has(id))
     throw new ValidationError(`Unknown error id(s): ${missing.join(', ')}`)
   }
 
-  const brandByErrorId = new Map(found.map(f => [f.id, f.brand_id]))
+  const brandByErrorId = new Map(found.map((f) => [f.id, f.brand_id]))
   const mismatched = pairs
-    .filter(p => brandByErrorId.get(p.errorId) !== p.expectedBrandId)
-    .map(p => `${p.errorId} (expected brand ${p.expectedBrandId}, got ${brandByErrorId.get(p.errorId)})`)
+    .filter((p) => brandByErrorId.get(p.errorId) !== p.expectedBrandId)
+    .map(
+      (p) =>
+        `${p.errorId} (expected brand ${p.expectedBrandId}, got ${brandByErrorId.get(p.errorId)})`,
+    )
   if (mismatched.length > 0) {
     throw new ValidationError(`Error id(s) belong to a different brand: ${mismatched.join(', ')}`)
   }

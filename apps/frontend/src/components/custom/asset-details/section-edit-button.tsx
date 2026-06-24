@@ -10,7 +10,8 @@ export function SectionEditButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="text-muted-foreground -mr-1"
     >
-      <PencilSimpleIcon aria-hidden="true" />Edit
+      <PencilSimpleIcon aria-hidden="true" />
+      Edit
     </Button>
   )
 }

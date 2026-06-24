@@ -20,8 +20,9 @@ export function AssetCompositionField({ assets }: { assets: AssetSummary[] }) {
     count: counts.get(type) ?? 0,
   }))
   const otherCount = total - knownParts.reduce((sum, part) => sum + part.count, 0)
-  const parts = [...knownParts, { label: OTHER_LABEL, count: otherCount }]
-    .filter((part) => part.count > 0)
+  const parts = [...knownParts, { label: OTHER_LABEL, count: otherCount }].filter(
+    (part) => part.count > 0,
+  )
 
   return (
     <div className="flex items-baseline gap-1.5">

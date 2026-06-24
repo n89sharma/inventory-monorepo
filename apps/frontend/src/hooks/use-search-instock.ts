@@ -13,17 +13,18 @@ export function useSearchInStock(filters: SearchInStockFilters) {
 
   return useSWR<AssetSearchRow[]>(
     warehouses.length > 0 ? [SEARCH_INSTOCK_KEY, { ...filters, warehouses }] : null,
-    ([, f]: [string, SearchInStockFilters]) => getAssetsForSearchInStock(
-      f.warehouses,
-      f.brand,
-      f.assetTypes,
-      f.readinesses,
-      f.model?.model_name ?? f.modelQuery,
-      f.meterMin,
-      f.meterMax,
-      f.cassettes,
-      f.internalFinisher,
-    ),
+    ([, f]: [string, SearchInStockFilters]) =>
+      getAssetsForSearchInStock(
+        f.warehouses,
+        f.brand,
+        f.assetTypes,
+        f.readinesses,
+        f.model?.model_name ?? f.modelQuery,
+        f.meterMin,
+        f.meterMax,
+        f.cassettes,
+        f.internalFinisher,
+      ),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,

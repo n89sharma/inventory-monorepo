@@ -24,7 +24,7 @@ import {
   updateAssetErrors,
   updateAssetLocation,
   updateAssetPricing,
-  updateAssetSpecs
+  updateAssetSpecs,
 } from '../controllers/assetController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -35,11 +35,26 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', requirePermission('view_asset'), validateQuery(AssetQuerySchema), getAssets)
-router.get('/sold', requirePermission('view_asset'), validateQuery(SoldAssetQuerySchema), getSoldAssets)
+router.get(
+  '/sold',
+  requirePermission('view_asset'),
+  validateQuery(SoldAssetQuerySchema),
+  getSoldAssets,
+)
 router.post('/export', requirePermission('view_asset'), exportAssetReport)
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
-router.get('/suggestions', requirePermission('view_asset'), validateQuery(BarcodeSuggestionsQuerySchema), getBarcodeSuggestions)
-router.get('/locations', requirePermission('view_asset'), validateQuery(LocationsByWarehouseQuerySchema), getLocationsByWarehouse)
+router.get(
+  '/suggestions',
+  requirePermission('view_asset'),
+  validateQuery(BarcodeSuggestionsQuerySchema),
+  getBarcodeSuggestions,
+)
+router.get(
+  '/locations',
+  requirePermission('view_asset'),
+  validateQuery(LocationsByWarehouseQuerySchema),
+  getLocationsByWarehouse,
+)
 router.get('/:barcode/history', requirePermission('view_asset'), getAssetHistory)
 router.get('/:barcode/summary', requirePermission('view_asset'), getAssetSummaryByBarcode)
 router.get('/:barcode', requirePermission('view_asset'), getAssetDetail)

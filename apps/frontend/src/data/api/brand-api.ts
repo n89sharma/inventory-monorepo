@@ -9,7 +9,7 @@ const CreateBrandResponseSchema = z.object({ id: z.number() })
 export async function getBrands(): Promise<Brand[]> {
   const { data } = await api.get<Brand[]>('/brands')
   const brands = z.array(BrandSchema).parse(data)
-  return brands.map(brand => ({ ...brand, name: formatTitleCase(brand.name) }))
+  return brands.map((brand) => ({ ...brand, name: formatTitleCase(brand.name) }))
 }
 
 export async function createBrand(form: BrandForm): Promise<{ id: number }> {

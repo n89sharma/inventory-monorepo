@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from "axios"
+import axios, { isAxiosError } from 'axios'
 import type { ApiResponse } from 'shared-types'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -9,14 +9,14 @@ export const api = axios.create({
   baseURL: apiUrl,
   timeout: 30000,
   headers: {
-    "Content-Type": "application/json"
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 const EnvelopeSchema = z.object({ success: z.literal(true), data: z.unknown() })
 
 api.interceptors.response.use(
-  response => {
+  (response) => {
     const envelope = EnvelopeSchema.safeParse(response.data)
     if (envelope.success) {
       response.data = envelope.data.data
@@ -37,7 +37,7 @@ api.interceptors.response.use(
           throw new Error(message)
         }
         const body = error.response.data as ApiResponse<unknown> | undefined
-        const message = (body && !body.success) ? body.error.summary : 'Request failed'
+        const message = body && !body.success ? body.error.summary : 'Request failed'
         toast.error(message, { position: 'top-center' })
         throw new Error(message)
       }
@@ -46,5 +46,5 @@ api.interceptors.response.use(
       throw new Error(message)
     }
     throw error
-  }
+  },
 )

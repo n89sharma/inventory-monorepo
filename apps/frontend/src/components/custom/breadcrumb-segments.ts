@@ -19,29 +19,20 @@ export function getBreadcrumForAssetDetails(
   searchList: SearchList | null,
   listSearch: string,
 ): BreadcrumbSegment[] {
-
   if (isCollection(section)) {
     return [
       { label: formatTitleCase(section), href: `/${section}` },
-      { label: collectionId ?? '', href: `/${section}/${collectionId}` }
+      { label: collectionId ?? '', href: `/${section}/${collectionId}` },
     ]
   }
 
   if (section === 'search') {
     const list = searchList ?? DEFAULT_SEARCH_LIST
-    return [
-      { label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }
-    ]
+    return [{ label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }]
   }
-  return [
-    { label: 'Home', href: '/' }
-  ]
+  return [{ label: 'Home', href: '/' }]
 }
 
-export function getBreadcrumbForAssetSummary(
-  section: NavigationSection): BreadcrumbSegment[] {
-
-  return [
-    { label: formatTitleCase(section), href: `/${section}` }
-  ]
+export function getBreadcrumbForAssetSummary(section: NavigationSection): BreadcrumbSegment[] {
+  return [{ label: formatTitleCase(section), href: `/${section}` }]
 }

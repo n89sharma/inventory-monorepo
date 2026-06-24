@@ -14,7 +14,10 @@ export function createUserPermissionTableColumns(
       accessorKey: 'name',
       size: 180,
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
           Name <ArrowsDownUpIcon />
         </Button>
       ),
@@ -23,7 +26,10 @@ export function createUserPermissionTableColumns(
       accessorKey: 'email',
       size: 220,
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
           Email <ArrowsDownUpIcon />
         </Button>
       ),
@@ -32,7 +38,10 @@ export function createUserPermissionTableColumns(
       accessorKey: 'role',
       size: 160,
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
           Role <ArrowsDownUpIcon />
         </Button>
       ),
@@ -44,11 +53,9 @@ export function createUserPermissionTableColumns(
       header: () => <div className="px-3">Clerk user</div>,
       cell: ({ row }) => (
         <div className="flex gap-2 justify-center">
-          {
-            row.original.clerk_id
-              ? <CheckCircleIcon weight="fill" className="text-green-600 size-4.5" />
-              : null
-          }
+          {row.original.clerk_id ? (
+            <CheckCircleIcon weight="fill" className="text-green-600 size-4.5" />
+          ) : null}
         </div>
       ),
     },
@@ -56,7 +63,10 @@ export function createUserPermissionTableColumns(
       accessorKey: 'is_active',
       size: 100,
       header: ({ column }) => (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
           Status <ArrowsDownUpIcon />
         </Button>
       ),
@@ -74,18 +84,15 @@ export function createUserPermissionTableColumns(
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>
               Edit
             </Button>
-            {user.is_active
-              ? (
-                <Button variant="destructive" size="sm" onClick={() => onDeactivate(user)}>
-                  Deactivate
-                </Button>
-              )
-              : (
-                <Button variant="outline" size="sm" onClick={() => onReactivate(user)}>
-                  Reactivate
-                </Button>
-              )
-            }
+            {user.is_active ? (
+              <Button variant="destructive" size="sm" onClick={() => onDeactivate(user)}>
+                Deactivate
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => onReactivate(user)}>
+                Reactivate
+              </Button>
+            )}
           </div>
         )
       },

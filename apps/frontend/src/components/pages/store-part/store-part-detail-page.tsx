@@ -1,20 +1,20 @@
-import { SummaryField } from "@/components/custom/cards/summary-field"
-import { StickyDetailsPageHeader } from "@/components/custom/sticky-details-page-header"
-import { AddPurchaseModal } from "@/components/modals/add-purchase-modal"
-import { storeTransactionLedgerColumns } from "@/components/pages/column-defs/store-part-columns"
-import { PageContent } from "@/components/layout/page-content"
-import { Button } from "@/components/shadcn/button"
-import { DataTable } from "@/components/shadcn/data-table"
-import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { useStorePartDetail } from "@/hooks/use-store-part"
-import { PlusIcon } from "@phosphor-icons/react"
-import { useMemo, useState } from "react"
-import { useParams, useSearchParams } from "react-router-dom"
+import { SummaryField } from '@/components/custom/cards/summary-field'
+import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
+import { AddPurchaseModal } from '@/components/modals/add-purchase-modal'
+import { storeTransactionLedgerColumns } from '@/components/pages/column-defs/store-part-columns'
+import { PageContent } from '@/components/layout/page-content'
+import { Button } from '@/components/shadcn/button'
+import { DataTable } from '@/components/shadcn/data-table'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useStorePartDetail } from '@/hooks/use-store-part'
+import { PlusIcon } from '@phosphor-icons/react'
+import { useMemo, useState } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
 
 export function StorePartDetailPage(): React.JSX.Element {
   const { partNumber = '' } = useParams()
   const [searchParams] = useSearchParams()
-  const warehouses = useReferenceDataStore(state => state.warehouses)
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
   const [addOpen, setAddOpen] = useState(false)
 
   const warehouseId = useMemo(() => {
@@ -28,7 +28,7 @@ export function StorePartDetailPage(): React.JSX.Element {
     const transactions = data?.transactions ?? []
     return warehouseId === null
       ? transactions
-      : transactions.filter(t => t.warehouse_id === warehouseId)
+      : transactions.filter((t) => t.warehouse_id === warehouseId)
   }, [data, warehouseId])
 
   const onHand = useMemo(
@@ -37,7 +37,11 @@ export function StorePartDetailPage(): React.JSX.Element {
   )
 
   if (isLoading) {
-    return <PageContent><p className="text-muted-foreground">Loading…</p></PageContent>
+    return (
+      <PageContent>
+        <p className="text-muted-foreground">Loading…</p>
+      </PageContent>
+    )
   }
 
   if (!data) {
@@ -48,7 +52,7 @@ export function StorePartDetailPage(): React.JSX.Element {
     )
   }
 
-  const warehouse = warehouses.find(w => w.id === warehouseId) ?? null
+  const warehouse = warehouses.find((w) => w.id === warehouseId) ?? null
   const onHandLabel = warehouse ? `On hand (${warehouse.city_code})` : 'On hand'
   const backHref = warehouseId === null ? '/store' : `/store?warehouse=${warehouseId}`
 

@@ -19,5 +19,8 @@ export type CollectionResults = {
 }
 
 export const emptyResults: CollectionResults = {
-  departures: [], transfers: [], holds: [], invoices: [],
+  departures: [],
+  transfers: [],
+  holds: [],
+  invoices: [],
 }

@@ -5,7 +5,7 @@ import { prisma } from '../prisma.js'
 export async function requireHoldOwnership(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const role: AppRole | null = res.locals.dbUserRole
   if (role && ROLE_PERMISSIONS[role].includes('edit_any_hold')) {
@@ -15,7 +15,7 @@ export async function requireHoldOwnership(
   const holdNumber = req.params.holdNumber
   const hold = await prisma.hold.findUnique({
     where: { hold_number: holdNumber },
-    select: { created_by_id: true }
+    select: { created_by_id: true },
   })
   if (!hold) {
     res.status(404).json(response404(`Hold ${holdNumber} not found`))

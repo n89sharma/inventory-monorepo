@@ -1,8 +1,30 @@
 import { api } from '@/data/api/axios-client'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import { type SelectOption, getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateDeparture, DepartureDetail, OrgSummary, OutgoingStatus, UpdateDepartureMetadata, Warehouse } from 'shared-types'
-import { type DepartureSummary, AssetDeltaSchema, CollectionHistorySchema, CreateDepartureSchema, DepartureDetailSchema, DepartureSummarySchema, SetDepartureOutgoingStatusSchema, UpdateDepartureMetadataSchema } from 'shared-types'
+import {
+  type SelectOption,
+  getIdOrNullFromSelection,
+  getSelectedOrNull,
+} from '@/ui-types/select-option-types'
+import type {
+  AssetDelta,
+  CollectionHistory,
+  CreateDeparture,
+  DepartureDetail,
+  OrgSummary,
+  OutgoingStatus,
+  UpdateDepartureMetadata,
+  Warehouse,
+} from 'shared-types'
+import {
+  type DepartureSummary,
+  AssetDeltaSchema,
+  CollectionHistorySchema,
+  CreateDepartureSchema,
+  DepartureDetailSchema,
+  DepartureSummarySchema,
+  SetDepartureOutgoingStatusSchema,
+  UpdateDepartureMetadataSchema,
+} from 'shared-types'
 import { z } from 'zod'
 
 const CreateDepartureResponseSchema = z.object({ departureNumber: z.string() })
@@ -12,7 +34,7 @@ export async function getDepartures(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  customer: SelectOption<OrgSummary>
+  customer: SelectOption<OrgSummary>,
 ): Promise<DepartureSummary[]> {
   const { data } = await api.get<DepartureSummary[]>(`/departures`, {
     params: {
@@ -20,7 +42,7 @@ export async function getDepartures(
       toDate: getSelectedOrNull(toDate),
       warehouse: getIdOrNullFromSelection(origin),
       customer: getIdOrNullFromSelection(customer),
-    }
+    },
   })
   return z.array(DepartureSummarySchema).parse(data)
 }
@@ -41,7 +63,10 @@ export async function createDeparture(d: DepartureForm): Promise<CreateDeparture
     customer: d.customer!,
     transporter: d.transporter!,
     comment: d.comment,
-    assets: d.assets.map(a => ({ id: a.id, outgoing_status: a.outgoing_status })) as CreateDeparture['assets']
+    assets: d.assets.map((a) => ({
+      id: a.id,
+      outgoing_status: a.outgoing_status,
+    })) as CreateDeparture['assets'],
   } satisfies CreateDeparture)
   const { data } = await api.post<CreateDepartureResponse>('/departures', createDepartureBody)
   return CreateDepartureResponseSchema.parse(data)
@@ -49,7 +74,7 @@ export async function createDeparture(d: DepartureForm): Promise<CreateDeparture
 
 export async function patchDepartureAssets(
   departureNumber: string,
-  delta: AssetDelta
+  delta: AssetDelta,
 ): Promise<void> {
   const patchDepartureAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/departures/${departureNumber}/assets`, patchDepartureAssetsBody)
@@ -58,24 +83,27 @@ export async function patchDepartureAssets(
 export async function setDepartureOutgoingStatus(
   departureNumber: string,
   assetIds: number[],
-  outgoingStatus: OutgoingStatus
+  outgoingStatus: OutgoingStatus,
 ): Promise<void> {
   const setDepartureOutgoingStatusBody = SetDepartureOutgoingStatusSchema.parse({
     assetIds,
-    outgoing_status: outgoingStatus
+    outgoing_status: outgoingStatus,
   })
-  await api.patch(`/departures/${departureNumber}/assets/outgoing-status`, setDepartureOutgoingStatusBody)
+  await api.patch(
+    `/departures/${departureNumber}/assets/outgoing-status`,
+    setDepartureOutgoingStatusBody,
+  )
 }
 
 export async function updateDepartureMetadata(
   departureNumber: string,
-  metadata: DepartureMetadataForm
+  metadata: DepartureMetadataForm,
 ): Promise<void> {
   const updateDepartureMetadataBody = UpdateDepartureMetadataSchema.parse({
     origin: getSelectedOrNull(metadata.origin)!,
     customer: metadata.customer!,
     transporter: metadata.transporter!,
-    comment: metadata.comment === '' ? null : metadata.comment
+    comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateDepartureMetadata)
   await api.patch(`/departures/${departureNumber}/metadata`, updateDepartureMetadataBody)
 }

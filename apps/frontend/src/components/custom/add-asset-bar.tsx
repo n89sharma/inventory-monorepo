@@ -18,7 +18,7 @@ export function AddAssetBar({
   validateAsset,
 }: AddAssetBarProps): React.JSX.Element {
   return (
-    <AddAssetBarShell label='Add asset'>
+    <AddAssetBarShell label="Add asset">
       <AddAssetByBarcode
         getAssets={() => existingAssets}
         onAddAsset={() => {}}
@@ -26,10 +26,10 @@ export function AddAssetBar({
         showLeadingIcon
         validateAsset={validateAsset}
         onCommit={onAddSingle}
-        className='w-96'
+        className="w-96"
       />
       {onAddBatchFromHold && (
-        <div className='ml-auto'>
+        <div className="ml-auto">
           <AddFromHoldButton
             getAssets={() => existingAssets}
             onAddAsset={() => {}}

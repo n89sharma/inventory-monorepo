@@ -20,9 +20,7 @@ export function BulkActionBar({
 }: BulkActionBarProps): React.ReactNode {
   const { state: sidebarState, isMobile } = useSidebar()
   const sidebarVisible = !isMobile && sidebarState === 'expanded'
-  const barLeft = sidebarVisible
-    ? 'calc(50% + var(--sidebar-width) / 2)'
-    : '50%'
+  const barLeft = sidebarVisible ? 'calc(50% + var(--sidebar-width) / 2)' : '50%'
 
   const hasSelection = selectedCount > 0
   const canShowSelectAll =

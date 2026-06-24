@@ -90,13 +90,18 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
     return () => onFlushPending?.(collectionId)
   }, [collectionId, onFlushPending])
 
-  if (detail.isLoading) return <div role="status" aria-live="polite">Loading…</div>
+  if (detail.isLoading)
+    return (
+      <div role="status" aria-live="polite">
+        Loading…
+      </div>
+    )
   if (detail.error) return <div>{detail.error.message}</div>
   if (!detail.data) return <div>{notFoundLabel}</div>
 
   const entity = detail.data
   const canEdit = hasPermission && (canEditEntity ?? true)
-  const selectedAssets = entity.assets.filter(a => rowSelection[a.barcode])
+  const selectedAssets = entity.assets.filter((a) => rowSelection[a.barcode])
 
   return (
     <>
@@ -123,9 +128,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           </div>
         }
       />
-      <PageContent
-        className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}
-      >
+      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
         {renderSummaryStrip(entity)}
         {renderMetadataModal(entity, {
           open: isMetadataModalOpen,
@@ -142,7 +145,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             onBulkRemove={onBulkRemove}
             totalCount={entity.assets.length}
             onSelectAll={() =>
-              setRowSelection(Object.fromEntries(entity.assets.map(a => [a.barcode, true])))
+              setRowSelection(Object.fromEntries(entity.assets.map((a) => [a.barcode, true])))
             }
             extraActions={renderBulkExtraActions?.({
               selectedAssets,

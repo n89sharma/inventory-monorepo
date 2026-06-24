@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../shadcn/card'
 import { DataRowContainer } from '../asset-details/detail-layout'
 import { DataValueRow } from '../asset-details/detail-row'
 
-export function Organization({ title, org }: { title: string, org: OrgDetail }) {
-
+export function Organization({ title, org }: { title: string; org: OrgDetail }) {
   return (
     <Card className="flex-1 gap-2">
       <CardHeader>

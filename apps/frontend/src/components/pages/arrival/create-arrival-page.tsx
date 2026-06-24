@@ -14,21 +14,24 @@ export function CreateArrivalPage(): React.JSX.Element {
     cancelNavUrl: '/arrivals',
   }
 
-  const breadcrumbs = [
-    { label: 'Arrivals', href: '/arrivals' },
-    { label: 'Create' },
-  ]
+  const breadcrumbs = [{ label: 'Arrivals', href: '/arrivals' }, { label: 'Create' }]
 
   async function onValidArrivalCreateSubmit(data: ArrivalForm) {
     try {
       const { arrivalNumber } = await mutations.create(data)
       navigate(`/arrivals/${arrivalNumber}`, {
-        state: { successToast: { entity: 'arrival', id: arrivalNumber } }
+        state: { successToast: { entity: 'arrival', id: arrivalNumber } },
       })
     } catch {
       // interceptor already showed the error toast
     }
   }
 
-  return <ArrivalFormPage pageConfig={pageConfig} breadcrumbs={breadcrumbs} onValidSubmit={onValidArrivalCreateSubmit} />
+  return (
+    <ArrivalFormPage
+      pageConfig={pageConfig}
+      breadcrumbs={breadcrumbs}
+      onValidSubmit={onValidArrivalCreateSubmit}
+    />
+  )
 }

@@ -31,7 +31,7 @@ export function EditArrivalMetadataModal({
   onSave,
 }: EditArrivalMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore(state => state.organizations)
+  const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(arrival), [arrival])
@@ -40,11 +40,7 @@ export function EditArrivalMetadataModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   async function onValid(values: ArrivalMetadataForm) {
     setIsSubmitting(true)
@@ -69,38 +65,38 @@ export function EditArrivalMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Arrival</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <ControlledSearchSelectInput
               control={form.control}
-              name='vendor'
+              name="vendor"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Vendor'
+              getLabel={(o) => o.name}
+              fieldLabel="Vendor"
               fieldRequired={true}
             />
             <ControlledSearchSelectInput
               control={form.control}
-              name='transporter'
+              name="transporter"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Transporter'
+              getLabel={(o) => o.name}
+              fieldLabel="Transporter"
               fieldRequired={true}
             />
             <Controller
               control={form.control}
-              name='warehouse'
+              name="warehouse"
               render={({ field: { onChange, value }, fieldState }) => (
                 <SelectOptions
                   selection={value}
                   onSelectionChange={onChange}
                   options={activeWarehouses}
-                  getLabel={w => w.city_code}
-                  fieldLabel='Warehouse'
+                  getLabel={(w) => w.city_code}
+                  fieldLabel="Warehouse"
                   anyAllowed={false}
                   fieldRequired={true}
                   error={fieldState.invalid}
@@ -109,25 +105,26 @@ export function EditArrivalMetadataModal({
             />
             <Controller
               control={form.control}
-              name='comment'
+              name="comment"
               render={({ field }) => (
-                <Field className='col-span-2'>
+                <Field className="col-span-2">
                   <FieldLabel>Comments</FieldLabel>
-                  <Textarea
-                    placeholder='Arrival notes…'
-                    className='resize-none'
-                    {...field}
-                  />
+                  <Textarea placeholder="Arrival notes…" className="resize-none" {...field} />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} type='button' disabled={isSubmitting}>
+          <Button onClick={submit} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </Button>
         </DialogFooter>
@@ -144,8 +141,12 @@ export function EditArrivalMetadataModal({
 function toFormValues(a: ArrivalDetail): ArrivalMetadataForm {
   return {
     vendor: { id: a.vendor.id, account_number: a.vendor.account_number, name: a.vendor.name },
-    transporter: { id: a.transporter.id, account_number: a.transporter.account_number, name: a.transporter.name },
+    transporter: {
+      id: a.transporter.id,
+      account_number: a.transporter.account_number,
+      name: a.transporter.name,
+    },
     warehouse: a.warehouse ? getSelectOption(a.warehouse) : UNSELECTED,
-    comment: a.comment ?? ''
+    comment: a.comment ?? '',
   }
 }

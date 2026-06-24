@@ -39,9 +39,9 @@ export function generateCsvReport(
   role: AppRole | null,
 ): string {
   const columns = resolveAssetColumns(columnKeys, role)
-  const flatRows = rows.map(r => flattenRow(r, columns))
+  const flatRows = rows.map((r) => flattenRow(r, columns))
   return stringify(flatRows, {
     header: true,
-    columns: columns.map(c => ({ key: c.key, header: c.header })),
+    columns: columns.map((c) => ({ key: c.key, header: c.header })),
   })
 }

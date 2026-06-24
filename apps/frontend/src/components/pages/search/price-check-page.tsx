@@ -14,18 +14,10 @@ import { Toggle } from '@/components/shadcn/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { useModelStore } from '@/data/store/model-store'
 import { useModelSales } from '@/hooks/use-model-sales'
-import {
-  EMPTY_SHARED_FILTERS,
-} from '@/lib/asset-filter-params'
+import { EMPTY_SHARED_FILTERS } from '@/lib/asset-filter-params'
 import { formatUSD } from '@/lib/formatters'
-import {
-  filterByMonths,
-  summarizeBands,
-  type BandSummary,
-} from '@/lib/model-sales-summary'
-import {
-  filtersToParams as instockFiltersToParams,
-} from '@/lib/search-instock-params'
+import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-sales-summary'
+import { filtersToParams as instockFiltersToParams } from '@/lib/search-instock-params'
 import {
   filtersToParams,
   paramsToFilters,
@@ -48,8 +40,8 @@ const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 const TABLE_PAGE_SIZE = 20
 const SUMMARY_HEIGHT_VAR = '--price-check-summary-height'
 const TABLE_SCROLL_MAX_HEIGHT =
-  `calc(100vh - var(--app-header-height, 0px) - var(--details-header-height, 0px)`
-  + ` - var(${SUMMARY_HEIGHT_VAR}, 0px) - 7.5rem)`
+  `calc(100vh - var(--app-header-height, 0px) - var(--details-header-height, 0px)` +
+  ` - var(${SUMMARY_HEIGHT_VAR}, 0px) - 7.5rem)`
 
 function formatSaleSummary(sale: ModelSaleRow): string {
   return `for $${formatUSD(sale.sale_price)} on ${format(sale.departed_at, SALE_DATE_FORMAT)}`
@@ -59,13 +51,7 @@ function formatSalesCount(count: number): string {
   return count === 1 ? '1 sale' : `${count} sales`
 }
 
-function ViewStockButton({
-  count,
-  href,
-}: {
-  count: number
-  href: string
-}): React.JSX.Element {
+function ViewStockButton({ count, href }: { count: number; href: string }): React.JSX.Element {
   if (count === 0) {
     return <p className="text-sm text-muted-foreground">None in stock</p>
   }
@@ -81,7 +67,7 @@ function MeterBandsTable({ bands }: { bands: BandSummary[] }): React.JSX.Element
     <div className="w-fit rounded-md border">
       <Table className="w-fit text-sm">
         <TableBody>
-          {bands.map(band => (
+          {bands.map((band) => (
             <TableRow key={band.name}>
               <TableCell className="font-medium">{band.name}</TableCell>
               <TableCell>{band.label}</TableCell>
@@ -155,9 +141,7 @@ function EmptyWindowState({
           Last sold {formatSaleSummary(lastSale)} — outside selected range
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          No sales recorded for this model
-        </p>
+        <p className="text-sm text-muted-foreground">No sales recorded for this model</p>
       )}
     </div>
   )
@@ -183,11 +167,7 @@ function PriceCheckResults({
   const columns = useMemo(() => createModelSalesColumns(getRowHref), [getRowHref])
 
   if (filters.model === null) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Select a model to see its recent sales.
-      </p>
-    )
+    return <p className="text-sm text-muted-foreground">Select a model to see its recent sales.</p>
   }
   if (data === undefined) return null
   if (visibleSales.length === 0) {
@@ -202,9 +182,7 @@ function PriceCheckResults({
     <div className="flex flex-col gap-1">
       <MeasuredSummary>
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold">
-            Last sold {formatSaleSummary(visibleSales[0])}
-          </h2>
+          <h2 className="text-lg font-semibold">Last sold {formatSaleSummary(visibleSales[0])}</h2>
           <ViewStockButton count={data.in_stock_count} href={inStockHref} />
         </div>
         <MeterBandsTable bands={bands} />
@@ -227,11 +205,8 @@ export function PriceCheckPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const [modelQuery, setModelQuery] = useState('')
 
-  const models = useModelStore(state => state.models)
-  const filters = useMemo(
-    () => paramsToFilters(searchParams, models),
-    [searchParams, models],
-  )
+  const models = useModelStore((state) => state.models)
+  const filters = useMemo(() => paramsToFilters(searchParams, models), [searchParams, models])
 
   function updateFilters(next: PriceCheckFilters) {
     setSearchParams(filtersToParams(next), { replace: true })
@@ -245,23 +220,18 @@ export function PriceCheckPage(): React.JSX.Element {
   const visibleSales = filters.range === 6 ? sales6 : sales12
   const bands = useMemo(() => summarizeBands(visibleSales), [visibleSales])
 
-  const inStockHref = useMemo(
-    () => {
-      const params = instockFiltersToParams({
-        ...EMPTY_SHARED_FILTERS,
-        model: filters.model,
-        brand: null,
-        assetTypes: [],
-      })
-      return `/search/instock?${params.toString()}`
-    },
-    [filters.model],
-  )
+  const inStockHref = useMemo(() => {
+    const params = instockFiltersToParams({
+      ...EMPTY_SHARED_FILTERS,
+      model: filters.model,
+      brand: null,
+      assetTypes: [],
+    })
+    return `/search/instock?${params.toString()}`
+  }, [filters.model])
 
   const columnVisibility = useMemo<VisibilityState>(
-    () => Object.fromEntries(
-      MODEL_SALES_SPEC_COLUMN_IDS.map(id => [id, filters.specsVisible]),
-    ),
+    () => Object.fromEntries(MODEL_SALES_SPEC_COLUMN_IDS.map((id) => [id, filters.specsVisible])),
     [filters.specsVisible],
   )
 
@@ -291,12 +261,12 @@ export function PriceCheckPage(): React.JSX.Element {
         </div>
         <form
           className="flex flex-row flex-wrap gap-2 items-end"
-          onSubmit={e => e.preventDefault()}
+          onSubmit={(e) => e.preventDefault()}
         >
           <ModelFilter
             selection={filters.model}
             query={modelQuery}
-            onSelectionChange={m => {
+            onSelectionChange={(m) => {
               setModelQuery('')
               updateFilters({ ...filters, model: m })
             }}
@@ -305,20 +275,20 @@ export function PriceCheckPage(): React.JSX.Element {
               setModelQuery('')
               updateFilters({ ...filters, model: null })
             }}
-            placeholder='Model *'
+            placeholder="Model *"
           />
 
           <ToggleGroup
             type="single"
             variant="outline"
             value={String(filters.range)}
-            onValueChange={value => {
+            onValueChange={(value) => {
               if (value === '') return
               updateFilters({ ...filters, range: value === '12' ? 12 : 6 })
             }}
             aria-label="Sales window"
           >
-            {RANGE_OPTIONS.map(range => (
+            {RANGE_OPTIONS.map((range) => (
               <ToggleGroupItem key={range} value={String(range)}>
                 {range} mo ({rangeCounts[range]})
               </ToggleGroupItem>
@@ -328,7 +298,7 @@ export function PriceCheckPage(): React.JSX.Element {
           <Toggle
             variant="outline"
             pressed={filters.specsVisible}
-            onPressedChange={v => updateFilters({ ...filters, specsVisible: v })}
+            onPressedChange={(v) => updateFilters({ ...filters, specsVisible: v })}
             aria-label="Show spec columns"
           >
             {filters.specsVisible ? 'Hide Specs' : 'Show Specs'}

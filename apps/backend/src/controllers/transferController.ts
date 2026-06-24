@@ -1,6 +1,15 @@
 import { isAfter } from 'date-fns'
 import { Request, Response } from 'express'
-import { ApiResponse, AssetDeltaSchema, CollectionHistory, CreateTransferSchema, TransferDetail, TransferSummary, UpdateTransferMetadataSchema, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  AssetDeltaSchema,
+  CollectionHistory,
+  CreateTransferSchema,
+  TransferDetail,
+  TransferSummary,
+  UpdateTransferMetadataSchema,
+  successResponse,
+} from 'shared-types'
 import { z } from 'zod'
 import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
@@ -11,35 +20,46 @@ import {
   createTransfer as createTransferSer,
   getTransfer as getTransferSer,
   patchTransferAssets as patchTransferAssetsSer,
-  patchTransferMetadata as patchTransferMetadataSer
+  patchTransferMetadata as patchTransferMetadataSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
-export const TransferQuerySchema = z.object({
-  fromDate: z.string(),
-  toDate: z.string().optional(),
-  origin: z.coerce.number().int().optional(),
-  destination: z.coerce.number().int().optional(),
-}).transform((data) => ({
-  fromDate: normalizeFromDate(data.fromDate),
-  toDate: normalizeToDate(data.toDate),
-  origin: data.origin,
-  destination: data.destination,
-})).refine((data) => !isAfter(data.fromDate, data.toDate), {
-  message: 'fromDate must be before toDate',
-})
+export const TransferQuerySchema = z
+  .object({
+    fromDate: z.string(),
+    toDate: z.string().optional(),
+    origin: z.coerce.number().int().optional(),
+    destination: z.coerce.number().int().optional(),
+  })
+  .transform((data) => ({
+    fromDate: normalizeFromDate(data.fromDate),
+    toDate: normalizeToDate(data.toDate),
+    origin: data.origin,
+    destination: data.destination,
+  }))
+  .refine((data) => !isAfter(data.fromDate, data.toDate), {
+    message: 'fromDate must be before toDate',
+  })
 
-export const getTransfers = asyncHandler(async (req: Request, res: Response<ApiResponse<TransferSummary[]>>) => {
-  const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<typeof TransferQuerySchema>
-  const transfers = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0))
-  res.json(successResponse(transfers))
-})
+export const getTransfers = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<TransferSummary[]>>) => {
+    const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<
+      typeof TransferQuerySchema
+    >
+    const transfers = await prisma.$queryRawTyped(
+      getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0),
+    )
+    res.json(successResponse(transfers))
+  },
+)
 
-export const getTransferDetail = asyncHandler(async (req: Request, res: Response<ApiResponse<TransferDetail>>) => {
-  const { transferNumber } = req.params
-  const data = await getTransferSer(transferNumber)
-  res.json(successResponse(data))
-})
+export const getTransferDetail = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<TransferDetail>>) => {
+    const { transferNumber } = req.params
+    const data = await getTransferSer(transferNumber)
+    res.json(successResponse(data))
+  },
+)
 
 export const createTransfer = asyncHandler(async (req, res) => {
   const validated = CreateTransferSchema.parse(req.body)
@@ -59,12 +79,15 @@ export const patchTransferAssets = asyncHandler(async (req, res) => {
   res.status(204).send()
 })
 
-export const getTransferHistory = asyncHandler(async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
-  const { transferNumber } = req.params
-  const transfer = await prisma.transfer.findUnique({
-    where: { transfer_number: transferNumber }, select: { id: true }
-  })
-  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
-  const history = await getCollectionHistorySer('Transfer', transfer.id)
-  res.json(successResponse(history))
-})
+export const getTransferHistory = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<CollectionHistory>>) => {
+    const { transferNumber } = req.params
+    const transfer = await prisma.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    const history = await getCollectionHistorySer('Transfer', transfer.id)
+    res.json(successResponse(history))
+  },
+)

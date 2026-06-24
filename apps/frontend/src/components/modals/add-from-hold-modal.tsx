@@ -27,8 +27,14 @@ interface AddFromHoldModalProps {
   onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
 }
 
-export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, onCommitBatch }: AddFromHoldModalProps) {
-  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
+export function AddFromHoldModal({
+  open,
+  onOpenChange,
+  getAssets,
+  onAddAsset,
+  onCommitBatch,
+}: AddFromHoldModalProps) {
+  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
   const holdMutations = useHoldMutations()
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -60,18 +66,26 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, on
     setIsConfirming(true)
     try {
       const holdAssets = await holdMutations.getAssets(selected.hold_number)
-      const currentIds = new Set(getAssets().map(a => a.id))
-      const toAdd = holdAssets.filter(a => !currentIds.has(a.id))
+      const currentIds = new Set(getAssets().map((a) => a.id))
+      const toAdd = holdAssets.filter((a) => !currentIds.has(a.id))
       if (onCommitBatch) {
         if (toAdd.length > 0) await onCommitBatch(toAdd)
       } else {
-        toAdd.forEach(asset => onAddAsset(asset))
+        toAdd.forEach((asset) => onAddAsset(asset))
       }
       const skipped = holdAssets.length - toAdd.length
       const assetNoun = `asset${toAdd.length !== 1 ? 's' : ''}`
-      const msg = skipped > 0
-        ? <>{toAdd.length} {assetNoun} added. {skipped} duplicate{skipped !== 1 ? 's' : ''} skipped.</>
-        : <>{toAdd.length} {assetNoun} added from Hold <EntityLink entity="hold" id={selected.hold_number} />.</>
+      const msg =
+        skipped > 0 ? (
+          <>
+            {toAdd.length} {assetNoun} added. {skipped} duplicate{skipped !== 1 ? 's' : ''} skipped.
+          </>
+        ) : (
+          <>
+            {toAdd.length} {assetNoun} added from Hold{' '}
+            <EntityLink entity="hold" id={selected.hold_number} />.
+          </>
+        )
       toast.success(msg, { position: 'top-center' })
       handleOpenChange(false)
     } catch {
@@ -104,24 +118,29 @@ export function AddFromHoldModal({ open, onOpenChange, getAssets, onAddAsset, on
           <DialogTitle>Add Assets from Hold</DialogTitle>
         </DialogHeader>
 
-        {selected !== null
-          ? <DetailGrid
+        {selected !== null ? (
+          <DetailGrid
             title={`Hold ${selected.hold_number}`}
             fields={holdDetailFields(selected)}
             onClear={handleClearSelection}
           />
-          : <SearchView
+        ) : (
+          <SearchView
             label="Hold"
             query={query}
             onQueryChange={handleQueryChange}
             isLoading={isLoading}
             results={results}
-            onSelect={c => { if (c.kind === 'hold') setSelected(c.data) }}
+            onSelect={(c) => {
+              if (c.kind === 'hold') setSelected(c.data)
+            }}
           />
-        }
+        )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            Cancel
+          </Button>
           <Button disabled={selected === null || isConfirming} onClick={handleConfirm}>
             {isConfirming ? 'Adding…' : 'Confirm'}
           </Button>

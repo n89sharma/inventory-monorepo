@@ -1,10 +1,6 @@
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
 import { getReadinessDisplay } from './readiness-config'
-import {
-  EntryHeader,
-  FieldDiffRow,
-  HistoryTimeline
-} from './history/history-primitives'
+import { EntryHeader, FieldDiffRow, HistoryTimeline } from './history/history-primitives'
 
 type CreateRecord = Extract<AssetHistoryRecord, { action_type: 'CREATE' }>
 type UpdateRecord = Extract<AssetHistoryRecord, { action_type: 'UPDATE' }>
@@ -51,16 +47,12 @@ const UPDATE_FIELDS: UpdateField[] = [
 ]
 
 function AssetHistoryCreateEntry({ record }: { record: CreateRecord }) {
-  return (
-    <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="created" />
-  )
+  return <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="created" />
 }
 
 function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
   const { before, after } = record.changes
-  const changedFields = UPDATE_FIELDS.filter(
-    ({ key }) => key in after || key in before
-  )
+  const changedFields = UPDATE_FIELDS.filter(({ key }) => key in after || key in before)
   return (
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb="updated" />
@@ -83,11 +75,13 @@ export function AssetHistoryList({ history }: { history: AssetHistory }) {
   return (
     <HistoryTimeline
       items={history}
-      renderEntry={(record) => (
-        record.action_type === 'CREATE'
-          ? <AssetHistoryCreateEntry record={record} />
-          : <AssetHistoryUpdateEntry record={record} />
-      )}
+      renderEntry={(record) =>
+        record.action_type === 'CREATE' ? (
+          <AssetHistoryCreateEntry record={record} />
+        ) : (
+          <AssetHistoryUpdateEntry record={record} />
+        )
+      }
     />
   )
 }

@@ -29,7 +29,7 @@ export function EditInvoiceMetadataModal({
   invoice,
   onSave,
 }: EditInvoiceMetadataModalProps): React.JSX.Element {
-  const orgs = useOrgStore(state => state.organizations)
+  const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(invoice), [invoice])
@@ -38,11 +38,7 @@ export function EditInvoiceMetadataModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   async function onValid(values: InvoiceMetadataForm) {
     setIsSubmitting(true)
@@ -67,12 +63,12 @@ export function EditInvoiceMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Invoice</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <Field>
               <FieldLabel>Invoice Number</FieldLabel>
               <Input value={invoice.invoice_number} disabled readOnly />
@@ -87,33 +83,38 @@ export function EditInvoiceMetadataModal({
             </Field>
             <ControlledSearchSelectInput
               control={form.control}
-              name='organization'
+              name="organization"
               options={orgs}
-              getLabel={o => o.name}
+              getLabel={(o) => o.name}
               fieldLabel={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
               fieldRequired={true}
             />
             <Controller
               control={form.control}
-              name='is_cleared'
+              name="is_cleared"
               render={({ field }) => (
-                <Field orientation='horizontal' className='w-fit items-center gap-2 self-end pb-2'>
+                <Field orientation="horizontal" className="w-fit items-center gap-2 self-end pb-2">
                   <Checkbox
-                    id='is_cleared'
+                    id="is_cleared"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <FieldLabel htmlFor='is_cleared'>Cleared</FieldLabel>
+                  <FieldLabel htmlFor="is_cleared">Cleared</FieldLabel>
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} type='button' disabled={isSubmitting}>
+          <Button onClick={submit} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </Button>
         </DialogFooter>
@@ -129,7 +130,11 @@ export function EditInvoiceMetadataModal({
 
 function toFormValues(i: InvoiceDetail): InvoiceMetadataForm {
   return {
-    organization: { id: i.customer.id, account_number: i.customer.account_number, name: i.customer.name },
-    is_cleared: i.is_cleared
+    organization: {
+      id: i.customer.id,
+      account_number: i.customer.account_number,
+      name: i.customer.name,
+    },
+    is_cleared: i.is_cleared,
   }
 }

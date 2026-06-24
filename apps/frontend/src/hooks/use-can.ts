@@ -4,9 +4,7 @@ import { useRole } from './use-role'
 
 export function useCan(): (permission: Permission) => boolean
 export function useCan(permission: Permission): boolean
-export function useCan(
-  permission?: Permission,
-): boolean | ((p: Permission) => boolean) {
+export function useCan(permission?: Permission): boolean | ((p: Permission) => boolean) {
   const role = useRole()
   const check = useCallback(
     (p: Permission) => role !== null && ROLE_PERMISSIONS[role].includes(p),

@@ -16,11 +16,11 @@ interface CreateOrgModalProps {
 }
 
 export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): React.JSX.Element {
-  const createOrg = useOrgStore(state => state.createOrg)
+  const createOrg = useOrgStore((state) => state.createOrg)
 
   const form = useForm<OrgForm>({
     resolver: zodResolver(OrgFormSchema),
-    defaultValues: getDefaultValues()
+    defaultValues: getDefaultValues(),
   })
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
       address: null,
       city: null,
       province: null,
-      country: null
+      country: null,
     }
   }
 
@@ -62,93 +62,91 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create Organization</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
-
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <ControlledInputWithClear
               control={form.control}
-              name='account_number'
-              fieldLabel='Account Number'
+              name="account_number"
+              fieldLabel="Account Number"
               fieldRequired={true}
-              inputType='string'
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='name'
-              fieldLabel='Name'
+              name="name"
+              fieldLabel="Name"
               fieldRequired={true}
-              inputType='string'
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='contact_name'
-              fieldLabel='Contact Name'
-              inputType='string'
+              name="contact_name"
+              fieldLabel="Contact Name"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='phone'
-              fieldLabel='Phone'
-              inputType='string'
+              name="phone"
+              fieldLabel="Phone"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='mobile'
-              fieldLabel='Mobile'
-              inputType='string'
+              name="mobile"
+              fieldLabel="Mobile"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='primary_email'
-              fieldLabel='Email'
-              inputType='string'
+              name="primary_email"
+              fieldLabel="Email"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='address'
-              fieldLabel='Address'
-              inputType='string'
-              className='col-span-2'
+              name="address"
+              fieldLabel="Address"
+              inputType="string"
+              className="col-span-2"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='city'
-              fieldLabel='City'
-              inputType='string'
+              name="city"
+              fieldLabel="City"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='province'
-              fieldLabel='Province'
-              inputType='string'
+              name="province"
+              fieldLabel="Province"
+              inputType="string"
             />
 
             <ControlledInputWithClear
               control={form.control}
-              name='country'
-              fieldLabel='Country'
-              inputType='string'
+              name="country"
+              fieldLabel="Country"
+              inputType="string"
             />
-
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='secondary' onClick={submitForm} type='button'>
+          <Button variant="secondary" onClick={submitForm} type="button">
             Save Organization
           </Button>
-          <Button variant='outline' onClick={() => onOpenChange(false)} type='button'>
+          <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
             Cancel
           </Button>
         </DialogFooter>

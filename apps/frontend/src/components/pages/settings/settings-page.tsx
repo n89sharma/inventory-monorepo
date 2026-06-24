@@ -11,15 +11,15 @@ export function SettingsPage(): React.JSX.Element {
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
 
   return (
-    <div className='flex flex-col gap-2 max-w-7xl'>
-      <h1 className='text-2xl font-semibold p-2'>Settings</h1>
-      <Button variant='secondary' onClick={() => setIsBrandModalOpen(true)} className='w-fit'>
+    <div className="flex flex-col gap-2 max-w-7xl">
+      <h1 className="text-2xl font-semibold p-2">Settings</h1>
+      <Button variant="secondary" onClick={() => setIsBrandModalOpen(true)} className="w-fit">
         <PlusIcon /> Create Brand
       </Button>
-      <Button variant='secondary' onClick={() => setIsModelModalOpen(true)} className='w-fit'>
+      <Button variant="secondary" onClick={() => setIsModelModalOpen(true)} className="w-fit">
         <PlusIcon /> Create Model
       </Button>
-      <Button variant='secondary' onClick={() => setIsOrgModalOpen(true)} className='w-fit'>
+      <Button variant="secondary" onClick={() => setIsOrgModalOpen(true)} className="w-fit">
         <PlusIcon /> Create Organization
       </Button>
       <CreateBrandModal open={isBrandModalOpen} onOpenChange={setIsBrandModalOpen} />

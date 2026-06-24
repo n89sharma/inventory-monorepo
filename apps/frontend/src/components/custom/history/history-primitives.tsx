@@ -1,4 +1,4 @@
-import { formatHistoryTimestamp } from '@/lib/formatters';
+import { formatHistoryTimestamp } from '@/lib/formatters'
 
 function formatHistoryValue(value: unknown): string {
   if (value === null || value === undefined) return ''
@@ -6,11 +6,19 @@ function formatHistoryValue(value: unknown): string {
   return String(value)
 }
 
-export function EntryHeader(
-  { userName, timestamp, verb }: { userName: string; timestamp: Date | string; verb: string }
-) {
+export function EntryHeader({
+  userName,
+  timestamp,
+  verb,
+}: {
+  userName: string
+  timestamp: Date | string
+  verb: string
+}) {
   return (
-    <p className="text-sm">{userName} {verb} {formatHistoryTimestamp(timestamp)}</p>
+    <p className="text-sm">
+      {userName} {verb} {formatHistoryTimestamp(timestamp)}
+    </p>
   )
 }
 
@@ -23,14 +31,17 @@ export function FieldChip({ label, value }: { label: string; value: unknown }) {
   )
 }
 
-export function FieldDiffRow(
-  { label, before, after, format }: {
-    label: string
-    before: unknown
-    after: unknown
-    format?: (value: unknown) => unknown
-  }
-) {
+export function FieldDiffRow({
+  label,
+  before,
+  after,
+  format,
+}: {
+  label: string
+  before: unknown
+  after: unknown
+  format?: (value: unknown) => unknown
+}) {
   const beforeStr = formatHistoryValue(format ? format(before) : before)
   const afterStr = formatHistoryValue(format ? format(after) : after)
   const hasBefore = beforeStr !== ''
@@ -60,20 +71,18 @@ export function FieldDiffRow(
     )
   }
 
-  return (
-    <div className="text-sm font-mono bg-muted/50 rounded px-2 py-0.5">
-      {content}
-    </div>
-  )
+  return <div className="text-sm font-mono bg-muted/50 rounded px-2 py-0.5">{content}</div>
 }
 
-export function HistoryTimeline<T>(
-  { items, renderEntry, emptyMessage = 'No history on record' }: {
-    items: T[]
-    renderEntry: (item: T, index: number) => React.ReactNode
-    emptyMessage?: string
-  }
-) {
+export function HistoryTimeline<T>({
+  items,
+  renderEntry,
+  emptyMessage = 'No history on record',
+}: {
+  items: T[]
+  renderEntry: (item: T, index: number) => React.ReactNode
+  emptyMessage?: string
+}) {
   if (items.length === 0) {
     return <p className="text-sm text-muted-foreground">{emptyMessage}</p>
   }

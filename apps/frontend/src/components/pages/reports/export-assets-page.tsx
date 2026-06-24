@@ -34,7 +34,7 @@ type ParsedSerialNumbers = {
 }
 
 function parseSerialNumbers(text: string): ParsedSerialNumbers {
-  const tokens = text.split(TOKEN_SEPARATOR).filter(token => token.length > 0)
+  const tokens = text.split(TOKEN_SEPARATOR).filter((token) => token.length > 0)
   const serialNumbers = [...new Set(tokens)]
   return {
     serialNumbers,
@@ -52,7 +52,7 @@ function SerialNumberCounts({
 }): React.JSX.Element | null {
   if (enteredCount === 0) return null
   return (
-    <p className='text-xs text-muted-foreground tabular-nums'>
+    <p className="text-xs text-muted-foreground tabular-nums">
       {enteredCount} entered, {duplicateCount} duplicate{duplicateCount === 1 ? '' : 's'} removed
     </p>
   )
@@ -71,21 +71,21 @@ function NotFoundSerialNumbersBanner({
   if (serialNumbers.length === 0) return null
   return (
     <div
-      className='flex items-start justify-between gap-2 rounded-lg border
-        border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive'
+      className="flex items-start justify-between gap-2 rounded-lg border
+        border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
     >
-      <div className='flex items-start gap-2'>
-        <WarningIcon className='mt-0.5 shrink-0' />
+      <div className="flex items-start gap-2">
+        <WarningIcon className="mt-0.5 shrink-0" />
         <span>
-          <span className='font-medium tabular-nums'>{serialNumbers.length} not found: </span>
-          <span className='break-all'>{serialNumbers.join(', ')}</span>
+          <span className="font-medium tabular-nums">{serialNumbers.length} not found: </span>
+          <span className="break-all">{serialNumbers.join(', ')}</span>
         </span>
       </div>
       <Button
-        variant='ghost'
-        size='sm'
+        variant="ghost"
+        size="sm"
         onClick={handleCopy}
-        className='h-7 shrink-0 gap-1.5 text-destructive hover:text-destructive'
+        className="h-7 shrink-0 gap-1.5 text-destructive hover:text-destructive"
       >
         <CopyIcon />
         Copy
@@ -122,23 +122,25 @@ export function ExportAssetsPage(): React.JSX.Element {
     (asset: AssetSearchRow) => assetDetailHref('all', asset.barcode, searchParams),
     [searchParams],
   )
-  const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
+  const handleBulkPriceSave = useCallback(() => {
+    mutate()
+  }, [mutate])
 
   return (
     <>
       <StickyPageHeader>
-        <div className='flex items-center justify-between gap-4'>
-          <div className='flex items-center gap-2'>
-            <h1 className='text-2xl font-semibold'>{PAGE_TITLE}</h1>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-semibold">{PAGE_TITLE}</h1>
             {isLoading && (
               <SpinnerGapIcon
-                className='animate-spin text-muted-foreground'
-                aria-label='Loading'
-                role='status'
+                className="animate-spin text-muted-foreground"
+                aria-label="Loading"
+                role="status"
               />
             )}
           </div>
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <ColumnPickerButton
               visible={visibleColumns}
               onVisibleChange={setVisibleColumns}
@@ -151,14 +153,14 @@ export function ExportAssetsPage(): React.JSX.Element {
             />
           </div>
         </div>
-        <div className='flex flex-col gap-1'>
+        <div className="flex flex-col gap-1">
           <Label htmlFor={TEXTAREA_ID}>{SERIAL_NUMBERS_LABEL}</Label>
           <Textarea
             id={TEXTAREA_ID}
             value={text}
-            onChange={e => setText(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
             placeholder={TEXTAREA_PLACEHOLDER}
-            className='min-h-20 font-mono text-sm'
+            className="min-h-20 font-mono text-sm"
           />
           <SerialNumberCounts enteredCount={enteredCount} duplicateCount={duplicateCount} />
         </div>

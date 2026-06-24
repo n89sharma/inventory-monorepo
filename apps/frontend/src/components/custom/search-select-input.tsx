@@ -80,20 +80,19 @@ export function SearchSelectInput<T>({
     }
     const needle = clean.toLowerCase()
     const substringMatches = options
-      .map(option => ({ option, index: getLabel(option).toLowerCase().indexOf(needle) }))
-      .filter(result => result.index !== -1)
-      .sort((a, b) =>
-        a.index - b.index || getLabel(a.option).length - getLabel(b.option).length,
-      )
-      .map(result => result.option)
+      .map((option) => ({ option, index: getLabel(option).toLowerCase().indexOf(needle) }))
+      .filter((result) => result.index !== -1)
+      .sort((a, b) => a.index - b.index || getLabel(a.option).length - getLabel(b.option).length)
+      .map((result) => result.option)
 
-    const ranked = substringMatches.length > 0
-      ? substringMatches
-      : options
-        .map(option => ({ option, score: defaultFilter(getLabel(option), clean) }))
-        .filter(result => result.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .map(result => result.option)
+    const ranked =
+      substringMatches.length > 0
+        ? substringMatches
+        : options
+            .map((option) => ({ option, score: defaultFilter(getLabel(option), clean) }))
+            .filter((result) => result.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .map((result) => result.option)
 
     setMatches(ranked.slice(0, SUGGESTION_LIMIT))
     setPopoverOpen(true)
@@ -128,11 +127,11 @@ export function SearchSelectInput<T>({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setHighlightedIndex(prev => (prev < matches.length - 1 ? prev + 1 : prev))
+        setHighlightedIndex((prev) => (prev < matches.length - 1 ? prev + 1 : prev))
         break
       case 'ArrowUp':
         e.preventDefault()
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1))
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1))
         break
       case 'Enter':
         if (highlightedIndex >= 0 && highlightedIndex < matches.length) {
@@ -163,8 +162,8 @@ export function SearchSelectInput<T>({
                 onClick={handleClear}
                 aria-label={clearLabel}
                 className={cn(
-                  "ml-0.5 inline-flex size-4 shrink-0 items-center justify-center",
-                  "rounded-full hover:bg-foreground/10",
+                  'ml-0.5 inline-flex size-4 shrink-0 items-center justify-center',
+                  'rounded-full hover:bg-foreground/10',
                 )}
               >
                 <XIcon aria-hidden="true" />
@@ -187,7 +186,7 @@ export function SearchSelectInput<T>({
             <InputGroup>
               <InputGroupInput
                 value={query}
-                onChange={e => updateSearch(e.target.value)}
+                onChange={(e) => updateSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
                 ref={inputRef}
                 placeholder={placeholder}
@@ -212,8 +211,12 @@ export function SearchSelectInput<T>({
         </PopoverAnchor>
         <PopoverContent
           align="start"
-          onOpenAutoFocus={e => { e.preventDefault() }}
-          onCloseAutoFocus={e => { e.preventDefault() }}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault()
+          }}
           className="w-max min-w-45 max-w-md p-1"
         >
           <div className="max-h-72 overflow-y-auto">
@@ -224,18 +227,20 @@ export function SearchSelectInput<T>({
                 role="option"
                 aria-selected={highlightedIndex === i}
                 onClick={() => handleSelect(m)}
-                onMouseDown={e => { e.preventDefault() }}
-                onKeyDown={e => {
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                }}
+                onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
                     handleSelect(m)
                   }
                 }}
                 className={cn(
-                  "block w-full text-left px-2 py-1 cursor-pointer rounded-sm whitespace-nowrap",
+                  'block w-full text-left px-2 py-1 cursor-pointer rounded-sm whitespace-nowrap',
                   highlightedIndex === i
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent/50",
+                    ? 'bg-accent text-accent-foreground'
+                    : 'hover:bg-accent/50',
                 )}
               >
                 {getLabel(m)}
@@ -245,7 +250,9 @@ export function SearchSelectInput<T>({
               <button
                 type="button"
                 onClick={handleCreate}
-                onMouseDown={e => { e.preventDefault() }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                }}
                 className="block w-full cursor-pointer rounded-sm px-2 py-1 text-left whitespace-nowrap hover:bg-accent/50"
               >
                 {createLabel(query.trim())}

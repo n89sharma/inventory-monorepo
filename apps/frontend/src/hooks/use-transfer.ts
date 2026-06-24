@@ -28,7 +28,7 @@ function transferListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  destination: SelectOption<Warehouse>
+  destination: SelectOption<Warehouse>,
 ): TransferListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -46,18 +46,15 @@ export function useTransfersList(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  destination: SelectOption<Warehouse>
+  destination: SelectOption<Warehouse>,
 ) {
-  return useSWR(
-    transferListKey(fromDate, toDate, origin, destination),
-    () => getTransfers(fromDate, toDate, origin, destination)
+  return useSWR(transferListKey(fromDate, toDate, origin, destination), () =>
+    getTransfers(fromDate, toDate, origin, destination),
   )
 }
 
 export function invalidateTransferLists() {
-  return mutate(
-    key => Array.isArray(key) && key[0] === TRANSFER_LIST_KEY_PREFIX,
-    undefined,
-    { revalidate: true }
-  )
+  return mutate((key) => Array.isArray(key) && key[0] === TRANSFER_LIST_KEY_PREFIX, undefined, {
+    revalidate: true,
+  })
 }

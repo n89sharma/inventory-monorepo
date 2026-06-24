@@ -1,14 +1,14 @@
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
-import { getSelectOption, isSelected, UNSELECTED, type SelectOption } from '@/ui-types/select-option-types'
-import { useMemo, useState } from 'react'
 import {
-  Controller,
-  type Control,
-  type FieldValues,
-  type Path,
-} from 'react-hook-form'
+  getSelectOption,
+  isSelected,
+  UNSELECTED,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import { useMemo, useState } from 'react'
+import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
 import type { Component, CoreFunction, Country, Status } from 'shared-types'
 import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
@@ -35,19 +35,17 @@ type CMYKFieldNames<T extends FieldValues> = {
   k: Path<T>
 }
 
-export function ControlledTextInput<T extends FieldValues>(
-  {
-    control,
-    name,
-    placeholder,
-    className,
-  }: {
-    control: Control<T>
-    name: Path<T>
-    placeholder?: string
-    className?: string
-  }
-) {
+export function ControlledTextInput<T extends FieldValues>({
+  control,
+  name,
+  placeholder,
+  className,
+}: {
+  control: Control<T>
+  name: Path<T>
+  placeholder?: string
+  className?: string
+}) {
   return (
     <Controller
       control={control}
@@ -55,7 +53,7 @@ export function ControlledTextInput<T extends FieldValues>(
       render={({ field, fieldState }) => (
         <Input
           value={(field.value as string) ?? ''}
-          onChange={e => field.onChange(e.target.value)}
+          onChange={(e) => field.onChange(e.target.value)}
           placeholder={placeholder ?? ''}
           aria-invalid={fieldState.invalid}
           className={className}
@@ -65,35 +63,33 @@ export function ControlledTextInput<T extends FieldValues>(
   )
 }
 
-export function ControlledNumberInput<T extends FieldValues>(
-  {
-    control,
-    name,
-    className,
-  }: {
-    control: Control<T>
-    name: Path<T>
-    className?: string
-  }
-) {
+export function ControlledNumberInput<T extends FieldValues>({
+  control,
+  name,
+  className,
+}: {
+  control: Control<T>
+  name: Path<T>
+  className?: string
+}) {
   return (
     <Controller
       control={control}
       name={name}
       render={({ field, fieldState }) => (
         <Input
-          type='number'
-          inputMode='numeric'
+          type="number"
+          inputMode="numeric"
           min={0}
           value={(field.value as number | null) ?? ''}
-          onChange={e => {
+          onChange={(e) => {
             const raw = e.target.value
             if (raw === '') return field.onChange(null)
             const n = Number(raw)
             if (isNaN(n)) return field.onChange(null)
             field.onChange(Math.max(0, n))
           }}
-          placeholder=''
+          placeholder=""
           aria-invalid={fieldState.invalid}
           className={cn('tabular-nums', className)}
         />
@@ -102,17 +98,15 @@ export function ControlledNumberInput<T extends FieldValues>(
   )
 }
 
-function ControlledConsumablesRow<T extends FieldValues>(
-  {
-    label,
-    control,
-    names,
-  }: {
-    label: string
-    control: Control<T>
-    names: CMYKFieldNames<T>
-  }
-) {
+function ControlledConsumablesRow<T extends FieldValues>({
+  label,
+  control,
+  names,
+}: {
+  label: string
+  control: Control<T>
+  names: CMYKFieldNames<T>
+}) {
   const orderedNames = [names.c, names.m, names.y, names.k]
   return (
     <ConsumablesRow label={label}>
@@ -136,7 +130,7 @@ function ControlledConsumablesRow<T extends FieldValues>(
 }
 
 function getCoreFunctionOptions(cfs: CoreFunction[]) {
-  return cfs.map(f => ({ id: f.id, label: f.accessory, value: f.accessory }))
+  return cfs.map((f) => ({ id: f.id, label: f.accessory, value: f.accessory }))
 }
 
 /**
@@ -145,23 +139,21 @@ function getCoreFunctionOptions(cfs: CoreFunction[]) {
  * brand's components when a brand is known, else the full cross-brand list
  * (labelled with the brand to disambiguate repeated names).
  */
-function ControlledComponentSearch<T extends FieldValues>(
-  {
-    control,
-    name,
-    brandName,
-    className,
-  }: {
-    control: Control<T>
-    name: Path<T>
-    brandName: string | null
-    className?: string
-  }
-) {
-  const components = useReferenceDataStore(state => state.components)
+function ControlledComponentSearch<T extends FieldValues>({
+  control,
+  name,
+  brandName,
+  className,
+}: {
+  control: Control<T>
+  name: Path<T>
+  brandName: string | null
+  className?: string
+}) {
+  const components = useReferenceDataStore((state) => state.components)
   const [query, setQuery] = useState('')
   const options = useMemo(
-    () => (brandName ? components.filter(c => c.brand_name === brandName) : components),
+    () => (brandName ? components.filter((c) => c.brand_name === brandName) : components),
     [components, brandName],
   )
   const getLabel = (c: Component) => (brandName ? c.name : `${c.brand_name} — ${c.name}`)
@@ -173,13 +165,19 @@ function ControlledComponentSearch<T extends FieldValues>(
         <SearchSelectInput
           selection={field.value as Component | null}
           query={query}
-          onSelectionChange={(c: Component) => { field.onChange(c); setQuery('') }}
+          onSelectionChange={(c: Component) => {
+            field.onChange(c)
+            setQuery('')
+          }}
           onQueryChange={setQuery}
-          onClear={() => { field.onChange(null); setQuery('') }}
+          onClear={() => {
+            field.onChange(null)
+            setQuery('')
+          }}
           options={options}
           getLabel={getLabel}
-          placeholder=''
-          clearLabel='Clear internal finisher'
+          placeholder=""
+          clearLabel="Clear internal finisher"
           className={className}
         />
       )}
@@ -204,19 +202,22 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
  * (`AssetForm` vs `SpecsForm`); both carry the same spec field names, so the
  * field paths are cast once via `p()`.
  */
-export function TechnicalSpecsFields<T extends FieldValues>(
-  { control, isColour, brandName, renderAfterReadiness }: TechnicalSpecsFieldsProps<T>
-) {
-  const readinesses = useReferenceDataStore(state => state.readinesses)
-  const countries = useReferenceDataStore(state => state.countries)
-  const coreFunctions = useReferenceDataStore(state => state.coreFunctions)
+export function TechnicalSpecsFields<T extends FieldValues>({
+  control,
+  isColour,
+  brandName,
+  renderAfterReadiness,
+}: TechnicalSpecsFieldsProps<T>) {
+  const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const countries = useReferenceDataStore((state) => state.countries)
+  const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
 
   const p = (name: string) => name as Path<T>
 
   return (
     <>
-      <div className='flex flex-col gap-2'>
-        <HorizontalField label='Readiness' required>
+      <div className="flex flex-col gap-2">
+        <HorizontalField label="Readiness" required>
           <Controller
             control={control}
             name={p('readiness')}
@@ -225,7 +226,7 @@ export function TechnicalSpecsFields<T extends FieldValues>(
               return (
                 <ReadinessPicker
                   selection={isSelected(readiness) ? readiness.selected : null}
-                  onChange={s => onChange(s ? getSelectOption(s) : UNSELECTED)}
+                  onChange={(s) => onChange(s ? getSelectOption(s) : UNSELECTED)}
                   options={readinesses}
                   error={fieldState.invalid}
                 />
@@ -236,18 +237,18 @@ export function TechnicalSpecsFields<T extends FieldValues>(
 
         {renderAfterReadiness}
 
-        <HorizontalField label='Country of Origin' required>
+        <HorizontalField label="Country of Origin" required>
           <ControlledSearchSelectField
             control={control}
             name={p('countryOfOrigin')}
             options={countries}
             getLabel={(c: Country) => formatTitleCase(c.name)}
-            clearLabel='Clear country of origin'
+            clearLabel="Clear country of origin"
             className={INPUT_WIDTH}
           />
         </HorizontalField>
 
-        <HorizontalField label='Manufactured Year'>
+        <HorizontalField label="Manufactured Year">
           <ControlledNumberInput
             control={control}
             name={p('manufacturedYear')}
@@ -256,18 +257,20 @@ export function TechnicalSpecsFields<T extends FieldValues>(
         </HorizontalField>
       </div>
 
-      <HorizontalField label='Meter' required>
-        <div className='flex items-center gap-2'>
+      <HorizontalField label="Meter" required>
+        <div className="flex items-center gap-2">
           <Controller
             control={control}
             name={p('meterColour')}
             render={({ field, fieldState }) => (
               <InputWithClearInline
                 value={field.value as number | null}
-                onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
-                fieldLabel=''
-                inputType='number'
-                suffix='C'
+                onValueChange={(val) =>
+                  field.onChange(typeof val === 'number' ? Math.max(0, val) : null)
+                }
+                fieldLabel=""
+                inputType="number"
+                suffix="C"
                 error={fieldState.invalid}
                 className={INPUT_WIDTH}
               />
@@ -279,10 +282,12 @@ export function TechnicalSpecsFields<T extends FieldValues>(
             render={({ field, fieldState }) => (
               <InputWithClearInline
                 value={field.value as number | null}
-                onValueChange={val => field.onChange(typeof val === 'number' ? Math.max(0, val) : null)}
-                fieldLabel=''
-                inputType='number'
-                suffix='B'
+                onValueChange={(val) =>
+                  field.onChange(typeof val === 'number' ? Math.max(0, val) : null)
+                }
+                fieldLabel=""
+                inputType="number"
+                suffix="B"
                 error={fieldState.invalid}
                 className={INPUT_WIDTH}
               />
@@ -293,26 +298,22 @@ export function TechnicalSpecsFields<T extends FieldValues>(
 
       <ConsumablesGrid requiredChannels={isColour ? ALL_CHANNELS : MONO_CHANNELS}>
         <ControlledConsumablesRow
-          label='Drum life'
+          label="Drum life"
           control={control}
           names={{ c: p('drumLifeC'), m: p('drumLifeM'), y: p('drumLifeY'), k: p('drumLifeK') }}
         />
         <ControlledConsumablesRow
-          label='Toner'
+          label="Toner"
           control={control}
           names={{ c: p('tonerLifeC'), m: p('tonerLifeM'), y: p('tonerLifeY'), k: p('tonerLifeK') }}
         />
       </ConsumablesGrid>
 
-      <div className='flex flex-col gap-2'>
-        <HorizontalField label='Cassettes' required>
-          <ControlledNumberInput
-            control={control}
-            name={p('cassettes')}
-            className={INPUT_WIDTH}
-          />
+      <div className="flex flex-col gap-2">
+        <HorizontalField label="Cassettes" required>
+          <ControlledNumberInput control={control} name={p('cassettes')} className={INPUT_WIDTH} />
         </HorizontalField>
-        <HorizontalField label='Internal Finisher'>
+        <HorizontalField label="Internal Finisher">
           <ControlledComponentSearch
             control={control}
             name={p('component')}
@@ -320,19 +321,19 @@ export function TechnicalSpecsFields<T extends FieldValues>(
             className={INPUT_WIDTH}
           />
         </HorizontalField>
-        <HorizontalField label='Core Functions'>
+        <HorizontalField label="Core Functions">
           <Controller
             name={p('coreFunctions')}
             control={control}
             render={({ field: { onChange, value } }) => (
               <MultipleSelector
                 options={getCoreFunctionOptions(coreFunctions)}
-                placeholder='Select functions…'
+                placeholder="Select functions…"
                 emptyIndicator={<p>No results found.</p>}
                 value={getCoreFunctionOptions(value as CoreFunction[])}
-                onChange={options => {
-                  const selectedIds = options.map(o => o.id)
-                  onChange(coreFunctions.filter(c => selectedIds.includes(c.id)))
+                onChange={(options) => {
+                  const selectedIds = options.map((o) => o.id)
+                  onChange(coreFunctions.filter((c) => selectedIds.includes(c.id)))
                 }}
               />
             )}

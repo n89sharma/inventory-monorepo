@@ -26,7 +26,7 @@ export function filterByMonths(
   now: Date = new Date(),
 ): ModelSaleRow[] {
   const cutoff = subMonths(now, months)
-  return sales.filter(sale => isAfter(sale.departed_at, cutoff))
+  return sales.filter((sale) => isAfter(sale.departed_at, cutoff))
 }
 
 function median(values: number[]): number | null {
@@ -37,20 +37,17 @@ function median(values: number[]): number | null {
   return (sorted[mid - 1] + sorted[mid]) / 2
 }
 
-function isInBand(
-  meter: number,
-  band: { min: number | null; max: number | null },
-): boolean {
+function isInBand(meter: number, band: { min: number | null; max: number | null }): boolean {
   if (band.min !== null && meter < band.min) return false
   if (band.max !== null && meter >= band.max) return false
   return true
 }
 
 export function summarizeBands(sales: ModelSaleRow[]): BandSummary[] {
-  return METER_BANDS.map(band => {
+  return METER_BANDS.map((band) => {
     const prices = sales
-      .filter(sale => sale.meter !== null && isInBand(sale.meter, band))
-      .map(sale => sale.sale_price)
+      .filter((sale) => sale.meter !== null && isInBand(sale.meter, band))
+      .map((sale) => sale.sale_price)
     return {
       name: band.name,
       label: band.label,

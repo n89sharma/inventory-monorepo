@@ -28,7 +28,7 @@ function departureListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  customer: SelectOption<OrgSummary>
+  customer: SelectOption<OrgSummary>,
 ): DepartureListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -46,18 +46,15 @@ export function useDeparturesList(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
   origin: SelectOption<Warehouse>,
-  customer: SelectOption<OrgSummary>
+  customer: SelectOption<OrgSummary>,
 ) {
-  return useSWR(
-    departureListKey(fromDate, toDate, origin, customer),
-    () => getDepartures(fromDate, toDate, origin, customer)
+  return useSWR(departureListKey(fromDate, toDate, origin, customer), () =>
+    getDepartures(fromDate, toDate, origin, customer),
   )
 }
 
 export function invalidateDepartureLists() {
-  return mutate(
-    key => Array.isArray(key) && key[0] === DEPARTURE_LIST_KEY_PREFIX,
-    undefined,
-    { revalidate: true }
-  )
+  return mutate((key) => Array.isArray(key) && key[0] === DEPARTURE_LIST_KEY_PREFIX, undefined, {
+    revalidate: true,
+  })
 }

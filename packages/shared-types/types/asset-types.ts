@@ -1,10 +1,9 @@
-import { z } from 'zod';
-import { ModelSummarySchema } from './model-types.js';
-import { CoreFunctionsSchema, CountrySchema, StatusSchema } from './reference-data-types.js';
+import { z } from 'zod'
+import { ModelSummarySchema } from './model-types.js'
+import { CoreFunctionsSchema, CountrySchema, StatusSchema } from './reference-data-types.js'
 
-export const MIN_MANUFACTURED_YEAR = 1980;
-export const MAX_MANUFACTURED_YEAR = 2100;
-
+export const MIN_MANUFACTURED_YEAR = 1980
+export const MAX_MANUFACTURED_YEAR = 2100
 
 export const AssetLocationDetailsSchema = z.object({
   warehouse_code: z.string(),
@@ -36,7 +35,7 @@ export const AssetSummarySchema = AssetIdentitySchema.extend({
   hold_number: z.string().nullable().optional(),
   purchase_invoice_number: z.string().nullable(),
   sales_invoice_number: z.string().nullable(),
-  is_in_transit: z.boolean()
+  is_in_transit: z.boolean(),
 })
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
@@ -82,10 +81,7 @@ const MAX_SERIAL_NUMBERS = 1000
 const MAX_SERIAL_NUMBER_LENGTH = 50
 
 export const AssetsBySerialNumberRequestSchema = z.object({
-  serialNumbers: z
-    .array(z.string().max(MAX_SERIAL_NUMBER_LENGTH))
-    .min(1)
-    .max(MAX_SERIAL_NUMBERS),
+  serialNumbers: z.array(z.string().max(MAX_SERIAL_NUMBER_LENGTH)).min(1).max(MAX_SERIAL_NUMBERS),
 })
 
 export type AssetsBySerialNumberRequest = z.infer<typeof AssetsBySerialNumberRequestSchema>
@@ -120,7 +116,7 @@ export const AssetDetailsSchema = z.object({
     other_cost: z.number().nullable(),
     parts_cost: z.number().nullable(),
     total_cost: z.number().nullable(),
-    sale_price: z.number().nullable()
+    sale_price: z.number().nullable(),
   }),
   specs: z.object({
     cassettes: z.number().nullable(),
@@ -135,48 +131,58 @@ export const AssetDetailsSchema = z.object({
     toner_life_c: z.number().nullable(),
     toner_life_m: z.number().nullable(),
     toner_life_y: z.number().nullable(),
-    toner_life_k: z.number().nullable()
+    toner_life_k: z.number().nullable(),
   }),
-  hold: z.object({
-    created_by: z.string(),
-    created_for: z.string(),
-    created_at: z.coerce.date().nullable(),
-    customer: z.string(),
-    from_dt: z.coerce.date().nullable(),
-    to_dt: z.coerce.date().nullable(),
-    notes: z.string().nullable(),
-    hold_number: z.string()
-  }).nullable(),
+  hold: z
+    .object({
+      created_by: z.string(),
+      created_for: z.string(),
+      created_at: z.coerce.date().nullable(),
+      customer: z.string(),
+      from_dt: z.coerce.date().nullable(),
+      to_dt: z.coerce.date().nullable(),
+      notes: z.string().nullable(),
+      hold_number: z.string(),
+    })
+    .nullable(),
   created_at: z.coerce.date(),
-  arrival: z.object({
-    arrival_number: z.string(),
-    origin: z.string(),
-    destination_code: z.string(),
-    destination_street: z.string(),
-    transporter: z.string(),
-    created_by: z.string(),
-    notes: z.string().nullable(),
-    created_at: z.coerce.date()
-  }).nullable(),
-  departure: z.object({
-    departure_number: z.string(),
-    origin_code: z.string(),
-    origin_street: z.string(),
-    destination: z.string(),
-    transporter: z.string(),
-    created_by: z.string(),
-    notes: z.string().nullable(),
-    created_at: z.coerce.date()
-  }).nullable(),
-  purchase_invoice: z.object({
-    invoice_number: z.string(),
-    is_cleared: z.boolean()
-  }).nullable(),
-  sales_invoice: z.object({
-    invoice_number: z.string(),
-    is_cleared: z.boolean()
-  }).nullable(),
-  latest_comment: z.string().nullable()
+  arrival: z
+    .object({
+      arrival_number: z.string(),
+      origin: z.string(),
+      destination_code: z.string(),
+      destination_street: z.string(),
+      transporter: z.string(),
+      created_by: z.string(),
+      notes: z.string().nullable(),
+      created_at: z.coerce.date(),
+    })
+    .nullable(),
+  departure: z
+    .object({
+      departure_number: z.string(),
+      origin_code: z.string(),
+      origin_street: z.string(),
+      destination: z.string(),
+      transporter: z.string(),
+      created_by: z.string(),
+      notes: z.string().nullable(),
+      created_at: z.coerce.date(),
+    })
+    .nullable(),
+  purchase_invoice: z
+    .object({
+      invoice_number: z.string(),
+      is_cleared: z.boolean(),
+    })
+    .nullable(),
+  sales_invoice: z
+    .object({
+      invoice_number: z.string(),
+      is_cleared: z.boolean(),
+    })
+    .nullable(),
+  latest_comment: z.string().nullable(),
 })
 
 export type AssetDetails = z.infer<typeof AssetDetailsSchema>
@@ -186,32 +192,37 @@ export type AssetDetails = z.infer<typeof AssetDetailsSchema>
 // verifies the id's brand matches the asset's model brand.
 export const UpdateErrorSchema = z.object({
   error_id: z.number().int().positive(),
-  is_fixed: z.boolean()
+  is_fixed: z.boolean(),
 })
 export type UpdateError = z.infer<typeof UpdateErrorSchema>
 
 // POST /arrivals  (and POST /arrivals/:n/assets) — payload for creating an asset
 export const CreateAssetSchema = z.object({
-  model: ModelSummarySchema.refine(val => !!val, "Model is required"),
-  serialNumber: z.string().refine(val => val.length > 0, "Serial number is required"),
-  meterBlack: z.number().min(0, "Meter must be positive"),
-  meterColour: z.number().min(0, "Meter must be positive"),
-  cassettes: z.number().min(0, "Cassettes are required"),
+  model: ModelSummarySchema.refine((val) => !!val, 'Model is required'),
+  serialNumber: z.string().refine((val) => val.length > 0, 'Serial number is required'),
+  meterBlack: z.number().min(0, 'Meter must be positive'),
+  meterColour: z.number().min(0, 'Meter must be positive'),
+  cassettes: z.number().min(0, 'Cassettes are required'),
   readiness: StatusSchema,
-  countryOfOrigin: CountrySchema.refine(val => !!val, "Country of origin is required"),
-  manufacturedYear: z.number().int().min(MIN_MANUFACTURED_YEAR).max(MAX_MANUFACTURED_YEAR).nullable(),
+  countryOfOrigin: CountrySchema.refine((val) => !!val, 'Country of origin is required'),
+  manufacturedYear: z
+    .number()
+    .int()
+    .min(MIN_MANUFACTURED_YEAR)
+    .max(MAX_MANUFACTURED_YEAR)
+    .nullable(),
   componentId: z.number().int().positive().nullable(),
   coreFunctions: z.array(CoreFunctionsSchema),
-  drumLifeC: z.number().min(0, "Drum life C required"),
-  drumLifeM: z.number().min(0, "Drum life M required"),
-  drumLifeY: z.number().min(0, "Drum life Y required"),
-  drumLifeK: z.number().min(0, "Drum life K required"),
-  tonerLifeC: z.number().min(0, "Toner life C required"),
-  tonerLifeM: z.number().min(0, "Toner life M required"),
-  tonerLifeY: z.number().min(0, "Toner life Y required"),
-  tonerLifeK: z.number().min(0, "Toner life K required"),
+  drumLifeC: z.number().min(0, 'Drum life C required'),
+  drumLifeM: z.number().min(0, 'Drum life M required'),
+  drumLifeY: z.number().min(0, 'Drum life Y required'),
+  drumLifeK: z.number().min(0, 'Drum life K required'),
+  tonerLifeC: z.number().min(0, 'Toner life C required'),
+  tonerLifeM: z.number().min(0, 'Toner life M required'),
+  tonerLifeY: z.number().min(0, 'Toner life Y required'),
+  tonerLifeK: z.number().min(0, 'Toner life K required'),
   errors: z.array(UpdateErrorSchema).default([]),
-  comment: z.string().max(2000).nullable().default(null)
+  comment: z.string().max(2000).nullable().default(null),
 })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 
@@ -225,7 +236,7 @@ export const AssetErrorSchema = z.object({
   added_at: z.coerce.date().nullable(),
   added_by: z.string().nullable(),
   fixed_at: z.coerce.date().nullable(),
-  fixed_by: z.string().nullable()
+  fixed_by: z.string().nullable(),
 })
 
 export type AssetError = z.infer<typeof AssetErrorSchema>
@@ -235,7 +246,7 @@ export const CommentSchema = z.object({
   username: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  initials: z.string()
+  initials: z.string(),
 })
 
 export type Comment = z.infer<typeof CommentSchema>
@@ -247,7 +258,7 @@ export const AssetTransferSchema = z.object({
   destination_code: z.string(),
   destination_street: z.string(),
   transfer_number: z.string(),
-  transporter: z.string()
+  transporter: z.string(),
 })
 
 export type AssetTransfer = z.infer<typeof AssetTransferSchema>
@@ -259,7 +270,7 @@ export const AssetHarvestedPartSchema = z.object({
   fixed_by: z.string(),
   notes: z.string().nullable(),
   part: z.string(),
-  is_exchange: z.boolean()
+  is_exchange: z.boolean(),
 })
 
 export type AssetHarvestedPart = z.infer<typeof AssetHarvestedPartSchema>
@@ -274,22 +285,22 @@ export const BarcodeSuggestionSchema = z.object({
 export type BarcodeSuggestion = z.infer<typeof BarcodeSuggestionSchema>
 
 export const UpdateAssetErrorsSchema = z.object({
-  errors: z.array(UpdateErrorSchema).max(100)
+  errors: z.array(UpdateErrorSchema).max(100),
 })
 
 export type UpdateAssetErrors = z.infer<typeof UpdateAssetErrorsSchema>
 
 export const CreateSalvagedPartSchema = z.object({
-  donor_barcode: z.string().min(1, "Donor is required"),
-  part: z.string().min(1, "Part is required"),
+  donor_barcode: z.string().min(1, 'Donor is required'),
+  part: z.string().min(1, 'Part is required'),
   is_exchange: z.boolean(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 })
 
 export type CreateSalvagedPart = z.infer<typeof CreateSalvagedPartSchema>
 
 export const CreateCommentSchema = z.object({
-  comment: z.string().min(1).max(2000)
+  comment: z.string().min(1).max(2000),
 })
 
 export type CreateComment = z.infer<typeof CreateCommentSchema>
@@ -306,7 +317,10 @@ export const UpdateAssetPricingSchema = z.object({
 export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
 
 export const BulkUpdateAssetPricingSchema = z.object({
-  items: z.array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema)).min(1).max(2000)
+  items: z
+    .array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema))
+    .min(1)
+    .max(2000),
 })
 
 export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
@@ -339,4 +353,3 @@ export const UpdateAssetLocationSchema = z.object({
 })
 
 export type UpdateAssetLocation = z.infer<typeof UpdateAssetLocationSchema>
-

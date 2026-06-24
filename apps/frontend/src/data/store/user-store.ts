@@ -1,4 +1,8 @@
-import { getUsers as getUsersApi, setUserRole as setUserRoleApi, toggleUserActive as toggleUserActiveApi } from '@/data/api/user-api'
+import {
+  getUsers as getUsersApi,
+  setUserRole as setUserRoleApi,
+  toggleUserActive as toggleUserActiveApi,
+} from '@/data/api/user-api'
 import type { AppRole, User } from 'shared-types'
 import { create } from 'zustand'
 
@@ -9,9 +13,9 @@ interface UserStore {
   toggleUserActive: (userId: number, isActive: boolean) => Promise<void>
 }
 
-export const useUserStore = create<UserStore>(set => ({
+export const useUserStore = create<UserStore>((set) => ({
   users: [],
-  setUsers: users => set({ users }),
+  setUsers: (users) => set({ users }),
 
   setUserRole: async (userId, role) => {
     await setUserRoleApi(userId, role)

@@ -24,7 +24,7 @@ export function DepartedDateRangeFilter({
           label="From"
           id="departed-from"
           date={getSelectOption(from)}
-          setDate={d => {
+          setDate={(d) => {
             const next = getSelectedOrNull(d)
             if (next) onChange(next, to)
           }}
@@ -36,7 +36,7 @@ export function DepartedDateRangeFilter({
           label="To"
           id="departed-to"
           date={getSelectOption(to)}
-          setDate={d => {
+          setDate={(d) => {
             const next = getSelectedOrNull(d)
             if (next) onChange(from, next)
           }}
@@ -45,9 +45,7 @@ export function DepartedDateRangeFilter({
           endMonth={today}
         />
       </div>
-      {valid ? null : (
-        <p className="text-destructive text-xs">{INVALID_RANGE_MESSAGE}</p>
-      )}
+      {valid ? null : <p className="text-destructive text-xs">{INVALID_RANGE_MESSAGE}</p>}
     </div>
   )
 }

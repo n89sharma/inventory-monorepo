@@ -10,7 +10,7 @@ export function CassettesFilter({
   return (
     <InputWithClearInline
       value={value}
-      onValueChange={val => {
+      onValueChange={(val) => {
         if (typeof val === 'string' || val === null) {
           onValueChange(null)
           return
@@ -18,9 +18,9 @@ export function CassettesFilter({
         const next = Number.isInteger(val) && val >= 0 ? val : null
         onValueChange(next)
       }}
-      fieldLabel='Cassettes (min)'
-      inputType='number'
-      className='w-35'
+      fieldLabel="Cassettes (min)"
+      inputType="number"
+      className="w-35"
     />
   )
 }

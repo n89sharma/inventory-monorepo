@@ -1,4 +1,9 @@
-import { CreateStorePartSchema, StorePartSchema, StorePartSummarySchema, WarehouseSchema } from 'shared-types'
+import {
+  CreateStorePartSchema,
+  StorePartSchema,
+  StorePartSummarySchema,
+  WarehouseSchema,
+} from 'shared-types'
 import { z } from 'zod'
 
 // part: an existing StorePart (has id), a new CreateStorePart (no id), or nothing yet
@@ -7,15 +12,15 @@ export const AddPurchaseFormSchema = z
     part: z.union([StorePartSchema, CreateStorePartSchema]).nullable(),
     quantity: z.string(),
     unitCost: z.string(),
-    notes: z.string()
+    notes: z.string(),
   })
-  .refine(form => form.part !== null, {
+  .refine((form) => form.part !== null, {
     message: 'Select or create a part',
-    path: ['part']
+    path: ['part'],
   })
-  .refine(form => /^\d+$/.test(form.quantity) && Number(form.quantity) > 0, {
+  .refine((form) => /^\d+$/.test(form.quantity) && Number(form.quantity) > 0, {
     message: 'Enter a quantity',
-    path: ['quantity']
+    path: ['quantity'],
   })
 
 export type AddPurchaseForm = z.infer<typeof AddPurchaseFormSchema>
@@ -24,7 +29,7 @@ export const EMPTY_ADD_PURCHASE_FORM: AddPurchaseForm = {
   part: null,
   quantity: '',
   unitCost: '',
-  notes: ''
+  notes: '',
 }
 
 // Consume a part from store inventory onto an asset. part is a per-warehouse
@@ -37,29 +42,30 @@ export const AddStorePartFormSchema = z
     warehouse: WarehouseSchema.nullable(),
     part: StorePartSummarySchema.omit({ last_updated: true }).nullable(),
     quantity: z.string(),
-    unitCost: z.string()
+    unitCost: z.string(),
   })
-  .refine(form => form.warehouse !== null, {
+  .refine((form) => form.warehouse !== null, {
     message: 'Select a warehouse',
-    path: ['warehouse']
+    path: ['warehouse'],
   })
-  .refine(form => form.part !== null, {
+  .refine((form) => form.part !== null, {
     message: 'Select a part',
-    path: ['part']
+    path: ['part'],
   })
-  .refine(form => /^\d+$/.test(form.quantity) && Number(form.quantity) > 0, {
+  .refine((form) => /^\d+$/.test(form.quantity) && Number(form.quantity) > 0, {
     message: 'Enter a quantity',
-    path: ['quantity']
+    path: ['quantity'],
   })
   .refine(
-    form => form.part === null
-      || !/^\d+$/.test(form.quantity)
-      || Number(form.quantity) <= form.part.on_hand,
-    { message: 'Quantity exceeds stock on hand', path: ['quantity'] }
+    (form) =>
+      form.part === null ||
+      !/^\d+$/.test(form.quantity) ||
+      Number(form.quantity) <= form.part.on_hand,
+    { message: 'Quantity exceeds stock on hand', path: ['quantity'] },
   )
-  .refine(form => form.unitCost.trim() !== '' && Number(form.unitCost) > 0, {
+  .refine((form) => form.unitCost.trim() !== '' && Number(form.unitCost) > 0, {
     message: 'Enter a unit cost greater than 0',
-    path: ['unitCost']
+    path: ['unitCost'],
   })
 
 export type AddStorePartForm = z.infer<typeof AddStorePartFormSchema>
@@ -68,5 +74,5 @@ export const EMPTY_ADD_STORE_PART_FORM: AddStorePartForm = {
   warehouse: null,
   part: null,
   quantity: '1',
-  unitCost: ''
+  unitCost: '',
 }

@@ -24,5 +24,5 @@ export const useModelStore = create<ModelStore>((set) => ({
     set({ models: await getModelsApi() })
     return result
   },
-  clearModels: () => set({ models: [] })
+  clearModels: () => set({ models: [] }),
 }))

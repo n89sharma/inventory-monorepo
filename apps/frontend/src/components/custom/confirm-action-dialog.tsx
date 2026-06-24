@@ -6,12 +6,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle
-} from "@/components/shadcn/alert-dialog"
-import type { Button } from "@/components/shadcn/button"
-import type { ComponentProps, ReactNode } from "react"
+  AlertDialogTitle,
+} from '@/components/shadcn/alert-dialog'
+import type { Button } from '@/components/shadcn/button'
+import type { ComponentProps, ReactNode } from 'react'
 
-type ButtonVariant = ComponentProps<typeof Button>["variant"]
+type ButtonVariant = ComponentProps<typeof Button>['variant']
 
 type ConfirmActionDialogProps = {
   title: string
@@ -31,7 +31,7 @@ export function ConfirmActionDialog({
   onConfirm,
   open,
   onOpenChange,
-  confirmVariant = "default",
+  confirmVariant = 'default',
   children,
 }: ConfirmActionDialogProps) {
   return (

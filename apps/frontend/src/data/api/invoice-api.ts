@@ -1,8 +1,26 @@
 import { api } from '@/data/api/axios-client'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
-import { getIdOrNullFromSelection, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { AssetDelta, CollectionHistory, CreateInvoice, InvoiceDetail, UpdateInvoiceMetadata } from 'shared-types'
-import { AssetDeltaSchema, CollectionHistorySchema, CreateInvoiceSchema, InvoiceDetailSchema, InvoiceSummarySchema, UpdateInvoiceMetadataSchema, type InvoiceSummary } from 'shared-types'
+import {
+  getIdOrNullFromSelection,
+  getSelectedOrNull,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
+import type {
+  AssetDelta,
+  CollectionHistory,
+  CreateInvoice,
+  InvoiceDetail,
+  UpdateInvoiceMetadata,
+} from 'shared-types'
+import {
+  AssetDeltaSchema,
+  CollectionHistorySchema,
+  CreateInvoiceSchema,
+  InvoiceDetailSchema,
+  InvoiceSummarySchema,
+  UpdateInvoiceMetadataSchema,
+  type InvoiceSummary,
+} from 'shared-types'
 import { z } from 'zod'
 
 const CreateInvoiceResponseSchema = z.object({ invoiceNumber: z.string() })
@@ -14,7 +32,7 @@ export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceRespon
     organization_id: d.organization!.id,
     invoice_type_id: getIdOrNullFromSelection(d.invoice_type)!,
     is_cleared: d.is_cleared,
-    assets: d.assets as CreateInvoice['assets']
+    assets: d.assets as CreateInvoice['assets'],
   } satisfies CreateInvoice)
   const { data } = await api.post<CreateInvoiceResponse>('/invoices', createInvoiceBody)
   return CreateInvoiceResponseSchema.parse(data)
@@ -22,13 +40,13 @@ export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceRespon
 
 export async function getInvoices(
   fromDate: SelectOption<Date>,
-  toDate: SelectOption<Date>
+  toDate: SelectOption<Date>,
 ): Promise<InvoiceSummary[]> {
   const { data } = await api.get<InvoiceSummary[]>(`/invoices`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate)
-    }
+      toDate: getSelectedOrNull(toDate),
+    },
   })
   return z.array(InvoiceSummarySchema).parse(data)
 }
@@ -45,19 +63,16 @@ export async function getInvoiceHistory(invoiceNumber: string): Promise<Collecti
 
 export async function updateInvoiceMetadata(
   invoiceNumber: string,
-  metadata: InvoiceMetadataForm
+  metadata: InvoiceMetadataForm,
 ): Promise<void> {
   const updateInvoiceMetadataBody = UpdateInvoiceMetadataSchema.parse({
     organization: metadata.organization!,
-    is_cleared: metadata.is_cleared
+    is_cleared: metadata.is_cleared,
   } satisfies UpdateInvoiceMetadata)
   await api.patch(`/invoices/${invoiceNumber}/metadata`, updateInvoiceMetadataBody)
 }
 
-export async function patchInvoiceAssets(
-  invoiceNumber: string,
-  delta: AssetDelta
-): Promise<void> {
+export async function patchInvoiceAssets(invoiceNumber: string, delta: AssetDelta): Promise<void> {
   const patchInvoiceAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/invoices/${invoiceNumber}/assets`, patchInvoiceAssetsBody)
 }

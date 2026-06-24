@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils"
-import { CheckIcon, CopyIcon } from "@phosphor-icons/react"
-import { useState } from "react"
+import { cn } from '@/lib/utils'
+import { CheckIcon, CopyIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
 
 type CopyButtonProps = {
   value: string | undefined
@@ -20,7 +20,7 @@ export function CopyButton({ value, className }: CopyButtonProps): React.JSX.Ele
   return (
     <button
       onClick={handleCopy}
-      className={cn("invisible group-hover:visible cursor-pointer", className)}
+      className={cn('invisible group-hover:visible cursor-pointer', className)}
       aria-label={`Copy ${value}`}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}

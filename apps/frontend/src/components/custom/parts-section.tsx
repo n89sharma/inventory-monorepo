@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
-import type { AssetDetails, AssetHarvestedPart, AssetStorePartRow } from "shared-types";
-import { Badge } from "../shadcn/badge";
-import { Section, SectionHeader } from "./asset-details/detail-layout";
-import { DataRow } from "./asset-details/detail-row";
-import { OptionalSection } from "./asset-details/optional-section";
+import { Link } from 'react-router-dom'
+import type { AssetDetails, AssetHarvestedPart, AssetStorePartRow } from 'shared-types'
+import { Badge } from '../shadcn/badge'
+import { Section, SectionHeader } from './asset-details/detail-layout'
+import { DataRow } from './asset-details/detail-row'
+import { OptionalSection } from './asset-details/optional-section'
 
 type PartSectionProps = {
   asset: AssetDetails
@@ -13,36 +13,47 @@ type PartSectionProps = {
   rowClassName?: string
   className?: string
 }
-export function PartsSection(
-  { asset, harvestedParts, storeParts, action, rowClassName, className }: PartSectionProps,
-): React.JSX.Element {
-
+export function PartsSection({
+  asset,
+  harvestedParts,
+  storeParts,
+  action,
+  rowClassName,
+  className,
+}: PartSectionProps): React.JSX.Element {
   const hasParts = !!harvestedParts?.length || !!storeParts?.length
 
   return (
     <Section className={className}>
       <SectionHeader title="Parts" action={action} />
       <OptionalSection condition={hasParts} fallback="No parts installed">
-        {harvestedParts?.map(p => getHarvestedPartBadge(p, asset.barcode, rowClassName))}
-        {storeParts?.map(sp => getStorePartBadge(sp, rowClassName))}
+        {harvestedParts?.map((p) => getHarvestedPartBadge(p, asset.barcode, rowClassName))}
+        {storeParts?.map((sp) => getStorePartBadge(sp, rowClassName))}
       </OptionalSection>
     </Section>
   )
 }
 
-function getHarvestedPartBadge(transfer: AssetHarvestedPart, currentAsset: string, rowClassName?: string) {
+function getHarvestedPartBadge(
+  transfer: AssetHarvestedPart,
+  currentAsset: string,
+  rowClassName?: string,
+) {
   const isDonor = transfer.donor === currentAsset
   const counterpartBarcode = isDonor ? transfer.recipient : transfer.donor
 
-  const badge = isDonor
-    ? <Badge variant="destructive">{transfer.is_exchange ? 'Removed (exchange)' : 'Removed'}</Badge>
-    : <Badge variant="success">{transfer.is_exchange ? 'Added (exchange)' : 'Added'}</Badge>
+  const badge = isDonor ? (
+    <Badge variant="destructive">{transfer.is_exchange ? 'Removed (exchange)' : 'Removed'}</Badge>
+  ) : (
+    <Badge variant="success">{transfer.is_exchange ? 'Added (exchange)' : 'Added'}</Badge>
+  )
 
   return (
     <DataRow
       key={`${transfer.donor}${transfer.part}`}
       label={transfer.part}
-      rowClassName={rowClassName}>
+      rowClassName={rowClassName}
+    >
       <div className="flex items-center gap-2">
         {badge}
         <Link
@@ -61,7 +72,8 @@ function getStorePartBadge(storePart: AssetStorePartRow, rowClassName?: string) 
     <DataRow
       key={`store-${storePart.store_part_id}-${storePart.part_number}`}
       label={`${storePart.part_number} x${storePart.quantity}`}
-      rowClassName={rowClassName}>
+      rowClassName={rowClassName}
+    >
       <div className="flex items-center gap-2">
         <Badge variant="success">Added</Badge>
         <Link

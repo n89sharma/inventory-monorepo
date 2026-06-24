@@ -22,7 +22,7 @@ function zeroMetrics(): ProfitabilityMetrics {
     asset_count: 0,
     gross_revenue: 0,
     cogs: 0,
-    gross_margin: 0
+    gross_margin: 0,
   }
 }
 

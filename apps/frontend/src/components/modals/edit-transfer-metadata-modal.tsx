@@ -1,6 +1,9 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { TransferMetadataFormSchema, type TransferMetadataForm } from '@/ui-types/transfer-form-types'
+import {
+  TransferMetadataFormSchema,
+  type TransferMetadataForm,
+} from '@/ui-types/transfer-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
@@ -31,7 +34,7 @@ export function EditTransferMetadataModal({
   onSave,
 }: EditTransferMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore(state => state.organizations)
+  const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(transfer), [transfer])
@@ -40,11 +43,7 @@ export function EditTransferMetadataModal({
     values,
   })
 
-  const guard = useUnsavedChangesGuard(
-    form.formState.isDirty,
-    onOpenChange,
-    () => form.reset(),
-  )
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   async function onValid(values: TransferMetadataForm) {
     setIsSubmitting(true)
@@ -69,22 +68,22 @@ export function EditTransferMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Transfer</DialogTitle>
         </DialogHeader>
-        <form onSubmit={e => e.preventDefault()}>
-          <FieldGroup className='grid grid-cols-2 gap-x-6 gap-y-3'>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
             <Controller
               control={form.control}
-              name='origin'
+              name="origin"
               render={({ field: { onChange, value }, fieldState }) => (
                 <SelectOptions
                   selection={value}
                   onSelectionChange={onChange}
                   options={activeWarehouses}
-                  getLabel={w => w.city_code}
-                  fieldLabel='Origin'
+                  getLabel={(w) => w.city_code}
+                  fieldLabel="Origin"
                   anyAllowed={false}
                   fieldRequired={true}
                   error={fieldState.invalid}
@@ -93,14 +92,14 @@ export function EditTransferMetadataModal({
             />
             <Controller
               control={form.control}
-              name='destination'
+              name="destination"
               render={({ field: { onChange, value }, fieldState }) => (
                 <SelectOptions
                   selection={value}
                   onSelectionChange={onChange}
                   options={activeWarehouses}
-                  getLabel={w => w.city_code}
-                  fieldLabel='Destination'
+                  getLabel={(w) => w.city_code}
+                  fieldLabel="Destination"
                   anyAllowed={false}
                   fieldRequired={true}
                   error={fieldState.invalid}
@@ -109,33 +108,34 @@ export function EditTransferMetadataModal({
             />
             <ControlledSearchSelectInput
               control={form.control}
-              name='transporter'
+              name="transporter"
               options={orgs}
-              getLabel={o => o.name}
-              fieldLabel='Transporter'
+              getLabel={(o) => o.name}
+              fieldLabel="Transporter"
               fieldRequired={true}
             />
             <Controller
               control={form.control}
-              name='comment'
+              name="comment"
               render={({ field }) => (
-                <Field className='col-span-2'>
+                <Field className="col-span-2">
                   <FieldLabel>Comments</FieldLabel>
-                  <Textarea
-                    placeholder='Transfer notes…'
-                    className='resize-none'
-                    {...field}
-                  />
+                  <Textarea placeholder="Transfer notes…" className="resize-none" {...field} />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={() => guard.onOpenChange(false)}
+            type="button"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button onClick={submit} type='button' disabled={isSubmitting}>
+          <Button onClick={submit} type="button" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </Button>
         </DialogFooter>
@@ -153,7 +153,11 @@ function toFormValues(t: TransferDetail): TransferMetadataForm {
   return {
     origin: getSelectOption(t.origin),
     destination: getSelectOption(t.destination),
-    transporter: { id: t.transporter.id, account_number: t.transporter.account_number, name: t.transporter.name },
-    comment: t.notes ?? ''
+    transporter: {
+      id: t.transporter.id,
+      account_number: t.transporter.account_number,
+      name: t.transporter.name,
+    },
+    comment: t.notes ?? '',
   }
 }

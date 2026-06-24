@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useState } from 'react'
 import {
   ANY_OPTION,
   getSelectOption,
   getSelectedOrNull,
   type SelectOption,
-} from "@/ui-types/select-option-types"
-import { SearchSelectInput } from "./search-select-input"
+} from '@/ui-types/select-option-types'
+import { SearchSelectInput } from './search-select-input'
 
 /**
  * List-page filter binding for {@link SearchSelectInput}: adapts the
@@ -36,9 +36,15 @@ export function SearchSelectOptionFilter<T>({
     <SearchSelectInput
       selection={getSelectedOrNull(selection)}
       query={query}
-      onSelectionChange={item => { onChange(getSelectOption(item)); setQuery('') }}
+      onSelectionChange={(item) => {
+        onChange(getSelectOption(item))
+        setQuery('')
+      }}
       onQueryChange={setQuery}
-      onClear={() => { onChange(ANY_OPTION); setQuery('') }}
+      onClear={() => {
+        onChange(ANY_OPTION)
+        setQuery('')
+      }}
       options={options}
       getLabel={getLabel}
       placeholder={placeholder}

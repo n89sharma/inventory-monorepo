@@ -19,14 +19,14 @@ export function CustomerFilter({
   placeholder?: string
   clearLabel?: string
 }): React.JSX.Element {
-  const allCustomers = useOrgStore(state => state.organizations)
+  const allCustomers = useOrgStore((state) => state.organizations)
   const [query, setQuery] = useState('')
 
   return (
     <SearchSelectInput
       selection={selection}
       query={query}
-      onSelectionChange={c => {
+      onSelectionChange={(c) => {
         setQuery('')
         onSelectionChange(c)
       }}
@@ -36,10 +36,10 @@ export function CustomerFilter({
         onClear()
       }}
       options={allCustomers}
-      getLabel={c => c.name}
+      getLabel={(c) => c.name}
       placeholder={placeholder}
       clearLabel={clearLabel}
-      className='w-35'
+      className="w-35"
     />
   )
 }

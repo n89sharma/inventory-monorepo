@@ -7,8 +7,10 @@ import { InvoiceFormPage } from './invoice-form-page'
 export function CreateInvoicePage(): React.JSX.Element {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const { preloadedAssets, returnTo } =
-    (state ?? {}) as { preloadedAssets?: AssetSummary[]; returnTo?: string }
+  const { preloadedAssets, returnTo } = (state ?? {}) as {
+    preloadedAssets?: AssetSummary[]
+    returnTo?: string
+  }
 
   const mutations = useInvoiceMutations()
 
@@ -19,10 +21,7 @@ export function CreateInvoicePage(): React.JSX.Element {
     cancelNavUrl: '/invoices',
   }
 
-  const breadcrumbs = [
-    { label: 'Invoices', href: '/invoices' },
-    { label: 'Create' },
-  ]
+  const breadcrumbs = [{ label: 'Invoices', href: '/invoices' }, { label: 'Create' }]
 
   async function onValidInvoiceCreateSubmit(data: InvoiceForm) {
     try {

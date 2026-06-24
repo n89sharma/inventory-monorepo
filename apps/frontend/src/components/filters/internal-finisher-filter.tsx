@@ -14,12 +14,12 @@ export function InternalFinisherFilter({
   onClear: () => void
 }): React.JSX.Element {
   const [query, setQuery] = useState('')
-  const allComponents = useReferenceDataStore(state => state.components)
+  const allComponents = useReferenceDataStore((state) => state.components)
   return (
     <SearchSelectInput
       selection={selection}
       query={query}
-      onSelectionChange={c => {
+      onSelectionChange={(c) => {
         setQuery('')
         onSelectionChange(c)
       }}
@@ -30,9 +30,9 @@ export function InternalFinisherFilter({
       }}
       options={allComponents}
       getLabel={componentLabel}
-      placeholder='Internal Finisher'
-      clearLabel='Clear internal finisher'
-      className='w-35'
+      placeholder="Internal Finisher"
+      clearLabel="Clear internal finisher"
+      className="w-35"
     />
   )
 }

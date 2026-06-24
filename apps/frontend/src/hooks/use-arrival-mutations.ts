@@ -1,7 +1,18 @@
-import { createArrival, createSingleArrivalAsset, getArrivalAssetForUpdate, patchArrivalAssets, updateArrivalAsset, updateArrivalMetadata } from '@/data/api/arrival-api'
+import {
+  createArrival,
+  createSingleArrivalAsset,
+  getArrivalAssetForUpdate,
+  patchArrivalAssets,
+  updateArrivalAsset,
+  updateArrivalMetadata,
+} from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { arrivalDetailKey, invalidateArrivalLists } from '@/hooks/use-arrival'
-import { flushPendingRemovals, scheduleAssetRemoval, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
+import {
+  flushPendingRemovals,
+  scheduleAssetRemoval,
+  scheduleBulkAssetRemoval,
+} from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import type { ArrivalDetail, AssetSummary } from 'shared-types'
 import { mutate } from 'swr'
@@ -23,8 +34,8 @@ async function createAsset(arrivalNumber: string, asset: AssetForm) {
   const created = await createSingleArrivalAsset(arrivalNumber, asset)
   mutate<ArrivalDetail>(
     cacheKey,
-    current => current ? { ...current, assets: [...current.assets, created] } : current,
-    { revalidate: false }
+    (current) => (current ? { ...current, assets: [...current.assets, created] } : current),
+    { revalidate: false },
   )
   invalidateAssetDetails([created.barcode])
   invalidateArrivalLists()
@@ -40,31 +51,38 @@ async function updateAsset(arrivalNumber: string, assetId: number, asset: AssetF
   const updated = await updateArrivalAsset(arrivalNumber, assetId, asset)
   mutate<ArrivalDetail>(
     cacheKey,
-    current => current
-      ? { ...current, assets: current.assets.map(a => a.id === assetId ? updated : a) }
-      : current,
-    { revalidate: false }
+    (current) =>
+      current
+        ? { ...current, assets: current.assets.map((a) => (a.id === assetId ? updated : a)) }
+        : current,
+    { revalidate: false },
   )
   invalidateAssetDetails([updated.barcode])
   mutate(cacheKey)
 }
 
 function removeAsset(arrivalNumber: string, asset: AssetSummary) {
-  scheduleAssetRemoval({
-    collectionId: arrivalNumber,
-    detailCacheKey: arrivalDetailKey(arrivalNumber),
-    patchAssets: delta => patchArrivalAssets(arrivalNumber, delta),
-    invalidateLists: invalidateArrivalLists,
-  }, asset)
+  scheduleAssetRemoval(
+    {
+      collectionId: arrivalNumber,
+      detailCacheKey: arrivalDetailKey(arrivalNumber),
+      patchAssets: (delta) => patchArrivalAssets(arrivalNumber, delta),
+      invalidateLists: invalidateArrivalLists,
+    },
+    asset,
+  )
 }
 
 function bulkRemoveAssets(arrivalNumber: string, assets: AssetSummary[]) {
-  scheduleBulkAssetRemoval({
-    collectionId: arrivalNumber,
-    detailCacheKey: arrivalDetailKey(arrivalNumber),
-    patchAssets: delta => patchArrivalAssets(arrivalNumber, delta),
-    invalidateLists: invalidateArrivalLists,
-  }, assets)
+  scheduleBulkAssetRemoval(
+    {
+      collectionId: arrivalNumber,
+      detailCacheKey: arrivalDetailKey(arrivalNumber),
+      patchAssets: (delta) => patchArrivalAssets(arrivalNumber, delta),
+      invalidateLists: invalidateArrivalLists,
+    },
+    assets,
+  )
 }
 
 const mutations = {

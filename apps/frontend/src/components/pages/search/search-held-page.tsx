@@ -9,10 +9,7 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
 import { useSearchHeld } from '@/hooks/use-search-held'
 import { useUrlFilters } from '@/hooks/use-url-filters'
-import {
-  filtersToParams,
-  paramsToFilters,
-} from '@/lib/search-held-params'
+import { filtersToParams, paramsToFilters } from '@/lib/search-held-params'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
@@ -26,37 +23,43 @@ const ROW_WARNING_CLASS = 'data-row-warning'
 
 function heldRowClassName(asset: AssetSearchRow): string | undefined {
   const days = daysHeld(asset.hold_created_at)
-  return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD
-    ? ROW_WARNING_CLASS
-    : undefined
+  return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
 }
 
 export function SearchHeldPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const models = useModelStore(state => state.models)
-  const allBrands = useReferenceDataStore(state => state.brands)
-  const allAssetTypes = useReferenceDataStore(state => state.assetTypes)
-  const allReadinesses = useReferenceDataStore(state => state.readinesses)
-  const allWarehouses = useReferenceDataStore(state => state.warehouses)
-  const allComponents = useReferenceDataStore(state => state.components)
-  const allUsers = useUserStore(state => state.users)
-  const allCustomers = useOrgStore(state => state.organizations)
+  const models = useModelStore((state) => state.models)
+  const allBrands = useReferenceDataStore((state) => state.brands)
+  const allAssetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const allReadinesses = useReferenceDataStore((state) => state.readinesses)
+  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
+  const allComponents = useReferenceDataStore((state) => state.components)
+  const allUsers = useUserStore((state) => state.users)
+  const allCustomers = useOrgStore((state) => state.organizations)
 
   const urlFilters = useMemo(
-    () => paramsToFilters(searchParams, {
-      warehouses: allWarehouses,
-      brands: allBrands,
-      assetTypes: allAssetTypes,
-      models,
-      readinesses: allReadinesses,
-      components: allComponents,
-      users: allUsers,
-      customers: allCustomers,
-    }),
+    () =>
+      paramsToFilters(searchParams, {
+        warehouses: allWarehouses,
+        brands: allBrands,
+        assetTypes: allAssetTypes,
+        models,
+        readinesses: allReadinesses,
+        components: allComponents,
+        users: allUsers,
+        customers: allCustomers,
+      }),
     [
-      searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
-      allComponents, allUsers, allCustomers,
+      searchParams,
+      allWarehouses,
+      allBrands,
+      allAssetTypes,
+      models,
+      allReadinesses,
+      allComponents,
+      allUsers,
+      allCustomers,
     ],
   )
 
@@ -67,7 +70,9 @@ export function SearchHeldPage(): React.JSX.Element {
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchHeld(urlFilters)
-  const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
+  const handleBulkPriceSave = useCallback(() => {
+    mutate()
+  }, [mutate])
 
   return (
     <AssetSearchPage
@@ -88,26 +93,26 @@ export function SearchHeldPage(): React.JSX.Element {
           <>
             <UserFilter
               selection={draft.heldBy}
-              onSelectionChange={u => updateImmediate({ ...draft, heldBy: u })}
+              onSelectionChange={(u) => updateImmediate({ ...draft, heldBy: u })}
               onClear={() => updateImmediate({ ...draft, heldBy: null })}
-              placeholder='Held By'
-              clearLabel='Clear held by'
+              placeholder="Held By"
+              clearLabel="Clear held by"
             />
             <UserFilter
               selection={draft.heldFor}
-              onSelectionChange={u => updateImmediate({ ...draft, heldFor: u })}
+              onSelectionChange={(u) => updateImmediate({ ...draft, heldFor: u })}
               onClear={() => updateImmediate({ ...draft, heldFor: null })}
-              placeholder='Held For'
-              clearLabel='Clear held for'
+              placeholder="Held For"
+              clearLabel="Clear held for"
             />
             <CustomerFilter
               selection={draft.holdCustomer}
-              onSelectionChange={c => updateImmediate({ ...draft, holdCustomer: c })}
+              onSelectionChange={(c) => updateImmediate({ ...draft, holdCustomer: c })}
               onClear={() => updateImmediate({ ...draft, holdCustomer: null })}
             />
             <DaysHeldFilter
               value={draft.daysHeldMin}
-              onValueChange={d => updateDebounced({ ...draft, daysHeldMin: d })}
+              onValueChange={(d) => updateDebounced({ ...draft, daysHeldMin: d })}
             />
           </>
         }

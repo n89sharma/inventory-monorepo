@@ -20,13 +20,13 @@ export function AssetIdentityFilters<T extends IdentityDraft>({
     <>
       <BrandFilter
         selection={draft.brand}
-        onSelectionChange={b => onImmediate({ ...draft, brand: b })}
+        onSelectionChange={(b) => onImmediate({ ...draft, brand: b })}
         onClear={() => onImmediate({ ...draft, brand: null })}
       />
 
       <AssetTypeFilter
         selection={draft.assetTypes}
-        onSelectionChange={a => onDebounced({ ...draft, assetTypes: a })}
+        onSelectionChange={(a) => onDebounced({ ...draft, assetTypes: a })}
       />
     </>
   )

@@ -1,5 +1,9 @@
 import { UserMenuButton } from '@/components/custom/user-menu-button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/shadcn/collapsible"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/shadcn/collapsible'
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +17,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail
-} from "@/components/shadcn/sidebar"
+  SidebarRail,
+} from '@/components/shadcn/sidebar'
 import { useCan } from '@/hooks/use-can'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { buildAssetSearchPath } from '@/lib/asset-filter-params'
@@ -31,8 +35,8 @@ import {
   StackIcon,
   ToolboxIcon,
   TruckTrailerIcon,
-  WarehouseIcon
-} from "@phosphor-icons/react"
+  WarehouseIcon,
+} from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -41,35 +45,35 @@ const PROFITABILITY_PATH = '/reports/profitability'
 
 const sidebarItems = [
   {
-    title: "Arrivals",
-    url: "/arrivals",
-    icon: <WarehouseIcon aria-hidden="true" />
+    title: 'Arrivals',
+    url: '/arrivals',
+    icon: <WarehouseIcon aria-hidden="true" />,
   },
   {
-    title: "Transfers",
-    url: "/transfers",
-    icon: <LineSegmentsIcon aria-hidden="true" />
+    title: 'Transfers',
+    url: '/transfers',
+    icon: <LineSegmentsIcon aria-hidden="true" />,
   },
   {
-    title: "Departures",
-    url: "/departures",
-    icon: <TruckTrailerIcon aria-hidden="true" />
+    title: 'Departures',
+    url: '/departures',
+    icon: <TruckTrailerIcon aria-hidden="true" />,
   },
   {
-    title: "Store",
+    title: 'Store',
     url: STORE_PATH,
-    icon: <ToolboxIcon aria-hidden="true" />
+    icon: <ToolboxIcon aria-hidden="true" />,
   },
   {
-    title: "Holds",
-    url: "/holds",
-    icon: <LockOpenIcon aria-hidden="true" />
+    title: 'Holds',
+    url: '/holds',
+    icon: <LockOpenIcon aria-hidden="true" />,
   },
   {
-    title: "Invoices",
-    url: "/invoices",
-    icon: <InvoiceIcon aria-hidden="true" />
-  }
+    title: 'Invoices',
+    url: '/invoices',
+    icon: <InvoiceIcon aria-hidden="true" />,
+  },
 ]
 
 const SEARCH_ASSETS_SUB_ITEMS = [
@@ -125,7 +129,6 @@ export function AppSidebar(): React.JSX.Element {
 
   return (
     <Sidebar collapsible="icon">
-
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -147,9 +150,7 @@ export function AppSidebar(): React.JSX.Element {
             <SidebarMenu>
               {sidebarItems.map((item) => {
                 const isActive = location.pathname.startsWith(item.url)
-                const to = item.url === STORE_PATH
-                  ? buildStoreListPath(defaultWarehouse)
-                  : item.url
+                const to = item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
@@ -180,10 +181,15 @@ export function AppSidebar(): React.JSX.Element {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {SEARCH_ASSETS_SUB_ITEMS.map(item => (
+                      {SEARCH_ASSETS_SUB_ITEMS.map((item) => (
                         <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton asChild isActive={location.pathname.startsWith(item.url) ? true : undefined}>
-                            <Link to={buildAssetSearchPath(item.url, defaultWarehouse)}>{item.title}</Link>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={location.pathname.startsWith(item.url) ? true : undefined}
+                          >
+                            <Link to={buildAssetSearchPath(item.url, defaultWarehouse)}>
+                              {item.title}
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -191,7 +197,9 @@ export function AppSidebar(): React.JSX.Element {
                         <SidebarMenuSubItem>
                           <SidebarMenuSubButton
                             asChild
-                            isActive={location.pathname.startsWith(PRICE_CHECK_ITEM.url) ? true : undefined}
+                            isActive={
+                              location.pathname.startsWith(PRICE_CHECK_ITEM.url) ? true : undefined
+                            }
                           >
                             <Link to={PRICE_CHECK_ITEM.url}>{PRICE_CHECK_ITEM.title}</Link>
                           </SidebarMenuSubButton>
@@ -201,8 +209,7 @@ export function AppSidebar(): React.JSX.Element {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              {
-                canViewReports &&
+              {canViewReports && (
                 <Collapsible
                   open={reportsOpen}
                   onOpenChange={setReportsOpen}
@@ -222,13 +229,17 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {REPORTS_SUB_ITEMS.map(item => {
-                          const to = item.url === PROFITABILITY_PATH
-                            ? buildProfitabilityReportPath(defaultWarehouse)
-                            : item.url
+                        {REPORTS_SUB_ITEMS.map((item) => {
+                          const to =
+                            item.url === PROFITABILITY_PATH
+                              ? buildProfitabilityReportPath(defaultWarehouse)
+                              : item.url
                           return (
                             <SidebarMenuSubItem key={item.title}>
-                              <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={location.pathname === item.url ? true : undefined}
+                              >
                                 <Link to={to}>{item.title}</Link>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
@@ -238,9 +249,8 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
-              }
-              {
-                canManageSettings &&
+              )}
+              {canManageSettings && (
                 <Collapsible
                   open={settingsOpen}
                   onOpenChange={setSettingsOpen}
@@ -260,9 +270,12 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {SETTINGS_SUB_ITEMS.map(item => (
+                        {SETTINGS_SUB_ITEMS.map((item) => (
                           <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton asChild isActive={location.pathname === item.url ? true : undefined}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={location.pathname === item.url ? true : undefined}
+                            >
                               <Link to={item.url}>{item.title}</Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -271,7 +284,9 @@ export function AppSidebar(): React.JSX.Element {
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               asChild
-                              isActive={location.pathname === USER_PERMISSIONS_ITEM.url ? true : undefined}
+                              isActive={
+                                location.pathname === USER_PERMISSIONS_ITEM.url ? true : undefined
+                              }
                             >
                               <Link to={USER_PERMISSIONS_ITEM.url}>
                                 {USER_PERMISSIONS_ITEM.title}
@@ -283,7 +298,7 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
-              }
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -7,5 +7,5 @@ interface GlobalSearchStore {
 }
 
 export const useGlobalSearchStore = create<GlobalSearchStore>(() => ({
-  searchGlobal: (query) => getGlobalSearchResultsApi(query)
+  searchGlobal: (query) => getGlobalSearchResultsApi(query),
 }))

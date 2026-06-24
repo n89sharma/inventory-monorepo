@@ -35,7 +35,7 @@ export function paramsToFilters(
 ): SearchInStockFilters {
   const brandId = params.get(PARAM_BRAND)
   const brand = brandId
-    ? ref.brands.find(b => b.id === Number.parseInt(brandId, 10)) ?? null
+    ? (ref.brands.find((b) => b.id === Number.parseInt(brandId, 10)) ?? null)
     : null
 
   return {

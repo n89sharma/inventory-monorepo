@@ -91,35 +91,11 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_departure',
     'create_update_invoice',
   ],
-  accountant: [
-    'view_asset',
-    'view_sale_price',
-    'view_purchase_price',
-    'view_collections',
-  ],
-  tech: [
-    'view_store',
-    'create_update_store',
-    'view_asset',
-    'edit_tech_specs',
-    'view_collections',
-  ],
-  senior_sales: [
-    'view_asset',
-    'view_sale_price',
-    'view_collections',
-    'create_update_hold',
-  ],
-  sales: [
-    'view_asset',
-    'view_collections',
-    'create_update_hold',
-  ],
-  sales_assistant: [
-    'view_asset',
-    'view_collections',
-    'create_update_hold',
-  ],
+  accountant: ['view_asset', 'view_sale_price', 'view_purchase_price', 'view_collections'],
+  tech: ['view_store', 'create_update_store', 'view_asset', 'edit_tech_specs', 'view_collections'],
+  senior_sales: ['view_asset', 'view_sale_price', 'view_collections', 'create_update_hold'],
+  sales: ['view_asset', 'view_collections', 'create_update_hold'],
+  sales_assistant: ['view_asset', 'view_collections', 'create_update_hold'],
   shipping: [
     'view_store',
     'view_asset',
@@ -128,16 +104,8 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_arrival',
     'create_update_store',
     'create_update_transfer',
-    'create_update_departure'
+    'create_update_departure',
   ],
-  picker: [
-    'view_asset',
-    'edit_location',
-    'view_collections',
-  ],
-  member: [
-    'view_asset',
-    'view_collections',
-  ],
+  picker: ['view_asset', 'edit_location', 'view_collections'],
+  member: ['view_asset', 'view_collections'],
 }
-

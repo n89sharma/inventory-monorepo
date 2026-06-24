@@ -11,7 +11,7 @@ export function DepartureOutgoingStatusToggle({
   onApply,
 }: DepartureOutgoingStatusToggleProps): React.ReactNode {
   function handleValueChange(next: string) {
-    const picked = OUTGOING_STATUS_OPTIONS.find(o => o === next)
+    const picked = OUTGOING_STATUS_OPTIONS.find((o) => o === next)
     if (picked) onApply(picked)
   }
 
@@ -25,7 +25,7 @@ export function DepartureOutgoingStatusToggle({
         variant="outline"
         size="sm"
       >
-        {OUTGOING_STATUS_OPTIONS.map(opt => (
+        {OUTGOING_STATUS_OPTIONS.map((opt) => (
           <ToggleGroupItem key={opt} value={opt}>
             {OUTGOING_STATUS_LABELS[opt]}
           </ToggleGroupItem>

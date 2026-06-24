@@ -111,7 +111,7 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)
-    const barcodes = items.map(item => item.barcode)
+    const barcodes = items.map((item) => item.barcode)
     invalidateAssetDetails(barcodes)
     invalidateAssetHistory(barcodes)
   },

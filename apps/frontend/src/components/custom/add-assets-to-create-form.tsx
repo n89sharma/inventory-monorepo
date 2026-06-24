@@ -31,10 +31,10 @@ export function AddAssetByBarcode({
   disabled,
   className,
   onCommit,
-  showLeadingIcon
+  showLeadingIcon,
 }: AddAssetByBarcodeProps): React.JSX.Element {
-  const getAssetByBarcode = useAssetStore(state => state.getAssetByBarcode)
-  const searchGlobal = useGlobalSearchStore(state => state.searchGlobal)
+  const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
+  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -62,7 +62,7 @@ export function AddAssetByBarcode({
     setIsLookingUp(true)
     try {
       const asset = await getAssetByBarcode(barcode)
-      if (getAssets().some(a => a.barcode === asset.barcode)) {
+      if (getAssets().some((a) => a.barcode === asset.barcode)) {
         setAssetError(`Asset ${asset.barcode} is already in this ${entityName}.`)
         return
       }
@@ -119,18 +119,18 @@ export function AddAssetByBarcode({
   return (
     <div className={className}>
       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverTrigger asChild><div /></PopoverTrigger>
+        <PopoverTrigger asChild>
+          <div />
+        </PopoverTrigger>
         <PopoverAnchor asChild>
-          <div className='relative'>
+          <div className="relative">
             {showLeadingIcon && (
-              <MagnifyingGlassIcon
-                className='absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none'
-              />
+              <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
             )}
             <Input
               ref={inputRef}
-              placeholder='Scan or enter barcode / serial…'
-              aria-label='Add asset by barcode or serial number'
+              placeholder="Scan or enter barcode / serial…"
+              aria-label="Add asset by barcode or serial number"
               value={displayValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
@@ -139,28 +139,28 @@ export function AddAssetByBarcode({
             />
             {isLookingUp && (
               <CircleNotchIcon
-                className='absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground'
+                className="absolute right-2 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground"
                 size={16}
               />
             )}
           </div>
         </PopoverAnchor>
         <PopoverContent
-          align='start'
-          onOpenAutoFocus={e => e.preventDefault()}
-          onCloseAutoFocus={e => e.preventDefault()}
-          className='w-[--radix-popover-anchor-width] min-w-80 p-1'
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="w-[--radix-popover-anchor-width] min-w-80 p-1"
         >
           <CommandResultList
             items={suggestions}
-            getKey={s => s.barcode}
-            getValue={s => s.barcode}
-            getColumns={s => [s.barcode, s.serial_number, s.asset_type, s.model]}
+            getKey={(s) => s.barcode}
+            getValue={(s) => s.barcode}
+            getColumns={(s) => [s.barcode, s.serial_number, s.asset_type, s.model]}
             onSelect={handleSuggestionSelect}
           />
         </PopoverContent>
       </Popover>
-      {assetError && <p className='text-destructive mt-1'>{assetError}</p>}
+      {assetError && <p className="text-destructive mt-1">{assetError}</p>}
     </div>
   )
 }
@@ -176,15 +176,15 @@ export function AddFromHoldButton({
   getAssets,
   onAddAsset,
   disabled,
-  onCommitBatch
+  onCommitBatch,
 }: AddFromHoldButtonProps): React.JSX.Element {
   const [isHoldModalOpen, setIsHoldModalOpen] = useState(false)
 
   return (
     <>
       <Button
-        variant='secondary'
-        type='button'
+        variant="secondary"
+        type="button"
         onClick={() => setIsHoldModalOpen(true)}
         disabled={disabled}
       >

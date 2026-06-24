@@ -1,8 +1,8 @@
-import { Badge } from "@/components/shadcn/badge"
-import { Button } from "@/components/shadcn/button"
-import { formatDate, formatThousandsK, formatUSD } from "@/lib/formatters"
-import { ArrowsDownUpIcon } from "@phosphor-icons/react"
-import type { ColumnDef } from "@tanstack/react-table"
+import { Badge } from '@/components/shadcn/badge'
+import { Button } from '@/components/shadcn/button'
+import { formatDate, formatThousandsK, formatUSD } from '@/lib/formatters'
+import { ArrowsDownUpIcon } from '@phosphor-icons/react'
+import type { ColumnDef } from '@tanstack/react-table'
 import type { ModelSaleRow } from 'shared-types'
 import { createIdColumn } from './shared-columns'
 
@@ -12,19 +12,9 @@ export const MODEL_SALES_SPEC_COLUMN_IDS = [
   'core_functions',
 ] as const
 
-function SortableHeader({
-  label,
-  onToggle,
-}: {
-  label: string
-  onToggle: () => void
-}) {
+function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
   return (
-    <Button
-      variant="ghost"
-      onClick={onToggle}
-      className="h-auto whitespace-normal py-1"
-    >
+    <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
       {label}
       <ArrowsDownUpIcon />
     </Button>
@@ -36,85 +26,87 @@ export function createModelSalesColumns(
 ): ColumnDef<ModelSaleRow>[] {
   return [
     createIdColumn<ModelSaleRow>({
-      accessorKey: "barcode",
-      header: "Barcode",
+      accessorKey: 'barcode',
+      header: 'Barcode',
       href: detailHref,
-      value: row => row.barcode,
+      value: (row) => row.barcode,
     }),
     {
-      accessorKey: "departed_at",
+      accessorKey: 'departed_at',
       header: ({ column }) => (
         <SortableHeader
           label="Date Sold"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
       cell: ({ row }) => formatDate(row.original.departed_at),
       size: 140,
     },
     {
-      accessorKey: "sale_price",
+      accessorKey: 'sale_price',
       header: ({ column }) => (
         <SortableHeader
           label="Sale Price"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
       cell: ({ row }) => formatUSD(row.original.sale_price),
       size: 100,
     },
     {
-      accessorKey: "meter",
+      accessorKey: 'meter',
       header: ({ column }) => (
         <SortableHeader
           label="Meter"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
       cell: ({ row }) => formatThousandsK(row.original.meter),
       size: 80,
     },
     {
-      accessorKey: "customer",
+      accessorKey: 'customer',
       header: ({ column }) => (
         <SortableHeader
           label="Customer"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
       cell: ({ row }) => row.original.customer ?? '',
       size: 160,
     },
     {
-      accessorKey: "salesperson",
+      accessorKey: 'salesperson',
       header: ({ column }) => (
         <SortableHeader
           label="Salesperson"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
       cell: ({ row }) => row.original.salesperson ?? '',
       size: 120,
     },
     {
-      accessorKey: "cassettes",
-      header: "Cassettes",
+      accessorKey: 'cassettes',
+      header: 'Cassettes',
       cell: ({ row }) => row.original.cassettes ?? '',
       size: 80,
     },
     {
-      accessorKey: "internal_finisher",
-      header: "Internal Finisher",
+      accessorKey: 'internal_finisher',
+      header: 'Internal Finisher',
       cell: ({ row }) => row.original.internal_finisher ?? '',
       size: 120,
     },
     {
-      accessorKey: "core_functions",
-      header: "Core Functions",
+      accessorKey: 'core_functions',
+      header: 'Core Functions',
       cell: ({ row }) => (
         <div className="flex flex-wrap justify-center gap-1">
-          {row.original.core_functions.map(name => (
-            <Badge key={name} variant="outline">{name}</Badge>
+          {row.original.core_functions.map((name) => (
+            <Badge key={name} variant="outline">
+              {name}
+            </Badge>
           ))}
         </div>
       ),

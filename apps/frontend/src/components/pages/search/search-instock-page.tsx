@@ -4,10 +4,7 @@ import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useSearchInStock } from '@/hooks/use-search-instock'
 import { useUrlFilters } from '@/hooks/use-url-filters'
-import {
-  filtersToParams,
-  paramsToFilters,
-} from '@/lib/search-instock-params'
+import { filtersToParams, paramsToFilters } from '@/lib/search-instock-params'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
@@ -18,26 +15,24 @@ const EMPTY_ASSETS: AssetSearchRow[] = []
 export function SearchInStockPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const models = useModelStore(state => state.models)
-  const allBrands = useReferenceDataStore(state => state.brands)
-  const allAssetTypes = useReferenceDataStore(state => state.assetTypes)
-  const allReadinesses = useReferenceDataStore(state => state.readinesses)
-  const allWarehouses = useReferenceDataStore(state => state.warehouses)
-  const allComponents = useReferenceDataStore(state => state.components)
+  const models = useModelStore((state) => state.models)
+  const allBrands = useReferenceDataStore((state) => state.brands)
+  const allAssetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const allReadinesses = useReferenceDataStore((state) => state.readinesses)
+  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
+  const allComponents = useReferenceDataStore((state) => state.components)
 
   const urlFilters = useMemo(
-    () => paramsToFilters(searchParams, {
-      warehouses: allWarehouses,
-      brands: allBrands,
-      assetTypes: allAssetTypes,
-      models,
-      readinesses: allReadinesses,
-      components: allComponents,
-    }),
-    [
-      searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses,
-      allComponents,
-    ],
+    () =>
+      paramsToFilters(searchParams, {
+        warehouses: allWarehouses,
+        brands: allBrands,
+        assetTypes: allAssetTypes,
+        models,
+        readinesses: allReadinesses,
+        components: allComponents,
+      }),
+    [searchParams, allWarehouses, allBrands, allAssetTypes, models, allReadinesses, allComponents],
   )
 
   const { draft, updateImmediate, updateDebounced } = useUrlFilters(
@@ -47,7 +42,9 @@ export function SearchInStockPage(): React.JSX.Element {
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchInStock(urlFilters)
-  const handleBulkPriceSave = useCallback(() => { mutate() }, [mutate])
+  const handleBulkPriceSave = useCallback(() => {
+    mutate()
+  }, [mutate])
 
   return (
     <AssetSearchPage

@@ -61,8 +61,18 @@ const STICKY_HEADER_CLASS =
 const STICKY_FOOTER_CLASS = 'sticky bottom-0 bg-muted z-10'
 
 const MONTH_LABELS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ] as const
 
 const METRIC_COLUMNS = [
@@ -115,29 +125,30 @@ function ProfitabilityFilterBar({
   filters: ProfitabilityFilters
   onChange: (next: ProfitabilityFilters) => void
 }): React.JSX.Element {
-  const brands = useReferenceDataStore(state => state.brands)
-  const warehouses = useReferenceDataStore(state => state.warehouses)
-  const organizations = useOrgStore(state => state.organizations)
-  const users = useUserStore(state => state.users)
+  const brands = useReferenceDataStore((state) => state.brands)
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const organizations = useOrgStore((state) => state.organizations)
+  const users = useUserStore((state) => state.users)
 
-  const warehouseSelection =
-    warehouses.filter(warehouse => filters.warehouseIds.includes(warehouse.id))
-  const salesRepSelection = users.find(user => user.id === filters.salesRepId) ?? null
-  const vendorSelection = organizations.find(org => org.id === filters.vendorId) ?? null
-  const brandSelection = brands.find(brand => brand.id === filters.brandId) ?? null
+  const warehouseSelection = warehouses.filter((warehouse) =>
+    filters.warehouseIds.includes(warehouse.id),
+  )
+  const salesRepSelection = users.find((user) => user.id === filters.salesRepId) ?? null
+  const vendorSelection = organizations.find((org) => org.id === filters.vendorId) ?? null
+  const brandSelection = brands.find((brand) => brand.id === filters.brandId) ?? null
 
   return (
     <div className="flex flex-row flex-wrap gap-2 items-center">
       <Select
         value={String(filters.year)}
-        onValueChange={raw => onChange({ ...filters, year: Number.parseInt(raw, 10) })}
+        onValueChange={(raw) => onChange({ ...filters, year: Number.parseInt(raw, 10) })}
       >
         <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>
         <SelectContent position="popper">
           <SelectGroup>
-            {YEARS.map(year => (
+            {YEARS.map((year) => (
               <SelectItem key={year} value={String(year)}>
                 {year}
               </SelectItem>
@@ -148,15 +159,17 @@ function ProfitabilityFilterBar({
 
       <WarehouseFilter
         selection={warehouseSelection}
-        onSelectionChange={selected => onChange({
-          ...filters,
-          warehouseIds: selected.map(warehouse => warehouse.id),
-        })}
+        onSelectionChange={(selected) =>
+          onChange({
+            ...filters,
+            warehouseIds: selected.map((warehouse) => warehouse.id),
+          })
+        }
       />
 
       <UserFilter
         selection={salesRepSelection}
-        onSelectionChange={user => onChange({ ...filters, salesRepId: user.id })}
+        onSelectionChange={(user) => onChange({ ...filters, salesRepId: user.id })}
         onClear={() => onChange({ ...filters, salesRepId: null })}
         placeholder="Salesperson"
         clearLabel="Clear salesperson"
@@ -164,7 +177,7 @@ function ProfitabilityFilterBar({
 
       <CustomerFilter
         selection={vendorSelection}
-        onSelectionChange={vendor => onChange({ ...filters, vendorId: vendor.id })}
+        onSelectionChange={(vendor) => onChange({ ...filters, vendorId: vendor.id })}
         onClear={() => onChange({ ...filters, vendorId: null })}
         placeholder="Vendor"
         clearLabel="Clear vendor"
@@ -172,7 +185,7 @@ function ProfitabilityFilterBar({
 
       <BrandFilter
         selection={brandSelection}
-        onSelectionChange={brand => onChange({ ...filters, brandId: brand.id })}
+        onSelectionChange={(brand) => onChange({ ...filters, brandId: brand.id })}
         onClear={() => onChange({ ...filters, brandId: null })}
       />
     </div>
@@ -191,12 +204,7 @@ function ActiveFilterBar({
       <span className="text-xs text-muted-foreground">
         {count} {count === 1 ? 'filter' : 'filters'} active
       </span>
-      <Button
-        variant="link"
-        size="sm"
-        className="h-auto p-0 text-xs"
-        onClick={onClear}
-      >
+      <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={onClear}>
         Clear all
       </Button>
     </div>
@@ -233,7 +241,7 @@ function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX
       <TableHeader>
         <TableRow>
           <TableHead className={STICKY_HEADER_CLASS}>Month</TableHead>
-          {METRIC_COLUMNS.map(column => (
+          {METRIC_COLUMNS.map((column) => (
             <TableHead key={column.key} className={cn('text-right', STICKY_HEADER_CLASS)}>
               {column.header}
             </TableHead>
@@ -244,10 +252,10 @@ function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX
         </TableRow>
       </TableHeader>
       <TableBody>
-        {months.map(row => (
+        {months.map((row) => (
           <TableRow key={row.month}>
             <TableCell className="font-medium">{MONTH_LABELS[row.month - 1]}</TableCell>
-            {METRIC_COLUMNS.map(column => (
+            {METRIC_COLUMNS.map((column) => (
               <TableCell
                 key={column.key}
                 className={cn(
@@ -269,7 +277,7 @@ function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX
       <TableFooter>
         <TableRow>
           <TableCell className={cn('font-semibold', STICKY_FOOTER_CLASS)}>Total</TableCell>
-          {METRIC_COLUMNS.map(column => (
+          {METRIC_COLUMNS.map((column) => (
             <TableCell
               key={column.key}
               className={cn(
@@ -309,9 +317,11 @@ function ProfitabilityReportBody({
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-sm text-muted-foreground">No activity for these filters.</p>
-        {hasActiveFilters
-          ? <Button variant="outline" size="sm" onClick={onClearFilters}>Clear filters</Button>
-          : null}
+        {hasActiveFilters ? (
+          <Button variant="outline" size="sm" onClick={onClearFilters}>
+            Clear filters
+          </Button>
+        ) : null}
       </div>
     )
   }
@@ -320,10 +330,7 @@ function ProfitabilityReportBody({
 
 export function ProfitabilityReportPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
-  const filters = useMemo(
-    () => paramsToFilters(searchParams, CURRENT_YEAR),
-    [searchParams],
-  )
+  const filters = useMemo(() => paramsToFilters(searchParams, CURRENT_YEAR), [searchParams])
 
   const canonicalParams = useMemo(() => filtersToParams(filters).toString(), [filters])
 
@@ -358,13 +365,13 @@ export function ProfitabilityReportPage(): React.JSX.Element {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">Profitability</h1>
-            {isLoading
-              ? <SpinnerGapIcon
-                  className="animate-spin text-muted-foreground"
-                  aria-label="Loading"
-                  role="status"
-                />
-              : null}
+            {isLoading ? (
+              <SpinnerGapIcon
+                className="animate-spin text-muted-foreground"
+                aria-label="Loading"
+                role="status"
+              />
+            ) : null}
           </div>
           <div className="flex items-center gap-2">
             <SavedViewsButton pageKey="report_profitability" />
@@ -372,9 +379,9 @@ export function ProfitabilityReportPage(): React.JSX.Element {
           </div>
         </div>
         <ProfitabilityFilterBar filters={filters} onChange={updateFilters} />
-        {activeFilterCount > 0
-          ? <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
-          : null}
+        {activeFilterCount > 0 ? (
+          <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
+        ) : null}
       </StickyPageHeader>
       <PageContent>
         <div className={cn('flex flex-col gap-4 transition-opacity', isLoading && 'opacity-50')}>

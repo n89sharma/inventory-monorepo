@@ -5,7 +5,14 @@ import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-heade
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { PageContent } from '@/components/layout/page-content'
 import { DataTable } from '@/components/shadcn/data-table'
-import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/shadcn/field'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveUsers } from '@/hooks/use-active-users'
@@ -37,19 +44,28 @@ function validateHoldAsset(asset: AssetSummary): string | null {
   return null
 }
 
-export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSubmit }: HoldFormPageProps): React.JSX.Element {
+export function HoldFormPage({
+  defaultValues,
+  pageConfig,
+  breadcrumbs,
+  onValidSubmit,
+}: HoldFormPageProps): React.JSX.Element {
   const form = useForm<HoldForm>({
     resolver: zodResolver(HoldFormSchema),
     defaultValues: defaultValues ?? {
       created_for: UNSELECTED,
       customer: null,
       notes: '',
-      assets: []
-    }
+      assets: [],
+    },
   })
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore(state => state.organizations)
-  const { fields: assets, append: addAsset, remove: deleteAsset } = useFieldArray({ control: form.control, name: 'assets' })
+  const orgs = useOrgStore((state) => state.organizations)
+  const {
+    fields: assets,
+    append: addAsset,
+    remove: deleteAsset,
+  } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
 
@@ -76,58 +92,53 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitHold}
       />
-      <PageContent className='flex flex-col gap-2'>
-        <form onSubmit={e => e.preventDefault()} className='border rounded-md p-2 flex flex-col gap-2'>
-          <fieldset disabled={isSubmitting} className='contents'>
+      <PageContent className="flex flex-col gap-2">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="border rounded-md p-2 flex flex-col gap-2"
+        >
+          <fieldset disabled={isSubmitting} className="contents">
             <FieldSet>
               <FieldLegend>General Hold Information</FieldLegend>
-              <FieldGroup className='grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl'>
-
+              <FieldGroup className="grid grid-cols-3 gap-x-6 gap-y-3 max-w-4xl">
                 <ControlledSelectOptionSearchSelect
                   control={form.control}
-                  name='created_for'
+                  name="created_for"
                   options={activeUsers}
-                  getLabel={u => u.name}
-                  fieldLabel='Created For'
+                  getLabel={(u) => u.name}
+                  fieldLabel="Created For"
                   fieldRequired={true}
-                  className='max-w-60'
+                  className="max-w-60"
                 />
 
                 <ControlledSearchSelectInput
                   control={form.control}
-                  name='customer'
+                  name="customer"
                   options={orgs}
-                  getLabel={o => o.name}
-                  fieldLabel='Customer'
+                  getLabel={(o) => o.name}
+                  fieldLabel="Customer"
                   fieldRequired={true}
-                  className='max-w-60'
+                  className="max-w-60"
                 />
-
               </FieldGroup>
 
               <Controller
                 control={form.control}
-                name='notes'
+                name="notes"
                 render={({ field }) => (
-                  <Field className='max-w-xl'>
+                  <Field className="max-w-xl">
                     <FieldLabel>Notes</FieldLabel>
-                    <Textarea
-                      placeholder='Hold notes…'
-                      className='resize-none'
-                      {...field}
-                    />
+                    <Textarea placeholder="Hold notes…" className="resize-none" {...field} />
                   </Field>
                 )}
               />
 
               <Controller
                 control={form.control}
-                name='assets'
+                name="assets"
                 render={({ fieldState }) => (
-                  <div aria-live='polite'>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                  <div aria-live="polite">
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </div>
                 )}
               />
@@ -135,17 +146,17 @@ export function HoldFormPage({ defaultValues, pageConfig, breadcrumbs, onValidSu
           </fieldset>
         </form>
 
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-center justify-between'>
-            <h2 className='text-lg font-semibold'>Assets</h2>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Assets</h2>
           </div>
           <AddAssetByBarcode
             getAssets={() => form.getValues('assets')}
             onAddAsset={addAsset}
-            entityName='hold'
+            entityName="hold"
             validateAsset={validateHoldAsset}
             disabled={isSubmitting}
-            className='max-w-xl'
+            className="max-w-xl"
           />
           <DataTable columns={assetTableColumns} data={assets} />
         </div>
