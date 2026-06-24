@@ -18,7 +18,7 @@ export function successResponse<T>(data: T): ApiResponse<T> {
   }
 }
 
-export function response400<T>(summary: string, details?: any): ApiResponse<T> {
+export function response400<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {
@@ -30,7 +30,7 @@ export function response400<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
-export function response401<T>(summary: string, details?: any): ApiResponse<T> {
+export function response401<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {
@@ -42,7 +42,7 @@ export function response401<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
-export function response403<T>(summary: string, details?: any): ApiResponse<T> {
+export function response403<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {
@@ -54,7 +54,7 @@ export function response403<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
-export function response404<T>(summary: string, details?: any): ApiResponse<T> {
+export function response404<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {
@@ -66,7 +66,7 @@ export function response404<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
-export function response409<T>(summary: string, details?: any): ApiResponse<T> {
+export function response409<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {
@@ -78,7 +78,7 @@ export function response409<T>(summary: string, details?: any): ApiResponse<T> {
   }
 }
 
-export function response500<T>(summary: string, details?: any): ApiResponse<T> {
+export function response500<T>(summary: string, details?: string): ApiResponse<T> {
   return {
     success: false,
     error: {

@@ -12,6 +12,7 @@
     "bdev": "npm run dev -w apps/backend",
     "fdev": "npm run dev -w apps/frontend",
     "bstart": "npm run start -w apps/backend",
+    "tlint": "npm run lint -w packages/shared-types",
     "blint": "npm run lint -w apps/backend",
     "flint": "npm run lint -w apps/frontend"
   }
