@@ -25,6 +25,7 @@ import { formatDate, formatDateWithTime, formatLocation, formatTitleCase, format
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { isFromGlobalSearch } from '@/ui-types/navigation-context'
 import type { AssetHistory } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
@@ -120,7 +121,11 @@ function RailField({ label, children }: { label: string; children: React.ReactNo
 export const AssetDetailsPage = () => {
 
   const { section, collectionId, assetId, searchList } = useAssetDetailsParams()
-  const listSearch = useLocation().search
+  const location = useLocation()
+  const listSearch = location.search
+  const breadcrumbSegments = isFromGlobalSearch(location.state)
+    ? []
+    : getBreadcrumForAssetDetails(section, collectionId, searchList, listSearch)
 
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editPricingOpen, setEditPricingOpen] = useState(false)
@@ -258,7 +263,7 @@ export const AssetDetailsPage = () => {
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumForAssetDetails(section, collectionId, searchList, listSearch)}
+        breadcrumbSegments={breadcrumbSegments}
         titleNode={
           <h1 className="text-xl flex items-center gap-6">
             <span className="font-semibold">

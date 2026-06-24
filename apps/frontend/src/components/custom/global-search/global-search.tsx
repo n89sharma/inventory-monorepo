@@ -3,6 +3,7 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/compon
 import { useGlobalSearchStore } from '@/data/store/global-search-store'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { cn } from '@/lib/utils'
+import { FROM_GLOBAL_SEARCH_STATE } from '@/ui-types/navigation-context'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -68,7 +69,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     setPopoverOpen(false)
     setQuery("")
     if (item.kind === 'asset') {
-      navigate(`/search/all/${item.data.barcode}`)
+      navigate(`/search/all/${item.data.barcode}`, { state: FROM_GLOBAL_SEARCH_STATE })
     } else if (item.kind === 'arrival') {
       navigate(`/arrivals/${item.data.arrival_number}`)
     } else if (item.kind === 'departure') {

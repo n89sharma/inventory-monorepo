@@ -29,6 +29,17 @@ export function getSearchList(pathname: string): SearchList | null {
     : null
 }
 
+export const FROM_GLOBAL_SEARCH_STATE = { fromGlobalSearch: true } as const
+
+export function isFromGlobalSearch(state: unknown): boolean {
+  return (
+    typeof state === 'object' &&
+    state !== null &&
+    'fromGlobalSearch' in state &&
+    (state as { fromGlobalSearch: unknown }).fromGlobalSearch === true
+  )
+}
+
 export function assetDetailHref(
   list: SearchList,
   barcode: string,

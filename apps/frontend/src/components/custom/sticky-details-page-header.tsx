@@ -19,7 +19,9 @@ export function StickyDetailsPageHeader(
   const { breadcrumbSegments, actions, subtitle } = props
   return (
     <StickyPageHeader>
-      <PageBreadcrumbToTitle segments={breadcrumbSegments} />
+      {breadcrumbSegments.length > 0
+        ? <PageBreadcrumbToTitle segments={breadcrumbSegments} />
+        : null}
       <div className="flex items-center justify-between gap-4">
         {props.titleNode ?? (
           <h1 className="text-2xl font-semibold group flex items-center gap-2">
