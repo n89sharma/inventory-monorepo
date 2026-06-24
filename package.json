@@ -11,6 +11,8 @@
     "fbuild": "npm run build -w apps/frontend",
     "bdev": "npm run dev -w apps/backend",
     "fdev": "npm run dev -w apps/frontend",
-    "bstart": "npm run start -w apps/backend"
+    "bstart": "npm run start -w apps/backend",
+    "blint": "npm run lint -w apps/backend",
+    "flint": "npm run lint -w apps/frontend"
   }
 }

@@ -48,6 +48,7 @@
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "eslint-plugin-sonarjs": "^4.1.0",
     "globals": "^16.5.0",
     "shadcn": "^4.4.0",
     "tailwindcss": "^4.1.10",

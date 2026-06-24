@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
+    "lint": "eslint .",
     "start": "node dist/src/index.js",
     "pgen": "npx prisma generate --sql",
     "ppull": "npx prisma db pull"
@@ -29,6 +30,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.23",
     "@types/morgan": "^1.9.10",
@@ -37,9 +39,13 @@
     "@types/pg": "^8.20.0",
     "@types/uuid": "^10.0.0",
     "dotenv": "^16.5.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-sonarjs": "^4.1.0",
+    "globals": "^16.5.0",
     "prisma": "7.8.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.62.0"
   },
   "engines": {
     "node": ">=22.16.0"
