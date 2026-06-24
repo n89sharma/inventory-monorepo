@@ -1,4 +1,4 @@
-import { AssetDelta, AssetSummary, CreateDeparture, DepartureDetail, OutgoingStatus, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, AssetSummary, CreateDeparture, DEFAULT_OUTGOING_STATUS, DepartureDetail, OutgoingStatus, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
@@ -6,8 +6,6 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
-
-const DEFAULT_ADD_STATUS: OutgoingStatus = 'SOLD'
 
 
 
@@ -142,7 +140,7 @@ export async function addAssetsToDepartureAndRecord(
   if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
 
   const addStatus = await prisma.status.findUniqueOrThrow({
-    where: { status: DEFAULT_ADD_STATUS },
+    where: { status: DEFAULT_OUTGOING_STATUS },
     select: { id: true }
   })
 

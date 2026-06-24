@@ -1,4 +1,4 @@
-import type { AssetType, Brand, OrgSummary, Status } from 'shared-types'
+import { OUTGOING_STATUS, type AssetType, type Brand, type OrgSummary, type Status } from 'shared-types'
 import {
   isAfter,
   isBefore,
@@ -25,10 +25,6 @@ const PARAM_FROM = 'from'
 const PARAM_TO = 'to'
 const PARAM_CUSTOMER = 'customer'
 const OTHER_ON = '1'
-
-export const SOLD_STATUS = 'SOLD'
-export const HARVESTED_STATUS = 'HARVESTED'
-export const SCRAPPED_STATUS = 'SCRAPPED'
 
 export const MAX_DEPARTED_MONTHS = 18
 const DEFAULT_FROM_DAYS = 30
@@ -58,8 +54,10 @@ export type SearchSoldReferenceData = SharedAssetReferenceData & {
 }
 
 export function resolveSoldStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
-  const wanted = new Set(
-    showOther ? [HARVESTED_STATUS, SCRAPPED_STATUS] : [SOLD_STATUS],
+  const wanted = new Set<string>(
+    showOther
+      ? [OUTGOING_STATUS.HARVESTED, OUTGOING_STATUS.SCRAPPED]
+      : [OUTGOING_STATUS.SOLD],
   )
   return allStatuses.filter(s => wanted.has(s.status))
 }

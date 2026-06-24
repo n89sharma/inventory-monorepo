@@ -1,4 +1,4 @@
-import { ArrivalDetail, AssetDelta, AssetSummary, CreateArrival, CreateAsset, ModelSummary, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
+import { ArrivalDetail, AssetDelta, AssetSummary, ASSET_STATUS, CreateArrival, CreateAsset, ModelSummary, UpdateArrivalMetadata, UpdateAsset } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
@@ -17,7 +17,7 @@ import { addRemoveCollectionFromAssets, recordCollectionAssetDelta } from '../li
 
 
 const arrivalZone = 'SHIPPING_AND_RECEIVING'
-const arrivalStatus = 'IN_STOCK'
+const arrivalStatus = ASSET_STATUS.IN_STOCK
 
 async function ensureArrivalLocationId(
   tx: Prisma.TransactionClient,

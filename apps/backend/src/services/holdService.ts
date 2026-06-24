@@ -1,4 +1,4 @@
-import { AppRole, AssetDelta, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
+import { AppRole, AssetDelta, ASSET_STATUS, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -12,7 +12,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   const assetIds = data.assets.map(a => a.id)
 
   const heldStatus = await prisma.status.findUniqueOrThrow({
-    where: { status: 'HELD' },
+    where: { status: ASSET_STATUS.HELD },
     select: { id: true }
   })
 
@@ -100,8 +100,8 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   userId: number
 ): Promise<void> {
   const [heldStatus, inStockStatus, hold] = await Promise.all([
-    prisma.status.findUniqueOrThrow({ where: { status: 'HELD' }, select: { id: true } }),
-    prisma.status.findUniqueOrThrow({ where: { status: 'IN_STOCK' }, select: { id: true } }),
+    prisma.status.findUniqueOrThrow({ where: { status: ASSET_STATUS.HELD }, select: { id: true } }),
+    prisma.status.findUniqueOrThrow({ where: { status: ASSET_STATUS.IN_STOCK }, select: { id: true } }),
     prisma.hold.findUnique({ where: { hold_number: holdNumber }, select: { id: true, archived_at: true } })
   ])
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
@@ -174,7 +174,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
 
 export async function archiveHold(holdNumber: string, userId: number): Promise<void> {
   const inStockStatus = await prisma.status.findUniqueOrThrow({
-    where: { status: 'IN_STOCK' },
+    where: { status: ASSET_STATUS.IN_STOCK },
     select: { id: true }
   })
 

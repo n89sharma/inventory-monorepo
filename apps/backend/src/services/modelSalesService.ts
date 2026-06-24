@@ -1,5 +1,5 @@
 import { subMonths } from 'date-fns'
-import type { ModelSaleRow, ModelSalesResult } from 'shared-types'
+import { ASSET_STATUS, type ModelSaleRow, type ModelSalesResult } from 'shared-types'
 import {
   getModelLastSale as getModelLastSaleQuery,
   getModelSales as getModelSalesQuery,
@@ -7,8 +7,6 @@ import {
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
-const IN_STOCK_STATUS = 'IN_STOCK'
-const SOLD_STATUS = 'SOLD'
 const SALES_WINDOW_MONTHS = 12
 
 function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
@@ -28,7 +26,7 @@ function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
 export async function getModelSales(modelId: number): Promise<ModelSalesResult> {
   const fromDate = subMonths(new Date(), SALES_WINDOW_MONTHS)
   const soldStatus = await prisma.status.findUniqueOrThrow({
-    where: { status: SOLD_STATUS },
+    where: { status: ASSET_STATUS.SOLD },
     select: { id: true },
   })
   const [model, sales, lastSaleRows, in_stock_count] = await Promise.all([
@@ -36,7 +34,7 @@ export async function getModelSales(modelId: number): Promise<ModelSalesResult> 
     prisma.$queryRawTyped(getModelSalesQuery(modelId, fromDate, soldStatus.id)),
     prisma.$queryRawTyped(getModelLastSaleQuery(modelId, soldStatus.id)),
     prisma.asset.count({
-      where: { model_id: modelId, Status: { status: IN_STOCK_STATUS } },
+      where: { model_id: modelId, Status: { status: ASSET_STATUS.IN_STOCK } },
     }),
   ])
   if (!model) throw new NotFoundError(`Model ${modelId} not found`)

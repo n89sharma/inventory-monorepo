@@ -7,10 +7,8 @@ import { ArrowsDownUpIcon } from "@phosphor-icons/react"
 import type { ColumnDef } from "@tanstack/react-table"
 import { differenceInCalendarDays } from "date-fns"
 import { Link } from "react-router-dom"
-import type { AssetSearchRow } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
 import { createIdColumn } from './shared-columns'
-
-const HELD_STATUS = 'HELD'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
@@ -81,7 +79,7 @@ export function createAssetSearchColumns(
     header: "Status",
     cell: ({ row }) => {
       const { status, held_by, hold_hold_number } = row.original
-      if (status !== HELD_STATUS || !held_by || !hold_hold_number) {
+      if (status !== ASSET_STATUS.HELD || !held_by || !hold_hold_number) {
         return <StatusBadge status={status} />
       }
       return (

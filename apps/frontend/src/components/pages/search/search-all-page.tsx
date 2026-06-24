@@ -17,7 +17,7 @@ import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { AssetSearchRow } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
@@ -26,8 +26,8 @@ import { SavedViewsButton } from '../../custom/saved-views-button'
 import { ShareButton } from '../../custom/share-button'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
-const STATUS_TOP_ORDER = ['IN_STOCK', 'HELD', 'ON_ORDER'] as const
-const STATUS_DIVIDER_AFTER = new Set<string>(['HELD', 'ON_ORDER'])
+const STATUS_TOP_ORDER = [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER] as const
+const STATUS_DIVIDER_AFTER = new Set<string>([ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER])
 
 export function SearchAllPage(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -39,7 +39,7 @@ export function SearchAllPage(): React.JSX.Element {
   const allStatuses = useMemo(
     () => {
       const filtered = rawStatuses.filter(
-        s => s.status != 'UNKNOWN' && s.status != 'LEASED',
+        s => s.status != ASSET_STATUS.UNKNOWN && s.status != ASSET_STATUS.LEASED,
       )
       const top: typeof filtered = []
       for (const key of STATUS_TOP_ORDER) {

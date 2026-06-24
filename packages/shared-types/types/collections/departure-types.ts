@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AssetSummarySchema } from '../asset-types.js';
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js';
-import { WarehouseSchema } from '../reference-data-types.js';
+import { OutgoingStatusSchema, WarehouseSchema } from '../reference-data-types.js';
 import { CollectionSummarySchema } from './collection-types.js';
 
 export const DepartureSummarySchema = CollectionSummarySchema.extend({
@@ -25,18 +25,6 @@ export const DepartureDetailSchema = z.object({
   assets: z.array(AssetSummarySchema)
 })
 export type DepartureDetail = z.infer<typeof DepartureDetailSchema>
-
-// Per-asset outcome chosen when departing; persisted as the asset's new status.
-export const OutgoingStatusSchema = z.enum(['SOLD', 'HARVESTED', 'SCRAPPED'])
-export type OutgoingStatus = z.infer<typeof OutgoingStatusSchema>
-
-export const DEFAULT_OUTGOING_STATUS: OutgoingStatus = 'SOLD'
-
-export const OUTGOING_STATUS_LABELS = {
-  SOLD: 'Sold',
-  HARVESTED: 'Harvested',
-  SCRAPPED: 'Scrapped'
-} as const satisfies Record<OutgoingStatus, string>
 
 export const DepartureAssetInputSchema = z.object({
   id: z.number(),

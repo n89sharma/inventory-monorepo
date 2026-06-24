@@ -8,6 +8,7 @@ import {
   AssetTransfer,
   Comment,
   AssetHarvestedPart,
+  ASSET_STATUS,
   ROLE_PERMISSIONS,
   type AppRole
 } from 'shared-types'
@@ -146,8 +147,6 @@ export async function getSoldAssets(
   return rows.map(mapAssetSearchRow).map(r => redactSearchRowCost(r, role))
 }
 
-const IN_STOCK_STATUS = 'IN_STOCK'
-export const HELD_STATUS = 'HELD'
 
 export async function getAssetsForSearchInStock(
   warehouseIds: number[],
@@ -162,7 +161,7 @@ export async function getAssetsForSearchInStock(
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
-    where: { status: IN_STOCK_STATUS },
+    where: { status: ASSET_STATUS.IN_STOCK },
     select: { id: true },
   })
   return getAssets(
@@ -204,7 +203,7 @@ export async function getAssetsForSearchHeld(
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
-    where: { status: HELD_STATUS },
+    where: { status: ASSET_STATUS.HELD },
     select: { id: true },
   })
   return getAssets(
