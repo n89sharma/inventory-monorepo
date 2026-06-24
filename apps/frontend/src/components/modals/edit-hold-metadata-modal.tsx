@@ -3,11 +3,13 @@ import { useActiveUsers } from '@/hooks/use-active-users'
 import { HoldMetadataFormSchema, type HoldMetadataForm } from '@/ui-types/hold-form-types'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import type { HoldDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { ControlledSelectOptionSearchSelect } from '../custom/controlled-select-option-search-select'
 import { Button } from '../shadcn/button'
@@ -32,19 +34,23 @@ export function EditHoldMetadataModal({
   const orgs = useOrgStore(state => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const values = useMemo(() => toFormValues(hold), [hold])
   const form = useForm<HoldMetadataForm>({
     resolver: zodResolver(HoldMetadataFormSchema),
-    defaultValues: toFormValues(hold)
+    values,
   })
 
-  useEffect(() => {
-    if (open) form.reset(toFormValues(hold))
-  }, [open, hold, form])
+  const guard = useUnsavedChangesGuard(
+    form.formState.isDirty,
+    onOpenChange,
+    () => form.reset(),
+  )
 
   async function onValid(values: HoldMetadataForm) {
     setIsSubmitting(true)
     try {
       await onSave(values)
+      form.reset(values)
       onOpenChange(false)
     } catch {
       // interceptor surfaced the error toast — keep modal open
@@ -62,7 +68,7 @@ export function EditHoldMetadataModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
+    <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
       <DialogContent className='sm:max-w-2xl'>
         <DialogHeader>
           <DialogTitle>Edit Hold</DialogTitle>
@@ -102,7 +108,7 @@ export function EditHoldMetadataModal({
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
             Cancel
           </Button>
           <Button onClick={submit} type='button' disabled={isSubmitting}>
@@ -110,6 +116,11 @@ export function EditHoldMetadataModal({
           </Button>
         </DialogFooter>
       </DialogContent>
+      <UnsavedChangesDialog
+        open={guard.confirmOpen}
+        onOpenChange={guard.setConfirmOpen}
+        onDiscard={guard.discard}
+      />
     </Dialog>
   )
 }

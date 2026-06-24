@@ -3,8 +3,9 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { modelLabel } from '@/lib/reference-labels'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Controller,
   useForm,
@@ -30,6 +31,32 @@ import {
 import { Textarea } from '../shadcn/textarea'
 
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
+
+function getDefaultNewAsset(allReadinesses: Status[] = []): AssetForm {
+  const untested = allReadinesses.find(r => r.status === 'UNTESTED')
+  return {
+    serialNumber: '',
+    model: null,
+    readiness: untested ? getSelectOption(untested) : UNSELECTED,
+    countryOfOrigin: null,
+    manufacturedYear: null,
+    meterBlack: null,
+    meterColour: null,
+    cassettes: null,
+    component: null,
+    coreFunctions: [],
+    drumLifeC: null,
+    drumLifeM: null,
+    drumLifeY: null,
+    drumLifeK: null,
+    tonerLifeC: null,
+    tonerLifeM: null,
+    tonerLifeY: null,
+    tonerLifeK: null,
+    errors: [],
+    comment: null,
+  }
+}
 
 interface AssetModalProps {
   open: boolean
@@ -60,23 +87,24 @@ export function AssetModal({
     submitLabel: isEditMode ? 'Update Asset' : 'Save Asset',
   }
 
-  const newAssetForm = useForm<AssetForm>({
-    resolver: zodResolver(AssetFormSchema),
-    defaultValues: getDefaultNewAsset(),
-  })
-  const isDirty = newAssetForm.formState.isDirty
-  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
   const readinesses = useReferenceDataStore(state => state.readinesses)
   const brands = useReferenceDataStore(state => state.brands)
   const models = useModelStore(state => state.models)
 
-  useEffect(() => {
-    if (open && editingAsset) {
-      newAssetForm.reset(editingAsset)
-    } else if (open && !editingAsset) {
-      newAssetForm.reset(getDefaultNewAsset(readinesses))
-    }
-  }, [open, editingAsset, readinesses])
+  const values = useMemo(
+    () => editingAsset ?? getDefaultNewAsset(readinesses),
+    [editingAsset, readinesses],
+  )
+  const newAssetForm = useForm<AssetForm>({
+    resolver: zodResolver(AssetFormSchema),
+    values,
+  })
+
+  const guard = useUnsavedChangesGuard(
+    newAssetForm.formState.isDirty,
+    onOpenChange,
+    () => newAssetForm.reset(),
+  )
 
   // Watch readiness + model to (a) drive the errors editor's enabled/brand state
   // and (b) clear errors on transitions: leaving HAS_ERRORS, or switching to a
@@ -115,32 +143,6 @@ export function AssetModal({
     }
     prevBrandRef.current = currentBrandName
   }, [currentBrandName, newAssetForm])
-
-  function getDefaultNewAsset(allReadinesses: Status[] = []) {
-    const untested = allReadinesses.find(r => r.status === 'UNTESTED')
-    return {
-      serialNumber: '',
-      model: null,
-      readiness: untested ? getSelectOption(untested) : UNSELECTED,
-      countryOfOrigin: null,
-      manufacturedYear: null,
-      meterBlack: null,
-      meterColour: null,
-      cassettes: null,
-      component: null,
-      coreFunctions: [],
-      drumLifeC: null,
-      drumLifeM: null,
-      drumLifeY: null,
-      drumLifeK: null,
-      tonerLifeC: null,
-      tonerLifeM: null,
-      tonerLifeY: null,
-      tonerLifeK: null,
-      errors: [],
-      comment: null,
-    }
-  }
 
   async function onValidAsset(rawAsset: AssetForm) {
     const asset: AssetForm = {
@@ -193,21 +195,8 @@ export function AssetModal({
     newAssetForm.handleSubmit(onValidAsset)()
   }
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen && isDirty) {
-      setConfirmCloseOpen(true)
-      return
-    }
-    onOpenChange(nextOpen)
-  }
-
-  function discardAndClose() {
-    setConfirmCloseOpen(false)
-    onOpenChange(false)
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={guard.onOpenChange}>
       <DialogContent className='md:max-w-175 max-h-[90vh] flex flex-col'>
         <DialogHeader>
           <DialogTitle>{modalConfig.title}</DialogTitle>
@@ -280,7 +269,7 @@ export function AssetModal({
         <DialogFooter>
           <Button
             variant='outline'
-            onClick={() => handleOpenChange(false)}
+            onClick={() => guard.onOpenChange(false)}
             type='button'
             disabled={isSubmitting}
           >
@@ -292,9 +281,9 @@ export function AssetModal({
         </DialogFooter>
       </DialogContent>
       <UnsavedChangesDialog
-        open={confirmCloseOpen}
-        onOpenChange={setConfirmCloseOpen}
-        onDiscard={discardAndClose}
+        open={guard.confirmOpen}
+        onOpenChange={guard.setConfirmOpen}
+        onDiscard={guard.discard}
       />
     </Dialog>
   )

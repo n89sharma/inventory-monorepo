@@ -2,11 +2,13 @@ import { useOrgStore } from '@/data/store/org-store'
 import { InvoiceMetadataFormSchema, type InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { formatTitleCase } from '@/lib/formatters'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceDetail } from 'shared-types'
 import { flattenFieldErrors } from '@/lib/utils'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { UnsavedChangesDialog } from '../custom/unsaved-changes-dialog'
 import { ControlledSearchSelectInput } from '../custom/controlled-search-select-input'
 import { Button } from '../shadcn/button'
 import { Checkbox } from '../shadcn/checkbox'
@@ -30,19 +32,23 @@ export function EditInvoiceMetadataModal({
   const orgs = useOrgStore(state => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const values = useMemo(() => toFormValues(invoice), [invoice])
   const form = useForm<InvoiceMetadataForm>({
     resolver: zodResolver(InvoiceMetadataFormSchema),
-    defaultValues: toFormValues(invoice)
+    values,
   })
 
-  useEffect(() => {
-    if (open) form.reset(toFormValues(invoice))
-  }, [open, invoice, form])
+  const guard = useUnsavedChangesGuard(
+    form.formState.isDirty,
+    onOpenChange,
+    () => form.reset(),
+  )
 
   async function onValid(values: InvoiceMetadataForm) {
     setIsSubmitting(true)
     try {
       await onSave(values)
+      form.reset(values)
       onOpenChange(false)
     } catch {
       // interceptor surfaced the error toast — keep modal open
@@ -60,7 +66,7 @@ export function EditInvoiceMetadataModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
+    <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
       <DialogContent className='sm:max-w-2xl'>
         <DialogHeader>
           <DialogTitle>Edit Invoice</DialogTitle>
@@ -104,7 +110,7 @@ export function EditInvoiceMetadataModal({
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)} type='button' disabled={isSubmitting}>
+          <Button variant='outline' onClick={() => guard.onOpenChange(false)} type='button' disabled={isSubmitting}>
             Cancel
           </Button>
           <Button onClick={submit} type='button' disabled={isSubmitting}>
@@ -112,6 +118,11 @@ export function EditInvoiceMetadataModal({
           </Button>
         </DialogFooter>
       </DialogContent>
+      <UnsavedChangesDialog
+        open={guard.confirmOpen}
+        onOpenChange={guard.setConfirmOpen}
+        onDiscard={guard.discard}
+      />
     </Dialog>
   )
 }

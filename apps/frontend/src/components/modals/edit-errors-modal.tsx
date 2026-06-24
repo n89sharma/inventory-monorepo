@@ -8,7 +8,9 @@ import {
 } from "@/components/shadcn/dialog"
 import { useAssetStore } from "@/data/store/asset-store"
 import { useReferenceDataStore } from "@/data/store/reference-data-store"
-import { useEffect, useState } from "react"
+import { useUnsavedChangesGuard } from "@/hooks/use-unsaved-changes-guard"
+import { useMemo, useState } from "react"
+import { useForm, useWatch } from "react-hook-form"
 import type { AssetDetails, AssetError, UpdateError } from "shared-types"
 import { toast } from "sonner"
 import { AssetErrorsEditor } from "../custom/asset-errors-editor"
@@ -22,36 +24,45 @@ interface EditErrorsModalProps {
   errors: AssetError[]
 }
 
+interface ErrorsForm {
+  errors: UpdateError[]
+}
+
+function toErrorsForm(errors: AssetError[]): ErrorsForm {
+  return { errors: errors.map(e => ({ error_id: e.error_id, is_fixed: e.is_fixed })) }
+}
+
 export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: EditErrorsModalProps) {
   const brands = useReferenceDataStore(state => state.brands)
   const updateAssetErrors = useAssetStore(state => state.updateAssetErrors)
 
-  const [localErrors, setLocalErrors] = useState<UpdateError[]>([])
-  const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false)
 
-  useEffect(() => {
-    if (open) {
-      setLocalErrors(errors.map(e => ({ error_id: e.error_id, is_fixed: e.is_fixed })))
-      setDirty(false)
-    }
-  }, [open])
+  const values = useMemo(() => toErrorsForm(errors), [errors])
+  const form = useForm<ErrorsForm>({ values })
+  const localErrors = useWatch({ control: form.control, name: 'errors' })
+
+  const guard = useUnsavedChangesGuard(
+    form.formState.isDirty,
+    onOpenChange,
+    () => form.reset(),
+  )
 
   if (!assetDetails) return null
 
   const brandId = brands.find(b => b.name === assetDetails.brand)?.id ?? null
 
   function handleChange(next: UpdateError[]) {
-    setLocalErrors(next)
-    setDirty(true)
+    form.setValue('errors', next, { shouldDirty: true })
   }
 
   async function handleSave() {
     if (!assetDetails) return
     setSaving(true)
     try {
-      await updateAssetErrors(assetDetails.barcode, localErrors)
+      const next = form.getValues().errors
+      await updateAssetErrors(assetDetails.barcode, next)
+      form.reset({ errors: next })
       toast.success('Errors updated.')
       onOpenChange(false)
     } catch {
@@ -60,21 +71,8 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
     setSaving(false)
   }
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen && dirty) {
-      setConfirmCloseOpen(true)
-      return
-    }
-    onOpenChange(nextOpen)
-  }
-
-  function discardAndClose() {
-    setConfirmCloseOpen(false)
-    onOpenChange(false)
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={guard.onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] min-h-[500px] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Errors</DialogTitle>
@@ -94,18 +92,18 @@ export function EditErrorsModal({ open, onOpenChange, assetDetails, errors }: Ed
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)} type="button">
+          <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button">
             Cancel
           </Button>
-          <Button onClick={handleSave} type="button" disabled={saving || !dirty}>
+          <Button onClick={handleSave} type="button" disabled={saving || !form.formState.isDirty}>
             {saving ? 'Saving…' : 'Save changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
       <UnsavedChangesDialog
-        open={confirmCloseOpen}
-        onOpenChange={setConfirmCloseOpen}
-        onDiscard={discardAndClose}
+        open={guard.confirmOpen}
+        onOpenChange={guard.setConfirmOpen}
+        onDiscard={guard.discard}
       />
     </Dialog>
   )

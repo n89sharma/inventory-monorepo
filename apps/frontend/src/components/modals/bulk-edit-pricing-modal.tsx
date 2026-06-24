@@ -1,23 +1,15 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/shadcn/alert-dialog'
+import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
 import { Button } from '@/components/shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/dialog'
 import { Input } from '@/components/shadcn/input'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
 import { useAssetStore } from '@/data/store/asset-store'
+import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatThousandsK } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import type { CellContext, ColumnDef } from '@tanstack/react-table'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -139,14 +131,19 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
   const [initialRows, setInitialRows] = useState<PricingRow[]>([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false)
+
+  const selectedAssetsRef = useRef(selectedAssets)
+  selectedAssetsRef.current = selectedAssets
+
+  const guard = useUnsavedChangesGuard(checkDirty(rows, initialRows), onOpenChange)
 
   useEffect(() => {
     if (!open) return
+    const assets = selectedAssetsRef.current
     setLoading(true)
-    Promise.allSettled(selectedAssets.map(a => getAssetDetail(a.barcode))).then(results => {
+    Promise.allSettled(assets.map(a => getAssetDetail(a.barcode))).then(results => {
       const loaded: PricingRow[] = results.map((r, i) => {
-        const asset = selectedAssets[i]
+        const asset = assets[i]
         if (r.status === 'fulfilled') {
           const { cost } = r.value
           return {
@@ -181,7 +178,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
       setInitialRows(loaded)
       setLoading(false)
     })
-  }, [open])
+  }, [open, getAssetDetail])
 
   function updateField(barcode: string, field: EditablePriceField, value: string) {
     setRows(prev => prev.map(r => r.barcode === barcode ? { ...r, [field]: value } : r))
@@ -193,19 +190,6 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
     getCoreRowModel: getCoreRowModel(),
     meta: { updateField } satisfies TableMeta,
   })
-
-  function requestClose() {
-    if (checkDirty(rows, initialRows)) {
-      setConfirmDiscardOpen(true)
-    } else {
-      onOpenChange(false)
-    }
-  }
-
-  function handleOpenChange(next: boolean) {
-    if (!next) requestClose()
-    else onOpenChange(true)
-  }
 
   async function handleSave() {
     setSaving(true)
@@ -232,7 +216,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Dialog open={open} onOpenChange={guard.onOpenChange}>
         <DialogContent className="sm:max-w-[min(90vw,1300px)] max-h-[min(80vh,800px)] flex flex-col">
           <DialogHeader>
             <DialogTitle>Bulk Edit Pricing</DialogTitle>
@@ -276,7 +260,7 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={requestClose} type="button" disabled={saving}>
+            <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button" disabled={saving}>
               Cancel
             </Button>
             <Button onClick={handleSave} type="button" disabled={saving || loading}>
@@ -286,22 +270,11 @@ export function BulkEditPricingModal({ open, onOpenChange, selectedAssets, onSav
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={confirmDiscardOpen} onOpenChange={setConfirmDiscardOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Discard changes?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You have unsaved changes. Should they be discarded?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep editing</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setConfirmDiscardOpen(false); onOpenChange(false) }}>
-              Discard
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <UnsavedChangesDialog
+        open={guard.confirmOpen}
+        onOpenChange={guard.setConfirmOpen}
+        onDiscard={guard.discard}
+      />
     </>
   )
 }

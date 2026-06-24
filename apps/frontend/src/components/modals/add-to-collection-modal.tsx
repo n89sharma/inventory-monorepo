@@ -139,7 +139,7 @@ export function AddToCollectionModal({
       setIsLoading(false)
     }, 150)
     return () => clearTimeout(t)
-  }, [query])
+  }, [query, canCreateDeparture, canCreateTransfer, canCreateHold, canCreateInvoice])
 
   function handleQueryChange(value: string) {
     setQuery(value)
