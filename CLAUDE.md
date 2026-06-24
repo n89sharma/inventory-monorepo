@@ -60,11 +60,16 @@ long section. Optimize for scannability.
 ## Commands
 
 Run from the **repo root** after every code change; summarize and fix any errors before
-considering the task complete:
+considering the task complete. **Lint first, then build** — never run a build before the linter:
 ```bash
-npm run bbuild   # build backend only
-npm run fbuild   # build shared-types then frontend
+npm run tlint                    # lint shared-types (also run for any shared-types change)
+npm run blint && npm run bbuild  # backend: lint, then build
+npm run flint && npm run fbuild  # frontend: lint, then build (fbuild compiles shared-types first)
 ```
+**Under NO CIRCUMSTANCES** leave a code change without running the linter, and never build
+without linting first. Zero tolerance: **no errors and no warnings** may remain after a change —
+fix them (don't suppress) before the task is complete.
+
 Per-app (run inside the app dir): `npm run dev` (backend: tsx watch; frontend: Vite on 5173).
 Backend also: `npm run pgen` (`prisma generate --sql`) after any `.sql` change.
 
