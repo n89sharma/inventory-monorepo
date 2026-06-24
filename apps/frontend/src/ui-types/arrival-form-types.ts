@@ -103,7 +103,7 @@ export const ArrivalFormSchema = z.object({
 })
 
 export type AssetForm = {
-  id?: number | undefined,
+  id?: number,
   model: ModelSummary | null,
   serialNumber: string,
   meterBlack: number | null,
@@ -147,7 +147,7 @@ export type SpecsForm = {
 }
 
 export type ArrivalForm = {
-  id?: number | undefined,
+  id?: number,
   vendor: OrgSummary | null,
   transporter: OrgSummary | null,
   warehouse: SelectOption<Warehouse>,

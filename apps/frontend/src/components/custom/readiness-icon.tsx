@@ -12,8 +12,7 @@ type IconConfig = {
   display: string
 }
 
-const READINESS_CODES = ['UNTESTED', 'HAS_ERRORS', 'PP_OK', 'CUSTOMER_READY'] as const
-type ReadinessCode = (typeof READINESS_CODES)[number]
+type ReadinessCode = 'UNTESTED' | 'HAS_ERRORS' | 'PP_OK' | 'CUSTOMER_READY'
 
 const READINESS_CONFIG = {
   UNTESTED: {

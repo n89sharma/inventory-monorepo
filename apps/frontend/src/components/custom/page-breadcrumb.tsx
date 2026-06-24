@@ -97,18 +97,15 @@ export function getBreadcrumForAssetDetails(
     ]
   }
 
-  switch (section) {
-    case 'search': {
-      const list = searchList ?? DEFAULT_SEARCH_LIST
-      return [
-        { label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }
-      ]
-    }
-    default:
-      return [
-        { label: 'Home', href: '/' }
-      ]
+  if (section === 'search') {
+    const list = searchList ?? DEFAULT_SEARCH_LIST
+    return [
+      { label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }
+    ]
   }
+  return [
+    { label: 'Home', href: '/' }
+  ]
 }
 
 export function getBreadcrumbForAssetSummary(

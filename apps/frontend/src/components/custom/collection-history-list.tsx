@@ -17,9 +17,10 @@ function formatKey(key: string): string {
 function AssetsChangedEntry({ record }: { record: AssetsChangedRecord }) {
   const { barcodes } = record.changes
   const count = barcodes.length
+  const plural = count !== 1 ? 's' : ''
   const verb = record.action_type === 'ASSETS_ADDED'
-    ? `added ${count} asset${count !== 1 ? 's' : ''}`
-    : `removed ${count} asset${count !== 1 ? 's' : ''}`
+    ? `added ${count} asset${plural}`
+    : `removed ${count} asset${plural}`
   return (
     <div className="flex flex-col gap-1.5">
       <EntryHeader userName={record.user_name} timestamp={record.changed_on} verb={verb} />

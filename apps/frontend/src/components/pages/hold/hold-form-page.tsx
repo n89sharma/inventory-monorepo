@@ -33,7 +33,7 @@ interface HoldFormPageProps {
 }
 
 function validateHoldAsset(asset: AssetSummary): string | null {
-  if (!!asset.hold_number) return `${asset.barcode} already has an active hold`
+  if (asset.hold_number) return `${asset.barcode} already has an active hold`
   return null
 }
 

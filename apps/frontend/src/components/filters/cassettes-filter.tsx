@@ -11,9 +11,11 @@ export function CassettesFilter({
     <InputWithClearInline
       value={value}
       onValueChange={val => {
-        const next = typeof val === 'string' || val === null
-          ? null
-          : Number.isInteger(val) && val >= 0 ? val : null
+        if (typeof val === 'string' || val === null) {
+          onValueChange(null)
+          return
+        }
+        const next = Number.isInteger(val) && val >= 0 ? val : null
         onValueChange(next)
       }}
       fieldLabel='Cassettes (min)'

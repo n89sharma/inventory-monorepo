@@ -144,9 +144,6 @@ export function SearchSelectInput<T>({
         }
         break
       case 'Escape':
-        setPopoverOpen(false)
-        setHighlightedIndex(-1)
-        break
       case 'Tab':
         setPopoverOpen(false)
         setHighlightedIndex(-1)

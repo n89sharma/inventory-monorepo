@@ -20,7 +20,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleNotchIcon } from "@phosphor-icons/react"
 import { useEffect, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, type FieldErrors } from "react-hook-form"
 import type { StorePart } from "shared-types"
 import { toast } from "sonner"
 
@@ -49,7 +49,7 @@ export function AddPurchaseModal({
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch, formState: { errors } } =
+  const { control, handleSubmit, reset, setValue, watch } =
     useForm<AddPurchaseForm>({
       resolver: zodResolver(AddPurchaseFormSchema),
       defaultValues: EMPTY_ADD_PURCHASE_FORM,
@@ -76,7 +76,7 @@ export function AddPurchaseModal({
     setSaving(false)
   }
 
-  function onInvalid(formErrors: typeof errors) {
+  function onInvalid(formErrors: FieldErrors<AddPurchaseForm>) {
     const message = formErrors.part?.message
       ?? formErrors.quantity?.message
       ?? 'Please fix the highlighted fields'

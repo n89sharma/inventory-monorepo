@@ -330,13 +330,10 @@ export function TechnicalSpecsFields<T extends FieldValues>(
                 placeholder='Select functions…'
                 emptyIndicator={<p>No results found.</p>}
                 value={getCoreFunctionOptions(value as CoreFunction[])}
-                onChange={options =>
-                  onChange(
-                    coreFunctions.filter(c =>
-                      options.map(o => o.id).includes(c.id),
-                    ),
-                  )
-                }
+                onChange={options => {
+                  const selectedIds = options.map(o => o.id)
+                  onChange(coreFunctions.filter(c => selectedIds.includes(c.id)))
+                }}
               />
             )}
           />

@@ -1,8 +1,5 @@
-const NAVIGATION_SECTIONS = [
-  'arrivals', 'departures', 'transfers', 'invoices', 'holds', 'search', 'home'
-] as const
-
-export type NavigationSection = typeof NAVIGATION_SECTIONS[number]
+export type NavigationSection =
+  | 'arrivals' | 'departures' | 'transfers' | 'invoices' | 'holds' | 'search' | 'home'
 
 export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
@@ -46,5 +43,6 @@ export function assetDetailHref(
   filters: URLSearchParams,
 ): string {
   const query = filters.toString()
-  return `/search/${list}/${barcode}${query ? `?${query}` : ''}`
+  const queryString = query ? `?${query}` : ''
+  return `/search/${list}/${barcode}${queryString}`
 }

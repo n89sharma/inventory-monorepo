@@ -103,6 +103,8 @@ export function flushPendingRemovals(collectionId: string): void {
   for (const [key, pending] of pendingRemovals) {
     if (!key.startsWith(prefix)) continue
     clearTimeout(pending.timer)
+    // Intentional fire-and-forget: flush the pending commit without blocking unmount.
+    // eslint-disable-next-line sonarjs/void-use
     void pending.commit()
   }
 }

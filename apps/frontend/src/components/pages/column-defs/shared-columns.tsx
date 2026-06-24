@@ -32,6 +32,15 @@ function SelectHitArea({
   )
 }
 
+function getHeaderCheckboxState(
+  allSelected: boolean,
+  someSelected: boolean,
+): boolean | 'indeterminate' {
+  if (allSelected) return true
+  if (someSelected) return 'indeterminate'
+  return false
+}
+
 export function createSelectColumn<TData>(): ColumnDef<TData> {
   return {
     id: 'select',
@@ -46,13 +55,10 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
         }
       >
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected()
-              ? true
-              : table.getIsSomePageRowsSelected()
-                ? 'indeterminate'
-                : false
-          }
+          checked={getHeaderCheckboxState(
+            table.getIsAllPageRowsSelected(),
+            table.getIsSomePageRowsSelected(),
+          )}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all on this page"
         />

@@ -26,7 +26,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon, ArrowsLeftRightIcon, CircleNotchIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { CreateSalvagedPartSchema, type CreateSalvagedPart, type Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -236,7 +236,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch, formState: { errors } } =
+  const { control, handleSubmit, reset, setValue, watch } =
     useForm<AddStorePartForm>({
       resolver: zodResolver(AddStorePartFormSchema),
       defaultValues: EMPTY_ADD_STORE_PART_FORM,
@@ -290,7 +290,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
     setSaving(false)
   }
 
-  function onInvalid(formErrors: typeof errors) {
+  function onInvalid(formErrors: FieldErrors<AddStorePartForm>) {
     const message = formErrors.warehouse?.message
       ?? formErrors.part?.message
       ?? formErrors.quantity?.message
