@@ -75,6 +75,7 @@ type AssetUpdateFields = Partial<{
   location_id: number | null
   model_id: number
   serial_number: string
+  status_id: number
   readiness_id: number
   country_of_origin_id: number | null
   manufactured_year: number | null
@@ -183,6 +184,7 @@ const RESOLVERS = {
   warehouse: foreignKeyResolver(ids => prisma.warehouse.findMany({ where: { id: { in: ids } }, select: { id: true, city_code: true } }), r => r.city_code),
   model: foreignKeyResolver(ids => prisma.model.findMany({ where: { id: { in: ids } }, select: { id: true, name: true } }), r => r.name),
   readiness: foreignKeyResolver(ids => prisma.readiness.findMany({ where: { id: { in: ids } }, select: { id: true, status: true } }), r => r.status),
+  status: foreignKeyResolver(ids => prisma.status.findMany({ where: { id: { in: ids } }, select: { id: true, status: true } }), r => r.status),
   country: foreignKeyResolver(ids => prisma.country.findMany({ where: { id: { in: ids } }, select: { id: true, name: true } }), r => r.name),
   component: foreignKeyResolver(ids => prisma.component.findMany({ where: { id: { in: ids } }, select: { id: true, name: true } }), r => r.name),
   invoiceType: foreignKeyResolver(ids => prisma.invoiceType.findMany({ where: { id: { in: ids } }, select: { id: true, type: true } }), r => r.type),
@@ -244,6 +246,36 @@ function emptyBuckets(): Record<Channel, Bucket> {
   }
 }
 
+async function applyLocationExpand(
+  before: unknown,
+  after: unknown,
+  bucket: Bucket
+): Promise<void> {
+  if (before === after) return
+  const [bp, ap] = await Promise.all([
+    resolveLocationParts(before as number | null | undefined),
+    resolveLocationParts(after as number | null | undefined)
+  ])
+  if (bp.warehouse !== ap.warehouse) { bucket.before.warehouse = bp.warehouse; bucket.after.warehouse = ap.warehouse }
+  if (bp.zone !== ap.zone) { bucket.before.zone = bp.zone; bucket.after.zone = ap.zone }
+  if (bp.bin !== ap.bin) { bucket.before.bin = bp.bin; bucket.after.bin = ap.bin }
+}
+
+async function applyErrorCodesArray(
+  spec: FieldSpec,
+  before: unknown,
+  after: unknown,
+  bucket: Bucket
+): Promise<void> {
+  if (JSON.stringify(before) === JSON.stringify(after)) return
+  const [bc, ac] = await Promise.all([
+    resolveErrorCodes(before as number[] | undefined),
+    resolveErrorCodes(after as number[] | undefined)
+  ])
+  bucket.before[spec.out ?? spec.field] = bc
+  bucket.after[spec.out ?? spec.field] = ac
+}
+
 async function applySpec(
   spec: FieldSpec,
   before: Record<string, unknown>,
@@ -254,28 +286,8 @@ async function applySpec(
   const b = before[spec.field]
   const a = after[spec.field]
 
-  if (spec.expand === 'location') {
-    if (b === a) return
-    const [bp, ap] = await Promise.all([
-      resolveLocationParts(b as number | null | undefined),
-      resolveLocationParts(a as number | null | undefined)
-    ])
-    if (bp.warehouse !== ap.warehouse) { bucket.before.warehouse = bp.warehouse; bucket.after.warehouse = ap.warehouse }
-    if (bp.zone !== ap.zone) { bucket.before.zone = bp.zone; bucket.after.zone = ap.zone }
-    if (bp.bin !== ap.bin) { bucket.before.bin = bp.bin; bucket.after.bin = ap.bin }
-    return
-  }
-
-  if (spec.array === 'errorCodes') {
-    if (JSON.stringify(b) === JSON.stringify(a)) return
-    const [bc, ac] = await Promise.all([
-      resolveErrorCodes(b as number[] | undefined),
-      resolveErrorCodes(a as number[] | undefined)
-    ])
-    bucket.before[spec.out ?? spec.field] = bc
-    bucket.after[spec.out ?? spec.field] = ac
-    return
-  }
+  if (spec.expand === 'location') return applyLocationExpand(b, a, bucket)
+  if (spec.array === 'errorCodes') return applyErrorCodesArray(spec, b, a, bucket)
 
   if (b === a) return
   if (spec.bothRequired && (!b || !a)) return
@@ -375,6 +387,7 @@ const ASSET_UPDATE_SPEC: FieldSpec[] = [
   { field: 'sales_invoice_id', out: 'invoice_number', resolve: 'invoice' },
   { field: 'location_id', expand: 'location' },
   { field: 'model_id', out: 'model_name', resolve: 'model', bothRequired: true },
+  { field: 'status_id', out: 'status', resolve: 'status' },
   { field: 'readiness_id', out: 'readiness', resolve: 'readiness' },
   { field: 'country_of_origin_id', out: 'country_of_origin', resolve: 'country' },
   { field: 'component_id', out: 'internal_finisher', resolve: 'component' },
@@ -642,6 +655,26 @@ export async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
     })
   } catch (error) {
     logger.error(`History batch write failed [UPDATE Asset batch ${String(field)}]`, { error })
+  }
+}
+
+// Records a status transition for a set of assets that share one new status but
+// may have had different prior statuses. Best-effort, call outside the transaction.
+export async function recordAssetStatusChange(
+  priorAssets: Array<{ id: number; status_id: number }>,
+  newStatusId: number,
+  userId: number
+): Promise<void> {
+  const assetsByPriorStatus = Object.groupBy(priorAssets, (asset) => asset.status_id)
+  for (const [priorStatusId, assets] of Object.entries(assetsByPriorStatus)) {
+    if (!assets) continue
+    await recordBatchAssetUpdate(
+      assets.map((asset) => asset.id),
+      'status_id',
+      Number(priorStatusId),
+      newStatusId,
+      userId
+    )
   }
 }
 

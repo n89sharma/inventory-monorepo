@@ -3,7 +3,7 @@ import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { recordHoldArchive, recordHoldCreate, recordHoldUpdate } from './historyService.js'
+import { recordAssetStatusChange, recordHoldArchive, recordHoldCreate, recordHoldUpdate } from './historyService.js'
 import { addRemoveCollectionFromAssets, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
 
@@ -19,7 +19,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   const now = new Date()
   const holdNumber = await getNewHoldNumber()
 
-  const hold = await prisma.$transaction(async (tx) => {
+  const { hold, priorAssets } = await prisma.$transaction(async (tx) => {
     const created = await tx.hold.create({
       data: {
         hold_number: holdNumber,
@@ -34,6 +34,11 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
       select: { id: true }
     })
 
+    const prior = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, status_id: true }
+    })
+
     await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: assetIds,
       assetsToRemove: [],
@@ -44,7 +49,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
       remove: { hold_id: null }
     })
 
-    return created
+    return { hold: created, priorAssets: prior }
   })
 
   await recordHoldCreate(hold.id, {
@@ -55,6 +60,8 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   }, userId)
 
   await recordCollectionAssetDelta('Hold', 'hold_id', hold.id, assetIds, [], userId)
+
+  await recordAssetStatusChange(priorAssets, heldStatus.id, userId)
 
   return holdNumber
 }
@@ -107,8 +114,18 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
   if (hold.archived_at) throw new ConflictError('Cannot edit an archived hold')
 
-  await prisma.$transaction(tx =>
-    addRemoveCollectionFromAssets(tx, {
+  const { addedPriorAssets, removedPriorAssets } = await prisma.$transaction(async (tx) => {
+    const [addedPrior, removedPrior] = await Promise.all([
+      tx.asset.findMany({
+        where: { id: { in: delta.assetIdsToAdd } },
+        select: { id: true, status_id: true }
+      }),
+      tx.asset.findMany({
+        where: { id: { in: delta.assetIdsToRemove } },
+        select: { id: true, status_id: true }
+      })
+    ])
+    await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
       assetsToRemove: delta.assetIdsToRemove,
       assetInCollectionWhere: { hold_id: { not: null } },
@@ -117,7 +134,8 @@ export async function addRemoveCollectionFromAssetsAndRecord(
       add: { hold_id: hold.id, status_id: heldStatus.id },
       remove: { hold_id: null, status_id: inStockStatus.id }
     })
-  )
+    return { addedPriorAssets: addedPrior, removedPriorAssets: removedPrior }
+  })
 
   await recordCollectionAssetDelta(
     'Hold',
@@ -127,6 +145,9 @@ export async function addRemoveCollectionFromAssetsAndRecord(
     delta.assetIdsToRemove,
     userId
   )
+
+  await recordAssetStatusChange(addedPriorAssets, heldStatus.id, userId)
+  await recordAssetStatusChange(removedPriorAssets, inStockStatus.id, userId)
 }
 
 export async function getHold(holdNumber: string): Promise<HoldDetail> {
@@ -180,7 +201,7 @@ export async function archiveHold(holdNumber: string, userId: number): Promise<v
 
   const now = new Date()
 
-  const { holdId, releasedAssetIds } = await prisma.$transaction(async (tx) => {
+  const { holdId, releasedAssets } = await prisma.$transaction(async (tx) => {
     const hold = await tx.hold.findUnique({
       where: { hold_number: holdNumber },
       select: { id: true, archived_at: true }
@@ -190,7 +211,7 @@ export async function archiveHold(holdNumber: string, userId: number): Promise<v
 
     const heldAssets = await tx.asset.findMany({
       where: { hold_id: hold.id },
-      select: { id: true }
+      select: { id: true, status_id: true }
     })
     const releasedAssetIds = heldAssets.map(a => a.id)
 
@@ -211,11 +232,13 @@ export async function archiveHold(holdNumber: string, userId: number): Promise<v
       })
     }
 
-    return { holdId: hold.id, releasedAssetIds }
+    return { holdId: hold.id, releasedAssets: heldAssets }
   })
 
   await recordHoldArchive(holdId, now, userId)
-  if (releasedAssetIds.length > 0) {
+  if (releasedAssets.length > 0) {
+    const releasedAssetIds = releasedAssets.map(a => a.id)
     await recordCollectionAssetDelta('Hold', 'hold_id', holdId, [], releasedAssetIds, userId)
+    await recordAssetStatusChange(releasedAssets, inStockStatus.id, userId)
   }
 }

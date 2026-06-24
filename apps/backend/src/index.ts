@@ -29,6 +29,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 if (isDev) { await import('dotenv/config') }
 
 const app = express();
+app.disable('x-powered-by')
 
 morgan.token('id', (req: Request) => req.id)
 

@@ -1,11 +1,11 @@
-import { AssetDelta, AssetSummary, CreateDeparture, DEFAULT_OUTGOING_STATUS, DepartureDetail, OutgoingStatus, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
+import { AssetDelta, CreateDeparture, DEFAULT_OUTGOING_STATUS, DepartureDetail, OutgoingStatus, OutgoingStatusSchema, UpdateDepartureMetadata } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { addRemoveCollectionFromAssets, assertAssetsNotInCollection, recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
+import { recordAssetStatusChange, recordDepartureCreate, recordDepartureUpdate } from './historyService.js'
 
 
 
@@ -47,7 +47,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   if (unseededStatuses.length > 0)
     throw new Error(`Outgoing statuses not seeded in DB: ${unseededStatuses.join(', ')}`)
 
-  const newDeparture = await prisma.$transaction(async (tx) => {
+  const { newDeparture, priorStatusByAsset } = await prisma.$transaction(async (tx) => {
     await assertAssetsNotInCollection(
       tx,
       assetIds,
@@ -67,6 +67,11 @@ export async function createDeparture(departure: CreateDeparture, userId: number
       }
     })
 
+    const priorAssets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, status_id: true }
+    })
+
     for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
       if (!assetsForStatus) continue
       await tx.asset.updateMany({
@@ -78,7 +83,10 @@ export async function createDeparture(departure: CreateDeparture, userId: number
       })
     }
 
-    return created
+    return {
+      newDeparture: created,
+      priorStatusByAsset: new Map(priorAssets.map(a => [a.id, a.status_id]))
+    }
   })
 
   await recordDepartureCreate(newDeparture.id, {
@@ -89,6 +97,12 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   }, userId)
 
   await recordCollectionAssetDelta('Departure', 'departure_id', newDeparture.id, assetIds, [], userId)
+
+  for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
+    if (!assetsForStatus) continue
+    const priorAssets = assetsForStatus.map(a => ({ id: a.id, status_id: priorStatusByAsset.get(a.id)! }))
+    await recordAssetStatusChange(priorAssets, statusIdByName.get(outgoingStatus)!, userId)
+  }
 
   return departureNumber
 }
@@ -144,8 +158,12 @@ export async function addAssetsToDepartureAndRecord(
     select: { id: true }
   })
 
-  await prisma.$transaction(tx =>
-    addRemoveCollectionFromAssets(tx, {
+  const priorAssets = await prisma.$transaction(async (tx) => {
+    const prior = await tx.asset.findMany({
+      where: { id: { in: delta.assetIdsToAdd } },
+      select: { id: true, status_id: true }
+    })
+    await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
       assetsToRemove: [],
       assetInCollectionWhere: { departure_id: { not: null } },
@@ -154,7 +172,8 @@ export async function addAssetsToDepartureAndRecord(
       add: { departure_id: departure.id, status_id: addStatus.id },
       remove: {}
     })
-  )
+    return prior
+  })
 
   await recordCollectionAssetDelta(
     'Departure',
@@ -164,6 +183,8 @@ export async function addAssetsToDepartureAndRecord(
     [],
     userId
   )
+
+  await recordAssetStatusChange(priorAssets, addStatus.id, userId)
 }
 
 export async function setDepartureOutgoingStatus(
@@ -183,18 +204,22 @@ export async function setDepartureOutgoingStatus(
     select: { id: true }
   })
 
-  await prisma.$transaction(async (tx) => {
-    const belonging = await tx.asset.count({
-      where: { id: { in: assetIds }, departure_id: departure.id }
+  const priorAssets = await prisma.$transaction(async (tx) => {
+    const assets = await tx.asset.findMany({
+      where: { id: { in: assetIds }, departure_id: departure.id },
+      select: { id: true, status_id: true }
     })
-    if (belonging !== assetIds.length)
+    if (assets.length !== assetIds.length)
       throw new ConflictError('Some assets do not belong to this departure')
 
     await tx.asset.updateMany({
       where: { id: { in: assetIds }, departure_id: departure.id },
       data: { status_id: status.id }
     })
+    return assets
   })
+
+  await recordAssetStatusChange(priorAssets, status.id, userId)
 }
 
 async function getNewDepartureNumber(originCode: string): Promise<string> {
