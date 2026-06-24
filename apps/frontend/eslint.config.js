@@ -34,4 +34,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Column-def modules export ColumnDef factories whose cell/header renderers
+    // can't be split out; they are not Fast Refresh boundaries by nature.
+    files: ['src/components/pages/column-defs/**'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 )

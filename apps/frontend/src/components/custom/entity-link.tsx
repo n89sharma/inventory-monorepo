@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/success-toast'
+import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 
 const LINK_CLASS = 'underline font-medium'
 
