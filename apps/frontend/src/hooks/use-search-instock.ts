@@ -11,9 +11,22 @@ export function useSearchInStock(filters: SearchInStockFilters) {
   const activeWarehouses = useActiveWarehouses()
   const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)
 
+  const queryFilters = {
+    warehouses,
+    brand: filters.brand,
+    assetTypes: filters.assetTypes,
+    readinesses: filters.readinesses,
+    model: filters.model,
+    modelQuery: filters.modelQuery,
+    meterMin: filters.meterMin,
+    meterMax: filters.meterMax,
+    cassettes: filters.cassettes,
+    internalFinisher: filters.internalFinisher,
+  }
+
   return useSWR<AssetSearchRow[]>(
-    warehouses.length > 0 ? [SEARCH_INSTOCK_KEY, { ...filters, warehouses }] : null,
-    ([, f]: [string, SearchInStockFilters]) =>
+    warehouses.length > 0 ? [SEARCH_INSTOCK_KEY, queryFilters] : null,
+    ([, f]: [string, typeof queryFilters]) =>
       getAssetsForSearchInStock(
         f.warehouses,
         f.brand,

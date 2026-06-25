@@ -10,7 +10,8 @@ import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useCallback } from 'react'
+import type { VisibilityState } from '@tanstack/react-table'
+import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow, SavedViewPageKey } from 'shared-types'
 
@@ -23,6 +24,7 @@ export function AssetSearchPage({
   onBulkPriceSave,
   defaultSort,
   getRowClassName,
+  forceVisibleColumnIds,
   children,
 }: {
   title: string
@@ -33,6 +35,7 @@ export function AssetSearchPage({
   onBulkPriceSave: () => void
   defaultSort?: { id: string; desc: boolean }
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
+  forceVisibleColumnIds?: readonly string[]
   children: React.ReactNode
 }): React.JSX.Element {
   const [searchParams] = useSearchParams()
@@ -43,6 +46,12 @@ export function AssetSearchPage({
     reset: resetColumns,
   } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
   const selection = useAssetSelection(assets, visibleColumns)
+  const effectiveColumnVisibility = useMemo<VisibilityState>(() => {
+    if (!forceVisibleColumnIds?.length) return columnVisibility
+    const out = { ...columnVisibility }
+    for (const id of forceVisibleColumnIds) out[id] = true
+    return out
+  }, [columnVisibility, forceVisibleColumnIds])
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
     [navContext, searchParams],
@@ -91,7 +100,7 @@ export function AssetSearchPage({
             rowSelection={selection.rowSelection}
             onRowSelectionChange={selection.setRowSelection}
             onBulkPriceSave={onBulkPriceSave}
-            columnVisibility={columnVisibility}
+            columnVisibility={effectiveColumnVisibility}
             getRowHref={getRowHref}
             getRowClassName={getRowClassName}
             defaultSort={defaultSort}

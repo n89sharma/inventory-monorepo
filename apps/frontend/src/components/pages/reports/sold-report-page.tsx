@@ -245,6 +245,7 @@ export function SoldReportPage(): React.JSX.Element {
       model: filters.model,
       brand: null,
       assetTypes: [],
+      priceCheck: false,
     })
     return `/search/instock?${params.toString()}`
   }, [filters.model])
