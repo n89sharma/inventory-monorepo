@@ -10,7 +10,7 @@ type LocationRow = {
   bin: string | null
 }
 
-export function buildLocation(r: LocationRow): AssetLocationDetails | null {
+function buildLocation(r: LocationRow): AssetLocationDetails | null {
   if (!r.warehouse_code || !r.warehouse_street || !r.zone) return null
   return {
     warehouse_code: r.warehouse_code,

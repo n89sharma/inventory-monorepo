@@ -9,8 +9,8 @@ import { Prisma } from '../../generated/prisma/client.js'
 import {
   getAssetStoreParts as getAssetStorePartsDb,
   getStorePartLedger,
-  getStoreParts as getStorePartsDb,
   getStorePartOnHand as getStorePartOnHandDb,
+  getStoreParts as getStorePartsDb,
 } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { decimalToNumber } from '../lib/decimal.js'
@@ -103,7 +103,7 @@ async function resolveStorePart(
   }
 }
 
-export async function getNewStoreTransactionNumber(): Promise<string> {
+async function getNewStoreTransactionNumber(): Promise<string> {
   const sequence = await getNextSequence('store_transaction')
   return `S-${String(sequence).padStart(7, '0')}`
 }

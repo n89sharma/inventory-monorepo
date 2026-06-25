@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "apps/backend": {
+      "ignore": ["generated/**"]
+    },
+    "apps/frontend": {
+      "entry": ["src/components/shadcn/**", "src/**/*.d.ts"],
+      "ignoreDependencies": ["shadcn", "vite-bundle-visualizer"]
+    }
+  }
+}

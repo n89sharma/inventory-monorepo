@@ -1,7 +1,7 @@
 import { getStorePartDetail, getStoreParts } from '@/data/api/store-part-api'
 import useSWR, { mutate, preload } from 'swr'
 
-export const STORE_LIST_KEY = 'store:list'
+const STORE_LIST_KEY = 'store:list'
 
 export const storePartDetailKey = (partNumber: string) => `store:${partNumber}`
 

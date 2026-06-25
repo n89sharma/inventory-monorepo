@@ -6,7 +6,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/shadcn/dropdown-menu'
-import { Field, FieldLabel } from '@/components/shadcn/field'
 import { cn } from '@/lib/utils'
 import { CaretDownIcon } from '@phosphor-icons/react'
 import React from 'react'
@@ -77,36 +76,6 @@ type MultiSelectOptionsProps<T extends { id: number }> = {
   fieldLabel: string
   className?: string
   dividerAfterIds?: number[]
-}
-
-export function MultiSelectOptions<T extends { id: number }>({
-  selection,
-  onSelectionChange,
-  options,
-  getLabel,
-  fieldLabel,
-  className,
-  dividerAfterIds,
-}: MultiSelectOptionsProps<T>): React.JSX.Element {
-  const triggerLabel = selection.length === 0 ? 'Any' : `${selection.length} selected`
-  return (
-    <Field className={className}>
-      <FieldLabel>{fieldLabel}</FieldLabel>
-      <MultiSelectMenu
-        selection={selection}
-        onSelectionChange={onSelectionChange}
-        options={options}
-        getLabel={getLabel}
-        dividerAfterIds={dividerAfterIds}
-        trigger={
-          <Button variant="outline" className="w-full justify-between font-normal">
-            {triggerLabel}
-            <CaretDownIcon />
-          </Button>
-        }
-      />
-    </Field>
-  )
 }
 
 export function MultiSelectOptionsInline<T extends { id: number }>({

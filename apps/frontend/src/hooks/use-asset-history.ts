@@ -1,7 +1,7 @@
 import { getAssetHistory } from '@/data/api/asset-api'
 import useSWR, { mutate } from 'swr'
 
-export const assetHistoryKey = (barcode: string) => `asset-history:${barcode}`
+const assetHistoryKey = (barcode: string) => `asset-history:${barcode}`
 
 export function useAssetHistory(barcode: string, enabled: boolean) {
   return useSWR(enabled ? assetHistoryKey(barcode) : null, () => getAssetHistory(barcode))

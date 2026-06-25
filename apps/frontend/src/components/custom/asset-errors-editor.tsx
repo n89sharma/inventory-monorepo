@@ -12,7 +12,7 @@ import type { Error as ReferenceErrorType, UpdateError } from 'shared-types'
  * presentation (placeholder, width). The selected error is appended to the list
  * below — the box itself never holds a selection, so `selection` is always null.
  */
-export type AssetErrorsSearchSlotProps = {
+type AssetErrorsSearchSlotProps = {
   selection: null
   query: string
   onQueryChange: (text: string) => void

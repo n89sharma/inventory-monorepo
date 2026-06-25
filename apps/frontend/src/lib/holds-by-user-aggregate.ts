@@ -1,6 +1,6 @@
 import type { ActiveHoldRow } from 'shared-types'
 
-export type CustomerHoldsGroup = {
+type CustomerHoldsGroup = {
   customerId: number
   customerName: string
   assetCount: number
@@ -17,7 +17,7 @@ export type SalespersonHoldsGroup = {
   customers: CustomerHoldsGroup[]
 }
 
-export type HoldsTotals = {
+type HoldsTotals = {
   assetCount: number
   holdCount: number
   salespersonCount: number

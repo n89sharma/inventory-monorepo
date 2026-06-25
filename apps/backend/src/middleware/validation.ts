@@ -1,21 +1,7 @@
 import { isAfter } from 'date-fns'
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
 import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
-
-export function validateBarcode(req: Request, res: Response, next: NextFunction) {
-  const barcode = req.body.barcode || req.params.barcode || req.query.barcode
-
-  if (!barcode) {
-    return res.status(400).json({ error: 'Barcode is required' })
-  }
-
-  if (!/^[A-Z]{3}-[A-Z]{2}-\d{6}$/.test(barcode)) {
-    return res.status(400).json({ error: 'Invalid barcode format' })
-  }
-
-  next()
-}
 
 export const ArrivalListQuerySchema = z
   .object({

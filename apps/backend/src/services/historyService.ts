@@ -1,7 +1,7 @@
 import { CollectionHistory, CollectionHistoryRecord } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
-import { prisma } from '../prisma.js'
 import { logger } from '../lib/logger.js'
+import { prisma } from '../prisma.js'
 
 type HistoryEntityType =
   | 'Arrival'
@@ -20,13 +20,6 @@ type ArrivalCreateState = {
   origin_id: number
   destination_id: number
   created_at: Date
-}
-
-type AssetCreateState = {
-  barcode: string
-  serial_number: string
-  model_id: number
-  arrival_id?: number | null
 }
 
 type DepartureCreateState = {
@@ -684,43 +677,6 @@ export async function recordAssetUpdate(
   return recordUpdate('Asset', assetId, ASSET_UPDATE_SPEC, before, after, userId)
 }
 
-// ─── Asset CREATE (single + batch) ────────────────────────────────────────────
-//
-// Kept hand-written: the snapshot pulls two labels (brand + model) from one model
-// row, which the single-label resolver registry doesn't express.
-
-export async function recordAssetCreate(
-  assetId: number,
-  state: AssetCreateState,
-  userId: number,
-): Promise<void> {
-  try {
-    const [model, arrival] = await Promise.all([
-      prisma.model.findUnique({
-        where: { id: state.model_id },
-        select: { name: true, brand: { select: { name: true } } },
-      }),
-      state.arrival_id
-        ? prisma.arrival.findUnique({
-            where: { id: state.arrival_id },
-            select: { arrival_number: true },
-          })
-        : Promise.resolve(null),
-    ])
-    await recordHistory('Asset', assetId, 'CREATE', userId, {
-      after: {
-        barcode: state.barcode,
-        serial_number: state.serial_number,
-        brand_name: model?.brand.name,
-        model_name: model?.name,
-        arrival_number: arrival?.arrival_number ?? null,
-      },
-    })
-  } catch (error) {
-    logger.error(`History write failed [CREATE Asset ${assetId}]`, { error })
-  }
-}
-
 export async function recordBatchAssetCreate(
   assets: Array<{
     id: number
@@ -820,7 +776,7 @@ export async function recordAssetUpdateOnCollection(
   }
 }
 
-export async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
+async function recordBatchAssetUpdate<K extends keyof AssetUpdateFields>(
   assetIds: number[],
   field: K,
   beforeValue: AssetUpdateFields[K],

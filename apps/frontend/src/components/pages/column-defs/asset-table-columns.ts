@@ -277,7 +277,7 @@ export const ASSET_TABLE_COLUMNS = [
 
 export type AssetColumnId = (typeof ASSET_TABLE_COLUMNS)[number]['id']
 
-export const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_TABLE_COLUMNS.filter(
+const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_TABLE_COLUMNS.filter(
   (c) => c.defaultColumn,
 ).map((c) => c.id)
 
@@ -321,10 +321,6 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   sold: SOLD_DEFAULT_COLUMN_IDS,
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
-
-export const ENABLED_ASSET_COLUMN_COUNT: number = ASSET_TABLE_COLUMNS.filter(
-  (c) => c.enabled,
-).length
 
 const IDENTITY_REPORT_KEYS = ['barcode', 'brand', 'model'] as const
 

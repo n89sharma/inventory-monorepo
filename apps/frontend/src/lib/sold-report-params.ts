@@ -8,7 +8,7 @@ const SPECS_ON = '1'
 
 export type SoldReportRange = 6 | 12
 
-export const DEFAULT_RANGE: SoldReportRange = 6
+const DEFAULT_RANGE: SoldReportRange = 6
 
 export type SoldReportFilters = {
   model: ModelSummary | null

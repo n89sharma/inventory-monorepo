@@ -1,5 +1,7 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import { importX } from 'eslint-plugin-import-x'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import sonarjs from 'eslint-plugin-sonarjs'
@@ -17,6 +19,10 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'import-x': importX,
+    },
+    settings: {
+      'import-x/resolver-next': [createTypeScriptImportResolver({ project: './tsconfig.json' })],
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -25,6 +31,7 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      'import-x/no-cycle': ['error', { ignoreExternal: true }],
     },
   },
   {

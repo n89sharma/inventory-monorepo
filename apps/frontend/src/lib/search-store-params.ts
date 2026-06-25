@@ -9,11 +9,6 @@ export type StoreFilters = {
   search: string
 }
 
-export const EMPTY_STORE_FILTERS: StoreFilters = {
-  warehouses: [],
-  search: '',
-}
-
 export function filtersToParams(filters: StoreFilters): URLSearchParams {
   const params = new URLSearchParams()
   if (filters.warehouses.length > 0) {

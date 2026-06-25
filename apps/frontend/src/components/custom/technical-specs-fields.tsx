@@ -13,11 +13,11 @@ import type { Component, CoreFunction, Country, Status } from 'shared-types'
 import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
 import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from './consumables-grid'
+import { ControlledSearchSelectField } from './controlled-search-select-field'
 import { HorizontalField } from './horizontal-field'
 import { InputWithClearInline } from './input-with-clear'
-import { ControlledSearchSelectField } from './controlled-search-select-field'
-import { SearchSelectInput } from './search-select-input'
 import { ReadinessPicker } from './readiness-picker'
+import { SearchSelectInput } from './search-select-input'
 
 const CMYK_LETTERS = ['C', 'M', 'Y', 'K'] as const
 
@@ -63,7 +63,7 @@ export function ControlledTextInput<T extends FieldValues>({
   )
 }
 
-export function ControlledNumberInput<T extends FieldValues>({
+function ControlledNumberInput<T extends FieldValues>({
   control,
   name,
   className,

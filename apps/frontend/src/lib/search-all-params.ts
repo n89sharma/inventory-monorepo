@@ -1,13 +1,12 @@
-import type { Status } from 'shared-types'
 import {
   decodeIds,
   encodeIds,
-  EMPTY_SHARED_FILTERS,
   getSharedFilters,
   setSharedFilterParams,
   type SharedAssetFilters,
   type SharedAssetReferenceData,
 } from '@/lib/asset-filter-params'
+import type { Status } from 'shared-types'
 
 const PARAM_STATUS = 'status'
 
@@ -17,11 +16,6 @@ export type SearchAllFilters = SharedAssetFilters & {
 
 export type SearchAllReferenceData = SharedAssetReferenceData & {
   statuses: Status[]
-}
-
-export const EMPTY_SEARCH_ALL_FILTERS: SearchAllFilters = {
-  ...EMPTY_SHARED_FILTERS,
-  statuses: [],
 }
 
 export function filtersToParams(filters: SearchAllFilters): URLSearchParams {

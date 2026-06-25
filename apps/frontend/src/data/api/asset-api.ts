@@ -12,7 +12,6 @@ import type {
   AssetStorePartRow,
   AssetTransfer,
   AssetType,
-  BarcodeSuggestion,
   Brand,
   BulkUpdateAssetPricing,
   Component,
@@ -41,7 +40,6 @@ import {
   AssetsBySerialNumberRequestSchema,
   AssetsBySerialNumberResultSchema,
   AssetTransferSchema,
-  BarcodeSuggestionSchema,
   BulkUpdateAssetPricingSchema,
   CommentSchema,
   CreateCommentSchema,
@@ -55,43 +53,32 @@ import {
 } from 'shared-types'
 import { z } from 'zod'
 
-export async function getBarcodeSuggestions(q: string): Promise<BarcodeSuggestion[]> {
-  try {
-    const { data } = await api.get<BarcodeSuggestion[]>('/assets/suggestions', { params: { q } })
-    return z.array(BarcodeSuggestionSchema).parse(data)
-  } catch {
-    return []
-  }
-}
-
 export async function getAssetDetail(params: { barcode: string }): Promise<AssetDetails> {
   const { data } = await api.get<AssetDetails>(`/assets/${params.barcode}`)
   return AssetDetailsSchema.parse(data)
 }
 
-export async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
+async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
   const { data } = await api.get<string[]>(`/assets/${params.barcode}/accessories`)
   return z.array(z.string()).parse(data)
 }
 
-export async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
+async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
   const { data } = await api.get<AssetError[]>(`/assets/${params.barcode}/errors`)
   return z.array(AssetErrorSchema).parse(data)
 }
 
-export async function getAssetComments(params: { barcode: string }): Promise<Comment[]> {
+async function getAssetComments(params: { barcode: string }): Promise<Comment[]> {
   const { data } = await api.get<Comment[]>(`/assets/${params.barcode}/comments`)
   return z.array(CommentSchema).parse(data)
 }
 
-export async function getAssetTransfers(params: { barcode: string }): Promise<AssetTransfer[]> {
+async function getAssetTransfers(params: { barcode: string }): Promise<AssetTransfer[]> {
   const { data } = await api.get<AssetTransfer[]>(`/assets/${params.barcode}/transfers`)
   return z.array(AssetTransferSchema).parse(data)
 }
 
-export async function getAssetHarvestedParts(params: {
-  barcode: string
-}): Promise<AssetHarvestedPart[]> {
+async function getAssetHarvestedParts(params: { barcode: string }): Promise<AssetHarvestedPart[]> {
   const { data } = await api.get<AssetHarvestedPart[]>(`/assets/${params.barcode}/parts`)
   return z.array(AssetHarvestedPartSchema).parse(data)
 }

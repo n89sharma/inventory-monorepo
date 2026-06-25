@@ -1,21 +1,4 @@
 import {
-  OUTGOING_STATUS,
-  type AssetType,
-  type Brand,
-  type OrgSummary,
-  type Status,
-} from 'shared-types'
-import {
-  isAfter,
-  isBefore,
-  isValid,
-  format,
-  parseISO,
-  startOfDay,
-  subDays,
-  subMonths,
-} from 'date-fns'
-import {
   decodeIds,
   encodeIds,
   getSharedFilters,
@@ -23,6 +6,23 @@ import {
   type SharedAssetFilters,
   type SharedAssetReferenceData,
 } from '@/lib/asset-filter-params'
+import {
+  format,
+  isAfter,
+  isBefore,
+  isValid,
+  parseISO,
+  startOfDay,
+  subDays,
+  subMonths,
+} from 'date-fns'
+import {
+  OUTGOING_STATUS,
+  type AssetType,
+  type Brand,
+  type OrgSummary,
+  type Status,
+} from 'shared-types'
 
 const PARAM_BRAND = 'brand'
 const PARAM_TYPE = 'type'
@@ -32,7 +32,7 @@ const PARAM_TO = 'to'
 const PARAM_CUSTOMER = 'customer'
 const OTHER_ON = '1'
 
-export const MAX_DEPARTED_MONTHS = 18
+const MAX_DEPARTED_MONTHS = 18
 const DEFAULT_FROM_DAYS = 30
 const URL_DATE_FORMAT = 'yyyy-MM-dd'
 

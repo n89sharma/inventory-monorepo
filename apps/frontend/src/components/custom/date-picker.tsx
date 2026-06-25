@@ -1,6 +1,5 @@
 import { Button } from '@/components/shadcn/button'
 import { Calendar } from '@/components/shadcn/calendar'
-import { Field, FieldLabel } from '@/components/shadcn/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   getSelectedOrNull,
@@ -21,45 +20,6 @@ interface DatePickerFieldProps {
   disabled?: Matcher | Matcher[]
   startMonth?: Date
   endMonth?: Date
-}
-
-export function DatePickerField({
-  label,
-  date,
-  setDate,
-  id,
-  className,
-  disabled,
-  startMonth,
-  endMonth,
-}: DatePickerFieldProps): React.JSX.Element {
-  return (
-    <Field className={className}>
-      <FieldLabel>{label}</FieldLabel>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            id={id}
-            className="justify-start text-muted-foreground text-xs rounded-md"
-          >
-            {isSelected(date) ? format(date.selected, 'PPP') : <span>Select</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-1" align="start">
-          <Calendar
-            mode="single"
-            selected={getSelectedOrNull(date) ?? undefined}
-            onSelect={(d) => (d ? setDate(getSelectOption(d)) : setDate(UNSELECTED))}
-            defaultMonth={getSelectedOrNull(date) ?? undefined}
-            disabled={disabled}
-            startMonth={startMonth}
-            endMonth={endMonth}
-          />
-        </PopoverContent>
-      </Popover>
-    </Field>
-  )
 }
 
 export function DatePickerFieldInline({

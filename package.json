@@ -17,6 +17,7 @@
     "flint": "npm run lint -w apps/frontend",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "knip": "knip",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
+    "knip": "^6.20.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.4"
   }
