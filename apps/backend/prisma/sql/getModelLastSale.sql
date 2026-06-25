@@ -3,6 +3,7 @@
 select
   a.barcode as barcode,
   d.created_at as departed_at,
+  c.purchase_cost::float8 as purchase_cost,
   c.sale_price::float8 as sale_price,
   ts.meter_total as meter,
   o."name" as customer,

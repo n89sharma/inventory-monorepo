@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const ModelSaleRowSchema = z.object({
   barcode: z.string(),
   departed_at: z.coerce.date(),
+  purchase_price: z.number().nullable(),
   sale_price: z.number(),
   meter: z.number().nullable(),
   customer: z.string().nullable(),

@@ -9,7 +9,14 @@ import {
 } from '@/components/pages/column-defs/model-sales-columns'
 import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shadcn/data-table'
-import { Table, TableBody, TableCell, TableRow } from '@/components/shadcn/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/shadcn/table'
 import { Toggle } from '@/components/shadcn/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { useModelStore } from '@/data/store/model-store'
@@ -66,15 +73,27 @@ function MeterBandsTable({ bands }: { bands: BandSummary[] }): React.JSX.Element
   return (
     <div className="w-fit rounded-md border">
       <Table className="w-fit text-sm">
+        <TableHeader>
+          <TableRow>
+            <TableHead />
+            <TableHead />
+            <TableHead className="text-center">Purchase price</TableHead>
+            <TableHead className="text-center">Sale price</TableHead>
+            <TableHead className="text-center">Sales</TableHead>
+          </TableRow>
+        </TableHeader>
         <TableBody>
           {bands.map((band) => (
             <TableRow key={band.name}>
-              <TableCell className="font-medium">{band.name}</TableCell>
-              <TableCell>{band.label}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {band.median === null ? NO_MEDIAN : `$${formatUSD(band.median)}`}
+              <TableCell className="text-center font-medium">{band.name}</TableCell>
+              <TableCell className="text-center">{band.label}</TableCell>
+              <TableCell className="text-center tabular-nums">
+                {band.purchaseMedian === null ? NO_MEDIAN : `$${formatUSD(band.purchaseMedian)}`}
               </TableCell>
-              <TableCell className="text-right">{formatSalesCount(band.count)}</TableCell>
+              <TableCell className="text-center tabular-nums">
+                {band.saleMedian === null ? NO_MEDIAN : `$${formatUSD(band.saleMedian)}`}
+              </TableCell>
+              <TableCell className="text-center tabular-nums">{band.count}</TableCell>
             </TableRow>
           ))}
         </TableBody>

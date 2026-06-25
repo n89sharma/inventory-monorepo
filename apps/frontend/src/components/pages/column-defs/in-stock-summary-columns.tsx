@@ -82,7 +82,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryRow>[] = [
   },
   {
     id: 'sold_report',
-    header: 'Sold',
+    header: 'Sold Report',
     enableSorting: false,
     cell: ({ row }) => (
       <Link

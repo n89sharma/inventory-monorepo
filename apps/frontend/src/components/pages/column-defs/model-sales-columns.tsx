@@ -48,6 +48,17 @@ export function createModelSalesColumns(
       size: 140,
     },
     {
+      accessorKey: 'purchase_price',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Purchase Price"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.purchase_price),
+      size: 110,
+    },
+    {
       accessorKey: 'sale_price',
       header: ({ column }) => (
         <SortableHeader

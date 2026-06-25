@@ -17,7 +17,8 @@ export type BandSummary = {
   name: string
   label: string
   count: number
-  median: number | null
+  purchaseMedian: number | null
+  saleMedian: number | null
 }
 
 export function filterByMonths(
@@ -45,14 +46,16 @@ function isInBand(meter: number, band: { min: number | null; max: number | null 
 
 export function summarizeBands(sales: ModelSaleRow[]): BandSummary[] {
   return METER_BANDS.map((band) => {
-    const prices = sales
-      .filter((sale) => sale.meter !== null && isInBand(sale.meter, band))
-      .map((sale) => sale.sale_price)
+    const inBand = sales.filter((sale) => sale.meter !== null && isInBand(sale.meter, band))
+    const purchasePrices = inBand
+      .map((sale) => sale.purchase_price)
+      .filter((price): price is number => price !== null)
     return {
       name: band.name,
       label: band.label,
-      count: prices.length,
-      median: median(prices),
+      count: inBand.length,
+      purchaseMedian: median(purchasePrices),
+      saleMedian: median(inBand.map((sale) => sale.sale_price)),
     }
   })
 }

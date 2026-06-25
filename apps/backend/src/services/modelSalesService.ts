@@ -13,6 +13,7 @@ function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
   return {
     barcode: row.barcode,
     departed_at: row.departed_at,
+    purchase_price: row.purchase_cost ?? null,
     sale_price: row.sale_price ?? 0,
     meter: row.meter,
     customer: row.customer,

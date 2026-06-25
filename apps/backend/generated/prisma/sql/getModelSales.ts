@@ -10,13 +10,14 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param fromDate
  * @param soldStatusId
  */
-export const getModelSales = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\nd.created_at as departed_at,\nc.sale_price::float8 as sale_price,\nts.meter_total as meter,\no.\"name\" as customer,\nu.\"name\" as salesperson,\nts.cassettes as cassettes,\ncmp.\"name\" as internal_finisher,\nacc.core_functions as core_functions\nfrom \"Asset\" a\njoin \"Departure\" d on d.id = a.departure_id\njoin \"Cost\" c on c.asset_id = a.id\njoin \"Organization\" o on o.id = d.destination_id\nleft join \"User\" u on u.id = d.sales_representative_id\nleft join \"TechnicalSpecification\" ts on ts.asset_id = a.id\nleft join \"Component\" cmp on cmp.id = ts.component_id\nleft join lateral (\nselect coalesce(array_agg(ac.accessory order by ac.accessory), '{}') as core_functions\nfrom \"AssetAccessory\" aa\njoin \"Accessory\" ac on ac.id = aa.accessory_id\nwhere aa.asset_id = a.id\n) acc on true\nwhere a.model_id = $1\nand a.status_id = $3\nand c.sale_price is not null\nand d.created_at >= $2\norder by d.created_at desc") as (modelId: number, fromDate: Date, soldStatusId: number) => $runtime.TypedSql<getModelSales.Parameters, getModelSales.Result>
+export const getModelSales = $runtime.makeTypedQueryFactory("select\na.barcode as barcode,\nd.created_at as departed_at,\nc.purchase_cost::float8 as purchase_cost,\nc.sale_price::float8 as sale_price,\nts.meter_total as meter,\no.\"name\" as customer,\nu.\"name\" as salesperson,\nts.cassettes as cassettes,\ncmp.\"name\" as internal_finisher,\nacc.core_functions as core_functions\nfrom \"Asset\" a\njoin \"Departure\" d on d.id = a.departure_id\njoin \"Cost\" c on c.asset_id = a.id\njoin \"Organization\" o on o.id = d.destination_id\nleft join \"User\" u on u.id = d.sales_representative_id\nleft join \"TechnicalSpecification\" ts on ts.asset_id = a.id\nleft join \"Component\" cmp on cmp.id = ts.component_id\nleft join lateral (\nselect coalesce(array_agg(ac.accessory order by ac.accessory), '{}') as core_functions\nfrom \"AssetAccessory\" aa\njoin \"Accessory\" ac on ac.id = aa.accessory_id\nwhere aa.asset_id = a.id\n) acc on true\nwhere a.model_id = $1\nand a.status_id = $3\nand c.sale_price is not null\nand d.created_at >= $2\norder by d.created_at desc") as (modelId: number, fromDate: Date, soldStatusId: number) => $runtime.TypedSql<getModelSales.Parameters, getModelSales.Result>
 
 export namespace getModelSales {
   export type Parameters = [modelId: number, fromDate: Date, soldStatusId: number]
   export type Result = {
     barcode: string
     departed_at: Date
+    purchase_cost: number | null
     sale_price: number | null
     meter: number | null
     customer: string
