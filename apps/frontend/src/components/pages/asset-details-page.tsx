@@ -90,15 +90,6 @@ function RailCardHeader({
   )
 }
 
-function RailEmpty({ entity }: { entity: string }) {
-  return (
-    <>
-      <h3 className="text-xs text-muted-foreground font-medium mb-2">{entity}</h3>
-      <p className="text-xs text-muted-foreground italic">Not on record</p>
-    </>
-  )
-}
-
 function AssetSummaryStrip({
   status,
   assetType,
@@ -152,10 +143,9 @@ type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
 function buildAssetLifecycle(
   assetDetails: AssetDetails,
   transfers: AssetTransfer[],
-): { populated: LifecycleItem[]; empty: string[] } {
-  const { hold, arrival, departure } = assetDetails
+): LifecycleItem[] {
+  const { hold, arrival, departure, purchase_invoice, sales_invoice } = assetDetails
   const populated: LifecycleItem[] = []
-  const empty: string[] = []
 
   if (hold) {
     populated.push({
@@ -176,8 +166,6 @@ function buildAssetLifecycle(
         </>
       ),
     })
-  } else {
-    empty.push('Hold')
   }
 
   if (arrival) {
@@ -195,12 +183,20 @@ function buildAssetLifecycle(
           <div className="flex flex-col gap-2">
             <RailField label="Vendor">{arrival.origin}</RailField>
             <RailField label="Warehouse">{arrival.destination_code}</RailField>
+            {purchase_invoice && (
+              <RailField label="Invoice">
+                <Link
+                  to={`/invoices/${purchase_invoice.invoice_number}`}
+                  className="font-medium hover:underline"
+                >
+                  {purchase_invoice.invoice_number}
+                </Link>
+              </RailField>
+            )}
           </div>
         </>
       ),
     })
-  } else {
-    empty.push('Arrival')
   }
 
   if (transfers.length > 0) {
@@ -225,8 +221,6 @@ function buildAssetLifecycle(
         ),
       })
     }
-  } else {
-    empty.push('Transfer')
   }
 
   if (departure) {
@@ -244,12 +238,20 @@ function buildAssetLifecycle(
           <div className="flex flex-col gap-2">
             <RailField label="Warehouse">{departure.origin_code}</RailField>
             <RailField label="Customer">{departure.destination}</RailField>
+            {sales_invoice && (
+              <RailField label="Invoice">
+                <Link
+                  to={`/invoices/${sales_invoice.invoice_number}`}
+                  className="font-medium hover:underline"
+                >
+                  {sales_invoice.invoice_number}
+                </Link>
+              </RailField>
+            )}
           </div>
         </>
       ),
     })
-  } else {
-    empty.push('Departure')
   }
 
   populated.sort((a, b) => {
@@ -259,7 +261,7 @@ function buildAssetLifecycle(
     return compareDesc(a.date, b.date)
   })
 
-  return { populated, empty }
+  return populated
 }
 
 export const AssetDetailsPage = () => {
@@ -304,10 +306,7 @@ export const AssetDetailsPage = () => {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
 
-  const { populated: populatedLifecycleItems, empty: emptyLifecycleEntities } = buildAssetLifecycle(
-    assetDetails,
-    transfers,
-  )
+  const populatedLifecycleItems = buildAssetLifecycle(assetDetails, transfers)
 
   return (
     <>
@@ -546,20 +545,17 @@ export const AssetDetailsPage = () => {
             </ActivitySection>
           </div>
 
-          <aside
-            className="w-48 shrink-0 self-start sticky flex flex-col gap-3"
-            style={{ top: RAIL_STICKY_TOP }}
-            aria-label="Lifecycle"
-          >
-            {populatedLifecycleItems.map((item) => (
-              <RailCard key={item.key}>{item.node}</RailCard>
-            ))}
-            {emptyLifecycleEntities.map((entity) => (
-              <RailCard key={`empty-${entity}`}>
-                <RailEmpty entity={entity} />
-              </RailCard>
-            ))}
-          </aside>
+          {populatedLifecycleItems.length > 0 && (
+            <aside
+              className="w-48 shrink-0 self-start sticky flex flex-col gap-3"
+              style={{ top: RAIL_STICKY_TOP }}
+              aria-label="Lifecycle"
+            >
+              {populatedLifecycleItems.map((item) => (
+                <RailCard key={item.key}>{item.node}</RailCard>
+              ))}
+            </aside>
+          )}
         </div>
       </PageContent>
 
