@@ -92,7 +92,14 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_invoice',
   ],
   accountant: ['view_asset', 'view_sale_price', 'view_purchase_price', 'view_collections'],
-  tech: ['view_store', 'create_update_store', 'view_asset', 'edit_tech_specs', 'view_collections'],
+  tech: [
+    'view_store',
+    'create_update_store',
+    'view_asset',
+    'edit_tech_specs',
+    'edit_location',
+    'view_collections',
+  ],
   senior_sales: [
     'view_asset',
     'view_sale_price',
