@@ -3,13 +3,7 @@ import { PencilSimpleIcon } from '@phosphor-icons/react'
 
 export function SectionEditButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button
-      variant="ghost"
-      size="xs"
-      type="button"
-      onClick={onClick}
-      className="text-muted-foreground -mr-1"
-    >
+    <Button variant="outline" size="xs" type="button" onClick={onClick}>
       <PencilSimpleIcon aria-hidden="true" />
       Edit
     </Button>
