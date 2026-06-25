@@ -32,6 +32,11 @@ export function formatUSD(value: number | null): string {
   return currencyValue
 }
 
+export function formatUSDWithSymbol(value: number | null): string {
+  if (value === null) return ''
+  return `$${formatUSD(value)}`
+}
+
 export function formatTitleCase(str: string): string {
   return str
     .toLowerCase()

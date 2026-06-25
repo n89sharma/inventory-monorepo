@@ -1,6 +1,11 @@
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
-import { formatDate, formatThousandsK, formatUSD } from '@/lib/formatters'
+import {
+  formatDate,
+  formatThousandsK,
+  formatTitleCase,
+  formatUSDWithSymbol,
+} from '@/lib/formatters'
 import { ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ModelSaleRow } from 'shared-types'
@@ -50,7 +55,7 @@ export function createModelSalesColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.sale_price),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.sale_price),
       size: 100,
     },
     {
@@ -72,7 +77,7 @@ export function createModelSalesColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => row.original.customer ?? '',
+      cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
       size: 160,
     },
     {

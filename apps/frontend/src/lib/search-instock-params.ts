@@ -8,8 +8,8 @@ import {
   type SharedAssetReferenceData,
 } from '@/lib/asset-filter-params'
 
-const PARAM_BRAND = 'brand'
-const PARAM_TYPE = 'type'
+export const PARAM_BRAND = 'brand'
+export const PARAM_TYPE = 'type'
 
 export type SearchInStockFilters = SharedAssetFilters & {
   brand: Brand | null

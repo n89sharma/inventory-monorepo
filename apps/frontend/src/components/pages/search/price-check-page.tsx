@@ -245,7 +245,7 @@ export function PriceCheckPage(): React.JSX.Element {
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">Price Check</h1>
+            <h1 className="text-2xl font-semibold">Sold Report</h1>
             {isLoading && (
               <SpinnerGapIcon
                 className="animate-spin text-muted-foreground"

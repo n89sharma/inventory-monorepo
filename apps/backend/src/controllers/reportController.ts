@@ -2,6 +2,7 @@ import { successResponse } from 'shared-types'
 import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { getHoldsByUserReport as getHoldsByUserReportSer } from '../services/holdsReportService.js'
+import { getInStockSummaryReport as getInStockSummaryReportSer } from '../services/inStockSummaryService.js'
 import { getProfitabilityCube as getProfitabilityCubeSer } from '../services/profitabilityService.js'
 
 const MIN_YEAR = 2000
@@ -19,5 +20,10 @@ export const getProfitabilityReport = asyncHandler(async (req, res) => {
 
 export const getHoldsByUserReport = asyncHandler(async (req, res) => {
   const data = await getHoldsByUserReportSer()
+  res.json(successResponse(data))
+})
+
+export const getInStockSummaryReport = asyncHandler(async (req, res) => {
+  const data = await getInStockSummaryReportSer()
   res.json(successResponse(data))
 })

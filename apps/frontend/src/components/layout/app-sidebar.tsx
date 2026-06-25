@@ -19,10 +19,12 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/shadcn/sidebar'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { buildAssetSearchPath } from '@/lib/asset-filter-params'
 import { buildProfitabilityReportPath } from '@/lib/profitability-report-url-params'
+import { buildInStockSummaryPath } from '@/lib/search-in-stock-summary-params'
 import { buildStoreListPath } from '@/lib/search-store-params'
 import {
   CaretDownIcon,
@@ -37,11 +39,14 @@ import {
   TruckTrailerIcon,
   WarehouseIcon,
 } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
+const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
+const DEFAULT_BRAND_NAME = 'Canon'
+const DEFAULT_ASSET_TYPE = 'Copier'
 
 const sidebarItems = [
   {
@@ -85,21 +90,44 @@ const SEARCH_ASSETS_SUB_ITEMS = [
 const SETTINGS_SUB_ITEMS = [
   { title: 'Catalog', url: '/settings/catalog' },
   { title: 'Organizations', url: '/settings/organizations' },
-]
-
-const REPORTS_SUB_ITEMS = [
-  { title: 'Profitability', url: PROFITABILITY_PATH },
-  { title: 'Held Assets', url: '/reports/holds-by-user' },
   { title: 'Export Assets', url: '/reports/serial-number' },
 ]
 
-const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
+const PRICE_CHECK_PATH = '/search/price-check'
 
-const PRICE_CHECK_ITEM = { title: 'Price Check', url: '/search/price-check' }
+type ReportPermission = 'view_reports' | 'view_sale_price'
+
+const REPORTS_SUB_ITEMS = [
+  { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
+  { title: 'Held', url: '/reports/holds-by-user', permission: 'view_reports' },
+  { title: 'Sold', url: PRICE_CHECK_PATH, permission: 'view_sale_price' },
+  { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_reports' },
+] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
+
+const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 
 export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const defaultWarehouse = useProfileDefaultWarehouse()
+
+  const brands = useReferenceDataStore((state) => state.brands)
+  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const defaultBrand = useMemo(
+    () => brands.find((b) => b.name === DEFAULT_BRAND_NAME) ?? null,
+    [brands],
+  )
+  const defaultAssetType = useMemo(
+    () => assetTypes.find((t) => t.asset_type === DEFAULT_ASSET_TYPE) ?? null,
+    [assetTypes],
+  )
+
+  function reportItemPath(url: string): string {
+    if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath(defaultWarehouse)
+    if (url === IN_STOCK_SUMMARY_PATH) {
+      return buildInStockSummaryPath(defaultWarehouse, defaultBrand, defaultAssetType)
+    }
+    return url
+  }
 
   const canManageSettings = useCan('manage_settings')
   const canManageUsers = useCan('manage_users')
@@ -109,10 +137,17 @@ export function AppSidebar(): React.JSX.Element {
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
 
-  const isReportsActive = location.pathname.startsWith('/reports')
+  const isPriceCheckActive = location.pathname.startsWith(PRICE_CHECK_PATH)
+
+  const reportItemVisible: Record<ReportPermission, boolean> = {
+    view_reports: canViewReports,
+    view_sale_price: canViewSalePrice,
+  }
+
+  const isReportsActive = location.pathname.startsWith('/reports') || isPriceCheckActive
   const [reportsOpen, setReportsOpen] = useState(isReportsActive)
 
-  const isSearchAssetsActive = location.pathname.startsWith('/search')
+  const isSearchAssetsActive = location.pathname.startsWith('/search') && !isPriceCheckActive
   const [searchAssetsOpen, setSearchAssetsOpen] = useState(isSearchAssetsActive)
 
   useEffect(() => {
@@ -193,23 +228,11 @@ export function AppSidebar(): React.JSX.Element {
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
-                      {canViewSalePrice && (
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={
-                              location.pathname.startsWith(PRICE_CHECK_ITEM.url) ? true : undefined
-                            }
-                          >
-                            <Link to={PRICE_CHECK_ITEM.url}>{PRICE_CHECK_ITEM.title}</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      )}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              {canViewReports && (
+              {(canViewReports || canViewSalePrice) && (
                 <Collapsible
                   open={reportsOpen}
                   onOpenChange={setReportsOpen}
@@ -229,22 +252,25 @@ export function AppSidebar(): React.JSX.Element {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {REPORTS_SUB_ITEMS.map((item) => {
-                          const to =
-                            item.url === PROFITABILITY_PATH
-                              ? buildProfitabilityReportPath(defaultWarehouse)
-                              : item.url
-                          return (
-                            <SidebarMenuSubItem key={item.title}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={location.pathname === item.url ? true : undefined}
-                              >
-                                <Link to={to}>{item.title}</Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          )
-                        })}
+                        {REPORTS_SUB_ITEMS.filter((item) => reportItemVisible[item.permission]).map(
+                          (item) => {
+                            const to = reportItemPath(item.url)
+                            const isActive =
+                              item.url === PRICE_CHECK_PATH
+                                ? location.pathname.startsWith(item.url)
+                                : location.pathname === item.url
+                            return (
+                              <SidebarMenuSubItem key={item.title}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={isActive ? true : undefined}
+                                >
+                                  <Link to={to}>{item.title}</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            )
+                          },
+                        )}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>

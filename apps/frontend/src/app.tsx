@@ -125,6 +125,11 @@ const HoldsByUserReportPage = lazy(() =>
     default: m.HoldsByUserReportPage,
   })),
 )
+const InStockSummaryReportPage = lazy(() =>
+  import('./components/pages/reports/in-stock-summary-report-page').then((m) => ({
+    default: m.InStockSummaryReportPage,
+  })),
+)
 const ExportAssetsPage = lazy(() =>
   import('./components/pages/reports/export-assets-page').then((m) => ({
     default: m.ExportAssetsPage,
@@ -261,9 +266,17 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/reports/serial-number"
+                      path="/reports/in-stock-summary"
                       element={
                         <PermissionRoute permission="view_reports">
+                          <InStockSummaryReportPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/reports/serial-number"
+                      element={
+                        <PermissionRoute permission="manage_settings">
                           <ExportAssetsPage />
                         </PermissionRoute>
                       }

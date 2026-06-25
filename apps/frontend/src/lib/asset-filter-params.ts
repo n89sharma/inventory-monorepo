@@ -2,12 +2,12 @@ import type { Component, ModelSummary, Status, Warehouse } from 'shared-types'
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 
-const PARAM_MODEL = 'model'
+export const PARAM_MODEL = 'model'
 const PARAM_Q = 'q'
-const PARAM_WH = 'wh'
+export const PARAM_WH = 'wh'
 const PARAM_READINESS = 'readiness'
-const PARAM_METER_MIN = 'meter_min'
-const PARAM_METER_MAX = 'meter_max'
+export const PARAM_METER_MIN = 'meter_min'
+export const PARAM_METER_MAX = 'meter_max'
 const PARAM_CAS = 'cas'
 const PARAM_FIN = 'fin'
 

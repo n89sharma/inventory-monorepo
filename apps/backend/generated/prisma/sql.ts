@@ -43,6 +43,8 @@ export * from "./sql/getHolds.js"
 
 export * from "./sql/getHoldsByUser.js"
 
+export * from "./sql/getInStockSummary.js"
+
 export * from "./sql/getInvoices.js"
 
 export * from "./sql/getLocationsByWarehouse.js"

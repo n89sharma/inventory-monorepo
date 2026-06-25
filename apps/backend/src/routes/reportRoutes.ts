@@ -3,6 +3,7 @@ import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
   getHoldsByUserReport,
+  getInStockSummaryReport,
   getProfitabilityReport,
 } from '../controllers/reportController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -13,7 +14,7 @@ const router = express.Router()
 
 router.use(requireAuth)
 
-router.post('/serial-number', requirePermission('view_reports'), getAssetsBySerialNumber)
+router.post('/serial-number', requirePermission('manage_settings'), getAssetsBySerialNumber)
 
 router.get(
   '/profitability',
@@ -23,5 +24,7 @@ router.get(
 )
 
 router.get('/holds-by-user', requirePermission('view_reports'), getHoldsByUserReport)
+
+router.get('/in-stock-summary', requirePermission('view_reports'), getInStockSummaryReport)
 
 export default router
