@@ -17,13 +17,8 @@ jobs:
 
       - run: npm ci
 
-      - name: Lint
-        run: |
-          npm run tlint
-          npm run blint
-          npm run flint
+      - name: Verify (lint, knip, typecheck)
+        run: npm run verify
 
-      - name: Build (typechecks all workspaces)
-        run: |
-          npm run bbuild
-          npm run fbuild
+      - name: Build frontend bundle
+        run: npm run fbuild
