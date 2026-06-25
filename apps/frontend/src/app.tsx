@@ -284,14 +284,6 @@ function AppRoutes() {
                       }
                     />
                     <Route path="/reports/sold-report/:assetId" element={<AssetDetailsPage />} />
-                    <Route
-                      path="/reports/serial-number"
-                      element={
-                        <PermissionRoute permission="manage_settings">
-                          <ExportAssetsPage />
-                        </PermissionRoute>
-                      }
-                    />
 
                     <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
 
@@ -326,6 +318,14 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="manage_users">
                           <UserManagementPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/export-assets"
+                      element={
+                        <PermissionRoute permission="manage_settings">
+                          <ExportAssetsPage />
                         </PermissionRoute>
                       }
                     />

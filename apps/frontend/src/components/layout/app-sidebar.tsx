@@ -90,7 +90,7 @@ const SEARCH_ASSETS_SUB_ITEMS = [
 const SETTINGS_SUB_ITEMS = [
   { title: 'Catalog', url: '/settings/catalog' },
   { title: 'Organizations', url: '/settings/organizations' },
-  { title: 'Export Assets', url: '/reports/serial-number' },
+  { title: 'Export Assets', url: '/settings/export-assets' },
 ]
 
 const SOLD_REPORT_PATH = '/reports/sold-report'
