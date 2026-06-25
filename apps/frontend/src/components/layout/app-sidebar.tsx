@@ -93,14 +93,14 @@ const SETTINGS_SUB_ITEMS = [
   { title: 'Export Assets', url: '/reports/serial-number' },
 ]
 
-const PRICE_CHECK_PATH = '/search/price-check'
+const SOLD_REPORT_PATH = '/reports/sold-report'
 
 type ReportPermission = 'view_reports' | 'view_sale_price'
 
 const REPORTS_SUB_ITEMS = [
   { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
   { title: 'Held', url: '/reports/holds-by-user', permission: 'view_reports' },
-  { title: 'Sold', url: PRICE_CHECK_PATH, permission: 'view_sale_price' },
+  { title: 'Sold', url: SOLD_REPORT_PATH, permission: 'view_sale_price' },
   { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_reports' },
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
 
@@ -137,17 +137,15 @@ export function AppSidebar(): React.JSX.Element {
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
 
-  const isPriceCheckActive = location.pathname.startsWith(PRICE_CHECK_PATH)
-
   const reportItemVisible: Record<ReportPermission, boolean> = {
     view_reports: canViewReports,
     view_sale_price: canViewSalePrice,
   }
 
-  const isReportsActive = location.pathname.startsWith('/reports') || isPriceCheckActive
+  const isReportsActive = location.pathname.startsWith('/reports')
   const [reportsOpen, setReportsOpen] = useState(isReportsActive)
 
-  const isSearchAssetsActive = location.pathname.startsWith('/search') && !isPriceCheckActive
+  const isSearchAssetsActive = location.pathname.startsWith('/search')
   const [searchAssetsOpen, setSearchAssetsOpen] = useState(isSearchAssetsActive)
 
   useEffect(() => {
@@ -256,7 +254,7 @@ export function AppSidebar(): React.JSX.Element {
                           (item) => {
                             const to = reportItemPath(item.url)
                             const isActive =
-                              item.url === PRICE_CHECK_PATH
+                              item.url === SOLD_REPORT_PATH
                                 ? location.pathname.startsWith(item.url)
                                 : location.pathname === item.url
                             return (

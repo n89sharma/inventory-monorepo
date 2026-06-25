@@ -319,7 +319,7 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   instock: INSTOCK_DEFAULT_COLUMN_IDS,
   held: HELD_DEFAULT_COLUMN_IDS,
   sold: SOLD_DEFAULT_COLUMN_IDS,
-  'price-check': DEFAULT_VISIBLE_COLUMN_IDS,
+  'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
 
 export const ENABLED_ASSET_COLUMN_COUNT: number = ASSET_TABLE_COLUMNS.filter(

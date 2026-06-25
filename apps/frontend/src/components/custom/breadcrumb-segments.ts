@@ -1,5 +1,6 @@
 import {
   isCollection,
+  listBasePath,
   SEARCH_LIST_LABELS,
   type NavigationSection,
   type SearchList,
@@ -28,7 +29,7 @@ export function getBreadcrumForAssetDetails(
 
   if (section === 'search') {
     const list = searchList ?? DEFAULT_SEARCH_LIST
-    return [{ label: SEARCH_LIST_LABELS[list], href: `/search/${list}${listSearch}` }]
+    return [{ label: SEARCH_LIST_LABELS[list], href: `${listBasePath(list)}/${list}${listSearch}` }]
   }
   return [{ label: 'Home', href: '/' }]
 }

@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { METER_BAND_LABELS } from '@/lib/meter-band-display'
-import { inStockDrilldownHref, priceCheckHref } from '@/lib/search-in-stock-summary-params'
+import { inStockDrilldownHref, soldReportHref } from '@/lib/search-in-stock-summary-params'
 import { ArrowSquareOutIcon, ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
@@ -81,13 +81,13 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryRow>[] = [
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
-    id: 'price_check',
-    header: 'Price Check',
+    id: 'sold_report',
+    header: 'Sold',
     enableSorting: false,
     cell: ({ row }) => (
       <Link
-        to={priceCheckHref(row.original.model_id)}
-        aria-label={`Price check ${row.original.model_name}`}
+        to={soldReportHref(row.original.model_id)}
+        aria-label={`Sold report for ${row.original.model_name}`}
         className="inline-flex text-muted-foreground hover:text-foreground"
       >
         <ArrowSquareOutIcon className="size-4" />

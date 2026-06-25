@@ -12,7 +12,7 @@ import { PARAM_BRAND, PARAM_TYPE } from '@/lib/search-instock-params'
 
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
 const INSTOCK_PATH = '/search/instock'
-const PRICE_CHECK_PATH = '/search/price-check'
+const SOLD_REPORT_PATH = '/reports/sold-report'
 
 const BAND_BOUNDS = {
   LOW: METER_BANDS[0],
@@ -87,8 +87,8 @@ export function inStockDrilldownHref(row: InStockSummaryRow): string {
   return `${INSTOCK_PATH}?${params.toString()}`
 }
 
-export function priceCheckHref(modelId: number): string {
+export function soldReportHref(modelId: number): string {
   const params = new URLSearchParams()
   params.set(PARAM_MODEL, String(modelId))
-  return `${PRICE_CHECK_PATH}?${params.toString()}`
+  return `${SOLD_REPORT_PATH}?${params.toString()}`
 }

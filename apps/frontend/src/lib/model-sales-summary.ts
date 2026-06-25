@@ -1,4 +1,4 @@
-import type { PriceCheckRange } from '@/lib/search-price-check-params'
+import type { SoldReportRange } from '@/lib/sold-report-params'
 import { isAfter, subMonths } from 'date-fns'
 import type { ModelSaleRow } from 'shared-types'
 
@@ -22,7 +22,7 @@ export type BandSummary = {
 
 export function filterByMonths(
   sales: ModelSaleRow[],
-  months: PriceCheckRange,
+  months: SoldReportRange,
   now: Date = new Date(),
 ): ModelSaleRow[] {
   const cutoff = subMonths(now, months)

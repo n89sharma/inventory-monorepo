@@ -138,8 +138,10 @@ const ExportAssetsPage = lazy(() =>
 const SearchAllPage = lazy(() =>
   import('./components/pages/search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
 )
-const PriceCheckPage = lazy(() =>
-  import('./components/pages/search/price-check-page').then((m) => ({ default: m.PriceCheckPage })),
+const SoldReportPage = lazy(() =>
+  import('./components/pages/reports/sold-report-page').then((m) => ({
+    default: m.SoldReportPage,
+  })),
 )
 const CatalogSettingsPage = lazy(() =>
   import('./components/pages/settings/catalog-settings-page').then((m) => ({
@@ -274,6 +276,15 @@ function AppRoutes() {
                       }
                     />
                     <Route
+                      path="/reports/sold-report"
+                      element={
+                        <PermissionRoute permission="view_sale_price">
+                          <SoldReportPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route path="/reports/sold-report/:assetId" element={<AssetDetailsPage />} />
+                    <Route
                       path="/reports/serial-number"
                       element={
                         <PermissionRoute permission="manage_settings">
@@ -292,15 +303,6 @@ function AppRoutes() {
                     <Route path="/search/held/:assetId" element={<AssetDetailsPage />} />
                     <Route path="/search/sold" element={<SearchSoldPage />} />
                     <Route path="/search/sold/:assetId" element={<AssetDetailsPage />} />
-                    <Route
-                      path="/search/price-check"
-                      element={
-                        <PermissionRoute permission="view_sale_price">
-                          <PriceCheckPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route path="/search/price-check/:assetId" element={<AssetDetailsPage />} />
 
                     <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
                     <Route

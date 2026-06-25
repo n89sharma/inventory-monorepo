@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { getHoldsByUserReport as getHoldsByUserReportSer } from '../services/holdsReportService.js'
 import { getInStockSummaryReport as getInStockSummaryReportSer } from '../services/inStockSummaryService.js'
+import { getModelSales as getModelSalesSer } from '../services/modelSalesService.js'
 import { getProfitabilityCube as getProfitabilityCubeSer } from '../services/profitabilityService.js'
 
 const MIN_YEAR = 2000
@@ -10,6 +11,16 @@ const MAX_YEAR = 2100
 
 export const ProfitabilityReportQuerySchema = z.object({
   year: z.coerce.number().int().min(MIN_YEAR).max(MAX_YEAR),
+})
+
+export const SoldReportQuerySchema = z.object({
+  modelId: z.coerce.number().int().positive(),
+})
+
+export const getSoldReport = asyncHandler(async (req, res) => {
+  const { modelId } = res.locals.query as z.infer<typeof SoldReportQuerySchema>
+  const data = await getModelSalesSer(modelId)
+  res.json(successResponse(data))
 })
 
 export const getProfitabilityReport = asyncHandler(async (req, res) => {

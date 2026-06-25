@@ -11,7 +11,7 @@ export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
 }
 
-const SEARCH_LISTS = ['instock', 'held', 'all', 'price-check', 'sold'] as const
+const SEARCH_LISTS = ['instock', 'held', 'all', 'sold-report', 'sold'] as const
 
 export type SearchList = (typeof SEARCH_LISTS)[number]
 
@@ -19,9 +19,15 @@ export const SEARCH_LIST_LABELS = {
   instock: 'In Stock',
   held: 'Held',
   all: 'All Assets',
-  'price-check': 'Price Check',
+  'sold-report': 'Sold Report',
   sold: 'Sold',
 } as const satisfies Record<SearchList, string>
+
+const REPORT_LISTS = new Set<SearchList>(['sold-report'])
+
+export function listBasePath(list: SearchList): string {
+  return REPORT_LISTS.has(list) ? '/reports' : '/search'
+}
 
 const SEARCH_LIST_PATH_INDEX = 2
 
@@ -48,5 +54,5 @@ export function assetDetailHref(
 ): string {
   const query = filters.toString()
   const queryString = query ? `?${query}` : ''
-  return `/search/${list}/${barcode}${queryString}`
+  return `${listBasePath(list)}/${list}/${barcode}${queryString}`
 }
