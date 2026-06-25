@@ -7,6 +7,8 @@
     "build": "tsc -b",
     "lint": "eslint .",
     "start": "node dist/src/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "pgen": "npx prisma generate --sql",
     "ppull": "npx prisma db pull"
   },
@@ -38,6 +40,7 @@
     "@types/node": "^25.6.2",
     "@types/pdfkit": "^0.17.6",
     "@types/pg": "^8.20.0",
+    "@types/supertest": "^7.2.0",
     "dotenv": "^16.5.0",
     "eslint": "^9.39.4",
     "eslint-import-resolver-typescript": "^4.4.5",
@@ -45,9 +48,11 @@
     "eslint-plugin-sonarjs": "^4.1.0",
     "globals": "^16.5.0",
     "prisma": "7.8.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.62.0"
+    "typescript-eslint": "^8.62.0",
+    "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">=22.16.0"

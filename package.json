@@ -19,6 +19,8 @@
     "verify": "npm run tlint && npm run blint && npm run flint && npm run knip && npm run bbuild && npm run ftypecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "npm run test -w apps/backend && npm run test -w apps/frontend",
+    "e2e": "playwright test",
     "knip": "knip",
     "prepare": "husky"
   },
@@ -26,6 +28,7 @@
     "*.{ts,tsx,js,jsx,json,md,css}": "prettier --write"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "husky": "^9.1.7",
     "knip": "^6.20.0",
     "lint-staged": "^16.4.0",
