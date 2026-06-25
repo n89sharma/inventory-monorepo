@@ -62,17 +62,25 @@ long section. Optimize for scannability.
 ## Commands
 
 Run from the **repo root** after every code change; summarize and fix any errors before
-considering the task complete. **Lint first, then build** — never run a build before the linter:
+considering the task complete. **Lint first, then knip, then build** — never run a later stage
+before the earlier one:
 
 ```bash
+npm run verify                   # lint + knip + typecheck, all workspaces (the gate; pre-push + CI run this)
+# or run stages individually:
 npm run tlint                    # lint shared-types (also run for any shared-types change)
 npm run blint && npm run bbuild  # backend: lint, then build
 npm run flint && npm run fbuild  # frontend: lint, then build (fbuild compiles shared-types first)
+npm run knip                     # dead-code check across all workspaces
 ```
 
 **Under NO CIRCUMSTANCES** leave a code change without running the linter, and never build
 without linting first. Zero tolerance: **no errors and no warnings** may remain after a change —
 fix them (don't suppress) before the task is complete.
+
+**No code change may introduce dead code** — unused files, exports, types, or dependencies.
+Run `npm run knip` after linting and confirm it's clean (exit 0). A new unused export means
+either delete it or drop the `export` keyword if it's used only in-file; never leave it dangling.
 
 Per-app (run inside the app dir): `npm run dev` (backend: tsx watch; frontend: Vite on 5173).
 Backend also: `npm run pgen` (`prisma generate --sql`) after any `.sql` change.
