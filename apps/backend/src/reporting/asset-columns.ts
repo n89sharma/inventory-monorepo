@@ -51,6 +51,8 @@ export const ASSET_COLUMNS = {
     header: 'country_of_origin',
     accessor: (a) => a.country_of_origin,
   },
+  weight: { key: 'weight', header: 'weight', accessor: (a) => a.weight },
+  size: { key: 'size', header: 'size', accessor: (a) => a.size },
 
   cost_purchase_cost: {
     key: 'cost_purchase_cost',

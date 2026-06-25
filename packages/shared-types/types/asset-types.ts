@@ -50,6 +50,8 @@ export const AssetSearchRowSchema = z.object({
   is_in_transit: z.boolean(),
   country_of_origin: z.string().nullable(),
   manufactured_year: z.number().nullable(),
+  weight: z.number(),
+  size: z.number(),
   specs_meter_total: z.number().nullable(),
   specs_cassettes: z.number().nullable(),
   specs_internal_finisher: z.string().nullable(),

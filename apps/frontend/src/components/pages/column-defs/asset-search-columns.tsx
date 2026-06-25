@@ -8,6 +8,7 @@ import {
   formatThousandsK,
   formatTitleCase,
   formatUSD,
+  formatWeightKg,
 } from '@/lib/formatters'
 import { ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -125,6 +126,28 @@ export function createAssetSearchColumns(
       ),
       cell: ({ row }) => formatThousandsK(row.original.specs_meter_total),
       size: 80,
+    },
+    {
+      accessorKey: 'weight',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Weight"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => formatWeightKg(row.original.weight),
+      size: 80,
+    },
+    {
+      accessorKey: 'size',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Size"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => row.original.size,
+      size: 70,
     },
     {
       id: 'days_held',

@@ -10,6 +10,8 @@ select
   a.is_in_transit as is_in_transit,
   co."name" as country_of_origin,
   a.manufactured_year as manufactured_year,
+  m.weight as weight,
+  m.size as size,
   w.city_code as warehouse_code,
   w.street as warehouse_street,
   z.zone as zone,

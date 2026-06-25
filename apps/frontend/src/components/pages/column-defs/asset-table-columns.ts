@@ -81,6 +81,8 @@ export const ASSET_TABLE_COLUMNS = [
     defaultColumn: true,
     enabled: true,
   },
+  { id: 'weight', label: 'Weight', section: 'specs', defaultColumn: false, enabled: true },
+  { id: 'size', label: 'Size', section: 'specs', defaultColumn: false, enabled: true },
   {
     id: 'specs_toner_life_c',
     label: 'Toner Life C',

@@ -71,6 +71,8 @@ type AssetSearchRowDb = LocationRow & {
   is_in_transit: boolean
   country_of_origin: string | null
   manufactured_year: number | null
+  weight: number
+  size: number
   specs_meter_total: number | null
   specs_cassettes: number | null
   specs_internal_finisher: string | null
@@ -110,6 +112,8 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     is_in_transit: r.is_in_transit,
     country_of_origin: r.country_of_origin,
     manufactured_year: r.manufactured_year,
+    weight: r.weight,
+    size: r.size,
     specs_meter_total: r.specs_meter_total,
     specs_cassettes: r.specs_cassettes,
     specs_internal_finisher: r.specs_internal_finisher,
