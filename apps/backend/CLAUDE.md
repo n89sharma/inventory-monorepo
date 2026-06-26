@@ -7,7 +7,7 @@ Loads when you work in this tree. Root `CLAUDE.md` rules still apply.
 
 | Layer        | Path                               | Responsibility                                                                                                                                                    |
 | ------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Server setup | `src/index.ts`                     | Express, CORS (`localhost:5173` dev, `shiva-inv.vercel.app` prod — confirm this domain is current), middleware, route registration                                |
+| Server setup | `src/index.ts`                     | Express, CORS (`localhost:5173` dev, `instock.copierexports.com` prod — confirm this domain is current), middleware, route registration                           |
 | DB schema    | `prisma/schema.prisma`             | Single source of truth for tables, relations, field types. Generated client: `generated/prisma`. Config: `prisma.config.ts`. Preview: `relationJoins`, `typedSql` |
 | Typed SQL    | `prisma/sql/getSomething.sql`      | Raw SQL for reads, camelCase names; run `npm run pgen` after any change                                                                                           |
 | Service      | `src/services/xyzService.ts`       | Pure DB logic — Prisma, conflict checks, business rules. No HTTP                                                                                                  |

@@ -4,8 +4,13 @@ import { LRUCache } from 'lru-cache'
 import { response401 } from 'shared-types'
 import { prisma } from '../prisma.js'
 
-// clerk_id → internal DB user id; TTL 1 hour, max 500 entries
-export const userIdCache = new LRUCache<string, number>({ max: 500, ttl: 1000 * 60 * 60 })
+// clerk_id → internal DB user id
+const USER_ID_CACHE_MAX = 500
+const USER_ID_CACHE_TTL_MS = 1000 * 60 * 60
+export const userIdCache = new LRUCache<string, number>({
+  max: USER_ID_CACHE_MAX,
+  ttl: USER_ID_CACHE_TTL_MS,
+})
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   const { userId, sessionClaims } = getAuth(req)

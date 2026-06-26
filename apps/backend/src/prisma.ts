@@ -5,15 +5,18 @@ import { PrismaClient } from '../generated/prisma/client.js'
 import { logger } from './lib/logger.js'
 import { requestContext } from './lib/context.js'
 
+const POOL_IDLE_TIMEOUT_MS = 30000
+const DB_POOL_MAX = Number(process.env.DB_POOL_MAX) || 40
+const SLOW_QUERY_THRESHOLD_MS = Number(process.env.SLOW_QUERY_THRESHOLD_MS) || 200
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  idleTimeoutMillis: 30000,
-  max: 40,
+  idleTimeoutMillis: POOL_IDLE_TIMEOUT_MS,
+  max: DB_POOL_MAX,
 })
 
 const adapter = new PrismaPg(pool)
 const isDev = process.env.NODE_ENV !== 'production'
-const SLOW_QUERY_THRESHOLD_MS = 200
 
 const prisma = new PrismaClient({
   adapter,
