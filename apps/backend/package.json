@@ -10,12 +10,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pgen": "npx prisma generate --sql",
-    "ppull": "npx prisma db pull"
+    "ppull": "npx prisma db pull",
+    "migrate": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@clerk/express": "^2.1.5",
     "@prisma/adapter-pg": "7.8.0",
     "@prisma/client": "7.8.0",
+    "prisma": "7.8.0",
     "bwip-js": "^4.11.1",
     "cors": "^2.8.6",
     "csv-stringify": "^6.7.0",
@@ -47,7 +49,6 @@
     "eslint-plugin-import-x": "^4.17.0",
     "eslint-plugin-sonarjs": "^4.1.0",
     "globals": "^16.5.0",
-    "prisma": "7.8.0",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

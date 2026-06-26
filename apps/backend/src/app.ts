@@ -29,14 +29,18 @@ if (isDev) {
   await import('dotenv/config')
 }
 
+const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60 * 1000
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 400
+const JSON_BODY_LIMIT = '500kb'
+
 const app = express()
 app.disable('x-powered-by')
 
 morgan.token('id', (req: Request) => req.id)
 
 const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 400,
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: RATE_LIMIT_MAX,
   keyGenerator: (req) => getAuth(req).userId?.toString() ?? ipKeyGenerator(req.ip ?? 'unknown', 56),
   standardHeaders: true,
   legacyHeaders: false,
@@ -44,12 +48,7 @@ const limiter = rateLimit({
 })
 
 const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:4173',
-    'https://shiva-inv.vercel.app',
-    'https://instock.copierexports.com',
-  ],
+  origin: process.env['ALLOWED_CORS_ORIGINS']?.split(',') ?? [],
 }
 
 app.use(cors(corsOptions))
@@ -70,7 +69,7 @@ app.use((_req, res, next) => {
 app.use(clerkMiddleware())
 app.use('/webhooks', webhookRoutes)
 app.use(limiter)
-app.use(express.json({ limit: '500kb' }))
+app.use(express.json({ limit: JSON_BODY_LIMIT }))
 app.use(requestId)
 
 const red = (s: string | number) => `\x1b[31m${s}\x1b[0m`
