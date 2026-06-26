@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bmigrate": "npm run migrate -w packages/backend",
+    "bmigrate": "npm run migrate -w apps/backend",
     "tbuild": "npm run build -w packages/shared-types",
     "bbuild": "npm run build -w packages/shared-types && npm run build -w apps/backend",
     "fbuild": "npm run build -w apps/frontend",
