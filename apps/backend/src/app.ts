@@ -31,10 +31,12 @@ if (isDev) {
 
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 60 * 1000
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 400
+const TRUSTED_PROXY_HOPS = 1
 const JSON_BODY_LIMIT = '500kb'
 
 const app = express()
 app.disable('x-powered-by')
+app.set('trust proxy', TRUSTED_PROXY_HOPS)
 
 morgan.token('id', (req: Request) => req.id)
 
