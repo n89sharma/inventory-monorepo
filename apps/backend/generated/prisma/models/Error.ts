@@ -220,8 +220,8 @@ export type ErrorWhereInput = {
   code?: Prisma.StringFilter<"Error"> | string
   description?: Prisma.StringNullableFilter<"Error"> | string | null
   category?: Prisma.StringFilter<"Error"> | string
-  asset_errors?: Prisma.AssetErrorListRelationFilter
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  asset_errors?: Prisma.AssetErrorListRelationFilter
 }
 
 export type ErrorOrderByWithRelationInput = {
@@ -230,8 +230,8 @@ export type ErrorOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  asset_errors?: Prisma.AssetErrorOrderByRelationAggregateInput
   brand?: Prisma.BrandOrderByWithRelationInput
+  asset_errors?: Prisma.AssetErrorOrderByRelationAggregateInput
 }
 
 export type ErrorWhereUniqueInput = Prisma.AtLeast<{
@@ -244,8 +244,8 @@ export type ErrorWhereUniqueInput = Prisma.AtLeast<{
   code?: Prisma.StringFilter<"Error"> | string
   description?: Prisma.StringNullableFilter<"Error"> | string | null
   category?: Prisma.StringFilter<"Error"> | string
-  asset_errors?: Prisma.AssetErrorListRelationFilter
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  asset_errors?: Prisma.AssetErrorListRelationFilter
 }, "id" | "brand_id_code">
 
 export type ErrorOrderByWithAggregationInput = {
@@ -276,8 +276,8 @@ export type ErrorCreateInput = {
   code: string
   description?: string | null
   category: string
-  asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutErrorInput
   brand: Prisma.BrandCreateNestedOneWithoutErrorsInput
+  asset_errors?: Prisma.AssetErrorCreateNestedManyWithoutErrorInput
 }
 
 export type ErrorUncheckedCreateInput = {
@@ -293,8 +293,8 @@ export type ErrorUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  asset_errors?: Prisma.AssetErrorUpdateManyWithoutErrorNestedInput
   brand?: Prisma.BrandUpdateOneRequiredWithoutErrorsNestedInput
+  asset_errors?: Prisma.AssetErrorUpdateManyWithoutErrorNestedInput
 }
 
 export type ErrorUncheckedUpdateInput = {
@@ -602,8 +602,8 @@ export type ErrorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   code?: boolean
   description?: boolean
   category?: boolean
-  asset_errors?: boolean | Prisma.Error$asset_errorsArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  asset_errors?: boolean | Prisma.Error$asset_errorsArgs<ExtArgs>
   _count?: boolean | Prisma.ErrorCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["error"]>
 
@@ -635,8 +635,8 @@ export type ErrorSelectScalar = {
 
 export type ErrorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "brand_id" | "code" | "description" | "category", ExtArgs["result"]["error"]>
 export type ErrorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  asset_errors?: boolean | Prisma.Error$asset_errorsArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  asset_errors?: boolean | Prisma.Error$asset_errorsArgs<ExtArgs>
   _count?: boolean | Prisma.ErrorCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ErrorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -649,8 +649,8 @@ export type ErrorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $ErrorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Error"
   objects: {
-    asset_errors: Prisma.$AssetErrorPayload<ExtArgs>[]
     brand: Prisma.$BrandPayload<ExtArgs>
+    asset_errors: Prisma.$AssetErrorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -665,7 +665,7 @@ export type $ErrorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type ErrorGetPayload<S extends boolean | null | undefined | ErrorDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ErrorPayload, S>
 
 export type ErrorCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ErrorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<ErrorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ErrorCountAggregateInputType | true
   }
 
@@ -1052,8 +1052,8 @@ readonly fields: ErrorFieldRefs;
  */
 export interface Prisma__ErrorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  asset_errors<T extends Prisma.Error$asset_errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Error$asset_errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  asset_errors<T extends Prisma.Error$asset_errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Error$asset_errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1112,7 +1112,6 @@ export type ErrorFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter, which Error to fetch.
    */
   where: Prisma.ErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1135,7 +1134,6 @@ export type ErrorFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Error to fetch.
    */
   where: Prisma.ErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1188,7 +1186,6 @@ export type ErrorFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Errors.
    */
   distinct?: Prisma.ErrorScalarFieldEnum | Prisma.ErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1241,7 +1238,6 @@ export type ErrorFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of Errors.
    */
   distinct?: Prisma.ErrorScalarFieldEnum | Prisma.ErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1294,7 +1290,6 @@ export type ErrorFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Errors.
    */
   distinct?: Prisma.ErrorScalarFieldEnum | Prisma.ErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1317,7 +1312,6 @@ export type ErrorCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * The data needed to create a Error.
    */
   data: Prisma.XOR<Prisma.ErrorCreateInput, Prisma.ErrorUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1378,7 +1372,6 @@ export type ErrorUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Choose, which Error to update.
    */
   where: Prisma.ErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1457,7 +1450,6 @@ export type ErrorUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * In case the Error was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ErrorUpdateInput, Prisma.ErrorUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1480,7 +1472,6 @@ export type ErrorDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Filter which Error to delete.
    */
   where: Prisma.ErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

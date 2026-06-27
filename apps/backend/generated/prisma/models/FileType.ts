@@ -192,13 +192,13 @@ export type FileTypeWhereInput = {
   NOT?: Prisma.FileTypeWhereInput | Prisma.FileTypeWhereInput[]
   id?: Prisma.IntFilter<"FileType"> | number
   type?: Prisma.StringFilter<"FileType"> | string
-  File?: Prisma.FileListRelationFilter
+  files?: Prisma.FileListRelationFilter
 }
 
 export type FileTypeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  File?: Prisma.FileOrderByRelationAggregateInput
+  files?: Prisma.FileOrderByRelationAggregateInput
 }
 
 export type FileTypeWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type FileTypeWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.FileTypeWhereInput | Prisma.FileTypeWhereInput[]
   OR?: Prisma.FileTypeWhereInput[]
   NOT?: Prisma.FileTypeWhereInput | Prisma.FileTypeWhereInput[]
-  File?: Prisma.FileListRelationFilter
+  files?: Prisma.FileListRelationFilter
 }, "id" | "type">
 
 export type FileTypeOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type FileTypeScalarWhereWithAggregatesInput = {
 
 export type FileTypeCreateInput = {
   type: string
-  File?: Prisma.FileCreateNestedManyWithoutFileTypeInput
+  files?: Prisma.FileCreateNestedManyWithoutTypeInput
 }
 
 export type FileTypeUncheckedCreateInput = {
   id?: number
   type: string
-  File?: Prisma.FileUncheckedCreateNestedManyWithoutFileTypeInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutTypeInput
 }
 
 export type FileTypeUpdateInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
-  File?: Prisma.FileUpdateManyWithoutFileTypeNestedInput
+  files?: Prisma.FileUpdateManyWithoutTypeNestedInput
 }
 
 export type FileTypeUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
-  File?: Prisma.FileUncheckedUpdateManyWithoutFileTypeNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutTypeNestedInput
 }
 
 export type FileTypeCreateManyInput = {
@@ -262,11 +262,6 @@ export type FileTypeUpdateManyMutationInput = {
 export type FileTypeUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
-}
-
-export type FileTypeScalarRelationFilter = {
-  is?: Prisma.FileTypeWhereInput
-  isNot?: Prisma.FileTypeWhereInput
 }
 
 export type FileTypeCountOrderByAggregateInput = {
@@ -292,50 +287,55 @@ export type FileTypeSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type FileTypeCreateNestedOneWithoutFileInput = {
-  create?: Prisma.XOR<Prisma.FileTypeCreateWithoutFileInput, Prisma.FileTypeUncheckedCreateWithoutFileInput>
-  connectOrCreate?: Prisma.FileTypeCreateOrConnectWithoutFileInput
+export type FileTypeScalarRelationFilter = {
+  is?: Prisma.FileTypeWhereInput
+  isNot?: Prisma.FileTypeWhereInput
+}
+
+export type FileTypeCreateNestedOneWithoutFilesInput = {
+  create?: Prisma.XOR<Prisma.FileTypeCreateWithoutFilesInput, Prisma.FileTypeUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.FileTypeCreateOrConnectWithoutFilesInput
   connect?: Prisma.FileTypeWhereUniqueInput
 }
 
-export type FileTypeUpdateOneRequiredWithoutFileNestedInput = {
-  create?: Prisma.XOR<Prisma.FileTypeCreateWithoutFileInput, Prisma.FileTypeUncheckedCreateWithoutFileInput>
-  connectOrCreate?: Prisma.FileTypeCreateOrConnectWithoutFileInput
-  upsert?: Prisma.FileTypeUpsertWithoutFileInput
+export type FileTypeUpdateOneRequiredWithoutFilesNestedInput = {
+  create?: Prisma.XOR<Prisma.FileTypeCreateWithoutFilesInput, Prisma.FileTypeUncheckedCreateWithoutFilesInput>
+  connectOrCreate?: Prisma.FileTypeCreateOrConnectWithoutFilesInput
+  upsert?: Prisma.FileTypeUpsertWithoutFilesInput
   connect?: Prisma.FileTypeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.FileTypeUpdateToOneWithWhereWithoutFileInput, Prisma.FileTypeUpdateWithoutFileInput>, Prisma.FileTypeUncheckedUpdateWithoutFileInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FileTypeUpdateToOneWithWhereWithoutFilesInput, Prisma.FileTypeUpdateWithoutFilesInput>, Prisma.FileTypeUncheckedUpdateWithoutFilesInput>
 }
 
-export type FileTypeCreateWithoutFileInput = {
+export type FileTypeCreateWithoutFilesInput = {
   type: string
 }
 
-export type FileTypeUncheckedCreateWithoutFileInput = {
+export type FileTypeUncheckedCreateWithoutFilesInput = {
   id?: number
   type: string
 }
 
-export type FileTypeCreateOrConnectWithoutFileInput = {
+export type FileTypeCreateOrConnectWithoutFilesInput = {
   where: Prisma.FileTypeWhereUniqueInput
-  create: Prisma.XOR<Prisma.FileTypeCreateWithoutFileInput, Prisma.FileTypeUncheckedCreateWithoutFileInput>
+  create: Prisma.XOR<Prisma.FileTypeCreateWithoutFilesInput, Prisma.FileTypeUncheckedCreateWithoutFilesInput>
 }
 
-export type FileTypeUpsertWithoutFileInput = {
-  update: Prisma.XOR<Prisma.FileTypeUpdateWithoutFileInput, Prisma.FileTypeUncheckedUpdateWithoutFileInput>
-  create: Prisma.XOR<Prisma.FileTypeCreateWithoutFileInput, Prisma.FileTypeUncheckedCreateWithoutFileInput>
+export type FileTypeUpsertWithoutFilesInput = {
+  update: Prisma.XOR<Prisma.FileTypeUpdateWithoutFilesInput, Prisma.FileTypeUncheckedUpdateWithoutFilesInput>
+  create: Prisma.XOR<Prisma.FileTypeCreateWithoutFilesInput, Prisma.FileTypeUncheckedCreateWithoutFilesInput>
   where?: Prisma.FileTypeWhereInput
 }
 
-export type FileTypeUpdateToOneWithWhereWithoutFileInput = {
+export type FileTypeUpdateToOneWithWhereWithoutFilesInput = {
   where?: Prisma.FileTypeWhereInput
-  data: Prisma.XOR<Prisma.FileTypeUpdateWithoutFileInput, Prisma.FileTypeUncheckedUpdateWithoutFileInput>
+  data: Prisma.XOR<Prisma.FileTypeUpdateWithoutFilesInput, Prisma.FileTypeUncheckedUpdateWithoutFilesInput>
 }
 
-export type FileTypeUpdateWithoutFileInput = {
+export type FileTypeUpdateWithoutFilesInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type FileTypeUncheckedUpdateWithoutFileInput = {
+export type FileTypeUncheckedUpdateWithoutFilesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -346,11 +346,11 @@ export type FileTypeUncheckedUpdateWithoutFileInput = {
  */
 
 export type FileTypeCountOutputType = {
-  File: number
+  files: number
 }
 
 export type FileTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  File?: boolean | FileTypeCountOutputTypeCountFileArgs
+  files?: boolean | FileTypeCountOutputTypeCountFilesArgs
 }
 
 /**
@@ -366,7 +366,7 @@ export type FileTypeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ext
 /**
  * FileTypeCountOutputType without action
  */
-export type FileTypeCountOutputTypeCountFileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type FileTypeCountOutputTypeCountFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FileWhereInput
 }
 
@@ -374,7 +374,7 @@ export type FileTypeCountOutputTypeCountFileArgs<ExtArgs extends runtime.Types.E
 export type FileTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
-  File?: boolean | Prisma.FileType$FileArgs<ExtArgs>
+  files?: boolean | Prisma.FileType$filesArgs<ExtArgs>
   _count?: boolean | Prisma.FileTypeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["fileType"]>
 
@@ -395,7 +395,7 @@ export type FileTypeSelectScalar = {
 
 export type FileTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type", ExtArgs["result"]["fileType"]>
 export type FileTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  File?: boolean | Prisma.FileType$FileArgs<ExtArgs>
+  files?: boolean | Prisma.FileType$filesArgs<ExtArgs>
   _count?: boolean | Prisma.FileTypeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FileTypeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -404,7 +404,7 @@ export type FileTypeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
 export type $FileTypePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "FileType"
   objects: {
-    File: Prisma.$FilePayload<ExtArgs>[]
+    files: Prisma.$FilePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -416,7 +416,7 @@ export type $FileTypePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type FileTypeGetPayload<S extends boolean | null | undefined | FileTypeDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$FileTypePayload, S>
 
 export type FileTypeCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<FileTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<FileTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: FileTypeCountAggregateInputType | true
   }
 
@@ -803,7 +803,7 @@ readonly fields: FileTypeFieldRefs;
  */
 export interface Prisma__FileTypeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  File<T extends Prisma.FileType$FileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileType$FileArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  files<T extends Prisma.FileType$filesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FileType$filesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -859,7 +859,6 @@ export type FileTypeFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which FileType to fetch.
    */
   where: Prisma.FileTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -882,7 +881,6 @@ export type FileTypeFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which FileType to fetch.
    */
   where: Prisma.FileTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -935,7 +933,6 @@ export type FileTypeFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of FileTypes.
    */
   distinct?: Prisma.FileTypeScalarFieldEnum | Prisma.FileTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -988,7 +985,6 @@ export type FileTypeFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of FileTypes.
    */
   distinct?: Prisma.FileTypeScalarFieldEnum | Prisma.FileTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1041,7 +1037,6 @@ export type FileTypeFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of FileTypes.
    */
   distinct?: Prisma.FileTypeScalarFieldEnum | Prisma.FileTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1064,7 +1059,6 @@ export type FileTypeCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a FileType.
    */
   data: Prisma.XOR<Prisma.FileTypeCreateInput, Prisma.FileTypeUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1121,7 +1115,6 @@ export type FileTypeUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which FileType to update.
    */
   where: Prisma.FileTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,7 +1189,6 @@ export type FileTypeUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the FileType was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.FileTypeUpdateInput, Prisma.FileTypeUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1211,6 @@ export type FileTypeDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which FileType to delete.
    */
   where: Prisma.FileTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1237,9 +1228,9 @@ export type FileTypeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
- * FileType.File
+ * FileType.files
  */
-export type FileType$FileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type FileType$filesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the File
    */

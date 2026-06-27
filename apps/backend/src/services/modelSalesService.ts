@@ -35,7 +35,7 @@ export async function getModelSales(modelId: number): Promise<ModelSalesResult> 
     prisma.$queryRawTyped(getModelSalesQuery(modelId, fromDate, soldStatus.id)),
     prisma.$queryRawTyped(getModelLastSaleQuery(modelId, soldStatus.id)),
     prisma.asset.count({
-      where: { model_id: modelId, Status: { status: ASSET_STATUS.IN_STOCK } },
+      where: { model_id: modelId, status: { status: ASSET_STATUS.IN_STOCK } },
     }),
   ])
   if (!model) throw new NotFoundError(`Model ${modelId} not found`)

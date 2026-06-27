@@ -228,7 +228,7 @@ export type SavedViewWhereInput = {
   query_string?: Prisma.StringFilter<"SavedView"> | string
   created_by_id?: Prisma.IntFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type SavedViewOrderByWithRelationInput = {
@@ -238,7 +238,7 @@ export type SavedViewOrderByWithRelationInput = {
   query_string?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  User?: Prisma.UserOrderByWithRelationInput
+  created_by?: Prisma.UserOrderByWithRelationInput
 }
 
 export type SavedViewWhereUniqueInput = Prisma.AtLeast<{
@@ -252,7 +252,7 @@ export type SavedViewWhereUniqueInput = Prisma.AtLeast<{
   query_string?: Prisma.StringFilter<"SavedView"> | string
   created_by_id?: Prisma.IntFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "created_by_id_page_key_name">
 
 export type SavedViewOrderByWithAggregationInput = {
@@ -286,7 +286,7 @@ export type SavedViewCreateInput = {
   page_key: string
   query_string: string
   created_at?: Date | string
-  User: Prisma.UserCreateNestedOneWithoutSavedViewInput
+  created_by: Prisma.UserCreateNestedOneWithoutSavedViewsInput
 }
 
 export type SavedViewUncheckedCreateInput = {
@@ -303,7 +303,7 @@ export type SavedViewUpdateInput = {
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  User?: Prisma.UserUpdateOneRequiredWithoutSavedViewNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutSavedViewsNestedInput
 }
 
 export type SavedViewUncheckedUpdateInput = {
@@ -393,56 +393,56 @@ export type SavedViewSumOrderByAggregateInput = {
   created_by_id?: Prisma.SortOrder
 }
 
-export type SavedViewCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput> | Prisma.SavedViewCreateWithoutUserInput[] | Prisma.SavedViewUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutUserInput | Prisma.SavedViewCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.SavedViewCreateManyUserInputEnvelope
+export type SavedViewCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput> | Prisma.SavedViewCreateWithoutCreated_byInput[] | Prisma.SavedViewUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutCreated_byInput | Prisma.SavedViewCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.SavedViewCreateManyCreated_byInputEnvelope
   connect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
 }
 
-export type SavedViewUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput> | Prisma.SavedViewCreateWithoutUserInput[] | Prisma.SavedViewUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutUserInput | Prisma.SavedViewCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.SavedViewCreateManyUserInputEnvelope
+export type SavedViewUncheckedCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput> | Prisma.SavedViewCreateWithoutCreated_byInput[] | Prisma.SavedViewUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutCreated_byInput | Prisma.SavedViewCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.SavedViewCreateManyCreated_byInputEnvelope
   connect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
 }
 
-export type SavedViewUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput> | Prisma.SavedViewCreateWithoutUserInput[] | Prisma.SavedViewUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutUserInput | Prisma.SavedViewCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.SavedViewUpsertWithWhereUniqueWithoutUserInput | Prisma.SavedViewUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.SavedViewCreateManyUserInputEnvelope
+export type SavedViewUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput> | Prisma.SavedViewCreateWithoutCreated_byInput[] | Prisma.SavedViewUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutCreated_byInput | Prisma.SavedViewCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.SavedViewUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.SavedViewUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.SavedViewCreateManyCreated_byInputEnvelope
   set?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   disconnect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   delete?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   connect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
-  update?: Prisma.SavedViewUpdateWithWhereUniqueWithoutUserInput | Prisma.SavedViewUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.SavedViewUpdateManyWithWhereWithoutUserInput | Prisma.SavedViewUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.SavedViewUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.SavedViewUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.SavedViewUpdateManyWithWhereWithoutCreated_byInput | Prisma.SavedViewUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.SavedViewScalarWhereInput | Prisma.SavedViewScalarWhereInput[]
 }
 
-export type SavedViewUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput> | Prisma.SavedViewCreateWithoutUserInput[] | Prisma.SavedViewUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutUserInput | Prisma.SavedViewCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.SavedViewUpsertWithWhereUniqueWithoutUserInput | Prisma.SavedViewUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.SavedViewCreateManyUserInputEnvelope
+export type SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput> | Prisma.SavedViewCreateWithoutCreated_byInput[] | Prisma.SavedViewUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.SavedViewCreateOrConnectWithoutCreated_byInput | Prisma.SavedViewCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.SavedViewUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.SavedViewUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.SavedViewCreateManyCreated_byInputEnvelope
   set?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   disconnect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   delete?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
   connect?: Prisma.SavedViewWhereUniqueInput | Prisma.SavedViewWhereUniqueInput[]
-  update?: Prisma.SavedViewUpdateWithWhereUniqueWithoutUserInput | Prisma.SavedViewUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.SavedViewUpdateManyWithWhereWithoutUserInput | Prisma.SavedViewUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.SavedViewUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.SavedViewUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.SavedViewUpdateManyWithWhereWithoutCreated_byInput | Prisma.SavedViewUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.SavedViewScalarWhereInput | Prisma.SavedViewScalarWhereInput[]
 }
 
-export type SavedViewCreateWithoutUserInput = {
+export type SavedViewCreateWithoutCreated_byInput = {
   name: string
   page_key: string
   query_string: string
   created_at?: Date | string
 }
 
-export type SavedViewUncheckedCreateWithoutUserInput = {
+export type SavedViewUncheckedCreateWithoutCreated_byInput = {
   id?: number
   name: string
   page_key: string
@@ -450,30 +450,30 @@ export type SavedViewUncheckedCreateWithoutUserInput = {
   created_at?: Date | string
 }
 
-export type SavedViewCreateOrConnectWithoutUserInput = {
+export type SavedViewCreateOrConnectWithoutCreated_byInput = {
   where: Prisma.SavedViewWhereUniqueInput
-  create: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput>
 }
 
-export type SavedViewCreateManyUserInputEnvelope = {
-  data: Prisma.SavedViewCreateManyUserInput | Prisma.SavedViewCreateManyUserInput[]
+export type SavedViewCreateManyCreated_byInputEnvelope = {
+  data: Prisma.SavedViewCreateManyCreated_byInput | Prisma.SavedViewCreateManyCreated_byInput[]
   skipDuplicates?: boolean
 }
 
-export type SavedViewUpsertWithWhereUniqueWithoutUserInput = {
+export type SavedViewUpsertWithWhereUniqueWithoutCreated_byInput = {
   where: Prisma.SavedViewWhereUniqueInput
-  update: Prisma.XOR<Prisma.SavedViewUpdateWithoutUserInput, Prisma.SavedViewUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.SavedViewCreateWithoutUserInput, Prisma.SavedViewUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.SavedViewUpdateWithoutCreated_byInput, Prisma.SavedViewUncheckedUpdateWithoutCreated_byInput>
+  create: Prisma.XOR<Prisma.SavedViewCreateWithoutCreated_byInput, Prisma.SavedViewUncheckedCreateWithoutCreated_byInput>
 }
 
-export type SavedViewUpdateWithWhereUniqueWithoutUserInput = {
+export type SavedViewUpdateWithWhereUniqueWithoutCreated_byInput = {
   where: Prisma.SavedViewWhereUniqueInput
-  data: Prisma.XOR<Prisma.SavedViewUpdateWithoutUserInput, Prisma.SavedViewUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.SavedViewUpdateWithoutCreated_byInput, Prisma.SavedViewUncheckedUpdateWithoutCreated_byInput>
 }
 
-export type SavedViewUpdateManyWithWhereWithoutUserInput = {
+export type SavedViewUpdateManyWithWhereWithoutCreated_byInput = {
   where: Prisma.SavedViewScalarWhereInput
-  data: Prisma.XOR<Prisma.SavedViewUpdateManyMutationInput, Prisma.SavedViewUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.SavedViewUpdateManyMutationInput, Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byInput>
 }
 
 export type SavedViewScalarWhereInput = {
@@ -488,7 +488,7 @@ export type SavedViewScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
 }
 
-export type SavedViewCreateManyUserInput = {
+export type SavedViewCreateManyCreated_byInput = {
   id?: number
   name: string
   page_key: string
@@ -496,14 +496,14 @@ export type SavedViewCreateManyUserInput = {
   created_at?: Date | string
 }
 
-export type SavedViewUpdateWithoutUserInput = {
+export type SavedViewUpdateWithoutCreated_byInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type SavedViewUncheckedUpdateWithoutUserInput = {
+export type SavedViewUncheckedUpdateWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
@@ -511,7 +511,7 @@ export type SavedViewUncheckedUpdateWithoutUserInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type SavedViewUncheckedUpdateManyWithoutUserInput = {
+export type SavedViewUncheckedUpdateManyWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
@@ -528,7 +528,7 @@ export type SavedViewSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   query_string?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["savedView"]>
 
 export type SavedViewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -538,7 +538,7 @@ export type SavedViewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   query_string?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["savedView"]>
 
 export type SavedViewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -548,7 +548,7 @@ export type SavedViewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   query_string?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["savedView"]>
 
 export type SavedViewSelectScalar = {
@@ -562,19 +562,19 @@ export type SavedViewSelectScalar = {
 
 export type SavedViewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "page_key" | "query_string" | "created_by_id" | "created_at", ExtArgs["result"]["savedView"]>
 export type SavedViewInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type SavedViewIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type SavedViewIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $SavedViewPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SavedView"
   objects: {
-    User: Prisma.$UserPayload<ExtArgs>
+    created_by: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -590,7 +590,7 @@ export type $SavedViewPayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type SavedViewGetPayload<S extends boolean | null | undefined | SavedViewDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$SavedViewPayload, S>
 
 export type SavedViewCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<SavedViewFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<SavedViewFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: SavedViewCountAggregateInputType | true
   }
 
@@ -977,7 +977,7 @@ readonly fields: SavedViewFieldRefs;
  */
 export interface Prisma__SavedViewClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  User<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1037,7 +1037,6 @@ export type SavedViewFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which SavedView to fetch.
    */
   where: Prisma.SavedViewWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1060,7 +1059,6 @@ export type SavedViewFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which SavedView to fetch.
    */
   where: Prisma.SavedViewWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1113,7 +1111,6 @@ export type SavedViewFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of SavedViews.
    */
   distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1166,7 +1163,6 @@ export type SavedViewFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of SavedViews.
    */
   distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1215,6 @@ export type SavedViewFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of SavedViews.
    */
   distinct?: Prisma.SavedViewScalarFieldEnum | Prisma.SavedViewScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1242,7 +1237,6 @@ export type SavedViewCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a SavedView.
    */
   data: Prisma.XOR<Prisma.SavedViewCreateInput, Prisma.SavedViewUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1303,7 +1297,6 @@ export type SavedViewUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which SavedView to update.
    */
   where: Prisma.SavedViewWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1382,7 +1375,6 @@ export type SavedViewUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the SavedView was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.SavedViewUpdateInput, Prisma.SavedViewUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1405,7 +1397,6 @@ export type SavedViewDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which SavedView to delete.
    */
   where: Prisma.SavedViewWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

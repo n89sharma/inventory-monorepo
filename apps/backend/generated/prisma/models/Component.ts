@@ -204,16 +204,16 @@ export type ComponentWhereInput = {
   id?: Prisma.IntFilter<"Component"> | number
   name?: Prisma.StringFilter<"Component"> | string
   brand_id?: Prisma.IntFilter<"Component"> | number
-  Brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
-  TechnicalSpecification?: Prisma.TechnicalSpecificationListRelationFilter
+  brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  technical_specifications?: Prisma.TechnicalSpecificationListRelationFilter
 }
 
 export type ComponentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
-  Brand?: Prisma.BrandOrderByWithRelationInput
-  TechnicalSpecification?: Prisma.TechnicalSpecificationOrderByRelationAggregateInput
+  brand?: Prisma.BrandOrderByWithRelationInput
+  technical_specifications?: Prisma.TechnicalSpecificationOrderByRelationAggregateInput
 }
 
 export type ComponentWhereUniqueInput = Prisma.AtLeast<{
@@ -224,8 +224,8 @@ export type ComponentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ComponentWhereInput | Prisma.ComponentWhereInput[]
   name?: Prisma.StringFilter<"Component"> | string
   brand_id?: Prisma.IntFilter<"Component"> | number
-  Brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
-  TechnicalSpecification?: Prisma.TechnicalSpecificationListRelationFilter
+  brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
+  technical_specifications?: Prisma.TechnicalSpecificationListRelationFilter
 }, "id" | "brand_id_name">
 
 export type ComponentOrderByWithAggregationInput = {
@@ -250,28 +250,28 @@ export type ComponentScalarWhereWithAggregatesInput = {
 
 export type ComponentCreateInput = {
   name: string
-  Brand: Prisma.BrandCreateNestedOneWithoutComponentInput
-  TechnicalSpecification?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
+  brand: Prisma.BrandCreateNestedOneWithoutComponentsInput
+  technical_specifications?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentUncheckedCreateInput = {
   id?: number
   name: string
   brand_id: number
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
+  technical_specifications?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Brand?: Prisma.BrandUpdateOneRequiredWithoutComponentNestedInput
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
+  brand?: Prisma.BrandUpdateOneRequiredWithoutComponentsNestedInput
+  technical_specifications?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
+  technical_specifications?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentCreateManyInput = {
@@ -338,20 +338,20 @@ export type ComponentSumOrderByAggregateInput = {
   brand_id?: Prisma.SortOrder
 }
 
-export type ComponentCreateNestedOneWithoutTechnicalSpecificationInput = {
-  create?: Prisma.XOR<Prisma.ComponentCreateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedCreateWithoutTechnicalSpecificationInput>
-  connectOrCreate?: Prisma.ComponentCreateOrConnectWithoutTechnicalSpecificationInput
+export type ComponentCreateNestedOneWithoutTechnical_specificationsInput = {
+  create?: Prisma.XOR<Prisma.ComponentCreateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedCreateWithoutTechnical_specificationsInput>
+  connectOrCreate?: Prisma.ComponentCreateOrConnectWithoutTechnical_specificationsInput
   connect?: Prisma.ComponentWhereUniqueInput
 }
 
-export type ComponentUpdateOneWithoutTechnicalSpecificationNestedInput = {
-  create?: Prisma.XOR<Prisma.ComponentCreateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedCreateWithoutTechnicalSpecificationInput>
-  connectOrCreate?: Prisma.ComponentCreateOrConnectWithoutTechnicalSpecificationInput
-  upsert?: Prisma.ComponentUpsertWithoutTechnicalSpecificationInput
+export type ComponentUpdateOneWithoutTechnical_specificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ComponentCreateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedCreateWithoutTechnical_specificationsInput>
+  connectOrCreate?: Prisma.ComponentCreateOrConnectWithoutTechnical_specificationsInput
+  upsert?: Prisma.ComponentUpsertWithoutTechnical_specificationsInput
   disconnect?: Prisma.ComponentWhereInput | boolean
   delete?: Prisma.ComponentWhereInput | boolean
   connect?: Prisma.ComponentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ComponentUpdateToOneWithWhereWithoutTechnicalSpecificationInput, Prisma.ComponentUpdateWithoutTechnicalSpecificationInput>, Prisma.ComponentUncheckedUpdateWithoutTechnicalSpecificationInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ComponentUpdateToOneWithWhereWithoutTechnical_specificationsInput, Prisma.ComponentUpdateWithoutTechnical_specificationsInput>, Prisma.ComponentUncheckedUpdateWithoutTechnical_specificationsInput>
 }
 
 export type ComponentCreateNestedManyWithoutBrandInput = {
@@ -396,39 +396,39 @@ export type ComponentUncheckedUpdateManyWithoutBrandNestedInput = {
   deleteMany?: Prisma.ComponentScalarWhereInput | Prisma.ComponentScalarWhereInput[]
 }
 
-export type ComponentCreateWithoutTechnicalSpecificationInput = {
+export type ComponentCreateWithoutTechnical_specificationsInput = {
   name: string
-  Brand: Prisma.BrandCreateNestedOneWithoutComponentInput
+  brand: Prisma.BrandCreateNestedOneWithoutComponentsInput
 }
 
-export type ComponentUncheckedCreateWithoutTechnicalSpecificationInput = {
+export type ComponentUncheckedCreateWithoutTechnical_specificationsInput = {
   id?: number
   name: string
   brand_id: number
 }
 
-export type ComponentCreateOrConnectWithoutTechnicalSpecificationInput = {
+export type ComponentCreateOrConnectWithoutTechnical_specificationsInput = {
   where: Prisma.ComponentWhereUniqueInput
-  create: Prisma.XOR<Prisma.ComponentCreateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedCreateWithoutTechnicalSpecificationInput>
+  create: Prisma.XOR<Prisma.ComponentCreateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedCreateWithoutTechnical_specificationsInput>
 }
 
-export type ComponentUpsertWithoutTechnicalSpecificationInput = {
-  update: Prisma.XOR<Prisma.ComponentUpdateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedUpdateWithoutTechnicalSpecificationInput>
-  create: Prisma.XOR<Prisma.ComponentCreateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedCreateWithoutTechnicalSpecificationInput>
+export type ComponentUpsertWithoutTechnical_specificationsInput = {
+  update: Prisma.XOR<Prisma.ComponentUpdateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedUpdateWithoutTechnical_specificationsInput>
+  create: Prisma.XOR<Prisma.ComponentCreateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedCreateWithoutTechnical_specificationsInput>
   where?: Prisma.ComponentWhereInput
 }
 
-export type ComponentUpdateToOneWithWhereWithoutTechnicalSpecificationInput = {
+export type ComponentUpdateToOneWithWhereWithoutTechnical_specificationsInput = {
   where?: Prisma.ComponentWhereInput
-  data: Prisma.XOR<Prisma.ComponentUpdateWithoutTechnicalSpecificationInput, Prisma.ComponentUncheckedUpdateWithoutTechnicalSpecificationInput>
+  data: Prisma.XOR<Prisma.ComponentUpdateWithoutTechnical_specificationsInput, Prisma.ComponentUncheckedUpdateWithoutTechnical_specificationsInput>
 }
 
-export type ComponentUpdateWithoutTechnicalSpecificationInput = {
+export type ComponentUpdateWithoutTechnical_specificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Brand?: Prisma.BrandUpdateOneRequiredWithoutComponentNestedInput
+  brand?: Prisma.BrandUpdateOneRequiredWithoutComponentsNestedInput
 }
 
-export type ComponentUncheckedUpdateWithoutTechnicalSpecificationInput = {
+export type ComponentUncheckedUpdateWithoutTechnical_specificationsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -436,13 +436,13 @@ export type ComponentUncheckedUpdateWithoutTechnicalSpecificationInput = {
 
 export type ComponentCreateWithoutBrandInput = {
   name: string
-  TechnicalSpecification?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
+  technical_specifications?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentUncheckedCreateWithoutBrandInput = {
   id?: number
   name: string
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
+  technical_specifications?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentCreateOrConnectWithoutBrandInput = {
@@ -487,13 +487,13 @@ export type ComponentCreateManyBrandInput = {
 
 export type ComponentUpdateWithoutBrandInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
+  technical_specifications?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  TechnicalSpecification?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
+  technical_specifications?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentUncheckedUpdateManyWithoutBrandInput = {
@@ -507,11 +507,11 @@ export type ComponentUncheckedUpdateManyWithoutBrandInput = {
  */
 
 export type ComponentCountOutputType = {
-  TechnicalSpecification: number
+  technical_specifications: number
 }
 
 export type ComponentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  TechnicalSpecification?: boolean | ComponentCountOutputTypeCountTechnicalSpecificationArgs
+  technical_specifications?: boolean | ComponentCountOutputTypeCountTechnical_specificationsArgs
 }
 
 /**
@@ -527,7 +527,7 @@ export type ComponentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * ComponentCountOutputType without action
  */
-export type ComponentCountOutputTypeCountTechnicalSpecificationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type ComponentCountOutputTypeCountTechnical_specificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TechnicalSpecificationWhereInput
 }
 
@@ -536,8 +536,8 @@ export type ComponentSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   name?: boolean
   brand_id?: boolean
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
-  TechnicalSpecification?: boolean | Prisma.Component$TechnicalSpecificationArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  technical_specifications?: boolean | Prisma.Component$technical_specificationsArgs<ExtArgs>
   _count?: boolean | Prisma.ComponentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["component"]>
 
@@ -545,14 +545,14 @@ export type ComponentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   name?: boolean
   brand_id?: boolean
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["component"]>
 
 export type ComponentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   brand_id?: boolean
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["component"]>
 
 export type ComponentSelectScalar = {
@@ -563,22 +563,22 @@ export type ComponentSelectScalar = {
 
 export type ComponentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "brand_id", ExtArgs["result"]["component"]>
 export type ComponentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
-  TechnicalSpecification?: boolean | Prisma.Component$TechnicalSpecificationArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  technical_specifications?: boolean | Prisma.Component$technical_specificationsArgs<ExtArgs>
   _count?: boolean | Prisma.ComponentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ComponentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }
 export type ComponentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
+  brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }
 
 export type $ComponentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Component"
   objects: {
-    Brand: Prisma.$BrandPayload<ExtArgs>
-    TechnicalSpecification: Prisma.$TechnicalSpecificationPayload<ExtArgs>[]
+    brand: Prisma.$BrandPayload<ExtArgs>
+    technical_specifications: Prisma.$TechnicalSpecificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -591,7 +591,7 @@ export type $ComponentPayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ComponentGetPayload<S extends boolean | null | undefined | ComponentDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ComponentPayload, S>
 
 export type ComponentCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ComponentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<ComponentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ComponentCountAggregateInputType | true
   }
 
@@ -978,8 +978,8 @@ readonly fields: ComponentFieldRefs;
  */
 export interface Prisma__ComponentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  TechnicalSpecification<T extends Prisma.Component$TechnicalSpecificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Component$TechnicalSpecificationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TechnicalSpecificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  brand<T extends Prisma.BrandDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BrandDefaultArgs<ExtArgs>>): Prisma.Prisma__BrandClient<runtime.Types.Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  technical_specifications<T extends Prisma.Component$technical_specificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Component$technical_specificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TechnicalSpecificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1036,7 +1036,6 @@ export type ComponentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which Component to fetch.
    */
   where: Prisma.ComponentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1059,7 +1058,6 @@ export type ComponentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which Component to fetch.
    */
   where: Prisma.ComponentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1112,7 +1110,6 @@ export type ComponentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of Components.
    */
   distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1165,7 +1162,6 @@ export type ComponentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of Components.
    */
   distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1218,7 +1214,6 @@ export type ComponentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Components.
    */
   distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1241,7 +1236,6 @@ export type ComponentCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a Component.
    */
   data: Prisma.XOR<Prisma.ComponentCreateInput, Prisma.ComponentUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1302,7 +1296,6 @@ export type ComponentUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which Component to update.
    */
   where: Prisma.ComponentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1381,7 +1374,6 @@ export type ComponentUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the Component was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ComponentUpdateInput, Prisma.ComponentUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1404,7 +1396,6 @@ export type ComponentDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which Component to delete.
    */
   where: Prisma.ComponentWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1422,9 +1413,9 @@ export type ComponentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
- * Component.TechnicalSpecification
+ * Component.technical_specifications
  */
-export type Component$TechnicalSpecificationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Component$technical_specificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the TechnicalSpecification
    */

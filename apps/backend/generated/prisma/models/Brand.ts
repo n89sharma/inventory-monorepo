@@ -192,17 +192,17 @@ export type BrandWhereInput = {
   NOT?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
   id?: Prisma.IntFilter<"Brand"> | number
   name?: Prisma.StringFilter<"Brand"> | string
-  Component?: Prisma.ComponentListRelationFilter
-  errors?: Prisma.ErrorListRelationFilter
   models?: Prisma.ModelListRelationFilter
+  errors?: Prisma.ErrorListRelationFilter
+  components?: Prisma.ComponentListRelationFilter
 }
 
 export type BrandOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  Component?: Prisma.ComponentOrderByRelationAggregateInput
-  errors?: Prisma.ErrorOrderByRelationAggregateInput
   models?: Prisma.ModelOrderByRelationAggregateInput
+  errors?: Prisma.ErrorOrderByRelationAggregateInput
+  components?: Prisma.ComponentOrderByRelationAggregateInput
 }
 
 export type BrandWhereUniqueInput = Prisma.AtLeast<{
@@ -211,9 +211,9 @@ export type BrandWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
   OR?: Prisma.BrandWhereInput[]
   NOT?: Prisma.BrandWhereInput | Prisma.BrandWhereInput[]
-  Component?: Prisma.ComponentListRelationFilter
-  errors?: Prisma.ErrorListRelationFilter
   models?: Prisma.ModelListRelationFilter
+  errors?: Prisma.ErrorListRelationFilter
+  components?: Prisma.ComponentListRelationFilter
 }, "id" | "name">
 
 export type BrandOrderByWithAggregationInput = {
@@ -236,32 +236,32 @@ export type BrandScalarWhereWithAggregatesInput = {
 
 export type BrandCreateInput = {
   name: string
-  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
-  errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelCreateNestedManyWithoutBrandInput
+  errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateInput = {
   id?: number
   name: string
-  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
-  errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
+  errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
-  errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
+  errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
-  errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
+  errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateManyInput = {
@@ -334,31 +334,31 @@ export type BrandUpdateOneRequiredWithoutModelsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutModelsInput, Prisma.BrandUpdateWithoutModelsInput>, Prisma.BrandUncheckedUpdateWithoutModelsInput>
 }
 
-export type BrandCreateNestedOneWithoutComponentInput = {
-  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
-  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentInput
+export type BrandCreateNestedOneWithoutComponentsInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentsInput, Prisma.BrandUncheckedCreateWithoutComponentsInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentsInput
   connect?: Prisma.BrandWhereUniqueInput
 }
 
-export type BrandUpdateOneRequiredWithoutComponentNestedInput = {
-  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
-  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentInput
-  upsert?: Prisma.BrandUpsertWithoutComponentInput
+export type BrandUpdateOneRequiredWithoutComponentsNestedInput = {
+  create?: Prisma.XOR<Prisma.BrandCreateWithoutComponentsInput, Prisma.BrandUncheckedCreateWithoutComponentsInput>
+  connectOrCreate?: Prisma.BrandCreateOrConnectWithoutComponentsInput
+  upsert?: Prisma.BrandUpsertWithoutComponentsInput
   connect?: Prisma.BrandWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutComponentInput, Prisma.BrandUpdateWithoutComponentInput>, Prisma.BrandUncheckedUpdateWithoutComponentInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BrandUpdateToOneWithWhereWithoutComponentsInput, Prisma.BrandUpdateWithoutComponentsInput>, Prisma.BrandUncheckedUpdateWithoutComponentsInput>
 }
 
 export type BrandCreateWithoutErrorsInput = {
   name: string
-  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutErrorsInput = {
   id?: number
   name: string
-  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutErrorsInput = {
@@ -379,28 +379,28 @@ export type BrandUpdateToOneWithWhereWithoutErrorsInput = {
 
 export type BrandUpdateWithoutErrorsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutErrorsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandCreateWithoutModelsInput = {
   name: string
-  Component?: Prisma.ComponentCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentCreateNestedManyWithoutBrandInput
 }
 
 export type BrandUncheckedCreateWithoutModelsInput = {
   id?: number
   name: string
-  Component?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
   errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
+  components?: Prisma.ComponentUncheckedCreateNestedManyWithoutBrandInput
 }
 
 export type BrandCreateOrConnectWithoutModelsInput = {
@@ -421,57 +421,57 @@ export type BrandUpdateToOneWithWhereWithoutModelsInput = {
 
 export type BrandUpdateWithoutModelsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUpdateManyWithoutBrandNestedInput
 }
 
 export type BrandUncheckedUpdateWithoutModelsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Component?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
   errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
+  components?: Prisma.ComponentUncheckedUpdateManyWithoutBrandNestedInput
 }
 
-export type BrandCreateWithoutComponentInput = {
+export type BrandCreateWithoutComponentsInput = {
   name: string
-  errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelCreateNestedManyWithoutBrandInput
+  errors?: Prisma.ErrorCreateNestedManyWithoutBrandInput
 }
 
-export type BrandUncheckedCreateWithoutComponentInput = {
+export type BrandUncheckedCreateWithoutComponentsInput = {
   id?: number
   name: string
-  errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
   models?: Prisma.ModelUncheckedCreateNestedManyWithoutBrandInput
+  errors?: Prisma.ErrorUncheckedCreateNestedManyWithoutBrandInput
 }
 
-export type BrandCreateOrConnectWithoutComponentInput = {
+export type BrandCreateOrConnectWithoutComponentsInput = {
   where: Prisma.BrandWhereUniqueInput
-  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentsInput, Prisma.BrandUncheckedCreateWithoutComponentsInput>
 }
 
-export type BrandUpsertWithoutComponentInput = {
-  update: Prisma.XOR<Prisma.BrandUpdateWithoutComponentInput, Prisma.BrandUncheckedUpdateWithoutComponentInput>
-  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentInput, Prisma.BrandUncheckedCreateWithoutComponentInput>
+export type BrandUpsertWithoutComponentsInput = {
+  update: Prisma.XOR<Prisma.BrandUpdateWithoutComponentsInput, Prisma.BrandUncheckedUpdateWithoutComponentsInput>
+  create: Prisma.XOR<Prisma.BrandCreateWithoutComponentsInput, Prisma.BrandUncheckedCreateWithoutComponentsInput>
   where?: Prisma.BrandWhereInput
 }
 
-export type BrandUpdateToOneWithWhereWithoutComponentInput = {
+export type BrandUpdateToOneWithWhereWithoutComponentsInput = {
   where?: Prisma.BrandWhereInput
-  data: Prisma.XOR<Prisma.BrandUpdateWithoutComponentInput, Prisma.BrandUncheckedUpdateWithoutComponentInput>
+  data: Prisma.XOR<Prisma.BrandUpdateWithoutComponentsInput, Prisma.BrandUncheckedUpdateWithoutComponentsInput>
 }
 
-export type BrandUpdateWithoutComponentInput = {
+export type BrandUpdateWithoutComponentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUpdateManyWithoutBrandNestedInput
+  errors?: Prisma.ErrorUpdateManyWithoutBrandNestedInput
 }
 
-export type BrandUncheckedUpdateWithoutComponentInput = {
+export type BrandUncheckedUpdateWithoutComponentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
   models?: Prisma.ModelUncheckedUpdateManyWithoutBrandNestedInput
+  errors?: Prisma.ErrorUncheckedUpdateManyWithoutBrandNestedInput
 }
 
 
@@ -480,15 +480,15 @@ export type BrandUncheckedUpdateWithoutComponentInput = {
  */
 
 export type BrandCountOutputType = {
-  Component: number
-  errors: number
   models: number
+  errors: number
+  components: number
 }
 
 export type BrandCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Component?: boolean | BrandCountOutputTypeCountComponentArgs
-  errors?: boolean | BrandCountOutputTypeCountErrorsArgs
   models?: boolean | BrandCountOutputTypeCountModelsArgs
+  errors?: boolean | BrandCountOutputTypeCountErrorsArgs
+  components?: boolean | BrandCountOutputTypeCountComponentsArgs
 }
 
 /**
@@ -504,8 +504,8 @@ export type BrandCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * BrandCountOutputType without action
  */
-export type BrandCountOutputTypeCountComponentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ComponentWhereInput
+export type BrandCountOutputTypeCountModelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModelWhereInput
 }
 
 /**
@@ -518,17 +518,17 @@ export type BrandCountOutputTypeCountErrorsArgs<ExtArgs extends runtime.Types.Ex
 /**
  * BrandCountOutputType without action
  */
-export type BrandCountOutputTypeCountModelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ModelWhereInput
+export type BrandCountOutputTypeCountComponentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComponentWhereInput
 }
 
 
 export type BrandSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  Component?: boolean | Prisma.Brand$ComponentArgs<ExtArgs>
-  errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
   models?: boolean | Prisma.Brand$modelsArgs<ExtArgs>
+  errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
+  components?: boolean | Prisma.Brand$componentsArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["brand"]>
 
@@ -549,9 +549,9 @@ export type BrandSelectScalar = {
 
 export type BrandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["brand"]>
 export type BrandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Component?: boolean | Prisma.Brand$ComponentArgs<ExtArgs>
-  errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
   models?: boolean | Prisma.Brand$modelsArgs<ExtArgs>
+  errors?: boolean | Prisma.Brand$errorsArgs<ExtArgs>
+  components?: boolean | Prisma.Brand$componentsArgs<ExtArgs>
   _count?: boolean | Prisma.BrandCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BrandIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -560,9 +560,9 @@ export type BrandIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $BrandPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Brand"
   objects: {
-    Component: Prisma.$ComponentPayload<ExtArgs>[]
-    errors: Prisma.$ErrorPayload<ExtArgs>[]
     models: Prisma.$ModelPayload<ExtArgs>[]
+    errors: Prisma.$ErrorPayload<ExtArgs>[]
+    components: Prisma.$ComponentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -574,7 +574,7 @@ export type $BrandPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type BrandGetPayload<S extends boolean | null | undefined | BrandDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$BrandPayload, S>
 
 export type BrandCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<BrandFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<BrandFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: BrandCountAggregateInputType | true
   }
 
@@ -961,9 +961,9 @@ readonly fields: BrandFieldRefs;
  */
 export interface Prisma__BrandClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Component<T extends Prisma.Brand$ComponentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$ComponentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  errors<T extends Prisma.Brand$errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   models<T extends Prisma.Brand$modelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$modelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  errors<T extends Prisma.Brand$errorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$errorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  components<T extends Prisma.Brand$componentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Brand$componentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1019,7 +1019,6 @@ export type BrandFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter, which Brand to fetch.
    */
   where: Prisma.BrandWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1042,7 +1041,6 @@ export type BrandFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Brand to fetch.
    */
   where: Prisma.BrandWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1095,7 +1093,6 @@ export type BrandFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Brands.
    */
   distinct?: Prisma.BrandScalarFieldEnum | Prisma.BrandScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1148,7 +1145,6 @@ export type BrandFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of Brands.
    */
   distinct?: Prisma.BrandScalarFieldEnum | Prisma.BrandScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1201,7 +1197,6 @@ export type BrandFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Brands.
    */
   distinct?: Prisma.BrandScalarFieldEnum | Prisma.BrandScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1224,7 +1219,6 @@ export type BrandCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * The data needed to create a Brand.
    */
   data: Prisma.XOR<Prisma.BrandCreateInput, Prisma.BrandUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1281,7 +1275,6 @@ export type BrandUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Choose, which Brand to update.
    */
   where: Prisma.BrandWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1356,7 +1349,6 @@ export type BrandUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * In case the Brand was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.BrandUpdateInput, Prisma.BrandUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1379,7 +1371,6 @@ export type BrandDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Filter which Brand to delete.
    */
   where: Prisma.BrandWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1397,27 +1388,27 @@ export type BrandDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Brand.Component
+ * Brand.models
  */
-export type Brand$ComponentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Brand$modelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Component
+   * Select specific fields to fetch from the Model
    */
-  select?: Prisma.ComponentSelect<ExtArgs> | null
+  select?: Prisma.ModelSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Component
+   * Omit specific fields from the Model
    */
-  omit?: Prisma.ComponentOmit<ExtArgs> | null
+  omit?: Prisma.ModelOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ComponentInclude<ExtArgs> | null
-  where?: Prisma.ComponentWhereInput
-  orderBy?: Prisma.ComponentOrderByWithRelationInput | Prisma.ComponentOrderByWithRelationInput[]
-  cursor?: Prisma.ComponentWhereUniqueInput
+  include?: Prisma.ModelInclude<ExtArgs> | null
+  where?: Prisma.ModelWhereInput
+  orderBy?: Prisma.ModelOrderByWithRelationInput | Prisma.ModelOrderByWithRelationInput[]
+  cursor?: Prisma.ModelWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
+  distinct?: Prisma.ModelScalarFieldEnum | Prisma.ModelScalarFieldEnum[]
 }
 
 /**
@@ -1445,27 +1436,27 @@ export type Brand$errorsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 /**
- * Brand.models
+ * Brand.components
  */
-export type Brand$modelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Brand$componentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Model
+   * Select specific fields to fetch from the Component
    */
-  select?: Prisma.ModelSelect<ExtArgs> | null
+  select?: Prisma.ComponentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Model
+   * Omit specific fields from the Component
    */
-  omit?: Prisma.ModelOmit<ExtArgs> | null
+  omit?: Prisma.ComponentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ModelInclude<ExtArgs> | null
-  where?: Prisma.ModelWhereInput
-  orderBy?: Prisma.ModelOrderByWithRelationInput | Prisma.ModelOrderByWithRelationInput[]
-  cursor?: Prisma.ModelWhereUniqueInput
+  include?: Prisma.ComponentInclude<ExtArgs> | null
+  where?: Prisma.ComponentWhereInput
+  orderBy?: Prisma.ComponentOrderByWithRelationInput | Prisma.ComponentOrderByWithRelationInput[]
+  cursor?: Prisma.ComponentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ModelScalarFieldEnum | Prisma.ModelScalarFieldEnum[]
+  distinct?: Prisma.ComponentScalarFieldEnum | Prisma.ComponentScalarFieldEnum[]
 }
 
 /**

@@ -208,13 +208,13 @@ export type WarehouseWhereInput = {
   city_code?: Prisma.StringFilter<"Warehouse"> | string
   street?: Prisma.StringFilter<"Warehouse"> | string
   is_active?: Prisma.BoolFilter<"Warehouse"> | boolean
-  arrivals?: Prisma.ArrivalListRelationFilter
-  departures?: Prisma.DepartureListRelationFilter
-  locations?: Prisma.LocationListRelationFilter
-  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
-  destination_transfers?: Prisma.TransferListRelationFilter
   origin_transfers?: Prisma.TransferListRelationFilter
-  User?: Prisma.UserListRelationFilter
+  destination_transfers?: Prisma.TransferListRelationFilter
+  departures?: Prisma.DepartureListRelationFilter
+  arrivals?: Prisma.ArrivalListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
+  users?: Prisma.UserListRelationFilter
+  storeTransactions?: Prisma.StoreTransactionListRelationFilter
 }
 
 export type WarehouseOrderByWithRelationInput = {
@@ -222,13 +222,13 @@ export type WarehouseOrderByWithRelationInput = {
   city_code?: Prisma.SortOrder
   street?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
-  arrivals?: Prisma.ArrivalOrderByRelationAggregateInput
-  departures?: Prisma.DepartureOrderByRelationAggregateInput
-  locations?: Prisma.LocationOrderByRelationAggregateInput
-  StoreTransaction?: Prisma.StoreTransactionOrderByRelationAggregateInput
-  destination_transfers?: Prisma.TransferOrderByRelationAggregateInput
   origin_transfers?: Prisma.TransferOrderByRelationAggregateInput
-  User?: Prisma.UserOrderByRelationAggregateInput
+  destination_transfers?: Prisma.TransferOrderByRelationAggregateInput
+  departures?: Prisma.DepartureOrderByRelationAggregateInput
+  arrivals?: Prisma.ArrivalOrderByRelationAggregateInput
+  locations?: Prisma.LocationOrderByRelationAggregateInput
+  users?: Prisma.UserOrderByRelationAggregateInput
+  storeTransactions?: Prisma.StoreTransactionOrderByRelationAggregateInput
 }
 
 export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
@@ -240,13 +240,13 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   city_code?: Prisma.StringFilter<"Warehouse"> | string
   street?: Prisma.StringFilter<"Warehouse"> | string
   is_active?: Prisma.BoolFilter<"Warehouse"> | boolean
-  arrivals?: Prisma.ArrivalListRelationFilter
-  departures?: Prisma.DepartureListRelationFilter
-  locations?: Prisma.LocationListRelationFilter
-  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
-  destination_transfers?: Prisma.TransferListRelationFilter
   origin_transfers?: Prisma.TransferListRelationFilter
-  User?: Prisma.UserListRelationFilter
+  destination_transfers?: Prisma.TransferListRelationFilter
+  departures?: Prisma.DepartureListRelationFilter
+  arrivals?: Prisma.ArrivalListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
+  users?: Prisma.UserListRelationFilter
+  storeTransactions?: Prisma.StoreTransactionListRelationFilter
 }, "id" | "city_code_street">
 
 export type WarehouseOrderByWithAggregationInput = {
@@ -275,13 +275,13 @@ export type WarehouseCreateInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateInput = {
@@ -289,26 +289,26 @@ export type WarehouseUncheckedCreateInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUpdateInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateInput = {
@@ -316,13 +316,13 @@ export type WarehouseUncheckedUpdateInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateManyInput = {
@@ -389,10 +389,18 @@ export type WarehouseNullableScalarRelationFilter = {
   isNot?: Prisma.WarehouseWhereInput | null
 }
 
-export type WarehouseCreateNestedOneWithoutDestination_transfersInput = {
-  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
-  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutDestination_transfersInput
+export type WarehouseCreateNestedOneWithoutStoreTransactionsInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStoreTransactionsInput
   connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStoreTransactionsInput
+  upsert?: Prisma.WarehouseUpsertWithoutStoreTransactionsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutStoreTransactionsInput, Prisma.WarehouseUpdateWithoutStoreTransactionsInput>, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionsInput>
 }
 
 export type WarehouseCreateNestedOneWithoutOrigin_transfersInput = {
@@ -401,12 +409,10 @@ export type WarehouseCreateNestedOneWithoutOrigin_transfersInput = {
   connect?: Prisma.WarehouseWhereUniqueInput
 }
 
-export type WarehouseUpdateOneRequiredWithoutDestination_transfersNestedInput = {
+export type WarehouseCreateNestedOneWithoutDestination_transfersInput = {
   create?: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
   connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutDestination_transfersInput
-  upsert?: Prisma.WarehouseUpsertWithoutDestination_transfersInput
   connect?: Prisma.WarehouseWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutDestination_transfersInput, Prisma.WarehouseUpdateWithoutDestination_transfersInput>, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
 }
 
 export type WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput = {
@@ -415,6 +421,14 @@ export type WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput = {
   upsert?: Prisma.WarehouseUpsertWithoutOrigin_transfersInput
   connect?: Prisma.WarehouseWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutOrigin_transfersInput, Prisma.WarehouseUpdateWithoutOrigin_transfersInput>, Prisma.WarehouseUncheckedUpdateWithoutOrigin_transfersInput>
+}
+
+export type WarehouseUpdateOneRequiredWithoutDestination_transfersNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutDestination_transfersInput
+  upsert?: Prisma.WarehouseUpsertWithoutDestination_transfersInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutDestination_transfersInput, Prisma.WarehouseUpdateWithoutDestination_transfersInput>, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
 }
 
 export type WarehouseCreateNestedOneWithoutArrivalsInput = {
@@ -459,76 +473,98 @@ export type WarehouseUpdateOneRequiredWithoutLocationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutLocationsInput, Prisma.WarehouseUpdateWithoutLocationsInput>, Prisma.WarehouseUncheckedUpdateWithoutLocationsInput>
 }
 
-export type WarehouseCreateNestedOneWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUserInput, Prisma.WarehouseUncheckedCreateWithoutUserInput>
-  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUserInput
+export type WarehouseCreateNestedOneWithoutUsersInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUsersInput
   connect?: Prisma.WarehouseWhereUniqueInput
 }
 
-export type WarehouseUpdateOneWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUserInput, Prisma.WarehouseUncheckedCreateWithoutUserInput>
-  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUserInput
-  upsert?: Prisma.WarehouseUpsertWithoutUserInput
+export type WarehouseUpdateOneWithoutUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutUsersInput
+  upsert?: Prisma.WarehouseUpsertWithoutUsersInput
   disconnect?: Prisma.WarehouseWhereInput | boolean
   delete?: Prisma.WarehouseWhereInput | boolean
   connect?: Prisma.WarehouseWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutUserInput, Prisma.WarehouseUpdateWithoutUserInput>, Prisma.WarehouseUncheckedUpdateWithoutUserInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutUsersInput, Prisma.WarehouseUpdateWithoutUsersInput>, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
 }
 
-export type WarehouseCreateNestedOneWithoutStoreTransactionInput = {
-  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionInput>
-  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStoreTransactionInput
-  connect?: Prisma.WarehouseWhereUniqueInput
-}
-
-export type WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput = {
-  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionInput>
-  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutStoreTransactionInput
-  upsert?: Prisma.WarehouseUpsertWithoutStoreTransactionInput
-  connect?: Prisma.WarehouseWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutStoreTransactionInput, Prisma.WarehouseUpdateWithoutStoreTransactionInput>, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionInput>
-}
-
-export type WarehouseCreateWithoutDestination_transfersInput = {
+export type WarehouseCreateWithoutStoreTransactionsInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
 }
 
-export type WarehouseUncheckedCreateWithoutDestination_transfersInput = {
+export type WarehouseUncheckedCreateWithoutStoreTransactionsInput = {
   id?: number
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
 }
 
-export type WarehouseCreateOrConnectWithoutDestination_transfersInput = {
+export type WarehouseCreateOrConnectWithoutStoreTransactionsInput = {
   where: Prisma.WarehouseWhereUniqueInput
-  create: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionsInput>
+}
+
+export type WarehouseUpsertWithoutStoreTransactionsInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionsInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionsInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutStoreTransactionsInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutStoreTransactionsInput, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionsInput>
+}
+
+export type WarehouseUpdateWithoutStoreTransactionsInput = {
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutStoreTransactionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
 }
 
 export type WarehouseCreateWithoutOrigin_transfersInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutOrigin_transfersInput = {
@@ -536,12 +572,12 @@ export type WarehouseUncheckedCreateWithoutOrigin_transfersInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutOrigin_transfersInput = {
@@ -549,40 +585,34 @@ export type WarehouseCreateOrConnectWithoutOrigin_transfersInput = {
   create: Prisma.XOR<Prisma.WarehouseCreateWithoutOrigin_transfersInput, Prisma.WarehouseUncheckedCreateWithoutOrigin_transfersInput>
 }
 
-export type WarehouseUpsertWithoutDestination_transfersInput = {
-  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
+export type WarehouseCreateWithoutDestination_transfersInput = {
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutDestination_transfersInput = {
+  id?: number
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutDestination_transfersInput = {
+  where: Prisma.WarehouseWhereUniqueInput
   create: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
-  where?: Prisma.WarehouseWhereInput
-}
-
-export type WarehouseUpdateToOneWithWhereWithoutDestination_transfersInput = {
-  where?: Prisma.WarehouseWhereInput
-  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
-}
-
-export type WarehouseUpdateWithoutDestination_transfersInput = {
-  city_code?: Prisma.StringFieldUpdateOperationsInput | string
-  street?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
-}
-
-export type WarehouseUncheckedUpdateWithoutDestination_transfersInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  city_code?: Prisma.StringFieldUpdateOperationsInput | string
-  street?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUpsertWithoutOrigin_transfersInput = {
@@ -600,12 +630,12 @@ export type WarehouseUpdateWithoutOrigin_transfersInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutOrigin_transfersInput = {
@@ -613,24 +643,60 @@ export type WarehouseUncheckedUpdateWithoutOrigin_transfersInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUpsertWithoutDestination_transfersInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedCreateWithoutDestination_transfersInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutDestination_transfersInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutDestination_transfersInput, Prisma.WarehouseUncheckedUpdateWithoutDestination_transfersInput>
+}
+
+export type WarehouseUpdateWithoutDestination_transfersInput = {
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutDestination_transfersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutArrivalsInput = {
   city_code: string
   street: string
   is_active?: boolean
+  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
   departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
   locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutArrivalsInput = {
@@ -638,12 +704,12 @@ export type WarehouseUncheckedCreateWithoutArrivalsInput = {
   city_code: string
   street: string
   is_active?: boolean
+  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutArrivalsInput = {
@@ -666,12 +732,12 @@ export type WarehouseUpdateWithoutArrivalsInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
   locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutArrivalsInput = {
@@ -679,24 +745,24 @@ export type WarehouseUncheckedUpdateWithoutArrivalsInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDeparturesInput = {
   city_code: string
   street: string
   is_active?: boolean
+  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
   arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
   locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDeparturesInput = {
@@ -704,12 +770,12 @@ export type WarehouseUncheckedCreateWithoutDeparturesInput = {
   city_code: string
   street: string
   is_active?: boolean
+  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
   arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDeparturesInput = {
@@ -732,12 +798,12 @@ export type WarehouseUpdateWithoutDeparturesInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
   arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
   locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDeparturesInput = {
@@ -745,24 +811,24 @@ export type WarehouseUncheckedUpdateWithoutDeparturesInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
   locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutLocationsInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutLocationsInput = {
@@ -770,12 +836,12 @@ export type WarehouseUncheckedCreateWithoutLocationsInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutLocationsInput = {
@@ -798,12 +864,12 @@ export type WarehouseUpdateWithoutLocationsInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutLocationsInput = {
@@ -811,144 +877,78 @@ export type WarehouseUncheckedUpdateWithoutLocationsInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
-export type WarehouseCreateWithoutUserInput = {
+export type WarehouseCreateWithoutUsersInput = {
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
 }
 
-export type WarehouseUncheckedCreateWithoutUserInput = {
+export type WarehouseUncheckedCreateWithoutUsersInput = {
   id?: number
   city_code: string
   street: string
   is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
   origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
-export type WarehouseCreateOrConnectWithoutUserInput = {
+export type WarehouseCreateOrConnectWithoutUsersInput = {
   where: Prisma.WarehouseWhereUniqueInput
-  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUserInput, Prisma.WarehouseUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
 }
 
-export type WarehouseUpsertWithoutUserInput = {
-  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutUserInput, Prisma.WarehouseUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUserInput, Prisma.WarehouseUncheckedCreateWithoutUserInput>
+export type WarehouseUpsertWithoutUsersInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutUsersInput, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutUsersInput, Prisma.WarehouseUncheckedCreateWithoutUsersInput>
   where?: Prisma.WarehouseWhereInput
 }
 
-export type WarehouseUpdateToOneWithWhereWithoutUserInput = {
+export type WarehouseUpdateToOneWithWhereWithoutUsersInput = {
   where?: Prisma.WarehouseWhereInput
-  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutUserInput, Prisma.WarehouseUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutUsersInput, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
 }
 
-export type WarehouseUpdateWithoutUserInput = {
+export type WarehouseUpdateWithoutUsersInput = {
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
 }
 
-export type WarehouseUncheckedUpdateWithoutUserInput = {
+export type WarehouseUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   city_code?: Prisma.StringFieldUpdateOperationsInput | string
   street?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
   origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-}
-
-export type WarehouseCreateWithoutStoreTransactionInput = {
-  city_code: string
-  street: string
-  is_active?: boolean
-  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserCreateNestedManyWithoutWarehouseInput
-}
-
-export type WarehouseUncheckedCreateWithoutStoreTransactionInput = {
-  id?: number
-  city_code: string
-  street: string
-  is_active?: boolean
-  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
-  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
-  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
-  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
-  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
-  User?: Prisma.UserUncheckedCreateNestedManyWithoutWarehouseInput
-}
-
-export type WarehouseCreateOrConnectWithoutStoreTransactionInput = {
-  where: Prisma.WarehouseWhereUniqueInput
-  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionInput>
-}
-
-export type WarehouseUpsertWithoutStoreTransactionInput = {
-  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionInput>
-  create: Prisma.XOR<Prisma.WarehouseCreateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedCreateWithoutStoreTransactionInput>
-  where?: Prisma.WarehouseWhereInput
-}
-
-export type WarehouseUpdateToOneWithWhereWithoutStoreTransactionInput = {
-  where?: Prisma.WarehouseWhereInput
-  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutStoreTransactionInput, Prisma.WarehouseUncheckedUpdateWithoutStoreTransactionInput>
-}
-
-export type WarehouseUpdateWithoutStoreTransactionInput = {
-  city_code?: Prisma.StringFieldUpdateOperationsInput | string
-  street?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
-  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUpdateManyWithoutWarehouseNestedInput
-}
-
-export type WarehouseUncheckedUpdateWithoutStoreTransactionInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  city_code?: Prisma.StringFieldUpdateOperationsInput | string
-  street?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
-  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
-  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
   destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
-  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
-  User?: Prisma.UserUncheckedUpdateManyWithoutWarehouseNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 
@@ -957,23 +957,23 @@ export type WarehouseUncheckedUpdateWithoutStoreTransactionInput = {
  */
 
 export type WarehouseCountOutputType = {
-  arrivals: number
-  departures: number
-  locations: number
-  StoreTransaction: number
-  destination_transfers: number
   origin_transfers: number
-  User: number
+  destination_transfers: number
+  departures: number
+  arrivals: number
+  locations: number
+  users: number
+  storeTransactions: number
 }
 
 export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  arrivals?: boolean | WarehouseCountOutputTypeCountArrivalsArgs
-  departures?: boolean | WarehouseCountOutputTypeCountDeparturesArgs
-  locations?: boolean | WarehouseCountOutputTypeCountLocationsArgs
-  StoreTransaction?: boolean | WarehouseCountOutputTypeCountStoreTransactionArgs
-  destination_transfers?: boolean | WarehouseCountOutputTypeCountDestination_transfersArgs
   origin_transfers?: boolean | WarehouseCountOutputTypeCountOrigin_transfersArgs
-  User?: boolean | WarehouseCountOutputTypeCountUserArgs
+  destination_transfers?: boolean | WarehouseCountOutputTypeCountDestination_transfersArgs
+  departures?: boolean | WarehouseCountOutputTypeCountDeparturesArgs
+  arrivals?: boolean | WarehouseCountOutputTypeCountArrivalsArgs
+  locations?: boolean | WarehouseCountOutputTypeCountLocationsArgs
+  users?: boolean | WarehouseCountOutputTypeCountUsersArgs
+  storeTransactions?: boolean | WarehouseCountOutputTypeCountStoreTransactionsArgs
 }
 
 /**
@@ -989,29 +989,8 @@ export type WarehouseCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * WarehouseCountOutputType without action
  */
-export type WarehouseCountOutputTypeCountArrivalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ArrivalWhereInput
-}
-
-/**
- * WarehouseCountOutputType without action
- */
-export type WarehouseCountOutputTypeCountDeparturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DepartureWhereInput
-}
-
-/**
- * WarehouseCountOutputType without action
- */
-export type WarehouseCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LocationWhereInput
-}
-
-/**
- * WarehouseCountOutputType without action
- */
-export type WarehouseCountOutputTypeCountStoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.StoreTransactionWhereInput
+export type WarehouseCountOutputTypeCountOrigin_transfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransferWhereInput
 }
 
 /**
@@ -1024,15 +1003,36 @@ export type WarehouseCountOutputTypeCountDestination_transfersArgs<ExtArgs exten
 /**
  * WarehouseCountOutputType without action
  */
-export type WarehouseCountOutputTypeCountOrigin_transfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TransferWhereInput
+export type WarehouseCountOutputTypeCountDeparturesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DepartureWhereInput
 }
 
 /**
  * WarehouseCountOutputType without action
  */
-export type WarehouseCountOutputTypeCountUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type WarehouseCountOutputTypeCountArrivalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ArrivalWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LocationWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountStoreTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StoreTransactionWhereInput
 }
 
 
@@ -1041,13 +1041,13 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   city_code?: boolean
   street?: boolean
   is_active?: boolean
-  arrivals?: boolean | Prisma.Warehouse$arrivalsArgs<ExtArgs>
-  departures?: boolean | Prisma.Warehouse$departuresArgs<ExtArgs>
-  locations?: boolean | Prisma.Warehouse$locationsArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.Warehouse$StoreTransactionArgs<ExtArgs>
-  destination_transfers?: boolean | Prisma.Warehouse$destination_transfersArgs<ExtArgs>
   origin_transfers?: boolean | Prisma.Warehouse$origin_transfersArgs<ExtArgs>
-  User?: boolean | Prisma.Warehouse$UserArgs<ExtArgs>
+  destination_transfers?: boolean | Prisma.Warehouse$destination_transfersArgs<ExtArgs>
+  departures?: boolean | Prisma.Warehouse$departuresArgs<ExtArgs>
+  arrivals?: boolean | Prisma.Warehouse$arrivalsArgs<ExtArgs>
+  locations?: boolean | Prisma.Warehouse$locationsArgs<ExtArgs>
+  users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
+  storeTransactions?: boolean | Prisma.Warehouse$storeTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["warehouse"]>
 
@@ -1074,13 +1074,13 @@ export type WarehouseSelectScalar = {
 
 export type WarehouseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "city_code" | "street" | "is_active", ExtArgs["result"]["warehouse"]>
 export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  arrivals?: boolean | Prisma.Warehouse$arrivalsArgs<ExtArgs>
-  departures?: boolean | Prisma.Warehouse$departuresArgs<ExtArgs>
-  locations?: boolean | Prisma.Warehouse$locationsArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.Warehouse$StoreTransactionArgs<ExtArgs>
-  destination_transfers?: boolean | Prisma.Warehouse$destination_transfersArgs<ExtArgs>
   origin_transfers?: boolean | Prisma.Warehouse$origin_transfersArgs<ExtArgs>
-  User?: boolean | Prisma.Warehouse$UserArgs<ExtArgs>
+  destination_transfers?: boolean | Prisma.Warehouse$destination_transfersArgs<ExtArgs>
+  departures?: boolean | Prisma.Warehouse$departuresArgs<ExtArgs>
+  arrivals?: boolean | Prisma.Warehouse$arrivalsArgs<ExtArgs>
+  locations?: boolean | Prisma.Warehouse$locationsArgs<ExtArgs>
+  users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
+  storeTransactions?: boolean | Prisma.Warehouse$storeTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WarehouseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1089,13 +1089,13 @@ export type WarehouseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Warehouse"
   objects: {
-    arrivals: Prisma.$ArrivalPayload<ExtArgs>[]
-    departures: Prisma.$DeparturePayload<ExtArgs>[]
-    locations: Prisma.$LocationPayload<ExtArgs>[]
-    StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>[]
-    destination_transfers: Prisma.$TransferPayload<ExtArgs>[]
     origin_transfers: Prisma.$TransferPayload<ExtArgs>[]
-    User: Prisma.$UserPayload<ExtArgs>[]
+    destination_transfers: Prisma.$TransferPayload<ExtArgs>[]
+    departures: Prisma.$DeparturePayload<ExtArgs>[]
+    arrivals: Prisma.$ArrivalPayload<ExtArgs>[]
+    locations: Prisma.$LocationPayload<ExtArgs>[]
+    users: Prisma.$UserPayload<ExtArgs>[]
+    storeTransactions: Prisma.$StoreTransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1109,7 +1109,7 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type WarehouseGetPayload<S extends boolean | null | undefined | WarehouseDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$WarehousePayload, S>
 
 export type WarehouseCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<WarehouseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<WarehouseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: WarehouseCountAggregateInputType | true
   }
 
@@ -1496,13 +1496,13 @@ readonly fields: WarehouseFieldRefs;
  */
 export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  arrivals<T extends Prisma.Warehouse$arrivalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$arrivalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  departures<T extends Prisma.Warehouse$departuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$departuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  locations<T extends Prisma.Warehouse$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  StoreTransaction<T extends Prisma.Warehouse$StoreTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$StoreTransactionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  destination_transfers<T extends Prisma.Warehouse$destination_transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$destination_transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   origin_transfers<T extends Prisma.Warehouse$origin_transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$origin_transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  User<T extends Prisma.Warehouse$UserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$UserArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  destination_transfers<T extends Prisma.Warehouse$destination_transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$destination_transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  departures<T extends Prisma.Warehouse$departuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$departuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  arrivals<T extends Prisma.Warehouse$arrivalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$arrivalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  locations<T extends Prisma.Warehouse$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Warehouse$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  storeTransactions<T extends Prisma.Warehouse$storeTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$storeTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1560,7 +1560,6 @@ export type WarehouseFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which Warehouse to fetch.
    */
   where: Prisma.WarehouseWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1583,7 +1582,6 @@ export type WarehouseFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which Warehouse to fetch.
    */
   where: Prisma.WarehouseWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1636,7 +1634,6 @@ export type WarehouseFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of Warehouses.
    */
   distinct?: Prisma.WarehouseScalarFieldEnum | Prisma.WarehouseScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1689,7 +1686,6 @@ export type WarehouseFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of Warehouses.
    */
   distinct?: Prisma.WarehouseScalarFieldEnum | Prisma.WarehouseScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1742,7 +1738,6 @@ export type WarehouseFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Warehouses.
    */
   distinct?: Prisma.WarehouseScalarFieldEnum | Prisma.WarehouseScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1765,7 +1760,6 @@ export type WarehouseCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a Warehouse.
    */
   data: Prisma.XOR<Prisma.WarehouseCreateInput, Prisma.WarehouseUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1822,7 +1816,6 @@ export type WarehouseUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which Warehouse to update.
    */
   where: Prisma.WarehouseWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1897,7 +1890,6 @@ export type WarehouseUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the Warehouse was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.WarehouseUpdateInput, Prisma.WarehouseUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1920,7 +1912,6 @@ export type WarehouseDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which Warehouse to delete.
    */
   where: Prisma.WarehouseWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1935,126 +1926,6 @@ export type WarehouseDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Warehouses to delete.
    */
   limit?: number
-}
-
-/**
- * Warehouse.arrivals
- */
-export type Warehouse$arrivalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Arrival
-   */
-  select?: Prisma.ArrivalSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Arrival
-   */
-  omit?: Prisma.ArrivalOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ArrivalInclude<ExtArgs> | null
-  where?: Prisma.ArrivalWhereInput
-  orderBy?: Prisma.ArrivalOrderByWithRelationInput | Prisma.ArrivalOrderByWithRelationInput[]
-  cursor?: Prisma.ArrivalWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
-}
-
-/**
- * Warehouse.departures
- */
-export type Warehouse$departuresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Departure
-   */
-  select?: Prisma.DepartureSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Departure
-   */
-  omit?: Prisma.DepartureOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DepartureInclude<ExtArgs> | null
-  where?: Prisma.DepartureWhereInput
-  orderBy?: Prisma.DepartureOrderByWithRelationInput | Prisma.DepartureOrderByWithRelationInput[]
-  cursor?: Prisma.DepartureWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.DepartureScalarFieldEnum | Prisma.DepartureScalarFieldEnum[]
-}
-
-/**
- * Warehouse.locations
- */
-export type Warehouse$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Location
-   */
-  select?: Prisma.LocationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Location
-   */
-  omit?: Prisma.LocationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LocationInclude<ExtArgs> | null
-  where?: Prisma.LocationWhereInput
-  orderBy?: Prisma.LocationOrderByWithRelationInput | Prisma.LocationOrderByWithRelationInput[]
-  cursor?: Prisma.LocationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LocationScalarFieldEnum | Prisma.LocationScalarFieldEnum[]
-}
-
-/**
- * Warehouse.StoreTransaction
- */
-export type Warehouse$StoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the StoreTransaction
-   */
-  select?: Prisma.StoreTransactionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the StoreTransaction
-   */
-  omit?: Prisma.StoreTransactionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.StoreTransactionInclude<ExtArgs> | null
-  where?: Prisma.StoreTransactionWhereInput
-  orderBy?: Prisma.StoreTransactionOrderByWithRelationInput | Prisma.StoreTransactionOrderByWithRelationInput[]
-  cursor?: Prisma.StoreTransactionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
-}
-
-/**
- * Warehouse.destination_transfers
- */
-export type Warehouse$destination_transfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Transfer
-   */
-  select?: Prisma.TransferSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Transfer
-   */
-  omit?: Prisma.TransferOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.TransferInclude<ExtArgs> | null
-  where?: Prisma.TransferWhereInput
-  orderBy?: Prisma.TransferOrderByWithRelationInput | Prisma.TransferOrderByWithRelationInput[]
-  cursor?: Prisma.TransferWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.TransferScalarFieldEnum | Prisma.TransferScalarFieldEnum[]
 }
 
 /**
@@ -2082,9 +1953,105 @@ export type Warehouse$origin_transfersArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
- * Warehouse.User
+ * Warehouse.destination_transfers
  */
-export type Warehouse$UserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Warehouse$destination_transfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transfer
+   */
+  select?: Prisma.TransferSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transfer
+   */
+  omit?: Prisma.TransferOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransferInclude<ExtArgs> | null
+  where?: Prisma.TransferWhereInput
+  orderBy?: Prisma.TransferOrderByWithRelationInput | Prisma.TransferOrderByWithRelationInput[]
+  cursor?: Prisma.TransferWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransferScalarFieldEnum | Prisma.TransferScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.departures
+ */
+export type Warehouse$departuresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Departure
+   */
+  select?: Prisma.DepartureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Departure
+   */
+  omit?: Prisma.DepartureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartureInclude<ExtArgs> | null
+  where?: Prisma.DepartureWhereInput
+  orderBy?: Prisma.DepartureOrderByWithRelationInput | Prisma.DepartureOrderByWithRelationInput[]
+  cursor?: Prisma.DepartureWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DepartureScalarFieldEnum | Prisma.DepartureScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.arrivals
+ */
+export type Warehouse$arrivalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Arrival
+   */
+  select?: Prisma.ArrivalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Arrival
+   */
+  omit?: Prisma.ArrivalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ArrivalInclude<ExtArgs> | null
+  where?: Prisma.ArrivalWhereInput
+  orderBy?: Prisma.ArrivalOrderByWithRelationInput | Prisma.ArrivalOrderByWithRelationInput[]
+  cursor?: Prisma.ArrivalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.locations
+ */
+export type Warehouse$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Location
+   */
+  select?: Prisma.LocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Location
+   */
+  omit?: Prisma.LocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocationInclude<ExtArgs> | null
+  where?: Prisma.LocationWhereInput
+  orderBy?: Prisma.LocationOrderByWithRelationInput | Prisma.LocationOrderByWithRelationInput[]
+  cursor?: Prisma.LocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LocationScalarFieldEnum | Prisma.LocationScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.users
+ */
+export type Warehouse$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the User
    */
@@ -2103,6 +2070,30 @@ export type Warehouse$UserArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.storeTransactions
+ */
+export type Warehouse$storeTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StoreTransaction
+   */
+  select?: Prisma.StoreTransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StoreTransaction
+   */
+  omit?: Prisma.StoreTransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StoreTransactionInclude<ExtArgs> | null
+  where?: Prisma.StoreTransactionWhereInput
+  orderBy?: Prisma.StoreTransactionOrderByWithRelationInput | Prisma.StoreTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.StoreTransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
 }
 
 /**

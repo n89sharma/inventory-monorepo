@@ -252,9 +252,9 @@ export type AssetSalvagedPartWhereInput = {
   is_exchange?: Prisma.BoolFilter<"AssetSalvagedPart"> | boolean
   part?: Prisma.StringFilter<"AssetSalvagedPart"> | string
   notes?: Prisma.StringNullableFilter<"AssetSalvagedPart"> | string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  recipient_asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  donor_asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  fixedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type AssetSalvagedPartOrderByWithRelationInput = {
@@ -266,9 +266,9 @@ export type AssetSalvagedPartOrderByWithRelationInput = {
   is_exchange?: Prisma.SortOrder
   part?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.AssetOrderByWithRelationInput
-  User?: Prisma.UserOrderByWithRelationInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.AssetOrderByWithRelationInput
+  recipient_asset?: Prisma.AssetOrderByWithRelationInput
+  donor_asset?: Prisma.AssetOrderByWithRelationInput
+  fixedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type AssetSalvagedPartWhereUniqueInput = Prisma.AtLeast<{
@@ -283,9 +283,9 @@ export type AssetSalvagedPartWhereUniqueInput = Prisma.AtLeast<{
   is_exchange?: Prisma.BoolFilter<"AssetSalvagedPart"> | boolean
   part?: Prisma.StringFilter<"AssetSalvagedPart"> | string
   notes?: Prisma.StringNullableFilter<"AssetSalvagedPart"> | string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  recipient_asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  donor_asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  fixedBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type AssetSalvagedPartOrderByWithAggregationInput = {
@@ -323,9 +323,9 @@ export type AssetSalvagedPartCreateInput = {
   is_exchange: boolean
   part: string
   notes?: string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetInput
-  User: Prisma.UserCreateNestedOneWithoutAssetSalvagedPartInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetInput
+  recipient_asset: Prisma.AssetCreateNestedOneWithoutReceived_partsInput
+  donor_asset: Prisma.AssetCreateNestedOneWithoutDonated_partsInput
+  fixedBy: Prisma.UserCreateNestedOneWithoutSalvaged_asset_partsInput
 }
 
 export type AssetSalvagedPartUncheckedCreateInput = {
@@ -344,9 +344,9 @@ export type AssetSalvagedPartUpdateInput = {
   is_exchange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   part?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetSalvagedPartNestedInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetNestedInput
+  recipient_asset?: Prisma.AssetUpdateOneRequiredWithoutReceived_partsNestedInput
+  donor_asset?: Prisma.AssetUpdateOneRequiredWithoutDonated_partsNestedInput
+  fixedBy?: Prisma.UserUpdateOneRequiredWithoutSalvaged_asset_partsNestedInput
 }
 
 export type AssetSalvagedPartUncheckedUpdateInput = {
@@ -446,142 +446,142 @@ export type AssetSalvagedPartSumOrderByAggregateInput = {
   fixed_by?: Prisma.SortOrder
 }
 
-export type AssetSalvagedPartCreateNestedManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartCreateNestedManyWithoutDonor_assetInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput> | Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyDonor_assetInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartCreateNestedManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartCreateNestedManyWithoutRecipient_assetInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput> | Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyRecipient_assetInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartUncheckedCreateNestedManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUncheckedCreateNestedManyWithoutDonor_assetInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput> | Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyDonor_assetInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartUncheckedCreateNestedManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUncheckedCreateNestedManyWithoutRecipient_assetInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput> | Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyRecipient_assetInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartUpdateManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUpdateManyWithoutDonor_assetNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput> | Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutDonor_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyDonor_assetInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutDonor_assetInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutDonor_assetInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartUpdateManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUpdateManyWithoutRecipient_assetNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput> | Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutRecipient_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyRecipient_assetInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutRecipient_assetInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutRecipient_assetInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUncheckedUpdateManyWithoutDonor_assetNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput> | Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutDonor_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyDonor_assetInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutDonor_assetInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutDonor_assetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutDonor_assetInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput> | Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInputEnvelope
+export type AssetSalvagedPartUncheckedUpdateManyWithoutRecipient_assetNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput> | Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutRecipient_assetInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyRecipient_assetInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutRecipient_assetInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutRecipient_assetInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutRecipient_assetInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput> | Prisma.AssetSalvagedPartCreateWithoutUserInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyUserInputEnvelope
+export type AssetSalvagedPartCreateNestedManyWithoutFixedByInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput> | Prisma.AssetSalvagedPartCreateWithoutFixedByInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyFixedByInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput> | Prisma.AssetSalvagedPartCreateWithoutUserInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyUserInputEnvelope
+export type AssetSalvagedPartUncheckedCreateNestedManyWithoutFixedByInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput> | Prisma.AssetSalvagedPartCreateWithoutFixedByInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyFixedByInputEnvelope
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
 }
 
-export type AssetSalvagedPartUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput> | Prisma.AssetSalvagedPartCreateWithoutUserInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutUserInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyUserInputEnvelope
+export type AssetSalvagedPartUpdateManyWithoutFixedByNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput> | Prisma.AssetSalvagedPartCreateWithoutFixedByInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutFixedByInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutFixedByInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyFixedByInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutUserInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutUserInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutFixedByInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutFixedByInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutFixedByInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutFixedByInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput> | Prisma.AssetSalvagedPartCreateWithoutUserInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutUserInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AssetSalvagedPartCreateManyUserInputEnvelope
+export type AssetSalvagedPartUncheckedUpdateManyWithoutFixedByNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput> | Prisma.AssetSalvagedPartCreateWithoutFixedByInput[] | Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput[]
+  connectOrCreate?: Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput | Prisma.AssetSalvagedPartCreateOrConnectWithoutFixedByInput[]
+  upsert?: Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutFixedByInput | Prisma.AssetSalvagedPartUpsertWithWhereUniqueWithoutFixedByInput[]
+  createMany?: Prisma.AssetSalvagedPartCreateManyFixedByInputEnvelope
   set?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   disconnect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   delete?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
   connect?: Prisma.AssetSalvagedPartWhereUniqueInput | Prisma.AssetSalvagedPartWhereUniqueInput[]
-  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutUserInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutUserInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutFixedByInput | Prisma.AssetSalvagedPartUpdateWithWhereUniqueWithoutFixedByInput[]
+  updateMany?: Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutFixedByInput | Prisma.AssetSalvagedPartUpdateManyWithWhereWithoutFixedByInput[]
   deleteMany?: Prisma.AssetSalvagedPartScalarWhereInput | Prisma.AssetSalvagedPartScalarWhereInput[]
 }
 
-export type AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateWithoutDonor_assetInput = {
   fixed_at: Date | string
   is_exchange: boolean
   part: string
   notes?: string | null
-  User: Prisma.UserCreateNestedOneWithoutAssetSalvagedPartInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetInput
+  recipient_asset: Prisma.AssetCreateNestedOneWithoutReceived_partsInput
+  fixedBy: Prisma.UserCreateNestedOneWithoutSalvaged_asset_partsInput
 }
 
-export type AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput = {
   id?: number
   recipient_asset_id: number
   fixed_at: Date | string
@@ -591,26 +591,26 @@ export type AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor
   notes?: string | null
 }
 
-export type AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateOrConnectWithoutDonor_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput>
 }
 
-export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInputEnvelope = {
-  data: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInput[]
+export type AssetSalvagedPartCreateManyDonor_assetInputEnvelope = {
+  data: Prisma.AssetSalvagedPartCreateManyDonor_assetInput | Prisma.AssetSalvagedPartCreateManyDonor_assetInput[]
   skipDuplicates?: boolean
 }
 
-export type AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateWithoutRecipient_assetInput = {
   fixed_at: Date | string
   is_exchange: boolean
   part: string
   notes?: string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetInput
-  User: Prisma.UserCreateNestedOneWithoutAssetSalvagedPartInput
+  donor_asset: Prisma.AssetCreateNestedOneWithoutDonated_partsInput
+  fixedBy: Prisma.UserCreateNestedOneWithoutSalvaged_asset_partsInput
 }
 
-export type AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput = {
   id?: number
   donor_asset_id: number
   fixed_at: Date | string
@@ -620,30 +620,30 @@ export type AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recip
   notes?: string | null
 }
 
-export type AssetSalvagedPartCreateOrConnectWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateOrConnectWithoutRecipient_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput>
 }
 
-export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInputEnvelope = {
-  data: Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInput | Prisma.AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInput[]
+export type AssetSalvagedPartCreateManyRecipient_assetInputEnvelope = {
+  data: Prisma.AssetSalvagedPartCreateManyRecipient_assetInput | Prisma.AssetSalvagedPartCreateManyRecipient_assetInput[]
   skipDuplicates?: boolean
 }
 
-export type AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUpsertWithWhereUniqueWithoutDonor_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput>
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput>
+  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutDonor_assetInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutDonor_assetInput>
 }
 
-export type AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateWithWhereUniqueWithoutDonor_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutDonor_assetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutDonor_assetInput>
 }
 
-export type AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateManyWithWhereWithoutDonor_assetInput = {
   where: Prisma.AssetSalvagedPartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutDonor_assetInput>
 }
 
 export type AssetSalvagedPartScalarWhereInput = {
@@ -660,32 +660,32 @@ export type AssetSalvagedPartScalarWhereInput = {
   notes?: Prisma.StringNullableFilter<"AssetSalvagedPart"> | string | null
 }
 
-export type AssetSalvagedPartUpsertWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUpsertWithWhereUniqueWithoutRecipient_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput>
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput>
+  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutRecipient_assetInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutRecipient_assetInput>
 }
 
-export type AssetSalvagedPartUpdateWithWhereUniqueWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateWithWhereUniqueWithoutRecipient_assetInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutRecipient_assetInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutRecipient_assetInput>
 }
 
-export type AssetSalvagedPartUpdateManyWithWhereWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateManyWithWhereWithoutRecipient_assetInput = {
   where: Prisma.AssetSalvagedPartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutRecipient_assetInput>
 }
 
-export type AssetSalvagedPartCreateWithoutUserInput = {
+export type AssetSalvagedPartCreateWithoutFixedByInput = {
   fixed_at: Date | string
   is_exchange: boolean
   part: string
   notes?: string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset: Prisma.AssetCreateNestedOneWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetInput
+  recipient_asset: Prisma.AssetCreateNestedOneWithoutReceived_partsInput
+  donor_asset: Prisma.AssetCreateNestedOneWithoutDonated_partsInput
 }
 
-export type AssetSalvagedPartUncheckedCreateWithoutUserInput = {
+export type AssetSalvagedPartUncheckedCreateWithoutFixedByInput = {
   id?: number
   recipient_asset_id: number
   donor_asset_id: number
@@ -695,33 +695,33 @@ export type AssetSalvagedPartUncheckedCreateWithoutUserInput = {
   notes?: string | null
 }
 
-export type AssetSalvagedPartCreateOrConnectWithoutUserInput = {
+export type AssetSalvagedPartCreateOrConnectWithoutFixedByInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput>
 }
 
-export type AssetSalvagedPartCreateManyUserInputEnvelope = {
-  data: Prisma.AssetSalvagedPartCreateManyUserInput | Prisma.AssetSalvagedPartCreateManyUserInput[]
+export type AssetSalvagedPartCreateManyFixedByInputEnvelope = {
+  data: Prisma.AssetSalvagedPartCreateManyFixedByInput | Prisma.AssetSalvagedPartCreateManyFixedByInput[]
   skipDuplicates?: boolean
 }
 
-export type AssetSalvagedPartUpsertWithWhereUniqueWithoutUserInput = {
+export type AssetSalvagedPartUpsertWithWhereUniqueWithoutFixedByInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutFixedByInput>
+  create: Prisma.XOR<Prisma.AssetSalvagedPartCreateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedCreateWithoutFixedByInput>
 }
 
-export type AssetSalvagedPartUpdateWithWhereUniqueWithoutUserInput = {
+export type AssetSalvagedPartUpdateWithWhereUniqueWithoutFixedByInput = {
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutUserInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateWithoutFixedByInput, Prisma.AssetSalvagedPartUncheckedUpdateWithoutFixedByInput>
 }
 
-export type AssetSalvagedPartUpdateManyWithWhereWithoutUserInput = {
+export type AssetSalvagedPartUpdateManyWithWhereWithoutFixedByInput = {
   where: Prisma.AssetSalvagedPartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.AssetSalvagedPartUpdateManyMutationInput, Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutFixedByInput>
 }
 
-export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateManyDonor_assetInput = {
   id?: number
   recipient_asset_id: number
   fixed_at: Date | string
@@ -731,7 +731,7 @@ export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_donor_asset_idToA
   notes?: string | null
 }
 
-export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartCreateManyRecipient_assetInput = {
   id?: number
   donor_asset_id: number
   fixed_at: Date | string
@@ -741,16 +741,16 @@ export type AssetSalvagedPartCreateManyAsset_AssetSalvagedPart_recipient_asset_i
   notes?: string | null
 }
 
-export type AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateWithoutDonor_assetInput = {
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_exchange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   part?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetSalvagedPartNestedInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetNestedInput
+  recipient_asset?: Prisma.AssetUpdateOneRequiredWithoutReceived_partsNestedInput
+  fixedBy?: Prisma.UserUpdateOneRequiredWithoutSalvaged_asset_partsNestedInput
 }
 
-export type AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedUpdateWithoutDonor_assetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   recipient_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -760,7 +760,7 @@ export type AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_donor
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_donor_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedUpdateManyWithoutDonor_assetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   recipient_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -770,16 +770,16 @@ export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_d
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type AssetSalvagedPartUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUpdateWithoutRecipient_assetInput = {
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_exchange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   part?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetSalvagedPartNestedInput
+  donor_asset?: Prisma.AssetUpdateOneRequiredWithoutDonated_partsNestedInput
+  fixedBy?: Prisma.UserUpdateOneRequiredWithoutSalvaged_asset_partsNestedInput
 }
 
-export type AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedUpdateWithoutRecipient_assetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   donor_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -789,7 +789,7 @@ export type AssetSalvagedPartUncheckedUpdateWithoutAsset_AssetSalvagedPart_recip
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_recipient_asset_idToAssetInput = {
+export type AssetSalvagedPartUncheckedUpdateManyWithoutRecipient_assetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   donor_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -799,7 +799,7 @@ export type AssetSalvagedPartUncheckedUpdateManyWithoutAsset_AssetSalvagedPart_r
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type AssetSalvagedPartCreateManyUserInput = {
+export type AssetSalvagedPartCreateManyFixedByInput = {
   id?: number
   recipient_asset_id: number
   donor_asset_id: number
@@ -809,16 +809,16 @@ export type AssetSalvagedPartCreateManyUserInput = {
   notes?: string | null
 }
 
-export type AssetSalvagedPartUpdateWithoutUserInput = {
+export type AssetSalvagedPartUpdateWithoutFixedByInput = {
   fixed_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_exchange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   part?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_donor_asset_idToAssetNestedInput
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: Prisma.AssetUpdateOneRequiredWithoutAssetSalvagedPart_AssetSalvagedPart_recipient_asset_idToAssetNestedInput
+  recipient_asset?: Prisma.AssetUpdateOneRequiredWithoutReceived_partsNestedInput
+  donor_asset?: Prisma.AssetUpdateOneRequiredWithoutDonated_partsNestedInput
 }
 
-export type AssetSalvagedPartUncheckedUpdateWithoutUserInput = {
+export type AssetSalvagedPartUncheckedUpdateWithoutFixedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   recipient_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   donor_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -828,7 +828,7 @@ export type AssetSalvagedPartUncheckedUpdateWithoutUserInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type AssetSalvagedPartUncheckedUpdateManyWithoutUserInput = {
+export type AssetSalvagedPartUncheckedUpdateManyWithoutFixedByInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   recipient_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   donor_asset_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -849,9 +849,9 @@ export type AssetSalvagedPartSelect<ExtArgs extends runtime.Types.Extensions.Int
   is_exchange?: boolean
   part?: boolean
   notes?: boolean
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetSalvagedPart"]>
 
 export type AssetSalvagedPartSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -863,9 +863,9 @@ export type AssetSalvagedPartSelectCreateManyAndReturn<ExtArgs extends runtime.T
   is_exchange?: boolean
   part?: boolean
   notes?: boolean
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetSalvagedPart"]>
 
 export type AssetSalvagedPartSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -877,9 +877,9 @@ export type AssetSalvagedPartSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   is_exchange?: boolean
   part?: boolean
   notes?: boolean
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetSalvagedPart"]>
 
 export type AssetSalvagedPartSelectScalar = {
@@ -895,27 +895,27 @@ export type AssetSalvagedPartSelectScalar = {
 
 export type AssetSalvagedPartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recipient_asset_id" | "donor_asset_id" | "fixed_at" | "fixed_by" | "is_exchange" | "part" | "notes", ExtArgs["result"]["assetSalvagedPart"]>
 export type AssetSalvagedPartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AssetSalvagedPartIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AssetSalvagedPartIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset_AssetSalvagedPart_donor_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  recipient_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  donor_asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  fixedBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $AssetSalvagedPartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AssetSalvagedPart"
   objects: {
-    Asset_AssetSalvagedPart_donor_asset_idToAsset: Prisma.$AssetPayload<ExtArgs>
-    User: Prisma.$UserPayload<ExtArgs>
-    Asset_AssetSalvagedPart_recipient_asset_idToAsset: Prisma.$AssetPayload<ExtArgs>
+    recipient_asset: Prisma.$AssetPayload<ExtArgs>
+    donor_asset: Prisma.$AssetPayload<ExtArgs>
+    fixedBy: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -933,7 +933,7 @@ export type $AssetSalvagedPartPayload<ExtArgs extends runtime.Types.Extensions.I
 export type AssetSalvagedPartGetPayload<S extends boolean | null | undefined | AssetSalvagedPartDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AssetSalvagedPartPayload, S>
 
 export type AssetSalvagedPartCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AssetSalvagedPartFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<AssetSalvagedPartFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: AssetSalvagedPartCountAggregateInputType | true
   }
 
@@ -1320,9 +1320,9 @@ readonly fields: AssetSalvagedPartFieldRefs;
  */
 export interface Prisma__AssetSalvagedPartClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Asset_AssetSalvagedPart_donor_asset_idToAsset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  User<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  Asset_AssetSalvagedPart_recipient_asset_idToAsset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  recipient_asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  donor_asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  fixedBy<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1384,7 +1384,6 @@ export type AssetSalvagedPartFindUniqueArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which AssetSalvagedPart to fetch.
    */
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1407,7 +1406,6 @@ export type AssetSalvagedPartFindUniqueOrThrowArgs<ExtArgs extends runtime.Types
    * Filter, which AssetSalvagedPart to fetch.
    */
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1460,7 +1458,6 @@ export type AssetSalvagedPartFindFirstArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of AssetSalvagedParts.
    */
   distinct?: Prisma.AssetSalvagedPartScalarFieldEnum | Prisma.AssetSalvagedPartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1513,7 +1510,6 @@ export type AssetSalvagedPartFindFirstOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter by unique combinations of AssetSalvagedParts.
    */
   distinct?: Prisma.AssetSalvagedPartScalarFieldEnum | Prisma.AssetSalvagedPartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1566,7 +1562,6 @@ export type AssetSalvagedPartFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of AssetSalvagedParts.
    */
   distinct?: Prisma.AssetSalvagedPartScalarFieldEnum | Prisma.AssetSalvagedPartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1589,7 +1584,6 @@ export type AssetSalvagedPartCreateArgs<ExtArgs extends runtime.Types.Extensions
    * The data needed to create a AssetSalvagedPart.
    */
   data: Prisma.XOR<Prisma.AssetSalvagedPartCreateInput, Prisma.AssetSalvagedPartUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1650,7 +1644,6 @@ export type AssetSalvagedPartUpdateArgs<ExtArgs extends runtime.Types.Extensions
    * Choose, which AssetSalvagedPart to update.
    */
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1729,7 +1722,6 @@ export type AssetSalvagedPartUpsertArgs<ExtArgs extends runtime.Types.Extensions
    * In case the AssetSalvagedPart was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AssetSalvagedPartUpdateInput, Prisma.AssetSalvagedPartUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1752,7 +1744,6 @@ export type AssetSalvagedPartDeleteArgs<ExtArgs extends runtime.Types.Extensions
    * Filter which AssetSalvagedPart to delete.
    */
   where: Prisma.AssetSalvagedPartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

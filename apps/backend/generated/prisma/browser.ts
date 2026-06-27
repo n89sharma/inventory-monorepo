@@ -18,6 +18,41 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
+ * Model Accessory
+ * 
+ */
+export type Accessory = Prisma.AccessoryModel
+/**
+ * Model AssetType
+ * 
+ */
+export type AssetType = Prisma.AssetTypeModel
+/**
+ * Model Status
+ * 
+ */
+export type Status = Prisma.StatusModel
+/**
+ * Model Readiness
+ * 
+ */
+export type Readiness = Prisma.ReadinessModel
+/**
+ * Model FileType
+ * 
+ */
+export type FileType = Prisma.FileTypeModel
+/**
+ * Model InvoiceType
+ * 
+ */
+export type InvoiceType = Prisma.InvoiceTypeModel
+/**
+ * Model Country
+ * 
+ */
+export type Country = Prisma.CountryModel
+/**
  * Model Asset
  * 
  */
@@ -47,6 +82,31 @@ export type Error = Prisma.ErrorModel
  * 
  */
 export type AssetError = Prisma.AssetErrorModel
+/**
+ * Model StorePart
+ * 
+ */
+export type StorePart = Prisma.StorePartModel
+/**
+ * Model StoreTransactionType
+ * 
+ */
+export type StoreTransactionType = Prisma.StoreTransactionTypeModel
+/**
+ * Model StoreTransaction
+ * 
+ */
+export type StoreTransaction = Prisma.StoreTransactionModel
+/**
+ * Model AssetStorePart
+ * 
+ */
+export type AssetStorePart = Prisma.AssetStorePartModel
+/**
+ * Model AssetSalvagedPart
+ * 
+ */
+export type AssetSalvagedPart = Prisma.AssetSalvagedPartModel
 /**
  * Model Transfer
  * 
@@ -78,15 +138,20 @@ export type Hold = Prisma.HoldModel
  */
 export type Invoice = Prisma.InvoiceModel
 /**
- * Model Warehouse
- * 
- */
-export type Warehouse = Prisma.WarehouseModel
-/**
  * Model Location
  * 
  */
 export type Location = Prisma.LocationModel
+/**
+ * Model Zone
+ * 
+ */
+export type Zone = Prisma.ZoneModel
+/**
+ * Model Warehouse
+ * 
+ */
+export type Warehouse = Prisma.WarehouseModel
 /**
  * Model Brand
  * 
@@ -97,6 +162,11 @@ export type Brand = Prisma.BrandModel
  * 
  */
 export type Model = Prisma.ModelModel
+/**
+ * Model Component
+ * 
+ */
+export type Component = Prisma.ComponentModel
 /**
  * Model File
  * 
@@ -113,87 +183,17 @@ export type Comment = Prisma.CommentModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model SavedView
+ * 
+ */
+export type SavedView = Prisma.SavedViewModel
+/**
  * Model Organization
  * 
  */
 export type Organization = Prisma.OrganizationModel
 /**
- * Model Accessory
- * 
- */
-export type Accessory = Prisma.AccessoryModel
-/**
- * Model AssetType
- * 
- */
-export type AssetType = Prisma.AssetTypeModel
-/**
- * Model FileType
- * 
- */
-export type FileType = Prisma.FileTypeModel
-/**
- * Model InvoiceType
- * 
- */
-export type InvoiceType = Prisma.InvoiceTypeModel
-/**
- * Model StorePart
- * 
- */
-export type StorePart = Prisma.StorePartModel
-/**
  * Model History
  * 
  */
 export type History = Prisma.HistoryModel
-/**
- * Model Readiness
- * 
- */
-export type Readiness = Prisma.ReadinessModel
-/**
- * Model Status
- * 
- */
-export type Status = Prisma.StatusModel
-/**
- * Model Zone
- * 
- */
-export type Zone = Prisma.ZoneModel
-/**
- * Model Country
- * 
- */
-export type Country = Prisma.CountryModel
-/**
- * Model Component
- * 
- */
-export type Component = Prisma.ComponentModel
-/**
- * Model AssetSalvagedPart
- * 
- */
-export type AssetSalvagedPart = Prisma.AssetSalvagedPartModel
-/**
- * Model AssetStorePart
- * 
- */
-export type AssetStorePart = Prisma.AssetStorePartModel
-/**
- * Model StoreTransaction
- * 
- */
-export type StoreTransaction = Prisma.StoreTransactionModel
-/**
- * Model StoreTransactionType
- * 
- */
-export type StoreTransactionType = Prisma.StoreTransactionTypeModel
-/**
- * Model SavedView
- * 
- */
-export type SavedView = Prisma.SavedViewModel

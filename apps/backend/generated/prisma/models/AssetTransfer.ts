@@ -560,7 +560,7 @@ export type $AssetTransferPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type AssetTransferGetPayload<S extends boolean | null | undefined | AssetTransferDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AssetTransferPayload, S>
 
 export type AssetTransferCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AssetTransferFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<AssetTransferFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: AssetTransferCountAggregateInputType | true
   }
 
@@ -1004,7 +1004,6 @@ export type AssetTransferFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which AssetTransfer to fetch.
    */
   where: Prisma.AssetTransferWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1027,7 +1026,6 @@ export type AssetTransferFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which AssetTransfer to fetch.
    */
   where: Prisma.AssetTransferWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1080,7 +1078,6 @@ export type AssetTransferFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of AssetTransfers.
    */
   distinct?: Prisma.AssetTransferScalarFieldEnum | Prisma.AssetTransferScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1133,7 +1130,6 @@ export type AssetTransferFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of AssetTransfers.
    */
   distinct?: Prisma.AssetTransferScalarFieldEnum | Prisma.AssetTransferScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1186,7 +1182,6 @@ export type AssetTransferFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of AssetTransfers.
    */
   distinct?: Prisma.AssetTransferScalarFieldEnum | Prisma.AssetTransferScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1209,7 +1204,6 @@ export type AssetTransferCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a AssetTransfer.
    */
   data: Prisma.XOR<Prisma.AssetTransferCreateInput, Prisma.AssetTransferUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1270,7 +1264,6 @@ export type AssetTransferUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which AssetTransfer to update.
    */
   where: Prisma.AssetTransferWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1349,7 +1342,6 @@ export type AssetTransferUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the AssetTransfer was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AssetTransferUpdateInput, Prisma.AssetTransferUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1372,7 +1364,6 @@ export type AssetTransferDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which AssetTransfer to delete.
    */
   where: Prisma.AssetTransferWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

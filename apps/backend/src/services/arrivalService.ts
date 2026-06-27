@@ -1,8 +1,8 @@
 import {
   ArrivalDetail,
+  ASSET_STATUS,
   AssetDelta,
   AssetSummary,
-  ASSET_STATUS,
   CreateArrival,
   CreateAsset,
   ModelSummary,
@@ -16,12 +16,16 @@ import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/s
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
+import { mapAssetSummary } from '../lib/asset-mappers.js'
+import {
+  addRemoveCollectionFromAssets,
+  recordCollectionAssetDelta,
+} from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
-import { reconcileAssetErrors } from './assetErrorService.js'
 import { upsertLatestComment } from './assetCommentService.js'
+import { reconcileAssetErrors } from './assetErrorService.js'
 import {
   recordArrivalCreate,
   recordArrivalUpdate,
@@ -29,10 +33,6 @@ import {
   recordAssetUpdateOnCollection,
   recordBatchAssetCreate,
 } from './historyService.js'
-import {
-  addRemoveCollectionFromAssets,
-  recordCollectionAssetDelta,
-} from '../lib/collection-assets.js'
 
 const arrivalZone = 'SHIPPING_AND_RECEIVING'
 const arrivalStatus = ASSET_STATUS.IN_STOCK
@@ -56,12 +56,12 @@ async function ensureArrivalLocationId(
 const assetIncludeArgs = {
   include: {
     model: true,
-    Readiness: true,
-    Country: true,
+    readiness: true,
+    country_of_origin: true,
     technical_specification: true,
     asset_accessories: {
       include: {
-        Accessory: true,
+        accessory: true,
       },
     },
     asset_errors: {
@@ -108,11 +108,11 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     meterBlack: dbAsset.technical_specification?.meter_black ?? 0,
     meterColour: dbAsset.technical_specification?.meter_colour ?? 0,
     cassettes: dbAsset.technical_specification?.cassettes ?? 0,
-    readiness: dbAsset.Readiness,
-    countryOfOrigin: dbAsset.Country,
+    readiness: dbAsset.readiness,
+    countryOfOrigin: dbAsset.country_of_origin,
     manufacturedYear: dbAsset.manufactured_year,
     componentId: dbAsset.technical_specification?.component_id ?? null,
-    coreFunctions: dbAsset.asset_accessories.map((ac) => ac.Accessory),
+    coreFunctions: dbAsset.asset_accessories.map((ac) => ac.accessory),
     drumLifeC: dbAsset.technical_specification?.drum_life_c ?? 0,
     drumLifeM: dbAsset.technical_specification?.drum_life_m ?? 0,
     drumLifeY: dbAsset.technical_specification?.drum_life_y ?? 0,
@@ -220,11 +220,11 @@ function mapInputAssetToPrismaCreateAsset(
     barcode,
     serial_number: asset.serialNumber,
     model: { connect: { id: asset.model.id } },
-    Location: { connect: { id: locationId } },
+    location: { connect: { id: locationId } },
     created_at: currentDateTime,
-    Status: { connect: { status: arrivalStatus } },
-    Readiness: { connect: { id: asset.readiness.id } },
-    Country: { connect: { id: asset.countryOfOrigin.id } },
+    status: { connect: { status: arrivalStatus } },
+    readiness: { connect: { id: asset.readiness.id } },
+    country_of_origin: { connect: { id: asset.countryOfOrigin.id } },
     manufactured_year: asset.manufacturedYear,
     asset_accessories: {
       create: asset.coreFunctions.map((c) => ({ accessory_id: c.id })),

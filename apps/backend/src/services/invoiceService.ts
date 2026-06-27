@@ -8,21 +8,21 @@ import {
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
+import { mapAssetSummary } from '../lib/asset-mappers.js'
+import {
+  addRemoveCollectionFromAssets,
+  assertAssetsNotInCollection,
+  recordCollectionAssetDelta,
+} from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { prisma } from '../prisma.js'
 import {
   recordAssetUpdateOnCollection,
   recordCollectionUpdateOnAssets,
   recordInvoiceCreate,
   recordInvoiceUpdate,
 } from './historyService.js'
-import {
-  addRemoveCollectionFromAssets,
-  assertAssetsNotInCollection,
-  recordCollectionAssetDelta,
-} from '../lib/collection-assets.js'
-import { prisma } from '../prisma.js'
 
 const INVOICE_NUMBER_PREFIX = 'I-'
 const INVOICE_NUMBER_PAD = 7
@@ -158,11 +158,11 @@ export async function addRemoveCollectionFromAssetsAndRecord(
 ): Promise<void> {
   const invoice = await prisma.invoice.findUnique({
     where: { invoice_number: invoiceNumber },
-    select: { id: true, InvoiceType: { select: { type: true } } },
+    select: { id: true, invoice_type: { select: { type: true } } },
   })
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
 
-  const link = invoiceAssetLink(invoice.InvoiceType.type, invoice.id)
+  const link = invoiceAssetLink(invoice.invoice_type.type, invoice.id)
 
   await prisma.$transaction((tx) =>
     addRemoveCollectionFromAssets(tx, {
@@ -193,7 +193,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       include: {
         updated_by: true,
         organization: true,
-        InvoiceType: true,
+        invoice_type: true,
       },
     }),
     prisma.$queryRawTyped(getAssetsForInvoice(invoiceNumber)),
@@ -202,7 +202,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
   return {
     invoice_number: invoice.invoice_number,
     invoice_reference: invoice.invoice_reference,
-    invoice_type: { id: invoice.InvoiceType.id, type: invoice.InvoiceType.type },
+    invoice_type: { id: invoice.invoice_type.id, type: invoice.invoice_type.type },
     is_cleared: invoice.is_cleared,
     created_at: invoice.created_at,
     created_by: {

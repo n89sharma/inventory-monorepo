@@ -261,13 +261,13 @@ async function resolveLocationParts(id: number | null | undefined): Promise<Loca
     select: {
       bin: true,
       warehouse: { select: { city_code: true } },
-      Zone: { select: { zone: true } },
+      zone: { select: { zone: true } },
     },
   })
   if (!r) return { warehouse: null, zone: null, bin: null }
   return {
     warehouse: r.warehouse?.city_code ?? null,
-    zone: r.Zone?.zone ?? null,
+    zone: r.zone?.zone ?? null,
     bin: r.bin ?? null,
   }
 }
@@ -845,12 +845,12 @@ export async function getCollectionHistory(
 ): Promise<CollectionHistory> {
   const rows = await prisma.history.findMany({
     where: { entity_type: entityType, entity_id: entityId },
-    include: { User: { select: { name: true } } },
+    include: { user: { select: { name: true } } },
     orderBy: { changed_on: 'desc' },
   })
   return rows.map((row) => ({
     action_type: row.action_type as CollectionHistoryRecord['action_type'],
-    user_name: row.User.name,
+    user_name: row.user.name,
     changed_on: row.changed_on,
     changes: row.changes,
   })) as CollectionHistory

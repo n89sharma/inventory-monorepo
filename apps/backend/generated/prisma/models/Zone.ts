@@ -192,13 +192,13 @@ export type ZoneWhereInput = {
   NOT?: Prisma.ZoneWhereInput | Prisma.ZoneWhereInput[]
   id?: Prisma.IntFilter<"Zone"> | number
   zone?: Prisma.StringFilter<"Zone"> | string
-  Location?: Prisma.LocationListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
 }
 
 export type ZoneOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   zone?: Prisma.SortOrder
-  Location?: Prisma.LocationOrderByRelationAggregateInput
+  locations?: Prisma.LocationOrderByRelationAggregateInput
 }
 
 export type ZoneWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type ZoneWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ZoneWhereInput | Prisma.ZoneWhereInput[]
   OR?: Prisma.ZoneWhereInput[]
   NOT?: Prisma.ZoneWhereInput | Prisma.ZoneWhereInput[]
-  Location?: Prisma.LocationListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
 }, "id" | "zone">
 
 export type ZoneOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type ZoneScalarWhereWithAggregatesInput = {
 
 export type ZoneCreateInput = {
   zone: string
-  Location?: Prisma.LocationCreateNestedManyWithoutZoneInput
+  locations?: Prisma.LocationCreateNestedManyWithoutZoneInput
 }
 
 export type ZoneUncheckedCreateInput = {
   id?: number
   zone: string
-  Location?: Prisma.LocationUncheckedCreateNestedManyWithoutZoneInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutZoneInput
 }
 
 export type ZoneUpdateInput = {
   zone?: Prisma.StringFieldUpdateOperationsInput | string
-  Location?: Prisma.LocationUpdateManyWithoutZoneNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutZoneNestedInput
 }
 
 export type ZoneUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   zone?: Prisma.StringFieldUpdateOperationsInput | string
-  Location?: Prisma.LocationUncheckedUpdateManyWithoutZoneNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutZoneNestedInput
 }
 
 export type ZoneCreateManyInput = {
@@ -292,50 +292,50 @@ export type ZoneSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type ZoneCreateNestedOneWithoutLocationInput = {
-  create?: Prisma.XOR<Prisma.ZoneCreateWithoutLocationInput, Prisma.ZoneUncheckedCreateWithoutLocationInput>
-  connectOrCreate?: Prisma.ZoneCreateOrConnectWithoutLocationInput
+export type ZoneCreateNestedOneWithoutLocationsInput = {
+  create?: Prisma.XOR<Prisma.ZoneCreateWithoutLocationsInput, Prisma.ZoneUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.ZoneCreateOrConnectWithoutLocationsInput
   connect?: Prisma.ZoneWhereUniqueInput
 }
 
-export type ZoneUpdateOneRequiredWithoutLocationNestedInput = {
-  create?: Prisma.XOR<Prisma.ZoneCreateWithoutLocationInput, Prisma.ZoneUncheckedCreateWithoutLocationInput>
-  connectOrCreate?: Prisma.ZoneCreateOrConnectWithoutLocationInput
-  upsert?: Prisma.ZoneUpsertWithoutLocationInput
+export type ZoneUpdateOneRequiredWithoutLocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ZoneCreateWithoutLocationsInput, Prisma.ZoneUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.ZoneCreateOrConnectWithoutLocationsInput
+  upsert?: Prisma.ZoneUpsertWithoutLocationsInput
   connect?: Prisma.ZoneWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ZoneUpdateToOneWithWhereWithoutLocationInput, Prisma.ZoneUpdateWithoutLocationInput>, Prisma.ZoneUncheckedUpdateWithoutLocationInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ZoneUpdateToOneWithWhereWithoutLocationsInput, Prisma.ZoneUpdateWithoutLocationsInput>, Prisma.ZoneUncheckedUpdateWithoutLocationsInput>
 }
 
-export type ZoneCreateWithoutLocationInput = {
+export type ZoneCreateWithoutLocationsInput = {
   zone: string
 }
 
-export type ZoneUncheckedCreateWithoutLocationInput = {
+export type ZoneUncheckedCreateWithoutLocationsInput = {
   id?: number
   zone: string
 }
 
-export type ZoneCreateOrConnectWithoutLocationInput = {
+export type ZoneCreateOrConnectWithoutLocationsInput = {
   where: Prisma.ZoneWhereUniqueInput
-  create: Prisma.XOR<Prisma.ZoneCreateWithoutLocationInput, Prisma.ZoneUncheckedCreateWithoutLocationInput>
+  create: Prisma.XOR<Prisma.ZoneCreateWithoutLocationsInput, Prisma.ZoneUncheckedCreateWithoutLocationsInput>
 }
 
-export type ZoneUpsertWithoutLocationInput = {
-  update: Prisma.XOR<Prisma.ZoneUpdateWithoutLocationInput, Prisma.ZoneUncheckedUpdateWithoutLocationInput>
-  create: Prisma.XOR<Prisma.ZoneCreateWithoutLocationInput, Prisma.ZoneUncheckedCreateWithoutLocationInput>
+export type ZoneUpsertWithoutLocationsInput = {
+  update: Prisma.XOR<Prisma.ZoneUpdateWithoutLocationsInput, Prisma.ZoneUncheckedUpdateWithoutLocationsInput>
+  create: Prisma.XOR<Prisma.ZoneCreateWithoutLocationsInput, Prisma.ZoneUncheckedCreateWithoutLocationsInput>
   where?: Prisma.ZoneWhereInput
 }
 
-export type ZoneUpdateToOneWithWhereWithoutLocationInput = {
+export type ZoneUpdateToOneWithWhereWithoutLocationsInput = {
   where?: Prisma.ZoneWhereInput
-  data: Prisma.XOR<Prisma.ZoneUpdateWithoutLocationInput, Prisma.ZoneUncheckedUpdateWithoutLocationInput>
+  data: Prisma.XOR<Prisma.ZoneUpdateWithoutLocationsInput, Prisma.ZoneUncheckedUpdateWithoutLocationsInput>
 }
 
-export type ZoneUpdateWithoutLocationInput = {
+export type ZoneUpdateWithoutLocationsInput = {
   zone?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ZoneUncheckedUpdateWithoutLocationInput = {
+export type ZoneUncheckedUpdateWithoutLocationsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   zone?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -346,11 +346,11 @@ export type ZoneUncheckedUpdateWithoutLocationInput = {
  */
 
 export type ZoneCountOutputType = {
-  Location: number
+  locations: number
 }
 
 export type ZoneCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Location?: boolean | ZoneCountOutputTypeCountLocationArgs
+  locations?: boolean | ZoneCountOutputTypeCountLocationsArgs
 }
 
 /**
@@ -366,7 +366,7 @@ export type ZoneCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * ZoneCountOutputType without action
  */
-export type ZoneCountOutputTypeCountLocationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type ZoneCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LocationWhereInput
 }
 
@@ -374,7 +374,7 @@ export type ZoneCountOutputTypeCountLocationArgs<ExtArgs extends runtime.Types.E
 export type ZoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   zone?: boolean
-  Location?: boolean | Prisma.Zone$LocationArgs<ExtArgs>
+  locations?: boolean | Prisma.Zone$locationsArgs<ExtArgs>
   _count?: boolean | Prisma.ZoneCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["zone"]>
 
@@ -395,7 +395,7 @@ export type ZoneSelectScalar = {
 
 export type ZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "zone", ExtArgs["result"]["zone"]>
 export type ZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Location?: boolean | Prisma.Zone$LocationArgs<ExtArgs>
+  locations?: boolean | Prisma.Zone$locationsArgs<ExtArgs>
   _count?: boolean | Prisma.ZoneCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ZoneIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -404,7 +404,7 @@ export type ZoneIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $ZonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Zone"
   objects: {
-    Location: Prisma.$LocationPayload<ExtArgs>[]
+    locations: Prisma.$LocationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -416,7 +416,7 @@ export type $ZonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type ZoneGetPayload<S extends boolean | null | undefined | ZoneDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ZonePayload, S>
 
 export type ZoneCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ZoneFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<ZoneFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ZoneCountAggregateInputType | true
   }
 
@@ -803,7 +803,7 @@ readonly fields: ZoneFieldRefs;
  */
 export interface Prisma__ZoneClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Location<T extends Prisma.Zone$LocationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Zone$LocationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  locations<T extends Prisma.Zone$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Zone$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -859,7 +859,6 @@ export type ZoneFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which Zone to fetch.
    */
   where: Prisma.ZoneWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -882,7 +881,6 @@ export type ZoneFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which Zone to fetch.
    */
   where: Prisma.ZoneWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -935,7 +933,6 @@ export type ZoneFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Zones.
    */
   distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -988,7 +985,6 @@ export type ZoneFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Zones.
    */
   distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1041,7 +1037,6 @@ export type ZoneFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter by unique combinations of Zones.
    */
   distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1064,7 +1059,6 @@ export type ZoneCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a Zone.
    */
   data: Prisma.XOR<Prisma.ZoneCreateInput, Prisma.ZoneUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1121,7 +1115,6 @@ export type ZoneUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which Zone to update.
    */
   where: Prisma.ZoneWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,7 +1189,6 @@ export type ZoneUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the Zone was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ZoneUpdateInput, Prisma.ZoneUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1211,6 @@ export type ZoneDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which Zone to delete.
    */
   where: Prisma.ZoneWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1237,9 +1228,9 @@ export type ZoneDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Zone.Location
+ * Zone.locations
  */
-export type Zone$LocationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Zone$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Location
    */

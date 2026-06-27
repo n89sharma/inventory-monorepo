@@ -268,10 +268,10 @@ export type HoldWhereInput = {
   from_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   archived_at?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
-  assets?: Prisma.AssetListRelationFilter
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   created_for?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   customer?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  assets?: Prisma.AssetListRelationFilter
 }
 
 export type HoldOrderByWithRelationInput = {
@@ -285,10 +285,10 @@ export type HoldOrderByWithRelationInput = {
   from_dt?: Prisma.SortOrderInput | Prisma.SortOrder
   to_dt?: Prisma.SortOrderInput | Prisma.SortOrder
   archived_at?: Prisma.SortOrderInput | Prisma.SortOrder
-  assets?: Prisma.AssetOrderByRelationAggregateInput
   created_by?: Prisma.UserOrderByWithRelationInput
   created_for?: Prisma.UserOrderByWithRelationInput
   customer?: Prisma.OrganizationOrderByWithRelationInput
+  assets?: Prisma.AssetOrderByRelationAggregateInput
 }
 
 export type HoldWhereUniqueInput = Prisma.AtLeast<{
@@ -305,10 +305,10 @@ export type HoldWhereUniqueInput = Prisma.AtLeast<{
   from_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   to_dt?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
   archived_at?: Prisma.DateTimeNullableFilter<"Hold"> | Date | string | null
-  assets?: Prisma.AssetListRelationFilter
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   created_for?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   customer?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  assets?: Prisma.AssetListRelationFilter
 }, "id" | "hold_number">
 
 export type HoldOrderByWithAggregationInput = {
@@ -352,10 +352,10 @@ export type HoldCreateInput = {
   from_dt?: Date | string | null
   to_dt?: Date | string | null
   archived_at?: Date | string | null
-  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
+  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
 }
 
 export type HoldUncheckedCreateInput = {
@@ -379,10 +379,10 @@ export type HoldUpdateInput = {
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
 }
 
 export type HoldUncheckedUpdateInput = {
@@ -717,9 +717,9 @@ export type HoldCreateWithoutCreated_byInput = {
   from_dt?: Date | string | null
   to_dt?: Date | string | null
   archived_at?: Date | string | null
-  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
+  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
 }
 
 export type HoldUncheckedCreateWithoutCreated_byInput = {
@@ -752,9 +752,9 @@ export type HoldCreateWithoutCreated_forInput = {
   from_dt?: Date | string | null
   to_dt?: Date | string | null
   archived_at?: Date | string | null
-  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   customer: Prisma.OrganizationCreateNestedOneWithoutHoldsInput
+  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
 }
 
 export type HoldUncheckedCreateWithoutCreated_forInput = {
@@ -835,9 +835,9 @@ export type HoldCreateWithoutCustomerInput = {
   from_dt?: Date | string | null
   to_dt?: Date | string | null
   archived_at?: Date | string | null
-  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
   created_by: Prisma.UserCreateNestedOneWithoutHolds_createdInput
   created_for: Prisma.UserCreateNestedOneWithoutHolds_forInput
+  assets?: Prisma.AssetCreateNestedManyWithoutHoldInput
 }
 
 export type HoldUncheckedCreateWithoutCustomerInput = {
@@ -910,9 +910,9 @@ export type HoldUpdateWithoutCreated_byInput = {
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
 }
 
 export type HoldUncheckedUpdateWithoutCreated_byInput = {
@@ -947,9 +947,9 @@ export type HoldUpdateWithoutCreated_forInput = {
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   customer?: Prisma.OrganizationUpdateOneRequiredWithoutHoldsNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
 }
 
 export type HoldUncheckedUpdateWithoutCreated_forInput = {
@@ -996,9 +996,9 @@ export type HoldUpdateWithoutCustomerInput = {
   from_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   to_dt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
   created_by?: Prisma.UserUpdateOneRequiredWithoutHolds_createdNestedInput
   created_for?: Prisma.UserUpdateOneRequiredWithoutHolds_forNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutHoldNestedInput
 }
 
 export type HoldUncheckedUpdateWithoutCustomerInput = {
@@ -1068,10 +1068,10 @@ export type HoldSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   from_dt?: boolean
   to_dt?: boolean
   archived_at?: boolean
-  assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   created_for?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.HoldCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["hold"]>
 
@@ -1122,10 +1122,10 @@ export type HoldSelectScalar = {
 
 export type HoldOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "hold_number" | "created_by_id" | "created_for_id" | "customer_id" | "notes" | "created_at" | "from_dt" | "to_dt" | "archived_at", ExtArgs["result"]["hold"]>
 export type HoldInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   created_for?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  assets?: boolean | Prisma.Hold$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.HoldCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type HoldIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1142,10 +1142,10 @@ export type HoldIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $HoldPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Hold"
   objects: {
-    assets: Prisma.$AssetPayload<ExtArgs>[]
     created_by: Prisma.$UserPayload<ExtArgs>
     created_for: Prisma.$UserPayload<ExtArgs>
     customer: Prisma.$OrganizationPayload<ExtArgs>
+    assets: Prisma.$AssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1165,7 +1165,7 @@ export type $HoldPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type HoldGetPayload<S extends boolean | null | undefined | HoldDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$HoldPayload, S>
 
 export type HoldCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<HoldFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<HoldFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: HoldCountAggregateInputType | true
   }
 
@@ -1552,10 +1552,10 @@ readonly fields: HoldFieldRefs;
  */
 export interface Prisma__HoldClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  assets<T extends Prisma.Hold$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Hold$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   created_for<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   customer<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assets<T extends Prisma.Hold$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Hold$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1619,7 +1619,6 @@ export type HoldFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which Hold to fetch.
    */
   where: Prisma.HoldWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1642,7 +1641,6 @@ export type HoldFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which Hold to fetch.
    */
   where: Prisma.HoldWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1695,7 +1693,6 @@ export type HoldFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Holds.
    */
   distinct?: Prisma.HoldScalarFieldEnum | Prisma.HoldScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1748,7 +1745,6 @@ export type HoldFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Holds.
    */
   distinct?: Prisma.HoldScalarFieldEnum | Prisma.HoldScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1801,7 +1797,6 @@ export type HoldFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter by unique combinations of Holds.
    */
   distinct?: Prisma.HoldScalarFieldEnum | Prisma.HoldScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1824,7 +1819,6 @@ export type HoldCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a Hold.
    */
   data: Prisma.XOR<Prisma.HoldCreateInput, Prisma.HoldUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1885,7 +1879,6 @@ export type HoldUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which Hold to update.
    */
   where: Prisma.HoldWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1964,7 +1957,6 @@ export type HoldUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the Hold was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.HoldUpdateInput, Prisma.HoldUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1987,7 +1979,6 @@ export type HoldDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which Hold to delete.
    */
   where: Prisma.HoldWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

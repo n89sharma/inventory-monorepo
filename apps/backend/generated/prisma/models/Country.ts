@@ -192,13 +192,13 @@ export type CountryWhereInput = {
   NOT?: Prisma.CountryWhereInput | Prisma.CountryWhereInput[]
   id?: Prisma.IntFilter<"Country"> | number
   name?: Prisma.StringFilter<"Country"> | string
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }
 
 export type CountryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  Asset?: Prisma.AssetOrderByRelationAggregateInput
+  assets?: Prisma.AssetOrderByRelationAggregateInput
 }
 
 export type CountryWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type CountryWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.CountryWhereInput[]
   NOT?: Prisma.CountryWhereInput | Prisma.CountryWhereInput[]
   name?: Prisma.StringFilter<"Country"> | string
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }, "id">
 
 export type CountryOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type CountryScalarWhereWithAggregatesInput = {
 
 export type CountryCreateInput = {
   name: string
-  Asset?: Prisma.AssetCreateNestedManyWithoutCountryInput
+  assets?: Prisma.AssetCreateNestedManyWithoutCountry_of_originInput
 }
 
 export type CountryUncheckedCreateInput = {
   id?: number
   name: string
-  Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutCountryInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutCountry_of_originInput
 }
 
 export type CountryUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUpdateManyWithoutCountryNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutCountry_of_originNestedInput
 }
 
 export type CountryUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUncheckedUpdateManyWithoutCountryNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutCountry_of_originNestedInput
 }
 
 export type CountryCreateManyInput = {
@@ -262,11 +262,6 @@ export type CountryUpdateManyMutationInput = {
 export type CountryUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-}
-
-export type CountryNullableScalarRelationFilter = {
-  is?: Prisma.CountryWhereInput | null
-  isNot?: Prisma.CountryWhereInput | null
 }
 
 export type CountryCountOrderByAggregateInput = {
@@ -292,52 +287,57 @@ export type CountrySumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type CountryCreateNestedOneWithoutAssetInput = {
-  create?: Prisma.XOR<Prisma.CountryCreateWithoutAssetInput, Prisma.CountryUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.CountryCreateOrConnectWithoutAssetInput
+export type CountryNullableScalarRelationFilter = {
+  is?: Prisma.CountryWhereInput | null
+  isNot?: Prisma.CountryWhereInput | null
+}
+
+export type CountryCreateNestedOneWithoutAssetsInput = {
+  create?: Prisma.XOR<Prisma.CountryCreateWithoutAssetsInput, Prisma.CountryUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.CountryCreateOrConnectWithoutAssetsInput
   connect?: Prisma.CountryWhereUniqueInput
 }
 
-export type CountryUpdateOneWithoutAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.CountryCreateWithoutAssetInput, Prisma.CountryUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.CountryCreateOrConnectWithoutAssetInput
-  upsert?: Prisma.CountryUpsertWithoutAssetInput
+export type CountryUpdateOneWithoutAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.CountryCreateWithoutAssetsInput, Prisma.CountryUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.CountryCreateOrConnectWithoutAssetsInput
+  upsert?: Prisma.CountryUpsertWithoutAssetsInput
   disconnect?: Prisma.CountryWhereInput | boolean
   delete?: Prisma.CountryWhereInput | boolean
   connect?: Prisma.CountryWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CountryUpdateToOneWithWhereWithoutAssetInput, Prisma.CountryUpdateWithoutAssetInput>, Prisma.CountryUncheckedUpdateWithoutAssetInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CountryUpdateToOneWithWhereWithoutAssetsInput, Prisma.CountryUpdateWithoutAssetsInput>, Prisma.CountryUncheckedUpdateWithoutAssetsInput>
 }
 
-export type CountryCreateWithoutAssetInput = {
+export type CountryCreateWithoutAssetsInput = {
   name: string
 }
 
-export type CountryUncheckedCreateWithoutAssetInput = {
+export type CountryUncheckedCreateWithoutAssetsInput = {
   id?: number
   name: string
 }
 
-export type CountryCreateOrConnectWithoutAssetInput = {
+export type CountryCreateOrConnectWithoutAssetsInput = {
   where: Prisma.CountryWhereUniqueInput
-  create: Prisma.XOR<Prisma.CountryCreateWithoutAssetInput, Prisma.CountryUncheckedCreateWithoutAssetInput>
+  create: Prisma.XOR<Prisma.CountryCreateWithoutAssetsInput, Prisma.CountryUncheckedCreateWithoutAssetsInput>
 }
 
-export type CountryUpsertWithoutAssetInput = {
-  update: Prisma.XOR<Prisma.CountryUpdateWithoutAssetInput, Prisma.CountryUncheckedUpdateWithoutAssetInput>
-  create: Prisma.XOR<Prisma.CountryCreateWithoutAssetInput, Prisma.CountryUncheckedCreateWithoutAssetInput>
+export type CountryUpsertWithoutAssetsInput = {
+  update: Prisma.XOR<Prisma.CountryUpdateWithoutAssetsInput, Prisma.CountryUncheckedUpdateWithoutAssetsInput>
+  create: Prisma.XOR<Prisma.CountryCreateWithoutAssetsInput, Prisma.CountryUncheckedCreateWithoutAssetsInput>
   where?: Prisma.CountryWhereInput
 }
 
-export type CountryUpdateToOneWithWhereWithoutAssetInput = {
+export type CountryUpdateToOneWithWhereWithoutAssetsInput = {
   where?: Prisma.CountryWhereInput
-  data: Prisma.XOR<Prisma.CountryUpdateWithoutAssetInput, Prisma.CountryUncheckedUpdateWithoutAssetInput>
+  data: Prisma.XOR<Prisma.CountryUpdateWithoutAssetsInput, Prisma.CountryUncheckedUpdateWithoutAssetsInput>
 }
 
-export type CountryUpdateWithoutAssetInput = {
+export type CountryUpdateWithoutAssetsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type CountryUncheckedUpdateWithoutAssetInput = {
+export type CountryUncheckedUpdateWithoutAssetsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -348,11 +348,11 @@ export type CountryUncheckedUpdateWithoutAssetInput = {
  */
 
 export type CountryCountOutputType = {
-  Asset: number
+  assets: number
 }
 
 export type CountryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | CountryCountOutputTypeCountAssetArgs
+  assets?: boolean | CountryCountOutputTypeCountAssetsArgs
 }
 
 /**
@@ -368,7 +368,7 @@ export type CountryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
 /**
  * CountryCountOutputType without action
  */
-export type CountryCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type CountryCountOutputTypeCountAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetWhereInput
 }
 
@@ -376,7 +376,7 @@ export type CountryCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.E
 export type CountrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  Asset?: boolean | Prisma.Country$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Country$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.CountryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["country"]>
 
@@ -397,7 +397,7 @@ export type CountrySelectScalar = {
 
 export type CountryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["country"]>
 export type CountryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.Country$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Country$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.CountryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CountryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -406,7 +406,7 @@ export type CountryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type $CountryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Country"
   objects: {
-    Asset: Prisma.$AssetPayload<ExtArgs>[]
+    assets: Prisma.$AssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -418,7 +418,7 @@ export type $CountryPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type CountryGetPayload<S extends boolean | null | undefined | CountryDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CountryPayload, S>
 
 export type CountryCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CountryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<CountryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: CountryCountAggregateInputType | true
   }
 
@@ -805,7 +805,7 @@ readonly fields: CountryFieldRefs;
  */
 export interface Prisma__CountryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Asset<T extends Prisma.Country$AssetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Country$AssetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assets<T extends Prisma.Country$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Country$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -861,7 +861,6 @@ export type CountryFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which Country to fetch.
    */
   where: Prisma.CountryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -884,7 +883,6 @@ export type CountryFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which Country to fetch.
    */
   where: Prisma.CountryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -937,7 +935,6 @@ export type CountryFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of Countries.
    */
   distinct?: Prisma.CountryScalarFieldEnum | Prisma.CountryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -990,7 +987,6 @@ export type CountryFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of Countries.
    */
   distinct?: Prisma.CountryScalarFieldEnum | Prisma.CountryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1043,7 +1039,6 @@ export type CountryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Countries.
    */
   distinct?: Prisma.CountryScalarFieldEnum | Prisma.CountryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,7 +1061,6 @@ export type CountryCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a Country.
    */
   data: Prisma.XOR<Prisma.CountryCreateInput, Prisma.CountryUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1123,7 +1117,6 @@ export type CountryUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which Country to update.
    */
   where: Prisma.CountryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1198,7 +1191,6 @@ export type CountryUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the Country was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CountryUpdateInput, Prisma.CountryUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1221,7 +1213,6 @@ export type CountryDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which Country to delete.
    */
   where: Prisma.CountryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1239,9 +1230,9 @@ export type CountryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * Country.Asset
+ * Country.assets
  */
-export type Country$AssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Country$assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Asset
    */

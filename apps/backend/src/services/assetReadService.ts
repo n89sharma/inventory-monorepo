@@ -1,26 +1,26 @@
+import { endOfDay, startOfDay } from 'date-fns'
 import {
+  ASSET_STATUS,
   AssetDetails,
   AssetError,
+  AssetHarvestedPart,
   AssetHistory,
   AssetHistoryRecord,
-  AssetSearchRow,
   AssetsBySerialNumberResult,
+  AssetSearchRow,
   AssetTransfer,
   Comment,
-  AssetHarvestedPart,
-  ASSET_STATUS,
   ROLE_PERMISSIONS,
   type AppRole,
 } from 'shared-types'
-import { startOfDay, endOfDay } from 'date-fns'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
   getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
   getAssetSalvagedParts as getAssetSalvagedPartsQuery,
-  getAssets as getAssetsQuery,
   getAssetsBySerialNumber as getAssetsBySerialNumberQuery,
+  getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
   getSoldAssets as getSoldAssetsQuery,
 } from '../../generated/prisma/sql.js'
@@ -284,7 +284,7 @@ export async function getAssetHistory(
 
   const rows = await prisma.history.findMany({
     where: { entity_type: { in: entityTypes }, entity_id: asset.id },
-    include: { User: { select: { name: true } } },
+    include: { user: { select: { name: true } } },
     orderBy: { changed_on: 'desc' },
   })
 
@@ -292,7 +292,7 @@ export async function getAssetHistory(
     (row) =>
       ({
         action_type: row.action_type as 'CREATE' | 'UPDATE',
-        user_name: row.User.name,
+        user_name: row.user.name,
         changed_on: row.changed_on,
         changes: row.changes as AssetHistoryRecord['changes'],
       }) as AssetHistoryRecord,

@@ -33,8 +33,8 @@ export type StoreTransactionAvgAggregateOutputType = {
   quantity: number | null
   unit_cost: runtime.Decimal | null
   departure_id: number | null
-  created_by_id: number | null
   warehouse_id: number | null
+  created_by_id: number | null
 }
 
 export type StoreTransactionSumAggregateOutputType = {
@@ -44,50 +44,50 @@ export type StoreTransactionSumAggregateOutputType = {
   quantity: number | null
   unit_cost: runtime.Decimal | null
   departure_id: number | null
-  created_by_id: number | null
   warehouse_id: number | null
+  created_by_id: number | null
 }
 
 export type StoreTransactionMinAggregateOutputType = {
   id: number | null
+  store_transaction_number: string | null
   store_part_id: number | null
   transaction_type_id: number | null
   quantity: number | null
   unit_cost: runtime.Decimal | null
   departure_id: number | null
+  warehouse_id: number | null
   created_by_id: number | null
   created_at: Date | null
   notes: string | null
-  store_transaction_number: string | null
-  warehouse_id: number | null
 }
 
 export type StoreTransactionMaxAggregateOutputType = {
   id: number | null
+  store_transaction_number: string | null
   store_part_id: number | null
   transaction_type_id: number | null
   quantity: number | null
   unit_cost: runtime.Decimal | null
   departure_id: number | null
+  warehouse_id: number | null
   created_by_id: number | null
   created_at: Date | null
   notes: string | null
-  store_transaction_number: string | null
-  warehouse_id: number | null
 }
 
 export type StoreTransactionCountAggregateOutputType = {
   id: number
+  store_transaction_number: number
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost: number
   departure_id: number
+  warehouse_id: number
   created_by_id: number
   created_at: number
   notes: number
-  store_transaction_number: number
-  warehouse_id: number
   _all: number
 }
 
@@ -99,8 +99,8 @@ export type StoreTransactionAvgAggregateInputType = {
   quantity?: true
   unit_cost?: true
   departure_id?: true
-  created_by_id?: true
   warehouse_id?: true
+  created_by_id?: true
 }
 
 export type StoreTransactionSumAggregateInputType = {
@@ -110,50 +110,50 @@ export type StoreTransactionSumAggregateInputType = {
   quantity?: true
   unit_cost?: true
   departure_id?: true
-  created_by_id?: true
   warehouse_id?: true
+  created_by_id?: true
 }
 
 export type StoreTransactionMinAggregateInputType = {
   id?: true
+  store_transaction_number?: true
   store_part_id?: true
   transaction_type_id?: true
   quantity?: true
   unit_cost?: true
   departure_id?: true
+  warehouse_id?: true
   created_by_id?: true
   created_at?: true
   notes?: true
-  store_transaction_number?: true
-  warehouse_id?: true
 }
 
 export type StoreTransactionMaxAggregateInputType = {
   id?: true
+  store_transaction_number?: true
   store_part_id?: true
   transaction_type_id?: true
   quantity?: true
   unit_cost?: true
   departure_id?: true
+  warehouse_id?: true
   created_by_id?: true
   created_at?: true
   notes?: true
-  store_transaction_number?: true
-  warehouse_id?: true
 }
 
 export type StoreTransactionCountAggregateInputType = {
   id?: true
+  store_transaction_number?: true
   store_part_id?: true
   transaction_type_id?: true
   quantity?: true
   unit_cost?: true
   departure_id?: true
+  warehouse_id?: true
   created_by_id?: true
   created_at?: true
   notes?: true
-  store_transaction_number?: true
-  warehouse_id?: true
   _all?: true
 }
 
@@ -245,16 +245,16 @@ export type StoreTransactionGroupByArgs<ExtArgs extends runtime.Types.Extensions
 
 export type StoreTransactionGroupByOutputType = {
   id: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost: runtime.Decimal | null
   departure_id: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date
   notes: string | null
-  store_transaction_number: string
-  warehouse_id: number
   _count: StoreTransactionCountAggregateOutputType | null
   _avg: StoreTransactionAvgAggregateOutputType | null
   _sum: StoreTransactionSumAggregateOutputType | null
@@ -282,42 +282,42 @@ export type StoreTransactionWhereInput = {
   OR?: Prisma.StoreTransactionWhereInput[]
   NOT?: Prisma.StoreTransactionWhereInput | Prisma.StoreTransactionWhereInput[]
   id?: Prisma.IntFilter<"StoreTransaction"> | number
+  store_transaction_number?: Prisma.StringFilter<"StoreTransaction"> | string
   store_part_id?: Prisma.IntFilter<"StoreTransaction"> | number
   transaction_type_id?: Prisma.IntFilter<"StoreTransaction"> | number
   quantity?: Prisma.IntFilter<"StoreTransaction"> | number
   unit_cost?: Prisma.DecimalNullableFilter<"StoreTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.IntNullableFilter<"StoreTransaction"> | number | null
+  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
   created_by_id?: Prisma.IntFilter<"StoreTransaction"> | number
   created_at?: Prisma.DateTimeFilter<"StoreTransaction"> | Date | string
   notes?: Prisma.StringNullableFilter<"StoreTransaction"> | string | null
-  store_transaction_number?: Prisma.StringFilter<"StoreTransaction"> | string
-  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
-  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  Departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
-  StorePart?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
-  StoreTransactionType?: Prisma.XOR<Prisma.StoreTransactionTypeScalarRelationFilter, Prisma.StoreTransactionTypeWhereInput>
-  Warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  store_part?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
+  transaction_type?: Prisma.XOR<Prisma.StoreTransactionTypeScalarRelationFilter, Prisma.StoreTransactionTypeWhereInput>
+  departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  asset_store_parts?: Prisma.AssetStorePartListRelationFilter
 }
 
 export type StoreTransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  store_transaction_number?: Prisma.SortOrder
   store_part_id?: Prisma.SortOrder
   transaction_type_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   departure_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  warehouse_id?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  store_transaction_number?: Prisma.SortOrder
-  warehouse_id?: Prisma.SortOrder
-  AssetStorePart?: Prisma.AssetStorePartOrderByRelationAggregateInput
-  User?: Prisma.UserOrderByWithRelationInput
-  Departure?: Prisma.DepartureOrderByWithRelationInput
-  StorePart?: Prisma.StorePartOrderByWithRelationInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeOrderByWithRelationInput
-  Warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  store_part?: Prisma.StorePartOrderByWithRelationInput
+  transaction_type?: Prisma.StoreTransactionTypeOrderByWithRelationInput
+  departure?: Prisma.DepartureOrderByWithRelationInput
+  created_by?: Prisma.UserOrderByWithRelationInput
+  asset_store_parts?: Prisma.AssetStorePartOrderByRelationAggregateInput
 }
 
 export type StoreTransactionWhereUniqueInput = Prisma.AtLeast<{
@@ -331,30 +331,30 @@ export type StoreTransactionWhereUniqueInput = Prisma.AtLeast<{
   quantity?: Prisma.IntFilter<"StoreTransaction"> | number
   unit_cost?: Prisma.DecimalNullableFilter<"StoreTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.IntNullableFilter<"StoreTransaction"> | number | null
+  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
   created_by_id?: Prisma.IntFilter<"StoreTransaction"> | number
   created_at?: Prisma.DateTimeFilter<"StoreTransaction"> | Date | string
   notes?: Prisma.StringNullableFilter<"StoreTransaction"> | string | null
-  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
-  AssetStorePart?: Prisma.AssetStorePartListRelationFilter
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  Departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
-  StorePart?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
-  StoreTransactionType?: Prisma.XOR<Prisma.StoreTransactionTypeScalarRelationFilter, Prisma.StoreTransactionTypeWhereInput>
-  Warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  warehouse?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
+  store_part?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
+  transaction_type?: Prisma.XOR<Prisma.StoreTransactionTypeScalarRelationFilter, Prisma.StoreTransactionTypeWhereInput>
+  departure?: Prisma.XOR<Prisma.DepartureNullableScalarRelationFilter, Prisma.DepartureWhereInput> | null
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  asset_store_parts?: Prisma.AssetStorePartListRelationFilter
 }, "id" | "store_transaction_number">
 
 export type StoreTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  store_transaction_number?: Prisma.SortOrder
   store_part_id?: Prisma.SortOrder
   transaction_type_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   departure_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  warehouse_id?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  store_transaction_number?: Prisma.SortOrder
-  warehouse_id?: Prisma.SortOrder
   _count?: Prisma.StoreTransactionCountOrderByAggregateInput
   _avg?: Prisma.StoreTransactionAvgOrderByAggregateInput
   _max?: Prisma.StoreTransactionMaxOrderByAggregateInput
@@ -367,110 +367,110 @@ export type StoreTransactionScalarWhereWithAggregatesInput = {
   OR?: Prisma.StoreTransactionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.StoreTransactionScalarWhereWithAggregatesInput | Prisma.StoreTransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
+  store_transaction_number?: Prisma.StringWithAggregatesFilter<"StoreTransaction"> | string
   store_part_id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
   transaction_type_id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
   quantity?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
   unit_cost?: Prisma.DecimalNullableWithAggregatesFilter<"StoreTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.IntNullableWithAggregatesFilter<"StoreTransaction"> | number | null
+  warehouse_id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
   created_by_id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"StoreTransaction"> | Date | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"StoreTransaction"> | string | null
-  store_transaction_number?: Prisma.StringWithAggregatesFilter<"StoreTransaction"> | string
-  warehouse_id?: Prisma.IntWithAggregatesFilter<"StoreTransaction"> | number
 }
 
 export type StoreTransactionCreateInput = {
+  store_transaction_number: string
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
 }
 
 export type StoreTransactionUncheckedCreateInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
 }
 
 export type StoreTransactionUpdateInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionCreateManyInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
 }
 
 export type StoreTransactionUpdateManyMutationInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type StoreTransactionUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StoreTransactionListRelationFilter = {
@@ -483,23 +483,18 @@ export type StoreTransactionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type StoreTransactionScalarRelationFilter = {
-  is?: Prisma.StoreTransactionWhereInput
-  isNot?: Prisma.StoreTransactionWhereInput
-}
-
 export type StoreTransactionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  store_transaction_number?: Prisma.SortOrder
   store_part_id?: Prisma.SortOrder
   transaction_type_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   departure_id?: Prisma.SortOrder
+  warehouse_id?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  store_transaction_number?: Prisma.SortOrder
-  warehouse_id?: Prisma.SortOrder
 }
 
 export type StoreTransactionAvgOrderByAggregateInput = {
@@ -509,36 +504,36 @@ export type StoreTransactionAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   departure_id?: Prisma.SortOrder
-  created_by_id?: Prisma.SortOrder
   warehouse_id?: Prisma.SortOrder
+  created_by_id?: Prisma.SortOrder
 }
 
 export type StoreTransactionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  store_transaction_number?: Prisma.SortOrder
   store_part_id?: Prisma.SortOrder
   transaction_type_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   departure_id?: Prisma.SortOrder
+  warehouse_id?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  store_transaction_number?: Prisma.SortOrder
-  warehouse_id?: Prisma.SortOrder
 }
 
 export type StoreTransactionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  store_transaction_number?: Prisma.SortOrder
   store_part_id?: Prisma.SortOrder
   transaction_type_id?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   departure_id?: Prisma.SortOrder
+  warehouse_id?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   notes?: Prisma.SortOrder
-  store_transaction_number?: Prisma.SortOrder
-  warehouse_id?: Prisma.SortOrder
 }
 
 export type StoreTransactionSumOrderByAggregateInput = {
@@ -548,8 +543,111 @@ export type StoreTransactionSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   unit_cost?: Prisma.SortOrder
   departure_id?: Prisma.SortOrder
-  created_by_id?: Prisma.SortOrder
   warehouse_id?: Prisma.SortOrder
+  created_by_id?: Prisma.SortOrder
+}
+
+export type StoreTransactionScalarRelationFilter = {
+  is?: Prisma.StoreTransactionWhereInput
+  isNot?: Prisma.StoreTransactionWhereInput
+}
+
+export type StoreTransactionCreateNestedManyWithoutStore_partInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput> | Prisma.StoreTransactionCreateWithoutStore_partInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput | Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput[]
+  createMany?: Prisma.StoreTransactionCreateManyStore_partInputEnvelope
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+}
+
+export type StoreTransactionUncheckedCreateNestedManyWithoutStore_partInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput> | Prisma.StoreTransactionCreateWithoutStore_partInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput | Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput[]
+  createMany?: Prisma.StoreTransactionCreateManyStore_partInputEnvelope
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+}
+
+export type StoreTransactionUpdateManyWithoutStore_partNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput> | Prisma.StoreTransactionCreateWithoutStore_partInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput | Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStore_partInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStore_partInput[]
+  createMany?: Prisma.StoreTransactionCreateManyStore_partInputEnvelope
+  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStore_partInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStore_partInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStore_partInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStore_partInput[]
+  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+}
+
+export type StoreTransactionUncheckedUpdateManyWithoutStore_partNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput> | Prisma.StoreTransactionCreateWithoutStore_partInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput | Prisma.StoreTransactionCreateOrConnectWithoutStore_partInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStore_partInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStore_partInput[]
+  createMany?: Prisma.StoreTransactionCreateManyStore_partInputEnvelope
+  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStore_partInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStore_partInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStore_partInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStore_partInput[]
+  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+}
+
+export type StoreTransactionCreateNestedManyWithoutTransaction_typeInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput> | Prisma.StoreTransactionCreateWithoutTransaction_typeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput | Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput[]
+  createMany?: Prisma.StoreTransactionCreateManyTransaction_typeInputEnvelope
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+}
+
+export type StoreTransactionUncheckedCreateNestedManyWithoutTransaction_typeInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput> | Prisma.StoreTransactionCreateWithoutTransaction_typeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput | Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput[]
+  createMany?: Prisma.StoreTransactionCreateManyTransaction_typeInputEnvelope
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+}
+
+export type StoreTransactionUpdateManyWithoutTransaction_typeNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput> | Prisma.StoreTransactionCreateWithoutTransaction_typeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput | Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutTransaction_typeInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutTransaction_typeInput[]
+  createMany?: Prisma.StoreTransactionCreateManyTransaction_typeInputEnvelope
+  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutTransaction_typeInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutTransaction_typeInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutTransaction_typeInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutTransaction_typeInput[]
+  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+}
+
+export type StoreTransactionUncheckedUpdateManyWithoutTransaction_typeNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput> | Prisma.StoreTransactionCreateWithoutTransaction_typeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput | Prisma.StoreTransactionCreateOrConnectWithoutTransaction_typeInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutTransaction_typeInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutTransaction_typeInput[]
+  createMany?: Prisma.StoreTransactionCreateManyTransaction_typeInputEnvelope
+  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutTransaction_typeInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutTransaction_typeInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutTransaction_typeInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutTransaction_typeInput[]
+  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+}
+
+export type StoreTransactionCreateNestedOneWithoutAsset_store_partsInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedCreateWithoutAsset_store_partsInput>
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutAsset_store_partsInput
+  connect?: Prisma.StoreTransactionWhereUniqueInput
+}
+
+export type StoreTransactionUpdateOneRequiredWithoutAsset_store_partsNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedCreateWithoutAsset_store_partsInput>
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutAsset_store_partsInput
+  upsert?: Prisma.StoreTransactionUpsertWithoutAsset_store_partsInput
+  connect?: Prisma.StoreTransactionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StoreTransactionUpdateToOneWithWhereWithoutAsset_store_partsInput, Prisma.StoreTransactionUpdateWithoutAsset_store_partsInput>, Prisma.StoreTransactionUncheckedUpdateWithoutAsset_store_partsInput>
 }
 
 export type StoreTransactionCreateNestedManyWithoutDepartureInput = {
@@ -636,171 +734,266 @@ export type StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput = {
   deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
 }
 
-export type StoreTransactionCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput> | Prisma.StoreTransactionCreateWithoutUserInput[] | Prisma.StoreTransactionUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutUserInput | Prisma.StoreTransactionCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.StoreTransactionCreateManyUserInputEnvelope
+export type StoreTransactionCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput> | Prisma.StoreTransactionCreateWithoutCreated_byInput[] | Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput | Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.StoreTransactionCreateManyCreated_byInputEnvelope
   connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
 }
 
-export type StoreTransactionUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput> | Prisma.StoreTransactionCreateWithoutUserInput[] | Prisma.StoreTransactionUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutUserInput | Prisma.StoreTransactionCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.StoreTransactionCreateManyUserInputEnvelope
+export type StoreTransactionUncheckedCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput> | Prisma.StoreTransactionCreateWithoutCreated_byInput[] | Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput | Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.StoreTransactionCreateManyCreated_byInputEnvelope
   connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
 }
 
-export type StoreTransactionUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput> | Prisma.StoreTransactionCreateWithoutUserInput[] | Prisma.StoreTransactionUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutUserInput | Prisma.StoreTransactionCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutUserInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.StoreTransactionCreateManyUserInputEnvelope
+export type StoreTransactionUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput> | Prisma.StoreTransactionCreateWithoutCreated_byInput[] | Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput | Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.StoreTransactionCreateManyCreated_byInputEnvelope
   set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutUserInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutUserInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutCreated_byInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
 }
 
-export type StoreTransactionUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput> | Prisma.StoreTransactionCreateWithoutUserInput[] | Prisma.StoreTransactionUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutUserInput | Prisma.StoreTransactionCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutUserInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.StoreTransactionCreateManyUserInputEnvelope
+export type StoreTransactionUncheckedUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput> | Prisma.StoreTransactionCreateWithoutCreated_byInput[] | Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput | Prisma.StoreTransactionCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.StoreTransactionCreateManyCreated_byInputEnvelope
   set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
   connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutUserInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutUserInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutCreated_byInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
 }
 
-export type StoreTransactionCreateNestedManyWithoutStorePartInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput> | Prisma.StoreTransactionCreateWithoutStorePartInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput | Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStorePartInputEnvelope
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-}
-
-export type StoreTransactionUncheckedCreateNestedManyWithoutStorePartInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput> | Prisma.StoreTransactionCreateWithoutStorePartInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput | Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStorePartInputEnvelope
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-}
-
-export type StoreTransactionUpdateManyWithoutStorePartNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput> | Prisma.StoreTransactionCreateWithoutStorePartInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput | Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStorePartInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStorePartInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStorePartInputEnvelope
-  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStorePartInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStorePartInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStorePartInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStorePartInput[]
-  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-}
-
-export type StoreTransactionUncheckedUpdateManyWithoutStorePartNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput> | Prisma.StoreTransactionCreateWithoutStorePartInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput | Prisma.StoreTransactionCreateOrConnectWithoutStorePartInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStorePartInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStorePartInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStorePartInputEnvelope
-  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStorePartInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStorePartInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStorePartInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStorePartInput[]
-  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-}
-
-export type StoreTransactionCreateNestedOneWithoutAssetStorePartInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutAssetStorePartInput>
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutAssetStorePartInput
-  connect?: Prisma.StoreTransactionWhereUniqueInput
-}
-
-export type StoreTransactionUpdateOneRequiredWithoutAssetStorePartNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutAssetStorePartInput>
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutAssetStorePartInput
-  upsert?: Prisma.StoreTransactionUpsertWithoutAssetStorePartInput
-  connect?: Prisma.StoreTransactionWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StoreTransactionUpdateToOneWithWhereWithoutAssetStorePartInput, Prisma.StoreTransactionUpdateWithoutAssetStorePartInput>, Prisma.StoreTransactionUncheckedUpdateWithoutAssetStorePartInput>
-}
-
-export type StoreTransactionCreateNestedManyWithoutStoreTransactionTypeInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput> | Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput | Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStoreTransactionTypeInputEnvelope
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-}
-
-export type StoreTransactionUncheckedCreateNestedManyWithoutStoreTransactionTypeInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput> | Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput | Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStoreTransactionTypeInputEnvelope
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-}
-
-export type StoreTransactionUpdateManyWithoutStoreTransactionTypeNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput> | Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput | Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStoreTransactionTypeInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStoreTransactionTypeInputEnvelope
-  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStoreTransactionTypeInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStoreTransactionTypeInput[]
-  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-}
-
-export type StoreTransactionUncheckedUpdateManyWithoutStoreTransactionTypeNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput> | Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput[] | Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput[]
-  connectOrCreate?: Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput | Prisma.StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput[]
-  upsert?: Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpsertWithWhereUniqueWithoutStoreTransactionTypeInput[]
-  createMany?: Prisma.StoreTransactionCreateManyStoreTransactionTypeInputEnvelope
-  set?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  disconnect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  delete?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  connect?: Prisma.StoreTransactionWhereUniqueInput | Prisma.StoreTransactionWhereUniqueInput[]
-  update?: Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpdateWithWhereUniqueWithoutStoreTransactionTypeInput[]
-  updateMany?: Prisma.StoreTransactionUpdateManyWithWhereWithoutStoreTransactionTypeInput | Prisma.StoreTransactionUpdateManyWithWhereWithoutStoreTransactionTypeInput[]
-  deleteMany?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-}
-
-export type StoreTransactionCreateWithoutDepartureInput = {
+export type StoreTransactionCreateWithoutStore_partInput = {
+  store_transaction_number: string
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
 }
 
-export type StoreTransactionUncheckedCreateWithoutDepartureInput = {
+export type StoreTransactionUncheckedCreateWithoutStore_partInput = {
   id?: number
+  store_transaction_number: string
+  transaction_type_id: number
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: number | null
+  warehouse_id: number
+  created_by_id: number
+  created_at: Date | string
+  notes?: string | null
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
+}
+
+export type StoreTransactionCreateOrConnectWithoutStore_partInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput>
+}
+
+export type StoreTransactionCreateManyStore_partInputEnvelope = {
+  data: Prisma.StoreTransactionCreateManyStore_partInput | Prisma.StoreTransactionCreateManyStore_partInput[]
+  skipDuplicates?: boolean
+}
+
+export type StoreTransactionUpsertWithWhereUniqueWithoutStore_partInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStore_partInput, Prisma.StoreTransactionUncheckedUpdateWithoutStore_partInput>
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStore_partInput, Prisma.StoreTransactionUncheckedCreateWithoutStore_partInput>
+}
+
+export type StoreTransactionUpdateWithWhereUniqueWithoutStore_partInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStore_partInput, Prisma.StoreTransactionUncheckedUpdateWithoutStore_partInput>
+}
+
+export type StoreTransactionUpdateManyWithWhereWithoutStore_partInput = {
+  where: Prisma.StoreTransactionScalarWhereInput
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutStore_partInput>
+}
+
+export type StoreTransactionScalarWhereInput = {
+  AND?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+  OR?: Prisma.StoreTransactionScalarWhereInput[]
+  NOT?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
+  id?: Prisma.IntFilter<"StoreTransaction"> | number
+  store_transaction_number?: Prisma.StringFilter<"StoreTransaction"> | string
+  store_part_id?: Prisma.IntFilter<"StoreTransaction"> | number
+  transaction_type_id?: Prisma.IntFilter<"StoreTransaction"> | number
+  quantity?: Prisma.IntFilter<"StoreTransaction"> | number
+  unit_cost?: Prisma.DecimalNullableFilter<"StoreTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: Prisma.IntNullableFilter<"StoreTransaction"> | number | null
+  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
+  created_by_id?: Prisma.IntFilter<"StoreTransaction"> | number
+  created_at?: Prisma.DateTimeFilter<"StoreTransaction"> | Date | string
+  notes?: Prisma.StringNullableFilter<"StoreTransaction"> | string | null
+}
+
+export type StoreTransactionCreateWithoutTransaction_typeInput = {
+  store_transaction_number: string
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  created_at: Date | string
+  notes?: string | null
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
+}
+
+export type StoreTransactionUncheckedCreateWithoutTransaction_typeInput = {
+  id?: number
+  store_transaction_number: string
+  store_part_id: number
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: number | null
+  warehouse_id: number
+  created_by_id: number
+  created_at: Date | string
+  notes?: string | null
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
+}
+
+export type StoreTransactionCreateOrConnectWithoutTransaction_typeInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput>
+}
+
+export type StoreTransactionCreateManyTransaction_typeInputEnvelope = {
+  data: Prisma.StoreTransactionCreateManyTransaction_typeInput | Prisma.StoreTransactionCreateManyTransaction_typeInput[]
+  skipDuplicates?: boolean
+}
+
+export type StoreTransactionUpsertWithWhereUniqueWithoutTransaction_typeInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedUpdateWithoutTransaction_typeInput>
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedCreateWithoutTransaction_typeInput>
+}
+
+export type StoreTransactionUpdateWithWhereUniqueWithoutTransaction_typeInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutTransaction_typeInput, Prisma.StoreTransactionUncheckedUpdateWithoutTransaction_typeInput>
+}
+
+export type StoreTransactionUpdateManyWithWhereWithoutTransaction_typeInput = {
+  where: Prisma.StoreTransactionScalarWhereInput
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutTransaction_typeInput>
+}
+
+export type StoreTransactionCreateWithoutAsset_store_partsInput = {
+  store_transaction_number: string
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  created_at: Date | string
+  notes?: string | null
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+}
+
+export type StoreTransactionUncheckedCreateWithoutAsset_store_partsInput = {
+  id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
+}
+
+export type StoreTransactionCreateOrConnectWithoutAsset_store_partsInput = {
+  where: Prisma.StoreTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedCreateWithoutAsset_store_partsInput>
+}
+
+export type StoreTransactionUpsertWithoutAsset_store_partsInput = {
+  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedUpdateWithoutAsset_store_partsInput>
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedCreateWithoutAsset_store_partsInput>
+  where?: Prisma.StoreTransactionWhereInput
+}
+
+export type StoreTransactionUpdateToOneWithWhereWithoutAsset_store_partsInput = {
+  where?: Prisma.StoreTransactionWhereInput
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutAsset_store_partsInput, Prisma.StoreTransactionUncheckedUpdateWithoutAsset_store_partsInput>
+}
+
+export type StoreTransactionUpdateWithoutAsset_store_partsInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+}
+
+export type StoreTransactionUncheckedUpdateWithoutAsset_store_partsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type StoreTransactionCreateWithoutDepartureInput = {
   store_transaction_number: string
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  created_at: Date | string
+  notes?: string | null
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
+}
+
+export type StoreTransactionUncheckedCreateWithoutDepartureInput = {
+  id?: number
+  store_transaction_number: string
+  store_part_id: number
+  transaction_type_id: number
+  quantity: number
+  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   warehouse_id: number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
+  created_by_id: number
+  created_at: Date | string
+  notes?: string | null
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
 }
 
 export type StoreTransactionCreateOrConnectWithoutDepartureInput = {
@@ -829,38 +1022,22 @@ export type StoreTransactionUpdateManyWithWhereWithoutDepartureInput = {
   data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureInput>
 }
 
-export type StoreTransactionScalarWhereInput = {
-  AND?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-  OR?: Prisma.StoreTransactionScalarWhereInput[]
-  NOT?: Prisma.StoreTransactionScalarWhereInput | Prisma.StoreTransactionScalarWhereInput[]
-  id?: Prisma.IntFilter<"StoreTransaction"> | number
-  store_part_id?: Prisma.IntFilter<"StoreTransaction"> | number
-  transaction_type_id?: Prisma.IntFilter<"StoreTransaction"> | number
-  quantity?: Prisma.IntFilter<"StoreTransaction"> | number
-  unit_cost?: Prisma.DecimalNullableFilter<"StoreTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: Prisma.IntNullableFilter<"StoreTransaction"> | number | null
-  created_by_id?: Prisma.IntFilter<"StoreTransaction"> | number
-  created_at?: Prisma.DateTimeFilter<"StoreTransaction"> | Date | string
-  notes?: Prisma.StringNullableFilter<"StoreTransaction"> | string | null
-  store_transaction_number?: Prisma.StringFilter<"StoreTransaction"> | string
-  warehouse_id?: Prisma.IntFilter<"StoreTransaction"> | number
-}
-
 export type StoreTransactionCreateWithoutWarehouseInput = {
+  store_transaction_number: string
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
 }
 
 export type StoreTransactionUncheckedCreateWithoutWarehouseInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
@@ -869,8 +1046,7 @@ export type StoreTransactionUncheckedCreateWithoutWarehouseInput = {
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
 }
 
 export type StoreTransactionCreateOrConnectWithoutWarehouseInput = {
@@ -899,290 +1075,221 @@ export type StoreTransactionUpdateManyWithWhereWithoutWarehouseInput = {
   data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseInput>
 }
 
-export type StoreTransactionCreateWithoutUserInput = {
+export type StoreTransactionCreateWithoutCreated_byInput = {
+  store_transaction_number: string
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
+  warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutTransactionsInput
+  transaction_type: Prisma.StoreTransactionTypeCreateNestedOneWithoutTransactionsInput
+  departure?: Prisma.DepartureCreateNestedOneWithoutStore_transactionsInput
+  asset_store_parts?: Prisma.AssetStorePartCreateNestedManyWithoutStore_transactionInput
 }
 
-export type StoreTransactionUncheckedCreateWithoutUserInput = {
+export type StoreTransactionUncheckedCreateWithoutCreated_byInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput
 }
 
-export type StoreTransactionCreateOrConnectWithoutUserInput = {
+export type StoreTransactionCreateOrConnectWithoutCreated_byInput = {
   where: Prisma.StoreTransactionWhereUniqueInput
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput>
 }
 
-export type StoreTransactionCreateManyUserInputEnvelope = {
-  data: Prisma.StoreTransactionCreateManyUserInput | Prisma.StoreTransactionCreateManyUserInput[]
+export type StoreTransactionCreateManyCreated_byInputEnvelope = {
+  data: Prisma.StoreTransactionCreateManyCreated_byInput | Prisma.StoreTransactionCreateManyCreated_byInput[]
   skipDuplicates?: boolean
 }
 
-export type StoreTransactionUpsertWithWhereUniqueWithoutUserInput = {
+export type StoreTransactionUpsertWithWhereUniqueWithoutCreated_byInput = {
   where: Prisma.StoreTransactionWhereUniqueInput
-  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutUserInput, Prisma.StoreTransactionUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutUserInput, Prisma.StoreTransactionUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedUpdateWithoutCreated_byInput>
+  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedCreateWithoutCreated_byInput>
 }
 
-export type StoreTransactionUpdateWithWhereUniqueWithoutUserInput = {
+export type StoreTransactionUpdateWithWhereUniqueWithoutCreated_byInput = {
   where: Prisma.StoreTransactionWhereUniqueInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutUserInput, Prisma.StoreTransactionUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutCreated_byInput, Prisma.StoreTransactionUncheckedUpdateWithoutCreated_byInput>
 }
 
-export type StoreTransactionUpdateManyWithWhereWithoutUserInput = {
+export type StoreTransactionUpdateManyWithWhereWithoutCreated_byInput = {
   where: Prisma.StoreTransactionScalarWhereInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutCreated_byInput>
 }
 
-export type StoreTransactionCreateWithoutStorePartInput = {
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
-}
-
-export type StoreTransactionUncheckedCreateWithoutStorePartInput = {
+export type StoreTransactionCreateManyStore_partInput = {
   id?: number
+  store_transaction_number: string
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
 }
 
-export type StoreTransactionCreateOrConnectWithoutStorePartInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput>
-}
-
-export type StoreTransactionCreateManyStorePartInputEnvelope = {
-  data: Prisma.StoreTransactionCreateManyStorePartInput | Prisma.StoreTransactionCreateManyStorePartInput[]
-  skipDuplicates?: boolean
-}
-
-export type StoreTransactionUpsertWithWhereUniqueWithoutStorePartInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStorePartInput, Prisma.StoreTransactionUncheckedUpdateWithoutStorePartInput>
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutStorePartInput>
-}
-
-export type StoreTransactionUpdateWithWhereUniqueWithoutStorePartInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStorePartInput, Prisma.StoreTransactionUncheckedUpdateWithoutStorePartInput>
-}
-
-export type StoreTransactionUpdateManyWithWhereWithoutStorePartInput = {
-  where: Prisma.StoreTransactionScalarWhereInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutStorePartInput>
-}
-
-export type StoreTransactionCreateWithoutAssetStorePartInput = {
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  StoreTransactionType: Prisma.StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
-}
-
-export type StoreTransactionUncheckedCreateWithoutAssetStorePartInput = {
-  id?: number
-  store_part_id: number
-  transaction_type_id: number
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: number | null
-  created_by_id: number
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-}
-
-export type StoreTransactionCreateOrConnectWithoutAssetStorePartInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutAssetStorePartInput>
-}
-
-export type StoreTransactionUpsertWithoutAssetStorePartInput = {
-  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedUpdateWithoutAssetStorePartInput>
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedCreateWithoutAssetStorePartInput>
-  where?: Prisma.StoreTransactionWhereInput
-}
-
-export type StoreTransactionUpdateToOneWithWhereWithoutAssetStorePartInput = {
-  where?: Prisma.StoreTransactionWhereInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutAssetStorePartInput, Prisma.StoreTransactionUncheckedUpdateWithoutAssetStorePartInput>
-}
-
-export type StoreTransactionUpdateWithoutAssetStorePartInput = {
+export type StoreTransactionUpdateWithoutStore_partInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
-export type StoreTransactionUncheckedUpdateWithoutAssetStorePartInput = {
+export type StoreTransactionUncheckedUpdateWithoutStore_partInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
+}
+
+export type StoreTransactionUncheckedUpdateManyWithoutStore_partInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
   store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
-export type StoreTransactionCreateWithoutStoreTransactionTypeInput = {
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  AssetStorePart?: Prisma.AssetStorePartCreateNestedManyWithoutStoreTransactionInput
-  User: Prisma.UserCreateNestedOneWithoutStoreTransactionInput
-  Departure?: Prisma.DepartureCreateNestedOneWithoutStoreTransactionInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutStoreTransactionInput
-  Warehouse: Prisma.WarehouseCreateNestedOneWithoutStoreTransactionInput
-}
-
-export type StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput = {
+export type StoreTransactionCreateManyTransaction_typeInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput
 }
 
-export type StoreTransactionCreateOrConnectWithoutStoreTransactionTypeInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput>
+export type StoreTransactionUpdateWithoutTransaction_typeInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
-export type StoreTransactionCreateManyStoreTransactionTypeInputEnvelope = {
-  data: Prisma.StoreTransactionCreateManyStoreTransactionTypeInput | Prisma.StoreTransactionCreateManyStoreTransactionTypeInput[]
-  skipDuplicates?: boolean
+export type StoreTransactionUncheckedUpdateWithoutTransaction_typeInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
 }
 
-export type StoreTransactionUpsertWithWhereUniqueWithoutStoreTransactionTypeInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  update: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedUpdateWithoutStoreTransactionTypeInput>
-  create: Prisma.XOR<Prisma.StoreTransactionCreateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedCreateWithoutStoreTransactionTypeInput>
-}
-
-export type StoreTransactionUpdateWithWhereUniqueWithoutStoreTransactionTypeInput = {
-  where: Prisma.StoreTransactionWhereUniqueInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateWithoutStoreTransactionTypeInput, Prisma.StoreTransactionUncheckedUpdateWithoutStoreTransactionTypeInput>
-}
-
-export type StoreTransactionUpdateManyWithWhereWithoutStoreTransactionTypeInput = {
-  where: Prisma.StoreTransactionScalarWhereInput
-  data: Prisma.XOR<Prisma.StoreTransactionUpdateManyMutationInput, Prisma.StoreTransactionUncheckedUpdateManyWithoutStoreTransactionTypeInput>
+export type StoreTransactionUncheckedUpdateManyWithoutTransaction_typeInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
+  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type StoreTransactionCreateManyDepartureInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  warehouse_id: number
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
 }
 
 export type StoreTransactionUpdateWithoutDepartureInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionUncheckedUpdateWithoutDepartureInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionUncheckedUpdateManyWithoutDepartureInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StoreTransactionCreateManyWarehouseInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
@@ -1191,24 +1298,24 @@ export type StoreTransactionCreateManyWarehouseInput = {
   created_by_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
 }
 
 export type StoreTransactionUpdateWithoutWarehouseInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionUncheckedUpdateWithoutWarehouseInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1217,12 +1324,12 @@ export type StoreTransactionUncheckedUpdateWithoutWarehouseInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
 }
 
 export type StoreTransactionUncheckedUpdateManyWithoutWarehouseInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1231,166 +1338,59 @@ export type StoreTransactionUncheckedUpdateManyWithoutWarehouseInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type StoreTransactionCreateManyUserInput = {
+export type StoreTransactionCreateManyCreated_byInput = {
   id?: number
+  store_transaction_number: string
   store_part_id: number
   transaction_type_id: number
   quantity: number
   unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: number | null
+  warehouse_id: number
   created_at: Date | string
   notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
 }
 
-export type StoreTransactionUpdateWithoutUserInput = {
+export type StoreTransactionUpdateWithoutCreated_byInput = {
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
+  warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutTransactionsNestedInput
+  transaction_type?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput
+  departure?: Prisma.DepartureUpdateOneWithoutStore_transactionsNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUpdateManyWithoutStore_transactionNestedInput
 }
 
-export type StoreTransactionUncheckedUpdateWithoutUserInput = {
+export type StoreTransactionUncheckedUpdateWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
+  asset_store_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput
 }
 
-export type StoreTransactionUncheckedUpdateManyWithoutUserInput = {
+export type StoreTransactionUncheckedUpdateManyWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-}
-
-export type StoreTransactionCreateManyStorePartInput = {
-  id?: number
-  transaction_type_id: number
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: number | null
-  created_by_id: number
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-}
-
-export type StoreTransactionUpdateWithoutStorePartInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StoreTransactionType?: Prisma.StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
-}
-
-export type StoreTransactionUncheckedUpdateWithoutStorePartInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
-}
-
-export type StoreTransactionUncheckedUpdateManyWithoutStorePartInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  transaction_type_id?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-}
-
-export type StoreTransactionCreateManyStoreTransactionTypeInput = {
-  id?: number
-  store_part_id: number
-  quantity: number
-  unit_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: number | null
-  created_by_id: number
-  created_at: Date | string
-  notes?: string | null
-  store_transaction_number: string
-  warehouse_id: number
-}
-
-export type StoreTransactionUpdateWithoutStoreTransactionTypeInput = {
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetStorePart?: Prisma.AssetStorePartUpdateManyWithoutStoreTransactionNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Departure?: Prisma.DepartureUpdateOneWithoutStoreTransactionNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutStoreTransactionNestedInput
-  Warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutStoreTransactionNestedInput
-}
-
-export type StoreTransactionUncheckedUpdateWithoutStoreTransactionTypeInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
-  AssetStorePart?: Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput
-}
-
-export type StoreTransactionUncheckedUpdateManyWithoutStoreTransactionTypeInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  unit_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  departure_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  store_transaction_number?: Prisma.StringFieldUpdateOperationsInput | string
-  warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -1399,11 +1399,11 @@ export type StoreTransactionUncheckedUpdateManyWithoutStoreTransactionTypeInput 
  */
 
 export type StoreTransactionCountOutputType = {
-  AssetStorePart: number
+  asset_store_parts: number
 }
 
 export type StoreTransactionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  AssetStorePart?: boolean | StoreTransactionCountOutputTypeCountAssetStorePartArgs
+  asset_store_parts?: boolean | StoreTransactionCountOutputTypeCountAsset_store_partsArgs
 }
 
 /**
@@ -1419,131 +1419,131 @@ export type StoreTransactionCountOutputTypeDefaultArgs<ExtArgs extends runtime.T
 /**
  * StoreTransactionCountOutputType without action
  */
-export type StoreTransactionCountOutputTypeCountAssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StoreTransactionCountOutputTypeCountAsset_store_partsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetStorePartWhereInput
 }
 
 
 export type StoreTransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  store_transaction_number?: boolean
   store_part_id?: boolean
   transaction_type_id?: boolean
   quantity?: boolean
   unit_cost?: boolean
   departure_id?: boolean
+  warehouse_id?: boolean
   created_by_id?: boolean
   created_at?: boolean
   notes?: boolean
-  store_transaction_number?: boolean
-  warehouse_id?: boolean
-  AssetStorePart?: boolean | Prisma.StoreTransaction$AssetStorePartArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  asset_store_parts?: boolean | Prisma.StoreTransaction$asset_store_partsArgs<ExtArgs>
   _count?: boolean | Prisma.StoreTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["storeTransaction"]>
 
 export type StoreTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  store_transaction_number?: boolean
   store_part_id?: boolean
   transaction_type_id?: boolean
   quantity?: boolean
   unit_cost?: boolean
   departure_id?: boolean
+  warehouse_id?: boolean
   created_by_id?: boolean
   created_at?: boolean
   notes?: boolean
-  store_transaction_number?: boolean
-  warehouse_id?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["storeTransaction"]>
 
 export type StoreTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  store_transaction_number?: boolean
   store_part_id?: boolean
   transaction_type_id?: boolean
   quantity?: boolean
   unit_cost?: boolean
   departure_id?: boolean
+  warehouse_id?: boolean
   created_by_id?: boolean
   created_at?: boolean
   notes?: boolean
-  store_transaction_number?: boolean
-  warehouse_id?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["storeTransaction"]>
 
 export type StoreTransactionSelectScalar = {
   id?: boolean
+  store_transaction_number?: boolean
   store_part_id?: boolean
   transaction_type_id?: boolean
   quantity?: boolean
   unit_cost?: boolean
   departure_id?: boolean
+  warehouse_id?: boolean
   created_by_id?: boolean
   created_at?: boolean
   notes?: boolean
-  store_transaction_number?: boolean
-  warehouse_id?: boolean
 }
 
-export type StoreTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "store_part_id" | "transaction_type_id" | "quantity" | "unit_cost" | "departure_id" | "created_by_id" | "created_at" | "notes" | "store_transaction_number" | "warehouse_id", ExtArgs["result"]["storeTransaction"]>
+export type StoreTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "store_transaction_number" | "store_part_id" | "transaction_type_id" | "quantity" | "unit_cost" | "departure_id" | "warehouse_id" | "created_by_id" | "created_at" | "notes", ExtArgs["result"]["storeTransaction"]>
 export type StoreTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  AssetStorePart?: boolean | Prisma.StoreTransaction$AssetStorePartArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  asset_store_parts?: boolean | Prisma.StoreTransaction$asset_store_partsArgs<ExtArgs>
   _count?: boolean | Prisma.StoreTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StoreTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type StoreTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  Departure?: boolean | Prisma.StoreTransaction$DepartureArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransactionType?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
-  Warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  transaction_type?: boolean | Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>
+  departure?: boolean | Prisma.StoreTransaction$departureArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $StoreTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StoreTransaction"
   objects: {
-    AssetStorePart: Prisma.$AssetStorePartPayload<ExtArgs>[]
-    User: Prisma.$UserPayload<ExtArgs>
-    Departure: Prisma.$DeparturePayload<ExtArgs> | null
-    StorePart: Prisma.$StorePartPayload<ExtArgs>
-    StoreTransactionType: Prisma.$StoreTransactionTypePayload<ExtArgs>
-    Warehouse: Prisma.$WarehousePayload<ExtArgs>
+    warehouse: Prisma.$WarehousePayload<ExtArgs>
+    store_part: Prisma.$StorePartPayload<ExtArgs>
+    transaction_type: Prisma.$StoreTransactionTypePayload<ExtArgs>
+    departure: Prisma.$DeparturePayload<ExtArgs> | null
+    created_by: Prisma.$UserPayload<ExtArgs>
+    asset_store_parts: Prisma.$AssetStorePartPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    store_transaction_number: string
     store_part_id: number
     transaction_type_id: number
     quantity: number
     unit_cost: runtime.Decimal | null
     departure_id: number | null
+    warehouse_id: number
     created_by_id: number
     created_at: Date
     notes: string | null
-    store_transaction_number: string
-    warehouse_id: number
   }, ExtArgs["result"]["storeTransaction"]>
   composites: {}
 }
@@ -1551,7 +1551,7 @@ export type $StoreTransactionPayload<ExtArgs extends runtime.Types.Extensions.In
 export type StoreTransactionGetPayload<S extends boolean | null | undefined | StoreTransactionDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload, S>
 
 export type StoreTransactionCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<StoreTransactionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<StoreTransactionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: StoreTransactionCountAggregateInputType | true
   }
 
@@ -1938,12 +1938,12 @@ readonly fields: StoreTransactionFieldRefs;
  */
 export interface Prisma__StoreTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  AssetStorePart<T extends Prisma.StoreTransaction$AssetStorePartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransaction$AssetStorePartArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetStorePartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  User<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  Departure<T extends Prisma.StoreTransaction$DepartureArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransaction$DepartureArgs<ExtArgs>>): Prisma.Prisma__DepartureClient<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  StorePart<T extends Prisma.StorePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePartDefaultArgs<ExtArgs>>): Prisma.Prisma__StorePartClient<runtime.Types.Result.GetResult<Prisma.$StorePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  StoreTransactionType<T extends Prisma.StoreTransactionTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__StoreTransactionTypeClient<runtime.Types.Result.GetResult<Prisma.$StoreTransactionTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  Warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  warehouse<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  store_part<T extends Prisma.StorePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePartDefaultArgs<ExtArgs>>): Prisma.Prisma__StorePartClient<runtime.Types.Result.GetResult<Prisma.$StorePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  transaction_type<T extends Prisma.StoreTransactionTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__StoreTransactionTypeClient<runtime.Types.Result.GetResult<Prisma.$StoreTransactionTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  departure<T extends Prisma.StoreTransaction$departureArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransaction$departureArgs<ExtArgs>>): Prisma.Prisma__DepartureClient<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  asset_store_parts<T extends Prisma.StoreTransaction$asset_store_partsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransaction$asset_store_partsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetStorePartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1974,16 +1974,16 @@ export interface Prisma__StoreTransactionClient<T, Null = never, ExtArgs extends
  */
 export interface StoreTransactionFieldRefs {
   readonly id: Prisma.FieldRef<"StoreTransaction", 'Int'>
+  readonly store_transaction_number: Prisma.FieldRef<"StoreTransaction", 'String'>
   readonly store_part_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
   readonly transaction_type_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
   readonly quantity: Prisma.FieldRef<"StoreTransaction", 'Int'>
   readonly unit_cost: Prisma.FieldRef<"StoreTransaction", 'Decimal'>
   readonly departure_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
+  readonly warehouse_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
   readonly created_by_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
   readonly created_at: Prisma.FieldRef<"StoreTransaction", 'DateTime'>
   readonly notes: Prisma.FieldRef<"StoreTransaction", 'String'>
-  readonly store_transaction_number: Prisma.FieldRef<"StoreTransaction", 'String'>
-  readonly warehouse_id: Prisma.FieldRef<"StoreTransaction", 'Int'>
 }
     
 
@@ -2008,7 +2008,6 @@ export type StoreTransactionFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which StoreTransaction to fetch.
    */
   where: Prisma.StoreTransactionWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2031,7 +2030,6 @@ export type StoreTransactionFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which StoreTransaction to fetch.
    */
   where: Prisma.StoreTransactionWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2084,7 +2082,6 @@ export type StoreTransactionFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of StoreTransactions.
    */
   distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2137,7 +2134,6 @@ export type StoreTransactionFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter by unique combinations of StoreTransactions.
    */
   distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2190,7 +2186,6 @@ export type StoreTransactionFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of StoreTransactions.
    */
   distinct?: Prisma.StoreTransactionScalarFieldEnum | Prisma.StoreTransactionScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2213,7 +2208,6 @@ export type StoreTransactionCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a StoreTransaction.
    */
   data: Prisma.XOR<Prisma.StoreTransactionCreateInput, Prisma.StoreTransactionUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2274,7 +2268,6 @@ export type StoreTransactionUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which StoreTransaction to update.
    */
   where: Prisma.StoreTransactionWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2353,7 +2346,6 @@ export type StoreTransactionUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the StoreTransaction was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.StoreTransactionUpdateInput, Prisma.StoreTransactionUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2376,7 +2368,6 @@ export type StoreTransactionDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which StoreTransaction to delete.
    */
   where: Prisma.StoreTransactionWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2394,9 +2385,28 @@ export type StoreTransactionDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
- * StoreTransaction.AssetStorePart
+ * StoreTransaction.departure
  */
-export type StoreTransaction$AssetStorePartArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StoreTransaction$departureArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Departure
+   */
+  select?: Prisma.DepartureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Departure
+   */
+  omit?: Prisma.DepartureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartureInclude<ExtArgs> | null
+  where?: Prisma.DepartureWhereInput
+}
+
+/**
+ * StoreTransaction.asset_store_parts
+ */
+export type StoreTransaction$asset_store_partsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the AssetStorePart
    */
@@ -2415,25 +2425,6 @@ export type StoreTransaction$AssetStorePartArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
-}
-
-/**
- * StoreTransaction.Departure
- */
-export type StoreTransaction$DepartureArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Departure
-   */
-  select?: Prisma.DepartureSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Departure
-   */
-  omit?: Prisma.DepartureOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DepartureInclude<ExtArgs> | null
-  where?: Prisma.DepartureWhereInput
 }
 
 /**

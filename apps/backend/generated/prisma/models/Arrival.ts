@@ -256,10 +256,10 @@ export type ArrivalWhereInput = {
   created_by_id?: Prisma.IntFilter<"Arrival"> | number
   notes?: Prisma.StringNullableFilter<"Arrival"> | string | null
   created_at?: Prisma.DateTimeFilter<"Arrival"> | Date | string
-  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  destination?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   origin?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  destination?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   transporter?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   assets?: Prisma.AssetListRelationFilter
 }
 
@@ -272,10 +272,10 @@ export type ArrivalOrderByWithRelationInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  created_by?: Prisma.UserOrderByWithRelationInput
-  destination?: Prisma.WarehouseOrderByWithRelationInput
   origin?: Prisma.OrganizationOrderByWithRelationInput
+  destination?: Prisma.WarehouseOrderByWithRelationInput
   transporter?: Prisma.OrganizationOrderByWithRelationInput
+  created_by?: Prisma.UserOrderByWithRelationInput
   assets?: Prisma.AssetOrderByRelationAggregateInput
 }
 
@@ -291,10 +291,10 @@ export type ArrivalWhereUniqueInput = Prisma.AtLeast<{
   created_by_id?: Prisma.IntFilter<"Arrival"> | number
   notes?: Prisma.StringNullableFilter<"Arrival"> | string | null
   created_at?: Prisma.DateTimeFilter<"Arrival"> | Date | string
-  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  destination?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   origin?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  destination?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   transporter?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   assets?: Prisma.AssetListRelationFilter
 }, "id" | "arrival_number">
 
@@ -332,10 +332,10 @@ export type ArrivalCreateInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
-  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   origin: Prisma.OrganizationCreateNestedOneWithoutArrivals_originInput
+  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutArrivals_transporterInput
+  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   assets?: Prisma.AssetCreateNestedManyWithoutArrivalInput
 }
 
@@ -355,10 +355,10 @@ export type ArrivalUpdateInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
-  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   origin?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_originNestedInput
+  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_transporterNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutArrivalNestedInput
 }
 
@@ -654,10 +654,10 @@ export type ArrivalCreateWithoutAssetsInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
-  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   origin: Prisma.OrganizationCreateNestedOneWithoutArrivals_originInput
+  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutArrivals_transporterInput
+  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
 }
 
 export type ArrivalUncheckedCreateWithoutAssetsInput = {
@@ -691,10 +691,10 @@ export type ArrivalUpdateWithoutAssetsInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
-  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   origin?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_originNestedInput
+  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_transporterNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
 }
 
 export type ArrivalUncheckedUpdateWithoutAssetsInput = {
@@ -712,9 +712,9 @@ export type ArrivalCreateWithoutDestinationInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   origin: Prisma.OrganizationCreateNestedOneWithoutArrivals_originInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutArrivals_transporterInput
+  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   assets?: Prisma.AssetCreateNestedManyWithoutArrivalInput
 }
 
@@ -773,8 +773,8 @@ export type ArrivalCreateWithoutCreated_byInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   origin: Prisma.OrganizationCreateNestedOneWithoutArrivals_originInput
+  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutArrivals_transporterInput
   assets?: Prisma.AssetCreateNestedManyWithoutArrivalInput
 }
@@ -820,9 +820,9 @@ export type ArrivalCreateWithoutOriginInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutArrivals_transporterInput
+  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   assets?: Prisma.AssetCreateNestedManyWithoutArrivalInput
 }
 
@@ -851,9 +851,9 @@ export type ArrivalCreateWithoutTransporterInput = {
   arrival_number: string
   notes?: string | null
   created_at: Date | string
-  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
-  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
   origin: Prisma.OrganizationCreateNestedOneWithoutArrivals_originInput
+  destination: Prisma.WarehouseCreateNestedOneWithoutArrivalsInput
+  created_by: Prisma.UserCreateNestedOneWithoutArrivalsInput
   assets?: Prisma.AssetCreateNestedManyWithoutArrivalInput
 }
 
@@ -924,9 +924,9 @@ export type ArrivalUpdateWithoutDestinationInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   origin?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_originNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_transporterNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutArrivalNestedInput
 }
 
@@ -965,8 +965,8 @@ export type ArrivalUpdateWithoutCreated_byInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   origin?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_originNestedInput
+  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_transporterNestedInput
   assets?: Prisma.AssetUpdateManyWithoutArrivalNestedInput
 }
@@ -1016,9 +1016,9 @@ export type ArrivalUpdateWithoutOriginInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_transporterNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutArrivalNestedInput
 }
 
@@ -1047,9 +1047,9 @@ export type ArrivalUpdateWithoutTransporterInput = {
   arrival_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
-  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
   origin?: Prisma.OrganizationUpdateOneRequiredWithoutArrivals_originNestedInput
+  destination?: Prisma.WarehouseUpdateOneRequiredWithoutArrivalsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutArrivalsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutArrivalNestedInput
 }
 
@@ -1114,10 +1114,10 @@ export type ArrivalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assets?: boolean | Prisma.Arrival$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.ArrivalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["arrival"]>
@@ -1131,10 +1131,10 @@ export type ArrivalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["arrival"]>
 
 export type ArrivalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1146,10 +1146,10 @@ export type ArrivalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["arrival"]>
 
 export type ArrivalSelectScalar = {
@@ -1165,33 +1165,33 @@ export type ArrivalSelectScalar = {
 
 export type ArrivalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "arrival_number" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "notes" | "created_at", ExtArgs["result"]["arrival"]>
 export type ArrivalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   assets?: boolean | Prisma.Arrival$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.ArrivalCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ArrivalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ArrivalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   origin?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ArrivalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Arrival"
   objects: {
-    created_by: Prisma.$UserPayload<ExtArgs>
-    destination: Prisma.$WarehousePayload<ExtArgs>
     origin: Prisma.$OrganizationPayload<ExtArgs>
+    destination: Prisma.$WarehousePayload<ExtArgs>
     transporter: Prisma.$OrganizationPayload<ExtArgs>
+    created_by: Prisma.$UserPayload<ExtArgs>
     assets: Prisma.$AssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1210,7 +1210,7 @@ export type $ArrivalPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ArrivalGetPayload<S extends boolean | null | undefined | ArrivalDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ArrivalPayload, S>
 
 export type ArrivalCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ArrivalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<ArrivalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ArrivalCountAggregateInputType | true
   }
 
@@ -1597,10 +1597,10 @@ readonly fields: ArrivalFieldRefs;
  */
 export interface Prisma__ArrivalClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  destination<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   origin<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  destination<T extends Prisma.WarehouseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WarehouseDefaultArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   transporter<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   assets<T extends Prisma.Arrival$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Arrival$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1663,7 +1663,6 @@ export type ArrivalFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which Arrival to fetch.
    */
   where: Prisma.ArrivalWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1686,7 +1685,6 @@ export type ArrivalFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which Arrival to fetch.
    */
   where: Prisma.ArrivalWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1739,7 +1737,6 @@ export type ArrivalFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of Arrivals.
    */
   distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1792,7 +1789,6 @@ export type ArrivalFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of Arrivals.
    */
   distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1845,7 +1841,6 @@ export type ArrivalFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Arrivals.
    */
   distinct?: Prisma.ArrivalScalarFieldEnum | Prisma.ArrivalScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1868,7 +1863,6 @@ export type ArrivalCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a Arrival.
    */
   data: Prisma.XOR<Prisma.ArrivalCreateInput, Prisma.ArrivalUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1929,7 +1923,6 @@ export type ArrivalUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which Arrival to update.
    */
   where: Prisma.ArrivalWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2008,7 +2001,6 @@ export type ArrivalUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the Arrival was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ArrivalUpdateInput, Prisma.ArrivalUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2031,7 +2023,6 @@ export type ArrivalDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which Arrival to delete.
    */
   where: Prisma.ArrivalWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -51,42 +51,42 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Accessory: 'Accessory',
+  AssetType: 'AssetType',
+  Status: 'Status',
+  Readiness: 'Readiness',
+  FileType: 'FileType',
+  InvoiceType: 'InvoiceType',
+  Country: 'Country',
   Asset: 'Asset',
   TechnicalSpecification: 'TechnicalSpecification',
   Cost: 'Cost',
   AssetAccessory: 'AssetAccessory',
   Error: 'Error',
   AssetError: 'AssetError',
+  StorePart: 'StorePart',
+  StoreTransactionType: 'StoreTransactionType',
+  StoreTransaction: 'StoreTransaction',
+  AssetStorePart: 'AssetStorePart',
+  AssetSalvagedPart: 'AssetSalvagedPart',
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
   Arrival: 'Arrival',
   Departure: 'Departure',
   Hold: 'Hold',
   Invoice: 'Invoice',
-  Warehouse: 'Warehouse',
   Location: 'Location',
+  Zone: 'Zone',
+  Warehouse: 'Warehouse',
   Brand: 'Brand',
   Model: 'Model',
+  Component: 'Component',
   File: 'File',
   Comment: 'Comment',
   User: 'User',
+  SavedView: 'SavedView',
   Organization: 'Organization',
-  Accessory: 'Accessory',
-  AssetType: 'AssetType',
-  FileType: 'FileType',
-  InvoiceType: 'InvoiceType',
-  StorePart: 'StorePart',
-  History: 'History',
-  Readiness: 'Readiness',
-  Status: 'Status',
-  Zone: 'Zone',
-  Country: 'Country',
-  Component: 'Component',
-  AssetSalvagedPart: 'AssetSalvagedPart',
-  AssetStorePart: 'AssetStorePart',
-  StoreTransaction: 'StoreTransaction',
-  StoreTransactionType: 'StoreTransactionType',
-  SavedView: 'SavedView'
+  History: 'History'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -105,36 +105,84 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const AccessoryScalarFieldEnum = {
+  id: 'id',
+  accessory: 'accessory'
+} as const
+
+export type AccessoryScalarFieldEnum = (typeof AccessoryScalarFieldEnum)[keyof typeof AccessoryScalarFieldEnum]
+
+
+export const AssetTypeScalarFieldEnum = {
+  id: 'id',
+  asset_type: 'asset_type'
+} as const
+
+export type AssetTypeScalarFieldEnum = (typeof AssetTypeScalarFieldEnum)[keyof typeof AssetTypeScalarFieldEnum]
+
+
+export const StatusScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
+
+
+export const ReadinessScalarFieldEnum = {
+  id: 'id',
+  status: 'status'
+} as const
+
+export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
+
+
+export const FileTypeScalarFieldEnum = {
+  id: 'id',
+  type: 'type'
+} as const
+
+export type FileTypeScalarFieldEnum = (typeof FileTypeScalarFieldEnum)[keyof typeof FileTypeScalarFieldEnum]
+
+
+export const InvoiceTypeScalarFieldEnum = {
+  id: 'id',
+  type: 'type'
+} as const
+
+export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
+
+
+export const CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+} as const
+
+export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
+
+
 export const AssetScalarFieldEnum = {
   id: 'id',
   barcode: 'barcode',
   serial_number: 'serial_number',
   model_id: 'model_id',
+  location_id: 'location_id',
+  status_id: 'status_id',
+  readiness_id: 'readiness_id',
   purchase_invoice_id: 'purchase_invoice_id',
   sales_invoice_id: 'sales_invoice_id',
   arrival_id: 'arrival_id',
   departure_id: 'departure_id',
   hold_id: 'hold_id',
-  created_at: 'created_at',
-  location_id: 'location_id',
-  barcode_normalized: 'barcode_normalized',
-  serial_normalized: 'serial_normalized',
-  readiness_id: 'readiness_id',
-  status_id: 'status_id',
-  is_in_transit: 'is_in_transit',
   country_of_origin_id: 'country_of_origin_id',
-  manufactured_year: 'manufactured_year'
+  manufactured_year: 'manufactured_year',
+  created_at: 'created_at',
+  is_in_transit: 'is_in_transit',
+  barcode_normalized: 'barcode_normalized',
+  serial_normalized: 'serial_normalized'
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
-
-
-export const RelationLoadStrategy = {
-  query: 'query',
-  join: 'join'
-} as const
-
-export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
 
 
 export const TechnicalSpecificationScalarFieldEnum = {
@@ -149,9 +197,9 @@ export const TechnicalSpecificationScalarFieldEnum = {
   drum_life_y: 'drum_life_y',
   drum_life_k: 'drum_life_k',
   toner_life_c: 'toner_life_c',
-  toner_life_k: 'toner_life_k',
   toner_life_m: 'toner_life_m',
   toner_life_y: 'toner_life_y',
+  toner_life_k: 'toner_life_k',
   component_id: 'component_id'
 } as const
 
@@ -203,6 +251,68 @@ export const AssetErrorScalarFieldEnum = {
 } as const
 
 export type AssetErrorScalarFieldEnum = (typeof AssetErrorScalarFieldEnum)[keyof typeof AssetErrorScalarFieldEnum]
+
+
+export const StorePartScalarFieldEnum = {
+  id: 'id',
+  part_number: 'part_number',
+  description: 'description'
+} as const
+
+export type StorePartScalarFieldEnum = (typeof StorePartScalarFieldEnum)[keyof typeof StorePartScalarFieldEnum]
+
+
+export const StoreTransactionTypeScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  is_inbound: 'is_inbound'
+} as const
+
+export type StoreTransactionTypeScalarFieldEnum = (typeof StoreTransactionTypeScalarFieldEnum)[keyof typeof StoreTransactionTypeScalarFieldEnum]
+
+
+export const StoreTransactionScalarFieldEnum = {
+  id: 'id',
+  store_transaction_number: 'store_transaction_number',
+  store_part_id: 'store_part_id',
+  transaction_type_id: 'transaction_type_id',
+  quantity: 'quantity',
+  unit_cost: 'unit_cost',
+  departure_id: 'departure_id',
+  warehouse_id: 'warehouse_id',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at',
+  notes: 'notes'
+} as const
+
+export type StoreTransactionScalarFieldEnum = (typeof StoreTransactionScalarFieldEnum)[keyof typeof StoreTransactionScalarFieldEnum]
+
+
+export const AssetStorePartScalarFieldEnum = {
+  id: 'id',
+  asset_id: 'asset_id',
+  store_part_id: 'store_part_id',
+  store_transaction_id: 'store_transaction_id',
+  estimated_cost: 'estimated_cost',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type AssetStorePartScalarFieldEnum = (typeof AssetStorePartScalarFieldEnum)[keyof typeof AssetStorePartScalarFieldEnum]
+
+
+export const AssetSalvagedPartScalarFieldEnum = {
+  id: 'id',
+  recipient_asset_id: 'recipient_asset_id',
+  donor_asset_id: 'donor_asset_id',
+  fixed_at: 'fixed_at',
+  fixed_by: 'fixed_by',
+  is_exchange: 'is_exchange',
+  part: 'part',
+  notes: 'notes'
+} as const
+
+export type AssetSalvagedPartScalarFieldEnum = (typeof AssetSalvagedPartScalarFieldEnum)[keyof typeof AssetSalvagedPartScalarFieldEnum]
 
 
 export const TransferScalarFieldEnum = {
@@ -275,15 +385,33 @@ export type HoldScalarFieldEnum = (typeof HoldScalarFieldEnum)[keyof typeof Hold
 export const InvoiceScalarFieldEnum = {
   id: 'id',
   invoice_number: 'invoice_number',
+  invoice_reference: 'invoice_reference',
   organization_id: 'organization_id',
   updated_by_id: 'updated_by_id',
   is_cleared: 'is_cleared',
   created_at: 'created_at',
-  invoice_type_id: 'invoice_type_id',
-  invoice_reference: 'invoice_reference'
+  invoice_type_id: 'invoice_type_id'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
+
+
+export const LocationScalarFieldEnum = {
+  id: 'id',
+  warehouse_id: 'warehouse_id',
+  zone_id: 'zone_id',
+  bin: 'bin'
+} as const
+
+export type LocationScalarFieldEnum = (typeof LocationScalarFieldEnum)[keyof typeof LocationScalarFieldEnum]
+
+
+export const ZoneScalarFieldEnum = {
+  id: 'id',
+  zone: 'zone'
+} as const
+
+export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
 
 
 export const WarehouseScalarFieldEnum = {
@@ -294,16 +422,6 @@ export const WarehouseScalarFieldEnum = {
 } as const
 
 export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
-
-
-export const LocationScalarFieldEnum = {
-  warehouse_id: 'warehouse_id',
-  id: 'id',
-  bin: 'bin',
-  zone_id: 'zone_id'
-} as const
-
-export type LocationScalarFieldEnum = (typeof LocationScalarFieldEnum)[keyof typeof LocationScalarFieldEnum]
 
 
 export const BrandScalarFieldEnum = {
@@ -319,12 +437,21 @@ export const ModelScalarFieldEnum = {
   name: 'name',
   weight: 'weight',
   size: 'size',
+  is_colour: 'is_colour',
   brand_id: 'brand_id',
-  asset_type_id: 'asset_type_id',
-  is_colour: 'is_colour'
+  asset_type_id: 'asset_type_id'
 } as const
 
 export type ModelScalarFieldEnum = (typeof ModelScalarFieldEnum)[keyof typeof ModelScalarFieldEnum]
+
+
+export const ComponentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  brand_id: 'brand_id'
+} as const
+
+export type ComponentScalarFieldEnum = (typeof ComponentScalarFieldEnum)[keyof typeof ComponentScalarFieldEnum]
 
 
 export const FileScalarFieldEnum = {
@@ -356,15 +483,27 @@ export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeo
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  email: 'email',
   name: 'name',
-  is_active: 'is_active',
+  email: 'email',
   clerk_id: 'clerk_id',
-  role: 'role',
-  default_warehouse_id: 'default_warehouse_id'
+  is_active: 'is_active',
+  default_warehouse_id: 'default_warehouse_id',
+  role: 'role'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const SavedViewScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  page_key: 'page_key',
+  query_string: 'query_string',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
 
 
 export const OrganizationScalarFieldEnum = {
@@ -387,47 +526,6 @@ export const OrganizationScalarFieldEnum = {
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
 
 
-export const AccessoryScalarFieldEnum = {
-  id: 'id',
-  accessory: 'accessory'
-} as const
-
-export type AccessoryScalarFieldEnum = (typeof AccessoryScalarFieldEnum)[keyof typeof AccessoryScalarFieldEnum]
-
-
-export const AssetTypeScalarFieldEnum = {
-  id: 'id',
-  asset_type: 'asset_type'
-} as const
-
-export type AssetTypeScalarFieldEnum = (typeof AssetTypeScalarFieldEnum)[keyof typeof AssetTypeScalarFieldEnum]
-
-
-export const FileTypeScalarFieldEnum = {
-  id: 'id',
-  type: 'type'
-} as const
-
-export type FileTypeScalarFieldEnum = (typeof FileTypeScalarFieldEnum)[keyof typeof FileTypeScalarFieldEnum]
-
-
-export const InvoiceTypeScalarFieldEnum = {
-  id: 'id',
-  type: 'type'
-} as const
-
-export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
-
-
-export const StorePartScalarFieldEnum = {
-  id: 'id',
-  part_number: 'part_number',
-  description: 'description'
-} as const
-
-export type StorePartScalarFieldEnum = (typeof StorePartScalarFieldEnum)[keyof typeof StorePartScalarFieldEnum]
-
-
 export const HistoryScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
@@ -439,112 +537,6 @@ export const HistoryScalarFieldEnum = {
 } as const
 
 export type HistoryScalarFieldEnum = (typeof HistoryScalarFieldEnum)[keyof typeof HistoryScalarFieldEnum]
-
-
-export const ReadinessScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type ReadinessScalarFieldEnum = (typeof ReadinessScalarFieldEnum)[keyof typeof ReadinessScalarFieldEnum]
-
-
-export const StatusScalarFieldEnum = {
-  id: 'id',
-  status: 'status'
-} as const
-
-export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
-
-
-export const ZoneScalarFieldEnum = {
-  id: 'id',
-  zone: 'zone'
-} as const
-
-export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
-
-
-export const CountryScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
-} as const
-
-export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
-
-
-export const ComponentScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  brand_id: 'brand_id'
-} as const
-
-export type ComponentScalarFieldEnum = (typeof ComponentScalarFieldEnum)[keyof typeof ComponentScalarFieldEnum]
-
-
-export const AssetSalvagedPartScalarFieldEnum = {
-  id: 'id',
-  recipient_asset_id: 'recipient_asset_id',
-  donor_asset_id: 'donor_asset_id',
-  fixed_at: 'fixed_at',
-  fixed_by: 'fixed_by',
-  is_exchange: 'is_exchange',
-  part: 'part',
-  notes: 'notes'
-} as const
-
-export type AssetSalvagedPartScalarFieldEnum = (typeof AssetSalvagedPartScalarFieldEnum)[keyof typeof AssetSalvagedPartScalarFieldEnum]
-
-
-export const AssetStorePartScalarFieldEnum = {
-  id: 'id',
-  asset_id: 'asset_id',
-  store_part_id: 'store_part_id',
-  store_transaction_id: 'store_transaction_id',
-  estimated_cost: 'estimated_cost',
-  created_by_id: 'created_by_id',
-  created_at: 'created_at'
-} as const
-
-export type AssetStorePartScalarFieldEnum = (typeof AssetStorePartScalarFieldEnum)[keyof typeof AssetStorePartScalarFieldEnum]
-
-
-export const StoreTransactionScalarFieldEnum = {
-  id: 'id',
-  store_part_id: 'store_part_id',
-  transaction_type_id: 'transaction_type_id',
-  quantity: 'quantity',
-  unit_cost: 'unit_cost',
-  departure_id: 'departure_id',
-  created_by_id: 'created_by_id',
-  created_at: 'created_at',
-  notes: 'notes',
-  store_transaction_number: 'store_transaction_number',
-  warehouse_id: 'warehouse_id'
-} as const
-
-export type StoreTransactionScalarFieldEnum = (typeof StoreTransactionScalarFieldEnum)[keyof typeof StoreTransactionScalarFieldEnum]
-
-
-export const StoreTransactionTypeScalarFieldEnum = {
-  id: 'id',
-  type: 'type',
-  is_inbound: 'is_inbound'
-} as const
-
-export type StoreTransactionTypeScalarFieldEnum = (typeof StoreTransactionTypeScalarFieldEnum)[keyof typeof StoreTransactionTypeScalarFieldEnum]
-
-
-export const SavedViewScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  page_key: 'page_key',
-  query_string: 'query_string',
-  created_by_id: 'created_by_id',
-  created_at: 'created_at'
-} as const
-
-export type SavedViewScalarFieldEnum = (typeof SavedViewScalarFieldEnum)[keyof typeof SavedViewScalarFieldEnum]
 
 
 export const SortOrder = {

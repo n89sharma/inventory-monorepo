@@ -200,14 +200,14 @@ export type StoreTransactionTypeWhereInput = {
   id?: Prisma.IntFilter<"StoreTransactionType"> | number
   type?: Prisma.StringFilter<"StoreTransactionType"> | string
   is_inbound?: Prisma.BoolFilter<"StoreTransactionType"> | boolean
-  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
+  transactions?: Prisma.StoreTransactionListRelationFilter
 }
 
 export type StoreTransactionTypeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
   is_inbound?: Prisma.SortOrder
-  StoreTransaction?: Prisma.StoreTransactionOrderByRelationAggregateInput
+  transactions?: Prisma.StoreTransactionOrderByRelationAggregateInput
 }
 
 export type StoreTransactionTypeWhereUniqueInput = Prisma.AtLeast<{
@@ -217,7 +217,7 @@ export type StoreTransactionTypeWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.StoreTransactionTypeWhereInput[]
   NOT?: Prisma.StoreTransactionTypeWhereInput | Prisma.StoreTransactionTypeWhereInput[]
   is_inbound?: Prisma.BoolFilter<"StoreTransactionType"> | boolean
-  StoreTransaction?: Prisma.StoreTransactionListRelationFilter
+  transactions?: Prisma.StoreTransactionListRelationFilter
 }, "id" | "type">
 
 export type StoreTransactionTypeOrderByWithAggregationInput = {
@@ -243,27 +243,27 @@ export type StoreTransactionTypeScalarWhereWithAggregatesInput = {
 export type StoreTransactionTypeCreateInput = {
   type: string
   is_inbound: boolean
-  StoreTransaction?: Prisma.StoreTransactionCreateNestedManyWithoutStoreTransactionTypeInput
+  transactions?: Prisma.StoreTransactionCreateNestedManyWithoutTransaction_typeInput
 }
 
 export type StoreTransactionTypeUncheckedCreateInput = {
   id?: number
   type: string
   is_inbound: boolean
-  StoreTransaction?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutStoreTransactionTypeInput
+  transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutTransaction_typeInput
 }
 
 export type StoreTransactionTypeUpdateInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   is_inbound?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  StoreTransaction?: Prisma.StoreTransactionUpdateManyWithoutStoreTransactionTypeNestedInput
+  transactions?: Prisma.StoreTransactionUpdateManyWithoutTransaction_typeNestedInput
 }
 
 export type StoreTransactionTypeUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
   is_inbound?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  StoreTransaction?: Prisma.StoreTransactionUncheckedUpdateManyWithoutStoreTransactionTypeNestedInput
+  transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutTransaction_typeNestedInput
 }
 
 export type StoreTransactionTypeCreateManyInput = {
@@ -281,11 +281,6 @@ export type StoreTransactionTypeUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
   is_inbound?: Prisma.BoolFieldUpdateOperationsInput | boolean
-}
-
-export type StoreTransactionTypeScalarRelationFilter = {
-  is?: Prisma.StoreTransactionTypeWhereInput
-  isNot?: Prisma.StoreTransactionTypeWhereInput
 }
 
 export type StoreTransactionTypeCountOrderByAggregateInput = {
@@ -314,53 +309,58 @@ export type StoreTransactionTypeSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type StoreTransactionTypeCreateNestedOneWithoutStoreTransactionInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutStoreTransactionInput>
-  connectOrCreate?: Prisma.StoreTransactionTypeCreateOrConnectWithoutStoreTransactionInput
+export type StoreTransactionTypeScalarRelationFilter = {
+  is?: Prisma.StoreTransactionTypeWhereInput
+  isNot?: Prisma.StoreTransactionTypeWhereInput
+}
+
+export type StoreTransactionTypeCreateNestedOneWithoutTransactionsInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.StoreTransactionTypeCreateOrConnectWithoutTransactionsInput
   connect?: Prisma.StoreTransactionTypeWhereUniqueInput
 }
 
-export type StoreTransactionTypeUpdateOneRequiredWithoutStoreTransactionNestedInput = {
-  create?: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutStoreTransactionInput>
-  connectOrCreate?: Prisma.StoreTransactionTypeCreateOrConnectWithoutStoreTransactionInput
-  upsert?: Prisma.StoreTransactionTypeUpsertWithoutStoreTransactionInput
+export type StoreTransactionTypeUpdateOneRequiredWithoutTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.StoreTransactionTypeCreateOrConnectWithoutTransactionsInput
+  upsert?: Prisma.StoreTransactionTypeUpsertWithoutTransactionsInput
   connect?: Prisma.StoreTransactionTypeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StoreTransactionTypeUpdateToOneWithWhereWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUpdateWithoutStoreTransactionInput>, Prisma.StoreTransactionTypeUncheckedUpdateWithoutStoreTransactionInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StoreTransactionTypeUpdateToOneWithWhereWithoutTransactionsInput, Prisma.StoreTransactionTypeUpdateWithoutTransactionsInput>, Prisma.StoreTransactionTypeUncheckedUpdateWithoutTransactionsInput>
 }
 
-export type StoreTransactionTypeCreateWithoutStoreTransactionInput = {
+export type StoreTransactionTypeCreateWithoutTransactionsInput = {
   type: string
   is_inbound: boolean
 }
 
-export type StoreTransactionTypeUncheckedCreateWithoutStoreTransactionInput = {
+export type StoreTransactionTypeUncheckedCreateWithoutTransactionsInput = {
   id?: number
   type: string
   is_inbound: boolean
 }
 
-export type StoreTransactionTypeCreateOrConnectWithoutStoreTransactionInput = {
+export type StoreTransactionTypeCreateOrConnectWithoutTransactionsInput = {
   where: Prisma.StoreTransactionTypeWhereUniqueInput
-  create: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutStoreTransactionInput>
+  create: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutTransactionsInput>
 }
 
-export type StoreTransactionTypeUpsertWithoutStoreTransactionInput = {
-  update: Prisma.XOR<Prisma.StoreTransactionTypeUpdateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedUpdateWithoutStoreTransactionInput>
-  create: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutStoreTransactionInput>
+export type StoreTransactionTypeUpsertWithoutTransactionsInput = {
+  update: Prisma.XOR<Prisma.StoreTransactionTypeUpdateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedUpdateWithoutTransactionsInput>
+  create: Prisma.XOR<Prisma.StoreTransactionTypeCreateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedCreateWithoutTransactionsInput>
   where?: Prisma.StoreTransactionTypeWhereInput
 }
 
-export type StoreTransactionTypeUpdateToOneWithWhereWithoutStoreTransactionInput = {
+export type StoreTransactionTypeUpdateToOneWithWhereWithoutTransactionsInput = {
   where?: Prisma.StoreTransactionTypeWhereInput
-  data: Prisma.XOR<Prisma.StoreTransactionTypeUpdateWithoutStoreTransactionInput, Prisma.StoreTransactionTypeUncheckedUpdateWithoutStoreTransactionInput>
+  data: Prisma.XOR<Prisma.StoreTransactionTypeUpdateWithoutTransactionsInput, Prisma.StoreTransactionTypeUncheckedUpdateWithoutTransactionsInput>
 }
 
-export type StoreTransactionTypeUpdateWithoutStoreTransactionInput = {
+export type StoreTransactionTypeUpdateWithoutTransactionsInput = {
   type?: Prisma.StringFieldUpdateOperationsInput | string
   is_inbound?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
-export type StoreTransactionTypeUncheckedUpdateWithoutStoreTransactionInput = {
+export type StoreTransactionTypeUncheckedUpdateWithoutTransactionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   type?: Prisma.StringFieldUpdateOperationsInput | string
   is_inbound?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -372,11 +372,11 @@ export type StoreTransactionTypeUncheckedUpdateWithoutStoreTransactionInput = {
  */
 
 export type StoreTransactionTypeCountOutputType = {
-  StoreTransaction: number
+  transactions: number
 }
 
 export type StoreTransactionTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  StoreTransaction?: boolean | StoreTransactionTypeCountOutputTypeCountStoreTransactionArgs
+  transactions?: boolean | StoreTransactionTypeCountOutputTypeCountTransactionsArgs
 }
 
 /**
@@ -392,7 +392,7 @@ export type StoreTransactionTypeCountOutputTypeDefaultArgs<ExtArgs extends runti
 /**
  * StoreTransactionTypeCountOutputType without action
  */
-export type StoreTransactionTypeCountOutputTypeCountStoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StoreTransactionTypeCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.StoreTransactionWhereInput
 }
 
@@ -401,7 +401,7 @@ export type StoreTransactionTypeSelect<ExtArgs extends runtime.Types.Extensions.
   id?: boolean
   type?: boolean
   is_inbound?: boolean
-  StoreTransaction?: boolean | Prisma.StoreTransactionType$StoreTransactionArgs<ExtArgs>
+  transactions?: boolean | Prisma.StoreTransactionType$transactionsArgs<ExtArgs>
   _count?: boolean | Prisma.StoreTransactionTypeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["storeTransactionType"]>
 
@@ -425,7 +425,7 @@ export type StoreTransactionTypeSelectScalar = {
 
 export type StoreTransactionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "is_inbound", ExtArgs["result"]["storeTransactionType"]>
 export type StoreTransactionTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  StoreTransaction?: boolean | Prisma.StoreTransactionType$StoreTransactionArgs<ExtArgs>
+  transactions?: boolean | Prisma.StoreTransactionType$transactionsArgs<ExtArgs>
   _count?: boolean | Prisma.StoreTransactionTypeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StoreTransactionTypeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -434,7 +434,7 @@ export type StoreTransactionTypeIncludeUpdateManyAndReturn<ExtArgs extends runti
 export type $StoreTransactionTypePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StoreTransactionType"
   objects: {
-    StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>[]
+    transactions: Prisma.$StoreTransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -447,7 +447,7 @@ export type $StoreTransactionTypePayload<ExtArgs extends runtime.Types.Extension
 export type StoreTransactionTypeGetPayload<S extends boolean | null | undefined | StoreTransactionTypeDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$StoreTransactionTypePayload, S>
 
 export type StoreTransactionTypeCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<StoreTransactionTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<StoreTransactionTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: StoreTransactionTypeCountAggregateInputType | true
   }
 
@@ -834,7 +834,7 @@ readonly fields: StoreTransactionTypeFieldRefs;
  */
 export interface Prisma__StoreTransactionTypeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  StoreTransaction<T extends Prisma.StoreTransactionType$StoreTransactionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionType$StoreTransactionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  transactions<T extends Prisma.StoreTransactionType$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionType$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -891,7 +891,6 @@ export type StoreTransactionTypeFindUniqueArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which StoreTransactionType to fetch.
    */
   where: Prisma.StoreTransactionTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -914,7 +913,6 @@ export type StoreTransactionTypeFindUniqueOrThrowArgs<ExtArgs extends runtime.Ty
    * Filter, which StoreTransactionType to fetch.
    */
   where: Prisma.StoreTransactionTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -967,7 +965,6 @@ export type StoreTransactionTypeFindFirstArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of StoreTransactionTypes.
    */
   distinct?: Prisma.StoreTransactionTypeScalarFieldEnum | Prisma.StoreTransactionTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1020,7 +1017,6 @@ export type StoreTransactionTypeFindFirstOrThrowArgs<ExtArgs extends runtime.Typ
    * Filter by unique combinations of StoreTransactionTypes.
    */
   distinct?: Prisma.StoreTransactionTypeScalarFieldEnum | Prisma.StoreTransactionTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1073,7 +1069,6 @@ export type StoreTransactionTypeFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Filter by unique combinations of StoreTransactionTypes.
    */
   distinct?: Prisma.StoreTransactionTypeScalarFieldEnum | Prisma.StoreTransactionTypeScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1096,7 +1091,6 @@ export type StoreTransactionTypeCreateArgs<ExtArgs extends runtime.Types.Extensi
    * The data needed to create a StoreTransactionType.
    */
   data: Prisma.XOR<Prisma.StoreTransactionTypeCreateInput, Prisma.StoreTransactionTypeUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1153,7 +1147,6 @@ export type StoreTransactionTypeUpdateArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which StoreTransactionType to update.
    */
   where: Prisma.StoreTransactionTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1228,7 +1221,6 @@ export type StoreTransactionTypeUpsertArgs<ExtArgs extends runtime.Types.Extensi
    * In case the StoreTransactionType was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.StoreTransactionTypeUpdateInput, Prisma.StoreTransactionTypeUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1251,7 +1243,6 @@ export type StoreTransactionTypeDeleteArgs<ExtArgs extends runtime.Types.Extensi
    * Filter which StoreTransactionType to delete.
    */
   where: Prisma.StoreTransactionTypeWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1269,9 +1260,9 @@ export type StoreTransactionTypeDeleteManyArgs<ExtArgs extends runtime.Types.Ext
 }
 
 /**
- * StoreTransactionType.StoreTransaction
+ * StoreTransactionType.transactions
  */
-export type StoreTransactionType$StoreTransactionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StoreTransactionType$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the StoreTransaction
    */

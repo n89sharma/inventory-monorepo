@@ -673,7 +673,7 @@ export type $CostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type CostGetPayload<S extends boolean | null | undefined | CostDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CostPayload, S>
 
 export type CostCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CostFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<CostFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: CostCountAggregateInputType | true
   }
 
@@ -1123,7 +1123,6 @@ export type CostFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which Cost to fetch.
    */
   where: Prisma.CostWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1146,7 +1145,6 @@ export type CostFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which Cost to fetch.
    */
   where: Prisma.CostWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1199,7 +1197,6 @@ export type CostFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Costs.
    */
   distinct?: Prisma.CostScalarFieldEnum | Prisma.CostScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1252,7 +1249,6 @@ export type CostFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Costs.
    */
   distinct?: Prisma.CostScalarFieldEnum | Prisma.CostScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1305,7 +1301,6 @@ export type CostFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter by unique combinations of Costs.
    */
   distinct?: Prisma.CostScalarFieldEnum | Prisma.CostScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1328,7 +1323,6 @@ export type CostCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a Cost.
    */
   data: Prisma.XOR<Prisma.CostCreateInput, Prisma.CostUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1389,7 +1383,6 @@ export type CostUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which Cost to update.
    */
   where: Prisma.CostWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1468,7 +1461,6 @@ export type CostUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the Cost was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CostUpdateInput, Prisma.CostUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1491,7 +1483,6 @@ export type CostDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which Cost to delete.
    */
   where: Prisma.CostWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

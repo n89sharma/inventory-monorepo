@@ -288,12 +288,12 @@ export type OrganizationWhereInput = {
   province?: Prisma.StringNullableFilter<"Organization"> | string | null
   country?: Prisma.StringNullableFilter<"Organization"> | string | null
   website?: Prisma.StringNullableFilter<"Organization"> | string | null
+  invoices?: Prisma.InvoiceListRelationFilter
   arrivals_origin?: Prisma.ArrivalListRelationFilter
   arrivals_transporter?: Prisma.ArrivalListRelationFilter
   departures_destination?: Prisma.DepartureListRelationFilter
   departures_transporter?: Prisma.DepartureListRelationFilter
   holds?: Prisma.HoldListRelationFilter
-  invoices?: Prisma.InvoiceListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
 }
 
@@ -312,12 +312,12 @@ export type OrganizationOrderByWithRelationInput = {
   province?: Prisma.SortOrderInput | Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
+  invoices?: Prisma.InvoiceOrderByRelationAggregateInput
   arrivals_origin?: Prisma.ArrivalOrderByRelationAggregateInput
   arrivals_transporter?: Prisma.ArrivalOrderByRelationAggregateInput
   departures_destination?: Prisma.DepartureOrderByRelationAggregateInput
   departures_transporter?: Prisma.DepartureOrderByRelationAggregateInput
   holds?: Prisma.HoldOrderByRelationAggregateInput
-  invoices?: Prisma.InvoiceOrderByRelationAggregateInput
   transfers?: Prisma.TransferOrderByRelationAggregateInput
 }
 
@@ -339,12 +339,12 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   province?: Prisma.StringNullableFilter<"Organization"> | string | null
   country?: Prisma.StringNullableFilter<"Organization"> | string | null
   website?: Prisma.StringNullableFilter<"Organization"> | string | null
+  invoices?: Prisma.InvoiceListRelationFilter
   arrivals_origin?: Prisma.ArrivalListRelationFilter
   arrivals_transporter?: Prisma.ArrivalListRelationFilter
   departures_destination?: Prisma.DepartureListRelationFilter
   departures_transporter?: Prisma.DepartureListRelationFilter
   holds?: Prisma.HoldListRelationFilter
-  invoices?: Prisma.InvoiceListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
 }, "id" | "account_number">
 
@@ -404,12 +404,12 @@ export type OrganizationCreateInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -428,12 +428,12 @@ export type OrganizationUncheckedCreateInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -451,12 +451,12 @@ export type OrganizationUpdateInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -475,12 +475,12 @@ export type OrganizationUncheckedUpdateInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -710,12 +710,12 @@ export type OrganizationCreateWithoutTransfersInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutTransfersInput = {
@@ -733,12 +733,12 @@ export type OrganizationUncheckedCreateWithoutTransfersInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutTransfersInput = {
@@ -771,12 +771,12 @@ export type OrganizationUpdateWithoutTransfersInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutTransfersInput = {
@@ -794,12 +794,12 @@ export type OrganizationUncheckedUpdateWithoutTransfersInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutArrivals_originInput = {
@@ -816,11 +816,11 @@ export type OrganizationCreateWithoutArrivals_originInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -839,11 +839,11 @@ export type OrganizationUncheckedCreateWithoutArrivals_originInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -866,11 +866,11 @@ export type OrganizationCreateWithoutArrivals_transporterInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -889,11 +889,11 @@ export type OrganizationUncheckedCreateWithoutArrivals_transporterInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -927,11 +927,11 @@ export type OrganizationUpdateWithoutArrivals_originInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -950,11 +950,11 @@ export type OrganizationUncheckedUpdateWithoutArrivals_originInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -983,11 +983,11 @@ export type OrganizationUpdateWithoutArrivals_transporterInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1006,11 +1006,11 @@ export type OrganizationUncheckedUpdateWithoutArrivals_transporterInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1028,11 +1028,11 @@ export type OrganizationCreateWithoutDepartures_destinationInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -1051,11 +1051,11 @@ export type OrganizationUncheckedCreateWithoutDepartures_destinationInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -1078,11 +1078,11 @@ export type OrganizationCreateWithoutDepartures_transporterInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   holds?: Prisma.HoldCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -1101,11 +1101,11 @@ export type OrganizationUncheckedCreateWithoutDepartures_transporterInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   holds?: Prisma.HoldUncheckedCreateNestedManyWithoutCustomerInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -1139,11 +1139,11 @@ export type OrganizationUpdateWithoutDepartures_destinationInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1162,11 +1162,11 @@ export type OrganizationUncheckedUpdateWithoutDepartures_destinationInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1195,11 +1195,11 @@ export type OrganizationUpdateWithoutDepartures_transporterInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   holds?: Prisma.HoldUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1218,11 +1218,11 @@ export type OrganizationUncheckedUpdateWithoutDepartures_transporterInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   holds?: Prisma.HoldUncheckedUpdateManyWithoutCustomerNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1240,11 +1240,11 @@ export type OrganizationCreateWithoutHoldsInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureCreateNestedManyWithoutTransporterInput
-  invoices?: Prisma.InvoiceCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferCreateNestedManyWithoutTransporterInput
 }
 
@@ -1263,11 +1263,11 @@ export type OrganizationUncheckedCreateWithoutHoldsInput = {
   province?: string | null
   country?: string | null
   website?: string | null
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   arrivals_origin?: Prisma.ArrivalUncheckedCreateNestedManyWithoutOriginInput
   arrivals_transporter?: Prisma.ArrivalUncheckedCreateNestedManyWithoutTransporterInput
   departures_destination?: Prisma.DepartureUncheckedCreateNestedManyWithoutDestinationInput
   departures_transporter?: Prisma.DepartureUncheckedCreateNestedManyWithoutTransporterInput
-  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutOrganizationInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutTransporterInput
 }
 
@@ -1301,11 +1301,11 @@ export type OrganizationUpdateWithoutHoldsInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUpdateManyWithoutTransporterNestedInput
-  invoices?: Prisma.InvoiceUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1324,11 +1324,11 @@ export type OrganizationUncheckedUpdateWithoutHoldsInput = {
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   arrivals_origin?: Prisma.ArrivalUncheckedUpdateManyWithoutOriginNestedInput
   arrivals_transporter?: Prisma.ArrivalUncheckedUpdateManyWithoutTransporterNestedInput
   departures_destination?: Prisma.DepartureUncheckedUpdateManyWithoutDestinationNestedInput
   departures_transporter?: Prisma.DepartureUncheckedUpdateManyWithoutTransporterNestedInput
-  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutOrganizationNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutTransporterNestedInput
 }
 
@@ -1444,22 +1444,22 @@ export type OrganizationUncheckedUpdateWithoutInvoicesInput = {
  */
 
 export type OrganizationCountOutputType = {
+  invoices: number
   arrivals_origin: number
   arrivals_transporter: number
   departures_destination: number
   departures_transporter: number
   holds: number
-  invoices: number
   transfers: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  invoices?: boolean | OrganizationCountOutputTypeCountInvoicesArgs
   arrivals_origin?: boolean | OrganizationCountOutputTypeCountArrivals_originArgs
   arrivals_transporter?: boolean | OrganizationCountOutputTypeCountArrivals_transporterArgs
   departures_destination?: boolean | OrganizationCountOutputTypeCountDepartures_destinationArgs
   departures_transporter?: boolean | OrganizationCountOutputTypeCountDepartures_transporterArgs
   holds?: boolean | OrganizationCountOutputTypeCountHoldsArgs
-  invoices?: boolean | OrganizationCountOutputTypeCountInvoicesArgs
   transfers?: boolean | OrganizationCountOutputTypeCountTransfersArgs
 }
 
@@ -1471,6 +1471,13 @@ export type OrganizationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
    * Select specific fields to fetch from the OrganizationCountOutputType
    */
   select?: Prisma.OrganizationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountInvoicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InvoiceWhereInput
 }
 
 /**
@@ -1511,13 +1518,6 @@ export type OrganizationCountOutputTypeCountHoldsArgs<ExtArgs extends runtime.Ty
 /**
  * OrganizationCountOutputType without action
  */
-export type OrganizationCountOutputTypeCountInvoicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.InvoiceWhereInput
-}
-
-/**
- * OrganizationCountOutputType without action
- */
 export type OrganizationCountOutputTypeCountTransfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TransferWhereInput
 }
@@ -1538,12 +1538,12 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   province?: boolean
   country?: boolean
   website?: boolean
+  invoices?: boolean | Prisma.Organization$invoicesArgs<ExtArgs>
   arrivals_origin?: boolean | Prisma.Organization$arrivals_originArgs<ExtArgs>
   arrivals_transporter?: boolean | Prisma.Organization$arrivals_transporterArgs<ExtArgs>
   departures_destination?: boolean | Prisma.Organization$departures_destinationArgs<ExtArgs>
   departures_transporter?: boolean | Prisma.Organization$departures_transporterArgs<ExtArgs>
   holds?: boolean | Prisma.Organization$holdsArgs<ExtArgs>
-  invoices?: boolean | Prisma.Organization$invoicesArgs<ExtArgs>
   transfers?: boolean | Prisma.Organization$transfersArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
@@ -1601,12 +1601,12 @@ export type OrganizationSelectScalar = {
 
 export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_number" | "name" | "contact_name" | "phone" | "phone_ext" | "mobile" | "primary_email" | "secondary_email" | "address" | "city" | "province" | "country" | "website", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  invoices?: boolean | Prisma.Organization$invoicesArgs<ExtArgs>
   arrivals_origin?: boolean | Prisma.Organization$arrivals_originArgs<ExtArgs>
   arrivals_transporter?: boolean | Prisma.Organization$arrivals_transporterArgs<ExtArgs>
   departures_destination?: boolean | Prisma.Organization$departures_destinationArgs<ExtArgs>
   departures_transporter?: boolean | Prisma.Organization$departures_transporterArgs<ExtArgs>
   holds?: boolean | Prisma.Organization$holdsArgs<ExtArgs>
-  invoices?: boolean | Prisma.Organization$invoicesArgs<ExtArgs>
   transfers?: boolean | Prisma.Organization$transfersArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1616,12 +1616,12 @@ export type OrganizationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Organization"
   objects: {
+    invoices: Prisma.$InvoicePayload<ExtArgs>[]
     arrivals_origin: Prisma.$ArrivalPayload<ExtArgs>[]
     arrivals_transporter: Prisma.$ArrivalPayload<ExtArgs>[]
     departures_destination: Prisma.$DeparturePayload<ExtArgs>[]
     departures_transporter: Prisma.$DeparturePayload<ExtArgs>[]
     holds: Prisma.$HoldPayload<ExtArgs>[]
-    invoices: Prisma.$InvoicePayload<ExtArgs>[]
     transfers: Prisma.$TransferPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1646,7 +1646,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
 export type OrganizationGetPayload<S extends boolean | null | undefined | OrganizationDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$OrganizationPayload, S>
 
 export type OrganizationCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<OrganizationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<OrganizationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: OrganizationCountAggregateInputType | true
   }
 
@@ -2033,12 +2033,12 @@ readonly fields: OrganizationFieldRefs;
  */
 export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  invoices<T extends Prisma.Organization$invoicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   arrivals_origin<T extends Prisma.Organization$arrivals_originArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$arrivals_originArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   arrivals_transporter<T extends Prisma.Organization$arrivals_transporterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$arrivals_transporterArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArrivalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   departures_destination<T extends Prisma.Organization$departures_destinationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$departures_destinationArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   departures_transporter<T extends Prisma.Organization$departures_transporterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$departures_transporterArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   holds<T extends Prisma.Organization$holdsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$holdsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HoldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  invoices<T extends Prisma.Organization$invoicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$invoicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfers<T extends Prisma.Organization$transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2107,7 +2107,6 @@ export type OrganizationFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Organization to fetch.
    */
   where: Prisma.OrganizationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2130,7 +2129,6 @@ export type OrganizationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which Organization to fetch.
    */
   where: Prisma.OrganizationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2183,7 +2181,6 @@ export type OrganizationFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of Organizations.
    */
   distinct?: Prisma.OrganizationScalarFieldEnum | Prisma.OrganizationScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2236,7 +2233,6 @@ export type OrganizationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
    * Filter by unique combinations of Organizations.
    */
   distinct?: Prisma.OrganizationScalarFieldEnum | Prisma.OrganizationScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2289,7 +2285,6 @@ export type OrganizationFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Organizations.
    */
   distinct?: Prisma.OrganizationScalarFieldEnum | Prisma.OrganizationScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2312,7 +2307,6 @@ export type OrganizationCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data needed to create a Organization.
    */
   data: Prisma.XOR<Prisma.OrganizationCreateInput, Prisma.OrganizationUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2369,7 +2363,6 @@ export type OrganizationUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which Organization to update.
    */
   where: Prisma.OrganizationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2444,7 +2437,6 @@ export type OrganizationUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * In case the Organization was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.OrganizationUpdateInput, Prisma.OrganizationUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2467,7 +2459,6 @@ export type OrganizationDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter which Organization to delete.
    */
   where: Prisma.OrganizationWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2482,6 +2473,30 @@ export type OrganizationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many Organizations to delete.
    */
   limit?: number
+}
+
+/**
+ * Organization.invoices
+ */
+export type Organization$invoicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invoice
+   */
+  select?: Prisma.InvoiceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invoice
+   */
+  omit?: Prisma.InvoiceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InvoiceInclude<ExtArgs> | null
+  where?: Prisma.InvoiceWhereInput
+  orderBy?: Prisma.InvoiceOrderByWithRelationInput | Prisma.InvoiceOrderByWithRelationInput[]
+  cursor?: Prisma.InvoiceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InvoiceScalarFieldEnum | Prisma.InvoiceScalarFieldEnum[]
 }
 
 /**
@@ -2602,30 +2617,6 @@ export type Organization$holdsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.HoldScalarFieldEnum | Prisma.HoldScalarFieldEnum[]
-}
-
-/**
- * Organization.invoices
- */
-export type Organization$invoicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Invoice
-   */
-  select?: Prisma.InvoiceSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Invoice
-   */
-  omit?: Prisma.InvoiceOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.InvoiceInclude<ExtArgs> | null
-  where?: Prisma.InvoiceWhereInput
-  orderBy?: Prisma.InvoiceOrderByWithRelationInput | Prisma.InvoiceOrderByWithRelationInput[]
-  cursor?: Prisma.InvoiceWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.InvoiceScalarFieldEnum | Prisma.InvoiceScalarFieldEnum[]
 }
 
 /**

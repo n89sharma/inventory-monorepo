@@ -192,13 +192,13 @@ export type AccessoryWhereInput = {
   NOT?: Prisma.AccessoryWhereInput | Prisma.AccessoryWhereInput[]
   id?: Prisma.IntFilter<"Accessory"> | number
   accessory?: Prisma.StringFilter<"Accessory"> | string
-  AssetAccessory?: Prisma.AssetAccessoryListRelationFilter
+  assetAccessories?: Prisma.AssetAccessoryListRelationFilter
 }
 
 export type AccessoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   accessory?: Prisma.SortOrder
-  AssetAccessory?: Prisma.AssetAccessoryOrderByRelationAggregateInput
+  assetAccessories?: Prisma.AssetAccessoryOrderByRelationAggregateInput
 }
 
 export type AccessoryWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type AccessoryWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.AccessoryWhereInput | Prisma.AccessoryWhereInput[]
   OR?: Prisma.AccessoryWhereInput[]
   NOT?: Prisma.AccessoryWhereInput | Prisma.AccessoryWhereInput[]
-  AssetAccessory?: Prisma.AssetAccessoryListRelationFilter
+  assetAccessories?: Prisma.AssetAccessoryListRelationFilter
 }, "id" | "accessory">
 
 export type AccessoryOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type AccessoryScalarWhereWithAggregatesInput = {
 
 export type AccessoryCreateInput = {
   accessory: string
-  AssetAccessory?: Prisma.AssetAccessoryCreateNestedManyWithoutAccessoryInput
+  assetAccessories?: Prisma.AssetAccessoryCreateNestedManyWithoutAccessoryInput
 }
 
 export type AccessoryUncheckedCreateInput = {
   id?: number
   accessory: string
-  AssetAccessory?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
+  assetAccessories?: Prisma.AssetAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
 }
 
 export type AccessoryUpdateInput = {
   accessory?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetAccessory?: Prisma.AssetAccessoryUpdateManyWithoutAccessoryNestedInput
+  assetAccessories?: Prisma.AssetAccessoryUpdateManyWithoutAccessoryNestedInput
 }
 
 export type AccessoryUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   accessory?: Prisma.StringFieldUpdateOperationsInput | string
-  AssetAccessory?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
+  assetAccessories?: Prisma.AssetAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
 }
 
 export type AccessoryCreateManyInput = {
@@ -262,11 +262,6 @@ export type AccessoryUpdateManyMutationInput = {
 export type AccessoryUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   accessory?: Prisma.StringFieldUpdateOperationsInput | string
-}
-
-export type AccessoryScalarRelationFilter = {
-  is?: Prisma.AccessoryWhereInput
-  isNot?: Prisma.AccessoryWhereInput
 }
 
 export type AccessoryCountOrderByAggregateInput = {
@@ -292,50 +287,67 @@ export type AccessorySumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type AccessoryCreateNestedOneWithoutAssetAccessoryInput = {
-  create?: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoryInput>
-  connectOrCreate?: Prisma.AccessoryCreateOrConnectWithoutAssetAccessoryInput
+export type AccessoryScalarRelationFilter = {
+  is?: Prisma.AccessoryWhereInput
+  isNot?: Prisma.AccessoryWhereInput
+}
+
+export type StringFieldUpdateOperationsInput = {
+  set?: string
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type AccessoryCreateNestedOneWithoutAssetAccessoriesInput = {
+  create?: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoriesInput>
+  connectOrCreate?: Prisma.AccessoryCreateOrConnectWithoutAssetAccessoriesInput
   connect?: Prisma.AccessoryWhereUniqueInput
 }
 
-export type AccessoryUpdateOneRequiredWithoutAssetAccessoryNestedInput = {
-  create?: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoryInput>
-  connectOrCreate?: Prisma.AccessoryCreateOrConnectWithoutAssetAccessoryInput
-  upsert?: Prisma.AccessoryUpsertWithoutAssetAccessoryInput
+export type AccessoryUpdateOneRequiredWithoutAssetAccessoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoriesInput>
+  connectOrCreate?: Prisma.AccessoryCreateOrConnectWithoutAssetAccessoriesInput
+  upsert?: Prisma.AccessoryUpsertWithoutAssetAccessoriesInput
   connect?: Prisma.AccessoryWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AccessoryUpdateToOneWithWhereWithoutAssetAccessoryInput, Prisma.AccessoryUpdateWithoutAssetAccessoryInput>, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoryInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AccessoryUpdateToOneWithWhereWithoutAssetAccessoriesInput, Prisma.AccessoryUpdateWithoutAssetAccessoriesInput>, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoriesInput>
 }
 
-export type AccessoryCreateWithoutAssetAccessoryInput = {
+export type AccessoryCreateWithoutAssetAccessoriesInput = {
   accessory: string
 }
 
-export type AccessoryUncheckedCreateWithoutAssetAccessoryInput = {
+export type AccessoryUncheckedCreateWithoutAssetAccessoriesInput = {
   id?: number
   accessory: string
 }
 
-export type AccessoryCreateOrConnectWithoutAssetAccessoryInput = {
+export type AccessoryCreateOrConnectWithoutAssetAccessoriesInput = {
   where: Prisma.AccessoryWhereUniqueInput
-  create: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoryInput>
+  create: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoriesInput>
 }
 
-export type AccessoryUpsertWithoutAssetAccessoryInput = {
-  update: Prisma.XOR<Prisma.AccessoryUpdateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoryInput>
-  create: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoryInput>
+export type AccessoryUpsertWithoutAssetAccessoriesInput = {
+  update: Prisma.XOR<Prisma.AccessoryUpdateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoriesInput>
+  create: Prisma.XOR<Prisma.AccessoryCreateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedCreateWithoutAssetAccessoriesInput>
   where?: Prisma.AccessoryWhereInput
 }
 
-export type AccessoryUpdateToOneWithWhereWithoutAssetAccessoryInput = {
+export type AccessoryUpdateToOneWithWhereWithoutAssetAccessoriesInput = {
   where?: Prisma.AccessoryWhereInput
-  data: Prisma.XOR<Prisma.AccessoryUpdateWithoutAssetAccessoryInput, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoryInput>
+  data: Prisma.XOR<Prisma.AccessoryUpdateWithoutAssetAccessoriesInput, Prisma.AccessoryUncheckedUpdateWithoutAssetAccessoriesInput>
 }
 
-export type AccessoryUpdateWithoutAssetAccessoryInput = {
+export type AccessoryUpdateWithoutAssetAccessoriesInput = {
   accessory?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type AccessoryUncheckedUpdateWithoutAssetAccessoryInput = {
+export type AccessoryUncheckedUpdateWithoutAssetAccessoriesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   accessory?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -346,11 +358,11 @@ export type AccessoryUncheckedUpdateWithoutAssetAccessoryInput = {
  */
 
 export type AccessoryCountOutputType = {
-  AssetAccessory: number
+  assetAccessories: number
 }
 
 export type AccessoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  AssetAccessory?: boolean | AccessoryCountOutputTypeCountAssetAccessoryArgs
+  assetAccessories?: boolean | AccessoryCountOutputTypeCountAssetAccessoriesArgs
 }
 
 /**
@@ -366,7 +378,7 @@ export type AccessoryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * AccessoryCountOutputType without action
  */
-export type AccessoryCountOutputTypeCountAssetAccessoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type AccessoryCountOutputTypeCountAssetAccessoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetAccessoryWhereInput
 }
 
@@ -374,7 +386,7 @@ export type AccessoryCountOutputTypeCountAssetAccessoryArgs<ExtArgs extends runt
 export type AccessorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   accessory?: boolean
-  AssetAccessory?: boolean | Prisma.Accessory$AssetAccessoryArgs<ExtArgs>
+  assetAccessories?: boolean | Prisma.Accessory$assetAccessoriesArgs<ExtArgs>
   _count?: boolean | Prisma.AccessoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["accessory"]>
 
@@ -395,7 +407,7 @@ export type AccessorySelectScalar = {
 
 export type AccessoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accessory", ExtArgs["result"]["accessory"]>
 export type AccessoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  AssetAccessory?: boolean | Prisma.Accessory$AssetAccessoryArgs<ExtArgs>
+  assetAccessories?: boolean | Prisma.Accessory$assetAccessoriesArgs<ExtArgs>
   _count?: boolean | Prisma.AccessoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AccessoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -404,7 +416,7 @@ export type AccessoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $AccessoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Accessory"
   objects: {
-    AssetAccessory: Prisma.$AssetAccessoryPayload<ExtArgs>[]
+    assetAccessories: Prisma.$AssetAccessoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -416,7 +428,7 @@ export type $AccessoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type AccessoryGetPayload<S extends boolean | null | undefined | AccessoryDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AccessoryPayload, S>
 
 export type AccessoryCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AccessoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<AccessoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: AccessoryCountAggregateInputType | true
   }
 
@@ -803,7 +815,7 @@ readonly fields: AccessoryFieldRefs;
  */
 export interface Prisma__AccessoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  AssetAccessory<T extends Prisma.Accessory$AssetAccessoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Accessory$AssetAccessoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assetAccessories<T extends Prisma.Accessory$assetAccessoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Accessory$assetAccessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -859,7 +871,6 @@ export type AccessoryFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which Accessory to fetch.
    */
   where: Prisma.AccessoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -882,7 +893,6 @@ export type AccessoryFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which Accessory to fetch.
    */
   where: Prisma.AccessoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -935,7 +945,6 @@ export type AccessoryFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of Accessories.
    */
   distinct?: Prisma.AccessoryScalarFieldEnum | Prisma.AccessoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -988,7 +997,6 @@ export type AccessoryFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of Accessories.
    */
   distinct?: Prisma.AccessoryScalarFieldEnum | Prisma.AccessoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1041,7 +1049,6 @@ export type AccessoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Accessories.
    */
   distinct?: Prisma.AccessoryScalarFieldEnum | Prisma.AccessoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1064,7 +1071,6 @@ export type AccessoryCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a Accessory.
    */
   data: Prisma.XOR<Prisma.AccessoryCreateInput, Prisma.AccessoryUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1121,7 +1127,6 @@ export type AccessoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which Accessory to update.
    */
   where: Prisma.AccessoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,7 +1201,6 @@ export type AccessoryUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the Accessory was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AccessoryUpdateInput, Prisma.AccessoryUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1223,6 @@ export type AccessoryDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which Accessory to delete.
    */
   where: Prisma.AccessoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1237,9 +1240,9 @@ export type AccessoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
- * Accessory.AssetAccessory
+ * Accessory.assetAccessories
  */
-export type Accessory$AssetAccessoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Accessory$assetAccessoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the AssetAccessory
    */

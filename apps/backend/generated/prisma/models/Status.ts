@@ -192,13 +192,13 @@ export type StatusWhereInput = {
   NOT?: Prisma.StatusWhereInput | Prisma.StatusWhereInput[]
   id?: Prisma.IntFilter<"Status"> | number
   status?: Prisma.StringFilter<"Status"> | string
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }
 
 export type StatusOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  Asset?: Prisma.AssetOrderByRelationAggregateInput
+  assets?: Prisma.AssetOrderByRelationAggregateInput
 }
 
 export type StatusWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type StatusWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.StatusWhereInput | Prisma.StatusWhereInput[]
   OR?: Prisma.StatusWhereInput[]
   NOT?: Prisma.StatusWhereInput | Prisma.StatusWhereInput[]
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }, "id" | "status">
 
 export type StatusOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type StatusScalarWhereWithAggregatesInput = {
 
 export type StatusCreateInput = {
   status: string
-  Asset?: Prisma.AssetCreateNestedManyWithoutStatusInput
+  assets?: Prisma.AssetCreateNestedManyWithoutStatusInput
 }
 
 export type StatusUncheckedCreateInput = {
   id?: number
   status: string
-  Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutStatusInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutStatusInput
 }
 
 export type StatusUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUpdateManyWithoutStatusNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutStatusNestedInput
 }
 
 export type StatusUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUncheckedUpdateManyWithoutStatusNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutStatusNestedInput
 }
 
 export type StatusCreateManyInput = {
@@ -262,11 +262,6 @@ export type StatusUpdateManyMutationInput = {
 export type StatusUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-}
-
-export type StatusScalarRelationFilter = {
-  is?: Prisma.StatusWhereInput
-  isNot?: Prisma.StatusWhereInput
 }
 
 export type StatusCountOrderByAggregateInput = {
@@ -292,50 +287,55 @@ export type StatusSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type StatusCreateNestedOneWithoutAssetInput = {
-  create?: Prisma.XOR<Prisma.StatusCreateWithoutAssetInput, Prisma.StatusUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAssetInput
+export type StatusScalarRelationFilter = {
+  is?: Prisma.StatusWhereInput
+  isNot?: Prisma.StatusWhereInput
+}
+
+export type StatusCreateNestedOneWithoutAssetsInput = {
+  create?: Prisma.XOR<Prisma.StatusCreateWithoutAssetsInput, Prisma.StatusUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAssetsInput
   connect?: Prisma.StatusWhereUniqueInput
 }
 
-export type StatusUpdateOneRequiredWithoutAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.StatusCreateWithoutAssetInput, Prisma.StatusUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAssetInput
-  upsert?: Prisma.StatusUpsertWithoutAssetInput
+export type StatusUpdateOneRequiredWithoutAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.StatusCreateWithoutAssetsInput, Prisma.StatusUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAssetsInput
+  upsert?: Prisma.StatusUpsertWithoutAssetsInput
   connect?: Prisma.StatusWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StatusUpdateToOneWithWhereWithoutAssetInput, Prisma.StatusUpdateWithoutAssetInput>, Prisma.StatusUncheckedUpdateWithoutAssetInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StatusUpdateToOneWithWhereWithoutAssetsInput, Prisma.StatusUpdateWithoutAssetsInput>, Prisma.StatusUncheckedUpdateWithoutAssetsInput>
 }
 
-export type StatusCreateWithoutAssetInput = {
+export type StatusCreateWithoutAssetsInput = {
   status: string
 }
 
-export type StatusUncheckedCreateWithoutAssetInput = {
+export type StatusUncheckedCreateWithoutAssetsInput = {
   id?: number
   status: string
 }
 
-export type StatusCreateOrConnectWithoutAssetInput = {
+export type StatusCreateOrConnectWithoutAssetsInput = {
   where: Prisma.StatusWhereUniqueInput
-  create: Prisma.XOR<Prisma.StatusCreateWithoutAssetInput, Prisma.StatusUncheckedCreateWithoutAssetInput>
+  create: Prisma.XOR<Prisma.StatusCreateWithoutAssetsInput, Prisma.StatusUncheckedCreateWithoutAssetsInput>
 }
 
-export type StatusUpsertWithoutAssetInput = {
-  update: Prisma.XOR<Prisma.StatusUpdateWithoutAssetInput, Prisma.StatusUncheckedUpdateWithoutAssetInput>
-  create: Prisma.XOR<Prisma.StatusCreateWithoutAssetInput, Prisma.StatusUncheckedCreateWithoutAssetInput>
+export type StatusUpsertWithoutAssetsInput = {
+  update: Prisma.XOR<Prisma.StatusUpdateWithoutAssetsInput, Prisma.StatusUncheckedUpdateWithoutAssetsInput>
+  create: Prisma.XOR<Prisma.StatusCreateWithoutAssetsInput, Prisma.StatusUncheckedCreateWithoutAssetsInput>
   where?: Prisma.StatusWhereInput
 }
 
-export type StatusUpdateToOneWithWhereWithoutAssetInput = {
+export type StatusUpdateToOneWithWhereWithoutAssetsInput = {
   where?: Prisma.StatusWhereInput
-  data: Prisma.XOR<Prisma.StatusUpdateWithoutAssetInput, Prisma.StatusUncheckedUpdateWithoutAssetInput>
+  data: Prisma.XOR<Prisma.StatusUpdateWithoutAssetsInput, Prisma.StatusUncheckedUpdateWithoutAssetsInput>
 }
 
-export type StatusUpdateWithoutAssetInput = {
+export type StatusUpdateWithoutAssetsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type StatusUncheckedUpdateWithoutAssetInput = {
+export type StatusUncheckedUpdateWithoutAssetsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -346,11 +346,11 @@ export type StatusUncheckedUpdateWithoutAssetInput = {
  */
 
 export type StatusCountOutputType = {
-  Asset: number
+  assets: number
 }
 
 export type StatusCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | StatusCountOutputTypeCountAssetArgs
+  assets?: boolean | StatusCountOutputTypeCountAssetsArgs
 }
 
 /**
@@ -366,7 +366,7 @@ export type StatusCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
 /**
  * StatusCountOutputType without action
  */
-export type StatusCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type StatusCountOutputTypeCountAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetWhereInput
 }
 
@@ -374,7 +374,7 @@ export type StatusCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.Ex
 export type StatusSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   status?: boolean
-  Asset?: boolean | Prisma.Status$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Status$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.StatusCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["status"]>
 
@@ -395,7 +395,7 @@ export type StatusSelectScalar = {
 
 export type StatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status", ExtArgs["result"]["status"]>
 export type StatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.Status$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Status$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.StatusCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StatusIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -404,7 +404,7 @@ export type StatusIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $StatusPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Status"
   objects: {
-    Asset: Prisma.$AssetPayload<ExtArgs>[]
+    assets: Prisma.$AssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -416,7 +416,7 @@ export type $StatusPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type StatusGetPayload<S extends boolean | null | undefined | StatusDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$StatusPayload, S>
 
 export type StatusCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<StatusFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<StatusFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: StatusCountAggregateInputType | true
   }
 
@@ -803,7 +803,7 @@ readonly fields: StatusFieldRefs;
  */
 export interface Prisma__StatusClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Asset<T extends Prisma.Status$AssetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Status$AssetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assets<T extends Prisma.Status$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Status$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -859,7 +859,6 @@ export type StatusFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter, which Status to fetch.
    */
   where: Prisma.StatusWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -882,7 +881,6 @@ export type StatusFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which Status to fetch.
    */
   where: Prisma.StatusWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -935,7 +933,6 @@ export type StatusFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Statuses.
    */
   distinct?: Prisma.StatusScalarFieldEnum | Prisma.StatusScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -988,7 +985,6 @@ export type StatusFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of Statuses.
    */
   distinct?: Prisma.StatusScalarFieldEnum | Prisma.StatusScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1041,7 +1037,6 @@ export type StatusFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Statuses.
    */
   distinct?: Prisma.StatusScalarFieldEnum | Prisma.StatusScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1064,7 +1059,6 @@ export type StatusCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * The data needed to create a Status.
    */
   data: Prisma.XOR<Prisma.StatusCreateInput, Prisma.StatusUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1121,7 +1115,6 @@ export type StatusUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Choose, which Status to update.
    */
   where: Prisma.StatusWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,7 +1189,6 @@ export type StatusUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * In case the Status was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.StatusUpdateInput, Prisma.StatusUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1211,6 @@ export type StatusDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter which Status to delete.
    */
   where: Prisma.StatusWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1237,9 +1228,9 @@ export type StatusDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * Status.Asset
+ * Status.assets
  */
-export type Status$AssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Status$assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Asset
    */

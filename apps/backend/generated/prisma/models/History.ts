@@ -236,7 +236,7 @@ export type HistoryWhereInput = {
   entity_type?: Prisma.StringFilter<"History"> | string
   entity_id?: Prisma.IntFilter<"History"> | number
   action_type?: Prisma.StringFilter<"History"> | string
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type HistoryOrderByWithRelationInput = {
@@ -247,7 +247,7 @@ export type HistoryOrderByWithRelationInput = {
   entity_type?: Prisma.SortOrder
   entity_id?: Prisma.SortOrder
   action_type?: Prisma.SortOrder
-  User?: Prisma.UserOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type HistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -261,7 +261,7 @@ export type HistoryWhereUniqueInput = Prisma.AtLeast<{
   entity_type?: Prisma.StringFilter<"History"> | string
   entity_id?: Prisma.IntFilter<"History"> | number
   action_type?: Prisma.StringFilter<"History"> | string
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type HistoryOrderByWithAggregationInput = {
@@ -298,7 +298,7 @@ export type HistoryCreateInput = {
   entity_type: string
   entity_id: number
   action_type: string
-  User: Prisma.UserCreateNestedOneWithoutHistoryInput
+  user: Prisma.UserCreateNestedOneWithoutHistoryInput
 }
 
 export type HistoryUncheckedCreateInput = {
@@ -317,7 +317,7 @@ export type HistoryUpdateInput = {
   entity_type?: Prisma.StringFieldUpdateOperationsInput | string
   entity_id?: Prisma.IntFieldUpdateOperationsInput | number
   action_type?: Prisma.StringFieldUpdateOperationsInput | string
-  User?: Prisma.UserUpdateOneRequiredWithoutHistoryNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutHistoryNestedInput
 }
 
 export type HistoryUncheckedUpdateInput = {
@@ -551,7 +551,7 @@ export type HistorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   entity_type?: boolean
   entity_id?: boolean
   action_type?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["history"]>
 
 export type HistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -562,7 +562,7 @@ export type HistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   entity_type?: boolean
   entity_id?: boolean
   action_type?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["history"]>
 
 export type HistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -573,7 +573,7 @@ export type HistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   entity_type?: boolean
   entity_id?: boolean
   action_type?: boolean
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["history"]>
 
 export type HistorySelectScalar = {
@@ -588,19 +588,19 @@ export type HistorySelectScalar = {
 
 export type HistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "changed_on" | "changes" | "entity_type" | "entity_id" | "action_type", ExtArgs["result"]["history"]>
 export type HistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type HistoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type HistoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $HistoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "History"
   objects: {
-    User: Prisma.$UserPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -617,7 +617,7 @@ export type $HistoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type HistoryGetPayload<S extends boolean | null | undefined | HistoryDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$HistoryPayload, S>
 
 export type HistoryCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<HistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<HistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: HistoryCountAggregateInputType | true
   }
 
@@ -1004,7 +1004,7 @@ readonly fields: HistoryFieldRefs;
  */
 export interface Prisma__HistoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  User<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1065,7 +1065,6 @@ export type HistoryFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which History to fetch.
    */
   where: Prisma.HistoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1088,7 +1087,6 @@ export type HistoryFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which History to fetch.
    */
   where: Prisma.HistoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1141,7 +1139,6 @@ export type HistoryFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of Histories.
    */
   distinct?: Prisma.HistoryScalarFieldEnum | Prisma.HistoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,7 +1191,6 @@ export type HistoryFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of Histories.
    */
   distinct?: Prisma.HistoryScalarFieldEnum | Prisma.HistoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1247,7 +1243,6 @@ export type HistoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Histories.
    */
   distinct?: Prisma.HistoryScalarFieldEnum | Prisma.HistoryScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1270,7 +1265,6 @@ export type HistoryCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a History.
    */
   data: Prisma.XOR<Prisma.HistoryCreateInput, Prisma.HistoryUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1331,7 +1325,6 @@ export type HistoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which History to update.
    */
   where: Prisma.HistoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1410,7 +1403,6 @@ export type HistoryUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the History was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.HistoryUpdateInput, Prisma.HistoryUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1433,7 +1425,6 @@ export type HistoryDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which History to delete.
    */
   where: Prisma.HistoryWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -252,10 +252,10 @@ export type AssetStorePartWhereInput = {
   estimated_cost?: Prisma.DecimalFilter<"AssetStorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_by_id?: Prisma.IntFilter<"AssetStorePart"> | number
   created_at?: Prisma.DateTimeFilter<"AssetStorePart"> | Date | string
-  Asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  StorePart?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
-  StoreTransaction?: Prisma.XOR<Prisma.StoreTransactionScalarRelationFilter, Prisma.StoreTransactionWhereInput>
+  asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  store_part?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
+  store_transaction?: Prisma.XOR<Prisma.StoreTransactionScalarRelationFilter, Prisma.StoreTransactionWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type AssetStorePartOrderByWithRelationInput = {
@@ -266,10 +266,10 @@ export type AssetStorePartOrderByWithRelationInput = {
   estimated_cost?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  Asset?: Prisma.AssetOrderByWithRelationInput
-  User?: Prisma.UserOrderByWithRelationInput
-  StorePart?: Prisma.StorePartOrderByWithRelationInput
-  StoreTransaction?: Prisma.StoreTransactionOrderByWithRelationInput
+  asset?: Prisma.AssetOrderByWithRelationInput
+  store_part?: Prisma.StorePartOrderByWithRelationInput
+  store_transaction?: Prisma.StoreTransactionOrderByWithRelationInput
+  created_by?: Prisma.UserOrderByWithRelationInput
 }
 
 export type AssetStorePartWhereUniqueInput = Prisma.AtLeast<{
@@ -283,10 +283,10 @@ export type AssetStorePartWhereUniqueInput = Prisma.AtLeast<{
   estimated_cost?: Prisma.DecimalFilter<"AssetStorePart"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_by_id?: Prisma.IntFilter<"AssetStorePart"> | number
   created_at?: Prisma.DateTimeFilter<"AssetStorePart"> | Date | string
-  Asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
-  User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  StorePart?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
-  StoreTransaction?: Prisma.XOR<Prisma.StoreTransactionScalarRelationFilter, Prisma.StoreTransactionWhereInput>
+  asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
+  store_part?: Prisma.XOR<Prisma.StorePartScalarRelationFilter, Prisma.StorePartWhereInput>
+  store_transaction?: Prisma.XOR<Prisma.StoreTransactionScalarRelationFilter, Prisma.StoreTransactionWhereInput>
+  created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type AssetStorePartOrderByWithAggregationInput = {
@@ -320,10 +320,10 @@ export type AssetStorePartScalarWhereWithAggregatesInput = {
 export type AssetStorePartCreateInput = {
   estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at: Date | string
-  Asset: Prisma.AssetCreateNestedOneWithoutAssetStorePartInput
-  User: Prisma.UserCreateNestedOneWithoutAssetStorePartInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutAssetStorePartInput
-  StoreTransaction: Prisma.StoreTransactionCreateNestedOneWithoutAssetStorePartInput
+  asset: Prisma.AssetCreateNestedOneWithoutAsset_store_partsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutAsset_store_partsInput
+  store_transaction: Prisma.StoreTransactionCreateNestedOneWithoutAsset_store_partsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_asset_partsInput
 }
 
 export type AssetStorePartUncheckedCreateInput = {
@@ -339,10 +339,10 @@ export type AssetStorePartUncheckedCreateInput = {
 export type AssetStorePartUpdateInput = {
   estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Asset?: Prisma.AssetUpdateOneRequiredWithoutAssetStorePartNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAssetStorePartNestedInput
+  asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_transaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_asset_partsNestedInput
 }
 
 export type AssetStorePartUncheckedUpdateInput = {
@@ -480,87 +480,87 @@ export type AssetStorePartUncheckedUpdateManyWithoutAssetNestedInput = {
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
-export type AssetStorePartCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput> | Prisma.AssetStorePartCreateWithoutUserInput[] | Prisma.AssetStorePartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutUserInput | Prisma.AssetStorePartCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AssetStorePartCreateManyUserInputEnvelope
+export type AssetStorePartCreateNestedManyWithoutStore_partInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput> | Prisma.AssetStorePartCreateWithoutStore_partInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_partInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput> | Prisma.AssetStorePartCreateWithoutUserInput[] | Prisma.AssetStorePartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutUserInput | Prisma.AssetStorePartCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.AssetStorePartCreateManyUserInputEnvelope
+export type AssetStorePartUncheckedCreateNestedManyWithoutStore_partInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput> | Prisma.AssetStorePartCreateWithoutStore_partInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_partInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput> | Prisma.AssetStorePartCreateWithoutUserInput[] | Prisma.AssetStorePartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutUserInput | Prisma.AssetStorePartCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutUserInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AssetStorePartCreateManyUserInputEnvelope
+export type AssetStorePartUpdateManyWithoutStore_partNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput> | Prisma.AssetStorePartCreateWithoutStore_partInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_partInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_partInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_partInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutUserInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutUserInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_partInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_partInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_partInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_partInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
-export type AssetStorePartUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput> | Prisma.AssetStorePartCreateWithoutUserInput[] | Prisma.AssetStorePartUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutUserInput | Prisma.AssetStorePartCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutUserInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.AssetStorePartCreateManyUserInputEnvelope
+export type AssetStorePartUncheckedUpdateManyWithoutStore_partNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput> | Prisma.AssetStorePartCreateWithoutStore_partInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_partInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_partInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_partInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_partInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutUserInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutUserInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_partInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_partInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_partInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_partInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
-export type AssetStorePartCreateNestedManyWithoutStorePartInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput> | Prisma.AssetStorePartCreateWithoutStorePartInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput | Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStorePartInputEnvelope
+export type AssetStorePartCreateNestedManyWithoutStore_transactionInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput> | Prisma.AssetStorePartCreateWithoutStore_transactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_transactionInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUncheckedCreateNestedManyWithoutStorePartInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput> | Prisma.AssetStorePartCreateWithoutStorePartInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput | Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStorePartInputEnvelope
+export type AssetStorePartUncheckedCreateNestedManyWithoutStore_transactionInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput> | Prisma.AssetStorePartCreateWithoutStore_transactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_transactionInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUpdateManyWithoutStorePartNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput> | Prisma.AssetStorePartCreateWithoutStorePartInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput | Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStorePartInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStorePartInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStorePartInputEnvelope
+export type AssetStorePartUpdateManyWithoutStore_transactionNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput> | Prisma.AssetStorePartCreateWithoutStore_transactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_transactionInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_transactionInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_transactionInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStorePartInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStorePartInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStorePartInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStorePartInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_transactionInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_transactionInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_transactionInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_transactionInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
-export type AssetStorePartUncheckedUpdateManyWithoutStorePartNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput> | Prisma.AssetStorePartCreateWithoutStorePartInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput | Prisma.AssetStorePartCreateOrConnectWithoutStorePartInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStorePartInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStorePartInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStorePartInputEnvelope
+export type AssetStorePartUncheckedUpdateManyWithoutStore_transactionNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput> | Prisma.AssetStorePartCreateWithoutStore_transactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStore_transactionInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_transactionInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStore_transactionInput[]
+  createMany?: Prisma.AssetStorePartCreateManyStore_transactionInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStorePartInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStorePartInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStorePartInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStorePartInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_transactionInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStore_transactionInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_transactionInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStore_transactionInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
@@ -572,54 +572,54 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type AssetStorePartCreateNestedManyWithoutStoreTransactionInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput> | Prisma.AssetStorePartCreateWithoutStoreTransactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStoreTransactionInputEnvelope
+export type AssetStorePartCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput> | Prisma.AssetStorePartCreateWithoutCreated_byInput[] | Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput | Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.AssetStorePartCreateManyCreated_byInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUncheckedCreateNestedManyWithoutStoreTransactionInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput> | Prisma.AssetStorePartCreateWithoutStoreTransactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStoreTransactionInputEnvelope
+export type AssetStorePartUncheckedCreateNestedManyWithoutCreated_byInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput> | Prisma.AssetStorePartCreateWithoutCreated_byInput[] | Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput | Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput[]
+  createMany?: Prisma.AssetStorePartCreateManyCreated_byInputEnvelope
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
 }
 
-export type AssetStorePartUpdateManyWithoutStoreTransactionNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput> | Prisma.AssetStorePartCreateWithoutStoreTransactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStoreTransactionInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStoreTransactionInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStoreTransactionInputEnvelope
+export type AssetStorePartUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput> | Prisma.AssetStorePartCreateWithoutCreated_byInput[] | Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput | Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.AssetStorePartCreateManyCreated_byInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStoreTransactionInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStoreTransactionInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStoreTransactionInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStoreTransactionInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutCreated_byInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
-export type AssetStorePartUncheckedUpdateManyWithoutStoreTransactionNestedInput = {
-  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput> | Prisma.AssetStorePartCreateWithoutStoreTransactionInput[] | Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput[]
-  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput | Prisma.AssetStorePartCreateOrConnectWithoutStoreTransactionInput[]
-  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStoreTransactionInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutStoreTransactionInput[]
-  createMany?: Prisma.AssetStorePartCreateManyStoreTransactionInputEnvelope
+export type AssetStorePartUncheckedUpdateManyWithoutCreated_byNestedInput = {
+  create?: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput> | Prisma.AssetStorePartCreateWithoutCreated_byInput[] | Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput[]
+  connectOrCreate?: Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput | Prisma.AssetStorePartCreateOrConnectWithoutCreated_byInput[]
+  upsert?: Prisma.AssetStorePartUpsertWithWhereUniqueWithoutCreated_byInput | Prisma.AssetStorePartUpsertWithWhereUniqueWithoutCreated_byInput[]
+  createMany?: Prisma.AssetStorePartCreateManyCreated_byInputEnvelope
   set?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   disconnect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   delete?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
   connect?: Prisma.AssetStorePartWhereUniqueInput | Prisma.AssetStorePartWhereUniqueInput[]
-  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStoreTransactionInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutStoreTransactionInput[]
-  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutStoreTransactionInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutStoreTransactionInput[]
+  update?: Prisma.AssetStorePartUpdateWithWhereUniqueWithoutCreated_byInput | Prisma.AssetStorePartUpdateWithWhereUniqueWithoutCreated_byInput[]
+  updateMany?: Prisma.AssetStorePartUpdateManyWithWhereWithoutCreated_byInput | Prisma.AssetStorePartUpdateManyWithWhereWithoutCreated_byInput[]
   deleteMany?: Prisma.AssetStorePartScalarWhereInput | Prisma.AssetStorePartScalarWhereInput[]
 }
 
 export type AssetStorePartCreateWithoutAssetInput = {
   estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at: Date | string
-  User: Prisma.UserCreateNestedOneWithoutAssetStorePartInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutAssetStorePartInput
-  StoreTransaction: Prisma.StoreTransactionCreateNestedOneWithoutAssetStorePartInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutAsset_store_partsInput
+  store_transaction: Prisma.StoreTransactionCreateNestedOneWithoutAsset_store_partsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_asset_partsInput
 }
 
 export type AssetStorePartUncheckedCreateWithoutAssetInput = {
@@ -670,58 +670,15 @@ export type AssetStorePartScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"AssetStorePart"> | Date | string
 }
 
-export type AssetStorePartCreateWithoutUserInput = {
+export type AssetStorePartCreateWithoutStore_partInput = {
   estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at: Date | string
-  Asset: Prisma.AssetCreateNestedOneWithoutAssetStorePartInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutAssetStorePartInput
-  StoreTransaction: Prisma.StoreTransactionCreateNestedOneWithoutAssetStorePartInput
+  asset: Prisma.AssetCreateNestedOneWithoutAsset_store_partsInput
+  store_transaction: Prisma.StoreTransactionCreateNestedOneWithoutAsset_store_partsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_asset_partsInput
 }
 
-export type AssetStorePartUncheckedCreateWithoutUserInput = {
-  id?: number
-  asset_id: number
-  store_part_id: number
-  store_transaction_id: number
-  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at: Date | string
-}
-
-export type AssetStorePartCreateOrConnectWithoutUserInput = {
-  where: Prisma.AssetStorePartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput>
-}
-
-export type AssetStorePartCreateManyUserInputEnvelope = {
-  data: Prisma.AssetStorePartCreateManyUserInput | Prisma.AssetStorePartCreateManyUserInput[]
-  skipDuplicates?: boolean
-}
-
-export type AssetStorePartUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.AssetStorePartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutUserInput, Prisma.AssetStorePartUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutUserInput, Prisma.AssetStorePartUncheckedCreateWithoutUserInput>
-}
-
-export type AssetStorePartUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.AssetStorePartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutUserInput, Prisma.AssetStorePartUncheckedUpdateWithoutUserInput>
-}
-
-export type AssetStorePartUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.AssetStorePartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutUserInput>
-}
-
-export type AssetStorePartCreateWithoutStorePartInput = {
-  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at: Date | string
-  Asset: Prisma.AssetCreateNestedOneWithoutAssetStorePartInput
-  User: Prisma.UserCreateNestedOneWithoutAssetStorePartInput
-  StoreTransaction: Prisma.StoreTransactionCreateNestedOneWithoutAssetStorePartInput
-}
-
-export type AssetStorePartUncheckedCreateWithoutStorePartInput = {
+export type AssetStorePartUncheckedCreateWithoutStore_partInput = {
   id?: number
   asset_id: number
   store_transaction_id: number
@@ -730,41 +687,41 @@ export type AssetStorePartUncheckedCreateWithoutStorePartInput = {
   created_at: Date | string
 }
 
-export type AssetStorePartCreateOrConnectWithoutStorePartInput = {
+export type AssetStorePartCreateOrConnectWithoutStore_partInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput>
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput>
 }
 
-export type AssetStorePartCreateManyStorePartInputEnvelope = {
-  data: Prisma.AssetStorePartCreateManyStorePartInput | Prisma.AssetStorePartCreateManyStorePartInput[]
+export type AssetStorePartCreateManyStore_partInputEnvelope = {
+  data: Prisma.AssetStorePartCreateManyStore_partInput | Prisma.AssetStorePartCreateManyStore_partInput[]
   skipDuplicates?: boolean
 }
 
-export type AssetStorePartUpsertWithWhereUniqueWithoutStorePartInput = {
+export type AssetStorePartUpsertWithWhereUniqueWithoutStore_partInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStorePartInput, Prisma.AssetStorePartUncheckedUpdateWithoutStorePartInput>
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStorePartInput, Prisma.AssetStorePartUncheckedCreateWithoutStorePartInput>
+  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStore_partInput, Prisma.AssetStorePartUncheckedUpdateWithoutStore_partInput>
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_partInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_partInput>
 }
 
-export type AssetStorePartUpdateWithWhereUniqueWithoutStorePartInput = {
+export type AssetStorePartUpdateWithWhereUniqueWithoutStore_partInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStorePartInput, Prisma.AssetStorePartUncheckedUpdateWithoutStorePartInput>
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStore_partInput, Prisma.AssetStorePartUncheckedUpdateWithoutStore_partInput>
 }
 
-export type AssetStorePartUpdateManyWithWhereWithoutStorePartInput = {
+export type AssetStorePartUpdateManyWithWhereWithoutStore_partInput = {
   where: Prisma.AssetStorePartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutStorePartInput>
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_partInput>
 }
 
-export type AssetStorePartCreateWithoutStoreTransactionInput = {
+export type AssetStorePartCreateWithoutStore_transactionInput = {
   estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at: Date | string
-  Asset: Prisma.AssetCreateNestedOneWithoutAssetStorePartInput
-  User: Prisma.UserCreateNestedOneWithoutAssetStorePartInput
-  StorePart: Prisma.StorePartCreateNestedOneWithoutAssetStorePartInput
+  asset: Prisma.AssetCreateNestedOneWithoutAsset_store_partsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutAsset_store_partsInput
+  created_by: Prisma.UserCreateNestedOneWithoutStore_asset_partsInput
 }
 
-export type AssetStorePartUncheckedCreateWithoutStoreTransactionInput = {
+export type AssetStorePartUncheckedCreateWithoutStore_transactionInput = {
   id?: number
   asset_id: number
   store_part_id: number
@@ -773,30 +730,73 @@ export type AssetStorePartUncheckedCreateWithoutStoreTransactionInput = {
   created_at: Date | string
 }
 
-export type AssetStorePartCreateOrConnectWithoutStoreTransactionInput = {
+export type AssetStorePartCreateOrConnectWithoutStore_transactionInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput>
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput>
 }
 
-export type AssetStorePartCreateManyStoreTransactionInputEnvelope = {
-  data: Prisma.AssetStorePartCreateManyStoreTransactionInput | Prisma.AssetStorePartCreateManyStoreTransactionInput[]
+export type AssetStorePartCreateManyStore_transactionInputEnvelope = {
+  data: Prisma.AssetStorePartCreateManyStore_transactionInput | Prisma.AssetStorePartCreateManyStore_transactionInput[]
   skipDuplicates?: boolean
 }
 
-export type AssetStorePartUpsertWithWhereUniqueWithoutStoreTransactionInput = {
+export type AssetStorePartUpsertWithWhereUniqueWithoutStore_transactionInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedUpdateWithoutStoreTransactionInput>
-  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStoreTransactionInput>
+  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedUpdateWithoutStore_transactionInput>
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedCreateWithoutStore_transactionInput>
 }
 
-export type AssetStorePartUpdateWithWhereUniqueWithoutStoreTransactionInput = {
+export type AssetStorePartUpdateWithWhereUniqueWithoutStore_transactionInput = {
   where: Prisma.AssetStorePartWhereUniqueInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStoreTransactionInput, Prisma.AssetStorePartUncheckedUpdateWithoutStoreTransactionInput>
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutStore_transactionInput, Prisma.AssetStorePartUncheckedUpdateWithoutStore_transactionInput>
 }
 
-export type AssetStorePartUpdateManyWithWhereWithoutStoreTransactionInput = {
+export type AssetStorePartUpdateManyWithWhereWithoutStore_transactionInput = {
   where: Prisma.AssetStorePartScalarWhereInput
-  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutStoreTransactionInput>
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutStore_transactionInput>
+}
+
+export type AssetStorePartCreateWithoutCreated_byInput = {
+  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  created_at: Date | string
+  asset: Prisma.AssetCreateNestedOneWithoutAsset_store_partsInput
+  store_part: Prisma.StorePartCreateNestedOneWithoutAsset_store_partsInput
+  store_transaction: Prisma.StoreTransactionCreateNestedOneWithoutAsset_store_partsInput
+}
+
+export type AssetStorePartUncheckedCreateWithoutCreated_byInput = {
+  id?: number
+  asset_id: number
+  store_part_id: number
+  store_transaction_id: number
+  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  created_at: Date | string
+}
+
+export type AssetStorePartCreateOrConnectWithoutCreated_byInput = {
+  where: Prisma.AssetStorePartWhereUniqueInput
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput>
+}
+
+export type AssetStorePartCreateManyCreated_byInputEnvelope = {
+  data: Prisma.AssetStorePartCreateManyCreated_byInput | Prisma.AssetStorePartCreateManyCreated_byInput[]
+  skipDuplicates?: boolean
+}
+
+export type AssetStorePartUpsertWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.AssetStorePartWhereUniqueInput
+  update: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedUpdateWithoutCreated_byInput>
+  create: Prisma.XOR<Prisma.AssetStorePartCreateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedCreateWithoutCreated_byInput>
+}
+
+export type AssetStorePartUpdateWithWhereUniqueWithoutCreated_byInput = {
+  where: Prisma.AssetStorePartWhereUniqueInput
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateWithoutCreated_byInput, Prisma.AssetStorePartUncheckedUpdateWithoutCreated_byInput>
+}
+
+export type AssetStorePartUpdateManyWithWhereWithoutCreated_byInput = {
+  where: Prisma.AssetStorePartScalarWhereInput
+  data: Prisma.XOR<Prisma.AssetStorePartUpdateManyMutationInput, Prisma.AssetStorePartUncheckedUpdateManyWithoutCreated_byInput>
 }
 
 export type AssetStorePartCreateManyAssetInput = {
@@ -811,9 +811,9 @@ export type AssetStorePartCreateManyAssetInput = {
 export type AssetStorePartUpdateWithoutAssetInput = {
   estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAssetStorePartNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_transaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_asset_partsNestedInput
 }
 
 export type AssetStorePartUncheckedUpdateWithoutAssetInput = {
@@ -834,42 +834,7 @@ export type AssetStorePartUncheckedUpdateManyWithoutAssetInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AssetStorePartCreateManyUserInput = {
-  id?: number
-  asset_id: number
-  store_part_id: number
-  store_transaction_id: number
-  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at: Date | string
-}
-
-export type AssetStorePartUpdateWithoutUserInput = {
-  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Asset?: Prisma.AssetUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAssetStorePartNestedInput
-}
-
-export type AssetStorePartUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
-  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type AssetStorePartUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
-  store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
-  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type AssetStorePartCreateManyStorePartInput = {
+export type AssetStorePartCreateManyStore_partInput = {
   id?: number
   asset_id: number
   store_transaction_id: number
@@ -878,15 +843,15 @@ export type AssetStorePartCreateManyStorePartInput = {
   created_at: Date | string
 }
 
-export type AssetStorePartUpdateWithoutStorePartInput = {
+export type AssetStorePartUpdateWithoutStore_partInput = {
   estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Asset?: Prisma.AssetUpdateOneRequiredWithoutAssetStorePartNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StoreTransaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAssetStorePartNestedInput
+  asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_transaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_asset_partsNestedInput
 }
 
-export type AssetStorePartUncheckedUpdateWithoutStorePartInput = {
+export type AssetStorePartUncheckedUpdateWithoutStore_partInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -895,7 +860,7 @@ export type AssetStorePartUncheckedUpdateWithoutStorePartInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AssetStorePartUncheckedUpdateManyWithoutStorePartInput = {
+export type AssetStorePartUncheckedUpdateManyWithoutStore_partInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -904,7 +869,7 @@ export type AssetStorePartUncheckedUpdateManyWithoutStorePartInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AssetStorePartCreateManyStoreTransactionInput = {
+export type AssetStorePartCreateManyStore_transactionInput = {
   id?: number
   asset_id: number
   store_part_id: number
@@ -913,15 +878,15 @@ export type AssetStorePartCreateManyStoreTransactionInput = {
   created_at: Date | string
 }
 
-export type AssetStorePartUpdateWithoutStoreTransactionInput = {
+export type AssetStorePartUpdateWithoutStore_transactionInput = {
   estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Asset?: Prisma.AssetUpdateOneRequiredWithoutAssetStorePartNestedInput
-  User?: Prisma.UserUpdateOneRequiredWithoutAssetStorePartNestedInput
-  StorePart?: Prisma.StorePartUpdateOneRequiredWithoutAssetStorePartNestedInput
+  asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  created_by?: Prisma.UserUpdateOneRequiredWithoutStore_asset_partsNestedInput
 }
 
-export type AssetStorePartUncheckedUpdateWithoutStoreTransactionInput = {
+export type AssetStorePartUncheckedUpdateWithoutStore_transactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -930,12 +895,47 @@ export type AssetStorePartUncheckedUpdateWithoutStoreTransactionInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type AssetStorePartUncheckedUpdateManyWithoutStoreTransactionInput = {
+export type AssetStorePartUncheckedUpdateManyWithoutStore_transactionInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
   estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AssetStorePartCreateManyCreated_byInput = {
+  id?: number
+  asset_id: number
+  store_part_id: number
+  store_transaction_id: number
+  estimated_cost: runtime.Decimal | runtime.DecimalJsLike | number | string
+  created_at: Date | string
+}
+
+export type AssetStorePartUpdateWithoutCreated_byInput = {
+  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_part?: Prisma.StorePartUpdateOneRequiredWithoutAsset_store_partsNestedInput
+  store_transaction?: Prisma.StoreTransactionUpdateOneRequiredWithoutAsset_store_partsNestedInput
+}
+
+export type AssetStorePartUncheckedUpdateWithoutCreated_byInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
+  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AssetStorePartUncheckedUpdateManyWithoutCreated_byInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  asset_id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_part_id?: Prisma.IntFieldUpdateOperationsInput | number
+  store_transaction_id?: Prisma.IntFieldUpdateOperationsInput | number
+  estimated_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -949,10 +949,10 @@ export type AssetStorePartSelect<ExtArgs extends runtime.Types.Extensions.Intern
   estimated_cost?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetStorePart"]>
 
 export type AssetStorePartSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -963,10 +963,10 @@ export type AssetStorePartSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   estimated_cost?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetStorePart"]>
 
 export type AssetStorePartSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -977,10 +977,10 @@ export type AssetStorePartSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   estimated_cost?: boolean
   created_by_id?: boolean
   created_at?: boolean
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetStorePart"]>
 
 export type AssetStorePartSelectScalar = {
@@ -995,31 +995,31 @@ export type AssetStorePartSelectScalar = {
 
 export type AssetStorePartOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "store_part_id" | "store_transaction_id" | "estimated_cost" | "created_by_id" | "created_at", ExtArgs["result"]["assetStorePart"]>
 export type AssetStorePartInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AssetStorePartIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type AssetStorePartIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
-  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  StorePart?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
-  StoreTransaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
+  store_part?: boolean | Prisma.StorePartDefaultArgs<ExtArgs>
+  store_transaction?: boolean | Prisma.StoreTransactionDefaultArgs<ExtArgs>
+  created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $AssetStorePartPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AssetStorePart"
   objects: {
-    Asset: Prisma.$AssetPayload<ExtArgs>
-    User: Prisma.$UserPayload<ExtArgs>
-    StorePart: Prisma.$StorePartPayload<ExtArgs>
-    StoreTransaction: Prisma.$StoreTransactionPayload<ExtArgs>
+    asset: Prisma.$AssetPayload<ExtArgs>
+    store_part: Prisma.$StorePartPayload<ExtArgs>
+    store_transaction: Prisma.$StoreTransactionPayload<ExtArgs>
+    created_by: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1036,7 +1036,7 @@ export type $AssetStorePartPayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type AssetStorePartGetPayload<S extends boolean | null | undefined | AssetStorePartDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AssetStorePartPayload, S>
 
 export type AssetStorePartCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AssetStorePartFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<AssetStorePartFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: AssetStorePartCountAggregateInputType | true
   }
 
@@ -1423,10 +1423,10 @@ readonly fields: AssetStorePartFieldRefs;
  */
 export interface Prisma__AssetStorePartClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  User<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  StorePart<T extends Prisma.StorePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePartDefaultArgs<ExtArgs>>): Prisma.Prisma__StorePartClient<runtime.Types.Result.GetResult<Prisma.$StorePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  StoreTransaction<T extends Prisma.StoreTransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__StoreTransactionClient<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  store_part<T extends Prisma.StorePartDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StorePartDefaultArgs<ExtArgs>>): Prisma.Prisma__StorePartClient<runtime.Types.Result.GetResult<Prisma.$StorePartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  store_transaction<T extends Prisma.StoreTransactionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StoreTransactionDefaultArgs<ExtArgs>>): Prisma.Prisma__StoreTransactionClient<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  created_by<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1487,7 +1487,6 @@ export type AssetStorePartFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which AssetStorePart to fetch.
    */
   where: Prisma.AssetStorePartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1510,7 +1509,6 @@ export type AssetStorePartFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which AssetStorePart to fetch.
    */
   where: Prisma.AssetStorePartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1563,7 +1561,6 @@ export type AssetStorePartFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of AssetStoreParts.
    */
   distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1616,7 +1613,6 @@ export type AssetStorePartFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of AssetStoreParts.
    */
   distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1669,7 +1665,6 @@ export type AssetStorePartFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of AssetStoreParts.
    */
   distinct?: Prisma.AssetStorePartScalarFieldEnum | Prisma.AssetStorePartScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1692,7 +1687,6 @@ export type AssetStorePartCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a AssetStorePart.
    */
   data: Prisma.XOR<Prisma.AssetStorePartCreateInput, Prisma.AssetStorePartUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1753,7 +1747,6 @@ export type AssetStorePartUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which AssetStorePart to update.
    */
   where: Prisma.AssetStorePartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1832,7 +1825,6 @@ export type AssetStorePartUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the AssetStorePart was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AssetStorePartUpdateInput, Prisma.AssetStorePartUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1855,7 +1847,6 @@ export type AssetStorePartDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which AssetStorePart to delete.
    */
   where: Prisma.AssetStorePartWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

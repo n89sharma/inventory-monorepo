@@ -244,9 +244,9 @@ export type AssetErrorWhereInput = {
   added_at?: Prisma.DateTimeNullableFilter<"AssetError"> | Date | string | null
   fixed_by?: Prisma.IntNullableFilter<"AssetError"> | number | null
   fixed_at?: Prisma.DateTimeNullableFilter<"AssetError"> | Date | string | null
-  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
   error?: Prisma.XOR<Prisma.ErrorScalarRelationFilter, Prisma.ErrorWhereInput>
+  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   fixedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -258,9 +258,9 @@ export type AssetErrorOrderByWithRelationInput = {
   added_at?: Prisma.SortOrderInput | Prisma.SortOrder
   fixed_by?: Prisma.SortOrderInput | Prisma.SortOrder
   fixed_at?: Prisma.SortOrderInput | Prisma.SortOrder
-  addedBy?: Prisma.UserOrderByWithRelationInput
   asset?: Prisma.AssetOrderByWithRelationInput
   error?: Prisma.ErrorOrderByWithRelationInput
+  addedBy?: Prisma.UserOrderByWithRelationInput
   fixedBy?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -276,9 +276,9 @@ export type AssetErrorWhereUniqueInput = Prisma.AtLeast<{
   added_at?: Prisma.DateTimeNullableFilter<"AssetError"> | Date | string | null
   fixed_by?: Prisma.IntNullableFilter<"AssetError"> | number | null
   fixed_at?: Prisma.DateTimeNullableFilter<"AssetError"> | Date | string | null
-  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
   error?: Prisma.XOR<Prisma.ErrorScalarRelationFilter, Prisma.ErrorWhereInput>
+  addedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   fixedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "asset_id_error_id">
 
@@ -314,9 +314,9 @@ export type AssetErrorCreateInput = {
   is_fixed: boolean
   added_at?: Date | string | null
   fixed_at?: Date | string | null
-  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   asset: Prisma.AssetCreateNestedOneWithoutAsset_errorsInput
   error: Prisma.ErrorCreateNestedOneWithoutAsset_errorsInput
+  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   fixedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_fixedInput
 }
 
@@ -334,9 +334,9 @@ export type AssetErrorUpdateInput = {
   is_fixed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   added_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fixed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_errorsNestedInput
   error?: Prisma.ErrorUpdateOneRequiredWithoutAsset_errorsNestedInput
+  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   fixedBy?: Prisma.UserUpdateOneWithoutAsset_errors_fixedNestedInput
 }
 
@@ -611,8 +611,8 @@ export type AssetErrorCreateWithoutAssetInput = {
   is_fixed: boolean
   added_at?: Date | string | null
   fixed_at?: Date | string | null
-  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   error: Prisma.ErrorCreateNestedOneWithoutAsset_errorsInput
+  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   fixedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_fixedInput
 }
 
@@ -668,8 +668,8 @@ export type AssetErrorCreateWithoutErrorInput = {
   is_fixed: boolean
   added_at?: Date | string | null
   fixed_at?: Date | string | null
-  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   asset: Prisma.AssetCreateNestedOneWithoutAsset_errorsInput
+  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   fixedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_fixedInput
 }
 
@@ -740,9 +740,9 @@ export type AssetErrorCreateWithoutFixedByInput = {
   is_fixed: boolean
   added_at?: Date | string | null
   fixed_at?: Date | string | null
-  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
   asset: Prisma.AssetCreateNestedOneWithoutAsset_errorsInput
   error: Prisma.ErrorCreateNestedOneWithoutAsset_errorsInput
+  addedBy?: Prisma.UserCreateNestedOneWithoutAsset_errors_addedInput
 }
 
 export type AssetErrorUncheckedCreateWithoutFixedByInput = {
@@ -809,8 +809,8 @@ export type AssetErrorUpdateWithoutAssetInput = {
   is_fixed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   added_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fixed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   error?: Prisma.ErrorUpdateOneRequiredWithoutAsset_errorsNestedInput
+  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   fixedBy?: Prisma.UserUpdateOneWithoutAsset_errors_fixedNestedInput
 }
 
@@ -845,8 +845,8 @@ export type AssetErrorUpdateWithoutErrorInput = {
   is_fixed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   added_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fixed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_errorsNestedInput
+  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   fixedBy?: Prisma.UserUpdateOneWithoutAsset_errors_fixedNestedInput
 }
 
@@ -917,9 +917,9 @@ export type AssetErrorUpdateWithoutFixedByInput = {
   is_fixed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   added_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   fixed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
   asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_errorsNestedInput
   error?: Prisma.ErrorUpdateOneRequiredWithoutAsset_errorsNestedInput
+  addedBy?: Prisma.UserUpdateOneWithoutAsset_errors_addedNestedInput
 }
 
 export type AssetErrorUncheckedUpdateWithoutFixedByInput = {
@@ -950,9 +950,9 @@ export type AssetErrorSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   added_at?: boolean
   fixed_by?: boolean
   fixed_at?: boolean
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }, ExtArgs["result"]["assetError"]>
 
@@ -964,9 +964,9 @@ export type AssetErrorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   added_at?: boolean
   fixed_by?: boolean
   fixed_at?: boolean
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }, ExtArgs["result"]["assetError"]>
 
@@ -978,9 +978,9 @@ export type AssetErrorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   added_at?: boolean
   fixed_by?: boolean
   fixed_at?: boolean
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }, ExtArgs["result"]["assetError"]>
 
@@ -996,30 +996,30 @@ export type AssetErrorSelectScalar = {
 
 export type AssetErrorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"asset_id" | "error_id" | "is_fixed" | "added_by" | "added_at" | "fixed_by" | "fixed_at", ExtArgs["result"]["assetError"]>
 export type AssetErrorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }
 export type AssetErrorIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }
 export type AssetErrorIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   error?: boolean | Prisma.ErrorDefaultArgs<ExtArgs>
+  addedBy?: boolean | Prisma.AssetError$addedByArgs<ExtArgs>
   fixedBy?: boolean | Prisma.AssetError$fixedByArgs<ExtArgs>
 }
 
 export type $AssetErrorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AssetError"
   objects: {
-    addedBy: Prisma.$UserPayload<ExtArgs> | null
     asset: Prisma.$AssetPayload<ExtArgs>
     error: Prisma.$ErrorPayload<ExtArgs>
+    addedBy: Prisma.$UserPayload<ExtArgs> | null
     fixedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1037,7 +1037,7 @@ export type $AssetErrorPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type AssetErrorGetPayload<S extends boolean | null | undefined | AssetErrorDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload, S>
 
 export type AssetErrorCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AssetErrorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<AssetErrorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: AssetErrorCountAggregateInputType | true
   }
 
@@ -1424,9 +1424,9 @@ readonly fields: AssetErrorFieldRefs;
  */
 export interface Prisma__AssetErrorClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  addedBy<T extends Prisma.AssetError$addedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetError$addedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   asset<T extends Prisma.AssetDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetDefaultArgs<ExtArgs>>): Prisma.Prisma__AssetClient<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   error<T extends Prisma.ErrorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ErrorDefaultArgs<ExtArgs>>): Prisma.Prisma__ErrorClient<runtime.Types.Result.GetResult<Prisma.$ErrorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  addedBy<T extends Prisma.AssetError$addedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetError$addedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   fixedBy<T extends Prisma.AssetError$fixedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AssetError$fixedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1488,7 +1488,6 @@ export type AssetErrorFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which AssetError to fetch.
    */
   where: Prisma.AssetErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1511,7 +1510,6 @@ export type AssetErrorFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which AssetError to fetch.
    */
   where: Prisma.AssetErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1564,7 +1562,6 @@ export type AssetErrorFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of AssetErrors.
    */
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1617,7 +1614,6 @@ export type AssetErrorFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of AssetErrors.
    */
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1670,7 +1666,6 @@ export type AssetErrorFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of AssetErrors.
    */
   distinct?: Prisma.AssetErrorScalarFieldEnum | Prisma.AssetErrorScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1693,7 +1688,6 @@ export type AssetErrorCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a AssetError.
    */
   data: Prisma.XOR<Prisma.AssetErrorCreateInput, Prisma.AssetErrorUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1754,7 +1748,6 @@ export type AssetErrorUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which AssetError to update.
    */
   where: Prisma.AssetErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1833,7 +1826,6 @@ export type AssetErrorUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the AssetError was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AssetErrorUpdateInput, Prisma.AssetErrorUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1856,7 +1848,6 @@ export type AssetErrorDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which AssetError to delete.
    */
   where: Prisma.AssetErrorWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

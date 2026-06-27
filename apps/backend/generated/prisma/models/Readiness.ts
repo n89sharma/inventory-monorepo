@@ -192,13 +192,13 @@ export type ReadinessWhereInput = {
   NOT?: Prisma.ReadinessWhereInput | Prisma.ReadinessWhereInput[]
   id?: Prisma.IntFilter<"Readiness"> | number
   status?: Prisma.StringFilter<"Readiness"> | string
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }
 
 export type ReadinessOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  Asset?: Prisma.AssetOrderByRelationAggregateInput
+  assets?: Prisma.AssetOrderByRelationAggregateInput
 }
 
 export type ReadinessWhereUniqueInput = Prisma.AtLeast<{
@@ -207,7 +207,7 @@ export type ReadinessWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ReadinessWhereInput | Prisma.ReadinessWhereInput[]
   OR?: Prisma.ReadinessWhereInput[]
   NOT?: Prisma.ReadinessWhereInput | Prisma.ReadinessWhereInput[]
-  Asset?: Prisma.AssetListRelationFilter
+  assets?: Prisma.AssetListRelationFilter
 }, "id" | "status">
 
 export type ReadinessOrderByWithAggregationInput = {
@@ -230,24 +230,24 @@ export type ReadinessScalarWhereWithAggregatesInput = {
 
 export type ReadinessCreateInput = {
   status: string
-  Asset?: Prisma.AssetCreateNestedManyWithoutReadinessInput
+  assets?: Prisma.AssetCreateNestedManyWithoutReadinessInput
 }
 
 export type ReadinessUncheckedCreateInput = {
   id?: number
   status: string
-  Asset?: Prisma.AssetUncheckedCreateNestedManyWithoutReadinessInput
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutReadinessInput
 }
 
 export type ReadinessUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUpdateManyWithoutReadinessNestedInput
+  assets?: Prisma.AssetUpdateManyWithoutReadinessNestedInput
 }
 
 export type ReadinessUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  Asset?: Prisma.AssetUncheckedUpdateManyWithoutReadinessNestedInput
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutReadinessNestedInput
 }
 
 export type ReadinessCreateManyInput = {
@@ -262,11 +262,6 @@ export type ReadinessUpdateManyMutationInput = {
 export type ReadinessUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-}
-
-export type ReadinessScalarRelationFilter = {
-  is?: Prisma.ReadinessWhereInput
-  isNot?: Prisma.ReadinessWhereInput
 }
 
 export type ReadinessCountOrderByAggregateInput = {
@@ -292,50 +287,55 @@ export type ReadinessSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type ReadinessCreateNestedOneWithoutAssetInput = {
-  create?: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetInput, Prisma.ReadinessUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.ReadinessCreateOrConnectWithoutAssetInput
+export type ReadinessScalarRelationFilter = {
+  is?: Prisma.ReadinessWhereInput
+  isNot?: Prisma.ReadinessWhereInput
+}
+
+export type ReadinessCreateNestedOneWithoutAssetsInput = {
+  create?: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetsInput, Prisma.ReadinessUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.ReadinessCreateOrConnectWithoutAssetsInput
   connect?: Prisma.ReadinessWhereUniqueInput
 }
 
-export type ReadinessUpdateOneRequiredWithoutAssetNestedInput = {
-  create?: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetInput, Prisma.ReadinessUncheckedCreateWithoutAssetInput>
-  connectOrCreate?: Prisma.ReadinessCreateOrConnectWithoutAssetInput
-  upsert?: Prisma.ReadinessUpsertWithoutAssetInput
+export type ReadinessUpdateOneRequiredWithoutAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetsInput, Prisma.ReadinessUncheckedCreateWithoutAssetsInput>
+  connectOrCreate?: Prisma.ReadinessCreateOrConnectWithoutAssetsInput
+  upsert?: Prisma.ReadinessUpsertWithoutAssetsInput
   connect?: Prisma.ReadinessWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ReadinessUpdateToOneWithWhereWithoutAssetInput, Prisma.ReadinessUpdateWithoutAssetInput>, Prisma.ReadinessUncheckedUpdateWithoutAssetInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReadinessUpdateToOneWithWhereWithoutAssetsInput, Prisma.ReadinessUpdateWithoutAssetsInput>, Prisma.ReadinessUncheckedUpdateWithoutAssetsInput>
 }
 
-export type ReadinessCreateWithoutAssetInput = {
+export type ReadinessCreateWithoutAssetsInput = {
   status: string
 }
 
-export type ReadinessUncheckedCreateWithoutAssetInput = {
+export type ReadinessUncheckedCreateWithoutAssetsInput = {
   id?: number
   status: string
 }
 
-export type ReadinessCreateOrConnectWithoutAssetInput = {
+export type ReadinessCreateOrConnectWithoutAssetsInput = {
   where: Prisma.ReadinessWhereUniqueInput
-  create: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetInput, Prisma.ReadinessUncheckedCreateWithoutAssetInput>
+  create: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetsInput, Prisma.ReadinessUncheckedCreateWithoutAssetsInput>
 }
 
-export type ReadinessUpsertWithoutAssetInput = {
-  update: Prisma.XOR<Prisma.ReadinessUpdateWithoutAssetInput, Prisma.ReadinessUncheckedUpdateWithoutAssetInput>
-  create: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetInput, Prisma.ReadinessUncheckedCreateWithoutAssetInput>
+export type ReadinessUpsertWithoutAssetsInput = {
+  update: Prisma.XOR<Prisma.ReadinessUpdateWithoutAssetsInput, Prisma.ReadinessUncheckedUpdateWithoutAssetsInput>
+  create: Prisma.XOR<Prisma.ReadinessCreateWithoutAssetsInput, Prisma.ReadinessUncheckedCreateWithoutAssetsInput>
   where?: Prisma.ReadinessWhereInput
 }
 
-export type ReadinessUpdateToOneWithWhereWithoutAssetInput = {
+export type ReadinessUpdateToOneWithWhereWithoutAssetsInput = {
   where?: Prisma.ReadinessWhereInput
-  data: Prisma.XOR<Prisma.ReadinessUpdateWithoutAssetInput, Prisma.ReadinessUncheckedUpdateWithoutAssetInput>
+  data: Prisma.XOR<Prisma.ReadinessUpdateWithoutAssetsInput, Prisma.ReadinessUncheckedUpdateWithoutAssetsInput>
 }
 
-export type ReadinessUpdateWithoutAssetInput = {
+export type ReadinessUpdateWithoutAssetsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ReadinessUncheckedUpdateWithoutAssetInput = {
+export type ReadinessUncheckedUpdateWithoutAssetsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -346,11 +346,11 @@ export type ReadinessUncheckedUpdateWithoutAssetInput = {
  */
 
 export type ReadinessCountOutputType = {
-  Asset: number
+  assets: number
 }
 
 export type ReadinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | ReadinessCountOutputTypeCountAssetArgs
+  assets?: boolean | ReadinessCountOutputTypeCountAssetsArgs
 }
 
 /**
@@ -366,7 +366,7 @@ export type ReadinessCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * ReadinessCountOutputType without action
  */
-export type ReadinessCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type ReadinessCountOutputTypeCountAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AssetWhereInput
 }
 
@@ -374,7 +374,7 @@ export type ReadinessCountOutputTypeCountAssetArgs<ExtArgs extends runtime.Types
 export type ReadinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   status?: boolean
-  Asset?: boolean | Prisma.Readiness$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Readiness$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.ReadinessCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["readiness"]>
 
@@ -395,7 +395,7 @@ export type ReadinessSelectScalar = {
 
 export type ReadinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status", ExtArgs["result"]["readiness"]>
 export type ReadinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  Asset?: boolean | Prisma.Readiness$AssetArgs<ExtArgs>
+  assets?: boolean | Prisma.Readiness$assetsArgs<ExtArgs>
   _count?: boolean | Prisma.ReadinessCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReadinessIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -404,7 +404,7 @@ export type ReadinessIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $ReadinessPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Readiness"
   objects: {
-    Asset: Prisma.$AssetPayload<ExtArgs>[]
+    assets: Prisma.$AssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -416,7 +416,7 @@ export type $ReadinessPayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type ReadinessGetPayload<S extends boolean | null | undefined | ReadinessDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ReadinessPayload, S>
 
 export type ReadinessCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ReadinessFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
+  Omit<ReadinessFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ReadinessCountAggregateInputType | true
   }
 
@@ -803,7 +803,7 @@ readonly fields: ReadinessFieldRefs;
  */
 export interface Prisma__ReadinessClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Asset<T extends Prisma.Readiness$AssetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Readiness$AssetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assets<T extends Prisma.Readiness$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Readiness$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -859,7 +859,6 @@ export type ReadinessFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which Readiness to fetch.
    */
   where: Prisma.ReadinessWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -882,7 +881,6 @@ export type ReadinessFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which Readiness to fetch.
    */
   where: Prisma.ReadinessWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -935,7 +933,6 @@ export type ReadinessFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of Readinesses.
    */
   distinct?: Prisma.ReadinessScalarFieldEnum | Prisma.ReadinessScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -988,7 +985,6 @@ export type ReadinessFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of Readinesses.
    */
   distinct?: Prisma.ReadinessScalarFieldEnum | Prisma.ReadinessScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1041,7 +1037,6 @@ export type ReadinessFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Readinesses.
    */
   distinct?: Prisma.ReadinessScalarFieldEnum | Prisma.ReadinessScalarFieldEnum[]
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1064,7 +1059,6 @@ export type ReadinessCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a Readiness.
    */
   data: Prisma.XOR<Prisma.ReadinessCreateInput, Prisma.ReadinessUncheckedCreateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1121,7 +1115,6 @@ export type ReadinessUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which Readiness to update.
    */
   where: Prisma.ReadinessWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,7 +1189,6 @@ export type ReadinessUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the Readiness was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ReadinessUpdateInput, Prisma.ReadinessUncheckedUpdateInput>
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,7 +1211,6 @@ export type ReadinessDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which Readiness to delete.
    */
   where: Prisma.ReadinessWhereUniqueInput
-  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1237,9 +1228,9 @@ export type ReadinessDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
- * Readiness.Asset
+ * Readiness.assets
  */
-export type Readiness$AssetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Readiness$assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Asset
    */
