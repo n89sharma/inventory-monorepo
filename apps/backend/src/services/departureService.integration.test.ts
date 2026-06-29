@@ -1,12 +1,12 @@
 import { DEFAULT_OUTGOING_STATUS, OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateDepartureInput,
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import {
@@ -16,10 +16,10 @@ import {
 } from './departureService.js'
 
 describe('departureService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

@@ -1,19 +1,19 @@
 import { ASSET_STATUS } from 'shared-types'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateArrivalInput,
   cleanupTransactionalData,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { prisma } from '../prisma.js'
 import { createArrival } from './arrivalService.js'
 
 describe('createArrival', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterAll(async () => {

@@ -1,19 +1,19 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateHoldInput,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { archiveHold, createHold } from './holdService.js'
 import { getHoldsByUserReport } from './holdsReportService.js'
 
 describe('holdsReportService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

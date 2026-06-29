@@ -1,18 +1,18 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { prisma } from '../prisma.js'
 import { createComment, upsertLatestComment } from './assetCommentService.js'
 
 describe('assetCommentService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

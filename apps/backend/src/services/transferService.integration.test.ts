@@ -1,10 +1,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateTransferInput,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { prisma } from '../prisma.js'
 import { createTransfer, patchTransferAssets } from './transferService.js'
@@ -13,10 +13,10 @@ import { createTransfer, patchTransferAssets } from './transferService.js'
 // That gap is pending a product decision, so it is intentionally NOT asserted here — these
 // tests cover only the asset-linking behavior we know is correct.
 describe('transferService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

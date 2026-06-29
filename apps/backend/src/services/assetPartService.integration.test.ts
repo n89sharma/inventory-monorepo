@@ -1,19 +1,19 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { createAssetSalvagedPart } from './assetPartService.js'
 
 describe('assetPartService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {
@@ -29,7 +29,7 @@ describe('assetPartService', () => {
 
     await createAssetSalvagedPart(
       recipient.barcode,
-      { donor_barcode: donor.barcode, part: 'Fuser', is_exchange: false, notes: null },
+      { donor_barcode: donor.barcode, part: 'Fuser', is_exchange: false },
       refs.userId,
     )
 
@@ -48,7 +48,7 @@ describe('assetPartService', () => {
     await expect(
       createAssetSalvagedPart(
         asset.barcode,
-        { donor_barcode: asset.barcode, part: 'Fuser', is_exchange: false, notes: null },
+        { donor_barcode: asset.barcode, part: 'Fuser', is_exchange: false },
         refs.userId,
       ),
     ).rejects.toThrow(ValidationError)
@@ -60,7 +60,7 @@ describe('assetPartService', () => {
     await expect(
       createAssetSalvagedPart(
         'DOES-NOT-EXIST',
-        { donor_barcode: donor.barcode, part: 'Fuser', is_exchange: false, notes: null },
+        { donor_barcode: donor.barcode, part: 'Fuser', is_exchange: false },
         refs.userId,
       ),
     ).rejects.toThrow(NotFoundError)
@@ -72,7 +72,7 @@ describe('assetPartService', () => {
     await expect(
       createAssetSalvagedPart(
         recipient.barcode,
-        { donor_barcode: 'DOES-NOT-EXIST', part: 'Fuser', is_exchange: false, notes: null },
+        { donor_barcode: 'DOES-NOT-EXIST', part: 'Fuser', is_exchange: false },
         refs.userId,
       ),
     ).rejects.toThrow(NotFoundError)

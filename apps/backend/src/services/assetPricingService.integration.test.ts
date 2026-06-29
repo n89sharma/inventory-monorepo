@@ -1,20 +1,20 @@
 import { BulkUpdateAssetPricing } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetCost,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { NotFoundError } from '../lib/errors.js'
 import { bulkUpdateAssetPricing, updateAssetPricing } from './assetPricingService.js'
 
 describe('assetPricingService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

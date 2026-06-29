@@ -1,6 +1,7 @@
 import {
   ASSET_STATUS,
   AssetSummary,
+  Country,
   CreateArrival,
   CreateArrivalSchema,
   CreateAsset,
@@ -8,7 +9,6 @@ import {
   CreateHold,
   CreateInvoice,
   CreateTransfer,
-  Country,
   DepartureAssetInput,
   INVOICE_TYPE,
   ModelSummary,
@@ -21,17 +21,17 @@ import { prisma } from '../src/prisma.js'
 import { createArrival, getArrival } from '../src/services/arrivalService.js'
 
 // Zone the arrival flow places assets in. Must match arrivalService.ts `arrivalZone`.
-const ARRIVAL_ZONE = 'SHIPPING_AND_RECEIVING'
+const SHIPPING_ZONE = 'SHIPPING_AND_RECEIVING'
 // Zone whose bin value is honored on relocation (assetLocationService.ts `BIN_ZONE`).
 const BIN_ZONE = 'BIN'
-const WAREHOUSE_CITY_CODE = 'YYZ'
+const YYZ_CODE = 'YYZ'
 const WAREHOUSE_STREET = '1 Test St'
-const WAREHOUSE2_CITY_CODE = 'LAX'
+const LAX_CODE = 'LAX'
 const WAREHOUSE2_STREET = '2 Test Ave'
 
 // Reference rows the collection flows need to exist before they run. The test DB is
 // migrated but empty (no seed script), so each integration test seeds its own.
-export interface ArrivalRefs {
+export interface ArrivalTestData {
   userId: number
   vendor: OrgSummary
   transporter: OrgSummary
@@ -63,15 +63,15 @@ function nonEmpty<T>(items: T[]): [T, ...T[]] {
   return [first, ...rest]
 }
 
-export async function seedReferenceData(): Promise<ArrivalRefs> {
+export async function seedArrivalTestData(): Promise<ArrivalTestData> {
   // Seed every status so any transition target (IN_STOCK, HELD, SOLD, …) resolves.
   for (const status of Object.values(ASSET_STATUS)) {
     await prisma.status.upsert({ where: { status }, create: { status }, update: {} })
   }
 
-  const arrivalZone = await prisma.zone.upsert({
-    where: { zone: ARRIVAL_ZONE },
-    create: { zone: ARRIVAL_ZONE },
+  const shippingZone = await prisma.zone.upsert({
+    where: { zone: SHIPPING_ZONE },
+    create: { zone: SHIPPING_ZONE },
     update: {},
   })
 
@@ -81,84 +81,84 @@ export async function seedReferenceData(): Promise<ArrivalRefs> {
     update: {},
   })
 
-  const readiness = await prisma.readiness.upsert({
+  const ready = await prisma.readiness.upsert({
     where: { status: 'READY' },
     create: { status: 'READY' },
     update: {},
   })
 
   // Country has no unique column, so upsert isn't available — find or create.
-  const country =
+  const china =
     (await prisma.country.findFirst({ where: { name: 'China' } })) ??
     (await prisma.country.create({ data: { name: 'China' } }))
 
-  const brand = await prisma.brand.upsert({
+  const canon = await prisma.brand.upsert({
     where: { name: 'Canon' },
     create: { name: 'Canon' },
     update: {},
   })
 
-  const assetType = await prisma.assetType.upsert({
+  const copier = await prisma.assetType.upsert({
     where: { asset_type: 'Copier' },
     create: { asset_type: 'Copier' },
     update: {},
   })
 
-  const model = await prisma.model.upsert({
-    where: { brand_id_name: { brand_id: brand.id, name: 'IRADX4745i' } },
+  const iradx4745i = await prisma.model.upsert({
+    where: { brand_id_name: { brand_id: canon.id, name: 'IRADX4745i' } },
     create: {
       name: 'IRADX4745i',
       weight: 1,
       size: 1,
       is_colour: false,
-      brand_id: brand.id,
-      asset_type_id: assetType.id,
+      brand_id: canon.id,
+      asset_type_id: copier.id,
     },
     update: {},
   })
 
-  const warehouse = await prisma.warehouse.upsert({
-    where: { city_code_street: { city_code: WAREHOUSE_CITY_CODE, street: WAREHOUSE_STREET } },
-    create: { city_code: WAREHOUSE_CITY_CODE, street: WAREHOUSE_STREET, is_active: true },
+  const yyz = await prisma.warehouse.upsert({
+    where: { city_code_street: { city_code: YYZ_CODE, street: WAREHOUSE_STREET } },
+    create: { city_code: YYZ_CODE, street: WAREHOUSE_STREET, is_active: true },
     update: {},
   })
 
-  const warehouse2 = await prisma.warehouse.upsert({
-    where: { city_code_street: { city_code: WAREHOUSE2_CITY_CODE, street: WAREHOUSE2_STREET } },
-    create: { city_code: WAREHOUSE2_CITY_CODE, street: WAREHOUSE2_STREET, is_active: true },
+  const lax = await prisma.warehouse.upsert({
+    where: { city_code_street: { city_code: LAX_CODE, street: WAREHOUSE2_STREET } },
+    create: { city_code: LAX_CODE, street: WAREHOUSE2_STREET, is_active: true },
     update: {},
   })
 
-  const user = await prisma.user.upsert({
+  const johnDoe = await prisma.user.upsert({
     where: { name: 'John Doe' },
     create: { name: 'John Doe', is_active: true },
     update: {},
   })
 
-  const vendor = await prisma.organization.upsert({
+  const testVendor = await prisma.organization.upsert({
     where: { account_number: 'TEST-VENDOR' },
     create: { account_number: 'TEST-VENDOR', name: 'CopierPurchaseVendor' },
     update: {},
   })
 
-  const transporter = await prisma.organization.upsert({
+  const testTransporter = await prisma.organization.upsert({
     where: { account_number: 'TEST-TRANSPORTER' },
     create: { account_number: 'TEST-TRANSPORTER', name: 'CopierTransports' },
     update: {},
   })
 
-  const customer = await prisma.organization.upsert({
+  const testCustomer = await prisma.organization.upsert({
     where: { account_number: 'TEST-CUSTOMER' },
     create: { account_number: 'TEST-CUSTOMER', name: 'CopierBuyer' },
     update: {},
   })
 
-  const invoiceTypeSale = await prisma.invoiceType.upsert({
+  const saleInvoiceType = await prisma.invoiceType.upsert({
     where: { type: INVOICE_TYPE.sales },
     create: { type: INVOICE_TYPE.sales },
     update: {},
   })
-  const invoiceTypePurchase = await prisma.invoiceType.upsert({
+  const purchaseInvoiceType = await prisma.invoiceType.upsert({
     where: { type: INVOICE_TYPE.purchase },
     create: { type: INVOICE_TYPE.purchase },
     update: {},
@@ -193,32 +193,32 @@ export async function seedReferenceData(): Promise<ArrivalRefs> {
   })
 
   return {
-    userId: user.id,
-    vendor: toOrgSummary(vendor),
-    transporter: toOrgSummary(transporter),
-    customer: toOrgSummary(customer),
-    warehouse: toWarehouse(warehouse),
-    warehouse2: toWarehouse(warehouse2),
+    userId: johnDoe.id,
+    vendor: toOrgSummary(testVendor),
+    transporter: toOrgSummary(testTransporter),
+    customer: toOrgSummary(testCustomer),
+    warehouse: toWarehouse(yyz),
+    warehouse2: toWarehouse(lax),
     model: {
-      id: model.id,
-      brand_name: brand.name,
-      model_name: model.name,
-      asset_type: assetType.asset_type,
-      weight: model.weight,
-      size: model.size,
-      is_colour: model.is_colour,
+      id: iradx4745i.id,
+      brand_name: canon.name,
+      model_name: iradx4745i.name,
+      asset_type: copier.asset_type,
+      weight: iradx4745i.weight,
+      size: iradx4745i.size,
+      is_colour: iradx4745i.is_colour,
     },
-    brandId: brand.id,
-    readiness: { id: readiness.id, status: readiness.status },
-    country: { id: country.id, name: country.name },
-    invoiceTypeSaleId: invoiceTypeSale.id,
-    invoiceTypePurchaseId: invoiceTypePurchase.id,
-    arrivalZoneId: arrivalZone.id,
+    brandId: canon.id,
+    readiness: { id: ready.id, status: ready.status },
+    country: { id: china.id, name: china.name },
+    invoiceTypeSaleId: saleInvoiceType.id,
+    invoiceTypePurchaseId: purchaseInvoiceType.id,
+    arrivalZoneId: shippingZone.id,
     binZoneId: binZone.id,
   }
 }
 
-function buildAsset(refs: ArrivalRefs): CreateAsset {
+function buildAsset(refs: ArrivalTestData): CreateAsset {
   serialCounter += 1
   // errors: [] and componentId: null keep validateErrorBrands / validateComponentBrands
   // short-circuiting, so no Error/Component reference rows are needed.
@@ -246,7 +246,7 @@ function buildAsset(refs: ArrivalRefs): CreateAsset {
   }
 }
 
-export function buildCreateArrivalInput(refs: ArrivalRefs, assetCount = 2): CreateArrival {
+export function buildCreateArrivalInput(refs: ArrivalTestData, assetCount = 2): CreateArrival {
   const assets = Array.from({ length: assetCount }, () => buildAsset(refs))
   return CreateArrivalSchema.parse({
     vendor: refs.vendor,
@@ -260,13 +260,16 @@ export function buildCreateArrivalInput(refs: ArrivalRefs, assetCount = 2): Crea
 // Create an arrival and return its assets as real AssetSummary objects (status IN_STOCK).
 // Collection flows (holds/departures/transfers) operate on existing assets, so tests
 // start from genuinely-arrived assets rather than fabricated summaries.
-export async function createArrivedAssets(refs: ArrivalRefs, count = 1): Promise<AssetSummary[]> {
+export async function createArrivedAssets(
+  refs: ArrivalTestData,
+  count = 1,
+): Promise<AssetSummary[]> {
   const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, count), refs.userId)
   const { assets } = await getArrival(arrivalNumber)
   return assets
 }
 
-export function buildCreateHoldInput(refs: ArrivalRefs, assets: AssetSummary[]): CreateHold {
+export function buildCreateHoldInput(refs: ArrivalTestData, assets: AssetSummary[]): CreateHold {
   return {
     created_for_id: refs.userId,
     customer_id: refs.customer.id,
@@ -276,7 +279,7 @@ export function buildCreateHoldInput(refs: ArrivalRefs, assets: AssetSummary[]):
 }
 
 export function buildCreateDepartureInput(
-  refs: ArrivalRefs,
+  refs: ArrivalTestData,
   assets: DepartureAssetInput[],
 ): CreateDeparture {
   return {
@@ -289,7 +292,7 @@ export function buildCreateDepartureInput(
 }
 
 export function buildCreateTransferInput(
-  refs: ArrivalRefs,
+  refs: ArrivalTestData,
   assets: AssetSummary[],
 ): CreateTransfer {
   return {
@@ -302,7 +305,7 @@ export function buildCreateTransferInput(
 }
 
 export function buildCreateInvoiceInput(
-  refs: ArrivalRefs,
+  refs: ArrivalTestData,
   assets: AssetSummary[],
   invoiceTypeId: number,
   isCleared = false,
@@ -378,7 +381,7 @@ export async function seedComponent(brandId: number, name: string): Promise<numb
 
 // A valid UpdateAssetSpecs payload; override individual fields per test.
 export function buildUpdateAssetSpecs(
-  refs: ArrivalRefs,
+  refs: ArrivalTestData,
   overrides: Partial<UpdateAssetSpecs> = {},
 ): UpdateAssetSpecs {
   return {

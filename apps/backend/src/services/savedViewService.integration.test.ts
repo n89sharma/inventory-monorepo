@@ -1,15 +1,19 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { ArrivalRefs, cleanupTransactionalData, seedReferenceData } from '../../test/factories.js'
+import {
+  ArrivalTestData,
+  cleanupTransactionalData,
+  seedArrivalTestData,
+} from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { createSavedView, deleteSavedView, listSavedViews } from './savedViewService.js'
 
 const NON_OWNER_OFFSET = 99999
 
 describe('savedViewService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

@@ -1,11 +1,11 @@
 import { OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateDepartureInput,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { NotFoundError } from '../lib/errors.js'
 import { updateAssetPricing } from './assetPricingService.js'
@@ -15,10 +15,10 @@ import { getModelSales } from './modelSalesService.js'
 const MISSING_ID = 999999
 
 describe('modelSalesService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

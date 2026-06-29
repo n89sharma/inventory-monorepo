@@ -1,11 +1,11 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   cleanupTransactionalData,
   createArrivedAssets,
+  seedArrivalTestData,
   seedBrand,
   seedError,
-  seedReferenceData,
 } from '../../test/factories.js'
 import { ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -14,10 +14,10 @@ import { updateAssetErrors } from './assetErrorService.js'
 const MISSING_ID = 999999
 
 describe('assetErrorService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

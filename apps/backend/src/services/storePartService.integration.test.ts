@@ -1,22 +1,22 @@
 import { AddPurchase, AddStorePartToAsset } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetCost,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { addPurchase, addStorePartToAsset, getStoreParts } from './storePartService.js'
 
 describe('storePartService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
   let partCounter = 0
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {

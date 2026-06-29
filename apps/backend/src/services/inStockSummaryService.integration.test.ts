@@ -1,22 +1,22 @@
 import { OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
-  ArrivalRefs,
+  ArrivalTestData,
   buildCreateDepartureInput,
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
   createArrivedAssets,
-  seedReferenceData,
+  seedArrivalTestData,
 } from '../../test/factories.js'
+import { updateAssetSpecs } from './assetSpecsService.js'
 import { createDeparture } from './departureService.js'
 import { getInStockSummaryReport } from './inStockSummaryService.js'
-import { updateAssetSpecs } from './assetSpecsService.js'
 
 describe('inStockSummaryService', () => {
-  let refs: ArrivalRefs
+  let refs: ArrivalTestData
 
   beforeAll(async () => {
-    refs = await seedReferenceData()
+    refs = await seedArrivalTestData()
   })
 
   afterEach(async () => {
@@ -37,7 +37,7 @@ describe('inStockSummaryService', () => {
     )
 
     const report = await getInStockSummaryReport()
-    const total = report.reduce((sum, row) => sum + row.asset_count, 0)
+    const total = report.reduce((sum, row) => sum + (row.asset_count ?? 0), 0)
     expect(total).toBe(2)
   })
 
