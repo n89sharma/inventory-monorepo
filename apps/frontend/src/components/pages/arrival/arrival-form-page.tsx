@@ -1,3 +1,4 @@
+import { PageContent } from '@/components/layout/page-content'
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
@@ -6,15 +7,14 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PageContent } from '@/components/layout/page-content'
-import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { SelectOptions } from '../../custom/select-options'
+import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
-import { AssetModal } from '../../modals/create-asset-modal'
+import { CreateAssetModal } from '../../modals/create-asset-modal'
 import { Button } from '../../shadcn/button'
 import { DataTable } from '../../shadcn/data-table'
 import {
@@ -181,7 +181,7 @@ export function ArrivalFormPage({
             </FieldSet>
           </fieldset>
         </form>
-        <AssetModal
+        <CreateAssetModal
           open={isAssetModalOpen}
           onOpenChange={setIsAssetModalOpen}
           addNewAsset={addAsset}
@@ -202,7 +202,7 @@ export function ArrivalFormPage({
                 setIsAssetModalOpen(true)
               }}
             >
-              Add Asset
+              Create New Asset
             </Button>
           </div>
           <DataTable columns={assetTableColumns} data={assets} />

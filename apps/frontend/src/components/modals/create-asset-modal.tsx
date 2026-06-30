@@ -1,9 +1,9 @@
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
-import { modelLabel } from '@/lib/reference-labels'
-import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { modelLabel } from '@/lib/reference-labels'
+import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
+import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -56,7 +56,7 @@ function getDefaultNewAsset(allReadinesses: Status[] = []): AssetForm {
   }
 }
 
-interface AssetModalProps {
+interface CreateAssetModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   addNewAsset?: UseFieldArrayAppend<ArrivalForm, 'assets'>
@@ -67,7 +67,7 @@ interface AssetModalProps {
   onUpdateAsset?: (asset: AssetForm) => Promise<void>
 }
 
-export function AssetModal({
+export function CreateAssetModal({
   open,
   onOpenChange,
   addNewAsset,
@@ -76,7 +76,7 @@ export function AssetModal({
   editingIndex,
   onCreateAsset,
   onUpdateAsset,
-}: AssetModalProps): React.JSX.Element {
+}: CreateAssetModalProps): React.JSX.Element {
   const isEditMode = editingAsset != null
   const [isSubmitting, setIsSubmitting] = useState(false)
 

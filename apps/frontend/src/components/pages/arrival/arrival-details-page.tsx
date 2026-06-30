@@ -1,16 +1,16 @@
 import { ArrivalSummaryStrip } from '@/components/custom/cards/arrival-summary-strip'
 import { SummaryField } from '@/components/custom/cards/summary-field'
 import { getArrivalHistory } from '@/data/api/arrival-api'
-import { formatDate } from '@/lib/formatters'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { useCan } from '@/hooks/use-can'
+import { formatDate } from '@/lib/formatters'
+import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetForm } from '@/ui-types/arrival-form-types'
 import type { AssetSummary } from 'shared-types'
 import { AddAssetBarForArrival } from '../../custom/add-asset-bar-for-arrival'
-import { AssetModal } from '../../modals/create-asset-modal'
+import { CreateAssetModal } from '../../modals/create-asset-modal'
 import { EditArrivalMetadataModal } from '../../modals/edit-arrival-metadata-modal'
 import { CollectionDetailPage } from '../collection-detail-page'
 import { createArrivalAssetSummaryColumns } from '../column-defs/asset-summary-columns'
@@ -92,7 +92,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       renderAddAssetBar={() => (
         <>
           <AddAssetBarForArrival onCreate={() => setIsAssetModalOpen(true)} />
-          <AssetModal
+          <CreateAssetModal
             open={isAssetModalOpen}
             onOpenChange={handleModalOpenChange}
             editingAsset={editingAssetForm}
