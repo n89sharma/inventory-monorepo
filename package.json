@@ -9,7 +9,7 @@
     "bmigrate": "npm run migrate -w apps/backend",
     "db:setup": "bash scripts/setup-db.sh",
     "tbuild": "npm run build -w packages/shared-types",
-    "bbuild": "npm run build -w packages/shared-types && npm run build -w apps/backend",
+    "bbuild": "npm run build -w apps/backend",
     "fbuild": "npm run build -w apps/frontend",
     "bdev": "npm run dev -w apps/backend",
     "fdev": "npm run dev -w apps/frontend",

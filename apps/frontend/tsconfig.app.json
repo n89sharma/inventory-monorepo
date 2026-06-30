@@ -24,6 +24,7 @@
       "@/*": ["./src/*"]
     }
   },
+  "references": [{ "path": "../../packages/shared-types" }],
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }
