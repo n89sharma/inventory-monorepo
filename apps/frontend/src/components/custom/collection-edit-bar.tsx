@@ -1,6 +1,7 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
 import {
+  BarcodeIcon,
   DotsThreeVerticalIcon,
   DownloadSimpleIcon,
   LockSimpleOpenIcon,
@@ -123,7 +124,7 @@ export function CollectionEditBar({
   const showDelete = !onRelease && canDelete
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 print:hidden">
       <CollectionHistorySheet cacheKey={historyCacheKey} fetcher={historyFetcher} />
       <ShareButton />
       {assets !== undefined && (
@@ -145,9 +146,12 @@ export function CollectionEditBar({
           disabled={printDisabled}
           aria-label="Print barcodes"
         >
-          {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <PrinterIcon />}
+          {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <BarcodeIcon />}
         </Button>
       )}
+      <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
+        <PrinterIcon />
+      </Button>
       {canEdit && (
         <Button onClick={onEdit}>
           <PencilSimpleIcon />

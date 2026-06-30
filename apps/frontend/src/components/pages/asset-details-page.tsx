@@ -446,7 +446,7 @@ export const AssetDetailsPage = () => {
             </div>
 
             {(canViewPurchasePrice || canViewSalePrice) && (
-              <Section className="w-full">
+              <Section className="w-full print:hidden">
                 <SectionHeader
                   title="Pricing"
                   action={

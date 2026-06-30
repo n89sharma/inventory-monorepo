@@ -2,6 +2,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
 import {
+  BarcodeIcon,
   DotsThreeVerticalIcon,
   MapPinIcon,
   PlusIcon,
@@ -60,7 +61,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canDelete = can('delete_asset')
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 print:hidden">
       <ShareButton />
       <Button
         variant="outline"
@@ -69,7 +70,10 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         disabled={printLoading}
         aria-label="Print barcode"
       >
-        {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <PrinterIcon />}
+        {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <BarcodeIcon />}
+      </Button>
+      <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
+        <PrinterIcon />
       </Button>
       {canEditLocation && (
         <Button
