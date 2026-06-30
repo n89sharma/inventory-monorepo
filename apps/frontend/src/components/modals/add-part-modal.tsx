@@ -87,7 +87,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
 
   const form = useForm<CreateSalvagedPart>({
     resolver: zodResolver(CreateSalvagedPartSchema),
-    defaultValues: { donor_barcode: '', part: '', is_exchange: false, notes: '' },
+    defaultValues: { donor_barcode: '', part: '', is_exchange: true, notes: '' },
   })
 
   const { isSubmitting } = form.formState
