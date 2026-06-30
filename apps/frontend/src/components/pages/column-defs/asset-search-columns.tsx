@@ -8,7 +8,7 @@ import {
   formatThousandsK,
   formatTitleCase,
   formatUSD,
-  formatWeightKg,
+  formatWeight,
 } from '@/lib/formatters'
 import { ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -135,7 +135,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatWeightKg(row.original.weight),
+      cell: ({ row }) => formatWeight(row.original.weight),
       size: 80,
     },
     {

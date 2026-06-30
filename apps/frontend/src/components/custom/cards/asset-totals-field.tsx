@@ -1,5 +1,5 @@
+import { formatWeight } from '@/lib/formatters'
 import type { AssetSummary } from 'shared-types'
-import { formatWeightKg } from '@/lib/formatters'
 
 const sizeFormatter = new Intl.NumberFormat('en-US')
 
@@ -15,7 +15,7 @@ export function AssetTotalsField({ assets }: { assets: AssetSummary[] }) {
     <>
       <div className="flex items-baseline gap-1.5">
         <span className="text-muted-foreground">Total Weight</span>
-        <span className="font-medium tabular-nums">{formatWeightKg(totalWeight)}</span>
+        <span className="font-medium tabular-nums">{formatWeight(totalWeight)}</span>
       </div>
       <div className="flex items-baseline gap-1.5">
         <span className="text-muted-foreground">Total Size</span>

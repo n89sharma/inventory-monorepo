@@ -11,14 +11,13 @@ import {
   DataRow,
   DataValueRow,
 } from '@/components/custom/asset-details/detail-row'
-import { Badge } from '@/components/shadcn/badge'
 import { OptionalSection } from '@/components/custom/asset-details/optional-section'
 import { SectionEditButton } from '@/components/custom/asset-details/section-edit-button'
 import { AssetEditBar } from '@/components/custom/asset-edit-bar'
 import { AssetHistoryList } from '@/components/custom/asset-history'
+import { getBreadcrumForAssetDetails } from '@/components/custom/breadcrumb-segments'
 import { Comment } from '@/components/custom/comment'
 import { CopyButton } from '@/components/custom/copy-button'
-import { getBreadcrumForAssetDetails } from '@/components/custom/breadcrumb-segments'
 import { ReadinessPill } from '@/components/custom/readiness-pill'
 import { StatusBadge } from '@/components/custom/status-badge'
 import { StickyDetailsPageHeader } from '@/components/custom/sticky-details-page-header'
@@ -27,6 +26,7 @@ import { AddPartModal } from '@/components/modals/add-part-modal'
 import { EditErrorsModal } from '@/components/modals/edit-errors-modal'
 import { EditPricingModal } from '@/components/modals/edit-pricing-modal'
 import { EditSpecsModal } from '@/components/modals/edit-specs-modal'
+import { Badge } from '@/components/shadcn/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
@@ -36,14 +36,14 @@ import {
   formatDate,
   formatDateWithTime,
   formatLocation,
-  formatTitleCase,
   formatThousandsK,
-  formatWeightKg,
+  formatTitleCase,
+  formatWeight,
 } from '@/lib/formatters'
+import { isFromGlobalSearch } from '@/ui-types/navigation-context'
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { isFromGlobalSearch } from '@/ui-types/navigation-context'
 import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
 import { AddCommentInput } from '../custom/add-comment-input'
 import { PartsSection } from '../custom/parts-section'
@@ -367,7 +367,7 @@ export const AssetDetailsPage = () => {
                   />
                   <DataValueRow
                     label="Weight"
-                    value={formatWeightKg(assetDetails.weight)}
+                    value={formatWeight(assetDetails.weight)}
                     rowClassName={ROW_GAP}
                   />
                   <DataValueRow label="Size" value={assetDetails.size} rowClassName={ROW_GAP} />
