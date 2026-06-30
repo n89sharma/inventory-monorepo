@@ -17,8 +17,8 @@ export function CreateTransferPage(): React.JSX.Element {
 
   const pageConfig = {
     pageHeading: 'Create Transfer',
-    saveButtonText: 'Create Transfer',
-    submittingText: 'Creating…',
+    saveButtonText: 'Save',
+    submittingText: 'Saving…',
     cancelNavUrl: '/transfers',
   }
 

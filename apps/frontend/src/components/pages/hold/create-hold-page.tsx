@@ -17,8 +17,8 @@ export function CreateHoldPage(): React.JSX.Element {
 
   const pageConfig = {
     pageHeading: 'Create Hold',
-    saveButtonText: 'Create Hold',
-    submittingText: 'Creating…',
+    saveButtonText: 'Save',
+    submittingText: 'Saving…',
     cancelNavUrl: '/holds',
   }
 

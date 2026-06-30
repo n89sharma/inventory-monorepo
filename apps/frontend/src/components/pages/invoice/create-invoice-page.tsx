@@ -16,8 +16,8 @@ export function CreateInvoicePage(): React.JSX.Element {
 
   const pageConfig = {
     pageHeading: 'Create Invoice',
-    saveButtonText: 'Create Invoice',
-    submittingText: 'Creating…',
+    saveButtonText: 'Save',
+    submittingText: 'Saving…',
     cancelNavUrl: '/invoices',
   }
 
