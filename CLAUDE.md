@@ -85,7 +85,10 @@ either delete it or drop the `export` keyword if it's used only in-file; never l
 Per-app (run inside the app dir): `npm run dev` (backend: tsx watch; frontend: Vite on 5173).
 Backend also: `npm run pgen` (`prisma generate --sql`) after any `.sql` change.
 
-**No test runner is configured.** Do not invent or run `npm test`.
+**Tests:** Vitest (`npm test` per workspace; `vitest` for watch). Backend integration tests run
+against the `loon_test` database, never `loon_dev`: `apps/backend/.env.test` sets `DATABASE_URL`,
+Vitest `globalSetup` applies migrations to it, and a `setupFiles` guard aborts the run if
+`DATABASE_URL` doesn't target `loon_test`. Requires the local Postgres container (`docker compose up -d`).
 
 ## Using third-party libraries
 

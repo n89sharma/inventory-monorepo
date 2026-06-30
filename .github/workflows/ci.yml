@@ -26,8 +26,49 @@ jobs:
       - name: Build frontend bundle
         run: npm run fbuild
 
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: loon_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Backend imports the `shared-types` package from its built dist/ output.
+      - name: Build shared-types
+        run: npm run tbuild
+
+      # Tests run against loon_test; the guard + globalSetup require this file.
+      - name: Write backend test env
+        run: |
+          cat > apps/backend/.env.test <<'EOF'
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loon_test
+          CLERK_PUBLISHABLE_KEY=pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
+          CLERK_SECRET_KEY=sk_test_dummy
+          EOF
+
+      - name: Run backend tests
+        run: npm run btest
+
   deploy-backend-production:
-    needs: verify
+    needs: [verify, backend-tests]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     concurrency:
