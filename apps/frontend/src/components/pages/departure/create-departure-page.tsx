@@ -1,6 +1,7 @@
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { DEFAULT_OUTGOING_STATUS, type AssetSummary } from 'shared-types'
 import { DepartureFormPage } from './departure-form-page'
@@ -14,6 +15,7 @@ export function CreateDeparturePage(): React.JSX.Element {
   }
 
   const mutations = useDepartureMutations()
+  const defaultWarehouse = useProfileDefaultWarehouse()
 
   const pageConfig = {
     pageHeading: 'Create Departure',
@@ -26,7 +28,7 @@ export function CreateDeparturePage(): React.JSX.Element {
 
   const defaultValues: DepartureForm | undefined = preloadedAssets?.length
     ? {
-        origin: UNSELECTED,
+        origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
         customer: null,
         transporter: null,
         comment: '',

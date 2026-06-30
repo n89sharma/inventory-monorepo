@@ -1,9 +1,10 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalFormSchema, type ArrivalForm } from '@/ui-types/arrival-form-types'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
@@ -45,6 +46,7 @@ export function ArrivalFormPage({
   breadcrumbs,
   onValidSubmit,
 }: ArrivalFormPageProps): React.JSX.Element {
+  const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<ArrivalForm>({
     resolver: zodResolver(ArrivalFormSchema),
     defaultValues: defaultValues ?? getDefaultArrival(),
@@ -79,7 +81,7 @@ export function ArrivalFormPage({
     return {
       vendor: null,
       transporter: null,
-      warehouse: UNSELECTED,
+      warehouse: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
       assets: [],
       comment: '',
     }

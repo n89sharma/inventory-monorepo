@@ -1,8 +1,9 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { flattenFieldErrors } from '@/lib/utils'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { TransferFormSchema, type TransferForm } from '@/ui-types/transfer-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo } from 'react'
@@ -44,6 +45,7 @@ export function TransferFormPage({
   breadcrumbs,
   onValidSubmit,
 }: TransferFormPageProps): React.JSX.Element {
+  const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<TransferForm>({
     resolver: zodResolver(TransferFormSchema),
     defaultValues: defaultValues ?? getDefaultTransfer(),
@@ -62,7 +64,7 @@ export function TransferFormPage({
 
   function getDefaultTransfer(): TransferForm {
     return {
-      origin: UNSELECTED,
+      origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
       destination: UNSELECTED,
       transporter: null,
       comment: '',

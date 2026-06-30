@@ -1,13 +1,15 @@
+import { PageContent } from '@/components/layout/page-content'
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { flattenFieldErrors } from '@/lib/utils'
 import {
   DepartureFormSchema,
   type DepartureForm,
   type DepartureFormAsset,
 } from '@/ui-types/departure-form-types'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
@@ -18,7 +20,6 @@ import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to
 import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { DepartureOutgoingStatusBar } from '../../custom/departure-outgoing-status-bar'
 import { SelectOptions } from '../../custom/select-options'
-import { PageContent } from '@/components/layout/page-content'
 import { StickyEditPageHeader } from '../../custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '../../custom/unsaved-changes-dialog'
 import { DataTable } from '../../shadcn/data-table'
@@ -53,6 +54,7 @@ export function DepartureFormPage({
   breadcrumbs,
   onValidSubmit,
 }: DepartureFormPageProps): React.JSX.Element {
+  const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<DepartureForm>({
     resolver: zodResolver(DepartureFormSchema),
     defaultValues: defaultValues ?? getDefaultDeparture(),
@@ -91,7 +93,7 @@ export function DepartureFormPage({
 
   function getDefaultDeparture(): DepartureForm {
     return {
-      origin: UNSELECTED,
+      origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
       customer: null,
       transporter: null,
       comment: '',
@@ -140,7 +142,7 @@ export function DepartureFormPage({
                       onSelectionChange={onChange}
                       options={activeWarehouses}
                       getLabel={(w) => w.city_code}
-                      fieldLabel="Origin"
+                      fieldLabel="Warehouse"
                       anyAllowed={false}
                       fieldRequired={true}
                       error={fieldState.invalid}

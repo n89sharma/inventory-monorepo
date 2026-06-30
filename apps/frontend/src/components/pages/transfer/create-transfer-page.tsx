@@ -1,5 +1,6 @@
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
-import { UNSELECTED } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
@@ -14,6 +15,7 @@ export function CreateTransferPage(): React.JSX.Element {
   }
 
   const mutations = useTransferMutations()
+  const defaultWarehouse = useProfileDefaultWarehouse()
 
   const pageConfig = {
     pageHeading: 'Create Transfer',
@@ -26,7 +28,7 @@ export function CreateTransferPage(): React.JSX.Element {
 
   const defaultValues: TransferForm | undefined = preloadedAssets?.length
     ? {
-        origin: UNSELECTED,
+        origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
         destination: UNSELECTED,
         transporter: null,
         comment: '',

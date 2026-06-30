@@ -16,6 +16,7 @@ import { Textarea } from '@/components/shadcn/textarea'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { useStorePartsList } from '@/hooks/use-store-part'
 import { cn } from '@/lib/utils'
 import {
@@ -231,6 +232,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
 function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   const addStorePartToAsset = useAssetStore((state) => state.addStorePartToAsset)
   const { data: allRows = [] } = useStorePartsList()
+  const defaultWarehouse = useProfileDefaultWarehouse()
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -241,10 +243,10 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
 
   useEffect(() => {
     if (open) {
-      reset(EMPTY_ADD_STORE_PART_FORM)
+      reset({ ...EMPTY_ADD_STORE_PART_FORM, warehouse: defaultWarehouse })
       setPartQuery('')
     }
-  }, [open, reset])
+  }, [open, reset, defaultWarehouse])
 
   const warehouse = watch('warehouse')
   const part = watch('part')
