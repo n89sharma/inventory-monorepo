@@ -32,7 +32,8 @@
       "WebFetch(domain:api.npmjs.org)",
       "WebFetch(domain:registry.npmjs.org)",
       "PowerShell(npm test -w apps/backend)",
-      "PowerShell(npm test -w apps/backend 2>&1)"
+      "PowerShell(npm test -w apps/backend 2>&1)",
+      "Bash(node *)"
     ]
   },
   "enabledMcpjsonServers": ["clerk", "context7", "vercel", "chrome-devtools"],

@@ -57,7 +57,12 @@ jobs:
 
       # Tests run against loon_test; the guard + globalSetup require this file.
       - name: Write backend test env
-        run: echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loon_test" > apps/backend/.env.test
+        run: |
+          cat > apps/backend/.env.test <<'EOF'
+          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loon_test
+          CLERK_PUBLISHABLE_KEY=pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
+          CLERK_SECRET_KEY=sk_test_dummy
+          EOF
 
       - name: Run backend tests
         run: npm run btest
