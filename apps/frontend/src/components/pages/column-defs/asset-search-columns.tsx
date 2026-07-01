@@ -240,6 +240,28 @@ export function createAssetSearchColumns(
       size: 90,
     },
     {
+      accessorKey: 'cost_transport_cost',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Transport Cost"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => formatUSD(row.original.cost_transport_cost),
+      size: 90,
+    },
+    {
+      accessorKey: 'cost_processing_cost',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Processing Cost"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => formatUSD(row.original.cost_processing_cost),
+      size: 90,
+    },
+    {
       accessorKey: 'cost_total_cost',
       header: ({ column }) => (
         <SortableHeader

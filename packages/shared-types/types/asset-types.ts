@@ -60,6 +60,8 @@ export const AssetSearchRowSchema = z.object({
   specs_toner_life_y: z.number().nullable(),
   specs_toner_life_k: z.number().nullable(),
   cost_purchase_cost: z.number().nullable(),
+  cost_transport_cost: z.number().nullable(),
+  cost_processing_cost: z.number().nullable(),
   cost_total_cost: z.number().nullable(),
   cost_sale_price: z.number().nullable(),
   hold_hold_number: z.string().nullable(),

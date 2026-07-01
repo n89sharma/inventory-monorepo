@@ -122,6 +122,22 @@ export const ASSET_TABLE_COLUMNS = [
     permission: 'view_purchase_price',
   },
   {
+    id: 'cost_transport_cost',
+    label: 'Transport Cost',
+    section: 'cost',
+    defaultColumn: false,
+    enabled: true,
+    permission: 'view_purchase_price',
+  },
+  {
+    id: 'cost_processing_cost',
+    label: 'Processing Cost',
+    section: 'cost',
+    defaultColumn: false,
+    enabled: true,
+    permission: 'view_purchase_price',
+  },
+  {
     id: 'cost_total_cost',
     label: 'Total Cost',
     section: 'cost',

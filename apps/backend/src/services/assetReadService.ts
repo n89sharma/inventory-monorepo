@@ -36,6 +36,8 @@ function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSe
   return {
     ...row,
     cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
+    cost_transport_cost: canViewPurchase ? row.cost_transport_cost : null,
+    cost_processing_cost: canViewPurchase ? row.cost_processing_cost : null,
     cost_total_cost: canViewPurchase ? row.cost_total_cost : null,
     cost_sale_price: canViewSale ? row.cost_sale_price : null,
   }
