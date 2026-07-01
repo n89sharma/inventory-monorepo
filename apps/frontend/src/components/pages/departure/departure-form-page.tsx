@@ -16,7 +16,10 @@ import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { DEFAULT_OUTGOING_STATUS, type AssetSummary, type OutgoingStatus } from 'shared-types'
 import { toast } from 'sonner'
-import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to-create-form'
+import {
+  AddAssetsByBarcodeOrSerial,
+  AddFromHoldButton,
+} from '../../custom/add-assets-to-create-form'
 import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { DepartureOutgoingStatusBar } from '../../custom/departure-outgoing-status-bar'
 import { SelectOptions } from '../../custom/select-options'
@@ -207,7 +210,7 @@ export function DepartureFormPage({
               disabled={isSubmitting}
             />
           </div>
-          <AddAssetByBarcode
+          <AddAssetsByBarcodeOrSerial
             getAssets={() => form.getValues('assets')}
             onAddAsset={addDepartureAsset}
             entityName="departure"

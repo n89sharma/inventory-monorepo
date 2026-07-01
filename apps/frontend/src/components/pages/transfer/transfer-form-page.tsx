@@ -9,7 +9,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
-import { AddAssetByBarcode, AddFromHoldButton } from '../../custom/add-assets-to-create-form'
+import {
+  AddAssetsByBarcodeOrSerial,
+  AddFromHoldButton,
+} from '../../custom/add-assets-to-create-form'
 import { ControlledSearchSelectInput } from '../../custom/controlled-search-select-input'
 import { SelectOptions } from '../../custom/select-options'
 import { PageContent } from '@/components/layout/page-content'
@@ -186,7 +189,7 @@ export function TransferFormPage({
               disabled={isSubmitting}
             />
           </div>
-          <AddAssetByBarcode
+          <AddAssetsByBarcodeOrSerial
             getAssets={() => form.getValues('assets')}
             onAddAsset={addAsset}
             entityName="transfer"

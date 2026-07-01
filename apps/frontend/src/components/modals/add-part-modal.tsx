@@ -1,4 +1,4 @@
-import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/custom/add-assets-to-create-form'
 import { HorizontalField } from '@/components/custom/horizontal-field'
 import { SearchSelectInput } from '@/components/custom/search-select-input'
 import { Button } from '@/components/shadcn/button'
@@ -136,7 +136,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
                       </Button>
                     </div>
                   ) : (
-                    <AddAssetByBarcode
+                    <AddAssetsByBarcodeOrSerial
                       getAssets={() => []}
                       onAddAsset={(asset) => {
                         field.onChange(asset.barcode)

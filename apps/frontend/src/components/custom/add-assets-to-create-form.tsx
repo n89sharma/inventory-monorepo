@@ -11,7 +11,7 @@ import { CommandResultList } from './global-search/command-result-list'
 
 const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
 
-interface AddAssetByBarcodeProps {
+interface AddAssetsByBarcodeOrSerialProps {
   getAssets: () => AssetSummary[]
   onAddAsset: (asset: AssetSummary) => void
   entityName: string
@@ -22,7 +22,7 @@ interface AddAssetByBarcodeProps {
   showLeadingIcon?: boolean
 }
 
-export function AddAssetByBarcode({
+export function AddAssetsByBarcodeOrSerial({
   getAssets,
   onAddAsset,
   entityName,
@@ -31,7 +31,7 @@ export function AddAssetByBarcode({
   className,
   onCommit,
   showLeadingIcon,
-}: AddAssetByBarcodeProps): React.JSX.Element {
+}: AddAssetsByBarcodeOrSerialProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')

@@ -1,4 +1,4 @@
-import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/custom/add-assets-to-create-form'
 import { ControlledSearchSelectInput } from '@/components/custom/controlled-search-select-input'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
 import { UnsavedChangesDialog } from '@/components/custom/unsaved-changes-dialog'
@@ -189,7 +189,7 @@ export function InvoiceFormPage({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Assets</h2>
           </div>
-          <AddAssetByBarcode
+          <AddAssetsByBarcodeOrSerial
             getAssets={() => form.getValues('assets')}
             onAddAsset={addAsset}
             entityName="invoice"

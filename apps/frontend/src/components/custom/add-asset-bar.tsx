@@ -1,6 +1,6 @@
 import type { AssetSummary } from 'shared-types'
 import { AddAssetBarShell } from './add-asset-bar-shell'
-import { AddAssetByBarcode, AddFromHoldButton } from './add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial, AddFromHoldButton } from './add-assets-to-create-form'
 
 interface AddAssetBarProps {
   existingAssets: AssetSummary[]
@@ -19,7 +19,7 @@ export function AddAssetBar({
 }: AddAssetBarProps): React.JSX.Element {
   return (
     <AddAssetBarShell label="Add asset">
-      <AddAssetByBarcode
+      <AddAssetsByBarcodeOrSerial
         getAssets={() => existingAssets}
         onAddAsset={() => {}}
         entityName={entityName}

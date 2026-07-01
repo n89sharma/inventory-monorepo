@@ -1,4 +1,4 @@
-import { AddAssetByBarcode } from '@/components/custom/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/custom/add-assets-to-create-form'
 import { ControlledSearchSelectInput } from '@/components/custom/controlled-search-select-input'
 import { ControlledSelectOptionSearchSelect } from '@/components/custom/controlled-select-option-search-select'
 import { StickyEditPageHeader } from '@/components/custom/sticky-edit-page-header'
@@ -152,7 +152,7 @@ export function HoldFormPage({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Assets</h2>
           </div>
-          <AddAssetByBarcode
+          <AddAssetsByBarcodeOrSerial
             getAssets={() => form.getValues('assets')}
             onAddAsset={addAsset}
             entityName="hold"
