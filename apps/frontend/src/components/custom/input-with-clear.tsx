@@ -15,6 +15,8 @@ export type InputWithClearProps = {
   fieldRequired?: boolean
   error?: boolean
   className?: string
+  inputClassName?: string
+  prefix?: React.ReactNode
   suffix?: React.ReactNode
 }
 
@@ -29,8 +31,10 @@ function InputWithClearBody({
   onValueChange,
   error,
   className,
+  inputClassName,
   placeholder,
   header,
+  prefix,
   suffix,
 }: InputWithClearBodyProps): React.JSX.Element {
   const resolvedInputType = inputType ?? 'string'
@@ -53,12 +57,18 @@ function InputWithClearBody({
     <Field className={className} data-invalid={error}>
       {header}
       <InputGroup>
+        {prefix ? (
+          <InputGroupAddon align="inline-start">
+            <span className="text-muted-foreground pl-1">{prefix}</span>
+          </InputGroupAddon>
+        ) : null}
         <InputGroupInput
           type={resolvedInputType}
           value={value ?? ''}
           onChange={(e) => onValueChange(coerce(e.target.value))}
           placeholder={placeholder}
           aria-invalid={error}
+          className={inputClassName}
         ></InputGroupInput>
 
         <InputGroupAddon align="inline-end">

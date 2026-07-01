@@ -143,6 +143,7 @@ export function CreateAssetModal({
   async function onValidAsset(rawAsset: AssetForm) {
     const asset: AssetForm = {
       ...rawAsset,
+      meterColour: rawAsset.meterColour ?? 0,
       drumLifeC: rawAsset.drumLifeC ?? 0,
       drumLifeM: rawAsset.drumLifeM ?? 0,
       drumLifeY: rawAsset.drumLifeY ?? 0,

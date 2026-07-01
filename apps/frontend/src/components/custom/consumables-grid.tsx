@@ -2,35 +2,49 @@ import { cn } from '@/lib/utils'
 import { Input } from '../shadcn/input'
 import { HorizontalField } from './horizontal-field'
 
-const CMYK_CHANNELS = [
-  { letter: 'C', dotClass: 'bg-cyan-500' },
-  { letter: 'M', dotClass: 'bg-fuchsia-500' },
-  { letter: 'Y', dotClass: 'bg-yellow-500' },
-  { letter: 'K', dotClass: 'bg-foreground' },
-] as const
+export type Channel = 'C' | 'M' | 'Y' | 'K'
 
-const CELLS_TEMPLATE = 'grid-cols-[repeat(4,minmax(0,72px))_auto]'
+const CHANNEL_ORDER: Channel[] = ['C', 'M', 'Y', 'K']
+
+const CHANNEL_DOT_CLASS = {
+  C: 'bg-cyan-500',
+  M: 'bg-fuchsia-500',
+  Y: 'bg-yellow-500',
+  K: 'bg-foreground',
+} as const satisfies Record<Channel, string>
+
+export function ChannelLabel({ channel }: { channel: Channel }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className={cn('size-2 rounded-full', CHANNEL_DOT_CLASS[channel])} />
+    </span>
+  )
+}
+
+const CELL_WIDTH_PX = 72
+
+function cellsTemplate(columnCount: number) {
+  return `repeat(${columnCount}, minmax(0, ${CELL_WIDTH_PX}px)) auto`
+}
 
 export function ConsumablesGrid({
   children,
-  requiredChannels = [],
+  visibleChannels,
 }: {
   children: React.ReactNode
-  requiredChannels?: Array<'C' | 'M' | 'Y' | 'K'>
+  visibleChannels: Channel[]
 }) {
+  const channels = CHANNEL_ORDER.filter((c) => visibleChannels.includes(c))
   return (
     <div className="flex flex-col gap-2">
       <HorizontalField label="">
-        <div className={cn('grid items-center gap-2 px-1', CELLS_TEMPLATE)}>
-          {CMYK_CHANNELS.map((c) => (
-            <div key={c.letter} className="flex items-center justify-center gap-1.5">
-              <span className={cn('size-2 rounded-full', c.dotClass)} />
-              <span className="text-xs font-medium text-muted-foreground">
-                {c.letter}
-                {requiredChannels.includes(c.letter) && (
-                  <span className="text-destructive ml-0.5">*</span>
-                )}
-              </span>
+        <div
+          className="grid items-center gap-2 px-1"
+          style={{ gridTemplateColumns: cellsTemplate(channels.length) }}
+        >
+          {channels.map((channel) => (
+            <div key={channel} className="flex items-center justify-center">
+              <ChannelLabel channel={channel} />
             </div>
           ))}
           <span />
@@ -41,10 +55,23 @@ export function ConsumablesGrid({
   )
 }
 
-export function ConsumablesRow({ label, children }: { label: string; children: React.ReactNode }) {
+export function ConsumablesRow({
+  label,
+  required,
+  columnCount,
+  children,
+}: {
+  label: string
+  required?: boolean
+  columnCount: number
+  children: React.ReactNode
+}) {
   return (
-    <HorizontalField label={label}>
-      <div className={cn('grid items-center gap-2', CELLS_TEMPLATE)}>
+    <HorizontalField label={label} required={required}>
+      <div
+        className="grid items-center gap-2"
+        style={{ gridTemplateColumns: cellsTemplate(columnCount) }}
+      >
         {children}
         <span className="text-xs text-muted-foreground">%</span>
       </div>

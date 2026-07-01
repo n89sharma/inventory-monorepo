@@ -12,21 +12,25 @@ import { Controller, type Control, type FieldValues, type Path } from 'react-hoo
 import type { Component, CoreFunction, Country, Status } from 'shared-types'
 import { Input } from '../shadcn/input'
 import MultipleSelector from '../shadcn/multiple-selector'
-import { ConsumablesCell, ConsumablesGrid, ConsumablesRow } from './consumables-grid'
+import {
+  ChannelLabel,
+  ConsumablesCell,
+  ConsumablesGrid,
+  ConsumablesRow,
+  type Channel,
+} from './consumables-grid'
 import { ControlledSearchSelectField } from './controlled-search-select-field'
 import { HorizontalField } from './horizontal-field'
 import { InputWithClearInline } from './input-with-clear'
 import { ReadinessPicker } from './readiness-picker'
 import { SearchSelectInput } from './search-select-input'
 
-const CMYK_LETTERS = ['C', 'M', 'Y', 'K'] as const
-
 // Shared width for the single-line inputs across the Create/Edit Asset and Edit
 // Specs modals — widest of the previous values so every box fits its content.
 export const INPUT_WIDTH = 'max-w-[200px]'
 
-const ALL_CHANNELS: Array<'C' | 'M' | 'Y' | 'K'> = ['C', 'M', 'Y', 'K']
-const MONO_CHANNELS: Array<'C' | 'M' | 'Y' | 'K'> = ['K']
+const ALL_CHANNELS: Channel[] = ['C', 'M', 'Y', 'K']
+const MONO_CHANNELS: Channel[] = ['K']
 
 type CMYKFieldNames<T extends FieldValues> = {
   c: Path<T>
@@ -98,29 +102,73 @@ function ControlledNumberInput<T extends FieldValues>({
   )
 }
 
+const METER_THOUSANDS = 1000
+const METER_INPUT_WIDTH = 'max-w-40'
+
+function ControlledMeterInput<T extends FieldValues>({
+  control,
+  name,
+  channel,
+}: {
+  control: Control<T>
+  name: Path<T>
+  channel: Channel
+}) {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <InputWithClearInline
+          value={typeof field.value === 'number' ? field.value / METER_THOUSANDS : null}
+          onValueChange={(val) =>
+            field.onChange(typeof val === 'number' ? Math.max(0, val) * METER_THOUSANDS : null)
+          }
+          fieldLabel=""
+          inputType="number"
+          prefix={<ChannelLabel channel={channel} />}
+          suffix="K"
+          error={fieldState.invalid}
+          className={METER_INPUT_WIDTH}
+          inputClassName="text-right"
+        />
+      )}
+    />
+  )
+}
+
 function ControlledConsumablesRow<T extends FieldValues>({
   label,
   control,
   names,
+  visibleChannels,
+  required,
 }: {
   label: string
   control: Control<T>
   names: CMYKFieldNames<T>
+  visibleChannels: Channel[]
+  required?: boolean
 }) {
-  const orderedNames = [names.c, names.m, names.y, names.k]
+  const channels = [
+    { letter: 'C', name: names.c },
+    { letter: 'M', name: names.m },
+    { letter: 'Y', name: names.y },
+    { letter: 'K', name: names.k },
+  ].filter((ch) => visibleChannels.includes(ch.letter as Channel))
   return (
-    <ConsumablesRow label={label}>
-      {orderedNames.map((fieldName, i) => (
+    <ConsumablesRow label={label} required={required} columnCount={channels.length}>
+      {channels.map((ch) => (
         <Controller
-          key={fieldName}
+          key={ch.name}
           control={control}
-          name={fieldName}
+          name={ch.name}
           render={({ field, fieldState }) => (
             <ConsumablesCell
               value={field.value as number | null}
               onChange={field.onChange}
               invalid={fieldState.invalid}
-              ariaLabel={`${label} ${CMYK_LETTERS[i]}`}
+              ariaLabel={`${label} ${ch.letter}`}
             />
           )}
         />
@@ -213,6 +261,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
 
   const p = (name: string) => name as Path<T>
+  const channels = isColour ? ALL_CHANNELS : MONO_CHANNELS
 
   return (
     <>
@@ -259,53 +308,27 @@ export function TechnicalSpecsFields<T extends FieldValues>({
 
       <HorizontalField label="Meter" required>
         <div className="flex items-center gap-2">
-          <Controller
-            control={control}
-            name={p('meterColour')}
-            render={({ field, fieldState }) => (
-              <InputWithClearInline
-                value={field.value as number | null}
-                onValueChange={(val) =>
-                  field.onChange(typeof val === 'number' ? Math.max(0, val) : null)
-                }
-                fieldLabel=""
-                inputType="number"
-                suffix="C"
-                error={fieldState.invalid}
-                className={INPUT_WIDTH}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name={p('meterBlack')}
-            render={({ field, fieldState }) => (
-              <InputWithClearInline
-                value={field.value as number | null}
-                onValueChange={(val) =>
-                  field.onChange(typeof val === 'number' ? Math.max(0, val) : null)
-                }
-                fieldLabel=""
-                inputType="number"
-                suffix="B"
-                error={fieldState.invalid}
-                className={INPUT_WIDTH}
-              />
-            )}
-          />
+          {isColour && (
+            <ControlledMeterInput control={control} name={p('meterColour')} channel="C" />
+          )}
+          <ControlledMeterInput control={control} name={p('meterBlack')} channel="K" />
         </div>
       </HorizontalField>
 
-      <ConsumablesGrid requiredChannels={isColour ? ALL_CHANNELS : MONO_CHANNELS}>
+      <ConsumablesGrid visibleChannels={channels}>
         <ControlledConsumablesRow
           label="Drum life"
           control={control}
           names={{ c: p('drumLifeC'), m: p('drumLifeM'), y: p('drumLifeY'), k: p('drumLifeK') }}
+          visibleChannels={channels}
+          required
         />
         <ControlledConsumablesRow
           label="Toner"
           control={control}
           names={{ c: p('tonerLifeC'), m: p('tonerLifeM'), y: p('tonerLifeY'), k: p('tonerLifeK') }}
+          visibleChannels={channels}
+          required
         />
       </ConsumablesGrid>
 
