@@ -79,18 +79,20 @@ export function EditErrorsModal({
           <DialogTitle>Edit Errors</DialogTitle>
         </DialogHeader>
 
-        <AssetErrorsEditor
-          value={localErrors}
-          onChange={handleChange}
-          brandId={brandId}
-          renderSearch={(slot) => <SearchSelectInput {...slot} placeholder="Add error" />}
-        />
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-2">
+          <AssetErrorsEditor
+            value={localErrors}
+            onChange={handleChange}
+            brandId={brandId}
+            renderSearch={(slot) => <SearchSelectInput {...slot} placeholder="Add error" />}
+          />
 
-        {localErrors.length === 0 && (
-          <p className="px-3 py-4 text-center text-muted-foreground">
-            No errors — add at least one.
-          </p>
-        )}
+          {localErrors.length === 0 && (
+            <p className="px-3 py-4 text-center text-muted-foreground">
+              No errors — add at least one.
+            </p>
+          )}
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => guard.onOpenChange(false)} type="button">
