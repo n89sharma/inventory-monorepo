@@ -1,9 +1,14 @@
 import { getAssetsForSearchInStock } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { resolveWarehouseScope } from '@/lib/asset-filter-params'
-import type { SearchInStockFilters } from '@/lib/search-instock-params'
-import type { AssetSearchRow } from 'shared-types'
+import { resolveWarehouseScope, type SharedAssetFilters } from '@/lib/filters/hooks'
+import type { AssetSearchRow, AssetType, Brand } from 'shared-types'
 import useSWR from 'swr'
+
+export type SearchInStockFilters = SharedAssetFilters & {
+  brand: Brand | null
+  assetTypes: AssetType[]
+  priceCheck: boolean
+}
 
 const SEARCH_INSTOCK_KEY = 'search-instock-assets'
 

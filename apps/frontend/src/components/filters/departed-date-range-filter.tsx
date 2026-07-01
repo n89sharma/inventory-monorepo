@@ -1,5 +1,5 @@
 import { DatePickerFieldInline } from '@/components/custom/date-picker'
-import { getDepartedFloor, isValidSoldDateRange } from '@/lib/search-sold-params'
+import { getDepartedFloor, isValidSoldDateRange } from '@/lib/filters/hooks'
 import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 
 const INVALID_RANGE_MESSAGE = 'Only data from the last 18 months can be shown'

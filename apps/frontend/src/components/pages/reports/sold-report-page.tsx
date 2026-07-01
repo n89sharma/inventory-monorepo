@@ -19,25 +19,23 @@ import {
 } from '@/components/shadcn/table'
 import { Toggle } from '@/components/shadcn/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { useModelStore } from '@/data/store/model-store'
 import { useModelSales } from '@/hooks/use-model-sales'
-import { EMPTY_SHARED_FILTERS } from '@/lib/asset-filter-params'
+import {
+  useModelParam,
+  useSoldReportRangeParam,
+  useSpecsVisibleParam,
+  type SoldReportRange,
+} from '@/lib/filters/hooks'
+import { buildInStockModelPath } from '@/lib/filters/serializers'
 import { formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-sales-summary'
-import { filtersToParams as instockFiltersToParams } from '@/lib/search-instock-params'
-import {
-  filtersToParams,
-  paramsToFilters,
-  type SoldReportFilters,
-  type SoldReportRange,
-} from '@/lib/sold-report-params'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { format, subMonths } from 'date-fns'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import type { ModelSaleRow, ModelSalesResult } from 'shared-types'
+import type { ModelSaleRow, ModelSalesResult, ModelSummary } from 'shared-types'
 
 const EMPTY_SALES: ModelSaleRow[] = []
 const RANGE_OPTIONS = [6, 12] as const satisfies readonly SoldReportRange[]
@@ -168,7 +166,8 @@ function EmptyWindowState({
 
 function SoldReportResults({
   data,
-  filters,
+  model,
+  range,
   visibleSales,
   bands,
   inStockHref,
@@ -176,7 +175,8 @@ function SoldReportResults({
   getRowHref,
 }: {
   data: ModelSalesResult | undefined
-  filters: SoldReportFilters
+  model: ModelSummary | null
+  range: SoldReportRange
   visibleSales: ModelSaleRow[]
   bands: BandSummary[]
   inStockHref: string
@@ -185,14 +185,14 @@ function SoldReportResults({
 }): React.JSX.Element | null {
   const columns = useMemo(() => createModelSalesColumns(getRowHref), [getRowHref])
 
-  if (filters.model === null) {
+  if (model === null) {
     return <p className="text-sm text-muted-foreground">Select a model to see its recent sales.</p>
   }
   if (data === undefined) return null
   if (visibleSales.length === 0) {
     return (
       <div className="flex items-start justify-between gap-4">
-        <EmptyWindowState range={filters.range} lastSale={data.last_sale} />
+        <EmptyWindowState range={range} lastSale={data.last_sale} />
         <ViewStockButton count={data.in_stock_count} href={inStockHref} />
       </div>
     )
@@ -205,7 +205,7 @@ function SoldReportResults({
           <ViewStockButton count={data.in_stock_count} href={inStockHref} />
         </div>
         <MeterBandsTable bands={bands} />
-        <RangeSentence count={visibleSales.length} range={filters.range} />
+        <RangeSentence count={visibleSales.length} range={range} />
       </MeasuredSummary>
       <DataTable
         columns={columns}
@@ -221,38 +221,26 @@ function SoldReportResults({
 }
 
 export function SoldReportPage(): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [modelQuery, setModelQuery] = useState('')
 
-  const models = useModelStore((state) => state.models)
-  const filters = useMemo(() => paramsToFilters(searchParams, models), [searchParams, models])
+  const { model, setModel, clear } = useModelParam()
+  const [range, setRange] = useSoldReportRangeParam()
+  const [specsVisible, setSpecsVisible] = useSpecsVisibleParam()
 
-  function updateFilters(next: SoldReportFilters) {
-    setSearchParams(filtersToParams(next), { replace: true })
-  }
-
-  const { data, isLoading } = useModelSales(filters.model?.id ?? null)
+  const { data, isLoading } = useModelSales(model?.id ?? null)
 
   const sales12 = data?.sales ?? EMPTY_SALES
   const sales6 = useMemo(() => filterByMonths(sales12, 6), [sales12])
   const rangeCounts = { 6: sales6.length, 12: sales12.length }
-  const visibleSales = filters.range === 6 ? sales6 : sales12
+  const visibleSales = range === 6 ? sales6 : sales12
   const bands = useMemo(() => summarizeBands(visibleSales), [visibleSales])
 
-  const inStockHref = useMemo(() => {
-    const params = instockFiltersToParams({
-      ...EMPTY_SHARED_FILTERS,
-      model: filters.model,
-      brand: null,
-      assetTypes: [],
-      priceCheck: false,
-    })
-    return `/search/instock?${params.toString()}`
-  }, [filters.model])
+  const inStockHref = model ? buildInStockModelPath(model.id) : ''
 
   const columnVisibility = useMemo<VisibilityState>(
-    () => Object.fromEntries(MODEL_SALES_SPEC_COLUMN_IDS.map((id) => [id, filters.specsVisible])),
-    [filters.specsVisible],
+    () => Object.fromEntries(MODEL_SALES_SPEC_COLUMN_IDS.map((id) => [id, specsVisible])),
+    [specsVisible],
   )
 
   const getRowHref = useCallback(
@@ -284,16 +272,16 @@ export function SoldReportPage(): React.JSX.Element {
           onSubmit={(e) => e.preventDefault()}
         >
           <ModelFilter
-            selection={filters.model}
+            selection={model}
             query={modelQuery}
             onSelectionChange={(m) => {
               setModelQuery('')
-              updateFilters({ ...filters, model: m })
+              setModel(m)
             }}
             onQueryChange={setModelQuery}
             onClear={() => {
               setModelQuery('')
-              updateFilters({ ...filters, model: null })
+              clear()
             }}
             placeholder="Model *"
           />
@@ -301,27 +289,27 @@ export function SoldReportPage(): React.JSX.Element {
           <ToggleGroup
             type="single"
             variant="outline"
-            value={String(filters.range)}
+            value={String(range)}
             onValueChange={(value) => {
               if (value === '') return
-              updateFilters({ ...filters, range: value === '12' ? 12 : 6 })
+              setRange(value === '12' ? 12 : 6)
             }}
             aria-label="Sales window"
           >
-            {RANGE_OPTIONS.map((range) => (
-              <ToggleGroupItem key={range} value={String(range)}>
-                {range} mo ({rangeCounts[range]})
+            {RANGE_OPTIONS.map((option) => (
+              <ToggleGroupItem key={option} value={String(option)}>
+                {option} mo ({rangeCounts[option]})
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
 
           <Toggle
             variant="outline"
-            pressed={filters.specsVisible}
-            onPressedChange={(v) => updateFilters({ ...filters, specsVisible: v })}
+            pressed={specsVisible}
+            onPressedChange={setSpecsVisible}
             aria-label="Show spec columns"
           >
-            {filters.specsVisible ? 'Hide Specs' : 'Show Specs'}
+            {specsVisible ? 'Hide Specs' : 'Show Specs'}
           </Toggle>
         </form>
       </StickyPageHeader>
@@ -329,7 +317,8 @@ export function SoldReportPage(): React.JSX.Element {
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
           <SoldReportResults
             data={data}
-            filters={filters}
+            model={model}
+            range={range}
             visibleSales={visibleSales}
             bands={bands}
             inStockHref={inStockHref}

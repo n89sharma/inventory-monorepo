@@ -4,32 +4,24 @@ import { CollectionPage } from '@/components/pages/collection-page'
 import { storePartTableColumns } from '@/components/pages/column-defs/store-part-columns'
 import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'
-import { filtersToParams, paramsToFilters, type StoreFilters } from '@/lib/search-store-params'
+import { useStoreSearchParam, useStoreWarehousesParam } from '@/lib/filters/hooks'
+import { buildStorePartPath } from '@/lib/filters/serializers'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import type { StorePart, StorePartSummary } from 'shared-types'
 
 export function StorePartsListPage(): React.JSX.Element {
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const filters = useMemo(
-    () => paramsToFilters(searchParams, warehouses),
-    [searchParams, warehouses],
-  )
+  const [warehouses, setWarehouses] = useStoreWarehousesParam()
+  const [search, setSearch] = useStoreSearchParam()
 
   const { data: rows = [] } = useStorePartsList()
   const [addOpen, setAddOpen] = useState(false)
 
-  const selectedWarehouseIds = useMemo(
-    () => new Set(filters.warehouses.map((w) => w.id)),
-    [filters.warehouses],
-  )
+  const selectedWarehouseIds = useMemo(() => new Set(warehouses.map((w) => w.id)), [warehouses])
 
   const filteredRows = useMemo(() => {
-    const needle = filters.search.trim().toLowerCase()
+    const needle = search.trim().toLowerCase()
     return rows.filter((row) => {
       if (selectedWarehouseIds.size > 0 && !selectedWarehouseIds.has(row.warehouse_id)) {
         return false
@@ -40,7 +32,7 @@ export function StorePartsListPage(): React.JSX.Element {
         row.description.toLowerCase().includes(needle)
       )
     })
-  }, [rows, selectedWarehouseIds, filters.search])
+  }, [rows, selectedWarehouseIds, search])
 
   const allParts = useMemo<StorePart[]>(() => {
     const byId = new Map<number, StorePart>()
@@ -52,11 +44,7 @@ export function StorePartsListPage(): React.JSX.Element {
     return [...byId.values()]
   }, [rows])
 
-  const targetWarehouse = filters.warehouses.length === 1 ? filters.warehouses[0] : null
-
-  function updateFilters(next: StoreFilters) {
-    setSearchParams(filtersToParams(next), { replace: true })
-  }
+  const targetWarehouse = warehouses.length === 1 ? warehouses[0] : null
 
   return (
     <>
@@ -66,7 +54,7 @@ export function StorePartsListPage(): React.JSX.Element {
         data={filteredRows}
         defaultSort={{ id: 'on_hand', desc: true }}
         onRowMouseEnter={(row) => preloadStorePartDetail(row.part_number)}
-        getRowHref={(row) => `/store/${row.part_number}?warehouse=${row.warehouse_id}`}
+        getRowHref={(row) => buildStorePartPath(row.part_number, row.warehouse_id)}
         actions={
           <Button
             onClick={() => setAddOpen(true)}
@@ -79,13 +67,10 @@ export function StorePartsListPage(): React.JSX.Element {
         }
         searchBar={
           <div className="flex flex-wrap items-center gap-3">
-            <WarehouseFilter
-              selection={filters.warehouses}
-              onSelectionChange={(selected) => updateFilters({ ...filters, warehouses: selected })}
-            />
+            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
             <Input
-              value={filters.search}
-              onChange={(e) => updateFilters({ ...filters, search: e.target.value })}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search part number or description"
               className="max-w-xs"
             />

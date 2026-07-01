@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/custom/protected-route'
 import { MainLayout } from '@/components/layout/layout'
 import { PageTitleUpdater } from '@/components/layout/page-title-updater'
 import { useAuth } from '@clerk/react'
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { lazy, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
@@ -347,8 +348,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      <PageTitleUpdater />
-      <AppRoutes />
+      <NuqsAdapter>
+        <PageTitleUpdater />
+        <AppRoutes />
+      </NuqsAdapter>
     </BrowserRouter>
   )
 }

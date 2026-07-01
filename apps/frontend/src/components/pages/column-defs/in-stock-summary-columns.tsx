@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { METER_BAND_LABELS } from '@/lib/meter-band-display'
-import { inStockDrilldownHref, soldReportHref } from '@/lib/search-in-stock-summary-params'
+import { inStockDrilldownHref, soldReportHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon, ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'

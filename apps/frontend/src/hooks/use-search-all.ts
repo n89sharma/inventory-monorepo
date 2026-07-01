@@ -1,9 +1,16 @@
 import { getAssetsForSearchAll } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { MIN_MODEL_INPUT_QUERY_LENGTH, resolveWarehouseScope } from '@/lib/asset-filter-params'
-import type { SearchAllFilters } from '@/lib/search-all-params'
-import type { AssetSearchRow } from 'shared-types'
+import {
+  MIN_MODEL_INPUT_QUERY_LENGTH,
+  resolveWarehouseScope,
+  type SharedAssetFilters,
+} from '@/lib/filters/hooks'
+import type { AssetSearchRow, Status } from 'shared-types'
 import useSWR from 'swr'
+
+export type SearchAllFilters = SharedAssetFilters & {
+  statuses: Status[]
+}
 
 const SEARCH_ALL_KEY = 'search-all-assets'
 

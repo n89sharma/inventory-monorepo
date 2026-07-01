@@ -5,22 +5,20 @@ import { storeTransactionLedgerColumns } from '@/components/pages/column-defs/st
 import { PageContent } from '@/components/layout/page-content'
 import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shadcn/data-table'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useStorePartDetail } from '@/hooks/use-store-part'
+import { useStoreWarehousesParam } from '@/lib/filters/hooks'
+import { buildStorePartsPathByWarehouseId } from '@/lib/filters/serializers'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 export function StorePartDetailPage(): React.JSX.Element {
   const { partNumber = '' } = useParams()
-  const [searchParams] = useSearchParams()
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const [scopeWarehouses] = useStoreWarehousesParam()
   const [addOpen, setAddOpen] = useState(false)
 
-  const warehouseId = useMemo(() => {
-    const raw = Number(searchParams.get('warehouse'))
-    return Number.isNaN(raw) || raw === 0 ? null : raw
-  }, [searchParams])
+  const warehouse = scopeWarehouses[0] ?? null
+  const warehouseId = warehouse?.id ?? null
 
   const { data, isLoading } = useStorePartDetail(partNumber)
 
@@ -52,9 +50,8 @@ export function StorePartDetailPage(): React.JSX.Element {
     )
   }
 
-  const warehouse = warehouses.find((w) => w.id === warehouseId) ?? null
   const onHandLabel = warehouse ? `On hand (${warehouse.city_code})` : 'On hand'
-  const backHref = warehouseId === null ? '/store' : `/store?warehouse=${warehouseId}`
+  const backHref = buildStorePartsPathByWarehouseId(warehouseId)
 
   return (
     <>

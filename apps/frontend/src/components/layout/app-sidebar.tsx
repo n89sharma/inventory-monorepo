@@ -22,10 +22,12 @@ import {
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
-import { buildAssetSearchPath } from '@/lib/asset-filter-params'
-import { buildProfitabilityReportPath } from '@/lib/profitability-report-url-params'
-import { buildInStockSummaryPath } from '@/lib/search-in-stock-summary-params'
-import { buildStoreListPath } from '@/lib/search-store-params'
+import {
+  buildAssetSearchPath,
+  buildInStockSummaryPath,
+  buildProfitabilityReportPath,
+  buildStoreListPath,
+} from '@/lib/filters/serializers'
 import {
   CaretDownIcon,
   ChartLineUpIcon,

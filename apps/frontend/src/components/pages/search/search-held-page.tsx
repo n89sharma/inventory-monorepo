@@ -3,17 +3,19 @@ import { AssetIdentityFilters } from '@/components/custom/asset-identity-filters
 import { CustomerFilter } from '@/components/filters/customer-filter'
 import { DaysHeldFilter } from '@/components/filters/days-held-filter'
 import { UserFilter } from '@/components/filters/user-filter'
-import { useModelStore } from '@/data/store/model-store'
-import { useOrgStore } from '@/data/store/org-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useUserStore } from '@/data/store/user-store'
-import { useSearchHeld } from '@/hooks/use-search-held'
-import { useUrlFilters } from '@/hooks/use-url-filters'
-import { filtersToParams, paramsToFilters } from '@/lib/search-held-params'
-import { useCallback, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import type { AssetSearchRow } from 'shared-types'
 import { daysHeld } from '@/components/pages/column-defs/asset-search-columns'
+import { useSearchHeld } from '@/hooks/use-search-held'
+import {
+  useAssetTypesParam,
+  useBrandParam,
+  useDaysHeldParam,
+  useHeldByParam,
+  useHeldForParam,
+  useHoldCustomerParam,
+  useSharedAssetFilters,
+} from '@/lib/filters/hooks'
+import { useCallback, useMemo } from 'react'
+import type { AssetSearchRow } from 'shared-types'
 import { AssetSearchPage } from './asset-search-page'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
@@ -26,50 +28,52 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
   return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
 }
 
+function HeldScopeFilters(): React.JSX.Element {
+  const [heldBy, setHeldBy] = useHeldByParam()
+  const [heldFor, setHeldFor] = useHeldForParam()
+  const [holdCustomer, setHoldCustomer] = useHoldCustomerParam()
+  const [daysHeldMin, setDaysHeldMin] = useDaysHeldParam()
+  return (
+    <>
+      <UserFilter
+        selection={heldBy}
+        onSelectionChange={setHeldBy}
+        onClear={() => setHeldBy(null)}
+        placeholder="Held By"
+        clearLabel="Clear held by"
+      />
+      <UserFilter
+        selection={heldFor}
+        onSelectionChange={setHeldFor}
+        onClear={() => setHeldFor(null)}
+        placeholder="Held For"
+        clearLabel="Clear held for"
+      />
+      <CustomerFilter
+        selection={holdCustomer}
+        onSelectionChange={setHoldCustomer}
+        onClear={() => setHoldCustomer(null)}
+      />
+      <DaysHeldFilter value={daysHeldMin} onValueChange={setDaysHeldMin} />
+    </>
+  )
+}
+
 export function SearchHeldPage(): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const shared = useSharedAssetFilters()
+  const [brand] = useBrandParam()
+  const [assetTypes] = useAssetTypesParam()
+  const [heldBy] = useHeldByParam()
+  const [heldFor] = useHeldForParam()
+  const [holdCustomer] = useHoldCustomerParam()
+  const [daysHeldMin] = useDaysHeldParam()
 
-  const models = useModelStore((state) => state.models)
-  const allBrands = useReferenceDataStore((state) => state.brands)
-  const allAssetTypes = useReferenceDataStore((state) => state.assetTypes)
-  const allReadinesses = useReferenceDataStore((state) => state.readinesses)
-  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
-  const allComponents = useReferenceDataStore((state) => state.components)
-  const allUsers = useUserStore((state) => state.users)
-  const allCustomers = useOrgStore((state) => state.organizations)
-
-  const urlFilters = useMemo(
-    () =>
-      paramsToFilters(searchParams, {
-        warehouses: allWarehouses,
-        brands: allBrands,
-        assetTypes: allAssetTypes,
-        models,
-        readinesses: allReadinesses,
-        components: allComponents,
-        users: allUsers,
-        customers: allCustomers,
-      }),
-    [
-      searchParams,
-      allWarehouses,
-      allBrands,
-      allAssetTypes,
-      models,
-      allReadinesses,
-      allComponents,
-      allUsers,
-      allCustomers,
-    ],
+  const filters = useMemo(
+    () => ({ ...shared, brand, assetTypes, heldBy, heldFor, holdCustomer, daysHeldMin }),
+    [shared, brand, assetTypes, heldBy, heldFor, holdCustomer, daysHeldMin],
   )
 
-  const { draft, updateImmediate, updateDebounced } = useUrlFilters(
-    urlFilters,
-    filtersToParams,
-    setSearchParams,
-  )
-
-  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchHeld(urlFilters)
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchHeld(filters)
   const handleBulkPriceSave = useCallback(() => {
     mutate()
   }, [mutate])
@@ -85,45 +89,7 @@ export function SearchHeldPage(): React.JSX.Element {
       defaultSort={DAYS_HELD_DESC_SORT}
       getRowClassName={heldRowClassName}
     >
-      <AssetFilterBar
-        draft={draft}
-        onImmediate={updateImmediate}
-        onDebounced={updateDebounced}
-        scopeSlot={
-          <>
-            <UserFilter
-              selection={draft.heldBy}
-              onSelectionChange={(u) => updateImmediate({ ...draft, heldBy: u })}
-              onClear={() => updateImmediate({ ...draft, heldBy: null })}
-              placeholder="Held By"
-              clearLabel="Clear held by"
-            />
-            <UserFilter
-              selection={draft.heldFor}
-              onSelectionChange={(u) => updateImmediate({ ...draft, heldFor: u })}
-              onClear={() => updateImmediate({ ...draft, heldFor: null })}
-              placeholder="Held For"
-              clearLabel="Clear held for"
-            />
-            <CustomerFilter
-              selection={draft.holdCustomer}
-              onSelectionChange={(c) => updateImmediate({ ...draft, holdCustomer: c })}
-              onClear={() => updateImmediate({ ...draft, holdCustomer: null })}
-            />
-            <DaysHeldFilter
-              value={draft.daysHeldMin}
-              onValueChange={(d) => updateDebounced({ ...draft, daysHeldMin: d })}
-            />
-          </>
-        }
-        identitySlot={
-          <AssetIdentityFilters
-            draft={draft}
-            onImmediate={updateImmediate}
-            onDebounced={updateDebounced}
-          />
-        }
-      />
+      <AssetFilterBar scopeSlot={<HeldScopeFilters />} identitySlot={<AssetIdentityFilters />} />
     </AssetSearchPage>
   )
 }

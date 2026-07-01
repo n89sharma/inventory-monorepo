@@ -7,26 +7,30 @@ import { PageContent } from '@/components/layout/page-content'
 import { IN_STOCK_SUMMARY_COLUMNS } from '@/components/pages/column-defs/in-stock-summary-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import { METER_BAND_LEGEND } from '@/lib/meter-band-display'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useCan } from '@/hooks/use-can'
 import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
-import { useUrlFilters } from '@/hooks/use-url-filters'
-import {
-  filtersToParams,
-  paramsToFilters,
-  type InStockSummaryFilters,
-} from '@/lib/search-in-stock-summary-params'
+import { useAssetTypesParam, useBrandParam, useWarehousesParam } from '@/lib/filters/hooks'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import type { InStockSummaryReport, InStockSummaryRow } from 'shared-types'
+import type {
+  AssetType,
+  Brand,
+  InStockSummaryReport,
+  InStockSummaryRow,
+  Warehouse,
+} from 'shared-types'
 
 const EMPTY_ROWS: InStockSummaryReport = []
 const DEFAULT_SORT = { id: 'asset_count', desc: true }
 const TABLE_PAGE_SIZE = 50
+
+type InStockSummaryFilters = {
+  warehouses: Warehouse[]
+  brand: Brand | null
+  assetTypes: AssetType[]
+}
 
 function filterRows(
   rows: InStockSummaryReport,
@@ -88,21 +92,15 @@ function InStockSummaryBody({
 }
 
 export function InStockSummaryReportPage(): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  const activeWarehouses = useActiveWarehouses()
-  const brands = useReferenceDataStore((state) => state.brands)
-  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
-
-  const urlFilters = useMemo(
-    () => paramsToFilters(searchParams, { warehouses: activeWarehouses, brands, assetTypes }),
-    [searchParams, activeWarehouses, brands, assetTypes],
-  )
-
-  const { draft, updateImmediate } = useUrlFilters(urlFilters, filtersToParams, setSearchParams)
+  const [warehouses, setWarehouses] = useWarehousesParam()
+  const [brand, setBrand] = useBrandParam()
+  const [assetTypes, setAssetTypes] = useAssetTypesParam()
 
   const { data: rows = EMPTY_ROWS, isLoading } = useInStockSummaryReport()
-  const visibleRows = useMemo(() => filterRows(rows, draft), [rows, draft])
+  const visibleRows = useMemo(
+    () => filterRows(rows, { warehouses, brand, assetTypes }),
+    [rows, warehouses, brand, assetTypes],
+  )
 
   const canViewPurchase = useCan('view_purchase_price')
   const columnVisibility = useMemo<VisibilityState>(
@@ -130,19 +128,13 @@ export function InStockSummaryReportPage(): React.JSX.Element {
           className="flex flex-row flex-wrap items-center gap-2"
           onSubmit={(e) => e.preventDefault()}
         >
-          <WarehouseFilter
-            selection={draft.warehouses}
-            onSelectionChange={(warehouses) => updateImmediate({ ...draft, warehouses })}
-          />
+          <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
           <BrandFilter
-            selection={draft.brand}
-            onSelectionChange={(brand) => updateImmediate({ ...draft, brand })}
-            onClear={() => updateImmediate({ ...draft, brand: null })}
+            selection={brand}
+            onSelectionChange={setBrand}
+            onClear={() => setBrand(null)}
           />
-          <AssetTypeFilter
-            selection={draft.assetTypes}
-            onSelectionChange={(assetTypes) => updateImmediate({ ...draft, assetTypes })}
-          />
+          <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
         </form>
       </StickyPageHeader>
       <PageContent>

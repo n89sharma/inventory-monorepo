@@ -4,85 +4,66 @@ import { MeterRangeInput } from '@/components/filters/meter-range-input'
 import { ModelFilter } from '@/components/filters/model-filter'
 import { ReadinessFilter } from '@/components/filters/readiness-filter'
 import { WarehouseFilter } from '@/components/filters/warehouse-filter'
-import type { SharedAssetFilters } from '@/lib/asset-filter-params'
+import {
+  useCassettesParam,
+  useInternalFinisherParam,
+  useMeterRangeParam,
+  useModelParam,
+  useReadinessesParam,
+  useWarehousesParam,
+} from '@/lib/filters/hooks'
 
 const DEFAULT_MODEL_PLACEHOLDER = 'Model'
 
-export function AssetFilterBar<T extends SharedAssetFilters>({
-  draft,
-  onImmediate,
-  onDebounced,
+export function AssetFilterBar({
   scopeSlot,
   identitySlot,
   modelPlaceholder = DEFAULT_MODEL_PLACEHOLDER,
 }: {
-  draft: T
-  onImmediate: (next: T) => void
-  onDebounced: (next: T) => void
   scopeSlot?: React.ReactNode
   identitySlot?: React.ReactNode
   modelPlaceholder?: string
 }): React.JSX.Element {
+  const [warehouses, setWarehouses] = useWarehousesParam()
+  const { model, modelQuery, setModel, setModelQuery, clear } = useModelParam()
+  const [readinesses, setReadinesses] = useReadinessesParam()
+  const { min, max, setMin, setMax } = useMeterRangeParam()
+  const [cassettes, setCassettes] = useCassettesParam()
+  const [internalFinisher, setInternalFinisher] = useInternalFinisherParam()
+
   return (
     <>
-      <WarehouseFilter
-        selection={draft.warehouses}
-        onSelectionChange={(w) => onImmediate({ ...draft, warehouses: w })}
-      />
+      <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
 
       {scopeSlot}
 
       {identitySlot}
 
       <ModelFilter
-        selection={draft.model}
-        query={draft.modelQuery ?? ''}
-        onSelectionChange={(m) =>
-          onImmediate({
-            ...draft,
-            model: m,
-            modelQuery: null,
-          })
-        }
-        onQueryChange={(text) =>
-          onDebounced({
-            ...draft,
-            modelQuery: text.length > 0 ? text : null,
-            model: null,
-          })
-        }
-        onClear={() =>
-          onImmediate({
-            ...draft,
-            model: null,
-            modelQuery: null,
-          })
-        }
+        selection={model}
+        query={modelQuery}
+        onSelectionChange={setModel}
+        onQueryChange={setModelQuery}
+        onClear={clear}
         placeholder={modelPlaceholder}
       />
 
-      <ReadinessFilter
-        selection={draft.readinesses}
-        onSelectionChange={(s) => onDebounced({ ...draft, readinesses: s })}
-      />
+      <ReadinessFilter selection={readinesses} onSelectionChange={setReadinesses} />
 
       <MeterRangeInput
-        min={draft.meterMin}
-        max={draft.meterMax}
-        onMinChange={(val) => onDebounced({ ...draft, meterMin: val })}
-        onMaxChange={(val) => onDebounced({ ...draft, meterMax: val })}
+        min={min}
+        max={max}
+        onMinChange={setMin}
+        onMaxChange={setMax}
         className="w-72"
       />
 
-      <CassettesFilter
-        value={draft.cassettes}
-        onValueChange={(val) => onDebounced({ ...draft, cassettes: val })}
-      />
+      <CassettesFilter value={cassettes} onValueChange={setCassettes} />
 
       <InternalFinisherFilter
-        selection={draft.internalFinisher}
-        onSelectionChange={(c) => onImmediate({ ...draft, internalFinisher: c })}
-        onClear={() => onImmediate({ ...draft, internalFinisher: null })}
+        selection={internalFinisher}
+        onSelectionChange={setInternalFinisher}
+        onClear={() => setInternalFinisher(null)}
       />
     </>
   )

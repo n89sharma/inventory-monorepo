@@ -1,6 +1,6 @@
 import type { SalespersonHoldsGroup } from '@/lib/holds-by-user-aggregate'
 import { formatTitleCase } from '@/lib/formatters'
-import { buildSearchHeldUrl } from '@/lib/search-held-params'
+import { buildSearchHeldUrl } from '@/lib/filters/serializers'
 import { cn } from '@/lib/utils'
 import { CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row } from '@tanstack/react-table'

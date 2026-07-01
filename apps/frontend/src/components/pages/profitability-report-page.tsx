@@ -25,26 +25,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useOrgStore } from '@/data/store/org-store'
-import { useUserStore } from '@/data/store/user-store'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
   aggregateCube,
   type MonthRow,
+  type ProfitabilityFilters,
   type ProfitabilityMetrics,
   type ProfitabilityTable,
 } from '@/lib/profitability-aggregate'
 import {
-  filtersToParams,
-  paramsToFilters,
-  type ProfitabilityFilters,
-} from '@/lib/profitability-report-url-params'
+  useBrandParam,
+  useSalespersonParam,
+  useVendorParam,
+  useWarehousesParam,
+  useYearParam,
+} from '@/lib/filters/hooks'
 import { formatUSD } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useEffect, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useMemo } from 'react'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
@@ -118,76 +117,49 @@ function countActiveFilters(filters: ProfitabilityFilters): number {
   return count
 }
 
-function ProfitabilityFilterBar({
-  filters,
-  onChange,
-}: {
-  filters: ProfitabilityFilters
-  onChange: (next: ProfitabilityFilters) => void
-}): React.JSX.Element {
-  const brands = useReferenceDataStore((state) => state.brands)
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
-  const organizations = useOrgStore((state) => state.organizations)
-  const users = useUserStore((state) => state.users)
-
-  const warehouseSelection = warehouses.filter((warehouse) =>
-    filters.warehouseIds.includes(warehouse.id),
-  )
-  const salesRepSelection = users.find((user) => user.id === filters.salesRepId) ?? null
-  const vendorSelection = organizations.find((org) => org.id === filters.vendorId) ?? null
-  const brandSelection = brands.find((brand) => brand.id === filters.brandId) ?? null
+function ProfitabilityFilterBar(): React.JSX.Element {
+  const [year, setYear] = useYearParam(CURRENT_YEAR)
+  const [warehouses, setWarehouses] = useWarehousesParam()
+  const [salesRep, setSalesRep] = useSalespersonParam()
+  const [vendor, setVendor] = useVendorParam()
+  const [brand, setBrand] = useBrandParam()
 
   return (
     <div className="flex flex-row flex-wrap gap-2 items-center">
-      <Select
-        value={String(filters.year)}
-        onValueChange={(raw) => onChange({ ...filters, year: Number.parseInt(raw, 10) })}
-      >
+      <Select value={String(year)} onValueChange={(raw) => setYear(Number.parseInt(raw, 10))}>
         <SelectTrigger className="w-32">
           <SelectValue />
         </SelectTrigger>
         <SelectContent position="popper">
           <SelectGroup>
-            {YEARS.map((year) => (
-              <SelectItem key={year} value={String(year)}>
-                {year}
+            {YEARS.map((option) => (
+              <SelectItem key={option} value={String(option)}>
+                {option}
               </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
 
-      <WarehouseFilter
-        selection={warehouseSelection}
-        onSelectionChange={(selected) =>
-          onChange({
-            ...filters,
-            warehouseIds: selected.map((warehouse) => warehouse.id),
-          })
-        }
-      />
+      <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
 
       <UserFilter
-        selection={salesRepSelection}
-        onSelectionChange={(user) => onChange({ ...filters, salesRepId: user.id })}
-        onClear={() => onChange({ ...filters, salesRepId: null })}
+        selection={salesRep}
+        onSelectionChange={setSalesRep}
+        onClear={() => setSalesRep(null)}
         placeholder="Salesperson"
         clearLabel="Clear salesperson"
       />
 
       <CustomerFilter
-        selection={vendorSelection}
-        onSelectionChange={(vendor) => onChange({ ...filters, vendorId: vendor.id })}
-        onClear={() => onChange({ ...filters, vendorId: null })}
+        selection={vendor}
+        onSelectionChange={setVendor}
+        onClear={() => setVendor(null)}
         placeholder="Vendor"
         clearLabel="Clear vendor"
       />
 
-      <BrandFilter
-        selection={brandSelection}
-        onSelectionChange={(brand) => onChange({ ...filters, brandId: brand.id })}
-        onClear={() => onChange({ ...filters, brandId: null })}
-      />
+      <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
     </div>
   )
 }
@@ -329,34 +301,33 @@ function ProfitabilityReportBody({
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const filters = useMemo(() => paramsToFilters(searchParams, CURRENT_YEAR), [searchParams])
+  const [year] = useYearParam(CURRENT_YEAR)
+  const [warehouses, setWarehouses] = useWarehousesParam()
+  const [salesRep, setSalesRep] = useSalespersonParam()
+  const [vendor, setVendor] = useVendorParam()
+  const [brand, setBrand] = useBrandParam()
 
-  const canonicalParams = useMemo(() => filtersToParams(filters).toString(), [filters])
+  const filters = useMemo<ProfitabilityFilters>(
+    () => ({
+      year,
+      warehouseIds: warehouses.map((w) => w.id),
+      salesRepId: salesRep?.id ?? null,
+      vendorId: vendor?.id ?? null,
+      brandId: brand?.id ?? null,
+    }),
+    [year, warehouses, salesRep, vendor, brand],
+  )
 
-  useEffect(() => {
-    if (canonicalParams !== searchParams.toString()) {
-      setSearchParams(canonicalParams, { replace: true })
-    }
-  }, [canonicalParams, searchParams, setSearchParams])
-
-  const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(filters.year)
+  const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(year)
   const table = useMemo(() => aggregateCube(cube, filters), [cube, filters])
 
   const activeFilterCount = countActiveFilters(filters)
 
-  function updateFilters(next: ProfitabilityFilters) {
-    setSearchParams(filtersToParams(next), { replace: true })
-  }
-
   function clearFilters() {
-    updateFilters({
-      year: filters.year,
-      warehouseIds: [],
-      salesRepId: null,
-      vendorId: null,
-      brandId: null,
-    })
+    void setWarehouses([])
+    void setSalesRep(null)
+    void setVendor(null)
+    void setBrand(null)
   }
 
   return (
@@ -378,7 +349,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
             <ShareButton />
           </div>
         </div>
-        <ProfitabilityFilterBar filters={filters} onChange={updateFilters} />
+        <ProfitabilityFilterBar />
         {activeFilterCount > 0 ? (
           <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
         ) : null}

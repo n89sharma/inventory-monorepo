@@ -2,19 +2,17 @@ import { AssetFilterBar } from '@/components/custom/asset-filter-bar'
 import { StickyPageHeader } from '@/components/custom/sticky-page-header'
 import { PageContent } from '@/components/layout/page-content'
 import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
-import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useSearchAll } from '@/hooks/use-search-all'
-import { useUrlFilters } from '@/hooks/use-url-filters'
+import { useSharedAssetFilters, useStatusesParam } from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
-import { filtersToParams, paramsToFilters } from '@/lib/search-all-params'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow, type Status } from 'shared-types'
 import { AssetResultsTable } from '../../custom/asset-results-table'
 import { ColumnPickerButton } from '../../custom/column-picker-button'
 import { ExportAssetsButton } from '../../custom/export-assets-button'
@@ -26,18 +24,9 @@ const EMPTY_ASSETS: AssetSearchRow[] = []
 const STATUS_TOP_ORDER = [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER] as const
 const STATUS_DIVIDER_AFTER = new Set<string>([ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER])
 
-export function SearchAllPage(): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const {
-    visibleColumns,
-    setVisibleColumns,
-    columnVisibility,
-    reset: resetColumns,
-  } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
-
-  const models = useModelStore((state) => state.models)
+function useOrderedStatuses(): { options: Status[]; dividerAfterIds: number[] } {
   const rawStatuses = useReferenceDataStore((state) => state.statuses)
-  const allStatuses = useMemo(() => {
+  const options = useMemo(() => {
     const filtered = rawStatuses.filter(
       (s) => s.status != ASSET_STATUS.UNKNOWN && s.status != ASSET_STATUS.LEASED,
     )
@@ -51,33 +40,50 @@ export function SearchAllPage(): React.JSX.Element {
     )
     return [...top, ...rest]
   }, [rawStatuses])
-  const statusDividerAfterIds = useMemo(
-    () => allStatuses.filter((s) => STATUS_DIVIDER_AFTER.has(s.status)).map((s) => s.id),
-    [allStatuses],
+  const dividerAfterIds = useMemo(
+    () => options.filter((s) => STATUS_DIVIDER_AFTER.has(s.status)).map((s) => s.id),
+    [options],
   )
-  const allReadinesses = useReferenceDataStore((state) => state.readinesses)
-  const allWarehouses = useReferenceDataStore((state) => state.warehouses)
-  const allComponents = useReferenceDataStore((state) => state.components)
+  return { options, dividerAfterIds }
+}
 
-  const urlFilters = useMemo(
-    () =>
-      paramsToFilters(searchParams, {
-        models,
-        statuses: allStatuses,
-        readinesses: allReadinesses,
-        warehouses: allWarehouses,
-        components: allComponents,
-      }),
-    [searchParams, models, allStatuses, allReadinesses, allWarehouses, allComponents],
+function StatusScopeFilter({
+  options,
+  dividerAfterIds,
+}: {
+  options: Status[]
+  dividerAfterIds: number[]
+}): React.JSX.Element {
+  const [statuses, setStatuses] = useStatusesParam()
+  return (
+    <MultiSelectOptionsInline
+      selection={statuses}
+      onSelectionChange={setStatuses}
+      options={options}
+      getLabel={(s) => formatTitleCase(s.status)}
+      fieldLabel="Status"
+      className="w-35"
+      dividerAfterIds={dividerAfterIds}
+    />
   )
+}
 
-  const { draft, updateImmediate, updateDebounced } = useUrlFilters(
-    urlFilters,
-    filtersToParams,
-    setSearchParams,
-  )
+export function SearchAllPage(): React.JSX.Element {
+  const [searchParams] = useSearchParams()
+  const {
+    visibleColumns,
+    setVisibleColumns,
+    columnVisibility,
+    reset: resetColumns,
+  } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
 
-  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(urlFilters)
+  const { options: statusOptions, dividerAfterIds: statusDividerAfterIds } = useOrderedStatuses()
+
+  const shared = useSharedAssetFilters()
+  const [statuses] = useStatusesParam()
+  const filters = useMemo(() => ({ ...shared, statuses }), [shared, statuses])
+
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(filters)
   const selection = useAssetSelection(assets, visibleColumns)
   const handleBulkPriceSave = useCallback(() => {
     mutate()
@@ -121,20 +127,9 @@ export function SearchAllPage(): React.JSX.Element {
           onSubmit={(e) => e.preventDefault()}
         >
           <AssetFilterBar
-            draft={draft}
-            onImmediate={updateImmediate}
-            onDebounced={updateDebounced}
             modelPlaceholder="Model *"
             scopeSlot={
-              <MultiSelectOptionsInline
-                selection={draft.statuses}
-                onSelectionChange={(s) => updateDebounced({ ...draft, statuses: s })}
-                options={allStatuses}
-                getLabel={(s) => formatTitleCase(s.status)}
-                fieldLabel="Status"
-                className="w-35"
-                dividerAfterIds={statusDividerAfterIds}
-              />
+              <StatusScopeFilter options={statusOptions} dividerAfterIds={statusDividerAfterIds} />
             }
           />
         </form>
