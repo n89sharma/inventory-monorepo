@@ -7,7 +7,7 @@ import {
   formatLocation,
   formatThousandsK,
   formatTitleCase,
-  formatUSD,
+  formatUSDWithSymbol,
   formatWeight,
 } from '@/lib/formatters'
 import { ArrowsDownUpIcon } from '@phosphor-icons/react'
@@ -236,7 +236,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.cost_purchase_cost),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.cost_purchase_cost),
       size: 90,
     },
     {
@@ -247,7 +247,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.cost_transport_cost),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.cost_transport_cost),
       size: 90,
     },
     {
@@ -258,7 +258,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.cost_processing_cost),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.cost_processing_cost),
       size: 90,
     },
     {
@@ -269,7 +269,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.cost_total_cost),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.cost_total_cost),
       size: 90,
     },
     {
@@ -280,7 +280,7 @@ export function createAssetSearchColumns(
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => formatUSD(row.original.cost_sale_price),
+      cell: ({ row }) => formatUSDWithSymbol(row.original.cost_sale_price),
       size: 90,
     },
     {
