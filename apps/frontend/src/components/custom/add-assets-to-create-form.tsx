@@ -2,7 +2,7 @@ import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { CircleNotchIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { Input } from '../shadcn/input'
@@ -10,6 +10,7 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadc
 import { CommandResultList } from './global-search/command-result-list'
 
 const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
+const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 interface AddAssetsByBarcodeOrSerialProps {
   getAssets: () => AssetSummary[]
@@ -41,10 +42,6 @@ export function AddAssetsByBarcodeOrSerial({
   const [popoverOpen, setPopoverOpen] = useState(false)
   const { results } = useGlobalSearch(searchQuery, ASSET_SEARCH_TYPES)
   const suggestions = results.assets
-
-  useEffect(() => {
-    setPopoverOpen(suggestions.length > 0)
-  }, [suggestions])
 
   async function addByBarcode(barcode: string) {
     setAssetError(null)
@@ -82,6 +79,37 @@ export function AddAssetsByBarcodeOrSerial({
     }
   }
 
+  const normalizedQuery = normalizeCode(searchQuery)
+  const exactMatches = useMemo(
+    () =>
+      suggestions.filter(
+        (s) =>
+          normalizeCode(s.barcode) === normalizedQuery ||
+          normalizeCode(s.serial_number) === normalizedQuery,
+      ),
+    [suggestions, normalizedQuery],
+  )
+  const autoAddedQueryRef = useRef<string | null>(null)
+  const addByBarcodeRef = useRef(addByBarcode)
+  addByBarcodeRef.current = addByBarcode
+
+  useEffect(() => {
+    if (!normalizedQuery) {
+      autoAddedQueryRef.current = null
+      setPopoverOpen(false)
+      return
+    }
+    if (exactMatches.length === 1) {
+      if (autoAddedQueryRef.current !== normalizedQuery) {
+        autoAddedQueryRef.current = normalizedQuery
+        addByBarcodeRef.current(exactMatches[0].barcode)
+      }
+      setPopoverOpen(false)
+      return
+    }
+    setPopoverOpen(suggestions.length > 0)
+  }, [suggestions, exactMatches, normalizedQuery])
+
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(BARCODE_INPUT_SANITIZER, '').toUpperCase()
     setDisplayValue(val)
@@ -98,7 +126,8 @@ export function AddAssetsByBarcodeOrSerial({
     if (e.key === 'Enter') {
       e.preventDefault()
       setPopoverOpen(false)
-      if (displayValue) addByBarcode(displayValue)
+      if (exactMatches.length === 1) addByBarcode(exactMatches[0].barcode)
+      else if (displayValue) addByBarcode(displayValue)
     } else if (e.key === 'Escape') {
       setPopoverOpen(false)
     }
