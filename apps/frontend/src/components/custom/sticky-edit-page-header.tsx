@@ -10,6 +10,7 @@ interface StickyEditPageHeaderProps {
   cancelNavUrl: string
   isSubmitting: boolean
   isDirty: boolean
+  canSave: boolean
   submittingText: string
   saveButtonText: string
   onSave: () => void
@@ -22,6 +23,7 @@ export function StickyEditPageHeader({
   cancelNavUrl,
   isSubmitting,
   isDirty,
+  canSave,
   submittingText,
   saveButtonText,
   onSave,
@@ -40,7 +42,7 @@ export function StickyEditPageHeader({
           >
             Cancel
           </Button>
-          <Button type="button" onClick={onSave} disabled={!isDirty || isSubmitting}>
+          <Button type="button" onClick={onSave} disabled={!isDirty || isSubmitting || !canSave}>
             {isSubmitting ? (
               <>
                 <CircleNotchIcon className="animate-spin mr-1" size={16} />

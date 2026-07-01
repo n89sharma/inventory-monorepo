@@ -72,6 +72,7 @@ export function InvoiceFormPage({
 
   const form = useForm<InvoiceForm>({
     resolver: zodResolver(InvoiceFormSchema),
+    mode: 'onChange',
     defaultValues: {
       invoice_reference: '',
       organization: null,
@@ -85,7 +86,7 @@ export function InvoiceFormPage({
     append: addAsset,
     remove: deleteAsset,
   } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting, isDirty } = form.formState
+  const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
 
@@ -110,6 +111,7 @@ export function InvoiceFormPage({
         cancelNavUrl={pageConfig.cancelNavUrl}
         isSubmitting={isSubmitting}
         isDirty={isDirty}
+        canSave={isValid}
         submittingText={pageConfig.submittingText}
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitInvoice}

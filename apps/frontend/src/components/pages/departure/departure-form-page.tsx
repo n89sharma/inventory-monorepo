@@ -57,6 +57,7 @@ export function DepartureFormPage({
   const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<DepartureForm>({
     resolver: zodResolver(DepartureFormSchema),
+    mode: 'onChange',
     defaultValues: defaultValues ?? getDefaultDeparture(),
   })
   const activeWarehouses = useActiveWarehouses()
@@ -67,7 +68,7 @@ export function DepartureFormPage({
     remove: deleteAsset,
     replace: replaceAssets,
   } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting, isDirty } = form.formState
+  const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -120,6 +121,7 @@ export function DepartureFormPage({
         cancelNavUrl={pageConfig.cancelNavUrl}
         isSubmitting={isSubmitting}
         isDirty={isDirty}
+        canSave={isValid}
         submittingText={pageConfig.submittingText}
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitDeparture}

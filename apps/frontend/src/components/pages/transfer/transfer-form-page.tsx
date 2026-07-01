@@ -48,6 +48,7 @@ export function TransferFormPage({
   const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<TransferForm>({
     resolver: zodResolver(TransferFormSchema),
+    mode: 'onChange',
     defaultValues: defaultValues ?? getDefaultTransfer(),
   })
   const activeWarehouses = useActiveWarehouses()
@@ -57,7 +58,7 @@ export function TransferFormPage({
     append: addAsset,
     remove: deleteAsset,
   } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting, isDirty } = form.formState
+  const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
 
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
@@ -91,6 +92,7 @@ export function TransferFormPage({
         cancelNavUrl={pageConfig.cancelNavUrl}
         isSubmitting={isSubmitting}
         isDirty={isDirty}
+        canSave={isValid}
         submittingText={pageConfig.submittingText}
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitTransfer}

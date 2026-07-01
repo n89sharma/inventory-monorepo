@@ -52,6 +52,7 @@ export function HoldFormPage({
 }: HoldFormPageProps): React.JSX.Element {
   const form = useForm<HoldForm>({
     resolver: zodResolver(HoldFormSchema),
+    mode: 'onChange',
     defaultValues: defaultValues ?? {
       created_for: UNSELECTED,
       customer: null,
@@ -66,7 +67,7 @@ export function HoldFormPage({
     append: addAsset,
     remove: deleteAsset,
   } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting, isDirty } = form.formState
+  const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
 
   const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
@@ -88,6 +89,7 @@ export function HoldFormPage({
         cancelNavUrl={pageConfig.cancelNavUrl}
         isSubmitting={isSubmitting}
         isDirty={isDirty}
+        canSave={isValid}
         submittingText={pageConfig.submittingText}
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitHold}

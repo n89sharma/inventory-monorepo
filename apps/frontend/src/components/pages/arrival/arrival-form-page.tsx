@@ -49,6 +49,7 @@ export function ArrivalFormPage({
   const defaultWarehouse = useProfileDefaultWarehouse()
   const form = useForm<ArrivalForm>({
     resolver: zodResolver(ArrivalFormSchema),
+    mode: 'onChange',
     defaultValues: defaultValues ?? getDefaultArrival(),
   })
   const activeWarehouses = useActiveWarehouses()
@@ -59,7 +60,7 @@ export function ArrivalFormPage({
     remove: deleteAsset,
     update: updateAsset,
   } = useFieldArray({ control: form.control, name: 'assets' })
-  const { isSubmitting, isDirty } = form.formState
+  const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetIndex, setEditingAssetIndex] = useState<number | null>(null)
@@ -106,6 +107,7 @@ export function ArrivalFormPage({
         cancelNavUrl={pageConfig.cancelNavUrl}
         isSubmitting={isSubmitting}
         isDirty={isDirty}
+        canSave={isValid}
         submittingText={pageConfig.submittingText}
         saveButtonText={pageConfig.saveButtonText}
         onSave={submitArrival}
