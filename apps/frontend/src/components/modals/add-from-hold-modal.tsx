@@ -1,4 +1,4 @@
-import { useGlobalSearchStore } from '@/data/store/global-search-store'
+import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
@@ -34,31 +34,16 @@ export function AddFromHoldModal({
   onAddAsset,
   onCommitBatch,
 }: AddFromHoldModalProps) {
-  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
   const holdMutations = useHoldMutations()
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<CollectionResults>(emptyResults)
+  const { results: searchResults, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
   const [selected, setSelected] = useState<HoldSuggestion | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
 
+  const results: CollectionResults = { ...emptyResults, holds: searchResults.holds }
+
   function handleQueryChange(value: string) {
     setQuery(value)
-    if (!value) {
-      setResults(emptyResults)
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
-    const t = setTimeout(async () => {
-      try {
-        const res = await searchGlobal(value)
-        setResults({ ...emptyResults, holds: res.holds })
-      } finally {
-        setIsLoading(false)
-      }
-    }, 150)
-    return () => clearTimeout(t)
   }
 
   async function handleConfirm() {
@@ -97,9 +82,7 @@ export function AddFromHoldModal({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setQuery('')
-      setResults(emptyResults)
       setSelected(null)
-      setIsLoading(false)
       setIsConfirming(false)
     }
     onOpenChange(nextOpen)
@@ -108,7 +91,6 @@ export function AddFromHoldModal({
   function handleClearSelection() {
     setSelected(null)
     setQuery('')
-    setResults(emptyResults)
   }
 
   return (

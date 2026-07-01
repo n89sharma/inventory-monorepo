@@ -1,32 +1,20 @@
 import { Input } from '@/components/shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
-import { useGlobalSearchStore } from '@/data/store/global-search-store'
+import { useGlobalSearch } from '@/hooks/use-global-search'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { cn } from '@/lib/utils'
 import { FROM_GLOBAL_SEARCH_STATE } from '@/ui-types/navigation-context'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { GlobalSearchResult } from 'shared-types'
 import { SearchPopoverContent, type FlatResult } from './search-popover-content'
-
-const emptyResults: GlobalSearchResult = {
-  assets: [],
-  arrivals: [],
-  departures: [],
-  transfers: [],
-  holds: [],
-  invoices: [],
-}
 
 const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoices'] as const
 type Tab = (typeof tabs)[number]
 
 export const GlobalSearch = ({ className }: { className?: string }) => {
-  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<GlobalSearchResult>(emptyResults)
+  const { results, isLoading } = useGlobalSearch(query)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('assets')
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -48,28 +36,14 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   }, [])
 
   useEffect(() => {
-    if (!query) return
-    const t = setTimeout(async () => {
-      const res = await searchGlobal(query)
-      setResults(res)
-      setIsLoading(false)
-      const firstWithResults = tabs.find((tab) => res[tab].length > 0)
-      if (firstWithResults) setActiveTab(firstWithResults)
-    }, 150)
-    return () => clearTimeout(t)
-  }, [query, searchGlobal])
+    const firstWithResults = tabs.find((tab) => results[tab].length > 0)
+    if (firstWithResults) setActiveTab(firstWithResults)
+  }, [results])
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()
     setQuery(val)
-    if (val) {
-      setPopoverOpen(true)
-      setIsLoading(true)
-    } else {
-      setPopoverOpen(false)
-      setIsLoading(false)
-      setResults(emptyResults)
-    }
+    setPopoverOpen(Boolean(val))
   }
 
   function navigateTo(item: FlatResult) {
@@ -93,8 +67,6 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   function clearSearch() {
     setQuery('')
     setPopoverOpen(false)
-    setIsLoading(false)
-    setResults(emptyResults)
     inputRef.current?.blur()
   }
 

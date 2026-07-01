@@ -4,7 +4,6 @@ import {
   ApiResponse,
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
-  BarcodeSuggestion,
   BulkUpdateAssetPricingSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
@@ -17,10 +16,9 @@ import {
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
-import { getAssetByBarcode, searchBarcodes } from '../../generated/prisma/sql.js'
+import { getAssetByBarcode } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
-import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import {
@@ -51,14 +49,6 @@ import {
 } from '../services/assetLocationService.js'
 import { updateAssetSpecs as updateAssetSpecsSer } from '../services/assetSpecsService.js'
 import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../services/assetPartService.js'
-
-export const BarcodeSuggestionsQuerySchema = z.object({
-  q: z
-    .string()
-    .min(1)
-    .max(50)
-    .regex(/^[a-zA-Z0-9\s\-_.]*$/),
-})
 
 export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number),
@@ -444,16 +434,3 @@ export const printAssetBarcodes = asyncHandler(async (req, res) => {
   res.setHeader('Content-Disposition', `attachment; filename="barcodes-${timestamp}.pdf"`)
   res.send(pdf)
 })
-
-export const getBarcodeSuggestions = asyncHandler(
-  async (req: Request, res: Response<ApiResponse<BarcodeSuggestion[]>>) => {
-    const { q } = res.locals.query as z.infer<typeof BarcodeSuggestionsQuerySchema>
-    const normalized = normalizeForSearch(q)
-    if (!normalized) {
-      res.json(successResponse([]))
-      return
-    }
-    const results = await prisma.$queryRawTyped(searchBarcodes(normalized))
-    res.json(successResponse(results))
-  },
-)

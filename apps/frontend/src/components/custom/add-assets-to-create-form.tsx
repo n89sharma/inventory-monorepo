@@ -1,6 +1,6 @@
 import { AddFromHoldModal } from '@/components/modals/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useGlobalSearchStore } from '@/data/store/global-search-store'
+import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { CircleNotchIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
@@ -10,7 +10,6 @@ import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadc
 import { CommandResultList } from './global-search/command-result-list'
 
 const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
-const SUGGESTION_DEBOUNCE_MS = 150
 
 interface AddAssetByBarcodeProps {
   getAssets: () => AssetSummary[]
@@ -34,28 +33,18 @@ export function AddAssetByBarcode({
   showLeadingIcon,
 }: AddAssetByBarcodeProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
-  const searchGlobal = useGlobalSearchStore((state) => state.searchGlobal)
   const inputRef = useRef<HTMLInputElement>(null)
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [assetError, setAssetError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
-  const [suggestions, setSuggestions] = useState<BarcodeSuggestion[]>([])
   const [popoverOpen, setPopoverOpen] = useState(false)
+  const { results } = useGlobalSearch(searchQuery, ASSET_SEARCH_TYPES)
+  const suggestions = results.assets
 
   useEffect(() => {
-    if (!searchQuery) {
-      setSuggestions([])
-      setPopoverOpen(false)
-      return
-    }
-    const t = setTimeout(async () => {
-      const res = await searchGlobal(searchQuery)
-      setSuggestions(res.assets)
-      setPopoverOpen(res.assets.length > 0)
-    }, SUGGESTION_DEBOUNCE_MS)
-    return () => clearTimeout(t)
-  }, [searchQuery, searchGlobal])
+    setPopoverOpen(suggestions.length > 0)
+  }, [suggestions])
 
   async function addByBarcode(barcode: string) {
     setAssetError(null)
@@ -84,7 +73,6 @@ export function AddAssetByBarcode({
       }
       setDisplayValue('')
       setSearchQuery('')
-      setSuggestions([])
       setPopoverOpen(false)
       inputRef.current?.focus()
     } catch {
