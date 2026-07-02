@@ -1,7 +1,6 @@
 import express from 'express'
 import {
   AssetQuerySchema,
-  BarcodeSuggestionsQuerySchema,
   LocationsByWarehouseQuerySchema,
   bulkUpdateAssetPricing,
   createAssetComment,
@@ -18,7 +17,6 @@ import {
   getAssets,
   getSoldAssets,
   SoldAssetQuerySchema,
-  getBarcodeSuggestions,
   printAssetBarcodes,
   getLocationsByWarehouse,
   updateAssetErrors,
@@ -43,12 +41,6 @@ router.get(
 )
 router.post('/export', requirePermission('view_asset'), exportAssetReport)
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
-router.get(
-  '/suggestions',
-  requirePermission('view_asset'),
-  validateQuery(BarcodeSuggestionsQuerySchema),
-  getBarcodeSuggestions,
-)
 router.get(
   '/locations',
   requirePermission('view_asset'),

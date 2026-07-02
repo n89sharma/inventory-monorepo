@@ -16,6 +16,7 @@ import {
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
   getAssetComments as getAssetCommentsQuery,
+  getAssetDetailsBatch as getAssetDetailsBatchQuery,
   getAssetDetails as getAssetDetailsQuery,
   getAssetErrors as getAssetErrorsQuery,
   getAssetSalvagedParts as getAssetSalvagedPartsQuery,
@@ -28,6 +29,7 @@ import { getInitials, mapAssetDetail, mapAssetSearchRow } from '../lib/asset-map
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
+import { type BarcodeLabel } from './barcodePrintService.js'
 
 function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSearchRow {
   const permissions = role ? ROLE_PERMISSIONS[role] : []
@@ -36,6 +38,8 @@ function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSe
   return {
     ...row,
     cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
+    cost_transport_cost: canViewPurchase ? row.cost_transport_cost : null,
+    cost_processing_cost: canViewPurchase ? row.cost_processing_cost : null,
     cost_total_cost: canViewPurchase ? row.cost_total_cost : null,
     cost_sale_price: canViewSale ? row.cost_sale_price : null,
   }
@@ -246,6 +250,31 @@ function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
       sale_price: canViewSale ? detail.cost.sale_price : null,
     },
   }
+}
+
+export async function getAssetDetailsBatch(barcodes: string[]): Promise<AssetDetails[]> {
+  const rows = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
+  return rows.map(mapAssetDetail)
+}
+
+export async function getBarcodeLabels(barcodes: string[]): Promise<BarcodeLabel[]> {
+  const details = await getAssetDetailsBatch(barcodes)
+  const byBarcode = new Map(details.map((d) => [d.barcode, d]))
+  return barcodes.flatMap((barcode) => {
+    const detail = byBarcode.get(barcode)
+    if (!detail) return []
+    return [
+      {
+        barcode: detail.barcode,
+        brand: detail.brand,
+        model: detail.model,
+        serialNumber: detail.serial_number,
+        meterTotal: detail.specs.meter_total,
+        meterBlack: detail.specs.meter_black,
+        meterColour: detail.specs.meter_colour,
+      },
+    ]
+  })
 }
 
 export async function getAccessories(barcode: string): Promise<string[]> {

@@ -52,6 +52,17 @@ export const InvoiceSuggestionSchema = z.object({
 
 export type InvoiceSuggestion = z.infer<typeof InvoiceSuggestionSchema>
 
+export const SEARCH_ENTITY_TYPES = [
+  'assets',
+  'arrivals',
+  'departures',
+  'transfers',
+  'holds',
+  'invoices',
+] as const
+
+export type SearchEntityType = (typeof SEARCH_ENTITY_TYPES)[number]
+
 export const GlobalSearchResultSchema = z.object({
   assets: z.array(BarcodeSuggestionSchema),
   arrivals: z.array(ArrivalSuggestionSchema),

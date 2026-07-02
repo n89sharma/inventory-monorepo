@@ -1,7 +1,14 @@
 import type { ProfitabilityCubeRow } from 'shared-types'
-import type { ProfitabilityFilters } from './profitability-report-url-params'
 
 const MONTHS_IN_YEAR = 12
+
+export type ProfitabilityFilters = {
+  year: number
+  warehouseIds: number[]
+  salesRepId: number | null
+  vendorId: number | null
+  brandId: number | null
+}
 
 export type ProfitabilityMetrics = {
   asset_count: number

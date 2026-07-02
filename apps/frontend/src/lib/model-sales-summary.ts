@@ -1,4 +1,4 @@
-import type { SoldReportRange } from '@/lib/sold-report-params'
+import type { SoldReportRange } from '@/lib/filters/hooks'
 import { isAfter, subMonths } from 'date-fns'
 import type { ModelSaleRow } from 'shared-types'
 

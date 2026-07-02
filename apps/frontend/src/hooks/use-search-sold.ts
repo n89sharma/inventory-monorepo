@@ -1,14 +1,23 @@
 import { getAssetsForSold } from '@/data/api/asset-api'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { resolveWarehouseScope } from '@/lib/asset-filter-params'
 import {
   isValidSoldDateRange,
   resolveSoldStatuses,
-  type SearchSoldFilters,
-} from '@/lib/search-sold-params'
-import type { AssetSearchRow } from 'shared-types'
+  resolveWarehouseScope,
+  type SharedAssetFilters,
+} from '@/lib/filters/hooks'
+import type { AssetSearchRow, AssetType, Brand, OrgSummary } from 'shared-types'
 import useSWR from 'swr'
+
+export type SearchSoldFilters = SharedAssetFilters & {
+  brand: Brand | null
+  assetTypes: AssetType[]
+  showOther: boolean
+  fromDate: Date
+  toDate: Date
+  customer: OrgSummary | null
+}
 
 const SEARCH_SOLD_KEY = 'search-sold-assets'
 

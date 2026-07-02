@@ -11,9 +11,9 @@ export function formatLocation(location: AssetLocationDetails | null): string {
   return `${location.warehouse_code} | ${formatTitleCase(location.zone)}`
 }
 
-export function formatWeightKg(value: number): string {
+export function formatWeight(value: number): string {
   const safeValue = Number.isFinite(value) ? value : 0
-  return `${new Intl.NumberFormat('en-US').format(Math.round(safeValue))} kg`
+  return `${new Intl.NumberFormat('en-US').format(Math.round(safeValue))} lbs`
 }
 
 export function formatThousandsK(value: number | null): string {

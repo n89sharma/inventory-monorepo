@@ -1,9 +1,17 @@
 import { getAssetsForSearchHeld } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { resolveWarehouseScope } from '@/lib/asset-filter-params'
-import type { SearchHeldFilters } from '@/lib/search-held-params'
-import type { AssetSearchRow } from 'shared-types'
+import { resolveWarehouseScope, type SharedAssetFilters } from '@/lib/filters/hooks'
+import type { AssetSearchRow, AssetType, Brand, OrgSummary, User } from 'shared-types'
 import useSWR from 'swr'
+
+export type SearchHeldFilters = SharedAssetFilters & {
+  brand: Brand | null
+  assetTypes: AssetType[]
+  heldBy: User | null
+  heldFor: User | null
+  holdCustomer: OrgSummary | null
+  daysHeldMin: number | null
+}
 
 const SEARCH_HELD_KEY = 'search-held-assets'
 

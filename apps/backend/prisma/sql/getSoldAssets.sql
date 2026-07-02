@@ -43,6 +43,8 @@ select
   t.toner_life_y as specs_toner_life_y,
   t.toner_life_k as specs_toner_life_k,
   c.purchase_cost as cost_purchase_cost,
+  c.transport_cost as cost_transport_cost,
+  c.processing_cost as cost_processing_cost,
   c.total_cost as cost_total_cost,
   c.sale_price as cost_sale_price,
   h.hold_number as hold_hold_number,

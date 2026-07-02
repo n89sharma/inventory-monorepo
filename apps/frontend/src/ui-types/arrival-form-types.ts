@@ -28,9 +28,11 @@ import {
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const CURRENT_YEAR = new Date().getFullYear()
 
-// Colour models require the C/M/Y channels for both drum life and toner; K is
-// always required (enforced inline on the field). Mono models require K only.
-const COLOUR_REQUIRED_CHANNELS = [
+// Colour models require the colour meter and the C/M/Y channels for both drum
+// life and toner; K is always required (enforced inline on the field). Mono
+// models require black meter and K only.
+const COLOUR_REQUIRED_FIELDS = [
+  { field: 'meterColour', label: 'Colour meter' },
   { field: 'drumLifeC', label: 'Drum life C' },
   { field: 'drumLifeM', label: 'Drum life M' },
   { field: 'drumLifeY', label: 'Drum life Y' },
@@ -56,11 +58,7 @@ const specFieldsShape = {
     .min(0)
     .nullable()
     .refine((v) => v != null && v != undefined, 'Black meter is required'),
-  meterColour: z
-    .number()
-    .min(0)
-    .nullable()
-    .refine((v) => v != null && v != undefined, 'Colour meter is required'),
+  meterColour: z.number().min(0).nullable(),
   cassettes: z
     .number()
     .min(0)
@@ -86,13 +84,13 @@ const specFieldsShape = {
     .refine((v) => v != null, 'Toner life K required'),
 } as const
 
-function refineColourChannels(
+function refineColourRequiredFields(
   val: Record<string, unknown>,
   isColour: boolean,
   ctx: z.RefinementCtx,
 ) {
   if (!isColour) return
-  for (const { field, label } of COLOUR_REQUIRED_CHANNELS) {
+  for (const { field, label } of COLOUR_REQUIRED_FIELDS) {
     if (val[field] == null) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: `${label} required` })
     }
@@ -126,7 +124,7 @@ export const AssetFormSchema = z
       })
     }
 
-    refineColourChannels(val, val.model?.is_colour ?? false, ctx)
+    refineColourRequiredFields(val, val.model?.is_colour ?? false, ctx)
   })
 
 // Edit Technical Specifications modal — the spec-field subset of an existing
@@ -138,7 +136,7 @@ export const SpecsFormSchema = z
     isColour: z.boolean(),
   })
   .superRefine((val, ctx) => {
-    refineColourChannels(val, val.isColour, ctx)
+    refineColourRequiredFields(val, val.isColour, ctx)
   })
 
 // Arrival Form Page within Edit or Create Arrival

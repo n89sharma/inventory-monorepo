@@ -1,6 +1,6 @@
-import { toast } from 'sonner'
-import { EntityLink } from '@/components/custom/entity-link'
+import { EntityLink } from '@/components/shared/entity-link'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
+import { toast } from 'sonner'
 
 export type SuccessToastPayload = {
   entity: LinkableEntity
