@@ -51,7 +51,7 @@ interface AssetStore {
     variant?: ReportVariant,
     columnKeys?: string[],
   ) => Promise<void>
-  printBarcodes: (barcodes: string[], filename?: string) => Promise<void>
+  printBarcodes: (barcodes: string[]) => Promise<void>
   bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
 
@@ -107,7 +107,7 @@ export const useAssetStore = create<AssetStore>(() => ({
   exportAssets: (barcodes, filename, variant, columnKeys) =>
     exportAssetsApi(barcodes, filename, variant, columnKeys),
 
-  printBarcodes: (barcodes, filename) => printBarcodesApi(barcodes, filename),
+  printBarcodes: (barcodes) => printBarcodesApi(barcodes),
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)

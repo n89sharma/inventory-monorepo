@@ -433,6 +433,6 @@ export const printAssetBarcodes = asyncHandler(async (req, res) => {
   const pdf = await generateBarcodePdfSer(labels)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'application/pdf')
-  res.setHeader('Content-Disposition', `attachment; filename="barcodes-${timestamp}.pdf"`)
+  res.setHeader('Content-Disposition', `inline; filename="barcodes-${timestamp}.pdf"`)
   res.send(pdf)
 })

@@ -48,7 +48,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   async function handlePrint() {
     setPrintLoading(true)
     try {
-      await printBarcodes([barcode], `${barcode}-barcode.pdf`)
+      await printBarcodes([barcode])
     } catch {
       toast.error('Failed to print barcode', { position: 'top-center' })
     } finally {

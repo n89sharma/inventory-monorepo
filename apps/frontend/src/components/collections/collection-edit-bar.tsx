@@ -108,7 +108,7 @@ export function CollectionEditBar({
 
     setPrintLoading(true)
     try {
-      await printBarcodes(printableBarcodes, `${section}-${collectionId}-barcodes.pdf`)
+      await printBarcodes(printableBarcodes)
     } catch {
       toast.error('Failed to print barcodes', { position: 'top-center' })
     } finally {

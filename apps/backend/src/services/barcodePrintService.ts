@@ -18,9 +18,11 @@ const BARCODE_OPTIONS = {
   includetext: false,
 } as const
 
-const PAGE_MARGIN = 40
+const LABEL_WIDTH = 288 // 4in at 72pt
+const LABEL_HEIGHT = 144 // 2in at 72pt
+const LABEL_PADDING = 8
+
 const BARCODE_DISPLAY_WIDTH = 240
-const ROW_GAP = 24
 
 const BARCODE_FONT_SIZE = 16
 const CAPTION_FONT_SIZE = 11
@@ -56,13 +58,8 @@ export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer
 
   return await new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({
-      size: 'A4',
-      margins: {
-        top: PAGE_MARGIN,
-        bottom: PAGE_MARGIN,
-        left: PAGE_MARGIN,
-        right: PAGE_MARGIN,
-      },
+      size: [LABEL_WIDTH, LABEL_HEIGHT],
+      margin: LABEL_PADDING,
     })
 
     const chunks: Buffer[] = []
@@ -70,7 +67,12 @@ export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
+    const captionWidth = LABEL_WIDTH - LABEL_PADDING * 2
+    const barcodeLeft = (LABEL_WIDTH - BARCODE_DISPLAY_WIDTH) / 2
+
     labels.forEach((label, index) => {
+      if (index > 0) doc.addPage()
+
       const png = images[index]
       const pixelWidth = png.readUInt32BE(PNG_WIDTH_OFFSET)
       const pixelHeight = png.readUInt32BE(PNG_HEIGHT_OFFSET)
@@ -81,37 +83,32 @@ export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer
 
       doc.font('Helvetica').fontSize(BARCODE_FONT_SIZE)
       const barcodeHeight = doc.heightOfString(barcode, {
-        width: BARCODE_DISPLAY_WIDTH,
+        width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
       })
       doc.fontSize(CAPTION_FONT_SIZE)
       const detailHeight = doc.heightOfString(detail, {
-        width: BARCODE_DISPLAY_WIDTH,
+        width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
       })
       const blockHeight = displayHeight + CAPTION_GAP + barcodeHeight + detailHeight
+      const blockTop = Math.max(LABEL_PADDING, (LABEL_HEIGHT - blockHeight) / 2)
 
-      if (doc.y + blockHeight > doc.page.height - PAGE_MARGIN) {
-        doc.addPage()
-      }
-
-      const blockTop = doc.y
-      doc.image(png, PAGE_MARGIN, blockTop, { width: BARCODE_DISPLAY_WIDTH })
+      doc.image(png, barcodeLeft, blockTop, { width: BARCODE_DISPLAY_WIDTH })
 
       const captionTop = blockTop + displayHeight + CAPTION_GAP
       doc.fontSize(BARCODE_FONT_SIZE)
-      doc.text(barcode, PAGE_MARGIN, captionTop, {
-        width: BARCODE_DISPLAY_WIDTH,
+      doc.text(barcode, LABEL_PADDING, captionTop, {
+        width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
         align: 'center',
       })
       doc.fontSize(CAPTION_FONT_SIZE)
-      doc.text(detail, PAGE_MARGIN, captionTop + barcodeHeight, {
-        width: BARCODE_DISPLAY_WIDTH,
+      doc.text(detail, LABEL_PADDING, captionTop + barcodeHeight, {
+        width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
         align: 'center',
       })
-      doc.y = blockTop + blockHeight + ROW_GAP
     })
 
     doc.end()
