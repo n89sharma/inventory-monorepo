@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
-import { createModelSalesColumns } from '@/components/reports/model-sales-columns'
+import { createModelSalesColumns } from '@/components/table-columns/model-sales-columns'
 import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
