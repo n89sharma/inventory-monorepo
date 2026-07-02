@@ -11,12 +11,12 @@ import { useEffect, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
-import { DetailGrid, SearchView } from '../modals/collection-search'
+import { DetailGrid, SearchView } from './collection-search'
 import {
   emptyResults,
   type CollectionResults,
   type SelectedCollection,
-} from '../modals/collection-search-types'
+} from './collection-search-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 
