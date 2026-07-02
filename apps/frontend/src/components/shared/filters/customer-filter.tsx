@@ -1,4 +1,4 @@
-import { SearchSelectInput } from '@/components/shared/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useOrgStore } from '@/data/store/org-store'
 import { useState } from 'react'
 import type { OrgSummary } from 'shared-types'

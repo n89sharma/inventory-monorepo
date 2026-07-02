@@ -5,11 +5,11 @@ import {
   ConsumablesRow,
   type Channel,
 } from '@/components/asset-details/consumables-grid'
-import { ControlledSearchSelectField } from '@/components/shared/controlled-search-select-field'
+import { ControlledSearchSelectField } from '@/components/shared/search-select/controlled-search-select-field'
 import { HorizontalField } from '@/components/shared/horizontal-field'
 import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { ReadinessPicker } from '@/components/shared/readiness/readiness-picker'
-import { SearchSelectInput } from '@/components/shared/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'

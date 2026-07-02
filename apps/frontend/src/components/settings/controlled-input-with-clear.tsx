@@ -5,7 +5,7 @@ import {
   type FieldValues,
   type Path,
 } from 'react-hook-form'
-import { InputWithClear } from './input-with-clear'
+import { InputWithClear } from '@/components/shared/input-with-clear'
 
 export type ControlledInputWithClearProps<TForm extends FieldValues> = {
   control: Control<TForm>

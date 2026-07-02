@@ -13,9 +13,9 @@ import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { FieldGroup } from '../shadcn/field'
 import { Label } from '../shadcn/label'
-import { ControlledInputWithClear } from '../shared/controlled-input-with-clear'
-import { ControlledSearchSelectInput } from '../shared/controlled-search-select-input'
-import { SelectOptions } from '../shared/select-options'
+import { ControlledInputWithClear } from '@/components/settings/controlled-input-with-clear'
+import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
+import { SelectOptions } from '../shared/search-select/select-options'
 
 interface CreateModelModalProps {
   open: boolean

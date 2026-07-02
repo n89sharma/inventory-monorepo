@@ -3,8 +3,8 @@ import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DaysHeldFilter } from '@/components/shared/filters/days-held-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { daysHeld } from '@/components/table-columns/asset-search-columns'
-import { AssetFilterBar } from '@/components/shared/asset-filter-bar'
-import { AssetIdentityFilters } from '@/components/shared/asset-identity-filters'
+import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
+import { AssetIdentityFilters } from '@/components/asset-search/asset-identity-filters'
 import { useSearchHeld } from '@/hooks/use-search-held'
 import {
   useAssetTypesParam,

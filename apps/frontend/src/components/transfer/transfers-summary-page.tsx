@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { SearchBar } from '@/components/shared/search-bar'
-import { SelectOptionsInline } from '@/components/shared/select-options'
+import { SelectOptionsInline } from '@/components/shared/search-select/select-options'
 import { transferTableColumns } from '@/components/transfer/transfer-columns'
 import { useTransferStore } from '@/data/store/transfer-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'

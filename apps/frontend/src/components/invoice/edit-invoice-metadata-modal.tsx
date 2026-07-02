@@ -13,7 +13,7 @@ import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Input } from '../shadcn/input'
-import { ControlledSearchSelectInput } from '../shared/controlled-search-select-input'
+import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
 interface EditInvoiceMetadataModalProps {

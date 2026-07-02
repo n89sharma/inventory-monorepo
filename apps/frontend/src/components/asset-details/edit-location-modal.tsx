@@ -26,7 +26,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import type { AssetDetails, AssetLocation, Warehouse, Zone } from 'shared-types'
 import { toast } from 'sonner'
-import { SearchSelectInput } from '../shared/search-select-input'
+import { SearchSelectInput } from '../shared/search-select/search-select-input'
 
 interface EditLocationModalProps {
   open: boolean

@@ -2,8 +2,8 @@ import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
 import { Toggle } from '@/components/shadcn/toggle'
-import { AssetFilterBar } from '@/components/shared/asset-filter-bar'
-import { AssetIdentityFilters } from '@/components/shared/asset-identity-filters'
+import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
+import { AssetIdentityFilters } from '@/components/asset-search/asset-identity-filters'
 import { useSearchSold } from '@/hooks/use-search-sold'
 import {
   useAssetTypesParam,

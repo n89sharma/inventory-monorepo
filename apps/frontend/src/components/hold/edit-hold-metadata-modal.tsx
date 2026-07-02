@@ -13,8 +13,8 @@ import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
-import { ControlledSearchSelectInput } from '../shared/controlled-search-select-input'
-import { ControlledSelectOptionSearchSelect } from '../shared/controlled-select-option-search-select'
+import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
+import { ControlledSelectOptionSearchSelect } from '../shared/search-select/controlled-select-option-search-select'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
 interface EditHoldMetadataModalProps {

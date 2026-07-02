@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/shadcn/dialog'
 import { Input } from '@/components/shadcn/input'
-import { FormSection } from '@/components/shared/form-section'
+import { FormSection } from '@/components/asset-details/form-section'
 import { HorizontalField } from '@/components/shared/horizontal-field'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'

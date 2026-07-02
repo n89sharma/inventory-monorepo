@@ -1,4 +1,4 @@
-import { SearchSelectInput } from '@/components/shared/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useUserStore } from '@/data/store/user-store'
 import { useState } from 'react'
 import type { User } from 'shared-types'

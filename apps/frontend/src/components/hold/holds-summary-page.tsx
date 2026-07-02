@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
-import { SearchSelectOptionFilter } from '../shared/search-select-option-filter'
+import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
 
 export function HoldSummaryPage(): React.JSX.Element {
   const fromDate = useHoldStore((state) => state.fromDate)

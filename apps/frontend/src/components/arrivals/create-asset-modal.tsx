@@ -18,9 +18,9 @@ import { AssetErrorsEditor } from '../asset-details/asset-errors-editor'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Textarea } from '../shadcn/textarea'
-import { ControlledSearchSelectField } from '../shared/controlled-search-select-field'
+import { ControlledSearchSelectField } from '../shared/search-select/controlled-search-select-field'
 import { HorizontalField } from '../shared/horizontal-field'
-import { SearchSelectInput } from '../shared/search-select-input'
+import { SearchSelectInput } from '../shared/search-select/search-select-input'
 
 import {
   ControlledTextInput,

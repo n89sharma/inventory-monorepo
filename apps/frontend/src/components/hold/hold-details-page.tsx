@@ -1,7 +1,7 @@
 import { HoldSummaryStrip } from '@/components/hold/hold-summary-strip'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog'
+import { ConfirmActionDialog } from '@/components/hold/confirm-action-dialog'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { getHoldHistory } from '@/data/api/hold-api'
 import { useCan } from '@/hooks/use-can'

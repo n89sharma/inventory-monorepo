@@ -4,7 +4,7 @@ import { createDepartureAssetSummaryColumns } from '@/components/table-columns/a
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { DepartureOutgoingStatusToggle } from '@/components/shared/departure-outgoing-status-toggle'
+import { DepartureOutgoingStatusToggle } from '@/components/departure/departure-outgoing-status-toggle'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'

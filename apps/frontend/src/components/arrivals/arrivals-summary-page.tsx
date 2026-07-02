@@ -11,8 +11,8 @@ import { Link } from 'react-router-dom'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
-import { SearchSelectOptionFilter } from '../shared/search-select-option-filter'
-import { SelectOptionsInline } from '../shared/select-options'
+import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
+import { SelectOptionsInline } from '../shared/search-select/select-options'
 
 export function ArrivalsSummaryPage(): React.JSX.Element {
   const fromDate = useArrivalStore((state) => state.fromDate)

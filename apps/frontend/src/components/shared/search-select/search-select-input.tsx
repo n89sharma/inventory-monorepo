@@ -2,15 +2,15 @@ import { cn } from '@/lib/utils'
 import { XIcon } from '@phosphor-icons/react'
 import { defaultFilter } from 'cmdk'
 import { useEffect, useRef, useState } from 'react'
-import { Badge } from '../shadcn/badge'
-import { Field } from '../shadcn/field'
+import { Badge } from '@/components/shadcn/badge'
+import { Field } from '@/components/shadcn/field'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from '../shadcn/input-group'
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
+} from '@/components/shadcn/input-group'
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 
 const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
 const SUGGESTION_LIMIT = 10

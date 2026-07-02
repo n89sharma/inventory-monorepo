@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { FieldGroup } from '../shadcn/field'
-import { ControlledInputWithClear } from '../shared/controlled-input-with-clear'
+import { ControlledInputWithClear } from '@/components/settings/controlled-input-with-clear'
 
 interface CreateOrgModalProps {
   open: boolean

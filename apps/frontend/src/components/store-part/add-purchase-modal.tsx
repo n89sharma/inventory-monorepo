@@ -10,7 +10,7 @@ import { FieldError } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
 import { HorizontalField } from '@/components/shared/horizontal-field'
-import { SearchSelectInput } from '@/components/shared/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useStorePartMutations } from '@/hooks/use-store-part-mutations'
 import {
   AddPurchaseFormSchema,

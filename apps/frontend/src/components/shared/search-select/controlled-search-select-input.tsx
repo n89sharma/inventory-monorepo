@@ -6,7 +6,7 @@ import {
   type FieldValues,
   type Path,
 } from 'react-hook-form'
-import { Field, FieldLabel } from '../shadcn/field'
+import { Field, FieldLabel } from '@/components/shadcn/field'
 import { SearchSelectInput } from './search-select-input'
 
 type ControlledSearchSelectInputProps<T, TForm extends FieldValues> = {

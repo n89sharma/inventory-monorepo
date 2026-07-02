@@ -15,8 +15,8 @@ import {
   AddFromHoldButton,
 } from '@/components/collections/add-assets-to-create-form'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
-import { ControlledSearchSelectInput } from '@/components/shared/controlled-search-select-input'
-import { SelectOptions } from '@/components/shared/select-options'
+import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
+import { SelectOptions } from '@/components/shared/search-select/select-options'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'

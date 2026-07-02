@@ -13,7 +13,7 @@ import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import type { AssetDetails, AssetError, UpdateError } from 'shared-types'
 import { toast } from 'sonner'
-import { SearchSelectInput } from '../shared/search-select-input'
+import { SearchSelectInput } from '../shared/search-select/search-select-input'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 import { AssetErrorsEditor } from './asset-errors-editor'
 

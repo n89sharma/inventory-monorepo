@@ -1,7 +1,7 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { Toggle } from '@/components/shadcn/toggle'
-import { AssetFilterBar } from '@/components/shared/asset-filter-bar'
-import { AssetIdentityFilters } from '@/components/shared/asset-identity-filters'
+import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
+import { AssetIdentityFilters } from '@/components/asset-search/asset-identity-filters'
 import { useCan } from '@/hooks/use-can'
 import { useSearchInStock } from '@/hooks/use-search-instock'
 import {

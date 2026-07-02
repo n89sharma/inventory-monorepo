@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/shadcn/sidebar'
-import { UserMenuButton } from '@/components/shared/user-menu-button'
+import { UserMenuButton } from '@/components/app-layout/user-menu-button'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
