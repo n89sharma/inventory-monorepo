@@ -119,11 +119,8 @@ function AssetSummaryStrip({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {tokens.map((t, i) => (
-        <Fragment key={t.key}>
-          {i > 0 && <span className="text-muted-foreground">·</span>}
-          {t.node}
-        </Fragment>
+      {tokens.map((t) => (
+        <Fragment key={t.key}>{t.node}</Fragment>
       ))}
     </div>
   )

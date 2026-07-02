@@ -344,7 +344,7 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
                 />
                 {part && (
                   <span className="text-xs text-muted-foreground">
-                    {part.description} · {onHand} in stock
+                    {part.description}, {onHand} in stock
                   </span>
                 )}
               </div>

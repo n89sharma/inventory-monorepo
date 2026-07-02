@@ -18,7 +18,7 @@ export function DestinationCell({ row }: { row: StoreTransactionRow }) {
         to={`/search/all/${row.asset_barcode}`}
         className="font-mono text-foreground hover:underline"
       >
-        Asset · {row.asset_barcode}
+        Asset {row.asset_barcode}
       </Link>
     )
   }

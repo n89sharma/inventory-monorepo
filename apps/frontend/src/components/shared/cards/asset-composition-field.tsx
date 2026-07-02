@@ -30,7 +30,7 @@ export function AssetCompositionField({ assets }: { assets: AssetSummary[] }) {
       <span className="font-medium tabular-nums">{total}</span>
       {parts.length > 0 ? (
         <span className="text-muted-foreground">
-          — {parts.map((part) => `${part.count} ${part.label}`).join(' · ')}
+          — {parts.map((part) => `${part.count} ${part.label}`).join(' ')}
         </span>
       ) : null}
     </div>
