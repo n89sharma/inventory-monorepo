@@ -1,6 +1,6 @@
 import { Button } from '@/components/shadcn/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
-import { ReadinessIcon } from '@/components/shared/readiness-icon'
+import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
   formatDate,

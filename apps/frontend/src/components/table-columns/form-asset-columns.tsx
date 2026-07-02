@@ -1,5 +1,5 @@
 import { Button } from '@/components/shadcn/button'
-import { ReadinessIcon } from '@/components/shared/readiness-icon'
+import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
 import type { DepartureFormAsset } from '@/ui-types/departure-form-types'

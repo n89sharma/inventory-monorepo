@@ -1,5 +1,5 @@
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
-import { getReadinessDisplay } from '../shared/readiness-config'
+import { getReadinessDisplay } from '../shared/readiness/readiness-config'
 import { EntryHeader, FieldDiffRow, HistoryTimeline } from './history-primitives'
 
 type CreateRecord = Extract<AssetHistoryRecord, { action_type: 'CREATE' }>

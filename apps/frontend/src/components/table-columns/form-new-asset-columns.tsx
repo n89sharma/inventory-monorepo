@@ -1,6 +1,6 @@
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
-import { ReadinessPill } from '@/components/shared/readiness-pill'
+import { ReadinessPill } from '@/components/shared/readiness/readiness-pill'
 import { formatThousandsK, formatTitleCase } from '@/lib/formatters'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'

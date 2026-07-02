@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/ta
 import { getBreadcrumForAssetDetails } from '@/components/shared/breadcrumb-segments'
 import { Comment } from '@/components/shared/comment'
 import { CopyButton } from '@/components/shared/copy-button'
-import { ReadinessPill } from '@/components/shared/readiness-pill'
+import { ReadinessPill } from '@/components/shared/readiness/readiness-pill'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useAssetDetailsParams } from '@/hooks/use-asset-detail-params'
