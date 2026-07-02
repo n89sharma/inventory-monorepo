@@ -1,4 +1,4 @@
-import { SearchSelectInput } from '@/components/custom/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select-input'
 import { useModelStore } from '@/data/store/model-store'
 import { modelLabel } from '@/lib/reference-labels'
 import type { ModelSummary } from 'shared-types'

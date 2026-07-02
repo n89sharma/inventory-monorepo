@@ -1,5 +1,5 @@
-import { MultiSelectOptionsInline } from '@/components/custom/multi-select-options'
-import { getReadinessDisplay } from '@/components/custom/readiness-config'
+import { MultiSelectOptionsInline } from '@/components/shared/multi-select-options'
+import { getReadinessDisplay } from '@/components/shared/readiness-config'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { Status } from 'shared-types'
 

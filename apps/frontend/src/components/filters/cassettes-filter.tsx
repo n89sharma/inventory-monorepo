@@ -1,4 +1,4 @@
-import { InputWithClearInline } from '@/components/custom/input-with-clear'
+import { InputWithClearInline } from '@/components/shared/input-with-clear'
 
 export function CassettesFilter({
   value,

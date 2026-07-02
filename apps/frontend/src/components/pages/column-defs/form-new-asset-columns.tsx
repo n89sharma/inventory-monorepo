@@ -1,10 +1,10 @@
-import { ReadinessPill } from '@/components/custom/readiness-pill'
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
+import { ReadinessPill } from '@/components/shared/readiness-pill'
 import { formatThousandsK, formatTitleCase } from '@/lib/formatters'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CoreFunction } from 'shared-types'
 

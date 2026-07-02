@@ -1,4 +1,4 @@
-import { SearchSelectInput } from '@/components/custom/search-select-input'
+import { SearchSelectInput } from '@/components/shared/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useState } from 'react'
 import type { Brand } from 'shared-types'

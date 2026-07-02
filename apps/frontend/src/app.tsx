@@ -1,8 +1,8 @@
-import { ErrorFallback } from '@/components/custom/error-fallback'
-import { PermissionRoute } from '@/components/custom/permission-route'
-import { ProtectedRoute } from '@/components/custom/protected-route'
-import { MainLayout } from '@/components/layout/layout'
-import { PageTitleUpdater } from '@/components/layout/page-title-updater'
+import { MainLayout } from '@/components/app-layout/layout'
+import { PageTitleUpdater } from '@/components/app-layout/page-title-updater'
+import { ErrorFallback } from '@/components/shared/error-fallback'
+import { PermissionRoute } from '@/components/shared/permission-route'
+import { ProtectedRoute } from '@/components/app-layout/protected-route'
 import { useAuth } from '@clerk/react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { lazy, Suspense } from 'react'
@@ -12,150 +12,152 @@ import { useAxiosAuth } from './hooks/use-axios-auth'
 import { useGlobalData } from './hooks/use-global-data'
 
 const LoginPage = lazy(() =>
-  import('./components/pages/login-page').then((m) => ({ default: m.LoginPage })),
+  import('./components/app-layout/login-page').then((m) => ({ default: m.LoginPage })),
 )
 
 const ArrivalsSummaryPage = lazy(() =>
-  import('./components/pages/arrival/arrivals-summary-page').then((m) => ({
+  import('./components/arrivals/arrivals-summary-page').then((m) => ({
     default: m.ArrivalsSummaryPage,
   })),
 )
 const CreateArrivalPage = lazy(() =>
-  import('./components/pages/arrival/create-arrival-page').then((m) => ({
+  import('./components/arrivals/create-arrival-page').then((m) => ({
     default: m.CreateArrivalPage,
   })),
 )
 const ArrivalDetailsPage = lazy(() =>
-  import('./components/pages/arrival/arrival-details-page').then((m) => ({
+  import('./components/arrivals/arrival-details-page').then((m) => ({
     default: m.ArrivalDetailsPage,
   })),
 )
 
 const TransferSummaryPage = lazy(() =>
-  import('./components/pages/transfer/transfers-summary-page').then((m) => ({
+  import('./components/transfer/transfers-summary-page').then((m) => ({
     default: m.TransferSummaryPage,
   })),
 )
 const CreateTransferPage = lazy(() =>
-  import('./components/pages/transfer/create-transfer-page').then((m) => ({
+  import('./components/transfer/create-transfer-page').then((m) => ({
     default: m.CreateTransferPage,
   })),
 )
 const TransferDetailsPage = lazy(() =>
-  import('./components/pages/transfer/transfer-details-page').then((m) => ({
+  import('./components/transfer/transfer-details-page').then((m) => ({
     default: m.TransferDetailsPage,
   })),
 )
 
 const DepartureSummaryPage = lazy(() =>
-  import('./components/pages/departure/departures-summary-page').then((m) => ({
+  import('@/components/departure/departures-summary-page').then((m) => ({
     default: m.DepartureSummaryPage,
   })),
 )
 const CreateDeparturePage = lazy(() =>
-  import('./components/pages/departure/create-departure-page').then((m) => ({
+  import('@/components/departure/create-departure-page').then((m) => ({
     default: m.CreateDeparturePage,
   })),
 )
 const DepartureDetailsPage = lazy(() =>
-  import('./components/pages/departure/departure-details-page').then((m) => ({
+  import('@/components/departure/departure-details-page').then((m) => ({
     default: m.DepartureDetailsPage,
   })),
 )
 
 const StorePartsListPage = lazy(() =>
-  import('./components/pages/store-part/store-parts-list-page').then((m) => ({
+  import('./components/store-part/store-parts-list-page').then((m) => ({
     default: m.StorePartsListPage,
   })),
 )
 const StorePartDetailPage = lazy(() =>
-  import('./components/pages/store-part/store-part-detail-page').then((m) => ({
+  import('./components/store-part/store-part-detail-page').then((m) => ({
     default: m.StorePartDetailPage,
   })),
 )
 
 const HoldSummaryPage = lazy(() =>
-  import('./components/pages/hold/holds-summary-page').then((m) => ({
+  import('./components/hold/holds-summary-page').then((m) => ({
     default: m.HoldSummaryPage,
   })),
 )
 const CreateHoldPage = lazy(() =>
-  import('./components/pages/hold/create-hold-page').then((m) => ({ default: m.CreateHoldPage })),
+  import('./components/hold/create-hold-page').then((m) => ({ default: m.CreateHoldPage })),
 )
 const HoldDetailsPage = lazy(() =>
-  import('./components/pages/hold/hold-details-page').then((m) => ({ default: m.HoldDetailsPage })),
+  import('./components/hold/hold-details-page').then((m) => ({ default: m.HoldDetailsPage })),
 )
 
 const InvoicesSummaryPage = lazy(() =>
-  import('./components/pages/invoice/invoices-summary-page').then((m) => ({
+  import('@/components/invoice/invoices-summary-page').then((m) => ({
     default: m.InvoicesSummaryPage,
   })),
 )
 const CreateInvoicePage = lazy(() =>
-  import('./components/pages/invoice/create-invoice-page').then((m) => ({
+  import('@/components/invoice/create-invoice-page').then((m) => ({
     default: m.CreateInvoicePage,
   })),
 )
 const InvoiceDetailsPage = lazy(() =>
-  import('./components/pages/invoice/invoice-details-page').then((m) => ({
+  import('@/components/invoice/invoice-details-page').then((m) => ({
     default: m.InvoiceDetailsPage,
   })),
 )
 
 const AssetDetailsPage = lazy(() =>
-  import('./components/pages/asset-details-page').then((m) => ({ default: m.AssetDetailsPage })),
+  import('./components/asset-details/asset-details-page').then((m) => ({
+    default: m.AssetDetailsPage,
+  })),
 )
 const SearchInStockPage = lazy(() =>
-  import('./components/pages/search/search-instock-page').then((m) => ({
+  import('./components/asset-search/search-instock-page').then((m) => ({
     default: m.SearchInStockPage,
   })),
 )
 const SearchHeldPage = lazy(() =>
-  import('./components/pages/search/search-held-page').then((m) => ({ default: m.SearchHeldPage })),
+  import('./components/asset-search/search-held-page').then((m) => ({ default: m.SearchHeldPage })),
 )
 const SearchSoldPage = lazy(() =>
-  import('./components/pages/search/search-sold-page').then((m) => ({ default: m.SearchSoldPage })),
+  import('./components/asset-search/search-sold-page').then((m) => ({ default: m.SearchSoldPage })),
 )
 const ProfitabilityReportPage = lazy(() =>
-  import('./components/pages/profitability-report-page').then((m) => ({
+  import('./components/reports/profitability-report-page').then((m) => ({
     default: m.ProfitabilityReportPage,
   })),
 )
 const HoldsByUserReportPage = lazy(() =>
-  import('./components/pages/holds-by-user-report-page').then((m) => ({
+  import('./components/reports/holds-by-user-report-page').then((m) => ({
     default: m.HoldsByUserReportPage,
   })),
 )
 const InStockSummaryReportPage = lazy(() =>
-  import('./components/pages/reports/in-stock-summary-report-page').then((m) => ({
+  import('./components/reports/in-stock-summary-report-page').then((m) => ({
     default: m.InStockSummaryReportPage,
   })),
 )
 const ExportAssetsPage = lazy(() =>
-  import('./components/pages/reports/export-assets-page').then((m) => ({
+  import('./components/reports/export-assets-page').then((m) => ({
     default: m.ExportAssetsPage,
   })),
 )
 const SearchAllPage = lazy(() =>
-  import('./components/pages/search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
+  import('./components/asset-search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
 )
 const SoldReportPage = lazy(() =>
-  import('./components/pages/reports/sold-report-page').then((m) => ({
+  import('./components/reports/sold-report-page').then((m) => ({
     default: m.SoldReportPage,
   })),
 )
 const CatalogSettingsPage = lazy(() =>
-  import('./components/pages/settings/catalog-settings-page').then((m) => ({
+  import('./components/settings/catalog-settings-page').then((m) => ({
     default: m.CatalogSettingsPage,
   })),
 )
 const OrganizationsSettingsPage = lazy(() =>
-  import('./components/pages/settings/organizations-settings-page').then((m) => ({
+  import('./components/settings/organizations-settings-page').then((m) => ({
     default: m.OrganizationsSettingsPage,
   })),
 )
 const UserManagementPage = lazy(() =>
-  import('./components/pages/admin/user-management-page').then((m) => ({
+  import('./components/admin/user-management-page').then((m) => ({
     default: m.UserManagementPage,
   })),
 )

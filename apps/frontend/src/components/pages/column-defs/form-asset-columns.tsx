@@ -1,6 +1,6 @@
-import { StatusBadge } from '@/components/custom/status-badge'
-import { ReadinessIcon } from '@/components/custom/readiness-icon'
 import { Button } from '@/components/shadcn/button'
+import { ReadinessIcon } from '@/components/shared/readiness-icon'
+import { StatusBadge } from '@/components/shared/status-badge'
 import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
 import type { DepartureFormAsset } from '@/ui-types/departure-form-types'
 import { TrashIcon } from '@phosphor-icons/react'
