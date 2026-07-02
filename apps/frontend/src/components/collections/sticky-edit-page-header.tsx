@@ -1,7 +1,7 @@
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { Button } from '../shadcn/button'
 import { StickyPageHeader } from './sticky-page-header'
-import { PageBreadcrumb } from '@/components/shared/page-breadcrumb'
+import { PageBreadcrumb } from './page-breadcrumb'
 
 interface StickyEditPageHeaderProps {
   breadcrumbs: { label: string; href?: string }[]

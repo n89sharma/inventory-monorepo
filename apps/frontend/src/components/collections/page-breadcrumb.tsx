@@ -8,7 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/shadcn/breadcrumb'
-import type { BreadcrumbSegment } from './breadcrumb-segments'
+import type { BreadcrumbSegment } from '@/components/shared/breadcrumb-segments'
 
 interface PageBreadcrumbProps {
   segments: BreadcrumbSegment[]
