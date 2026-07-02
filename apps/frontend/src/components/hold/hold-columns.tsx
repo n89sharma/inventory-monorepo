@@ -3,7 +3,7 @@ import {
   createdAtColumn,
   createdByColumn,
   createIdColumn,
-} from '@/components/pages/column-defs/shared-columns'
+} from '@/components/table-columns/shared-columns'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { HoldSummary } from 'shared-types'

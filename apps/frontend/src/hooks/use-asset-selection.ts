@@ -1,4 +1,4 @@
-import { buildExportColumnKeys } from '@/components/pages/column-defs/asset-table-columns'
+import { buildExportColumnKeys } from '@/components/table-columns/asset-table-columns'
 import { useAssetStore } from '@/data/store/asset-store'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'

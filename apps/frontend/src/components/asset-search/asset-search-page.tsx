@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/pages/column-defs/asset-table-columns'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/table-columns/asset-table-columns'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'

@@ -4,7 +4,7 @@ import { Input } from '@/components/shadcn/input'
 import {
   COLUMN_SECTIONS,
   type AssetTableColumn,
-} from '@/components/pages/column-defs/asset-table-columns'
+} from '@/components/table-columns/asset-table-columns'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'

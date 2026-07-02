@@ -1,4 +1,4 @@
-import { createAssetSummaryColumns } from '@/components/pages/column-defs/asset-summary-columns'
+import { createAssetSummaryColumns } from '@/components/table-columns/asset-summary-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'

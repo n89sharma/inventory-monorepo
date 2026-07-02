@@ -4,7 +4,7 @@ import { useCan } from '@/hooks/use-can'
 import {
   ASSET_TABLE_COLUMNS,
   type AssetTableColumn,
-} from '@/components/pages/column-defs/asset-table-columns'
+} from '@/components/table-columns/asset-table-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'

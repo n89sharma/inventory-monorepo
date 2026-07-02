@@ -1,4 +1,4 @@
-import { ASSET_TABLE_COLUMNS } from '@/components/pages/column-defs/asset-table-columns'
+import { ASSET_TABLE_COLUMNS } from '@/components/table-columns/asset-table-columns'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 

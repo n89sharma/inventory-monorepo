@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { getFormAssetColumns } from '@/components/pages/column-defs/form-asset-columns'
+import { getFormAssetColumns } from '@/components/table-columns/form-asset-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
   Field,

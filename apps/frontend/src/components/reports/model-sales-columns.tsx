@@ -1,4 +1,4 @@
-import { createIdColumn } from '@/components/pages/column-defs/shared-columns'
+import { createIdColumn } from '@/components/table-columns/shared-columns'
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
 import {

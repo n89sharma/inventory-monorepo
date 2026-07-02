@@ -3,7 +3,7 @@ import {
   createIdColumn,
   createdAtColumn,
   createdByColumn,
-} from '@/components/pages/column-defs/shared-columns'
+} from '@/components/table-columns/shared-columns'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'

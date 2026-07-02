@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/pages/column-defs/asset-table-columns'
+import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/table-columns/asset-table-columns'
 import { Button } from '@/components/shadcn/button'
 import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
