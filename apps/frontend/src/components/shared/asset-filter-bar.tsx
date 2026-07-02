@@ -1,9 +1,9 @@
-import { CassettesFilter } from '@/components/filters/cassettes-filter'
-import { InternalFinisherFilter } from '@/components/filters/internal-finisher-filter'
-import { MeterRangeInput } from '@/components/filters/meter-range-input'
-import { ModelFilter } from '@/components/filters/model-filter'
-import { ReadinessFilter } from '@/components/filters/readiness-filter'
-import { WarehouseFilter } from '@/components/filters/warehouse-filter'
+import { CassettesFilter } from '@/components/shared/filters/cassettes-filter'
+import { InternalFinisherFilter } from '@/components/shared/filters/internal-finisher-filter'
+import { MeterRangeInput } from '@/components/shared/filters/meter-range-input'
+import { ModelFilter } from '@/components/shared/filters/model-filter'
+import { ReadinessFilter } from '@/components/shared/filters/readiness-filter'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import {
   useCassettesParam,
   useInternalFinisherParam,

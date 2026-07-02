@@ -1,5 +1,5 @@
-import { AssetTypeFilter } from '@/components/filters/asset-type-filter'
-import { BrandFilter } from '@/components/filters/brand-filter'
+import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
+import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { useAssetTypesParam, useBrandParam } from '@/lib/filters/hooks'
 
 export function AssetIdentityFilters(): React.JSX.Element {

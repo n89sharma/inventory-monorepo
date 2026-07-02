@@ -1,8 +1,8 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { BrandFilter } from '@/components/filters/brand-filter'
-import { CustomerFilter } from '@/components/filters/customer-filter'
-import { UserFilter } from '@/components/filters/user-filter'
-import { WarehouseFilter } from '@/components/filters/warehouse-filter'
+import { BrandFilter } from '@/components/shared/filters/brand-filter'
+import { CustomerFilter } from '@/components/shared/filters/customer-filter'
+import { UserFilter } from '@/components/shared/filters/user-filter'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
 import {
   Select,

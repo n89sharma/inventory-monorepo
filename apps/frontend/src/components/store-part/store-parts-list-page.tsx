@@ -1,4 +1,4 @@
-import { WarehouseFilter } from '@/components/filters/warehouse-filter'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
 import { CollectionPage } from '@/components/collections/collection-page'
