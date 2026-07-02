@@ -33,6 +33,7 @@ import {
   getAssetsForSearchHeld as getAssetsForSearchHeldSer,
   getAssets as getAssetsSer,
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
+  getBarcodeLabels as getBarcodeLabelsSer,
   getSoldAssets as getSoldAssetsSer,
 } from '../services/assetReadService.js'
 import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
@@ -428,7 +429,8 @@ export const exportAssetReport = asyncHandler(async (req, res) => {
 
 export const printAssetBarcodes = asyncHandler(async (req, res) => {
   const { barcodes } = PrintBarcodesSchema.parse(req.body)
-  const pdf = await generateBarcodePdfSer(barcodes)
+  const labels = await getBarcodeLabelsSer(barcodes)
+  const pdf = await generateBarcodePdfSer(labels)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'application/pdf')
   res.setHeader('Content-Disposition', `attachment; filename="barcodes-${timestamp}.pdf"`)
