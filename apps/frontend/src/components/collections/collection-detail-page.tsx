@@ -10,7 +10,7 @@ import type { AssetSummary, CollectionHistory, Permission } from 'shared-types'
 import { DataTable } from '../shadcn/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
-import { StickyDetailsPageHeader } from '@/components/shared-collection-components/sticky-details-page-header'
+import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 
 type DetailSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 

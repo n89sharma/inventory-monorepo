@@ -1,6 +1,6 @@
 import { departureTableColumns } from '@/components/departure/departure-columns'
 import { Button } from '@/components/shadcn/button'
-import { CollectionPage } from '@/components/shared-collection-components/collection-page'
+import { CollectionPage } from '@/components/collections/collection-page'
 import { SearchBar } from '@/components/shared/search-bar'
 import { SearchSelectOptionFilter } from '@/components/shared/search-select-option-filter'
 import { SelectOptionsInline } from '@/components/shared/select-options'

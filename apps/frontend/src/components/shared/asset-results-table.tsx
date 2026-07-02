@@ -1,7 +1,7 @@
 import { createAssetSearchColumns } from '@/components/pages/column-defs/asset-search-columns'
 import { createSelectColumn } from '@/components/pages/column-defs/shared-columns'
 import { DataTable } from '@/components/shadcn/data-table'
-import { BulkEditBar } from '@/components/shared-collection-components/bulk-edit-bar'
+import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
 import { memo, useMemo } from 'react'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'

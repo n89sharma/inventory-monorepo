@@ -1,6 +1,6 @@
 import { createAssetSummaryColumns } from '@/components/pages/column-defs/asset-summary-columns'
-import { AddAssetBar } from '@/components/shared-collection-components/add-asset-bar'
-import { CollectionDetailPage } from '@/components/shared-collection-components/collection-detail-page'
+import { AddAssetBar } from '@/components/collections/add-asset-bar'
+import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
 import { TransferSummaryStrip } from '@/components/transfer/transfer-summary-strip'

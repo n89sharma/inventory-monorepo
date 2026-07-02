@@ -13,8 +13,8 @@ import { Textarea } from '@/components/shadcn/textarea'
 import {
   AddAssetsByBarcodeOrSerial,
   AddFromHoldButton,
-} from '@/components/shared-collection-components/add-assets-to-create-form'
-import { StickyEditPageHeader } from '@/components/shared-collection-components/sticky-edit-page-header'
+} from '@/components/collections/add-assets-to-create-form'
+import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { ControlledSearchSelectInput } from '@/components/shared/controlled-search-select-input'
 import { DepartureOutgoingStatusBar } from '@/components/shared/departure-outgoing-status-bar'
 import { SelectOptions } from '@/components/shared/select-options'

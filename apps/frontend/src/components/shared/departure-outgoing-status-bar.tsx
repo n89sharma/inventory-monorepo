@@ -1,5 +1,5 @@
 import type { OutgoingStatus } from 'shared-types'
-import { BulkActionBar } from '../shared-collection-components/bulk-action-bar'
+import { BulkActionBar } from '../collections/bulk-action-bar'
 import { DepartureOutgoingStatusToggle } from './departure-outgoing-status-toggle'
 
 type DepartureOutgoingStatusBarProps = {

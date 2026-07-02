@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { DataTable } from '@/components/shadcn/data-table'
-import { StickyPageHeader } from '@/components/shared-collection-components/sticky-page-header'
+import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import type { ColumnDef } from '@tanstack/react-table'
 
 interface CollectionPageProps<TData, TValue> {

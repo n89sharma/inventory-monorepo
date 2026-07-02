@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/shadcn/sheet'
-import { CollectionHistoryList } from '@/components/shared-collection-components/collection-history-list'
+import { CollectionHistoryList } from '@/components/collections/collection-history-list'
 import { useCollectionHistory } from '@/hooks/use-collection-history'
 import { ClockCounterClockwiseIcon } from '@phosphor-icons/react'
 import { useState } from 'react'

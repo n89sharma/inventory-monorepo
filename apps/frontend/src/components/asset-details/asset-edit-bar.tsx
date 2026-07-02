@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
-import { AddToCollectionModal } from '../shared-collection-components/add-to-collection-modal'
+import { AddToCollectionModal } from '../collections/add-to-collection-modal'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
 import { EditLocationModal } from './edit-location-modal'

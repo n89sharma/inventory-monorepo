@@ -1,7 +1,7 @@
 import { WarehouseFilter } from '@/components/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
-import { CollectionPage } from '@/components/shared-collection-components/collection-page'
+import { CollectionPage } from '@/components/collections/collection-page'
 import { AddPurchaseModal } from '@/components/store-part/add-purchase-modal'
 import { storePartTableColumns } from '@/components/store-part/store-part-table-columns'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'

@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { createArrivalAssetSummaryColumns } from '../pages/column-defs/asset-summary-columns'
-import { CollectionDetailPage } from '../shared-collection-components/collection-detail-page'
+import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
 import { EditArrivalMetadataModal } from './edit-arrival-metadata-modal'
 

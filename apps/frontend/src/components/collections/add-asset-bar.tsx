@@ -1,5 +1,5 @@
 import type { AssetSummary } from 'shared-types'
-import { AddAssetBarShell } from '../shared-collection-components/add-asset-bar-shell'
+import { AddAssetBarShell } from '../collections/add-asset-bar-shell'
 import { AddAssetsByBarcodeOrSerial, AddFromHoldButton } from './add-assets-to-create-form'
 
 interface AddAssetBarProps {

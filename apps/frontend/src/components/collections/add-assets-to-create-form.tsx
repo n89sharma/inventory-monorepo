@@ -1,4 +1,4 @@
-import { AddFromHoldModal } from '@/components/shared-collection-components/add-from-hold-modal'
+import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { CircleNotchIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'

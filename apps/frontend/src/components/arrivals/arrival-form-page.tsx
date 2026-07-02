@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { StickyEditPageHeader } from '@/components/shared-collection-components/sticky-edit-page-header'
+import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'

@@ -1,4 +1,4 @@
-import { AddAssetBarShell } from '@/components/shared-collection-components/add-asset-bar-shell'
+import { AddAssetBarShell } from '@/components/collections/add-asset-bar-shell'
 import { PlusIcon } from '@phosphor-icons/react'
 import { Button } from '../shadcn/button'
 

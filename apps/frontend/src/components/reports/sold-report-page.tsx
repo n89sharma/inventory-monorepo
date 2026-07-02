@@ -13,7 +13,7 @@ import {
 } from '@/components/shadcn/table'
 import { Toggle } from '@/components/shadcn/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { StickyPageHeader } from '@/components/shared-collection-components/sticky-page-header'
+import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useModelSales } from '@/hooks/use-model-sales'

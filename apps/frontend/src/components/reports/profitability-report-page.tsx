@@ -21,8 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import { StickyPageHeader } from '@/components/shared-collection-components/sticky-page-header'
-import { MetricCard } from '@/components/shared/cards/metric-card'
+import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { MetricCard } from './metric-card'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'

@@ -46,7 +46,7 @@ import { Link, useLocation } from 'react-router-dom'
 import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
 import { PartsSection } from '../shared/parts-section'
 import { AddCommentInput } from './add-comment-input'
-import { StickyDetailsPageHeader } from '@/components/shared-collection-components/sticky-details-page-header'
+import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 
 function AssetHistoryTabContent({ barcode, enabled }: { barcode: string; enabled: boolean }) {
   const { data, isLoading } = useAssetHistory(barcode, enabled)

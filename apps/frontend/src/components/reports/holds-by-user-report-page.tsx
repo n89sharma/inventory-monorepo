@@ -12,8 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
-import { StickyPageHeader } from '@/components/shared-collection-components/sticky-page-header'
-import { MetricCard } from '@/components/shared/cards/metric-card'
+import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { MetricCard } from './metric-card'
 import { ShareButton } from '@/components/shared/share-button'
 import { useHoldsByUserReport } from '@/hooks/use-holds-by-user-report'
 import { aggregateHolds, type HoldsByUserTable } from '@/lib/holds-by-user-aggregate'
