@@ -1,5 +1,6 @@
 import { SignIn } from '@clerk/react'
-import { POST_LOGIN_REDIRECT } from '@/app'
+
+const POST_LOGIN_REDIRECT = '/'
 
 export function LoginPage() {
   return (

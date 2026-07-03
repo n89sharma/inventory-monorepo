@@ -1,5 +1,6 @@
 import { MainLayout } from '@/components/app-layout/layout'
 import { PageTitleUpdater } from '@/components/app-layout/page-title-updater'
+import { PostLoginLanding } from '@/components/app-layout/post-login-landing'
 import { ErrorFallback } from '@/components/shared/error-fallback'
 import { PermissionRoute } from '@/components/shared/permission-route'
 import { ProtectedRoute } from '@/components/app-layout/protected-route'
@@ -10,8 +11,6 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAxiosAuth } from './hooks/use-axios-auth'
 import { useGlobalData } from './hooks/use-global-data'
-
-export const POST_LOGIN_REDIRECT = '/search/instock'
 
 const LoginPage = lazy(() =>
   import('./components/app-layout/login-page').then((m) => ({ default: m.LoginPage })),
@@ -178,7 +177,7 @@ function AppRoutes() {
               <ErrorBoundary FallbackComponent={ErrorFallback} resetKeys={[location.pathname]}>
                 <Suspense fallback={null}>
                   <Routes>
-                    <Route path="/" element={<Navigate to={POST_LOGIN_REDIRECT} replace />} />
+                    <Route path="/" element={<PostLoginLanding />} />
 
                     <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
                     <Route

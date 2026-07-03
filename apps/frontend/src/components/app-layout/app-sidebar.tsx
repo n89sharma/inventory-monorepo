@@ -21,6 +21,7 @@ import {
 import { UserMenuButton } from '@/components/app-layout/user-menu-button'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
+import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import {
   buildAssetSearchPath,
@@ -48,7 +49,6 @@ const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
 const DEFAULT_BRAND_NAME = 'Canon'
-const DEFAULT_ASSET_TYPE = 'Copier'
 
 const sidebarItems = [
   {
@@ -113,15 +113,11 @@ export function AppSidebar(): React.JSX.Element {
   const defaultWarehouse = useProfileDefaultWarehouse()
 
   const brands = useReferenceDataStore((state) => state.brands)
-  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
   const defaultBrand = useMemo(
     () => brands.find((b) => b.name === DEFAULT_BRAND_NAME) ?? null,
     [brands],
   )
-  const defaultAssetType = useMemo(
-    () => assetTypes.find((t) => t.asset_type === DEFAULT_ASSET_TYPE) ?? null,
-    [assetTypes],
-  )
+  const defaultAssetType = useDefaultAssetType()
 
   function reportItemPath(url: string): string {
     if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath(defaultWarehouse)
@@ -208,7 +204,13 @@ export function AppSidebar(): React.JSX.Element {
                             asChild
                             isActive={location.pathname.startsWith(item.url) ? true : undefined}
                           >
-                            <Link to={buildAssetSearchPath(item.url, defaultWarehouse)}>
+                            <Link
+                              to={buildAssetSearchPath(
+                                item.url,
+                                defaultWarehouse,
+                                defaultAssetType,
+                              )}
+                            >
                               {item.title}
                             </Link>
                           </SidebarMenuSubButton>

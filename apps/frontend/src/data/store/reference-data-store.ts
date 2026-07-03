@@ -28,6 +28,7 @@ interface ReferenceDataStore {
   components: Component[]
   countries: Country[]
   loading: boolean
+  loaded: boolean
 
   setReferenceData: (refData: ReferenceData) => void
   setBrands: (brands: Brand[]) => void
@@ -50,9 +51,11 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
   components: [],
   countries: [],
   loading: false,
+  loaded: false,
 
   setReferenceData: (referenceData) =>
     set({
+      loaded: true,
       coreFunctions: referenceData.coreFunctions,
       assetTypes: referenceData.assetTypes,
       brands: referenceData.brands,
@@ -75,6 +78,7 @@ export const useReferenceDataStore = create<ReferenceDataStore>((set) => ({
 
   clearReferenceData: () =>
     set({
+      loaded: false,
       coreFunctions: [],
       assetTypes: [],
       brands: [],

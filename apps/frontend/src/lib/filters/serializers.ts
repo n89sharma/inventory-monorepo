@@ -21,6 +21,7 @@ const BAND_BOUNDS = {
 
 const serializeWarehouse = createSerializer({ warehouse: FILTER_PARSERS.warehouse })
 const serializeWh = createSerializer({ wh: FILTER_PARSERS.wh })
+const serializeAssetSearch = createSerializer({ wh: FILTER_PARSERS.wh, type: FILTER_PARSERS.type })
 const serializeInStockSummary = createSerializer({
   wh: FILTER_PARSERS.wh,
   brand: FILTER_PARSERS.brand,
@@ -100,6 +101,13 @@ export function buildProfitabilityReportPath(warehouse: Warehouse | null): strin
   return serializeWh(PROFITABILITY_REPORT_PATH, { wh: warehouse ? [warehouse.id] : null })
 }
 
-export function buildAssetSearchPath(path: string, warehouse: Warehouse | null): string {
-  return serializeWh(path, { wh: warehouse ? [warehouse.id] : null })
+export function buildAssetSearchPath(
+  path: string,
+  warehouse: Warehouse | null,
+  assetType: AssetType | null,
+): string {
+  return serializeAssetSearch(path, {
+    wh: warehouse ? [warehouse.id] : null,
+    type: assetType ? [assetType.id] : null,
+  })
 }
