@@ -57,6 +57,11 @@ const sidebarItems = [
     icon: <WarehouseIcon aria-hidden="true" />,
   },
   {
+    title: 'Holds',
+    url: '/holds',
+    icon: <LockOpenIcon aria-hidden="true" />,
+  },
+  {
     title: 'Transfers',
     url: '/transfers',
     icon: <LineSegmentsIcon aria-hidden="true" />,
@@ -67,19 +72,14 @@ const sidebarItems = [
     icon: <TruckTrailerIcon aria-hidden="true" />,
   },
   {
-    title: 'Store',
-    url: STORE_PATH,
-    icon: <ToolboxIcon aria-hidden="true" />,
-  },
-  {
-    title: 'Holds',
-    url: '/holds',
-    icon: <LockOpenIcon aria-hidden="true" />,
-  },
-  {
     title: 'Invoices',
     url: '/invoices',
     icon: <InvoiceIcon aria-hidden="true" />,
+  },
+  {
+    title: 'Store',
+    url: STORE_PATH,
+    icon: <ToolboxIcon aria-hidden="true" />,
   },
 ]
 
@@ -183,20 +183,6 @@ export function AppSidebar(): React.JSX.Element {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {sidebarItems.map((item) => {
-                const isActive = location.pathname.startsWith(item.url)
-                const to = item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
-                      <Link to={to}>
-                        {item.icon}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
               <Collapsible
                 open={searchAssetsOpen}
                 onOpenChange={setSearchAssetsOpen}
@@ -232,6 +218,20 @@ export function AppSidebar(): React.JSX.Element {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+              {sidebarItems.map((item) => {
+                const isActive = location.pathname.startsWith(item.url)
+                const to = item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
+                      <Link to={to}>
+                        {item.icon}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
               {(canViewReports || canViewSalePrice) && (
                 <Collapsible
                   open={reportsOpen}
