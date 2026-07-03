@@ -2,18 +2,17 @@ import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DaysHeldFilter } from '@/components/shared/filters/days-held-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { daysHeld } from '@/components/table-columns/asset-search-columns'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
-import { AssetIdentityFilters } from '@/components/asset-search/asset-identity-filters'
 import { useSearchHeld } from '@/hooks/use-search-held'
 import {
-  useAssetTypesParam,
-  useBrandParam,
+  useAssetFilters,
   useDaysHeldParam,
   useHeldByParam,
   useHeldForParam,
   useHoldCustomerParam,
-  useSharedAssetFilters,
+  useWarehousesParam,
 } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
@@ -29,12 +28,14 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
 }
 
 function HeldScopeFilters(): React.JSX.Element {
+  const [warehouses, setWarehouses] = useWarehousesParam()
   const [heldBy, setHeldBy] = useHeldByParam()
   const [heldFor, setHeldFor] = useHeldForParam()
   const [holdCustomer, setHoldCustomer] = useHoldCustomerParam()
   const [daysHeldMin, setDaysHeldMin] = useDaysHeldParam()
   return (
     <>
+      <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
       <UserFilter
         selection={heldBy}
         onSelectionChange={setHeldBy}
@@ -60,17 +61,16 @@ function HeldScopeFilters(): React.JSX.Element {
 }
 
 export function SearchHeldPage(): React.JSX.Element {
-  const shared = useSharedAssetFilters()
-  const [brand] = useBrandParam()
-  const [assetTypes] = useAssetTypesParam()
+  const assetFilters = useAssetFilters()
+  const [warehouses] = useWarehousesParam()
   const [heldBy] = useHeldByParam()
   const [heldFor] = useHeldForParam()
   const [holdCustomer] = useHoldCustomerParam()
   const [daysHeldMin] = useDaysHeldParam()
 
   const filters = useMemo(
-    () => ({ ...shared, brand, assetTypes, heldBy, heldFor, holdCustomer, daysHeldMin }),
-    [shared, brand, assetTypes, heldBy, heldFor, holdCustomer, daysHeldMin],
+    () => ({ ...assetFilters, warehouses, heldBy, heldFor, holdCustomer, daysHeldMin }),
+    [assetFilters, warehouses, heldBy, heldFor, holdCustomer, daysHeldMin],
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchHeld(filters)
@@ -89,7 +89,7 @@ export function SearchHeldPage(): React.JSX.Element {
       defaultSort={DAYS_HELD_DESC_SORT}
       getRowClassName={heldRowClassName}
     >
-      <AssetFilterBar scopeSlot={<HeldScopeFilters />} identitySlot={<AssetIdentityFilters />} />
+      <AssetFilterBar scopeFilters={<HeldScopeFilters />} />
     </AssetSearchPage>
   )
 }

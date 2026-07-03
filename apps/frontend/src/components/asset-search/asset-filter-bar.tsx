@@ -1,30 +1,31 @@
+import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
+import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { CassettesFilter } from '@/components/shared/filters/cassettes-filter'
 import { InternalFinisherFilter } from '@/components/shared/filters/internal-finisher-filter'
 import { MeterRangeInput } from '@/components/shared/filters/meter-range-input'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { ReadinessFilter } from '@/components/shared/filters/readiness-filter'
-import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import {
+  useAssetTypesParam,
+  useBrandParam,
   useCassettesParam,
   useInternalFinisherParam,
   useMeterRangeParam,
   useModelParam,
   useReadinessesParam,
-  useWarehousesParam,
 } from '@/lib/filters/hooks'
 
 const DEFAULT_MODEL_PLACEHOLDER = 'Model'
 
 export function AssetFilterBar({
-  scopeSlot,
-  identitySlot,
+  scopeFilters,
   modelPlaceholder = DEFAULT_MODEL_PLACEHOLDER,
 }: {
-  scopeSlot?: React.ReactNode
-  identitySlot?: React.ReactNode
+  scopeFilters?: React.ReactNode
   modelPlaceholder?: string
 }): React.JSX.Element {
-  const [warehouses, setWarehouses] = useWarehousesParam()
+  const [brand, setBrand] = useBrandParam()
+  const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { model, modelQuery, setModel, setModelQuery, clear } = useModelParam()
   const [readinesses, setReadinesses] = useReadinessesParam()
   const { min, max, setMin, setMax } = useMeterRangeParam()
@@ -33,11 +34,11 @@ export function AssetFilterBar({
 
   return (
     <>
-      <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+      {scopeFilters}
 
-      {scopeSlot}
+      <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
 
-      {identitySlot}
+      <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
 
       <ModelFilter
         selection={model}

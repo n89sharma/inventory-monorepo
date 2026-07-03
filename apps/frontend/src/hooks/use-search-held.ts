@@ -1,12 +1,11 @@
 import { getAssetsForSearchHeld } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { resolveWarehouseScope, type SharedAssetFilters } from '@/lib/filters/hooks'
-import type { AssetSearchRow, AssetType, Brand, OrgSummary, User } from 'shared-types'
+import { resolveWarehouseScope, type AssetFilters } from '@/lib/filters/hooks'
+import type { AssetSearchRow, OrgSummary, User, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
-export type SearchHeldFilters = SharedAssetFilters & {
-  brand: Brand | null
-  assetTypes: AssetType[]
+export type SearchHeldFilters = AssetFilters & {
+  warehouses: Warehouse[]
   heldBy: User | null
   heldFor: User | null
   holdCustomer: OrgSummary | null

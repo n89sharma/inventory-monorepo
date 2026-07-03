@@ -5,14 +5,13 @@ import {
   isValidSoldDateRange,
   resolveSoldStatuses,
   resolveWarehouseScope,
-  type SharedAssetFilters,
+  type AssetFilters,
 } from '@/lib/filters/hooks'
-import type { AssetSearchRow, AssetType, Brand, OrgSummary } from 'shared-types'
+import type { AssetSearchRow, OrgSummary, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
-export type SearchSoldFilters = SharedAssetFilters & {
-  brand: Brand | null
-  assetTypes: AssetType[]
+export type SearchSoldFilters = AssetFilters & {
+  warehouses: Warehouse[]
   showOther: boolean
   fromDate: Date
   toDate: Date

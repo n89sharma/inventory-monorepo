@@ -6,13 +6,14 @@ import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportAssetsButton } from '@/components/shared/export-assets-button'
 import { MultiSelectOptionsInline } from '@/components/shared/search-select/multi-select-options'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { useSearchAll } from '@/hooks/use-search-all'
-import { useSharedAssetFilters, useStatusesParam } from '@/lib/filters/hooks'
+import { useAssetFilters, useStatusesParam, useWarehousesParam } from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
@@ -79,9 +80,13 @@ export function SearchAllPage(): React.JSX.Element {
 
   const { options: statusOptions, dividerAfterIds: statusDividerAfterIds } = useOrderedStatuses()
 
-  const shared = useSharedAssetFilters()
+  const assetFilters = useAssetFilters()
+  const [warehouses, setWarehouses] = useWarehousesParam()
   const [statuses] = useStatusesParam()
-  const filters = useMemo(() => ({ ...shared, statuses }), [shared, statuses])
+  const filters = useMemo(
+    () => ({ ...assetFilters, warehouses, statuses }),
+    [assetFilters, warehouses, statuses],
+  )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(filters)
   const selection = useAssetSelection(assets, visibleColumns)
@@ -128,8 +133,14 @@ export function SearchAllPage(): React.JSX.Element {
         >
           <AssetFilterBar
             modelPlaceholder="Model *"
-            scopeSlot={
-              <StatusScopeFilter options={statusOptions} dividerAfterIds={statusDividerAfterIds} />
+            scopeFilters={
+              <>
+                <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+                <StatusScopeFilter
+                  options={statusOptions}
+                  dividerAfterIds={statusDividerAfterIds}
+                />
+              </>
             }
           />
         </form>

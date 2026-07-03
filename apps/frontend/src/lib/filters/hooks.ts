@@ -148,8 +148,9 @@ export function useWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void]
   return useIdListParam('wh', warehouses)
 }
 
-export type SharedAssetFilters = {
-  warehouses: Warehouse[]
+export type AssetFilters = {
+  brand: Brand | null
+  assetTypes: AssetType[]
   model: ModelSummary | null
   modelQuery: string | null
   readinesses: Status[]
@@ -159,11 +160,12 @@ export type SharedAssetFilters = {
   internalFinisher: Component | null
 }
 
-// Composes the shared filters into the resolved object the SWR hooks consume.
+// Composes the asset-attribute filters into the resolved object the SWR hooks consume.
 // Read-only: callers that never invoke a setter observe the committed (URL) value,
 // so SWR keys on the debounced value while the filter bar edits its own draft.
-export function useSharedAssetFilters(): SharedAssetFilters {
-  const [warehouses] = useWarehousesParam()
+export function useAssetFilters(): AssetFilters {
+  const [brand] = useBrandParam()
+  const [assetTypes] = useAssetTypesParam()
   const { model, modelQuery } = useModelParam()
   const [readinesses] = useReadinessesParam()
   const { min, max } = useMeterRangeParam()
@@ -171,7 +173,8 @@ export function useSharedAssetFilters(): SharedAssetFilters {
   const [internalFinisher] = useInternalFinisherParam()
   return useMemo(
     () => ({
-      warehouses,
+      brand,
+      assetTypes,
       model,
       modelQuery: modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? modelQuery : null,
       readinesses,
@@ -180,7 +183,7 @@ export function useSharedAssetFilters(): SharedAssetFilters {
       cassettes,
       internalFinisher,
     }),
-    [warehouses, model, modelQuery, readinesses, min, max, cassettes, internalFinisher],
+    [brand, assetTypes, model, modelQuery, readinesses, min, max, cassettes, internalFinisher],
   )
 }
 

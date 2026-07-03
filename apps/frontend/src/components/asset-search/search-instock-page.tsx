@@ -1,15 +1,10 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
-import { AssetIdentityFilters } from '@/components/asset-search/asset-identity-filters'
 import { useCan } from '@/hooks/use-can'
 import { useSearchInStock } from '@/hooks/use-search-instock'
-import {
-  useAssetTypesParam,
-  useBrandParam,
-  usePriceCheckParam,
-  useSharedAssetFilters,
-} from '@/lib/filters/hooks'
+import { useAssetFilters, usePriceCheckParam, useWarehousesParam } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
@@ -18,14 +13,13 @@ const PURCHASE_COST_COLUMN_ID = 'cost_purchase_cost'
 const PRICE_CHECK_COLUMN_IDS = [PURCHASE_COST_COLUMN_ID] as const
 
 export function SearchInStockPage(): React.JSX.Element {
-  const shared = useSharedAssetFilters()
-  const [brand] = useBrandParam()
-  const [assetTypes] = useAssetTypesParam()
+  const assetFilters = useAssetFilters()
+  const [warehouses, setWarehouses] = useWarehousesParam()
   const [priceCheck, setPriceCheck] = usePriceCheckParam()
 
   const filters = useMemo(
-    () => ({ ...shared, brand, assetTypes, priceCheck }),
-    [shared, brand, assetTypes, priceCheck],
+    () => ({ ...assetFilters, warehouses, priceCheck }),
+    [assetFilters, warehouses, priceCheck],
   )
 
   const canViewPurchasePrice = useCan('view_purchase_price')
@@ -54,19 +48,21 @@ export function SearchInStockPage(): React.JSX.Element {
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
     >
       <AssetFilterBar
-        scopeSlot={
-          canViewPurchasePrice ? (
-            <Toggle
-              variant="outline"
-              pressed={priceCheck}
-              onPressedChange={setPriceCheck}
-              aria-label="Show only assets with a missing or zero purchase price"
-            >
-              Price Check
-            </Toggle>
-          ) : undefined
+        scopeFilters={
+          <>
+            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+            {canViewPurchasePrice ? (
+              <Toggle
+                variant="outline"
+                pressed={priceCheck}
+                onPressedChange={setPriceCheck}
+                aria-label="Show only assets with a missing or zero purchase price"
+              >
+                Price Check
+              </Toggle>
+            ) : undefined}
+          </>
         }
-        identitySlot={<AssetIdentityFilters />}
       />
     </AssetSearchPage>
   )

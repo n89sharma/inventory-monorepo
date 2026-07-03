@@ -3,12 +3,13 @@ import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import {
   MIN_MODEL_INPUT_QUERY_LENGTH,
   resolveWarehouseScope,
-  type SharedAssetFilters,
+  type AssetFilters,
 } from '@/lib/filters/hooks'
-import type { AssetSearchRow, Status } from 'shared-types'
+import type { AssetSearchRow, Status, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
-export type SearchAllFilters = SharedAssetFilters & {
+export type SearchAllFilters = AssetFilters & {
+  warehouses: Warehouse[]
   statuses: Status[]
 }
 
