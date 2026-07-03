@@ -11,6 +11,8 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { useAxiosAuth } from './hooks/use-axios-auth'
 import { useGlobalData } from './hooks/use-global-data'
 
+export const POST_LOGIN_REDIRECT = '/search/instock'
+
 const LoginPage = lazy(() =>
   import('./components/app-layout/login-page').then((m) => ({ default: m.LoginPage })),
 )
@@ -176,7 +178,7 @@ function AppRoutes() {
               <ErrorBoundary FallbackComponent={ErrorFallback} resetKeys={[location.pathname]}>
                 <Suspense fallback={null}>
                   <Routes>
-                    <Route path="/" element={<Navigate to="/arrivals" replace />} />
+                    <Route path="/" element={<Navigate to={POST_LOGIN_REDIRECT} replace />} />
 
                     <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
                     <Route

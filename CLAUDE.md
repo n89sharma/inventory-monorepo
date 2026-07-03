@@ -59,6 +59,11 @@ numbered implementation sections **split Backend / Frontend with `###` subheadin
 scope**, **Verification**. Put a blank line between every bullet, and use subheadings within any
 long section. Optimize for scannability.
 
+## Commits
+
+Don't add meta/attribution trailers to commit messages (e.g. "Generated with Claude",
+"Co-Authored-By: Claude"). Write the message as if authored by the developer.
+
 ## Commands
 
 Run from the **repo root** after every code change; summarize and fix any errors before
