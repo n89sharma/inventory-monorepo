@@ -34,38 +34,44 @@ export function AssetFilterBar({
 
   return (
     <>
-      {scopeFilters}
+      <div className="flex flex-row flex-wrap gap-2 items-end">{scopeFilters}</div>
 
-      <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
+      <div className="flex flex-row flex-wrap gap-2 items-end">
+        <BrandFilter
+          selection={brand}
+          onSelectionChange={setBrand}
+          onClear={() => setBrand(null)}
+        />
 
-      <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
+        <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
 
-      <ModelFilter
-        selection={model}
-        query={modelQuery}
-        onSelectionChange={setModel}
-        onQueryChange={setModelQuery}
-        onClear={clear}
-        placeholder={modelPlaceholder}
-      />
+        <ModelFilter
+          selection={model}
+          query={modelQuery}
+          onSelectionChange={setModel}
+          onQueryChange={setModelQuery}
+          onClear={clear}
+          placeholder={modelPlaceholder}
+        />
 
-      <ReadinessFilter selection={readinesses} onSelectionChange={setReadinesses} />
+        <ReadinessFilter selection={readinesses} onSelectionChange={setReadinesses} />
 
-      <MeterRangeInput
-        min={min}
-        max={max}
-        onMinChange={setMin}
-        onMaxChange={setMax}
-        className="w-72"
-      />
+        <MeterRangeInput
+          min={min}
+          max={max}
+          onMinChange={setMin}
+          onMaxChange={setMax}
+          className="w-72"
+        />
 
-      <CassettesFilter value={cassettes} onValueChange={setCassettes} />
+        <CassettesFilter value={cassettes} onValueChange={setCassettes} />
 
-      <InternalFinisherFilter
-        selection={internalFinisher}
-        onSelectionChange={setInternalFinisher}
-        onClear={() => setInternalFinisher(null)}
-      />
+        <InternalFinisherFilter
+          selection={internalFinisher}
+          onSelectionChange={setInternalFinisher}
+          onClear={() => setInternalFinisher(null)}
+        />
+      </div>
     </>
   )
 }

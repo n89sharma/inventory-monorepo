@@ -86,10 +86,7 @@ export function AssetSearchPage({
             />
           </div>
         </div>
-        <form
-          className="flex flex-row flex-wrap gap-2 items-end"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form className="flex flex-col gap-2" onSubmit={(e) => e.preventDefault()}>
           {children}
         </form>
       </StickyPageHeader>
