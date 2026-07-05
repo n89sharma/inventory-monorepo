@@ -30,7 +30,7 @@ export function ModelFilter({
       getLabel={modelLabel}
       placeholder={placeholder}
       clearLabel="Clear model"
-      className="w-35"
+      className="w-50"
     />
   )
 }
