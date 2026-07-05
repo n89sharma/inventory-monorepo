@@ -29,7 +29,39 @@ interface AssetErrorsEditorProps {
   brandId: number | null
   disabled?: boolean
   invalid?: boolean
+  statusToggleable?: boolean
   renderSearch: (props: AssetErrorsSearchSlotProps) => ReactNode
+}
+
+function ErrorStatusBadge({
+  isFixed,
+  toggleable,
+  onToggle,
+}: {
+  isFixed: boolean
+  toggleable: boolean
+  onToggle: () => void
+}) {
+  const variant = isFixed ? 'success' : 'destructive'
+  const label = isFixed ? 'Fixed' : 'Open'
+  if (!toggleable) {
+    return (
+      <Badge variant={variant} className="cursor-not-allowed">
+        {label}
+      </Badge>
+    )
+  }
+  return (
+    <Badge asChild variant={variant}>
+      <button
+        type="button"
+        onClick={onToggle}
+        className="cursor-pointer hover:opacity-80 transition-opacity"
+      >
+        {label}
+      </button>
+    </Badge>
+  )
 }
 
 export function AssetErrorsEditor({
@@ -38,6 +70,7 @@ export function AssetErrorsEditor({
   brandId,
   disabled = false,
   invalid = false,
+  statusToggleable = true,
   renderSearch,
 }: AssetErrorsEditorProps) {
   const allErrors = useReferenceDataStore((state) => state.errors)
@@ -99,15 +132,11 @@ export function AssetErrorsEditor({
                   )}
                 </div>
                 <div className="flex w-16 justify-center">
-                  <Badge asChild variant={e.is_fixed ? 'success' : 'destructive'}>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleFixed(e.error_id)}
-                      className="cursor-pointer hover:opacity-80 transition-opacity"
-                    >
-                      {e.is_fixed ? 'Fixed' : 'Open'}
-                    </button>
-                  </Badge>
+                  <ErrorStatusBadge
+                    isFixed={e.is_fixed}
+                    toggleable={statusToggleable}
+                    onToggle={() => handleToggleFixed(e.error_id)}
+                  />
                 </div>
                 <div className="flex w-8 justify-center">
                   <Button

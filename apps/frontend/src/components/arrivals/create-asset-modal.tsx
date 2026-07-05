@@ -239,6 +239,7 @@ export function CreateAssetModal({
                       brandId={brandId}
                       disabled={!isHasErrors}
                       invalid={fieldState.invalid}
+                      statusToggleable={false}
                       renderSearch={(slot) => (
                         <SearchSelectInput {...slot} placeholder="" className={INPUT_WIDTH} />
                       )}
