@@ -237,6 +237,7 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
   brandName: string | null
+  readinessDisabledStatuses?: string[]
   renderAfterReadiness?: React.ReactNode
 }
 
@@ -254,6 +255,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   control,
   isColour,
   brandName,
+  readinessDisabledStatuses,
   renderAfterReadiness,
 }: TechnicalSpecsFieldsProps<T>) {
   const readinesses = useReferenceDataStore((state) => state.readinesses)
@@ -277,6 +279,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
                   selection={isSelected(readiness) ? readiness.selected : null}
                   onChange={(s) => onChange(s ? getSelectOption(s) : UNSELECTED)}
                   options={readinesses}
+                  disabledStatuses={readinessDisabledStatuses}
                   error={fieldState.invalid}
                 />
               )

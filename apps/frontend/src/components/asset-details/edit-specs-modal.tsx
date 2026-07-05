@@ -18,7 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { useForm, type FieldErrors } from 'react-hook-form'
-import type { AssetDetails } from 'shared-types'
+import type { AssetDetails, AssetError } from 'shared-types'
 import { toast } from 'sonner'
 
 interface EditSpecsModalProps {
@@ -26,7 +26,13 @@ interface EditSpecsModalProps {
   onOpenChange: (open: boolean) => void
   assetDetails: AssetDetails | null
   accessories: string[]
+  errors: AssetError[]
 }
+
+// Readiness follows the asset's errors (see assetErrorService): HAS_ERRORS is never
+// chosen by hand, so the specs picker always disables it. While any error is open the
+// whole picker is locked — readiness stays on the enforced HAS_ERRORS.
+const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 
 const EMPTY_SPECS_FORM: SpecsForm = {
   readiness: UNSELECTED,
@@ -53,12 +59,19 @@ export function EditSpecsModal({
   onOpenChange,
   assetDetails,
   accessories,
+  errors,
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
   const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
   const components = useReferenceDataStore((state) => state.components)
+
+  const hasOpenError = errors.some((e) => !e.is_fixed)
+  const readinessDisabledStatuses = useMemo(
+    () => (hasOpenError ? readinesses.map((r) => r.status) : [HAS_ERRORS_READINESS]),
+    [hasOpenError, readinesses],
+  )
 
   const values = useMemo<SpecsForm>(() => {
     if (!assetDetails) return EMPTY_SPECS_FORM
@@ -150,6 +163,7 @@ export function EditSpecsModal({
             control={form.control}
             isColour={assetDetails.is_colour}
             brandName={assetDetails.brand}
+            readinessDisabledStatuses={readinessDisabledStatuses}
           />
         </form>
 

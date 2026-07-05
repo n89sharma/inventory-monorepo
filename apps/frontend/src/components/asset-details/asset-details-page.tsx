@@ -566,6 +566,7 @@ export const AssetDetailsPage = () => {
         onOpenChange={setEditSpecsOpen}
         assetDetails={assetDetails}
         accessories={accessories}
+        errors={errors}
       />
       <EditErrorsModal
         open={editErrorsOpen}
