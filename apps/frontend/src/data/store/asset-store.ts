@@ -39,10 +39,14 @@ interface AssetStore {
   createAssetHarvestedPart: (barcode: string, data: CreateSalvagedPart) => Promise<void>
   addStorePartToAsset: (barcode: string, form: AddStorePartForm) => Promise<AddPurchaseResponse>
   createComment: (barcode: string, data: CreateComment) => Promise<void>
-  updateAssetLocation: (barcode: string, data: UpdateAssetLocation) => Promise<void>
+  updateAssetLocation: (
+    barcode: string,
+    data: UpdateAssetLocation,
+    skipErrorToast?: boolean,
+  ) => Promise<void>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
   updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<void>
-  getAssetByBarcode: (barcode: string) => Promise<AssetSummary>
+  getAssetByBarcode: (barcode: string, skipErrorToast?: boolean) => Promise<AssetSummary>
   getAssetDetail: (barcode: string) => Promise<AssetDetails>
   getLocationsByWarehouse: (warehouseId: number) => Promise<AssetLocation[]>
   exportAssets: (
@@ -80,8 +84,8 @@ export const useAssetStore = create<AssetStore>(() => ({
     mutate(assetDetailKey(barcode))
   },
 
-  updateAssetLocation: async (barcode, data) => {
-    await updateAssetLocationApi(barcode, data)
+  updateAssetLocation: async (barcode, data, skipErrorToast) => {
+    await updateAssetLocationApi(barcode, data, skipErrorToast)
     mutate(assetDetailKey(barcode))
     invalidateAssetHistory([barcode])
   },
@@ -98,7 +102,7 @@ export const useAssetStore = create<AssetStore>(() => ({
     invalidateAssetHistory([barcode])
   },
 
-  getAssetByBarcode: (barcode) => getAssetByBarcodeApi(barcode),
+  getAssetByBarcode: (barcode, skipErrorToast) => getAssetByBarcodeApi(barcode, skipErrorToast),
 
   getAssetDetail: (barcode) => getAssetDetailApi({ barcode }),
 

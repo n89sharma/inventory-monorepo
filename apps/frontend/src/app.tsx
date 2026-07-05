@@ -139,6 +139,11 @@ const ExportAssetsPage = lazy(() =>
     default: m.ExportAssetsPage,
   })),
 )
+const PutAwayPage = lazy(() =>
+  import('./components/put-away/put-away-page').then((m) => ({
+    default: m.PutAwayPage,
+  })),
+)
 const SearchAllPage = lazy(() =>
   import('./components/asset-search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
 )
@@ -225,6 +230,15 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="view_store">
                           <StorePartDetailPage />
+                        </PermissionRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/put-away"
+                      element={
+                        <PermissionRoute permission="edit_location">
+                          <PutAwayPage />
                         </PermissionRoute>
                       }
                     />

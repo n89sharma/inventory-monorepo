@@ -68,8 +68,11 @@ export async function createTransfer(t: TransferForm): Promise<CreateTransferRes
   return CreateTransferResponseSchema.parse(data)
 }
 
-export async function getAssetByBarcode(barcode: string): Promise<AssetSummary> {
-  const { data } = await api.get<AssetSummary>(`/assets/${barcode}/summary`)
+export async function getAssetByBarcode(
+  barcode: string,
+  skipErrorToast = false,
+): Promise<AssetSummary> {
+  const { data } = await api.get<AssetSummary>(`/assets/${barcode}/summary`, { skipErrorToast })
   return AssetSummarySchema.parse(data)
 }
 

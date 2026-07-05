@@ -26,8 +26,19 @@ describe('assetLocationService', () => {
     await cleanupTransactionalData()
   })
 
-  it('honors the bin value when relocating into the BIN zone', async () => {
+  it('relocates an asset into an existing BIN shelf', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
+    await prisma.location.upsert({
+      where: {
+        warehouse_id_zone_id_bin: {
+          warehouse_id: refs.warehouse.id,
+          zone_id: refs.binZoneId,
+          bin: 'A1',
+        },
+      },
+      create: { warehouse_id: refs.warehouse.id, zone_id: refs.binZoneId, bin: 'A1' },
+      update: {},
+    })
 
     await updateAssetLocation(
       asset.barcode,
@@ -43,21 +54,16 @@ describe('assetLocationService', () => {
     expect(row.location?.bin).toBe('A1')
   })
 
-  it('forces an empty bin for non-BIN zones', async () => {
+  it('rejects relocating to a shelf that does not exist', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
 
-    await updateAssetLocation(
-      asset.barcode,
-      { warehouse_id: refs.warehouse.id, zone_id: refs.arrivalZoneId, bin: 'A1' },
-      refs.userId,
-    )
-
-    const row = await prisma.asset.findUniqueOrThrow({
-      where: { id: asset.id },
-      select: { location: { select: { bin: true, zone_id: true } } },
-    })
-    expect(row.location?.zone_id).toBe(refs.arrivalZoneId)
-    expect(row.location?.bin).toBe('')
+    await expect(
+      updateAssetLocation(
+        asset.barcode,
+        { warehouse_id: refs.warehouse.id, zone_id: refs.binZoneId, bin: 'NO-SUCH-SHELF' },
+        refs.userId,
+      ),
+    ).rejects.toThrow(NotFoundError)
   })
 
   it('rejects relocating an asset that does not exist', async () => {

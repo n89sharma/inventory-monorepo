@@ -37,6 +37,7 @@ import {
   LineSegmentsIcon,
   LockOpenIcon,
   MagnifyingGlassIcon,
+  MapPinIcon,
   StackIcon,
   ToolboxIcon,
   TruckTrailerIcon,
@@ -131,6 +132,7 @@ export function AppSidebar(): React.JSX.Element {
   const canManageUsers = useCan('manage_users')
   const canViewReports = useCan('view_reports')
   const canViewSalePrice = useCan('view_sale_price')
+  const canPutAway = useCan('edit_location')
 
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
@@ -234,6 +236,19 @@ export function AppSidebar(): React.JSX.Element {
                   </SidebarMenuItem>
                 )
               })}
+              {canPutAway && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname.startsWith('/put-away') ? true : undefined}
+                  >
+                    <Link to="/put-away">
+                      <MapPinIcon aria-hidden="true" />
+                      <span>Put Away</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               {(canViewReports || canViewSalePrice) && (
                 <Collapsible
                   open={reportsOpen}

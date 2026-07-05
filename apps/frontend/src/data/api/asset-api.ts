@@ -117,11 +117,12 @@ export async function getLocationsByWarehouse(warehouseId: number): Promise<Asse
 export async function updateAssetLocation(
   barcode: string,
   data: UpdateAssetLocation,
+  skipErrorToast = false,
 ): Promise<void> {
   const updateAssetLocationBody = UpdateAssetLocationSchema.parse(
     data satisfies UpdateAssetLocation,
   )
-  await api.put(`/assets/${barcode}/location`, updateAssetLocationBody)
+  await api.put(`/assets/${barcode}/location`, updateAssetLocationBody, { skipErrorToast })
 }
 
 export async function postComment(barcode: string, data: CreateComment): Promise<void> {

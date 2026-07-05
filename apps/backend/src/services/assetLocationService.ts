@@ -4,8 +4,6 @@ import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
 
-const BIN_ZONE = 'BIN'
-
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
   return prisma.$queryRawTyped(getLocationsByWarehouseQuery(warehouseId))
 }
@@ -22,28 +20,17 @@ export async function updateAssetLocation(
     })
     if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-    const zone = await tx.zone.findUnique({ where: { id: data.zone_id }, select: { zone: true } })
-    if (!zone) throw new NotFoundError('Zone not found')
-
-    const warehouse = await tx.warehouse.findUnique({
-      where: { id: data.warehouse_id },
-      select: { id: true },
-    })
-    if (!warehouse) throw new NotFoundError('Warehouse not found')
-
-    const bin = zone.zone === BIN_ZONE ? data.bin : ''
-
-    const location = await tx.location.upsert({
+    const location = await tx.location.findUnique({
       where: {
         warehouse_id_zone_id_bin: {
           warehouse_id: data.warehouse_id,
           zone_id: data.zone_id,
-          bin,
+          bin: data.bin,
         },
       },
-      create: { warehouse_id: data.warehouse_id, zone_id: data.zone_id, bin },
-      update: {},
+      select: { id: true },
     })
+    if (!location) throw new NotFoundError('Location not found')
 
     await tx.asset.update({ where: { barcode }, data: { location_id: location.id } })
 

@@ -9,6 +9,7 @@ const SECTION_LABEL: Record<string, string> = {
   departures: 'Departures',
   holds: 'Holds',
   invoices: 'Invoices',
+  'put-away': 'Put Away',
   search: 'Search',
   settings: 'Settings',
   reports: 'Reports',
