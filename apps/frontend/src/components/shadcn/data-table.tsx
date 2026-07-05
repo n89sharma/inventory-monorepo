@@ -1,6 +1,7 @@
 import type {
   Column,
   ColumnDef,
+  ExpandedState,
   OnChangeFn,
   Row,
   RowData,
@@ -11,6 +12,7 @@ import type {
 import {
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -53,6 +55,7 @@ interface DataTableProps<TData, TValue> {
   pinLeft?: string[]
   getRowHref?: (row: TData) => string
   getRowClassName?: (row: TData) => string | undefined
+  getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   scrollMaxHeight?: string
 }
@@ -111,11 +114,13 @@ export function DataTable<TData, TValue>({
   pinLeft,
   getRowHref,
   getRowClassName,
+  getSubRows,
   columnVisibility,
   scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
+  const [expanded, setExpanded] = useState<ExpandedState>({})
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
@@ -130,10 +135,15 @@ export function DataTable<TData, TValue>({
     enableRowSelection: true,
     onRowSelectionChange,
     getRowId,
+    getSubRows,
+    getExpandedRowModel: getExpandedRowModel(),
+    onExpandedChange: setExpanded,
+    paginateExpandedRows: false,
     state: {
       sorting,
       rowSelection,
       columnVisibility,
+      expanded,
     },
     initialState: {
       pagination: {
@@ -182,6 +192,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     row={row}
                     isSelected={row.getIsSelected()}
+                    isExpanded={row.getIsExpanded()}
                     onRowMouseEnter={onRowMouseEnter}
                     getRowHref={getRowHref}
                     getRowClassName={getRowClassName}
@@ -252,33 +263,41 @@ export function DataTable<TData, TValue>({
 function DataRowImpl<TData>({
   row,
   isSelected,
+  isExpanded,
   onRowMouseEnter,
   getRowHref,
   getRowClassName,
 }: {
   row: Row<TData>
   isSelected: boolean
+  isExpanded?: boolean
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
   getRowClassName?: (row: TData) => string | undefined
   columnVisibility?: VisibilityState
 }) {
   const navigate = useNavigate()
+  const canExpand = row.getCanExpand()
   return (
     <TableRow
       data-state={isSelected && 'selected'}
-      className={`group/row ${getRowHref ? 'cursor-pointer' : ''} ${getRowClassName?.(row.original) ?? ''}`.trim()}
+      data-expanded={isExpanded || undefined}
+      className={`group/row ${getRowHref || canExpand ? 'cursor-pointer' : ''} ${getRowClassName?.(row.original) ?? ''}`.trim()}
       onMouseEnter={() => onRowMouseEnter?.(row.original)}
       onClick={(e) => {
-        if (!getRowHref) return
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return
         if (hasTextSelection()) return
+        if (canExpand) {
+          row.toggleExpanded()
+          return
+        }
+        if (!getRowHref) return
         const href = getRowHref(row.original)
         if (e.metaKey || e.ctrlKey) window.open(href, '_blank')
         else navigate(href)
       }}
       onAuxClick={(e) => {
-        if (e.button !== 1 || !getRowHref) return
+        if (e.button !== 1 || canExpand || !getRowHref) return
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return
         window.open(getRowHref(row.original), '_blank')
       }}

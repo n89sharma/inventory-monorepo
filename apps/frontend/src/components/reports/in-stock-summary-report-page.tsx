@@ -1,6 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
+import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { IN_STOCK_SUMMARY_COLUMNS } from '@/components/table-columns/in-stock-summary-columns'
 import { DataTable } from '@/components/shadcn/data-table'
@@ -8,19 +9,23 @@ import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
 import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
-import { useAssetTypesParam, useBrandParam, useWarehousesParam } from '@/lib/filters/hooks'
+import {
+  useAssetTypesParam,
+  useBrandParam,
+  useModelParam,
+  useWarehousesParam,
+} from '@/lib/filters/hooks'
+import { inStockDrilldownHref } from '@/lib/filters/serializers'
+import {
+  buildInStockSummaryGroups,
+  type InStockSummaryTableRow,
+} from '@/lib/in-stock-summary-grouping'
 import { METER_BAND_LEGEND } from '@/lib/meter-band-display'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo } from 'react'
-import type {
-  AssetType,
-  Brand,
-  InStockSummaryReport,
-  InStockSummaryRow,
-  Warehouse,
-} from 'shared-types'
+import type { AssetType, Brand, InStockSummaryReport, ModelSummary, Warehouse } from 'shared-types'
 
 const EMPTY_ROWS: InStockSummaryReport = []
 const DEFAULT_SORT = { id: 'asset_count', desc: true }
@@ -30,20 +35,23 @@ type InStockSummaryFilters = {
   warehouses: Warehouse[]
   brand: Brand | null
   assetTypes: AssetType[]
+  model: ModelSummary | null
 }
 
-function filterRows(
+function buildFilteredGroups(
   rows: InStockSummaryReport,
   filters: InStockSummaryFilters,
-): InStockSummaryRow[] {
+): InStockSummaryTableRow[] {
   const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
   const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
-  return rows.filter(
+  const filtered = rows.filter(
     (row) =>
       (warehouseIds.size === 0 || warehouseIds.has(row.warehouse_id)) &&
       (filters.brand === null || row.brand_id === filters.brand.id) &&
-      (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)),
+      (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
+      (filters.model === null || row.model_id === filters.model.id),
   )
+  return buildInStockSummaryGroups(filtered)
 }
 
 function MeterBandLegend(): React.JSX.Element {
@@ -59,12 +67,20 @@ function MeterBandLegend(): React.JSX.Element {
   )
 }
 
+function getSubRows(row: InStockSummaryTableRow): InStockSummaryTableRow[] | undefined {
+  return 'subRows' in row ? row.subRows : undefined
+}
+
+function getRowHref(row: InStockSummaryTableRow): string {
+  return 'subRows' in row ? '' : inStockDrilldownHref(row)
+}
+
 function InStockSummaryBody({
   rows,
   isLoading,
   columnVisibility,
 }: {
-  rows: InStockSummaryRow[]
+  rows: InStockSummaryTableRow[]
   isLoading: boolean
   columnVisibility: VisibilityState
 }): React.JSX.Element | null {
@@ -84,6 +100,8 @@ function InStockSummaryBody({
         columns={IN_STOCK_SUMMARY_COLUMNS}
         data={rows}
         defaultSort={DEFAULT_SORT}
+        getSubRows={getSubRows}
+        getRowHref={getRowHref}
         columnVisibility={columnVisibility}
         initialPageSize={TABLE_PAGE_SIZE}
       />
@@ -95,11 +113,12 @@ export function InStockSummaryReportPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
+  const { model, modelQuery, setModel, setModelQuery, clear: clearModel } = useModelParam()
 
   const { data: rows = EMPTY_ROWS, isLoading } = useInStockSummaryReport()
   const visibleRows = useMemo(
-    () => filterRows(rows, { warehouses, brand, assetTypes }),
-    [rows, warehouses, brand, assetTypes],
+    () => buildFilteredGroups(rows, { warehouses, brand, assetTypes, model }),
+    [rows, warehouses, brand, assetTypes, model],
   )
 
   const canViewPurchase = useCan('view_purchase_price')
@@ -135,6 +154,13 @@ export function InStockSummaryReportPage(): React.JSX.Element {
             onClear={() => setBrand(null)}
           />
           <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
+          <ModelFilter
+            selection={model}
+            query={modelQuery}
+            onSelectionChange={setModel}
+            onQueryChange={setModelQuery}
+            onClear={clearModel}
+          />
         </form>
       </StickyPageHeader>
       <PageContent>
