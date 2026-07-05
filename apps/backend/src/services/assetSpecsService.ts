@@ -1,6 +1,6 @@
 import { UpdateAssetSpecs } from 'shared-types'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
-import { NotFoundError } from '../lib/errors.js'
+import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
 
@@ -17,6 +17,7 @@ export async function updateAssetSpecs(
       country_of_origin_id: true,
       manufactured_year: true,
       model: { select: { brand_id: true } },
+      asset_errors: { where: { is_fixed: false }, select: { error_id: true }, take: 1 },
       technical_specification: {
         select: {
           cassettes: true,
@@ -37,6 +38,13 @@ export async function updateAssetSpecs(
     },
   })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
+
+  // Readiness is owned by the error state while any error is open — it stays locked
+  // on HAS_ERRORS and can only change once the errors are fixed or removed.
+  const hasOpenError = asset.asset_errors.length > 0
+  if (hasOpenError && data.readiness_id !== asset.readiness_id) {
+    throw new ValidationError('Readiness cannot be changed while the asset has open errors')
+  }
 
   if (data.component_id !== null) {
     await validateComponentBrands(prisma, [
