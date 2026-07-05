@@ -67,16 +67,18 @@ Don't add meta/attribution trailers to commit messages (e.g. "Generated with Cla
 ## Commands
 
 Run from the **repo root** after every code change; summarize and fix any errors before
-considering the task complete. **Lint first, then knip, then build** — never run a later stage
-before the earlier one:
+considering the task complete. **Lint first, then knip, then build, then test** — never run a
+later stage before the earlier one:
 
 ```bash
 npm run verify                   # lint + knip + typecheck, all workspaces (the gate; pre-push + CI run this)
+npm test                         # full Vitest suite, both workspaces (btest + ftest) — run after verify
 # or run stages individually:
 npm run tlint                    # lint shared-types (also run for any shared-types change)
 npm run blint && npm run bbuild  # backend: lint, then build
 npm run flint && npm run fbuild  # frontend: lint, then build (fbuild compiles shared-types first)
 npm run knip                     # dead-code check across all workspaces
+npm run btest && npm run ftest   # tests: backend (needs Postgres up), then frontend
 ```
 
 **Under NO CIRCUMSTANCES** leave a code change without running the linter, and never build
@@ -94,6 +96,13 @@ Backend also: `npm run pgen` (`prisma generate --sql`) after any `.sql` change.
 against the `loon_test` database, never `loon_dev`: `apps/backend/.env.test` sets `DATABASE_URL`,
 Vitest `globalSetup` applies migrations to it, and a `setupFiles` guard aborts the run if
 `DATABASE_URL` doesn't target `loon_test`. Requires the local Postgres container (`docker compose up -d`).
+
+**Run the tests after every code change** — `npm test` from the repo root runs both workspaces
+(`btest` + `ftest`). Same zero-tolerance rule as lint: a change is not complete until the full
+suite passes. **Never commit or push with a failing or unrun test.** If a change touches only one
+workspace you may run that workspace's suite while iterating, but the full `npm test` must pass
+before the task is considered done. Backend tests need the Postgres container up (`docker compose
+up -d`); if it isn't running, start it — don't skip the tests.
 
 ## Using third-party libraries
 
