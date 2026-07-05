@@ -52,6 +52,11 @@ export interface ArrivalTestData {
 const STORE_TXN_PURCHASE = 'PURCHASE'
 const STORE_TXN_USED = 'USED'
 
+// Readiness reference codes. HAS_ERRORS / PP_OK are resolved by assetErrorService;
+// UNTESTED is the benign default handed to freshly-built assets.
+const READINESS_CODES = ['UNTESTED', 'HAS_ERRORS', 'PP_OK', 'CUSTOMER_READY'] as const
+const DEFAULT_READINESS = 'UNTESTED'
+
 // Asset serial numbers aren't unique in the schema, but a per-call counter keeps
 // built assets distinguishable across multiple arrivals in one run.
 let serialCounter = 0
@@ -81,10 +86,12 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
     update: {},
   })
 
-  const ready = await prisma.readiness.upsert({
-    where: { status: 'READY' },
-    create: { status: 'READY' },
-    update: {},
+  // Seed every readiness so any transition target (HAS_ERRORS, PP_OK, …) resolves.
+  for (const status of READINESS_CODES) {
+    await prisma.readiness.upsert({ where: { status }, create: { status }, update: {} })
+  }
+  const defaultReadiness = await prisma.readiness.findUniqueOrThrow({
+    where: { status: DEFAULT_READINESS },
   })
 
   // Country has no unique column, so upsert isn't available — find or create.
@@ -209,7 +216,7 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
       is_colour: iradx4745i.is_colour,
     },
     brandId: canon.id,
-    readiness: { id: ready.id, status: ready.status },
+    readiness: { id: defaultReadiness.id, status: defaultReadiness.status },
     country: { id: china.id, name: china.name },
     invoiceTypeSaleId: saleInvoiceType.id,
     invoiceTypePurchaseId: purchaseInvoiceType.id,
