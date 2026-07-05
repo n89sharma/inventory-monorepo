@@ -164,6 +164,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     model: r.model!,
     is_colour: r.is_colour!,
     brand: r.brand!,
+    brand_id: r.brand_id!,
     asset_type: r.asset_type!,
     status: r.status!,
     readiness: r.readiness!,

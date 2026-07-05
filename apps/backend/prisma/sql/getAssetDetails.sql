@@ -5,6 +5,7 @@ select
   m."name" as model,
   m.is_colour as is_colour,
   b."name" as brand,
+  b.id as brand_id,
   at.asset_type as asset_type,
   s.status  as status,
   rd.status  as readiness,

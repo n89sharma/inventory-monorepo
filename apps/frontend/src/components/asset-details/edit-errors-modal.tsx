@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from '@/components/shadcn/dialog'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -38,7 +37,6 @@ export function EditErrorsModal({
   assetDetails,
   errors,
 }: EditErrorsModalProps) {
-  const brands = useReferenceDataStore((state) => state.brands)
   const updateAssetErrors = useAssetStore((state) => state.updateAssetErrors)
 
   const [saving, setSaving] = useState(false)
@@ -51,7 +49,7 @@ export function EditErrorsModal({
 
   if (!assetDetails) return null
 
-  const brandId = brands.find((b) => b.name === assetDetails.brand)?.id ?? null
+  const brandId = assetDetails.brand_id
 
   function handleChange(next: UpdateError[]) {
     form.setValue('errors', next, { shouldDirty: true })

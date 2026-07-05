@@ -103,6 +103,7 @@ export const AssetDetailsSchema = z.object({
   model: z.string(),
   is_colour: z.boolean(),
   brand: z.string(),
+  brand_id: z.number(),
   asset_type: z.string(),
   serial_number: z.string(),
   status: z.string(),
