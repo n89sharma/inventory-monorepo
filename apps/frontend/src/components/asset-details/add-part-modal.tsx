@@ -337,14 +337,18 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
                   }}
                   options={partOptions}
                   getLabel={(p) => p.part_number}
-                  placeholder={warehouse ? 'Search part number' : 'Select a warehouse first'}
+                  getSearchText={(p) => `${p.part_number} ${p.description}`}
+                  getColumns={(p) => [p.part_number, p.description]}
+                  placeholder={
+                    warehouse ? 'Search part # or description' : 'Select a warehouse first'
+                  }
                   clearLabel="Clear part"
                   error={fieldState.invalid}
                   disabled={!warehouse}
                 />
                 {part && (
                   <span className="text-xs text-muted-foreground">
-                    {part.description}, {onHand} in stock
+                    {part.part_number}, {part.description}, {onHand} in stock
                   </span>
                 )}
               </div>

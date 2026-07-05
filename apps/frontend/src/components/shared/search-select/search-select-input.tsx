@@ -23,6 +23,8 @@ export type SearchSelectInputProps<T> = {
   onClear: () => void
   options: T[]
   getLabel: (item: T) => string
+  getSearchText?: (item: T) => string
+  getColumns?: (item: T) => string[]
   placeholder: string
   clearLabel?: string
   className?: string
@@ -47,6 +49,8 @@ export function SearchSelectInput<T>({
   onClear,
   options,
   getLabel,
+  getSearchText = getLabel,
+  getColumns,
   placeholder,
   clearLabel = 'Clear',
   className,
@@ -80,16 +84,19 @@ export function SearchSelectInput<T>({
     }
     const needle = clean.toLowerCase()
     const substringMatches = options
-      .map((option) => ({ option, index: getLabel(option).toLowerCase().indexOf(needle) }))
+      .map((option) => ({ option, index: getSearchText(option).toLowerCase().indexOf(needle) }))
       .filter((result) => result.index !== -1)
-      .sort((a, b) => a.index - b.index || getLabel(a.option).length - getLabel(b.option).length)
+      .sort(
+        (a, b) =>
+          a.index - b.index || getSearchText(a.option).length - getSearchText(b.option).length,
+      )
       .map((result) => result.option)
 
     const ranked =
       substringMatches.length > 0
         ? substringMatches
         : options
-            .map((option) => ({ option, score: defaultFilter(getLabel(option), clean) }))
+            .map((option) => ({ option, score: defaultFilter(getSearchText(option), clean) }))
             .filter((result) => result.score > 0)
             .sort((a, b) => b.score - a.score)
             .map((result) => result.option)
@@ -243,7 +250,7 @@ export function SearchSelectInput<T>({
                     : 'hover:bg-accent/50',
                 )}
               >
-                {getLabel(m)}
+                {getColumns ? <SuggestionColumns columns={getColumns(m)} /> : getLabel(m)}
               </button>
             ))}
             {matches.length === 0 && onCreateOption && query.trim() && (
@@ -265,5 +272,19 @@ export function SearchSelectInput<T>({
         </PopoverContent>
       </Popover>
     </div>
+  )
+}
+
+function SuggestionColumns({ columns }: { columns: string[] }): React.JSX.Element {
+  const [identifier, ...rest] = columns
+  return (
+    <span className="flex items-center gap-3">
+      <span className="font-mono font-medium">{identifier}</span>
+      {rest.map((col, i) => (
+        <span key={i} className="text-muted-foreground text-xs">
+          {col}
+        </span>
+      ))}
+    </span>
   )
 }
