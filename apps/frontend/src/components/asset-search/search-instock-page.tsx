@@ -1,10 +1,16 @@
-import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
-import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
-import { Toggle } from '@/components/shadcn/toggle'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
+import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
+import { Toggle } from '@/components/shadcn/toggle'
+import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { useCan } from '@/hooks/use-can'
+import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useSearchInStock } from '@/hooks/use-search-instock'
-import { useAssetFilters, usePriceCheckParam, useWarehousesParam } from '@/lib/filters/hooks'
+import {
+  useAssetFilters,
+  useAssetTypesParam,
+  usePriceCheckParam,
+  useWarehousesParam,
+} from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
@@ -16,6 +22,16 @@ export function SearchInStockPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [priceCheck, setPriceCheck] = usePriceCheckParam()
+  const [, setAssetTypes] = useAssetTypesParam()
+  const copierType = useDefaultAssetType()
+
+  const handlePriceCheckChange = useCallback(
+    (next: boolean) => {
+      if (next && copierType) setAssetTypes([copierType])
+      setPriceCheck(next)
+    },
+    [copierType, setAssetTypes, setPriceCheck],
+  )
 
   const filters = useMemo(
     () => ({ ...assetFilters, warehouses, priceCheck }),
@@ -55,10 +71,10 @@ export function SearchInStockPage(): React.JSX.Element {
               <Toggle
                 variant="outline"
                 pressed={priceCheck}
-                onPressedChange={setPriceCheck}
+                onPressedChange={handlePriceCheckChange}
                 aria-label="Show only assets with a missing or zero purchase price"
               >
-                Price Check
+                $0 Price Check
               </Toggle>
             ) : undefined}
           </>
