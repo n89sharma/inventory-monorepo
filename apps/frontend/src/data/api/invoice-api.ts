@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import type { InvoiceTypeFilter } from '@/data/store/invoice-store'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import {
   getIdOrNullFromSelection,
@@ -41,11 +42,13 @@ export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceRespon
 export async function getInvoices(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
+  invoiceType: InvoiceTypeFilter,
 ): Promise<InvoiceSummary[]> {
   const { data } = await api.get<InvoiceSummary[]>(`/invoices`, {
     params: {
       fromDate: getSelectedOrNull(fromDate),
       toDate: getSelectedOrNull(toDate),
+      invoiceType,
     },
   })
   return z.array(InvoiceSummarySchema).parse(data)

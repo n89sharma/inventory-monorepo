@@ -9,9 +9,11 @@ import {
   UpdateInvoiceMetadataSchema,
   successResponse,
 } from 'shared-types'
+import { z } from 'zod'
 import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
+import { InvoiceListQuerySchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import {
   createInvoice as createInvoiceSer,
@@ -29,8 +31,10 @@ export const createInvoice = asyncHandler(async (req, res) => {
 
 export const getInvoices = asyncHandler(
   async (req: Request, res: Response<ApiResponse<InvoiceSummary[]>>) => {
-    const { fromDate, toDate } = res.locals.parsedDates
-    const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate))
+    const { fromDate, toDate, invoiceType } = res.locals.query as z.infer<
+      typeof InvoiceListQuerySchema
+    >
+    const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
     res.json(successResponse(invoices))
   },
 )
