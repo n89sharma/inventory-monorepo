@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const AppRoles = [
   'admin',
+  'leadership',
   'general_manager',
   'inventory_manager',
   'accountant',

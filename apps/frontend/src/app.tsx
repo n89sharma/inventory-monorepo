@@ -267,12 +267,12 @@ function AppRoutes() {
 
                     <Route
                       path="/reports"
-                      element={<Navigate to="/reports/profitability" replace />}
+                      element={<Navigate to="/reports/in-stock-summary" replace />}
                     />
                     <Route
                       path="/reports/profitability"
                       element={
-                        <PermissionRoute permission="view_reports">
+                        <PermissionRoute permission="view_profitability_report">
                           <ProfitabilityReportPage />
                         </PermissionRoute>
                       }

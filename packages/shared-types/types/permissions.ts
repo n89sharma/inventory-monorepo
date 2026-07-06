@@ -15,6 +15,7 @@ export type Permission =
   | 'delete_asset'
   | 'view_collections'
   | 'view_reports'
+  | 'view_profitability_report'
   | 'create_update_hold'
   | 'create_update_arrival'
   | 'create_update_transfer'
@@ -42,6 +43,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'delete_asset',
     'view_collections',
     'view_reports',
+    'view_profitability_report',
     'create_update_hold',
     'create_update_arrival',
     'create_update_store',
@@ -49,6 +51,27 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_departure',
     'create_update_invoice',
     'delete_collection',
+    'edit_any_hold',
+  ],
+  leadership: [
+    'view_store',
+    'view_asset',
+    'view_sale_price',
+    'view_purchase_price',
+    'edit_tech_specs',
+    'edit_location',
+    'edit_serial_number',
+    'edit_prices',
+    'create_asset',
+    'view_collections',
+    'view_reports',
+    'view_profitability_report',
+    'create_update_hold',
+    'create_update_arrival',
+    'create_update_store',
+    'create_update_transfer',
+    'create_update_departure',
+    'create_update_invoice',
     'edit_any_hold',
   ],
   general_manager: [

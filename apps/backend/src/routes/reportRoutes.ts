@@ -20,7 +20,7 @@ router.post('/serial-number', requirePermission('manage_settings'), getAssetsByS
 
 router.get(
   '/profitability',
-  requirePermission('view_reports'),
+  requirePermission('view_profitability_report'),
   validateQuery(ProfitabilityReportQuerySchema),
   getProfitabilityReport,
 )

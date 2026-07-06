@@ -98,13 +98,13 @@ const SETTINGS_SUB_ITEMS = [
 
 const SOLD_REPORT_PATH = '/reports/sold-report'
 
-type ReportPermission = 'view_reports' | 'view_sale_price'
+type ReportPermission = 'view_reports' | 'view_sale_price' | 'view_profitability_report'
 
 const REPORTS_SUB_ITEMS = [
   { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
   { title: 'Held', url: '/reports/holds-by-user', permission: 'view_reports' },
   { title: 'Sold', url: SOLD_REPORT_PATH, permission: 'view_sale_price' },
-  { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_reports' },
+  { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_profitability_report' },
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
@@ -132,6 +132,7 @@ export function AppSidebar(): React.JSX.Element {
   const canManageUsers = useCan('manage_users')
   const canViewReports = useCan('view_reports')
   const canViewSalePrice = useCan('view_sale_price')
+  const canViewProfitabilityReport = useCan('view_profitability_report')
   const canPutAway = useCan('edit_location')
 
   const isSettingsActive = location.pathname.startsWith('/settings')
@@ -140,6 +141,7 @@ export function AppSidebar(): React.JSX.Element {
   const reportItemVisible: Record<ReportPermission, boolean> = {
     view_reports: canViewReports,
     view_sale_price: canViewSalePrice,
+    view_profitability_report: canViewProfitabilityReport,
   }
 
   const isReportsActive = location.pathname.startsWith('/reports')
