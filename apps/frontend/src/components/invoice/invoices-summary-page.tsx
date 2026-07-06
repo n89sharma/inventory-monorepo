@@ -23,8 +23,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   const hasSearched = useInvoiceStore((state) => state.hasSearched)
   const setHasSearched = useInvoiceStore((state) => state.setHasSearched)
 
-  const { data: invoices = [] } = useInvoicesList(fromDate, toDate)
-  const visibleInvoices = invoices.filter((invoice) => invoice.invoice_type === invoiceType)
+  const { data: invoices = [] } = useInvoicesList(fromDate, toDate, invoiceType)
 
   async function onInvoiceSearch(_: SearchOptions) {
     setHasSearched(true)
@@ -38,7 +37,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
     <CollectionPage
       title="Invoices"
       columns={invoiceTableColumns}
-      data={visibleInvoices}
+      data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={(invoice) => `/invoices/${invoice.invoice_number}`}
       searchBar={

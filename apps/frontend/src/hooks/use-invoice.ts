@@ -1,4 +1,5 @@
 import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
+import type { InvoiceTypeFilter } from '@/data/store/invoice-store'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'
 import useSWR, { mutate, preload } from 'swr'
@@ -15,20 +16,32 @@ export function preloadInvoiceDetail(invoiceNumber: string) {
 
 const INVOICE_LIST_KEY_PREFIX = 'invoices:list'
 
-type InvoiceListKey = readonly [typeof INVOICE_LIST_KEY_PREFIX, string | null, string | null]
+type InvoiceListKey = readonly [
+  typeof INVOICE_LIST_KEY_PREFIX,
+  string | null,
+  string | null,
+  InvoiceTypeFilter,
+]
 
 function invoiceListKey(
   fromDate: SelectOption<Date>,
   toDate: SelectOption<Date>,
+  invoiceType: InvoiceTypeFilter,
 ): InvoiceListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
   const to = getSelectedOrNull(toDate)
-  return [INVOICE_LIST_KEY_PREFIX, from.toISOString(), to?.toISOString() ?? null]
+  return [INVOICE_LIST_KEY_PREFIX, from.toISOString(), to?.toISOString() ?? null, invoiceType]
 }
 
-export function useInvoicesList(fromDate: SelectOption<Date>, toDate: SelectOption<Date>) {
-  return useSWR(invoiceListKey(fromDate, toDate), () => getInvoices(fromDate, toDate))
+export function useInvoicesList(
+  fromDate: SelectOption<Date>,
+  toDate: SelectOption<Date>,
+  invoiceType: InvoiceTypeFilter,
+) {
+  return useSWR(invoiceListKey(fromDate, toDate, invoiceType), () =>
+    getInvoices(fromDate, toDate, invoiceType),
+  )
 }
 
 export function invalidateInvoiceLists() {

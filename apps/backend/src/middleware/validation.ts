@@ -1,5 +1,6 @@
 import { isAfter } from 'date-fns'
 import { NextFunction, Request, Response } from 'express'
+import { INVOICE_TYPE } from 'shared-types'
 import { z } from 'zod'
 import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 
@@ -37,6 +38,21 @@ export const DepartureListQuerySchema = z
     message: 'fromDate must be before toDate',
   })
 
+export const InvoiceListQuerySchema = z
+  .object({
+    fromDate: z.string(),
+    toDate: z.string().optional(),
+    invoiceType: z.enum([INVOICE_TYPE.purchase, INVOICE_TYPE.sales]),
+  })
+  .transform((data) => ({
+    fromDate: normalizeFromDate(data.fromDate),
+    toDate: normalizeToDate(data.toDate),
+    invoiceType: data.invoiceType,
+  }))
+  .refine((data) => !isAfter(data.fromDate, data.toDate), {
+    message: 'fromDate must be before toDate',
+  })
+
 export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.query)
@@ -46,24 +62,4 @@ export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
     res.locals.query = result.data
     next()
   }
-}
-
-export function validateDateRange(req: Request, res: Response, next: NextFunction) {
-  if (!req.query.fromDate) {
-    return res.status(400).json({ error: 'fromDate not provided' })
-  }
-
-  const fromDate = normalizeFromDate(String(req.query.fromDate))
-  const toDate = normalizeToDate(req.query.toDate ? String(req.query.toDate) : undefined)
-
-  if (isAfter(fromDate, toDate)) {
-    return res.status(400).json({ error: 'fromDate must be before toDate' })
-  }
-
-  res.locals.parsedDates = {
-    fromDate: fromDate,
-    toDate: toDate,
-  }
-
-  next()
 }

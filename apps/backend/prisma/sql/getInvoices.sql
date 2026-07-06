@@ -30,6 +30,7 @@ from "Invoice" i
     join "AssetType" atype on atype.id = m.asset_type_id
     where ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id
   ) ac on true
-where i.created_at between $1 and $2
+where it.type = $3
+  and i.created_at between $1 and $2
 order by i.created_at desc
 limit 500
