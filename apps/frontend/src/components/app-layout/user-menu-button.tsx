@@ -1,3 +1,4 @@
+import microsoftLogo from '@/assets/microsoft.svg'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,6 @@ import {
 import { SidebarMenuButton } from '@/components/shadcn/sidebar'
 import { useClerk, useUser } from '@clerk/react'
 import { EnvelopeIcon, SignOutIcon, UserIcon } from '@phosphor-icons/react'
-import microsoftLogo from '@/assets/microsoft.svg'
 
 export function UserMenuButton() {
   const { user } = useUser()
@@ -26,7 +26,7 @@ export function UserMenuButton() {
           <UserIcon aria-hidden="true" />
           <div className="flex flex-col text-left leading-tight">
             <span className="truncate text-sm font-medium">{displayName}</span>
-            <span className="truncate text-xs text-muted-foreground">{email}</span>
+            <span className="truncate text-[10px] text-muted-foreground">{email}</span>
           </div>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
