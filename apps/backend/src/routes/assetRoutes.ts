@@ -2,6 +2,7 @@ import express from 'express'
 import {
   AssetQuerySchema,
   LocationsByWarehouseQuerySchema,
+  SoldAssetQuerySchema,
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
@@ -10,15 +11,14 @@ import {
   getAssetComments,
   getAssetDetail,
   getAssetErrors,
-  getAssetHistory,
   getAssetHarvestedParts,
+  getAssetHistory,
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
-  getSoldAssets,
-  SoldAssetQuerySchema,
-  printAssetBarcodes,
   getLocationsByWarehouse,
+  getSoldAssets,
+  printAssetBarcodes,
   updateAssetErrors,
   updateAssetLocation,
   updateAssetPricing,
@@ -52,15 +52,15 @@ router.get('/:barcode/summary', requirePermission('view_asset'), getAssetSummary
 router.get('/:barcode', requirePermission('view_asset'), getAssetDetail)
 router.get('/:barcode/accessories', requirePermission('view_asset'), getAssetAccessories)
 router.get('/:barcode/errors', requirePermission('view_asset'), getAssetErrors)
-router.put('/:barcode/errors', requirePermission('edit_tech_specs'), updateAssetErrors)
-router.put('/:barcode/location', requirePermission('edit_location'), updateAssetLocation)
+router.put('/:barcode/errors', requirePermission('update_tech_specs'), updateAssetErrors)
+router.put('/:barcode/location', requirePermission('update_location'), updateAssetLocation)
 router.put('/bulk/pricing', requirePermission('edit_prices'), bulkUpdateAssetPricing)
 router.put('/:barcode/pricing', requirePermission('edit_prices'), updateAssetPricing)
-router.put('/:barcode/specs', requirePermission('edit_tech_specs'), updateAssetSpecs)
+router.put('/:barcode/specs', requirePermission('update_tech_specs'), updateAssetSpecs)
 router.get('/:barcode/comments', requirePermission('view_asset'), getAssetComments)
 router.post('/:barcode/comments', requirePermission('view_asset'), createAssetComment)
 router.get('/:barcode/parts', requirePermission('view_asset'), getAssetHarvestedParts)
-router.post('/:barcode/parts', requirePermission('edit_tech_specs'), createAssetHarvestedPart)
+router.post('/:barcode/parts', requirePermission('update_tech_specs'), createAssetHarvestedPart)
 router.get('/:barcode/transfers', requirePermission('view_asset'), getAssetTransfers)
 
 export default router

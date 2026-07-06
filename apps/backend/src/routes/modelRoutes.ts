@@ -8,6 +8,6 @@ const router = express.Router()
 router.use(requireAuth)
 
 router.get('/', getModels)
-router.post('/', requirePermission('manage_settings'), createModel)
+router.post('/', requirePermission('update_settings'), createModel)
 
 export default router

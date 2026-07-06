@@ -2,6 +2,7 @@ import { PageContent } from '@/components/app-layout/page-content'
 import { AddPartModal } from '@/components/asset-details/add-part-modal'
 import { AssetEditBar } from '@/components/asset-details/asset-edit-bar'
 import { AssetHistoryList } from '@/components/asset-details/asset-history'
+import { Comment } from '@/components/asset-details/comment'
 import {
   ActivitySection,
   DataRowContainer,
@@ -19,11 +20,12 @@ import { EditErrorsModal } from '@/components/asset-details/edit-errors-modal'
 import { EditPricingModal } from '@/components/asset-details/edit-pricing-modal'
 import { EditSpecsModal } from '@/components/asset-details/edit-specs-modal'
 import { OptionalSection } from '@/components/asset-details/optional-section'
+import { PartsSection } from '@/components/asset-details/parts-section'
 import { SectionEditButton } from '@/components/asset-details/section-edit-button'
+import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { Badge } from '@/components/shadcn/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { getBreadcrumForAssetDetails } from '@/components/shared/breadcrumb-segments'
-import { Comment } from '@/components/asset-details/comment'
 import { CopyButton } from '@/components/shared/copy-button'
 import { ReadinessPill } from '@/components/shared/readiness/readiness-pill'
 import { StatusBadge } from '@/components/shared/status-badge'
@@ -44,9 +46,7 @@ import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
-import { PartsSection } from '@/components/asset-details/parts-section'
 import { AddCommentInput } from './add-comment-input'
-import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 
 function AssetHistoryTabContent({ barcode, enabled }: { barcode: string; enabled: boolean }) {
   const { data, isLoading } = useAssetHistory(barcode, enabled)
@@ -287,7 +287,7 @@ export const AssetDetailsPage = () => {
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canEditPrices = useCan('edit_prices')
-  const canEditTechSpecs = useCan('edit_tech_specs')
+  const canEditTechSpecs = useCan('update_tech_specs')
 
   if (detailLoading)
     return (

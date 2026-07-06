@@ -1,9 +1,9 @@
 import { MainLayout } from '@/components/app-layout/layout'
 import { PageTitleUpdater } from '@/components/app-layout/page-title-updater'
 import { PostLoginLanding } from '@/components/app-layout/post-login-landing'
+import { ProtectedRoute } from '@/components/app-layout/protected-route'
 import { ErrorFallback } from '@/components/shared/error-fallback'
 import { PermissionRoute } from '@/components/shared/permission-route'
-import { ProtectedRoute } from '@/components/app-layout/protected-route'
 import { useAuth } from '@clerk/react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { lazy, Suspense } from 'react'
@@ -184,7 +184,14 @@ function AppRoutes() {
                   <Routes>
                     <Route path="/" element={<PostLoginLanding />} />
 
-                    <Route path="/arrivals" element={<ArrivalsSummaryPage />} />
+                    <Route
+                      path="/arrivals"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <ArrivalsSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
                     <Route
                       path="/arrivals/new"
                       element={
@@ -193,9 +200,23 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/arrivals/:collectionId" element={<ArrivalDetailsPage />} />
+                    <Route
+                      path="/arrivals/:collectionId"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <ArrivalDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
-                    <Route path="/transfers" element={<TransferSummaryPage />} />
+                    <Route
+                      path="/transfers"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <TransferSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
                     <Route
                       path="/transfers/new"
                       element={
@@ -204,9 +225,23 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/transfers/:collectionId" element={<TransferDetailsPage />} />
+                    <Route
+                      path="/transfers/:collectionId"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <TransferDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
-                    <Route path="/departures" element={<DepartureSummaryPage />} />
+                    <Route
+                      path="/departures"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <DepartureSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
                     <Route
                       path="/departures/new"
                       element={
@@ -215,7 +250,14 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/departures/:collectionId" element={<DepartureDetailsPage />} />
+                    <Route
+                      path="/departures/:collectionId"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <DepartureDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
                     <Route
                       path="/store"
@@ -237,13 +279,20 @@ function AppRoutes() {
                     <Route
                       path="/put-away"
                       element={
-                        <PermissionRoute permission="edit_location">
+                        <PermissionRoute permission="update_location">
                           <PutAwayPage />
                         </PermissionRoute>
                       }
                     />
 
-                    <Route path="/holds" element={<HoldSummaryPage />} />
+                    <Route
+                      path="/holds"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <HoldSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
                     <Route
                       path="/holds/new"
                       element={
@@ -252,9 +301,23 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/holds/:collectionId" element={<HoldDetailsPage />} />
+                    <Route
+                      path="/holds/:collectionId"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <HoldDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
-                    <Route path="/invoices" element={<InvoicesSummaryPage />} />
+                    <Route
+                      path="/invoices"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <InvoicesSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
                     <Route
                       path="/invoices/new"
                       element={
@@ -263,7 +326,14 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/invoices/:collectionId" element={<InvoiceDetailsPage />} />
+                    <Route
+                      path="/invoices/:collectionId"
+                      element={
+                        <PermissionRoute permission="view_collections">
+                          <InvoiceDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
                     <Route
                       path="/reports"
@@ -301,24 +371,94 @@ function AppRoutes() {
                         </PermissionRoute>
                       }
                     />
-                    <Route path="/reports/sold-report/:assetId" element={<AssetDetailsPage />} />
+                    <Route
+                      path="/reports/sold-report/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
-                    <Route path="/:section/:collectionId/:assetId" element={<AssetDetailsPage />} />
+                    <Route
+                      path="/:section/:collectionId/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
-                    <Route path="/search/all" element={<SearchAllPage />} />
-                    <Route path="/search/all/:assetId" element={<AssetDetailsPage />} />
-                    <Route path="/search/instock" element={<SearchInStockPage />} />
-                    <Route path="/search/instock/:assetId" element={<AssetDetailsPage />} />
-                    <Route path="/search/held" element={<SearchHeldPage />} />
-                    <Route path="/search/held/:assetId" element={<AssetDetailsPage />} />
-                    <Route path="/search/sold" element={<SearchSoldPage />} />
-                    <Route path="/search/sold/:assetId" element={<AssetDetailsPage />} />
+                    <Route
+                      path="/search/all"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <SearchAllPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/all/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/instock"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <SearchInStockPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/instock/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/held"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <SearchHeldPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/held/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/sold"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <SearchSoldPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/sold/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
                     <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
                     <Route
                       path="/settings/catalog"
                       element={
-                        <PermissionRoute permission="manage_settings">
+                        <PermissionRoute permission="update_settings">
                           <CatalogSettingsPage />
                         </PermissionRoute>
                       }
@@ -326,7 +466,7 @@ function AppRoutes() {
                     <Route
                       path="/settings/organizations"
                       element={
-                        <PermissionRoute permission="manage_settings">
+                        <PermissionRoute permission="update_settings">
                           <OrganizationsSettingsPage />
                         </PermissionRoute>
                       }
@@ -334,7 +474,7 @@ function AppRoutes() {
                     <Route
                       path="/settings/user-permissions"
                       element={
-                        <PermissionRoute permission="manage_users">
+                        <PermissionRoute permission="update_users">
                           <UserManagementPage />
                         </PermissionRoute>
                       }
@@ -342,7 +482,7 @@ function AppRoutes() {
                     <Route
                       path="/settings/export-assets"
                       element={
-                        <PermissionRoute permission="manage_settings">
+                        <PermissionRoute permission="update_settings">
                           <ExportAssetsPage />
                         </PermissionRoute>
                       }

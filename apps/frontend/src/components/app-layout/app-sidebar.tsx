@@ -1,3 +1,4 @@
+import { UserMenuButton } from '@/components/app-layout/user-menu-button'
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,7 +19,6 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/shadcn/sidebar'
-import { UserMenuButton } from '@/components/app-layout/user-menu-button'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
@@ -51,38 +51,51 @@ const PROFITABILITY_PATH = '/reports/profitability'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
 const DEFAULT_BRAND_NAME = 'Canon'
 
+type SidebarPermission = 'view_collections' | 'view_store'
+
 const sidebarItems = [
   {
     title: 'Arrivals',
     url: '/arrivals',
     icon: <WarehouseIcon aria-hidden="true" />,
+    permission: 'view_collections',
   },
   {
     title: 'Holds',
     url: '/holds',
     icon: <LockOpenIcon aria-hidden="true" />,
+    permission: 'view_collections',
   },
   {
     title: 'Transfers',
     url: '/transfers',
     icon: <LineSegmentsIcon aria-hidden="true" />,
+    permission: 'view_collections',
   },
   {
     title: 'Departures',
     url: '/departures',
     icon: <TruckTrailerIcon aria-hidden="true" />,
+    permission: 'view_collections',
   },
   {
     title: 'Invoices',
     url: '/invoices',
     icon: <InvoiceIcon aria-hidden="true" />,
+    permission: 'view_collections',
   },
   {
     title: 'Store',
     url: STORE_PATH,
     icon: <ToolboxIcon aria-hidden="true" />,
+    permission: 'view_store',
   },
-]
+] as const satisfies readonly {
+  title: string
+  url: string
+  icon: React.JSX.Element
+  permission: SidebarPermission
+}[]
 
 const SEARCH_ASSETS_SUB_ITEMS = [
   { title: 'In Stock', url: '/search/instock' },
@@ -128,12 +141,19 @@ export function AppSidebar(): React.JSX.Element {
     return url
   }
 
-  const canManageSettings = useCan('manage_settings')
-  const canManageUsers = useCan('manage_users')
+  const canManageSettings = useCan('update_settings')
+  const canManageUsers = useCan('update_users')
   const canViewReports = useCan('view_reports')
   const canViewSalePrice = useCan('view_sale_price')
   const canViewProfitabilityReport = useCan('view_profitability_report')
-  const canPutAway = useCan('edit_location')
+  const canPutAway = useCan('update_location')
+  const canViewCollections = useCan('view_collections')
+  const canViewStore = useCan('view_store')
+
+  const sidebarItemVisible: Record<SidebarPermission, boolean> = {
+    view_collections: canViewCollections,
+    view_store: canViewStore,
+  }
 
   const isSettingsActive = location.pathname.startsWith('/settings')
   const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
@@ -224,20 +244,23 @@ export function AppSidebar(): React.JSX.Element {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              {sidebarItems.map((item) => {
-                const isActive = location.pathname.startsWith(item.url)
-                const to = item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
-                      <Link to={to}>
-                        {item.icon}
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
+              {sidebarItems
+                .filter((item) => sidebarItemVisible[item.permission])
+                .map((item) => {
+                  const isActive = location.pathname.startsWith(item.url)
+                  const to =
+                    item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
+                        <Link to={to}>
+                          {item.icon}
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               {canPutAway && (
                 <SidebarMenuItem>
                   <SidebarMenuButton

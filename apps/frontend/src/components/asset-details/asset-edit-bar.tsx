@@ -13,6 +13,7 @@ import {
 import { useState } from 'react'
 import { assetDetailsToSummary, type Permission } from 'shared-types'
 import { toast } from 'sonner'
+import { AddToCollectionModal } from '../collections/add-to-collection-modal'
 import { Button } from '../shadcn/button'
 import {
   DropdownMenu,
@@ -20,7 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
-import { AddToCollectionModal } from '../collections/add-to-collection-modal'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
 import { EditLocationModal } from './edit-location-modal'
@@ -56,7 +56,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     }
   }
 
-  const canEditLocation = can('edit_location')
+  const canEditLocation = can('update_location')
   const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p))
   const canDelete = can('delete_asset')
 

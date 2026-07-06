@@ -16,7 +16,7 @@ const router = express.Router()
 
 router.use(requireAuth)
 
-router.post('/serial-number', requirePermission('manage_settings'), getAssetsBySerialNumber)
+router.post('/serial-number', requirePermission('update_settings'), getAssetsBySerialNumber)
 
 router.get(
   '/profitability',

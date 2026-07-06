@@ -1,147 +1,145 @@
 import { type AppRole } from './user-types.js'
 
 export type Permission =
-  | 'manage_users'
-  | 'assign_roles'
-  | 'manage_settings'
   | 'view_asset'
-  | 'view_sale_price'
-  | 'view_purchase_price'
-  | 'edit_tech_specs'
-  | 'edit_location'
-  | 'edit_serial_number'
-  | 'edit_prices'
-  | 'create_asset'
-  | 'delete_asset'
   | 'view_collections'
   | 'view_reports'
-  | 'view_profitability_report'
-  | 'create_update_hold'
+  | 'view_store'
   | 'create_update_arrival'
+  | 'create_update_hold'
   | 'create_update_transfer'
   | 'create_update_departure'
   | 'create_update_invoice'
-  | 'delete_collection'
-  | 'edit_any_hold'
-  | 'view_store'
   | 'create_update_store'
+  | 'update_tech_specs'
+  | 'update_location'
+  | 'update_settings'
+  | 'view_sale_price'
+  | 'view_purchase_price'
+  | 'edit_any_hold'
+  | 'edit_prices'
+  | 'view_profitability_report'
+  | 'update_users'
+  | 'update_user_roles'
+  | 'delete_asset'
+  | 'delete_collection'
 
 export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   admin: [
-    'view_store',
-    'manage_users',
-    'assign_roles',
-    'manage_settings',
     'view_asset',
-    'view_sale_price',
-    'view_purchase_price',
-    'edit_tech_specs',
-    'edit_location',
-    'edit_serial_number',
-    'edit_prices',
-    'create_asset',
-    'delete_asset',
     'view_collections',
     'view_reports',
-    'view_profitability_report',
-    'create_update_hold',
+    'view_store',
     'create_update_arrival',
-    'create_update_store',
+    'create_update_hold',
     'create_update_transfer',
     'create_update_departure',
     'create_update_invoice',
-    'delete_collection',
+    'create_update_store',
+    'update_tech_specs',
+    'update_location',
+    'update_settings',
+    'view_sale_price',
+    'view_purchase_price',
     'edit_any_hold',
+    'edit_prices',
+    'view_profitability_report',
+    'update_users',
+    'update_user_roles',
+    'delete_asset',
+    'delete_collection',
   ],
   leadership: [
-    'view_store',
     'view_asset',
-    'view_sale_price',
-    'view_purchase_price',
-    'edit_tech_specs',
-    'edit_location',
-    'edit_serial_number',
-    'edit_prices',
-    'create_asset',
     'view_collections',
     'view_reports',
-    'view_profitability_report',
-    'create_update_hold',
+    'view_store',
     'create_update_arrival',
-    'create_update_store',
+    'create_update_hold',
     'create_update_transfer',
     'create_update_departure',
     'create_update_invoice',
+    'create_update_store',
+    'update_tech_specs',
+    'update_location',
+    'view_sale_price',
+    'view_purchase_price',
     'edit_any_hold',
+    'edit_prices',
+    'view_profitability_report',
   ],
   general_manager: [
-    'view_store',
     'view_asset',
-    'view_sale_price',
-    'view_purchase_price',
-    'edit_tech_specs',
-    'edit_location',
-    'edit_serial_number',
-    'edit_prices',
-    'create_asset',
     'view_collections',
     'view_reports',
-    'create_update_hold',
+    'view_store',
     'create_update_arrival',
-    'create_update_store',
+    'create_update_hold',
     'create_update_transfer',
     'create_update_departure',
     'create_update_invoice',
+    'create_update_store',
+    'update_tech_specs',
+    'update_location',
+    'view_sale_price',
+    'view_purchase_price',
     'edit_any_hold',
+    'edit_prices',
   ],
   inventory_manager: [
-    'view_store',
-    'manage_settings',
     'view_asset',
-    'view_sale_price',
-    'view_purchase_price',
-    'edit_tech_specs',
-    'edit_location',
-    'edit_serial_number',
-    'edit_prices',
-    'create_asset',
     'view_collections',
     'view_reports',
-    'create_update_hold',
+    'view_store',
     'create_update_arrival',
-    'create_update_store',
+    'create_update_hold',
     'create_update_transfer',
     'create_update_departure',
     'create_update_invoice',
+    'create_update_store',
+    'update_tech_specs',
+    'update_location',
+    'update_settings',
+    'view_sale_price',
+    'view_purchase_price',
+    'edit_prices',
   ],
-  accountant: ['view_asset', 'view_sale_price', 'view_purchase_price', 'view_collections'],
+  accountant: [
+    'view_asset',
+    'view_collections',
+    'view_sale_price',
+    'view_purchase_price',
+    'edit_prices',
+  ],
   tech: [
+    'view_asset',
+    'view_collections',
     'view_store',
     'create_update_store',
-    'view_asset',
-    'edit_tech_specs',
-    'edit_location',
-    'view_collections',
+    'update_tech_specs',
+    'update_location',
   ],
   senior_sales: [
     'view_asset',
-    'view_sale_price',
     'view_collections',
+    'view_reports',
     'create_update_hold',
+    'view_sale_price',
     'view_purchase_price',
   ],
   sales: ['view_asset', 'view_collections', 'create_update_hold', 'view_sale_price'],
   sales_assistant: ['view_asset', 'view_collections', 'create_update_hold'],
   shipping: [
-    'view_store',
     'view_asset',
-    'edit_location',
     'view_collections',
+    'view_store',
     'create_update_arrival',
-    'create_update_store',
     'create_update_transfer',
     'create_update_departure',
+    'create_update_store',
+    'update_tech_specs',
+    'update_location',
   ],
-  picker: ['view_asset', 'edit_location', 'view_collections'],
+  picker: ['view_asset', 'view_collections', 'update_location'],
   member: ['view_asset', 'view_collections'],
 }
