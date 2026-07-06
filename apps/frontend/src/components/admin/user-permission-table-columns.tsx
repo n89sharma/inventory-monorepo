@@ -4,7 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { User } from 'shared-types'
 
 export function createUserPermissionTableColumns(
-  currentUserEmail: string | null | undefined,
+  currentUserId: number | null | undefined,
   onEditRole: (user: User) => void,
   onDeactivate: (user: User) => void,
   onReactivate: (user: User) => void,
@@ -78,7 +78,7 @@ export function createUserPermissionTableColumns(
       header: 'Actions',
       cell: ({ row }) => {
         const user = row.original
-        if (user.email === currentUserEmail || user.role === 'admin' || !user.clerk_id) return null
+        if (user.id === currentUserId || user.role === 'admin' || !user.clerk_id) return null
         return (
           <div className="flex gap-2 justify-center">
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>

@@ -28,8 +28,8 @@ import {
 } from '@/components/shadcn/select'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useUserStore } from '@/data/store/user-store'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { formatTitleCase } from '@/lib/formatters'
-import { useUser } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo, useState } from 'react'
 import { AppRoles, type AppRole, type User } from 'shared-types'
@@ -39,8 +39,7 @@ import { createUserPermissionTableColumns } from './user-permission-table-column
 const ASSIGNABLE_ROLES = AppRoles.filter((r) => r !== 'admin')
 
 export function UserManagementPage() {
-  const { user: clerkUser } = useUser()
-  const currentUserEmail = clerkUser?.primaryEmailAddress?.emailAddress
+  const currentUserId = useCurrentUser()?.id
 
   const users = useUserStore((state) => state.users)
   const setUserRole = useUserStore((state) => state.setUserRole)
@@ -105,12 +104,12 @@ export function UserManagementPage() {
   const columns = useMemo(
     () =>
       createUserPermissionTableColumns(
-        currentUserEmail,
+        currentUserId,
         handleEditRole,
         handleDeactivate,
         handleReactivate,
       ),
-    [currentUserEmail, handleEditRole, handleDeactivate, handleReactivate],
+    [currentUserId, handleEditRole, handleDeactivate, handleReactivate],
   )
 
   return (

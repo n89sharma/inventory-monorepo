@@ -2,8 +2,7 @@ import { Avatar, AvatarFallback } from '@/components/shadcn/avatar'
 import { Button } from '@/components/shadcn/button'
 import { Textarea } from '@/components/shadcn/textarea'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useUserStore } from '@/data/store/user-store'
-import { useAuth } from '@clerk/react'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { getInitials } from 'shared-types'
 import { useState } from 'react'
@@ -16,9 +15,7 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
   const [text, setText] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const createComment = useAssetStore((state) => state.createComment)
-  const { userId } = useAuth()
-  const users = useUserStore((state) => state.users)
-  const currentUser = users.find((u) => u.clerk_id === userId)
+  const currentUser = useCurrentUser()
   const initials = currentUser ? getInitials(currentUser.name) : ''
 
   async function handleSubmit() {
