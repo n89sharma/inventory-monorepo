@@ -127,8 +127,11 @@ A stale or unverified recommendation is worse than none.
 ## Code style (all TS)
 
 - **Formatting is owned by Prettier** (`.prettierrc`: no semicolons, single quotes, 100-col,
-  trailing commas). Run `npm run format`; a husky pre-commit hook formats staged files on commit.
-  Don't hand-format or fight the formatter — the rules below are _semantic_, not layout.
+  trailing commas). A husky pre-commit hook formats staged files on commit; don't hand-format or
+  fight the formatter — the rules below are _semantic_, not layout. **Never run `npm run format`**
+  (it's `prettier --write .` across the whole repo): on this Windows checkout (`core.autocrlf=true`,
+  no `.gitattributes`) it rewrites ~200 files LF↔CRLF and floods `git status` with phantom changes.
+  Format only the files you touched: `npx prettier --write <file>…`.
 - **Static values as top-of-file `const`** — never inline magic strings, event names, or
   defaults. One place to change. e.g. `const DEFAULT_ROLE = 'member'`.
 - **Constant maps:** `const X = {...} as const satisfies Record<...>` with **no variable
