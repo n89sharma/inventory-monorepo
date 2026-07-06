@@ -144,16 +144,6 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
   }
 }
 
-export function getInitials(name: string): string {
-  const words = name.trim().split(/\s+/)
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
-  return words
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-}
-
 type AssetDetailRow = getAssetDetailsBatchQuery.Result
 
 export function mapAssetDetail(r: AssetDetailRow): AssetDetails {

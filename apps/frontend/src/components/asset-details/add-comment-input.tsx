@@ -2,7 +2,10 @@ import { Avatar, AvatarFallback } from '@/components/shadcn/avatar'
 import { Button } from '@/components/shadcn/button'
 import { Textarea } from '@/components/shadcn/textarea'
 import { useAssetStore } from '@/data/store/asset-store'
+import { useUserStore } from '@/data/store/user-store'
+import { useAuth } from '@clerk/react'
 import { CircleNotchIcon } from '@phosphor-icons/react'
+import { getInitials } from 'shared-types'
 import { useState } from 'react'
 
 type AddCommentInputProps = {
@@ -13,6 +16,10 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
   const [text, setText] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const createComment = useAssetStore((state) => state.createComment)
+  const { userId } = useAuth()
+  const users = useUserStore((state) => state.users)
+  const currentUser = users.find((u) => u.clerk_id === userId)
+  const initials = currentUser ? getInitials(currentUser.name) : ''
 
   async function handleSubmit() {
     if (!text.trim() || isSubmitting) return
@@ -29,7 +36,7 @@ export function AddCommentInput({ barcode }: AddCommentInputProps) {
   return (
     <div className="flex flex-row gap-4 pl-2">
       <Avatar className="h-8 w-8 shrink-0">
-        <AvatarFallback>DU</AvatarFallback>
+        <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col gap-2 flex-1">
         <Textarea

@@ -10,6 +10,7 @@ import {
   AssetSearchRow,
   AssetTransfer,
   Comment,
+  getInitials,
   ROLE_PERMISSIONS,
   type AppRole,
 } from 'shared-types'
@@ -25,7 +26,7 @@ import {
   getAssetTransfers as getAssetTransfersQuery,
   getSoldAssets as getSoldAssetsQuery,
 } from '../../generated/prisma/sql.js'
-import { getInitials, mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
