@@ -30,12 +30,12 @@ import { toast } from 'sonner'
 
 const PAGE_TITLE = 'Put Away'
 const BIN_ZONE = 'BIN'
-const SCAN_SANITIZER = /[^a-zA-Z0-9-.]/g
-const BIN_ERROR_DELAY_MS = 500
+const SCAN_SANITIZER = /[^a-zA-Z0-9._-]/g
+const LOCATION_ERROR_DELAY_MS = 500
 const ASSET_LOOKUP_DELAY_MS = 500
 
 interface PutAwayForm {
-  bin: string
+  location: string
   asset: string
 }
 
@@ -49,6 +49,10 @@ function scanInputClassName(success: boolean): string {
     success &&
       'border-green-600 bg-green-500/10 text-green-800 focus-visible:ring-green-600/40 dark:border-green-500 dark:text-green-300',
   )
+}
+
+function locationName(location: AssetLocation): string {
+  return location.bin || location.zone
 }
 
 function currentLocationLabel(asset: AssetSummary): string {
@@ -90,7 +94,7 @@ function AssetAdornment({
   return null
 }
 
-function BinField({
+function LocationField({
   inputRef,
   value,
   onChange,
@@ -111,19 +115,19 @@ function BinField({
 }): React.JSX.Element {
   return (
     <Field data-invalid={!!error}>
-      <FieldLabel htmlFor="put-away-bin">Bin</FieldLabel>
+      <FieldLabel htmlFor="put-away-location">Location</FieldLabel>
       <div className="relative">
         <MapPinIcon
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           size={24}
         />
         <Input
-          id="put-away-bin"
+          id="put-away-location"
           ref={inputRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          placeholder="Scan bin barcode"
+          placeholder="Scan bin or zone"
           disabled={disabled}
           aria-invalid={!!error}
           autoComplete="off"
@@ -200,18 +204,18 @@ export function PutAwayPage(): React.JSX.Element {
     null
   const warehouseId = selectedWarehouse?.id
 
-  const [binLocations, setBinLocations] = useState<AssetLocation[]>([])
+  const [locations, setLocations] = useState<AssetLocation[]>([])
   const [fetchingLocations, setFetchingLocations] = useState(false)
-  const [selectedBin, setSelectedBin] = useState<AssetLocation | null>(null)
+  const [selectedLocation, setSelectedLocation] = useState<AssetLocation | null>(null)
   const [scannedAsset, setScannedAsset] = useState<AssetSummary | null>(null)
   const [lookingUp, setLookingUp] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const form = useForm<PutAwayForm>({ defaultValues: { bin: '', asset: '' } })
-  const binValue = form.watch('bin')
+  const form = useForm<PutAwayForm>({ defaultValues: { location: '', asset: '' } })
+  const locationValue = form.watch('location')
   const assetValue = form.watch('asset')
 
-  const binSuccess = !!selectedBin && !form.formState.errors.bin
+  const locationSuccess = !!selectedLocation && !form.formState.errors.location
   const assetSuccess = !!scannedAsset && !form.formState.errors.asset
   const crossWarehouse =
     !!scannedAsset?.location &&
@@ -219,18 +223,18 @@ export function PutAwayPage(): React.JSX.Element {
     scannedAsset.location.warehouse_code !== selectedWarehouse.city_code
 
   useEffect(() => {
-    form.reset({ bin: '', asset: '' })
-    setSelectedBin(null)
+    form.reset({ location: '', asset: '' })
+    setSelectedLocation(null)
     setScannedAsset(null)
     if (!warehouseId) {
-      setBinLocations([])
+      setLocations([])
       return
     }
     let cancelled = false
     setFetchingLocations(true)
     getLocationsByWarehouse(warehouseId)
       .then((all) => {
-        if (!cancelled) setBinLocations(all.filter((l) => l.zone === BIN_ZONE))
+        if (!cancelled) setLocations(all)
       })
       .catch(() => {
         /* interceptor already showed the error toast */
@@ -244,29 +248,33 @@ export function PutAwayPage(): React.JSX.Element {
   }, [warehouseId, getLocationsByWarehouse, form])
 
   useEffect(() => {
-    form.setFocus('bin')
+    form.setFocus('location')
   }, [form])
 
   useEffect(() => {
-    if (!binValue) {
-      setSelectedBin(null)
-      form.clearErrors('bin')
+    if (!locationValue) {
+      setSelectedLocation(null)
+      form.clearErrors('location')
       return
     }
-    const match = binLocations.find((l) => l.bin === binValue)
+    const binMatch = locations.find((l) => l.bin === locationValue)
+    const zoneMatch = locations.find(
+      (l) => l.bin === '' && l.zone === locationValue && l.zone !== BIN_ZONE,
+    )
+    const match = binMatch ?? zoneMatch
     if (match) {
-      setSelectedBin(match)
-      form.clearErrors('bin')
+      setSelectedLocation(match)
+      form.clearErrors('location')
       form.setFocus('asset')
       return
     }
-    setSelectedBin(null)
+    setSelectedLocation(null)
     const timer = setTimeout(
-      () => form.setError('bin', { type: 'manual', message: 'Bin not available' }),
-      BIN_ERROR_DELAY_MS,
+      () => form.setError('location', { type: 'manual', message: 'Location not available' }),
+      LOCATION_ERROR_DELAY_MS,
     )
     return () => clearTimeout(timer)
-  }, [binValue, binLocations, form])
+  }, [locationValue, locations, form])
 
   useEffect(() => {
     if (!assetValue) {
@@ -305,23 +313,23 @@ export function PutAwayPage(): React.JSX.Element {
     form.setFocus('asset')
   }
 
-  function clearBin() {
-    form.setValue('bin', '')
-    setSelectedBin(null)
-    form.clearErrors('bin')
-    form.setFocus('bin')
+  function clearLocation() {
+    form.setValue('location', '')
+    setSelectedLocation(null)
+    form.clearErrors('location')
+    form.setFocus('location')
   }
 
   async function handleConfirm() {
-    if (!scannedAsset || !selectedBin) return
+    if (!scannedAsset || !selectedLocation) return
     setSaving(true)
     try {
       await updateAssetLocation(scannedAsset.barcode, {
-        warehouse_id: selectedBin.warehouse_id,
-        zone_id: selectedBin.zone_id,
-        bin: selectedBin.bin,
+        warehouse_id: selectedLocation.warehouse_id,
+        zone_id: selectedLocation.zone_id,
+        bin: selectedLocation.bin,
       })
-      toast.success(`Moved ${scannedAsset.barcode} to ${selectedBin.bin}`, {
+      toast.success(`Moved ${scannedAsset.barcode} to ${locationName(selectedLocation)}`, {
         position: 'top-center',
       })
       resetAsset()
@@ -358,17 +366,17 @@ export function PutAwayPage(): React.JSX.Element {
 
       <PageContent className="flex max-w-xl flex-col gap-6">
         <Controller
-          name="bin"
+          name="location"
           control={form.control}
           render={({ field, fieldState }) => (
-            <BinField
+            <LocationField
               inputRef={field.ref}
               value={field.value}
               onChange={(value) => field.onChange(sanitizeScan(value))}
               onBlur={field.onBlur}
-              onClear={clearBin}
+              onClear={clearLocation}
               error={fieldState.error?.message}
-              success={binSuccess}
+              success={locationSuccess}
               disabled={fetchingLocations || saving}
             />
           )}
@@ -392,7 +400,7 @@ export function PutAwayPage(): React.JSX.Element {
           )}
         />
 
-        {scannedAsset && selectedBin ? (
+        {scannedAsset && selectedLocation ? (
           <div className="flex flex-col gap-3 rounded-lg border p-4">
             <div>
               <p className="text-lg font-semibold">
@@ -403,7 +411,7 @@ export function PutAwayPage(): React.JSX.Element {
             <div className="flex items-center gap-3 text-base">
               <span className="text-muted-foreground">{currentLocationLabel(scannedAsset)}</span>
               <ArrowRightIcon className="shrink-0" />
-              <span className="font-semibold tabular-nums">{selectedBin.bin}</span>
+              <span className="font-semibold tabular-nums">{locationName(selectedLocation)}</span>
             </div>
             {crossWarehouse ? (
               <div className="flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
@@ -417,7 +425,7 @@ export function PutAwayPage(): React.JSX.Element {
           </div>
         ) : null}
 
-        {scannedAsset && selectedBin ? (
+        {scannedAsset && selectedLocation ? (
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
