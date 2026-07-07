@@ -20,15 +20,15 @@ const BARCODE_OPTIONS = {
 
 const LABEL_WIDTH = 288 // 4in at 72pt
 const LABEL_HEIGHT = 144 // 2in at 72pt
-const LABEL_PADDING = 8
+const LABEL_PADDING = 6
 
 const BARCODE_DISPLAY_WIDTH = 240
 
 const BARCODE_FONT_SIZE = 16
-const CAPTION_FONT_SIZE = 11
+const CAPTION_FONT_SIZE = 13
 
 const CAPTION_GAP = 2
-const CAPTION_LINE_GAP = 2
+const CAPTION_LINE_GAP = 1
 
 const PNG_WIDTH_OFFSET = 16
 const PNG_HEIGHT_OFFSET = 20
@@ -44,11 +44,12 @@ function formatThousandsK(value: number): string {
   return (value / 1000).toFixed(0) + ' K'
 }
 
-function captionLines(label: BarcodeLabel): [string, string, string] {
+function captionLines(label: BarcodeLabel): [string, string, string, string] {
   const barcode = `${label.barcode}`
-  const brandModelSerial = `${label.brand} / ${label.model} / ${label.serialNumber}`
+  const model = `${label.brand} ${label.model}`
+  const serial = `${label.serialNumber}`
   const meters = `T: ${formatMeter(label.meterTotal)} B: ${formatMeter(label.meterBlack)} C: ${formatMeter(label.meterColour)}`
-  return [barcode, brandModelSerial, meters]
+  return [barcode, model, serial, meters]
 }
 
 export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer> {
@@ -78,8 +79,8 @@ export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer
       const pixelHeight = png.readUInt32BE(PNG_HEIGHT_OFFSET)
       const displayHeight = BARCODE_DISPLAY_WIDTH * (pixelHeight / pixelWidth)
 
-      const [barcode, brandModelSerial, meters] = captionLines(label)
-      const detail = `${brandModelSerial}\n${meters}`
+      const [barcode, model, serial, meters] = captionLines(label)
+      const detail = `${model}\n${serial}\n${meters}`
 
       doc.font('Helvetica').fontSize(BARCODE_FONT_SIZE)
       const barcodeHeight = doc.heightOfString(barcode, {
