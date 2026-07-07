@@ -1,6 +1,7 @@
 import type { AssetSummary, OrgSummary, Warehouse } from 'shared-types'
-import { AssetSummarySchema, OrgSummarySchema } from 'shared-types'
+import { OrgSummarySchema } from 'shared-types'
 import z from 'zod'
+import { AssetSummaryFormSchema } from './asset-summary-form-schema'
 import { isSelected, WarehouseSelectOptionSchema, type SelectOption } from './select-option-types'
 
 export const TransferFormSchema = z
@@ -13,7 +14,7 @@ export const TransferFormSchema = z
     ),
     transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
     comment: z.string(),
-    assets: z.array(AssetSummarySchema).nonempty('No assets in the transfer'),
+    assets: z.array(AssetSummaryFormSchema).nonempty('No assets in the transfer'),
   })
   .refine(
     (data) => {

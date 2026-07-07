@@ -36,6 +36,7 @@ export const AssetSummarySchema = AssetIdentitySchema.extend({
   purchase_invoice_number: z.string().nullable(),
   sales_invoice_number: z.string().nullable(),
   is_in_transit: z.boolean(),
+  created_at: z.coerce.date(),
 })
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
@@ -48,6 +49,7 @@ export const AssetSearchRowSchema = z.object({
   readiness: z.string(),
   location: AssetLocationDetailsSchema.nullable(),
   is_in_transit: z.boolean(),
+  created_at: z.coerce.date(),
   country_of_origin: z.string().nullable(),
   manufactured_year: z.number().nullable(),
   weight: z.number(),

@@ -27,6 +27,7 @@ select
   s.status as status,
   rd.status as readiness,
   a.is_in_transit as is_in_transit,
+  a.created_at as created_at,
   co."name" as country_of_origin,
   a.manufactured_year as manufactured_year,
   m.weight as weight,

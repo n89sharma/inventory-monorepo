@@ -18,5 +18,6 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     purchase_invoice_number: assetDetails.purchase_invoice?.invoice_number ?? null,
     sales_invoice_number: assetDetails.sales_invoice?.invoice_number ?? null,
     is_in_transit: assetDetails.is_in_transit,
+    created_at: assetDetails.created_at,
   }
 }

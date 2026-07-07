@@ -1,9 +1,10 @@
 import type { AssetSummary, OrgSummary, OutgoingStatus, Warehouse } from 'shared-types'
-import { AssetSummarySchema, OrgSummarySchema, OutgoingStatusSchema } from 'shared-types'
+import { OrgSummarySchema, OutgoingStatusSchema } from 'shared-types'
 import z from 'zod'
+import { AssetSummaryFormSchema } from './asset-summary-form-schema'
 import { isSelected, WarehouseSelectOptionSchema, type SelectOption } from './select-option-types'
 
-const DepartureFormAssetSchema = AssetSummarySchema.extend({
+const DepartureFormAssetSchema = AssetSummaryFormSchema.extend({
   outgoing_status: OutgoingStatusSchema,
 })
 

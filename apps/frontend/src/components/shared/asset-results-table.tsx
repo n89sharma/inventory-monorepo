@@ -28,6 +28,7 @@ function toAssetSummary(r: AssetSearchRow): AssetSummary {
     purchase_invoice_number: r.purchase_invoice_invoice_number,
     sales_invoice_number: null,
     is_in_transit: r.is_in_transit,
+    created_at: r.created_at,
   }
 }
 

@@ -1,6 +1,7 @@
-import { AssetSummarySchema, OrgSummarySchema } from 'shared-types'
+import { OrgSummarySchema } from 'shared-types'
 import type { AssetSummary, InvoiceType, OrgSummary } from 'shared-types'
 import z from 'zod'
+import { AssetSummaryFormSchema } from './asset-summary-form-schema'
 import { SelectOptionSchema, isSelected, type SelectOption } from './select-option-types'
 
 const InvoiceTypeZod = z.object({ id: z.number(), type: z.string() })
@@ -14,7 +15,7 @@ export const InvoiceFormSchema = z.object({
     'Invoice type is required',
   ),
   is_cleared: z.boolean(),
-  assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice'),
+  assets: z.array(AssetSummaryFormSchema).nonempty('No assets in the invoice'),
 })
 
 export type InvoiceForm = {

@@ -36,6 +36,7 @@ type AssetSummaryRow = LocationRow & {
   purchase_invoice_number: string | null
   sales_invoice_number: string | null
   is_in_transit: boolean
+  created_at: Date
 }
 
 export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
@@ -56,6 +57,7 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     purchase_invoice_number: r.purchase_invoice_number,
     sales_invoice_number: r.sales_invoice_number,
     is_in_transit: r.is_in_transit,
+    created_at: r.created_at,
   }
 }
 
@@ -69,6 +71,7 @@ type AssetSearchRowDb = LocationRow & {
   status: string
   readiness: string
   is_in_transit: boolean
+  created_at: Date
   country_of_origin: string | null
   manufactured_year: number | null
   weight: number
@@ -112,6 +115,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     readiness: r.readiness,
     location: buildLocation(r),
     is_in_transit: r.is_in_transit,
+    created_at: r.created_at,
     country_of_origin: r.country_of_origin,
     manufactured_year: r.manufactured_year,
     weight: r.weight,
