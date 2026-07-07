@@ -104,6 +104,21 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'view_purchase_price',
     'edit_prices',
   ],
+  senior_sales: [
+    'view_asset',
+    'view_collections',
+    'view_reports',
+    'create_update_hold',
+    'view_sale_price',
+    'view_purchase_price',
+  ],
+  sales: [
+    'view_asset',
+    'view_collections',
+    'view_reports',
+    'create_update_hold',
+    'view_sale_price',
+  ],
   accountant: [
     'view_asset',
     'view_collections',
@@ -119,15 +134,6 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'update_tech_specs',
     'update_location',
   ],
-  senior_sales: [
-    'view_asset',
-    'view_collections',
-    'view_reports',
-    'create_update_hold',
-    'view_sale_price',
-    'view_purchase_price',
-  ],
-  sales: ['view_asset', 'view_collections', 'create_update_hold', 'view_sale_price'],
   sales_assistant: ['view_asset', 'view_collections', 'create_update_hold'],
   shipping: [
     'view_asset',
