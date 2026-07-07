@@ -20,9 +20,10 @@ import {
   type SelectOption,
 } from '@/ui-types/select-option-types'
 import { useMemo, useState } from 'react'
-import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form'
+import { Controller, useWatch, type Control, type FieldValues, type Path } from 'react-hook-form'
 import type { Component, CoreFunction, Country, Status } from 'shared-types'
 import { Input } from '../shadcn/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../shadcn/input-group'
 import MultipleSelector from '../shadcn/multiple-selector'
 
 // Shared width for the single-line inputs across the Create/Edit Asset and Edit
@@ -139,6 +140,33 @@ function ControlledMeterInput<T extends FieldValues>({
         />
       )}
     />
+  )
+}
+
+function MeterTotal<T extends FieldValues>({
+  control,
+  blackName,
+  colourName,
+}: {
+  control: Control<T>
+  blackName: Path<T>
+  colourName: Path<T>
+}) {
+  const black = useWatch({ control, name: blackName })
+  const colour = useWatch({ control, name: colourName })
+  const total =
+    ((typeof black === 'number' ? black : 0) + (typeof colour === 'number' ? colour : 0)) /
+    METER_THOUSANDS
+  return (
+    <InputGroup className={METER_INPUT_WIDTH}>
+      <InputGroupAddon align="inline-start">
+        <span className="text-muted-foreground pl-1">Total</span>
+      </InputGroupAddon>
+      <InputGroupInput readOnly tabIndex={-1} value={total} className="text-right tabular-nums" />
+      <InputGroupAddon align="inline-end">
+        <span className="text-muted-foreground pr-1">K</span>
+      </InputGroupAddon>
+    </InputGroup>
   )
 }
 
@@ -326,6 +354,13 @@ export function TechnicalSpecsFields<T extends FieldValues>({
             <ControlledMeterInput control={control} name={p('meterColour')} channel="C" />
           )}
           <ControlledMeterInput control={control} name={p('meterBlack')} channel="K" />
+          {isColour && (
+            <MeterTotal
+              control={control}
+              blackName={p('meterBlack')}
+              colourName={p('meterColour')}
+            />
+          )}
         </div>
       </HorizontalField>
 
