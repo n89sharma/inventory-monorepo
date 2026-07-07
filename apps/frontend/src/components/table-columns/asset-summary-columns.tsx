@@ -2,7 +2,7 @@ import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-
 import { Button } from '@/components/shadcn/button'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
-import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import { formatDate, formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
 import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
@@ -63,6 +63,14 @@ export function createAssetSummaryColumns(
       id: 'location',
       header: 'Location',
       cell: ({ row }) => formatLocation(row.original.location),
+    },
+    // Hidden by default (see collection-detail-page columnVisibility); defined so
+    // the detail tables can default-sort by asset creation date.
+    {
+      accessorKey: 'created_at',
+      header: 'Created',
+      cell: ({ row }) => formatDate(row.original.created_at),
+      size: 100,
     },
   ]
 

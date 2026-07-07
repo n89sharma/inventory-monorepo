@@ -356,6 +356,17 @@ export function createAssetSearchColumns(
       size: 120,
     },
     {
+      accessorKey: 'created_at',
+      header: ({ column }) => (
+        <SortableHeader
+          label="Created"
+          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        />
+      ),
+      cell: ({ row }) => formatDate(row.original.created_at),
+      size: 100,
+    },
+    {
       accessorKey: 'arrival_created_at',
       header: ({ column }) => (
         <SortableHeader

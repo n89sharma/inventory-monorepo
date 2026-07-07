@@ -51,6 +51,7 @@ export const ASSET_TABLE_COLUMNS = [
   { id: 'readiness', label: 'Readiness', section: 'general', defaultColumn: true, enabled: true },
   { id: 'location', label: 'Location', section: 'general', defaultColumn: false, enabled: true },
   { id: 'stock_days', label: 'Stock Days', section: 'general', defaultColumn: true, enabled: true },
+  { id: 'created_at', label: 'Created', section: 'general', defaultColumn: false, enabled: true },
 
   // Specs
   {

@@ -14,7 +14,10 @@ import { StickyDetailsPageHeader } from '@/components/collections/sticky-details
 
 type DetailSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
-const DEFAULT_ASSET_SORT = { id: 'barcode', desc: true } as const
+const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
+// created_at drives the default sort but is not shown; the detail tables have no
+// column picker, so hide it explicitly.
+const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
@@ -162,6 +165,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           onRowSelectionChange={setRowSelection}
           getRowId={getAssetRowId}
           defaultSort={DEFAULT_ASSET_SORT}
+          columnVisibility={ASSET_COLUMN_VISIBILITY}
         />
       </PageContent>
     </>

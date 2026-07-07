@@ -15,6 +15,7 @@ import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
+const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 const PURCHASE_COST_COLUMN_ID = 'cost_purchase_cost'
 const PRICE_CHECK_COLUMN_IDS = [PURCHASE_COST_COLUMN_ID] as const
 
@@ -61,6 +62,7 @@ export function SearchInStockPage(): React.JSX.Element {
       assets={visibleAssets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
+      defaultSort={CREATED_AT_DESC_SORT}
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
     >
       <AssetFilterBar

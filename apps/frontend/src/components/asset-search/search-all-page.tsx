@@ -22,6 +22,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow, type Status } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
+const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 const STATUS_TOP_ORDER = [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER] as const
 const STATUS_DIVIDER_AFTER = new Set<string>([ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER])
 
@@ -151,6 +152,7 @@ export function SearchAllPage(): React.JSX.Element {
             onBulkPriceSave={handleBulkPriceSave}
             columnVisibility={columnVisibility}
             getRowHref={getRowHref}
+            defaultSort={CREATED_AT_DESC_SORT}
           />
         </div>
       </PageContent>
