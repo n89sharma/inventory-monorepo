@@ -59,11 +59,13 @@ export function ConsumablesRow({
   label,
   required,
   columnCount,
+  unit,
   children,
 }: {
   label: string
   required?: boolean
   columnCount: number
+  unit: string
   children: React.ReactNode
 }) {
   return (
@@ -73,7 +75,7 @@ export function ConsumablesRow({
         style={{ gridTemplateColumns: cellsTemplate(columnCount) }}
       >
         {children}
-        <span className="text-xs text-muted-foreground">%</span>
+        <span className="text-xs text-muted-foreground">{unit}</span>
       </div>
     </HorizontalField>
   )

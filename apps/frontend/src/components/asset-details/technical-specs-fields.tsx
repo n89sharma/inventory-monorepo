@@ -142,12 +142,14 @@ function ControlledConsumablesRow<T extends FieldValues>({
   control,
   names,
   visibleChannels,
+  unit,
   required,
 }: {
   label: string
   control: Control<T>
   names: CMYKFieldNames<T>
   visibleChannels: Channel[]
+  unit: string
   required?: boolean
 }) {
   const channels = [
@@ -157,7 +159,7 @@ function ControlledConsumablesRow<T extends FieldValues>({
     { letter: 'K', name: names.k },
   ].filter((ch) => visibleChannels.includes(ch.letter as Channel))
   return (
-    <ConsumablesRow label={label} required={required} columnCount={channels.length}>
+    <ConsumablesRow label={label} required={required} columnCount={channels.length} unit={unit}>
       {channels.map((ch) => (
         <Controller
           key={ch.name}
@@ -324,6 +326,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
           control={control}
           names={{ c: p('drumLifeC'), m: p('drumLifeM'), y: p('drumLifeY'), k: p('drumLifeK') }}
           visibleChannels={channels}
+          unit="K"
           required
         />
         <ControlledConsumablesRow
@@ -331,6 +334,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
           control={control}
           names={{ c: p('tonerLifeC'), m: p('tonerLifeM'), y: p('tonerLifeY'), k: p('tonerLifeK') }}
           visibleChannels={channels}
+          unit="%"
           required
         />
       </ConsumablesGrid>
