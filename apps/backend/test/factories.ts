@@ -21,7 +21,7 @@ import { prisma } from '../src/prisma.js'
 import { createArrival, getArrival } from '../src/services/arrivalService.js'
 
 // Zone the arrival flow places assets in. Must match arrivalService.ts `arrivalZone`.
-const SHIPPING_ZONE = 'SHIPPING_AND_RECEIVING'
+const ARRIVAL_ZONE = 'ARRIVAL'
 // Zone whose bin value is honored on relocation (assetLocationService.ts `BIN_ZONE`).
 const BIN_ZONE = 'BIN'
 const YYZ_CODE = 'YYZ'
@@ -74,9 +74,9 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
     await prisma.status.upsert({ where: { status }, create: { status }, update: {} })
   }
 
-  const shippingZone = await prisma.zone.upsert({
-    where: { zone: SHIPPING_ZONE },
-    create: { zone: SHIPPING_ZONE },
+  const arrivalZone = await prisma.zone.upsert({
+    where: { zone: ARRIVAL_ZONE },
+    create: { zone: ARRIVAL_ZONE },
     update: {},
   })
 
@@ -220,7 +220,7 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
     country: { id: china.id, name: china.name },
     invoiceTypeSaleId: saleInvoiceType.id,
     invoiceTypePurchaseId: purchaseInvoiceType.id,
-    arrivalZoneId: shippingZone.id,
+    arrivalZoneId: arrivalZone.id,
     binZoneId: binZone.id,
   }
 }

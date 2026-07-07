@@ -34,7 +34,7 @@ import {
   recordBatchAssetCreate,
 } from './historyService.js'
 
-const arrivalZone = 'SHIPPING_AND_RECEIVING'
+const arrivalZone = 'ARRIVAL'
 const arrivalStatus = ASSET_STATUS.IN_STOCK
 
 async function ensureArrivalLocationId(
