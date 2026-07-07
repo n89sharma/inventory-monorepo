@@ -1,3 +1,4 @@
+import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
@@ -13,7 +14,8 @@ import {
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
-import type { Status } from 'shared-types'
+import type { AssetSummary, Status } from 'shared-types'
+import { toast } from 'sonner'
 import { AssetErrorsEditor } from '../asset-details/asset-errors-editor'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -64,7 +66,7 @@ interface CreateAssetModalProps {
   updateAsset?: UseFieldArrayUpdate<ArrivalForm, 'assets'>
   editingAsset?: AssetForm | null
   editingIndex?: number | null
-  onCreateAsset?: (asset: AssetForm) => Promise<void>
+  onCreateAsset?: (asset: AssetForm) => Promise<AssetSummary>
   onUpdateAsset?: (asset: AssetForm) => Promise<void>
 }
 
@@ -89,6 +91,7 @@ export function CreateAssetModal({
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const brands = useReferenceDataStore((state) => state.brands)
   const models = useModelStore((state) => state.models)
+  const printBarcodes = useAssetStore((state) => state.printBarcodes)
 
   const values = useMemo(
     () => editingAsset ?? getDefaultNewAsset(readinesses),
@@ -141,6 +144,14 @@ export function CreateAssetModal({
     prevBrandRef.current = currentBrandName
   }, [currentBrandName, newAssetForm])
 
+  async function printCreatedAssetBarcode(barcode: string) {
+    try {
+      await printBarcodes([barcode])
+    } catch {
+      toast.error('Failed to print barcode', { position: 'top-center' })
+    }
+  }
+
   async function onValidAsset(rawAsset: AssetForm) {
     const asset: AssetForm = {
       ...rawAsset,
@@ -174,9 +185,10 @@ export function CreateAssetModal({
     if (onCreateAsset) {
       setIsSubmitting(true)
       try {
-        await onCreateAsset(asset)
+        const created = await onCreateAsset(asset)
         newAssetForm.reset(getDefaultNewAsset(readinesses))
         onOpenChange(false)
+        void printCreatedAssetBarcode(created.barcode)
       } catch {
         // interceptor already showed the error toast — keep modal open
       } finally {

@@ -40,6 +40,7 @@ async function createAsset(arrivalNumber: string, asset: AssetForm) {
   invalidateAssetDetails([created.barcode])
   invalidateArrivalLists()
   mutate(cacheKey)
+  return created
 }
 
 async function getAssetForEdit(arrivalNumber: string, assetId: number): Promise<AssetForm> {
