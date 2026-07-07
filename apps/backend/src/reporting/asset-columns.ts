@@ -8,8 +8,7 @@ const formatDate = (val: unknown): string | null => {
   return String(val)
 }
 
-const stockDays = (a: AssetDetails): number | null =>
-  a.arrival ? differenceInCalendarDays(new Date(), a.arrival.created_at) : null
+const stockDays = (a: AssetDetails): number => differenceInCalendarDays(new Date(), a.created_at)
 
 const daysHeld = (a: AssetDetails): number | null =>
   a.hold?.created_at ? differenceInCalendarDays(new Date(), a.hold.created_at) : null

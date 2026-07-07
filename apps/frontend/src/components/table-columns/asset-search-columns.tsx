@@ -19,8 +19,7 @@ import { createIdColumn } from './shared-columns'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
-const stockDays = (arrived: Date | null): number | undefined =>
-  arrived ? differenceInCalendarDays(new Date(), arrived) : undefined
+const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date(), createdAt)
 
 export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
@@ -379,15 +378,14 @@ export function createAssetSearchColumns(
     },
     {
       id: 'stock_days',
-      accessorFn: (row) => stockDays(row.arrival_created_at),
+      accessorFn: (row) => stockDays(row.created_at),
       header: ({ column }) => (
         <SortableHeader
           label="Stock Days"
           onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         />
       ),
-      cell: ({ row }) => stockDays(row.original.arrival_created_at) ?? '',
-      sortUndefined: 'last',
+      cell: ({ row }) => stockDays(row.original.created_at),
       size: 80,
     },
     {
