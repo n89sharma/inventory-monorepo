@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "graph": "depcruise src --include-only ^src/components --collapse ^src/components/[^/]+ --output-type dot | dot -Tsvg -o diagrams/components-highlevel.svg",
+    "graph:detail": "depcruise src --include-only ^src/components --output-type dot | dot -Tsvg -o diagrams/components-detail.svg"
   },
   "dependencies": {
     "@clerk/react": "^6.4.2",
