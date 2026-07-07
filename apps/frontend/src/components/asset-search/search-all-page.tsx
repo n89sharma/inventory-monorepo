@@ -17,8 +17,8 @@ import { useAssetFilters, useStatusesParam, useWarehousesParam } from '@/lib/fil
 import { formatTitleCase } from '@/lib/formatters'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow, type Status } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
@@ -71,7 +71,7 @@ function StatusScopeFilter({
 }
 
 export function SearchAllPage(): React.JSX.Element {
-  const [searchParams] = useSearchParams()
+  const searchParams = useOptimisticSearchParams()
   const {
     visibleColumns,
     setVisibleColumns,

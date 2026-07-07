@@ -12,8 +12,8 @@ import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
 import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { CopyIcon, SpinnerGapIcon, WarningIcon } from '@phosphor-icons/react'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -117,7 +117,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   )
   const selection = useAssetSelection(assets, visibleColumns)
 
-  const [searchParams] = useSearchParams()
+  const searchParams = useOptimisticSearchParams()
   const getRowHref = useCallback(
     (asset: AssetSearchRow) => assetDetailHref('all', asset.barcode, searchParams),
     [searchParams],

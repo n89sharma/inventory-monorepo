@@ -11,8 +11,8 @@ import { useColumnVisibility } from '@/hooks/use-column-visibility'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import type { AssetSearchRow, SavedViewPageKey } from 'shared-types'
 
 export function AssetSearchPage({
@@ -38,7 +38,7 @@ export function AssetSearchPage({
   forceVisibleColumnIds?: readonly string[]
   children: React.ReactNode
 }): React.JSX.Element {
-  const [searchParams] = useSearchParams()
+  const searchParams = useOptimisticSearchParams()
   const {
     visibleColumns,
     setVisibleColumns,

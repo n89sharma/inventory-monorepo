@@ -30,8 +30,9 @@ import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { format, subMonths } from 'date-fns'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import type { ModelSaleRow, ModelSalesResult, ModelSummary } from 'shared-types'
 
 const EMPTY_SALES: ModelSaleRow[] = []
@@ -220,7 +221,7 @@ function SoldReportResults({
 }
 
 export function SoldReportPage(): React.JSX.Element {
-  const [searchParams] = useSearchParams()
+  const searchParams = useOptimisticSearchParams()
   const [modelQuery, setModelQuery] = useState('')
 
   const { model, setModel, clear } = useModelParam()
