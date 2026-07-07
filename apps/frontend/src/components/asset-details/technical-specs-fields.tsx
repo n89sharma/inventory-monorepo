@@ -32,6 +32,11 @@ export const INPUT_WIDTH = 'max-w-[200px]'
 const ALL_CHANNELS: Channel[] = ['C', 'M', 'Y', 'K']
 const MONO_CHANNELS: Channel[] = ['K']
 
+// Accessory codes hidden from the Core Functions picker — redundant with the
+// dedicated Cassettes and Internal Finisher fields. Already-selected values on
+// an existing asset are still shown; these are only removed from the options.
+const EXCLUDED_CORE_FUNCTIONS = ['CASS', 'FIN']
+
 type CMYKFieldNames<T extends FieldValues> = {
   c: Path<T>
   m: Path<T>
@@ -263,6 +268,10 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
   const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
+  const selectableCoreFunctions = useMemo(
+    () => coreFunctions.filter((c) => !EXCLUDED_CORE_FUNCTIONS.includes(c.accessory)),
+    [coreFunctions],
+  )
 
   const p = (name: string) => name as Path<T>
   const channels = isColour ? ALL_CHANNELS : MONO_CHANNELS
@@ -357,7 +366,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
             control={control}
             render={({ field: { onChange, value } }) => (
               <MultipleSelector
-                options={getCoreFunctionOptions(coreFunctions)}
+                options={getCoreFunctionOptions(selectableCoreFunctions)}
                 placeholder="Select functions…"
                 emptyIndicator={<p>No results found.</p>}
                 value={getCoreFunctionOptions(value as CoreFunction[])}
