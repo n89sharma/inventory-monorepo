@@ -8,7 +8,7 @@ import type { AssetSearchRow, AssetSummary } from 'shared-types'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const STOCK_DAYS_ASC_SORT = { id: 'stock_days', desc: false } as const
-const PIN_LEFT = ['select', 'barcode', 'brand', 'model']
+const PIN_LEFT = ['select', 'barcode', 'serial_number', 'model']
 
 function toAssetSummary(r: AssetSearchRow): AssetSummary {
   return {

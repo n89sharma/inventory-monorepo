@@ -33,6 +33,7 @@ export const COLUMN_SECTIONS = [
 
 export const ASSET_TABLE_COLUMNS = [
   // General
+  { id: 'brand', label: 'Brand', section: 'general', defaultColumn: false, enabled: true },
   {
     id: 'asset_type',
     label: 'Asset Type',
