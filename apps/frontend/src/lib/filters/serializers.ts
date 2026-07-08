@@ -5,9 +5,8 @@ import type { AssetType, Brand, InStockSummaryRow, MeterBand, Warehouse } from '
 
 const STORE_LIST_PATH = '/store'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
-const INSTOCK_PATH = '/search/instock'
+const ONHAND_PATH = '/search/onhand'
 const SOLD_REPORT_PATH = '/reports/sold-report'
-const SEARCH_HELD_PATH = '/search/held'
 const PROFITABILITY_REPORT_PATH = '/reports/profitability'
 
 const BAND_BOUNDS = {
@@ -69,7 +68,7 @@ export function buildInStockSummaryPath(
 
 export function inStockDrilldownHref(row: InStockSummaryRow): string {
   const bounds = row.meter_band === 'UNKNOWN' ? null : BAND_BOUNDS[row.meter_band]
-  return serializeDrilldown(INSTOCK_PATH, {
+  return serializeDrilldown(ONHAND_PATH, {
     wh: [row.warehouse_id],
     brand: row.brand_id,
     type: [row.asset_type_id],
@@ -83,15 +82,15 @@ export function soldReportHref(modelId: number): string {
   return serializeModel(SOLD_REPORT_PATH, { model: modelId })
 }
 
-export function buildInStockModelPath(modelId: number): string {
-  return serializeModel(INSTOCK_PATH, { model: modelId })
+export function buildOnHandModelPath(modelId: number): string {
+  return serializeModel(ONHAND_PATH, { model: modelId })
 }
 
-export function buildSearchHeldUrl(selection: {
+export function buildSearchOnHandUrl(selection: {
   heldForId?: number
   holdCustomerId?: number
 }): string {
-  return serializeHeld(SEARCH_HELD_PATH, {
+  return serializeHeld(ONHAND_PATH, {
     heldfor: selection.heldForId ?? null,
     holdcustomer: selection.holdCustomerId ?? null,
   })

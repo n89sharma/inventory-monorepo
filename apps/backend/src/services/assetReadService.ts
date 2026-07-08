@@ -149,45 +149,7 @@ export async function getSoldAssets(
   return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
 }
 
-export async function getAssetsForSearchInStock(
-  warehouseIds: number[],
-  brandIds: number[],
-  assetTypeIds: number[],
-  readinessIds: number[],
-  model: string,
-  meterMinParam: number,
-  meterMaxParam: number,
-  cassettesParam: number,
-  componentIdParam: number,
-  role: AppRole | null,
-): Promise<AssetSearchRow[]> {
-  const statuses = await prisma.status.findMany({
-    where: { status: ASSET_STATUS.IN_STOCK },
-    select: { id: true },
-  })
-  return getAssets(
-    model,
-    statuses.map((s) => s.id),
-    readinessIds,
-    warehouseIds,
-    meterMinParam,
-    meterMaxParam,
-    cassettesParam,
-    componentIdParam,
-    brandIds,
-    assetTypeIds,
-    null,
-    null,
-    -1,
-    -1,
-    -1,
-    -1,
-    -1,
-    role,
-  )
-}
-
-export async function getAssetsForSearchHeld(
+export async function getAssetsForSearchOnHand(
   warehouseIds: number[],
   brandIds: number[],
   assetTypeIds: number[],
@@ -200,11 +162,10 @@ export async function getAssetsForSearchHeld(
   heldByIdParam: number,
   heldForIdParam: number,
   holdCustomerIdParam: number,
-  daysHeldMinParam: number,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
-    where: { status: ASSET_STATUS.HELD },
+    where: { status: { in: [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD] } },
     select: { id: true },
   })
   return getAssets(
@@ -224,7 +185,7 @@ export async function getAssetsForSearchHeld(
     heldByIdParam,
     heldForIdParam,
     holdCustomerIdParam,
-    daysHeldMinParam,
+    -1,
     role,
   )
 }

@@ -23,7 +23,7 @@ import {
   useSpecsVisibleParam,
   type SoldReportRange,
 } from '@/lib/filters/hooks'
-import { buildInStockModelPath } from '@/lib/filters/serializers'
+import { buildOnHandModelPath } from '@/lib/filters/serializers'
 import { formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-sales-summary'
 import { assetDetailHref } from '@/ui-types/navigation-context'
@@ -236,7 +236,7 @@ export function SoldReportPage(): React.JSX.Element {
   const visibleSales = range === 6 ? sales6 : sales12
   const bands = useMemo(() => summarizeBands(visibleSales), [visibleSales])
 
-  const inStockHref = model ? buildInStockModelPath(model.id) : ''
+  const inStockHref = model ? buildOnHandModelPath(model.id) : ''
 
   const columnVisibility = useMemo<VisibilityState>(
     () => Object.fromEntries(MODEL_SALES_SPEC_COLUMN_IDS.map((id) => [id, specsVisible])),

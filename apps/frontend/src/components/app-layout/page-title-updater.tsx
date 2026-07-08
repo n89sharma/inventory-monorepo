@@ -24,7 +24,7 @@ const ENTITY_LABEL: Record<string, string> = {
 }
 
 function deriveSearchTitle(id: string | undefined, sub: string | undefined): string {
-  const view = id === 'instock' ? 'In Stock' : 'All'
+  const view = id === 'onhand' ? 'On Hand' : 'All'
   if (sub) return `Asset ${sub} | ${view} | Search Assets | ${APP_NAME}`
   return `${view} | Search Assets | ${APP_NAME}`
 }

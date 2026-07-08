@@ -11,13 +11,12 @@ export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
 }
 
-const SEARCH_LISTS = ['instock', 'held', 'all', 'sold-report', 'sold'] as const
+const SEARCH_LISTS = ['onhand', 'all', 'sold-report', 'sold'] as const
 
 export type SearchList = (typeof SEARCH_LISTS)[number]
 
 export const SEARCH_LIST_LABELS = {
-  instock: 'In Stock',
-  held: 'Held',
+  onhand: 'On Hand',
   all: 'All Assets',
   'sold-report': 'Sold Report',
   sold: 'Sold',

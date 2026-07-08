@@ -298,7 +298,7 @@ const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_TABLE_COLUMNS.filter
   (c) => c.defaultColumn,
 ).map((c) => c.id)
 
-const INSTOCK_DEFAULT_COLUMN_IDS = [
+const ONHAND_DEFAULT_COLUMN_IDS = [
   'serial_number',
   'status',
   'readiness',
@@ -315,16 +315,6 @@ const SOLD_DEFAULT_COLUMN_IDS = [
   'cost_sale_price',
 ] as const satisfies readonly AssetColumnId[]
 
-const HELD_DEFAULT_COLUMN_IDS = [
-  'serial_number',
-  'specs_meter_total',
-  'days_held',
-  'hold_hold_number',
-  'held_by',
-  'hold_created_for',
-  'hold_customer',
-] as const satisfies readonly AssetColumnId[]
-
 export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
   'serial_number',
   'status',
@@ -333,8 +323,7 @@ export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
 
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   all: DEFAULT_VISIBLE_COLUMN_IDS,
-  instock: INSTOCK_DEFAULT_COLUMN_IDS,
-  held: HELD_DEFAULT_COLUMN_IDS,
+  onhand: ONHAND_DEFAULT_COLUMN_IDS,
   sold: SOLD_DEFAULT_COLUMN_IDS,
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>

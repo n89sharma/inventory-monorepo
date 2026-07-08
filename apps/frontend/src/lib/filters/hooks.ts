@@ -246,10 +246,6 @@ export function useCassettesParam(): [number | null, (next: number | null) => vo
   return useDebouncedNumberParam('cas')
 }
 
-export function useDaysHeldParam(): [number | null, (next: number | null) => void] {
-  return useDebouncedNumberParam('heldmin')
-}
-
 export function useMeterRangeParam(): {
   min: number | null
   max: number | null

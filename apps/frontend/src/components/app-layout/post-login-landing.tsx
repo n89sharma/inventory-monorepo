@@ -4,7 +4,7 @@ import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehous
 import { buildAssetSearchPath } from '@/lib/filters/serializers'
 import { Navigate } from 'react-router-dom'
 
-const INSTOCK_PATH = '/search/instock'
+const ONHAND_PATH = '/search/onhand'
 
 export function PostLoginLanding(): React.JSX.Element | null {
   const loaded = useReferenceDataStore((state) => state.loaded)
@@ -14,6 +14,6 @@ export function PostLoginLanding(): React.JSX.Element | null {
   if (!loaded) return null
 
   return (
-    <Navigate to={buildAssetSearchPath(INSTOCK_PATH, defaultWarehouse, defaultAssetType)} replace />
+    <Navigate to={buildAssetSearchPath(ONHAND_PATH, defaultWarehouse, defaultAssetType)} replace />
   )
 }

@@ -1,9 +1,7 @@
 import express from 'express'
 import {
-  SearchInStockQuerySchema,
-  SearchHeldQuerySchema,
-  getAssetsForSearchInStock,
-  getAssetsForSearchHeld,
+  SearchOnHandQuerySchema,
+  getAssetsForSearchOnHand,
 } from '../controllers/assetController.js'
 import { globalSearch, GlobalSearchQuerySchema } from '../controllers/searchController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -22,17 +20,10 @@ router.get(
 )
 
 router.get(
-  '/instock',
+  '/onhand',
   requirePermission('view_asset'),
-  validateQuery(SearchInStockQuerySchema),
-  getAssetsForSearchInStock,
-)
-
-router.get(
-  '/held',
-  requirePermission('view_asset'),
-  validateQuery(SearchHeldQuerySchema),
-  getAssetsForSearchHeld,
+  validateQuery(SearchOnHandQuerySchema),
+  getAssetsForSearchOnHand,
 )
 
 export default router

@@ -54,7 +54,6 @@ export const FILTER_PARSERS = {
   heldby: parseAsInteger,
   heldfor: parseAsInteger,
   holdcustomer: parseAsInteger,
-  heldmin: parseAsNonNegativeInt,
   year: parseAsInteger,
   sp: parseAsInteger,
   vendor: parseAsInteger,

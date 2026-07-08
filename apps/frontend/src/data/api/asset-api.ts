@@ -297,33 +297,6 @@ export async function getAssetsForSold(
   return z.array(AssetSearchRowSchema).parse(data)
 }
 
-export async function getAssetsForSearchInStock(
-  warehouses: Warehouse[],
-  brand: Brand | null,
-  assetTypes: AssetType[],
-  readinesses: Status[],
-  model: string | null,
-  meterMin: number | null,
-  meterMax: number | null,
-  cassettes: number | null,
-  component: Component | null,
-): Promise<AssetSearchRow[]> {
-  const { data } = await api.get<AssetSearchRow[]>(`/search/instock`, {
-    params: {
-      warehouseIds: warehouses.map((w) => w.id),
-      brandIds: brand ? [brand.id] : [],
-      assetTypeIds: assetTypes.map((a) => a.id),
-      readinessIds: readinesses.map((s) => s.id),
-      model: model ?? undefined,
-      meterMin: meterMin ?? undefined,
-      meterMax: meterMax ?? undefined,
-      cassettes: cassettes ?? undefined,
-      componentId: component?.id ?? undefined,
-    },
-  })
-  return z.array(AssetSearchRowSchema).parse(data)
-}
-
 export async function getAssetsBySerialNumber(
   serialNumbers: string[],
 ): Promise<AssetsBySerialNumberResult> {
@@ -334,7 +307,7 @@ export async function getAssetsBySerialNumber(
   return AssetsBySerialNumberResultSchema.parse(data)
 }
 
-export async function getAssetsForSearchHeld(
+export async function getAssetsForSearchOnHand(
   warehouses: Warehouse[],
   brand: Brand | null,
   assetTypes: AssetType[],
@@ -347,9 +320,8 @@ export async function getAssetsForSearchHeld(
   heldBy: User | null,
   heldFor: User | null,
   holdCustomer: OrgSummary | null,
-  daysHeldMin: number | null,
 ): Promise<AssetSearchRow[]> {
-  const { data } = await api.get<AssetSearchRow[]>(`/search/held`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/search/onhand`, {
     params: {
       warehouseIds: warehouses.map((w) => w.id),
       brandIds: brand ? [brand.id] : [],
@@ -363,7 +335,6 @@ export async function getAssetsForSearchHeld(
       heldById: heldBy?.id ?? undefined,
       heldForId: heldFor?.id ?? undefined,
       holdCustomerId: holdCustomer?.id ?? undefined,
-      daysHeldMin: daysHeldMin ?? undefined,
     },
   })
   return z.array(AssetSearchRowSchema).parse(data)

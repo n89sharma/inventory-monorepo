@@ -108,13 +108,10 @@ const AssetDetailsPage = lazy(() =>
     default: m.AssetDetailsPage,
   })),
 )
-const SearchInStockPage = lazy(() =>
-  import('./components/asset-search/search-instock-page').then((m) => ({
-    default: m.SearchInStockPage,
+const SearchOnHandPage = lazy(() =>
+  import('./components/asset-search/search-onhand-page').then((m) => ({
+    default: m.SearchOnHandPage,
   })),
-)
-const SearchHeldPage = lazy(() =>
-  import('./components/asset-search/search-held-page').then((m) => ({ default: m.SearchHeldPage })),
 )
 const SearchSoldPage = lazy(() =>
   import('./components/asset-search/search-sold-page').then((m) => ({ default: m.SearchSoldPage })),
@@ -406,31 +403,15 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/search/instock"
+                      path="/search/onhand"
                       element={
                         <PermissionRoute permission="view_asset">
-                          <SearchInStockPage />
+                          <SearchOnHandPage />
                         </PermissionRoute>
                       }
                     />
                     <Route
-                      path="/search/instock/:assetId"
-                      element={
-                        <PermissionRoute permission="view_asset">
-                          <AssetDetailsPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/search/held"
-                      element={
-                        <PermissionRoute permission="view_asset">
-                          <SearchHeldPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/search/held/:assetId"
+                      path="/search/onhand/:assetId"
                       element={
                         <PermissionRoute permission="view_asset">
                           <AssetDetailsPage />

@@ -29,8 +29,7 @@ import {
   getAssetHistory as getAssetHistorySer,
   getAssetHarvestedParts as getAssetHarvestedPartsSer,
   getTransfers as getAssetTransfersSer,
-  getAssetsForSearchInStock as getAssetsForSearchInStockSer,
-  getAssetsForSearchHeld as getAssetsForSearchHeldSer,
+  getAssetsForSearchOnHand as getAssetsForSearchOnHandSer,
   getAssets as getAssetsSer,
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
   getBarcodeLabels as getBarcodeLabelsSer,
@@ -203,53 +202,7 @@ export const getSoldAssets = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const SearchInStockQuerySchema = z.object({
-  warehouseIds: z
-    .preprocess(toNumberArray, z.array(z.string().transform(Number)))
-    .refine((ids) => ids.length > 0, { message: 'At least one warehouse is required' }),
-  brandIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
-  assetTypeIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
-  readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
-  model: z
-    .string()
-    .min(3)
-    .max(100)
-    .regex(/^[a-zA-Z0-9\s\-_.]+$/)
-    .optional(),
-  meterMin: z.string().optional().transform(Number),
-  meterMax: z.string().optional().transform(Number),
-  cassettes: z.string().optional().transform(Number),
-  componentId: z.string().optional().transform(Number),
-})
-
-export const getAssetsForSearchInStock = asyncHandler(async (req, res) => {
-  const {
-    warehouseIds,
-    brandIds,
-    assetTypeIds,
-    readinessIds,
-    model,
-    meterMin,
-    meterMax,
-    cassettes,
-    componentId,
-  } = res.locals.query as z.infer<typeof SearchInStockQuerySchema>
-  const data = await getAssetsForSearchInStockSer(
-    warehouseIds,
-    brandIds,
-    assetTypeIds,
-    readinessIds,
-    model ?? '',
-    isNaN(meterMin) ? -1 : meterMin,
-    isNaN(meterMax) ? -1 : meterMax,
-    isNaN(cassettes) ? -1 : cassettes,
-    isNaN(componentId) ? -1 : componentId,
-    res.locals.dbUserRole,
-  )
-  res.json(successResponse(data))
-})
-
-export const SearchHeldQuerySchema = z.object({
+export const SearchOnHandQuerySchema = z.object({
   warehouseIds: z
     .preprocess(toNumberArray, z.array(z.string().transform(Number)))
     .refine((ids) => ids.length > 0, { message: 'At least one warehouse is required' }),
@@ -269,10 +222,9 @@ export const SearchHeldQuerySchema = z.object({
   heldById: z.string().optional().transform(Number),
   heldForId: z.string().optional().transform(Number),
   holdCustomerId: z.string().optional().transform(Number),
-  daysHeldMin: z.string().optional().transform(Number),
 })
 
-export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
+export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
   const {
     warehouseIds,
     brandIds,
@@ -286,9 +238,8 @@ export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
     heldById,
     heldForId,
     holdCustomerId,
-    daysHeldMin,
-  } = res.locals.query as z.infer<typeof SearchHeldQuerySchema>
-  const data = await getAssetsForSearchHeldSer(
+  } = res.locals.query as z.infer<typeof SearchOnHandQuerySchema>
+  const data = await getAssetsForSearchOnHandSer(
     warehouseIds,
     brandIds,
     assetTypeIds,
@@ -301,7 +252,6 @@ export const getAssetsForSearchHeld = asyncHandler(async (req, res) => {
     isNaN(heldById) ? -1 : heldById,
     isNaN(heldForId) ? -1 : heldForId,
     isNaN(holdCustomerId) ? -1 : holdCustomerId,
-    isNaN(daysHeldMin) ? -1 : daysHeldMin,
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

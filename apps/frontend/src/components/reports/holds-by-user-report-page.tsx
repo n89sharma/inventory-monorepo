@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom'
 import type { ActiveHoldRow } from 'shared-types'
 
 const DAYS_SUFFIX = 'd'
-const SEARCH_HELD_URL = '/search/held'
+const SEARCH_ONHAND_URL = '/search/onhand'
 const INTERACTIVE_SELECTOR = 'a, button'
 const MEDIAN_HELD_WARNING_THRESHOLD = 30
 const ROW_WARNING_CLASS = 'bg-[var(--row-warning)] hover:bg-[var(--row-warning-hover)]'
@@ -123,8 +123,8 @@ function HoldsReportBody({ table }: { table: HoldsByUserTable }): React.JSX.Elem
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-sm text-muted-foreground">No active holds.</p>
-        <Link to={SEARCH_HELD_URL} className="text-sm underline">
-          Go to Search Held
+        <Link to={SEARCH_ONHAND_URL} className="text-sm underline">
+          Go to On-Hand
         </Link>
       </div>
     )

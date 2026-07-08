@@ -4,6 +4,7 @@ export const SAVED_VIEW_PAGE_KEYS = [
   'search_all',
   'search_instock',
   'search_held',
+  'search_onhand',
   'search_sold',
   'sold_report',
   'report_profitability',
