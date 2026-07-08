@@ -1,7 +1,8 @@
 /** Rooted, top-down dependency tree for a single component. See `npm run graph:tree`. */
 const SHADCN = 'src/components/shadcn'
 const EXTERNAL = '(?:node_modules|packages/shared-types)'
-const ROOT = 'search-instock-page\\.tsx$'
+const rootFile = process.env.GRAPH_TREE_ROOT
+const ROOT = rootFile && `${rootFile.replace(/[.]/g, '\\.')}$`
 
 module.exports = {
   options: {
@@ -17,7 +18,9 @@ module.exports = {
           node: { shape: 'box', style: 'rounded,filled', fillcolor: '#ffffff' },
           edge: { arrowhead: 'vee', color: '#94a3b8' },
           modules: [
-            { criteria: { source: ROOT }, attributes: { fillcolor: '#bbf7d0', penwidth: 2 } },
+            ...(ROOT
+              ? [{ criteria: { source: ROOT }, attributes: { fillcolor: '#bbf7d0', penwidth: 2 } }]
+              : []),
             { criteria: { source: SHADCN }, attributes: { fillcolor: '#bae6fd' } },
             { criteria: { source: EXTERNAL }, attributes: { fillcolor: '#e5e7eb', shape: 'cylinder' } },
           ],
