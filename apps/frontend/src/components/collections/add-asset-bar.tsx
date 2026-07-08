@@ -1,5 +1,4 @@
 import type { AssetSummary } from 'shared-types'
-import { AddAssetBarShell } from '../collections/add-asset-bar-shell'
 import { AddAssetsByBarcodeOrSerial, AddFromHoldButton } from './add-assets-to-create-form'
 
 interface AddAssetBarProps {
@@ -18,7 +17,7 @@ export function AddAssetBar({
   validateAsset,
 }: AddAssetBarProps): React.JSX.Element {
   return (
-    <AddAssetBarShell label="Add asset">
+    <div className="flex items-center gap-2">
       <AddAssetsByBarcodeOrSerial
         getAssets={() => existingAssets}
         onAddAsset={() => {}}
@@ -37,6 +36,6 @@ export function AddAssetBar({
           />
         </div>
       )}
-    </AddAssetBarShell>
+    </div>
   )
 }

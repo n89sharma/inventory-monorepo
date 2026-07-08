@@ -1,13 +1,16 @@
 import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
-import { CircleNotchIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { BarcodeIcon, CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { CommandResultList } from '../global-search/command-result-list'
 import { Button } from '../shadcn/button'
 import { Input } from '../shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
+
+const buildAddAssetPlaceholder = (entityName: string) =>
+  `Scan barcode or serial to add to this ${entityName}…`
 
 const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
 const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -142,11 +145,11 @@ export function AddAssetsByBarcodeOrSerial({
         <PopoverAnchor asChild>
           <div className="relative">
             {showLeadingIcon && (
-              <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
+              <BarcodeIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
             )}
             <Input
               ref={inputRef}
-              placeholder="Scan or enter barcode / serial…"
+              placeholder={buildAddAssetPlaceholder(entityName)}
               aria-label="Add asset by barcode or serial number"
               value={displayValue}
               onChange={handleInputChange}

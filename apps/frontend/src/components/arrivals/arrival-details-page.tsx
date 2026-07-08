@@ -1,4 +1,3 @@
-import { AddAssetBarForArrival } from '@/components/arrivals/add-asset-bar-for-arrival'
 import { ArrivalSummaryStrip } from '@/components/arrivals/arrival-summary-strip'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { getArrivalHistory } from '@/data/api/arrival-api'
@@ -6,11 +5,13 @@ import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { useCan } from '@/hooks/use-can'
 import { formatDate } from '@/lib/formatters'
+import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { createArrivalAssetSummaryColumns } from '../table-columns/asset-summary-columns'
+import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
 import { EditArrivalMetadataModal } from './edit-arrival-metadata-modal'
@@ -90,8 +91,11 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         />
       )}
       renderAddAssetBar={() => (
-        <>
-          <AddAssetBarForArrival onCreate={() => setIsAssetModalOpen(true)} />
+        <div className="flex justify-end">
+          <Button type="button" variant="secondary" onClick={() => setIsAssetModalOpen(true)}>
+            <PlusIcon />
+            Create Asset
+          </Button>
           <CreateAssetModal
             open={isAssetModalOpen}
             onOpenChange={handleModalOpenChange}
@@ -99,7 +103,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             onCreateAsset={(asset) => mutations.createAsset(arrivalNumber, asset)}
             onUpdateAsset={(asset) => mutations.updateAsset(arrivalNumber, editingAssetId!, asset)}
           />
-        </>
+        </div>
       )}
     />
   )
