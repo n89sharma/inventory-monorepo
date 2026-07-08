@@ -146,6 +146,16 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'update_tech_specs',
     'update_location',
   ],
+  accountant_shipping: [
+    'view_asset',
+    'view_collections',
+    'create_update_arrival',
+    'create_update_transfer',
+    'create_update_departure',
+    'view_sale_price',
+    'view_purchase_price',
+    'edit_prices',
+  ],
   accountant: [
     'view_asset',
     'view_collections',
