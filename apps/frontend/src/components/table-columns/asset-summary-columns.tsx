@@ -60,6 +60,24 @@ export function createAssetSummaryColumns(
       size: 80,
     },
     {
+      accessorKey: 'cassettes',
+      header: 'Cassettes',
+      cell: ({ row }) => row.original.cassettes ?? '',
+      size: 70,
+    },
+    {
+      accessorKey: 'internal_finisher',
+      header: 'Internal Finisher',
+      cell: ({ row }) => row.original.internal_finisher ?? '',
+      size: 90,
+    },
+    {
+      accessorKey: 'accessories',
+      header: 'Accessories',
+      cell: ({ row }) => row.original.accessories.join(', '),
+      size: 140,
+    },
+    {
       id: 'location',
       header: 'Location',
       cell: ({ row }) => formatLocation(row.original.location),
