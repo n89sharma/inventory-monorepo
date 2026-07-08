@@ -27,6 +27,9 @@ export type AssetIdentity = z.infer<typeof AssetIdentitySchema>
 
 export const AssetSummarySchema = AssetIdentitySchema.extend({
   meter_total: z.number().nullable(),
+  cassettes: z.number().nullable(),
+  internal_finisher: z.string().nullable(),
+  accessories: z.array(z.string()),
   weight: z.number(),
   size: z.number(),
   status: z.string(),

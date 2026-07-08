@@ -17,13 +17,9 @@ export * from "./sql/getAssetDetailsBatch.js"
 
 export * from "./sql/getAssetErrors.js"
 
-export * from "./sql/getAssetSalvagedParts.js"
-
-export * from "./sql/getAssetStoreParts.js"
-
-export * from "./sql/getAssetTransfers.js"
-
 export * from "./sql/getAssets.js"
+
+export * from "./sql/getAssetSalvagedParts.js"
 
 export * from "./sql/getAssetsBySerialNumber.js"
 
@@ -36,6 +32,10 @@ export * from "./sql/getAssetsForHold.js"
 export * from "./sql/getAssetsForInvoice.js"
 
 export * from "./sql/getAssetsForTransfers.js"
+
+export * from "./sql/getAssetStoreParts.js"
+
+export * from "./sql/getAssetTransfers.js"
 
 export * from "./sql/getDepartures.js"
 
@@ -51,9 +51,9 @@ export * from "./sql/getLocationsByWarehouse.js"
 
 export * from "./sql/getModelLastSale.js"
 
-export * from "./sql/getModelSales.js"
-
 export * from "./sql/getModels.js"
+
+export * from "./sql/getModelSales.js"
 
 export * from "./sql/getOrganizations.js"
 

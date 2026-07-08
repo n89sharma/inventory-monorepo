@@ -28,6 +28,9 @@ type AssetSummaryRow = LocationRow & {
   asset_type: string
   serial_number: string
   meter_total: number | null
+  cassettes: number | null
+  internal_finisher: string | null
+  accessories: string[] | null
   weight: number
   size: number
   status: string
@@ -48,6 +51,9 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     asset_type: r.asset_type,
     serial_number: r.serial_number,
     meter_total: r.meter_total,
+    cassettes: r.cassettes,
+    internal_finisher: r.internal_finisher,
+    accessories: r.accessories ?? [],
     weight: r.weight,
     size: r.size,
     status: r.status,

@@ -1,6 +1,9 @@
 import type { AssetDetails, AssetSummary } from '../types/asset-types.js'
 
-export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary {
+export function assetDetailsToSummary(
+  assetDetails: AssetDetails,
+  accessories: string[],
+): AssetSummary {
   return {
     id: assetDetails.id,
     barcode: assetDetails.barcode,
@@ -9,6 +12,9 @@ export function assetDetailsToSummary(assetDetails: AssetDetails): AssetSummary 
     asset_type: assetDetails.asset_type,
     serial_number: assetDetails.serial_number,
     meter_total: assetDetails.specs.meter_total,
+    cassettes: assetDetails.specs.cassettes,
+    internal_finisher: assetDetails.specs.internal_finisher,
+    accessories,
     weight: assetDetails.weight,
     size: assetDetails.size,
     status: assetDetails.status,

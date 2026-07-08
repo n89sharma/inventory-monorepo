@@ -6,6 +6,9 @@ select
   a.barcode as barcode,
   a.serial_number as serial_number,
   s.meter_total as meter_total,
+  s.cassettes as cassettes,
+  cmp."name" as internal_finisher,
+  acc.accessories as accessories,
   m.weight as weight,
   m.size as size,
   w.city_code as warehouse_code,
@@ -22,6 +25,13 @@ from "AssetTransfer" tt
   join "Transfer" t on t.id = tt.transfer_id
   join "Asset" a on a.id = tt.asset_id
   join "TechnicalSpecification" s on s.asset_id = a.id
+  left join "Component" cmp on cmp.id = s.component_id
+  left join lateral (
+    select coalesce(array_agg(ac.accessory order by ac.accessory), '{}') as accessories
+    from "AssetAccessory" aa
+      join "Accessory" ac on ac.id = aa.accessory_id
+    where aa.asset_id = a.id
+  ) acc on true
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id

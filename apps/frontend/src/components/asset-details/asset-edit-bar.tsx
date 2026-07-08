@@ -35,6 +35,7 @@ const COLLECTION_PERMISSIONS: Permission[] = [
 export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Element {
   const { data } = useAssetDetail(barcode)
   const assetDetails = data?.assetDetails ?? null
+  const accessories = data?.accessories ?? []
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
@@ -42,7 +43,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [printLoading, setPrintLoading] = useState(false)
 
-  const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails) : null
+  const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails, accessories) : null
   const can = useCan()
 
   async function handlePrint() {
