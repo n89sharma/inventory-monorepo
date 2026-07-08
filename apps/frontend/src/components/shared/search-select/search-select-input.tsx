@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
+import { rankMatches } from '@/lib/rank-matches'
 import { XIcon } from '@phosphor-icons/react'
-import { defaultFilter } from 'cmdk'
 import { useEffect, useRef, useState } from 'react'
 import { Badge } from '@/components/shadcn/badge'
 import { Field } from '@/components/shadcn/field'
@@ -82,25 +82,7 @@ export function SearchSelectInput<T>({
       setHighlightedIndex(-1)
       return
     }
-    const needle = clean.toLowerCase()
-    const substringMatches = options
-      .map((option) => ({ option, index: getSearchText(option).toLowerCase().indexOf(needle) }))
-      .filter((result) => result.index !== -1)
-      .sort(
-        (a, b) =>
-          a.index - b.index || getSearchText(a.option).length - getSearchText(b.option).length,
-      )
-      .map((result) => result.option)
-
-    const ranked =
-      substringMatches.length > 0
-        ? substringMatches
-        : options
-            .map((option) => ({ option, score: defaultFilter(getSearchText(option), clean) }))
-            .filter((result) => result.score > 0)
-            .sort((a, b) => b.score - a.score)
-            .map((result) => result.option)
-
+    const ranked = rankMatches(options, clean, getSearchText)
     setMatches(ranked.slice(0, SUGGESTION_LIMIT))
     setPopoverOpen(true)
   }

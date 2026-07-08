@@ -369,15 +369,13 @@ export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => 
 }
 
 export function useStoreSearchParam(): [string, (next: string) => void] {
-  const [search, setSearch] = useQueryState('search', searchParser)
-  const setValue = useCallback(
-    (next: string) => {
-      const trimmed = next.trim()
-      void setSearch(trimmed.length > 0 ? trimmed : null)
-    },
-    [setSearch],
+  const [committed, setCommitted] = useQueryState('search', searchParser)
+  const commit = useCallback(
+    (next: string) => void setCommitted(next.length > 0 ? next : null),
+    [setCommitted],
   )
-  return [search, setValue]
+  const [draft, setDraft] = useDebouncedParam(committed, commit)
+  return [draft, setDraft]
 }
 
 export function resolveWarehouseScope(

@@ -1,15 +1,20 @@
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
-import { Input } from '@/components/shadcn/input'
+import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { AddPurchaseModal } from '@/components/store-part/add-purchase-modal'
 import { storePartTableColumns } from '@/components/store-part/store-part-table-columns'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'
 import { useStoreSearchParam, useStoreWarehousesParam } from '@/lib/filters/hooks'
+import { rankMatches } from '@/lib/rank-matches'
 import { buildStorePartPath } from '@/lib/filters/serializers'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import type { StorePart, StorePartSummary } from 'shared-types'
+
+function storePartSearchText(row: StorePartSummary): string {
+  return `${row.part_number} ${row.description}`
+}
 
 export function StorePartsListPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useStoreWarehousesParam()
@@ -21,17 +26,11 @@ export function StorePartsListPage(): React.JSX.Element {
   const selectedWarehouseIds = useMemo(() => new Set(warehouses.map((w) => w.id)), [warehouses])
 
   const filteredRows = useMemo(() => {
-    const needle = search.trim().toLowerCase()
-    return rows.filter((row) => {
-      if (selectedWarehouseIds.size > 0 && !selectedWarehouseIds.has(row.warehouse_id)) {
-        return false
-      }
-      if (!needle) return true
-      return (
-        row.part_number.toLowerCase().includes(needle) ||
-        row.description.toLowerCase().includes(needle)
-      )
-    })
+    const inWarehouse =
+      selectedWarehouseIds.size > 0
+        ? rows.filter((row) => selectedWarehouseIds.has(row.warehouse_id))
+        : rows
+    return rankMatches(inWarehouse, search, storePartSearchText)
   }, [rows, selectedWarehouseIds, search])
 
   const allParts = useMemo<StorePart[]>(() => {
@@ -68,10 +67,11 @@ export function StorePartsListPage(): React.JSX.Element {
         searchBar={
           <div className="flex flex-wrap items-center gap-3">
             <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
-            <Input
+            <InputWithClearInline
+              inputType="string"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search part number or description"
+              onValueChange={(val) => setSearch(typeof val === 'string' ? val : '')}
+              fieldLabel="Search part number or description"
               className="max-w-xs"
             />
           </div>
