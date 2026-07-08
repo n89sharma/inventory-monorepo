@@ -14,11 +14,12 @@ import {
   useHeldByParam,
   useHeldForParam,
   useHoldCustomerParam,
+  useInStockOnlyParam,
   usePriceCheckParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
-import type { AssetSearchRow } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
@@ -35,6 +36,7 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
 export function SearchOnHandPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
   const [warehouses, setWarehouses] = useWarehousesParam()
+  const [inStockOnly, setInStockOnly] = useInStockOnlyParam()
   const [priceCheck, setPriceCheck] = usePriceCheckParam()
   const [, setAssetTypes] = useAssetTypesParam()
   const [heldBy, setHeldBy] = useHeldByParam()
@@ -64,10 +66,12 @@ export function SearchOnHandPage(): React.JSX.Element {
 
   const visibleAssets = useMemo(
     () =>
-      priceCheck
-        ? assets.filter((a) => a.cost_purchase_cost == null || a.cost_purchase_cost === 0)
-        : assets,
-    [assets, priceCheck],
+      assets.filter(
+        (a) =>
+          (!priceCheck || a.cost_purchase_cost == null || a.cost_purchase_cost === 0) &&
+          (!inStockOnly || a.status === ASSET_STATUS.IN_STOCK),
+      ),
+    [assets, priceCheck, inStockOnly],
   )
 
   return (
@@ -86,6 +90,14 @@ export function SearchOnHandPage(): React.JSX.Element {
         scopeFilters={
           <>
             <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+            <Toggle
+              variant="outline"
+              pressed={inStockOnly}
+              onPressedChange={setInStockOnly}
+              aria-label="Show only in-stock assets"
+            >
+              {inStockOnly ? 'Show All' : 'Show In Stock'}
+            </Toggle>
             {canViewPurchasePrice ? (
               <Toggle
                 variant="outline"

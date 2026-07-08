@@ -47,6 +47,7 @@ export const FILTER_PARSERS = {
   type: parseAsIdList,
   status: parseAsIdList,
   pricecheck: parseAsOnFlag,
+  instock: parseAsOnFlag,
   other: parseAsOnFlag,
   from: parseAsDateOnly,
   to: parseAsDateOnly,

@@ -29,6 +29,7 @@ const DEFAULT_SOLD_RANGE: SoldReportRange = 6
 const ID_LIST_DEFAULT: number[] = []
 const idListParser = parseAsIdList.withDefault(ID_LIST_DEFAULT)
 const priceCheckParser = FILTER_PARSERS.pricecheck.withDefault(false)
+const inStockOnlyParser = FILTER_PARSERS.instock.withDefault(false)
 const showOtherParser = FILTER_PARSERS.other.withDefault(false)
 const specsParser = FILTER_PARSERS.specs.withDefault(false)
 const searchParser = FILTER_PARSERS.search.withDefault('')
@@ -294,6 +295,12 @@ export function useModelParam(): {
 
 export function usePriceCheckParam(): [boolean, (next: boolean) => void] {
   const [on, setOn] = useQueryState('pricecheck', priceCheckParser)
+  const setValue = useCallback((next: boolean) => void setOn(next ? true : null), [setOn])
+  return [on, setValue]
+}
+
+export function useInStockOnlyParam(): [boolean, (next: boolean) => void] {
+  const [on, setOn] = useQueryState('instock', inStockOnlyParser)
   const setValue = useCallback((next: boolean) => void setOn(next ? true : null), [setOn])
   return [on, setValue]
 }
