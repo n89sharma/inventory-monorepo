@@ -1,8 +1,11 @@
 import { PageContent } from '@/components/app-layout/page-content'
+import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
+import { SearchSelectOptionFilter } from '@/components/shared/search-select/search-select-option-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
+import { ANY_OPTION, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
 import type { ColumnDef, RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -10,7 +13,6 @@ import type { AssetSummary, CollectionHistory, Permission } from 'shared-types'
 import { DataTable } from '../shadcn/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
-import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 
 type DetailSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
@@ -77,6 +79,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const hasPermission = useCan(permission)
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [modelFilter, setModelFilter] = useState<SelectOption<string>>(ANY_OPTION)
 
   const assetHref = useMemo(
     () => (asset: AssetSummary) => `/${section}/${collectionId}/${asset.barcode}`,
@@ -104,7 +107,14 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
 
   const entity = detail.data
   const canEdit = hasPermission && (canEditEntity ?? true)
-  const selectedAssets = entity.assets.filter((a) => rowSelection[a.barcode])
+
+  const selectedModel = getSelectedOrNull(modelFilter)
+  const modelOptions = [...new Set(entity.assets.map((asset) => asset.model))].sort()
+  const visibleAssets = selectedModel
+    ? entity.assets.filter((asset) => asset.model === selectedModel)
+    : entity.assets
+
+  const selectedAssets = visibleAssets.filter((a) => rowSelection[a.barcode])
 
   return (
     <>
@@ -146,9 +156,9 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             currentCollectionType={section}
             returnTo={`/${section}/${collectionId}`}
             onBulkRemove={onBulkRemove}
-            totalCount={entity.assets.length}
+            totalCount={visibleAssets.length}
             onSelectAll={() =>
-              setRowSelection(Object.fromEntries(entity.assets.map((a) => [a.barcode, true])))
+              setRowSelection(Object.fromEntries(visibleAssets.map((a) => [a.barcode, true])))
             }
             extraActions={renderBulkExtraActions?.({
               selectedAssets,
@@ -158,7 +168,18 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         )}
         <DataTable
           columns={columns}
-          data={entity.assets}
+          data={visibleAssets}
+          tableFilter={
+            <SearchSelectOptionFilter
+              selection={modelFilter}
+              onChange={setModelFilter}
+              options={modelOptions}
+              getLabel={(model) => model}
+              placeholder="Model"
+              clearLabel="Clear model"
+              className="w-50 rounded-lg bg-background"
+            />
+          }
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
           getRowHref={assetHref}
           rowSelection={rowSelection}

@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 import type { CollectionSummarySchema } from 'shared-types'
 
 const ID_COLUMN_SIZE = 120
-const SELECT_COLUMN_SIZE = 44
+export const SELECT_COLUMN_SIZE = 44
 
 function SelectHitArea({ onActivate, children }: { onActivate: () => void; children: ReactNode }) {
   return (

@@ -17,14 +17,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { memo, useState, type CSSProperties } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     cellClassName?: string
   }
 }
-import { memo, useState, type CSSProperties } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import {
   Table,
@@ -36,11 +36,13 @@ import {
 } from '@/components/shadcn/table'
 
 import { Button } from '@/components/shadcn/button'
+import { SELECT_COLUMN_SIZE } from '@/components/table-columns/shared-columns'
 import {
   CaretDoubleLeftIcon,
   CaretDoubleRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  FunnelSimpleIcon,
 } from '@phosphor-icons/react'
 
 interface DataTableProps<TData, TValue> {
@@ -58,6 +60,7 @@ interface DataTableProps<TData, TValue> {
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   scrollMaxHeight?: string
+  tableFilter?: React.ReactNode
 }
 
 const CELL_BG =
@@ -117,6 +120,7 @@ export function DataTable<TData, TValue>({
   getSubRows,
   columnVisibility,
   scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
+  tableFilter,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
@@ -162,52 +166,65 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="overflow-auto rounded-md border" style={{ maxHeight: scrollMaxHeight }}>
-        <Table className="table-fixed !w-max min-w-full">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                      className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table
-                .getRowModel()
-                .rows.map((row) => (
-                  <DataRow
-                    key={row.id}
-                    row={row}
-                    isSelected={row.getIsSelected()}
-                    isExpanded={row.getIsExpanded()}
-                    onRowMouseEnter={onRowMouseEnter}
-                    getRowHref={getRowHref}
-                    getRowClassName={getRowClassName}
-                    columnVisibility={columnVisibility}
-                  />
-                ))
-            ) : (
-              <TableRow role="status" aria-live="polite">
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+      <div className="overflow-hidden rounded-md border">
+        {tableFilter && (
+          <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
+            <div
+              className="flex shrink-0 items-center justify-center pl-4"
+              style={{ width: SELECT_COLUMN_SIZE }}
+            >
+              <FunnelSimpleIcon className="size-6 text-muted-foreground" aria-hidden="true" />
+            </div>
+            {tableFilter}
+          </div>
+        )}
+        <div className="overflow-auto" style={{ maxHeight: scrollMaxHeight }}>
+          <Table className="table-fixed !w-max min-w-full">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
+                        className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table
+                  .getRowModel()
+                  .rows.map((row) => (
+                    <DataRow
+                      key={row.id}
+                      row={row}
+                      isSelected={row.getIsSelected()}
+                      isExpanded={row.getIsExpanded()}
+                      onRowMouseEnter={onRowMouseEnter}
+                      getRowHref={getRowHref}
+                      getRowClassName={getRowClassName}
+                      columnVisibility={columnVisibility}
+                    />
+                  ))
+              ) : (
+                <TableRow role="status" aria-live="polite">
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <div className="flex flex-col items-center gap-2 p-2">
