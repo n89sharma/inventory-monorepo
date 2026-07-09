@@ -2,6 +2,7 @@ import { isAfter, subMonths } from 'date-fns'
 import { Request, Response } from 'express'
 import {
   ApiResponse,
+  AssetActiveCollectionsRequestSchema,
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
   BulkUpdateAssetPricingSchema,
@@ -35,6 +36,7 @@ import {
   getBarcodeLabels as getBarcodeLabelsSer,
   getSoldAssets as getSoldAssetsSer,
 } from '../services/assetReadService.js'
+import { getAssetActiveCollections as getAssetActiveCollectionsSer } from '../services/collectionValidationService.js'
 import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
 import { generateBarcodePdf as generateBarcodePdfSer } from '../services/barcodePrintService.js'
 import {
@@ -260,6 +262,12 @@ export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
 export const getAssetsBySerialNumber = asyncHandler(async (req, res) => {
   const { serialNumbers } = AssetsBySerialNumberRequestSchema.parse(req.body)
   const data = await getAssetsBySerialNumberSer(serialNumbers, res.locals.dbUserRole)
+  res.json(successResponse(data))
+})
+
+export const getAssetActiveCollections = asyncHandler(async (req, res) => {
+  const { assetIds } = AssetActiveCollectionsRequestSchema.parse(req.body)
+  const data = await getAssetActiveCollectionsSer(prisma, assetIds)
   res.json(successResponse(data))
 })
 

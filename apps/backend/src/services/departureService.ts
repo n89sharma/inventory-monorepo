@@ -9,14 +9,11 @@ import {
 } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
-import {
-  addRemoveCollectionFromAssets,
-  assertAssetsNotInCollection,
-  recordCollectionAssetDelta,
-} from '../lib/collection-assets.js'
+import { recordCollectionAssetDelta } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { assertAssetsCanJoinCollection } from './collectionValidationService.js'
 import {
   recordAssetStatusChange,
   recordDepartureCreate,
@@ -62,13 +59,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     throw new Error(`Outgoing statuses not seeded in DB: ${unseededStatuses.join(', ')}`)
 
   const { newDeparture, priorStatusByAsset } = await prisma.$transaction(async (tx) => {
-    await assertAssetsNotInCollection(
-      tx,
-      assetIds,
-      { departure_id: { not: null } },
-      (barcodes) =>
-        new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
-    )
+    await assertAssetsCanJoinCollection(tx, assetIds, 'departure')
 
     const created = await tx.departure.create({
       data: {
@@ -197,14 +188,10 @@ export async function addAssetsToDepartureAndRecord(
       where: { id: { in: delta.assetIdsToAdd } },
       select: { id: true, status_id: true },
     })
-    await addRemoveCollectionFromAssets(tx, {
-      assetsToAdd: delta.assetIdsToAdd,
-      assetsToRemove: [],
-      assetInCollectionWhere: { departure_id: { not: null } },
-      assetInCollectionError: (barcodes) =>
-        new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
-      add: { departure_id: departure.id, status_id: addStatus.id },
-      remove: {},
+    await assertAssetsCanJoinCollection(tx, delta.assetIdsToAdd, 'departure')
+    await tx.asset.updateMany({
+      where: { id: { in: delta.assetIdsToAdd } },
+      data: { departure_id: departure.id, status_id: addStatus.id },
     })
     return prior
   })

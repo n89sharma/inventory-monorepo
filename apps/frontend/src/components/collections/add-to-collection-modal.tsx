@@ -1,4 +1,5 @@
 import { EntityLink } from '@/components/shared/entity-link'
+import { getAssetActiveCollections } from '@/data/api/asset-api'
 import { getGlobalSearchResults } from '@/data/api/search-api'
 import { useCan } from '@/hooks/use-can'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
@@ -8,7 +9,7 @@ import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 import { formatDate } from '@/lib/formatters'
 import { useEffect, useState } from 'react'
-import type { AssetSummary } from 'shared-types'
+import { canAddAssetToCollection, type AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { DetailGrid, SearchView } from './collection-search'
@@ -130,6 +131,7 @@ export function AddToCollectionModal({
   const [duplicateCount, setDuplicateCount] = useState(0)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [isConfirming, setIsConfirming] = useState(false)
+  const [departureEligible, setDepartureEligible] = useState(true)
 
   const canCreateTransfer = useCan('create_update_transfer')
   const canCreateDeparture = useCan('create_update_departure')
@@ -142,13 +144,32 @@ export function AddToCollectionModal({
   const invoiceMutations = useInvoiceMutations()
 
   const assetCount = selectedAssets.length
+  const selectedAssetIdKey = selectedAssets.map((a) => a.id).join(',')
+
+  useEffect(() => {
+    if (!open || !selectedAssetIdKey) return
+    let cancelled = false
+    getAssetActiveCollections(selectedAssetIdKey.split(',').map(Number))
+      .then((presence) => {
+        if (!cancelled)
+          setDepartureEligible(
+            presence.every((p) => canAddAssetToCollection(p.active_collections, 'departure')),
+          )
+      })
+      .catch(() => {
+        if (!cancelled) setDepartureEligible(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open, selectedAssetIdKey])
 
   useEffect(() => {
     if (!query) return
     const t = setTimeout(async () => {
       const res = await getGlobalSearchResults(query)
       setResults({
-        departures: canCreateDeparture ? res.departures : [],
+        departures: canCreateDeparture && departureEligible ? res.departures : [],
         transfers: canCreateTransfer ? res.transfers : [],
         holds: canCreateHold ? res.holds : [],
         invoices: canCreateInvoice ? res.invoices : [],
@@ -156,7 +177,14 @@ export function AddToCollectionModal({
       setIsLoading(false)
     }, 150)
     return () => clearTimeout(t)
-  }, [query, canCreateDeparture, canCreateTransfer, canCreateHold, canCreateInvoice])
+  }, [
+    query,
+    canCreateDeparture,
+    departureEligible,
+    canCreateTransfer,
+    canCreateHold,
+    canCreateInvoice,
+  ])
 
   function handleQueryChange(value: string) {
     setQuery(value)
@@ -268,6 +296,7 @@ export function AddToCollectionModal({
       setDuplicateCount(0)
       setIsLoadingDetail(false)
       setIsConfirming(false)
+      setDepartureEligible(true)
     }
     onOpenChange(nextOpen)
   }

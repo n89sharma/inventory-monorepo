@@ -13,6 +13,7 @@ import {
   getAssetErrors,
   getAssetHarvestedParts,
   getAssetHistory,
+  getAssetActiveCollections,
   getAssetSummaryByBarcode,
   getAssetTransfers,
   getAssets,
@@ -40,6 +41,7 @@ router.get(
   getSoldAssets,
 )
 router.post('/export', requirePermission('view_asset'), exportAssetReport)
+router.post('/active-collections', requirePermission('view_asset'), getAssetActiveCollections)
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
 router.get(
   '/locations',

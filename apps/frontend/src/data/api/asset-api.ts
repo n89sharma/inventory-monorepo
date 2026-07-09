@@ -1,6 +1,8 @@
 import { api } from '@/data/api/axios-client'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
 import type {
+  AssetActiveCollections,
+  AssetActiveCollectionsRequest,
   AssetDetails,
   AssetError,
   AssetHarvestedPart,
@@ -31,6 +33,8 @@ import type {
 } from 'shared-types'
 
 import {
+  AssetActiveCollectionsRequestSchema,
+  AssetActiveCollectionsSchema,
   AssetDetailsSchema,
   AssetErrorSchema,
   AssetHarvestedPartSchema,
@@ -305,6 +309,16 @@ export async function getAssetsBySerialNumber(
   } satisfies AssetsBySerialNumberRequest)
   const { data } = await api.post('/reports/serial-number', getAssetsBySerialNumberBody)
   return AssetsBySerialNumberResultSchema.parse(data)
+}
+
+export async function getAssetActiveCollections(
+  assetIds: number[],
+): Promise<AssetActiveCollections[]> {
+  const getAssetActiveCollectionsBody = AssetActiveCollectionsRequestSchema.parse({
+    assetIds,
+  } satisfies AssetActiveCollectionsRequest)
+  const { data } = await api.post('/assets/active-collections', getAssetActiveCollectionsBody)
+  return z.array(AssetActiveCollectionsSchema).parse(data)
 }
 
 export async function getAssetsForSearchOnHand(

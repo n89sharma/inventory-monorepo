@@ -9,6 +9,7 @@ import {
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
+import { prisma } from '../prisma.js'
 import {
   addAssetsToDepartureAndRecord,
   createDeparture,
@@ -109,6 +110,39 @@ describe('departureService', () => {
         departureNumber,
         [stranger.id],
         OUTGOING_STATUS.SCRAPPED,
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+  })
+
+  it('rejects departing an in-transit asset', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await prisma.asset.update({ where: { id: asset.id }, data: { is_in_transit: true } })
+
+    await expect(
+      createDeparture(
+        buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+  })
+
+  it('rejects adding an in-transit asset to an existing departure', async () => {
+    const [onDeparture] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: onDeparture.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    const [inTransit] = await createArrivedAssets(refs, 1)
+    await prisma.asset.update({ where: { id: inTransit.id }, data: { is_in_transit: true } })
+
+    await expect(
+      addAssetsToDepartureAndRecord(
+        departureNumber,
+        { assetIdsToAdd: [inTransit.id], assetIdsToRemove: [] },
         refs.userId,
       ),
     ).rejects.toThrow(ConflictError)
