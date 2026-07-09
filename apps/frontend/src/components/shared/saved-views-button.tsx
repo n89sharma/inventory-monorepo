@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/too
 import { useSavedViews } from '@/hooks/use-saved-view'
 import { useSavedViewMutations } from '@/hooks/use-saved-view-mutations'
 import { BookmarksIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { SavedViewPageKey, SavedViewSummary } from 'shared-types'
@@ -120,7 +121,8 @@ function SaveViewDialog({
 }
 
 export function SavedViewsButton({ pageKey }: { pageKey: SavedViewPageKey }): React.JSX.Element {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [, setSearchParams] = useSearchParams()
+  const liveSearchParams = useOptimisticSearchParams()
   const { data: views = EMPTY_VIEWS } = useSavedViews(pageKey)
   const { create, remove } = useSavedViewMutations()
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -130,7 +132,7 @@ export function SavedViewsButton({ pageKey }: { pageKey: SavedViewPageKey }): Re
   }
 
   async function saveView(name: string) {
-    await create({ name, page_key: pageKey, query_string: searchParams.toString() })
+    await create({ name, page_key: pageKey, query_string: liveSearchParams.toString() })
     toast.success(`Saved view "${name}"`, TOAST_POSITION)
   }
 
