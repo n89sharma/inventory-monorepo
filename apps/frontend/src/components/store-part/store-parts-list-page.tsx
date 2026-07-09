@@ -2,7 +2,7 @@ import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
 import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { CollectionPage } from '@/components/collections/collection-page'
-import { AddPurchaseModal } from '@/components/store-part/add-purchase-modal'
+import { StoreTransactionModal } from '@/components/store-part/store-transaction-modal'
 import { storePartTableColumns } from '@/components/store-part/store-part-table-columns'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'
 import { useStoreSearchParam, useStoreWarehousesParam } from '@/lib/filters/hooks'
@@ -78,7 +78,7 @@ export function StorePartsListPage(): React.JSX.Element {
         }
       />
       {targetWarehouse && (
-        <AddPurchaseModal
+        <StoreTransactionModal
           open={addOpen}
           onOpenChange={setAddOpen}
           warehouseId={targetWarehouse.id}

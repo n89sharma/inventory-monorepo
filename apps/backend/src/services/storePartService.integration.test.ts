@@ -1,4 +1,4 @@
-import { AddPurchase, AddStorePartToAsset } from 'shared-types'
+import { RecordStoreTransaction, AddStorePartToAsset } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
@@ -9,7 +9,7 @@ import {
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { addPurchase, addStorePartToAsset, getStoreParts } from './storePartService.js'
+import { recordStoreTransaction, addStorePartToAsset, getStoreParts } from './storePartService.js'
 
 describe('storePartService', () => {
   let refs: ArrivalTestData
@@ -31,14 +31,14 @@ describe('storePartService', () => {
   async function purchaseNewPart(quantity: number, unitCost: number): Promise<number> {
     partCounter += 1
     const partNumber = `TEST-PART-${partCounter}`
-    const purchase: AddPurchase = {
+    const purchase: RecordStoreTransaction = {
       part: { mode: 'new', part_number: partNumber, description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity,
       unit_cost: unitCost,
       notes: null,
     }
-    await addPurchase(purchase, refs.userId)
+    await recordStoreTransaction(purchase, refs.userId)
     const part = await prisma.storePart.findUniqueOrThrow({
       where: { part_number: partNumber },
       select: { id: true },
@@ -85,27 +85,27 @@ describe('storePartService', () => {
 
   it('rejects creating a part whose part_number already exists', async () => {
     const partNumber = 'TEST-PART-DUP'
-    const purchase: AddPurchase = {
+    const purchase: RecordStoreTransaction = {
       part: { mode: 'new', part_number: partNumber, description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity: 1,
       unit_cost: 5,
       notes: null,
     }
-    await addPurchase(purchase, refs.userId)
+    await recordStoreTransaction(purchase, refs.userId)
 
-    await expect(addPurchase(purchase, refs.userId)).rejects.toThrow(ConflictError)
+    await expect(recordStoreTransaction(purchase, refs.userId)).rejects.toThrow(ConflictError)
   })
 
   it('numbers the store transaction S-<7-digit sequence>', async () => {
-    const purchase: AddPurchase = {
+    const purchase: RecordStoreTransaction = {
       part: { mode: 'new', part_number: 'TEST-PART-NUM', description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity: 1,
       unit_cost: 5,
       notes: null,
     }
-    const { store_transaction_number } = await addPurchase(purchase, refs.userId)
+    const { store_transaction_number } = await recordStoreTransaction(purchase, refs.userId)
     expect(store_transaction_number).toMatch(/^S-\d{7}$/)
   })
 })

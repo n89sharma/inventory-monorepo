@@ -1,6 +1,6 @@
 import {
-  AddPurchase,
-  AddPurchaseResponse,
+  RecordStoreTransaction,
+  StoreTransactionResponse,
   AddStorePartToAsset,
   AssetStorePartRow,
   StorePartDetail,
@@ -47,7 +47,10 @@ export async function getStorePart(partId: number): Promise<StorePartDetail> {
   }
 }
 
-export async function addPurchase(data: AddPurchase, userId: number): Promise<AddPurchaseResponse> {
+export async function recordStoreTransaction(
+  data: RecordStoreTransaction,
+  userId: number,
+): Promise<StoreTransactionResponse> {
   const purchaseType = await prisma.storeTransactionType.findFirstOrThrow({
     where: { type: PURCHASE_TYPE, is_inbound: true },
     select: { id: true },
@@ -82,7 +85,7 @@ export async function addPurchase(data: AddPurchase, userId: number): Promise<Ad
 
 async function resolveStorePart(
   tx: Prisma.TransactionClient,
-  part: AddPurchase['part'],
+  part: RecordStoreTransaction['part'],
 ): Promise<{ storePartId: number; partNumber: string }> {
   if (part.mode === 'existing') {
     const existing = await tx.storePart.findUnique({
@@ -123,7 +126,7 @@ export async function addStorePartToAsset(
   barcode: string,
   data: AddStorePartToAsset,
   userId: number,
-): Promise<AddPurchaseResponse> {
+): Promise<StoreTransactionResponse> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 

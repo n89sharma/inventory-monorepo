@@ -1,16 +1,16 @@
 import { api } from '@/data/api/axios-client'
-import type { AddPurchaseForm, AddStorePartForm } from '@/ui-types/store-part-form-types'
+import type { StoreTransactionForm, AddStorePartForm } from '@/ui-types/store-part-form-types'
 import type {
-  AddPurchase,
-  AddPurchaseResponse,
+  RecordStoreTransaction,
+  StoreTransactionResponse,
   AddStorePartToAsset,
   AssetStorePartRow,
   StorePartDetail,
   StorePartSummary,
 } from 'shared-types'
 import {
-  AddPurchaseResponseSchema,
-  AddPurchaseSchema,
+  StoreTransactionResponseSchema,
+  RecordStoreTransactionSchema,
   AddStorePartToAssetSchema,
   AssetStorePartRowSchema,
   StorePartDetailSchema,
@@ -28,22 +28,22 @@ export async function getStorePartDetail(partId: number): Promise<StorePartDetai
   return StorePartDetailSchema.parse(data)
 }
 
-export async function addPurchase(
+export async function recordStoreTransaction(
   warehouseId: number,
-  form: AddPurchaseForm,
-): Promise<AddPurchaseResponse> {
-  const addPurchaseBody = AddPurchaseSchema.parse({
+  form: StoreTransactionForm,
+): Promise<StoreTransactionResponse> {
+  const recordStoreTransactionBody = RecordStoreTransactionSchema.parse({
     part: buildPartPayload(form.part),
     warehouse_id: warehouseId,
     quantity: Number(form.quantity),
     unit_cost: form.unitCost.trim() === '' ? null : Number(form.unitCost),
     notes: form.notes.trim() === '' ? null : form.notes,
-  } satisfies AddPurchase)
-  const { data } = await api.post<AddPurchaseResponse>('/store', addPurchaseBody)
-  return AddPurchaseResponseSchema.parse(data)
+  } satisfies RecordStoreTransaction)
+  const { data } = await api.post<StoreTransactionResponse>('/store', recordStoreTransactionBody)
+  return StoreTransactionResponseSchema.parse(data)
 }
 
-function buildPartPayload(part: AddPurchaseForm['part']): AddPurchase['part'] {
+function buildPartPayload(part: StoreTransactionForm['part']): RecordStoreTransaction['part'] {
   if (part === null) throw new Error('No part selected')
   if ('id' in part) return { mode: 'existing', store_part_id: part.id }
   return { mode: 'new', part_number: part.part_number, description: part.description }
@@ -57,7 +57,7 @@ export async function getAssetStoreParts(barcode: string): Promise<AssetStorePar
 export async function addStorePartToAsset(
   barcode: string,
   form: AddStorePartForm,
-): Promise<AddPurchaseResponse> {
+): Promise<StoreTransactionResponse> {
   if (form.part === null || form.warehouse === null) throw new Error('Part and warehouse required')
   const addStorePartToAssetBody = AddStorePartToAssetSchema.parse({
     store_part_id: form.part.id,
@@ -65,9 +65,9 @@ export async function addStorePartToAsset(
     quantity: Number(form.quantity),
     unit_cost: Number(form.unitCost),
   } satisfies AddStorePartToAsset)
-  const { data } = await api.post<AddPurchaseResponse>(
+  const { data } = await api.post<StoreTransactionResponse>(
     `/store/asset/${barcode}/parts`,
     addStorePartToAssetBody,
   )
-  return AddPurchaseResponseSchema.parse(data)
+  return StoreTransactionResponseSchema.parse(data)
 }

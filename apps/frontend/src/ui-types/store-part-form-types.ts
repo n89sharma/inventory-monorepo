@@ -7,7 +7,7 @@ import {
 import { z } from 'zod'
 
 // part: an existing StorePart (has id), a new CreateStorePart (no id), or nothing yet
-export const AddPurchaseFormSchema = z
+export const StoreTransactionFormSchema = z
   .object({
     part: z.union([StorePartSchema, CreateStorePartSchema]).nullable(),
     quantity: z.string(),
@@ -23,9 +23,9 @@ export const AddPurchaseFormSchema = z
     path: ['quantity'],
   })
 
-export type AddPurchaseForm = z.infer<typeof AddPurchaseFormSchema>
+export type StoreTransactionForm = z.infer<typeof StoreTransactionFormSchema>
 
-export const EMPTY_ADD_PURCHASE_FORM: AddPurchaseForm = {
+export const EMPTY_STORE_TRANSACTION_FORM: StoreTransactionForm = {
   part: null,
   quantity: '',
   unitCost: '',

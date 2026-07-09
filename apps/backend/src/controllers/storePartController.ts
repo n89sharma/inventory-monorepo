@@ -1,8 +1,12 @@
-import { AddPurchaseSchema, AddStorePartToAssetSchema, successResponse } from 'shared-types'
+import {
+  RecordStoreTransactionSchema,
+  AddStorePartToAssetSchema,
+  successResponse,
+} from 'shared-types'
 import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import {
-  addPurchase as addPurchaseSer,
+  recordStoreTransaction as recordStoreTransactionSer,
   addStorePartToAsset as addStorePartToAssetSer,
   getAssetStoreParts as getAssetStorePartsSer,
   getStorePart as getStorePartSer,
@@ -22,9 +26,9 @@ export const getStorePart = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const addPurchase = asyncHandler(async (req, res) => {
-  const validated = AddPurchaseSchema.parse(req.body)
-  const result = await addPurchaseSer(validated, res.locals.dbUserId)
+export const recordStoreTransaction = asyncHandler(async (req, res) => {
+  const validated = RecordStoreTransactionSchema.parse(req.body)
+  const result = await recordStoreTransactionSer(validated, res.locals.dbUserId)
   res.status(201).json(result)
 })
 

@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-  addPurchase,
+  recordStoreTransaction,
   addStorePartToAsset,
   getAssetStoreParts,
   getStorePart,
@@ -17,6 +17,6 @@ router.get('/', requirePermission('view_store'), getStoreParts)
 router.get('/asset/:barcode/parts', requirePermission('view_asset'), getAssetStoreParts)
 router.post('/asset/:barcode/parts', requirePermission('update_tech_specs'), addStorePartToAsset)
 router.get('/:partId', requirePermission('view_store'), getStorePart)
-router.post('/', requirePermission('create_update_store'), addPurchase)
+router.post('/', requirePermission('create_update_store'), recordStoreTransaction)
 
 export default router

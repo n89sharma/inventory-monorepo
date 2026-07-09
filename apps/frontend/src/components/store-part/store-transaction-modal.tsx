@@ -13,9 +13,9 @@ import { HorizontalField } from '@/components/shared/horizontal-field'
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useStorePartMutations } from '@/hooks/use-store-part-mutations'
 import {
-  AddPurchaseFormSchema,
-  EMPTY_ADD_PURCHASE_FORM,
-  type AddPurchaseForm,
+  StoreTransactionFormSchema,
+  EMPTY_STORE_TRANSACTION_FORM,
+  type StoreTransactionForm,
 } from '@/ui-types/store-part-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
@@ -24,7 +24,7 @@ import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import type { StorePart } from 'shared-types'
 import { toast } from 'sonner'
 
-interface AddPurchaseModalProps {
+interface StoreTransactionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   warehouseId: number
@@ -33,40 +33,44 @@ interface AddPurchaseModalProps {
   lockedPart?: StorePart
 }
 
-function isNewPart(part: AddPurchaseForm['part']): boolean {
+function isNewPart(part: StoreTransactionForm['part']): boolean {
   return part !== null && !('id' in part)
 }
 
-export function AddPurchaseModal({
+export function StoreTransactionModal({
   open,
   onOpenChange,
   warehouseId,
   warehouseLabel,
   allParts,
   lockedPart,
-}: AddPurchaseModalProps) {
-  const { addPurchase } = useStorePartMutations()
+}: StoreTransactionModalProps) {
+  const { recordStoreTransaction } = useStorePartMutations()
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch } = useForm<AddPurchaseForm>({
-    resolver: zodResolver(AddPurchaseFormSchema),
-    defaultValues: EMPTY_ADD_PURCHASE_FORM,
+  const { control, handleSubmit, reset, setValue, watch } = useForm<StoreTransactionForm>({
+    resolver: zodResolver(StoreTransactionFormSchema),
+    defaultValues: EMPTY_STORE_TRANSACTION_FORM,
   })
 
   useEffect(() => {
     if (open) {
-      reset(lockedPart ? { ...EMPTY_ADD_PURCHASE_FORM, part: lockedPart } : EMPTY_ADD_PURCHASE_FORM)
+      reset(
+        lockedPart
+          ? { ...EMPTY_STORE_TRANSACTION_FORM, part: lockedPart }
+          : EMPTY_STORE_TRANSACTION_FORM,
+      )
       setPartQuery('')
     }
   }, [open, lockedPart, reset])
 
   const part = watch('part')
 
-  async function onValid(values: AddPurchaseForm) {
+  async function onValid(values: StoreTransactionForm) {
     setSaving(true)
     try {
-      await addPurchase(warehouseId, values)
+      await recordStoreTransaction(warehouseId, values)
       toast.success('Purchase added.', { position: 'top-center' })
       onOpenChange(false)
     } catch {
@@ -75,7 +79,7 @@ export function AddPurchaseModal({
     setSaving(false)
   }
 
-  function onInvalid(formErrors: FieldErrors<AddPurchaseForm>) {
+  function onInvalid(formErrors: FieldErrors<StoreTransactionForm>) {
     const message =
       formErrors.part?.message ??
       formErrors.quantity?.message ??
@@ -91,7 +95,7 @@ export function AddPurchaseModal({
         </DialogHeader>
 
         <form
-          id="add-purchase-form"
+          id="store-transaction-form"
           onSubmit={handleSubmit(onValid, onInvalid)}
           className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1"
         >
@@ -215,7 +219,7 @@ export function AddPurchaseModal({
           >
             Cancel
           </Button>
-          <Button type="submit" form="add-purchase-form" disabled={saving}>
+          <Button type="submit" form="store-transaction-form" disabled={saving}>
             {saving ? (
               <>
                 <CircleNotchIcon className="animate-spin" />

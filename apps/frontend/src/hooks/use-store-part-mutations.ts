@@ -1,21 +1,21 @@
-import { addPurchase as addPurchaseApi } from '@/data/api/store-part-api'
+import { recordStoreTransaction as recordStoreTransactionApi } from '@/data/api/store-part-api'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
-import type { AddPurchaseForm } from '@/ui-types/store-part-form-types'
-import type { AddPurchaseResponse } from 'shared-types'
+import type { StoreTransactionForm } from '@/ui-types/store-part-form-types'
+import type { StoreTransactionResponse } from 'shared-types'
 import { mutate } from 'swr'
 
-async function addPurchase(
+async function recordStoreTransaction(
   warehouseId: number,
-  form: AddPurchaseForm,
-): Promise<AddPurchaseResponse> {
-  const result = await addPurchaseApi(warehouseId, form)
+  form: StoreTransactionForm,
+): Promise<StoreTransactionResponse> {
+  const result = await recordStoreTransactionApi(warehouseId, form)
   invalidateStorePartLists()
   mutate(storePartDetailKey(result.store_part_id))
   return result
 }
 
 const mutations = {
-  addPurchase,
+  recordStoreTransaction,
 } as const
 
 export function useStorePartMutations() {

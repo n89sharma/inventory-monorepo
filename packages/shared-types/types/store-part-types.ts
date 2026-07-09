@@ -60,7 +60,7 @@ export const StorePartDetailSchema = z.object({
 export type StorePartDetail = z.infer<typeof StorePartDetailSchema>
 
 // POST /store — record an inbound purchase against an existing or new part
-export const AddPurchaseSchema = z.object({
+export const RecordStoreTransactionSchema = z.object({
   part: z.discriminatedUnion('mode', [
     z.object({ mode: z.literal('existing'), store_part_id: z.number().int() }),
     z.object({ mode: z.literal('new') }).merge(CreateStorePartSchema),
@@ -70,14 +70,14 @@ export const AddPurchaseSchema = z.object({
   unit_cost: z.number().nonnegative().nullable(),
   notes: z.string().nullable(),
 })
-export type AddPurchase = z.infer<typeof AddPurchaseSchema>
+export type RecordStoreTransaction = z.infer<typeof RecordStoreTransactionSchema>
 
-export const AddPurchaseResponseSchema = z.object({
+export const StoreTransactionResponseSchema = z.object({
   store_transaction_number: z.string(),
   store_part_id: z.number(),
   part_number: z.string(),
 })
-export type AddPurchaseResponse = z.infer<typeof AddPurchaseResponseSchema>
+export type StoreTransactionResponse = z.infer<typeof StoreTransactionResponseSchema>
 
 // A store part consumed by an asset — rendered in the asset's Parts section
 export const AssetStorePartRowSchema = z.object({
