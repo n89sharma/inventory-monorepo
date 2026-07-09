@@ -29,11 +29,13 @@ describe('savedViewService', () => {
       name: 'My View',
       page_key: 'search_all',
       query_string: '?q=1',
+      column_ids: ['serial_number', 'status'],
     })
 
     const views = await listSavedViews(refs.userId, 'search_all')
     expect(views).toHaveLength(1)
     expect(views[0].name).toBe('My View')
+    expect(views[0].column_ids).toEqual(['serial_number', 'status'])
   })
 
   it('rejects a duplicate name for the same user and page', async () => {
@@ -41,10 +43,16 @@ describe('savedViewService', () => {
       name: 'Dup',
       page_key: 'search_all',
       query_string: '?a',
+      column_ids: [],
     })
 
     await expect(
-      createSavedView(refs.userId, { name: 'Dup', page_key: 'search_all', query_string: '?b' }),
+      createSavedView(refs.userId, {
+        name: 'Dup',
+        page_key: 'search_all',
+        query_string: '?b',
+        column_ids: [],
+      }),
     ).rejects.toThrow(ConflictError)
   })
 
@@ -53,6 +61,7 @@ describe('savedViewService', () => {
       name: 'OnlyAll',
       page_key: 'search_all',
       query_string: '?a',
+      column_ids: [],
     })
 
     const held = await listSavedViews(refs.userId, 'search_held')
@@ -64,6 +73,7 @@ describe('savedViewService', () => {
       name: 'ToDelete',
       page_key: 'search_all',
       query_string: '?a',
+      column_ids: [],
     })
 
     await expect(deleteSavedView(refs.userId + NON_OWNER_OFFSET, id)).rejects.toThrow(NotFoundError)

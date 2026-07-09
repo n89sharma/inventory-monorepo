@@ -120,7 +120,15 @@ function SaveViewDialog({
   )
 }
 
-export function SavedViewsButton({ pageKey }: { pageKey: SavedViewPageKey }): React.JSX.Element {
+export function SavedViewsButton({
+  pageKey,
+  visibleColumns,
+  onApplyColumns,
+}: {
+  pageKey: SavedViewPageKey
+  visibleColumns?: Set<string>
+  onApplyColumns?: (columnIds: readonly string[]) => void
+}): React.JSX.Element {
   const [, setSearchParams] = useSearchParams()
   const liveSearchParams = useOptimisticSearchParams()
   const { data: views = EMPTY_VIEWS } = useSavedViews(pageKey)
@@ -129,10 +137,16 @@ export function SavedViewsButton({ pageKey }: { pageKey: SavedViewPageKey }): Re
 
   function applyView(view: SavedViewSummary) {
     setSearchParams(new URLSearchParams(view.query_string), { replace: true })
+    onApplyColumns?.(view.column_ids)
   }
 
   async function saveView(name: string) {
-    await create({ name, page_key: pageKey, query_string: liveSearchParams.toString() })
+    await create({
+      name,
+      page_key: pageKey,
+      query_string: liveSearchParams.toString(),
+      column_ids: visibleColumns ? [...visibleColumns] : [],
+    })
     toast.success(`Saved view "${name}"`, TOAST_POSITION)
   }
 

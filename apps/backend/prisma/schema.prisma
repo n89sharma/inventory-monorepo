@@ -550,6 +550,7 @@ model SavedView {
   name          String   @db.VarChar(100)
   page_key      String   @db.VarChar(40)
   query_string  String
+  column_ids    String[] @default([])
   created_by_id Int
   created_at    DateTime @default(now())
   created_by    User     @relation(fields: [created_by_id], references: [id])

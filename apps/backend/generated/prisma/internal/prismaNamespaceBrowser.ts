@@ -499,6 +499,7 @@ export const SavedViewScalarFieldEnum = {
   name: 'name',
   page_key: 'page_key',
   query_string: 'query_string',
+  column_ids: 'column_ids',
   created_by_id: 'created_by_id',
   created_at: 'created_at'
 } as const

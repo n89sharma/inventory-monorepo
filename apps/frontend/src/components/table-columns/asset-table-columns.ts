@@ -329,6 +329,27 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
 
+const COLUMN_BY_ID = new Map<string, AssetTableColumn>(
+  (ASSET_TABLE_COLUMNS as readonly AssetTableColumn[]).map((c) => [c.id, c]),
+)
+
+// Filters a stored/shared set of column ids down to what the current viewer may see:
+// drops unknown ids (columns removed since the view was saved) and permission-gated
+// columns the viewer lacks. Applied when restoring a saved view.
+export function resolveVisibleColumns(
+  columnIds: readonly string[],
+  can: (permission: Permission) => boolean,
+): Set<string> {
+  const resolved = new Set<string>()
+  for (const id of columnIds) {
+    const column = COLUMN_BY_ID.get(id)
+    if (!column) continue
+    if (column.permission && !can(column.permission)) continue
+    resolved.add(id)
+  }
+  return resolved
+}
+
 const IDENTITY_REPORT_KEYS = ['barcode', 'brand', 'model'] as const
 
 const COLUMN_ID_TO_REPORT_KEYS: Partial<Record<AssetColumnId, readonly string[]>> = {

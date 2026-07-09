@@ -8,6 +8,7 @@ const SAVED_VIEW_SUMMARY_SELECT = {
   name: true,
   page_key: true,
   query_string: true,
+  column_ids: true,
   created_at: true,
 } as const
 

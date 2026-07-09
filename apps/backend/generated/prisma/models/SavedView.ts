@@ -59,6 +59,7 @@ export type SavedViewCountAggregateOutputType = {
   name: number
   page_key: number
   query_string: number
+  column_ids: number
   created_by_id: number
   created_at: number
   _all: number
@@ -98,6 +99,7 @@ export type SavedViewCountAggregateInputType = {
   name?: true
   page_key?: true
   query_string?: true
+  column_ids?: true
   created_by_id?: true
   created_at?: true
   _all?: true
@@ -194,6 +196,7 @@ export type SavedViewGroupByOutputType = {
   name: string
   page_key: string
   query_string: string
+  column_ids: string[]
   created_by_id: number
   created_at: Date
   _count: SavedViewCountAggregateOutputType | null
@@ -226,6 +229,7 @@ export type SavedViewWhereInput = {
   name?: Prisma.StringFilter<"SavedView"> | string
   page_key?: Prisma.StringFilter<"SavedView"> | string
   query_string?: Prisma.StringFilter<"SavedView"> | string
+  column_ids?: Prisma.StringNullableListFilter<"SavedView">
   created_by_id?: Prisma.IntFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -236,6 +240,7 @@ export type SavedViewOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   page_key?: Prisma.SortOrder
   query_string?: Prisma.SortOrder
+  column_ids?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   created_by?: Prisma.UserOrderByWithRelationInput
@@ -250,6 +255,7 @@ export type SavedViewWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"SavedView"> | string
   page_key?: Prisma.StringFilter<"SavedView"> | string
   query_string?: Prisma.StringFilter<"SavedView"> | string
+  column_ids?: Prisma.StringNullableListFilter<"SavedView">
   created_by_id?: Prisma.IntFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
   created_by?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -260,6 +266,7 @@ export type SavedViewOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   page_key?: Prisma.SortOrder
   query_string?: Prisma.SortOrder
+  column_ids?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   _count?: Prisma.SavedViewCountOrderByAggregateInput
@@ -277,6 +284,7 @@ export type SavedViewScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"SavedView"> | string
   page_key?: Prisma.StringWithAggregatesFilter<"SavedView"> | string
   query_string?: Prisma.StringWithAggregatesFilter<"SavedView"> | string
+  column_ids?: Prisma.StringNullableListFilter<"SavedView">
   created_by_id?: Prisma.IntWithAggregatesFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"SavedView"> | Date | string
 }
@@ -285,6 +293,7 @@ export type SavedViewCreateInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_at?: Date | string
   created_by: Prisma.UserCreateNestedOneWithoutSavedViewsInput
 }
@@ -294,6 +303,7 @@ export type SavedViewUncheckedCreateInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_by_id: number
   created_at?: Date | string
 }
@@ -302,6 +312,7 @@ export type SavedViewUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_by?: Prisma.UserUpdateOneRequiredWithoutSavedViewsNestedInput
 }
@@ -311,6 +322,7 @@ export type SavedViewUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -320,6 +332,7 @@ export type SavedViewCreateManyInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_by_id: number
   created_at?: Date | string
 }
@@ -328,6 +341,7 @@ export type SavedViewUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -336,6 +350,7 @@ export type SavedViewUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -350,6 +365,14 @@ export type SavedViewOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type SavedViewCreated_by_idPage_keyNameCompoundUniqueInput = {
   created_by_id: number
   page_key: string
@@ -361,6 +384,7 @@ export type SavedViewCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   page_key?: Prisma.SortOrder
   query_string?: Prisma.SortOrder
+  column_ids?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -435,10 +459,20 @@ export type SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput = {
   deleteMany?: Prisma.SavedViewScalarWhereInput | Prisma.SavedViewScalarWhereInput[]
 }
 
+export type SavedViewCreatecolumn_idsInput = {
+  set: string[]
+}
+
+export type SavedViewUpdatecolumn_idsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type SavedViewCreateWithoutCreated_byInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_at?: Date | string
 }
 
@@ -447,6 +481,7 @@ export type SavedViewUncheckedCreateWithoutCreated_byInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_at?: Date | string
 }
 
@@ -484,6 +519,7 @@ export type SavedViewScalarWhereInput = {
   name?: Prisma.StringFilter<"SavedView"> | string
   page_key?: Prisma.StringFilter<"SavedView"> | string
   query_string?: Prisma.StringFilter<"SavedView"> | string
+  column_ids?: Prisma.StringNullableListFilter<"SavedView">
   created_by_id?: Prisma.IntFilter<"SavedView"> | number
   created_at?: Prisma.DateTimeFilter<"SavedView"> | Date | string
 }
@@ -493,6 +529,7 @@ export type SavedViewCreateManyCreated_byInput = {
   name: string
   page_key: string
   query_string: string
+  column_ids?: Prisma.SavedViewCreatecolumn_idsInput | string[]
   created_at?: Date | string
 }
 
@@ -500,6 +537,7 @@ export type SavedViewUpdateWithoutCreated_byInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -508,6 +546,7 @@ export type SavedViewUncheckedUpdateWithoutCreated_byInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -516,6 +555,7 @@ export type SavedViewUncheckedUpdateManyWithoutCreated_byInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   page_key?: Prisma.StringFieldUpdateOperationsInput | string
   query_string?: Prisma.StringFieldUpdateOperationsInput | string
+  column_ids?: Prisma.SavedViewUpdatecolumn_idsInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -526,6 +566,7 @@ export type SavedViewSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   name?: boolean
   page_key?: boolean
   query_string?: boolean
+  column_ids?: boolean
   created_by_id?: boolean
   created_at?: boolean
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -536,6 +577,7 @@ export type SavedViewSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   page_key?: boolean
   query_string?: boolean
+  column_ids?: boolean
   created_by_id?: boolean
   created_at?: boolean
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -546,6 +588,7 @@ export type SavedViewSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   page_key?: boolean
   query_string?: boolean
+  column_ids?: boolean
   created_by_id?: boolean
   created_at?: boolean
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -556,11 +599,12 @@ export type SavedViewSelectScalar = {
   name?: boolean
   page_key?: boolean
   query_string?: boolean
+  column_ids?: boolean
   created_by_id?: boolean
   created_at?: boolean
 }
 
-export type SavedViewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "page_key" | "query_string" | "created_by_id" | "created_at", ExtArgs["result"]["savedView"]>
+export type SavedViewOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "page_key" | "query_string" | "column_ids" | "created_by_id" | "created_at", ExtArgs["result"]["savedView"]>
 export type SavedViewInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -581,6 +625,7 @@ export type $SavedViewPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     name: string
     page_key: string
     query_string: string
+    column_ids: string[]
     created_by_id: number
     created_at: Date
   }, ExtArgs["result"]["savedView"]>
@@ -1011,6 +1056,7 @@ export interface SavedViewFieldRefs {
   readonly name: Prisma.FieldRef<"SavedView", 'String'>
   readonly page_key: Prisma.FieldRef<"SavedView", 'String'>
   readonly query_string: Prisma.FieldRef<"SavedView", 'String'>
+  readonly column_ids: Prisma.FieldRef<"SavedView", 'String[]'>
   readonly created_by_id: Prisma.FieldRef<"SavedView", 'Int'>
   readonly created_at: Prisma.FieldRef<"SavedView", 'DateTime'>
 }
