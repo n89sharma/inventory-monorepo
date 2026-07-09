@@ -33,6 +33,7 @@ export async function recordStoreTransaction(
   form: StoreTransactionForm,
 ): Promise<StoreTransactionResponse> {
   const recordStoreTransactionBody = RecordStoreTransactionSchema.parse({
+    kind: form.kind,
     part: buildPartPayload(form.part),
     warehouse_id: warehouseId,
     quantity: Number(form.quantity),

@@ -63,10 +63,10 @@ export function StorePartDetailPage(): React.JSX.Element {
           <Button
             onClick={() => setAddOpen(true)}
             disabled={!warehouse}
-            title={warehouse ? undefined : 'Open from a warehouse to add a purchase'}
+            title={warehouse ? undefined : 'Open from a warehouse to record a transaction'}
           >
             <PlusIcon aria-hidden="true" />
-            Add Part
+            Transaction
           </Button>
         }
         subtitle={
@@ -91,6 +91,7 @@ export function StorePartDetailPage(): React.JSX.Element {
           warehouseLabel={warehouse.city_code}
           allParts={[]}
           lockedPart={{ id: data.id, part_number: data.part_number, description: data.description }}
+          onHandByPartId={{ [data.id]: onHand }}
         />
       )}
     </>

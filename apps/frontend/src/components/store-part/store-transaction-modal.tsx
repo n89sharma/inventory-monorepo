@@ -9,6 +9,7 @@ import {
 import { FieldError } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
 import { Textarea } from '@/components/shadcn/textarea'
+import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { HorizontalField } from '@/components/shared/horizontal-field'
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useStorePartMutations } from '@/hooks/use-store-part-mutations'
@@ -21,8 +22,28 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
-import type { StorePart } from 'shared-types'
+import type { StorePart, StoreTransactionKind } from 'shared-types'
 import { toast } from 'sonner'
+
+const KIND_OPTIONS = [
+  { value: 'PURCHASE', label: 'Purchase' },
+  { value: 'SALE', label: 'Sale' },
+] as const satisfies readonly { value: StoreTransactionKind; label: string }[]
+
+const TITLE_BY_KIND = {
+  PURCHASE: 'Add Purchase',
+  SALE: 'Record Sale',
+} as const satisfies Record<StoreTransactionKind, string>
+
+const SUCCESS_BY_KIND = {
+  PURCHASE: 'Purchase added.',
+  SALE: 'Sale recorded.',
+} as const satisfies Record<StoreTransactionKind, string>
+
+const MONEY_LABEL_BY_KIND = {
+  PURCHASE: 'Unit cost',
+  SALE: 'Unit price',
+} as const satisfies Record<StoreTransactionKind, string>
 
 interface StoreTransactionModalProps {
   open: boolean
@@ -31,6 +52,8 @@ interface StoreTransactionModalProps {
   warehouseLabel: string
   allParts: StorePart[]
   lockedPart?: StorePart
+  // On-hand for this warehouse, keyed by part id — used to guard a SALE against overselling.
+  onHandByPartId: Record<number, number>
 }
 
 function isNewPart(part: StoreTransactionForm['part']): boolean {
@@ -44,6 +67,7 @@ export function StoreTransactionModal({
   warehouseLabel,
   allParts,
   lockedPart,
+  onHandByPartId,
 }: StoreTransactionModalProps) {
   const { recordStoreTransaction } = useStorePartMutations()
   const [partQuery, setPartQuery] = useState('')
@@ -65,13 +89,32 @@ export function StoreTransactionModal({
     }
   }, [open, lockedPart, reset])
 
+  const kind = watch('kind')
   const part = watch('part')
+  const quantity = watch('quantity')
+
+  const selectedPartId = part !== null && 'id' in part ? part.id : null
+  const onHand = selectedPartId === null ? null : (onHandByPartId[selectedPartId] ?? 0)
+  const overStock =
+    kind === 'SALE' && onHand !== null && /^\d+$/.test(quantity) && Number(quantity) > onHand
+
+  function handleKindChange(next: string) {
+    const picked = KIND_OPTIONS.find((o) => o.value === next)?.value
+    if (!picked) return
+    // A SALE cannot create a new part — drop any in-progress new part.
+    if (picked === 'SALE' && isNewPart(part)) setValue('part', null, { shouldValidate: true })
+    setValue('kind', picked, { shouldValidate: true })
+  }
 
   async function onValid(values: StoreTransactionForm) {
+    if (overStock) {
+      toast.error('Quantity exceeds stock on hand', { position: 'top-center' })
+      return
+    }
     setSaving(true)
     try {
       await recordStoreTransaction(warehouseId, values)
-      toast.success('Purchase added.', { position: 'top-center' })
+      toast.success(SUCCESS_BY_KIND[values.kind], { position: 'top-center' })
       onOpenChange(false)
     } catch {
       // axios interceptor already surfaced the error toast
@@ -91,7 +134,7 @@ export function StoreTransactionModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Purchase</DialogTitle>
+          <DialogTitle>{TITLE_BY_KIND[kind]}</DialogTitle>
         </DialogHeader>
 
         <form
@@ -99,6 +142,22 @@ export function StoreTransactionModal({
           onSubmit={handleSubmit(onValid, onInvalid)}
           className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1"
         >
+          <HorizontalField label="Type" required>
+            <ToggleGroup
+              type="single"
+              value={kind}
+              onValueChange={handleKindChange}
+              variant="outline"
+              size="sm"
+            >
+              {KIND_OPTIONS.map((opt) => (
+                <ToggleGroupItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </HorizontalField>
+
           <HorizontalField label="Warehouse">
             <span className="text-sm">{warehouseLabel}</span>
           </HorizontalField>
@@ -124,11 +183,17 @@ export function StoreTransactionModal({
                         field.onChange(null)
                         setPartQuery('')
                       }}
-                      onCreateOption={(query) => {
-                        field.onChange({ part_number: query, description: '' })
-                        setPartQuery('')
-                      }}
-                      createLabel={(query) => `Create part "${query}"`}
+                      onCreateOption={
+                        kind === 'PURCHASE'
+                          ? (query) => {
+                              field.onChange({ part_number: query, description: '' })
+                              setPartQuery('')
+                            }
+                          : undefined
+                      }
+                      createLabel={
+                        kind === 'PURCHASE' ? (query) => `Create part "${query}"` : undefined
+                      }
                       options={allParts}
                       getLabel={(p) => p.part_number}
                       placeholder="Search part number or description"
@@ -161,24 +226,33 @@ export function StoreTransactionModal({
           )}
 
           <HorizontalField label="Quantity" required>
-            <Controller
-              control={control}
-              name="quantity"
-              render={({ field }) => (
-                <Input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="0"
-                  className="max-w-[160px] tabular-nums"
-                />
+            <div className="flex flex-col gap-1">
+              <Controller
+                control={control}
+                name="quantity"
+                render={({ field }) => (
+                  <Input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="0"
+                    className="max-w-[160px] tabular-nums"
+                  />
+                )}
+              />
+              {kind === 'SALE' && onHand !== null && (
+                <span
+                  className={`text-xs ${overStock ? 'text-destructive' : 'text-muted-foreground'}`}
+                >
+                  On hand: {onHand}
+                </span>
               )}
-            />
+            </div>
           </HorizontalField>
 
-          <HorizontalField label="Unit cost">
+          <HorizontalField label={MONEY_LABEL_BY_KIND[kind]}>
             <Controller
               control={control}
               name="unitCost"
@@ -219,14 +293,14 @@ export function StoreTransactionModal({
           >
             Cancel
           </Button>
-          <Button type="submit" form="store-transaction-form" disabled={saving}>
+          <Button type="submit" form="store-transaction-form" disabled={saving || overStock}>
             {saving ? (
               <>
                 <CircleNotchIcon className="animate-spin" />
-                Adding...
+                Saving...
               </>
             ) : (
-              'Add Part'
+              TITLE_BY_KIND[kind]
             )}
           </Button>
         </DialogFooter>

@@ -2,13 +2,17 @@ import {
   CreateStorePartSchema,
   StorePartSchema,
   StorePartSummarySchema,
+  StoreTransactionKindSchema,
   WarehouseSchema,
 } from 'shared-types'
 import { z } from 'zod'
 
-// part: an existing StorePart (has id), a new CreateStorePart (no id), or nothing yet
+// kind: PURCHASE adds stock, SALE deducts it.
+// part: an existing StorePart (has id), a new CreateStorePart (no id), or nothing yet.
+// A SALE requires an existing part — you cannot sell a part that isn't stocked.
 export const StoreTransactionFormSchema = z
   .object({
+    kind: StoreTransactionKindSchema,
     part: z.union([StorePartSchema, CreateStorePartSchema]).nullable(),
     quantity: z.string(),
     unitCost: z.string(),
@@ -16,6 +20,10 @@ export const StoreTransactionFormSchema = z
   })
   .refine((form) => form.part !== null, {
     message: 'Select or create a part',
+    path: ['part'],
+  })
+  .refine((form) => form.kind === 'PURCHASE' || (form.part !== null && 'id' in form.part), {
+    message: 'A sale requires an existing part',
     path: ['part'],
   })
   .refine((form) => /^\d+$/.test(form.quantity) && Number(form.quantity) > 0, {
@@ -26,6 +34,7 @@ export const StoreTransactionFormSchema = z
 export type StoreTransactionForm = z.infer<typeof StoreTransactionFormSchema>
 
 export const EMPTY_STORE_TRANSACTION_FORM: StoreTransactionForm = {
+  kind: 'PURCHASE',
   part: null,
   quantity: '',
   unitCost: '',

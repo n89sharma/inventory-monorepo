@@ -32,6 +32,7 @@ describe('storePartService', () => {
     partCounter += 1
     const partNumber = `TEST-PART-${partCounter}`
     const purchase: RecordStoreTransaction = {
+      kind: 'PURCHASE',
       part: { mode: 'new', part_number: partNumber, description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity,
@@ -86,6 +87,7 @@ describe('storePartService', () => {
   it('rejects creating a part whose part_number already exists', async () => {
     const partNumber = 'TEST-PART-DUP'
     const purchase: RecordStoreTransaction = {
+      kind: 'PURCHASE',
       part: { mode: 'new', part_number: partNumber, description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity: 1,
@@ -99,6 +101,7 @@ describe('storePartService', () => {
 
   it('numbers the store transaction S-<7-digit sequence>', async () => {
     const purchase: RecordStoreTransaction = {
+      kind: 'PURCHASE',
       part: { mode: 'new', part_number: 'TEST-PART-NUM', description: 'Test part' },
       warehouse_id: refs.warehouse.id,
       quantity: 1,
@@ -107,5 +110,38 @@ describe('storePartService', () => {
     }
     const { store_transaction_number } = await recordStoreTransaction(purchase, refs.userId)
     expect(store_transaction_number).toMatch(/^S-\d{7}$/)
+  })
+
+  it('deducts on-hand when a SALE is recorded', async () => {
+    const storePartId = await purchaseNewPart(10, 5)
+
+    const sale: RecordStoreTransaction = {
+      kind: 'SALE',
+      part: { mode: 'existing', store_part_id: storePartId },
+      warehouse_id: refs.warehouse.id,
+      quantity: 4,
+      unit_cost: 8,
+      notes: null,
+    }
+    await recordStoreTransaction(sale, refs.userId)
+
+    const onHandRow = (await getStoreParts()).find(
+      (r) => r.id === storePartId && r.warehouse_id === refs.warehouse.id,
+    )
+    expect(onHandRow?.on_hand).toBe(6)
+  })
+
+  it('rejects a SALE that exceeds on-hand', async () => {
+    const storePartId = await purchaseNewPart(2, 5)
+
+    const sale: RecordStoreTransaction = {
+      kind: 'SALE',
+      part: { mode: 'existing', store_part_id: storePartId },
+      warehouse_id: refs.warehouse.id,
+      quantity: 5,
+      unit_cost: 8,
+      notes: null,
+    }
+    await expect(recordStoreTransaction(sale, refs.userId)).rejects.toThrow(ConflictError)
   })
 })

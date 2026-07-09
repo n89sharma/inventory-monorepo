@@ -59,17 +59,29 @@ export const StorePartDetailSchema = z.object({
 })
 export type StorePartDetail = z.infer<typeof StorePartDetailSchema>
 
-// POST /store — record an inbound purchase against an existing or new part
-export const RecordStoreTransactionSchema = z.object({
-  part: z.discriminatedUnion('mode', [
-    z.object({ mode: z.literal('existing'), store_part_id: z.number().int() }),
-    z.object({ mode: z.literal('new') }).merge(CreateStorePartSchema),
-  ]),
-  warehouse_id: z.number().int(),
-  quantity: z.number().int().positive(),
-  unit_cost: z.number().nonnegative().nullable(),
-  notes: z.string().nullable(),
-})
+// A store transaction is either a PURCHASE (inbound, adds stock) or a SALE
+// (outbound, deducts stock). USED (asset consumption) is recorded separately.
+export const StoreTransactionKindSchema = z.enum(['PURCHASE', 'SALE'])
+export type StoreTransactionKind = z.infer<typeof StoreTransactionKindSchema>
+
+// POST /store — record a PURCHASE or SALE against an existing part (a PURCHASE
+// may also create the part on first receipt; a SALE requires an existing part)
+export const RecordStoreTransactionSchema = z
+  .object({
+    kind: StoreTransactionKindSchema,
+    part: z.discriminatedUnion('mode', [
+      z.object({ mode: z.literal('existing'), store_part_id: z.number().int() }),
+      z.object({ mode: z.literal('new') }).merge(CreateStorePartSchema),
+    ]),
+    warehouse_id: z.number().int(),
+    quantity: z.number().int().positive(),
+    unit_cost: z.number().nonnegative().nullable(),
+    notes: z.string().nullable(),
+  })
+  .refine((body) => body.kind === 'PURCHASE' || body.part.mode === 'existing', {
+    message: 'A sale requires an existing part',
+    path: ['part'],
+  })
 export type RecordStoreTransaction = z.infer<typeof RecordStoreTransactionSchema>
 
 export const StoreTransactionResponseSchema = z.object({

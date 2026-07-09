@@ -1,5 +1,6 @@
 import {
   RecordStoreTransaction,
+  StoreTransactionKind,
   StoreTransactionResponse,
   AddStorePartToAsset,
   AssetStorePartRow,
@@ -17,8 +18,12 @@ import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
-const PURCHASE_TYPE = 'PURCHASE'
 const USED_TYPE = 'USED'
+
+const STORE_TRANSACTION_TYPE_BY_KIND = {
+  PURCHASE: { type: 'PURCHASE', is_inbound: true },
+  SALE: { type: 'SALE', is_inbound: false },
+} as const satisfies Record<StoreTransactionKind, { type: string; is_inbound: boolean }>
 
 export async function getStoreParts() {
   const rows = await prisma.$queryRawTyped(getStorePartsDb())
@@ -51,8 +56,9 @@ export async function recordStoreTransaction(
   data: RecordStoreTransaction,
   userId: number,
 ): Promise<StoreTransactionResponse> {
-  const purchaseType = await prisma.storeTransactionType.findFirstOrThrow({
-    where: { type: PURCHASE_TYPE, is_inbound: true },
+  const kindConfig = STORE_TRANSACTION_TYPE_BY_KIND[data.kind]
+  const transactionType = await prisma.storeTransactionType.findFirstOrThrow({
+    where: kindConfig,
     select: { id: true },
   })
   const now = new Date()
@@ -61,10 +67,20 @@ export async function recordStoreTransaction(
   return prisma.$transaction(async (tx) => {
     const { storePartId, partNumber } = await resolveStorePart(tx, data.part)
 
+    if (!kindConfig.is_inbound) {
+      const [onHandRow] = await tx.$queryRawTyped(
+        getStorePartOnHandDb(storePartId, data.warehouse_id),
+      )
+      const onHand = onHandRow?.on_hand ?? 0
+      if (onHand < data.quantity) {
+        throw new ConflictError(`Only ${onHand} in stock for this part in the selected warehouse`)
+      }
+    }
+
     await tx.storeTransaction.create({
       data: {
         store_part_id: storePartId,
-        transaction_type_id: purchaseType.id,
+        transaction_type_id: transactionType.id,
         quantity: data.quantity,
         unit_cost: data.unit_cost,
         warehouse_id: data.warehouse_id,

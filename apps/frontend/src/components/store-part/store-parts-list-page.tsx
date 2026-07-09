@@ -45,6 +45,15 @@ export function StorePartsListPage(): React.JSX.Element {
 
   const targetWarehouse = warehouses.length === 1 ? warehouses[0] : null
 
+  const onHandByPartId = useMemo<Record<number, number>>(() => {
+    if (!targetWarehouse) return {}
+    return Object.fromEntries(
+      rows
+        .filter((row) => row.warehouse_id === targetWarehouse.id)
+        .map((row) => [row.id, row.on_hand]),
+    )
+  }, [rows, targetWarehouse])
+
   return (
     <>
       <CollectionPage<StorePartSummary, unknown>
@@ -58,10 +67,12 @@ export function StorePartsListPage(): React.JSX.Element {
           <Button
             onClick={() => setAddOpen(true)}
             disabled={!targetWarehouse}
-            title={targetWarehouse ? undefined : 'Select a single warehouse to add a purchase'}
+            title={
+              targetWarehouse ? undefined : 'Select a single warehouse to record a transaction'
+            }
           >
             <PlusIcon aria-hidden="true" />
-            Add Part
+            Transaction
           </Button>
         }
         searchBar={
@@ -84,6 +95,7 @@ export function StorePartsListPage(): React.JSX.Element {
           warehouseId={targetWarehouse.id}
           warehouseLabel={targetWarehouse.city_code}
           allParts={allParts}
+          onHandByPartId={onHandByPartId}
         />
       )}
     </>
