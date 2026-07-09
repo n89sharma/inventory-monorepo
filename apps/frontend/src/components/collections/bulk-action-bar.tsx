@@ -6,6 +6,7 @@ import { useSidebar } from '../shadcn/sidebar'
 type BulkActionBarProps = {
   selectedCount: number
   totalCount?: number
+  hiddenCount?: number
   onSelectAll?: () => void
   onClear: () => void
   children?: React.ReactNode
@@ -14,6 +15,7 @@ type BulkActionBarProps = {
 export function BulkActionBar({
   selectedCount,
   totalCount,
+  hiddenCount,
   onSelectAll,
   onClear,
   children,
@@ -23,6 +25,7 @@ export function BulkActionBar({
   const barLeft = sidebarVisible ? 'calc(50% + var(--sidebar-width) / 2)' : '50%'
 
   const hasSelection = selectedCount > 0
+  const hasHidden = hiddenCount !== undefined && hiddenCount > 0
   const canShowSelectAll =
     totalCount !== undefined && onSelectAll !== undefined && selectedCount < totalCount
 
@@ -31,7 +34,7 @@ export function BulkActionBar({
       return `${selectedCount} asset${selectedCount !== 1 ? 's' : ''} selected`
     }
     if (selectedCount === totalCount) {
-      return `All ${totalCount} assets selected`
+      return hasHidden ? `All ${totalCount} shown selected` : `All ${totalCount} assets selected`
     }
     return `${selectedCount} of ${totalCount} selected`
   }
@@ -56,6 +59,7 @@ export function BulkActionBar({
     >
       <div className="flex flex-nowrap items-center gap-2 whitespace-nowrap rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg">
         <span aria-live="polite">{getCountLabel()}</span>
+        {hasHidden && <span className="text-muted-foreground">{hiddenCount} hidden by filter</span>}
         {canShowSelectAll && (
           <Button variant="ghost" onClick={onSelectAll}>
             Select all

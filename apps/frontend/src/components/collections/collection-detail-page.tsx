@@ -5,12 +5,12 @@ import { SearchSelectOptionFilter } from '@/components/shared/search-select/sear
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
-import { ANY_OPTION, getSelectedOrNull, type SelectOption } from '@/ui-types/select-option-types'
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table'
+import { ANY_OPTION, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
+import type { ColumnDef, Table } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory, Permission } from 'shared-types'
-import { DataTable } from '../shadcn/data-table'
+import { DataTable, type DataTableSelection } from '../shadcn/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
@@ -21,6 +21,24 @@ const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 // column picker, so hide it explicitly.
 const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
+
+function ModelTableFilter({ table }: { table: Table<AssetSummary> }) {
+  const column = table.getColumn('model')
+  if (!column) return null
+  const options = ([...column.getFacetedUniqueValues().keys()] as string[]).sort()
+  const selected = (column.getFilterValue() as string | undefined) ?? null
+  return (
+    <SearchSelectOptionFilter
+      selection={selected ? getSelectOption(selected) : ANY_OPTION}
+      onChange={(next) => column.setFilterValue(getSelectedOrNull(next) ?? undefined)}
+      options={options}
+      getLabel={(model) => model}
+      placeholder="Model"
+      clearLabel="Clear model"
+      className="w-50 rounded-lg bg-background"
+    />
+  )
+}
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
   section: DetailSection
@@ -78,8 +96,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const { state } = useLocation()
   const hasPermission = useCan(permission)
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [modelFilter, setModelFilter] = useState<SelectOption<string>>(ANY_OPTION)
+  const [selection, setSelection] = useState<DataTableSelection<AssetSummary> | null>(null)
 
   const assetHref = useMemo(
     () => (asset: AssetSummary) => `/${section}/${collectionId}/${asset.barcode}`,
@@ -108,13 +125,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const entity = detail.data
   const canEdit = hasPermission && (canEditEntity ?? true)
 
-  const selectedModel = getSelectedOrNull(modelFilter)
-  const modelOptions = [...new Set(entity.assets.map((asset) => asset.model))].sort()
-  const visibleAssets = selectedModel
-    ? entity.assets.filter((asset) => asset.model === selectedModel)
-    : entity.assets
-
-  const selectedAssets = visibleAssets.filter((a) => rowSelection[a.barcode])
+  const selectedAssets = selection?.selectedRows ?? []
 
   return (
     <>
@@ -151,39 +162,27 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         {canEdit && (
           <BulkEditBar
             selectedAssets={selectedAssets}
-            onClear={() => setRowSelection({})}
+            onClear={() => selection?.clearSelection()}
             refreshKey={refreshKey}
             currentCollectionType={section}
             returnTo={`/${section}/${collectionId}`}
             onBulkRemove={onBulkRemove}
-            totalCount={visibleAssets.length}
-            onSelectAll={() =>
-              setRowSelection(Object.fromEntries(visibleAssets.map((a) => [a.barcode, true])))
-            }
+            totalCount={selection?.visibleCount}
+            hiddenCount={selection?.hiddenCount}
+            onSelectAll={() => selection?.selectAllVisible()}
             extraActions={renderBulkExtraActions?.({
               selectedAssets,
-              clearSelection: () => setRowSelection({}),
+              clearSelection: () => selection?.clearSelection(),
             })}
           />
         )}
         <DataTable
           columns={columns}
-          data={visibleAssets}
-          tableFilter={
-            <SearchSelectOptionFilter
-              selection={modelFilter}
-              onChange={setModelFilter}
-              options={modelOptions}
-              getLabel={(model) => model}
-              placeholder="Model"
-              clearLabel="Clear model"
-              className="w-50 rounded-lg bg-background"
-            />
-          }
+          data={entity.assets}
+          renderTableFilter={(table) => <ModelTableFilter table={table} />}
+          onSelectionChange={setSelection}
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
           getRowHref={assetHref}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
           getRowId={getAssetRowId}
           defaultSort={DEFAULT_ASSET_SORT}
           columnVisibility={ASSET_COLUMN_VISIBILITY}

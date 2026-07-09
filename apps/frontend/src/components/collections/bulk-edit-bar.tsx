@@ -24,6 +24,7 @@ type BulkEditBarProps = {
   currentCollectionType?: CollectionType
   returnTo?: string
   totalCount?: number
+  hiddenCount?: number
   onSelectAll?: () => void
   onBulkRemove?: (assets: AssetSummary[]) => void
   extraActions?: React.ReactNode
@@ -37,6 +38,7 @@ export function BulkEditBar({
   currentCollectionType,
   returnTo,
   totalCount,
+  hiddenCount,
   onSelectAll,
   onBulkRemove,
   extraActions,
@@ -94,6 +96,7 @@ export function BulkEditBar({
       <BulkActionBar
         selectedCount={selectedCount}
         totalCount={totalCount}
+        hiddenCount={hiddenCount}
         onSelectAll={onSelectAll}
         onClear={onClear}
       >

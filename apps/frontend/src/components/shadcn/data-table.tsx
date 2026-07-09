@@ -1,23 +1,28 @@
 import type {
   Column,
   ColumnDef,
+  ColumnFiltersState,
   ExpandedState,
   OnChangeFn,
   Row,
   RowData,
   RowSelectionState,
   SortingState,
+  Table as ReactTableInstance,
   VisibilityState,
 } from '@tanstack/react-table'
 import {
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 declare module '@tanstack/react-table' {
@@ -45,6 +50,15 @@ import {
   FunnelSimpleIcon,
 } from '@phosphor-icons/react'
 
+export type DataTableSelection<TData> = {
+  selectedRows: TData[]
+  visibleCount: number
+  totalCount: number
+  hiddenCount: number
+  selectAllVisible: () => void
+  clearSelection: () => void
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -60,7 +74,8 @@ interface DataTableProps<TData, TValue> {
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   scrollMaxHeight?: string
-  tableFilter?: React.ReactNode
+  renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
+  onSelectionChange?: (selection: DataTableSelection<TData>) => void
 }
 
 const CELL_BG =
@@ -120,10 +135,12 @@ export function DataTable<TData, TValue>({
   getSubRows,
   columnVisibility,
   scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
-  tableFilter,
+  renderTableFilter,
+  onSelectionChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const headerScrollRef = useRef<HTMLDivElement>(null)
   const bodyScrollRef = useRef<HTMLDivElement>(null)
@@ -151,6 +168,10 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
     enableRowSelection: true,
     onRowSelectionChange,
     getRowId,
@@ -161,6 +182,7 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       rowSelection,
+      columnFilters,
       columnVisibility,
       expanded,
     },
@@ -173,6 +195,21 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  useEffect(() => {
+    if (!onSelectionChange) return
+    const visibleRows = table.getFilteredRowModel().rows
+    const totalCount = table.getCoreRowModel().rows.length
+    onSelectionChange({
+      selectedRows: table.getFilteredSelectedRowModel().rows.map((row) => row.original),
+      visibleCount: visibleRows.length,
+      totalCount,
+      hiddenCount: totalCount - visibleRows.length,
+      selectAllVisible: () =>
+        table.setRowSelection(Object.fromEntries(visibleRows.map((row) => [row.id, true]))),
+      clearSelection: () => table.resetRowSelection(),
+    })
+  }, [onSelectionChange, table, rowSelection, columnFilters, data])
+
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
 
@@ -182,7 +219,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="overflow-hidden rounded-md border">
-        {tableFilter && (
+        {renderTableFilter && (
           <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
             <div
               className="flex shrink-0 items-center justify-center pl-4"
@@ -190,7 +227,7 @@ export function DataTable<TData, TValue>({
             >
               <FunnelSimpleIcon className="size-6 text-muted-foreground" aria-hidden="true" />
             </div>
-            {tableFilter}
+            {renderTableFilter(table)}
           </div>
         )}
         <div className="flex border-b">
