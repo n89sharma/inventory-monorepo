@@ -23,8 +23,8 @@ export async function getStoreParts(): Promise<StorePartSummary[]> {
   return z.array(StorePartSummarySchema).parse(data)
 }
 
-export async function getStorePartDetail(partNumber: string): Promise<StorePartDetail> {
-  const { data } = await api.get<StorePartDetail>(`/store/${partNumber}`)
+export async function getStorePartDetail(partId: number): Promise<StorePartDetail> {
+  const { data } = await api.get<StorePartDetail>(`/store/${partId}`)
   return StorePartDetailSchema.parse(data)
 }
 

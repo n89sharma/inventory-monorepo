@@ -10,7 +10,7 @@ async function addPurchase(
 ): Promise<AddPurchaseResponse> {
   const result = await addPurchaseApi(warehouseId, form)
   invalidateStorePartLists()
-  mutate(storePartDetailKey(result.part_number))
+  mutate(storePartDetailKey(result.store_part_id))
   return result
 }
 

@@ -1,4 +1,5 @@
 import { AddPurchaseSchema, AddStorePartToAssetSchema, successResponse } from 'shared-types'
+import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import {
   addPurchase as addPurchaseSer,
@@ -13,8 +14,11 @@ export const getStoreParts = asyncHandler(async (_req, res) => {
   res.json(successResponse(parts))
 })
 
+const PartIdSchema = z.coerce.number().int().positive()
+
 export const getStorePart = asyncHandler(async (req, res) => {
-  const data = await getStorePartSer(req.params.partNumber)
+  const partId = PartIdSchema.parse(req.params.partId)
+  const data = await getStorePartSer(partId)
   res.json(successResponse(data))
 })
 

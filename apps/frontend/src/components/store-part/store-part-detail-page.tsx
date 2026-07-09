@@ -13,14 +13,14 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 export function StorePartDetailPage(): React.JSX.Element {
-  const { partNumber = '' } = useParams()
+  const { partId = '' } = useParams()
   const [scopeWarehouses] = useStoreWarehousesParam()
   const [addOpen, setAddOpen] = useState(false)
 
   const warehouse = scopeWarehouses[0] ?? null
   const warehouseId = warehouse?.id ?? null
 
-  const { data, isLoading } = useStorePartDetail(partNumber)
+  const { data, isLoading } = useStorePartDetail(Number(partId))
 
   const ledgerRows = useMemo(() => {
     const transactions = data?.transactions ?? []

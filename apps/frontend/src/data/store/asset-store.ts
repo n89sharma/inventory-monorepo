@@ -75,7 +75,7 @@ export const useAssetStore = create<AssetStore>(() => ({
     const result = await addStorePartToAssetApi(barcode, form)
     invalidateAssetDetails([barcode])
     invalidateStorePartLists()
-    mutate(storePartDetailKey(result.part_number))
+    mutate(storePartDetailKey(result.store_part_id))
     return result
   },
 

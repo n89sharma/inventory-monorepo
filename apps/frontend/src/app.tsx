@@ -265,7 +265,7 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/store/:partNumber"
+                      path="/store/:partId"
                       element={
                         <PermissionRoute permission="view_store">
                           <StorePartDetailPage />

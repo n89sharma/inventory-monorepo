@@ -6,12 +6,12 @@
 import * as $runtime from "@prisma/client/runtime/client"
 
 /**
- * @param text
+ * @param int4
  */
-export const getStorePartLedger = $runtime.makeTypedQueryFactory("select\nst.id as id,\nst.store_transaction_number as store_transaction_number,\nst.created_at as created_at,\nst.warehouse_id as warehouse_id,\nw.city_code as warehouse_code,\nstt.type as type,\nstt.is_inbound as is_inbound,\nst.quantity as quantity,\nst.unit_cost as unit_cost,\nd.id as departure_id,\nd.departure_number as departure_number,\nasp.asset_id as asset_id,\nasp.asset_barcode as asset_barcode,\nu.\"name\" as created_by,\nst.notes as notes\nfrom \"StoreTransaction\" st\njoin \"StorePart\" sp on sp.id = st.store_part_id\njoin \"StoreTransactionType\" stt on stt.id = st.transaction_type_id\njoin \"Warehouse\" w on w.id = st.warehouse_id\njoin \"User\" u on u.id = st.created_by_id\nleft join \"Departure\" d on d.id = st.departure_id\nleft join lateral (\nselect a.id as asset_id, a.barcode as asset_barcode\nfrom \"AssetStorePart\" asp2\njoin \"Asset\" a on a.id = asp2.asset_id\nwhere asp2.store_transaction_id = st.id\nlimit 1\n) asp on true\nwhere sp.part_number = $1\norder by st.created_at desc") as (text: string) => $runtime.TypedSql<getStorePartLedger.Parameters, getStorePartLedger.Result>
+export const getStorePartLedger = $runtime.makeTypedQueryFactory("select\nst.id as id,\nst.store_transaction_number as store_transaction_number,\nst.created_at as created_at,\nst.warehouse_id as warehouse_id,\nw.city_code as warehouse_code,\nstt.type as type,\nstt.is_inbound as is_inbound,\nst.quantity as quantity,\nst.unit_cost as unit_cost,\nd.id as departure_id,\nd.departure_number as departure_number,\nasp.asset_id as asset_id,\nasp.asset_barcode as asset_barcode,\nu.\"name\" as created_by,\nst.notes as notes\nfrom \"StoreTransaction\" st\njoin \"StoreTransactionType\" stt on stt.id = st.transaction_type_id\njoin \"Warehouse\" w on w.id = st.warehouse_id\njoin \"User\" u on u.id = st.created_by_id\nleft join \"Departure\" d on d.id = st.departure_id\nleft join lateral (\nselect a.id as asset_id, a.barcode as asset_barcode\nfrom \"AssetStorePart\" asp2\njoin \"Asset\" a on a.id = asp2.asset_id\nwhere asp2.store_transaction_id = st.id\nlimit 1\n) asp on true\nwhere st.store_part_id = $1\norder by st.created_at desc") as (int4: number) => $runtime.TypedSql<getStorePartLedger.Parameters, getStorePartLedger.Result>
 
 export namespace getStorePartLedger {
-  export type Parameters = [text: string]
+  export type Parameters = [int4: number]
   export type Result = {
     id: number
     store_transaction_number: string

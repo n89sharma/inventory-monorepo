@@ -52,8 +52,8 @@ export function StorePartsListPage(): React.JSX.Element {
         columns={storePartTableColumns}
         data={filteredRows}
         defaultSort={{ id: 'on_hand', desc: true }}
-        onRowMouseEnter={(row) => preloadStorePartDetail(row.part_number)}
-        getRowHref={(row) => buildStorePartPath(row.part_number, row.warehouse_id)}
+        onRowMouseEnter={(row) => preloadStorePartDetail(row.id)}
+        getRowHref={(row) => buildStorePartPath(row.id, row.warehouse_id)}
         actions={
           <Button
             onClick={() => setAddOpen(true)}

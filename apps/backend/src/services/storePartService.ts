@@ -28,14 +28,14 @@ export async function getStoreParts() {
   }))
 }
 
-export async function getStorePart(partNumber: string): Promise<StorePartDetail> {
+export async function getStorePart(partId: number): Promise<StorePartDetail> {
   const part = await prisma.storePart.findUnique({
-    where: { part_number: partNumber },
+    where: { id: partId },
     select: { id: true, part_number: true, description: true },
   })
-  if (!part) throw new NotFoundError(`Part ${partNumber} not found`)
+  if (!part) throw new NotFoundError(`Part ${partId} not found`)
 
-  const rows = await prisma.$queryRawTyped(getStorePartLedger(partNumber))
+  const rows = await prisma.$queryRawTyped(getStorePartLedger(partId))
   return {
     id: part.id,
     part_number: part.part_number,
@@ -72,7 +72,11 @@ export async function addPurchase(data: AddPurchase, userId: number): Promise<Ad
       },
     })
 
-    return { store_transaction_number: storeTransactionNumber, part_number: partNumber }
+    return {
+      store_transaction_number: storeTransactionNumber,
+      store_part_id: storePartId,
+      part_number: partNumber,
+    }
   })
 }
 
@@ -196,6 +200,10 @@ export async function addStorePartToAsset(
       create: { asset_id: asset.id, parts_cost, total_cost },
     })
 
-    return { store_transaction_number: storeTransactionNumber, part_number: part.part_number }
+    return {
+      store_transaction_number: storeTransactionNumber,
+      store_part_id: data.store_part_id,
+      part_number: part.part_number,
+    }
   })
 }

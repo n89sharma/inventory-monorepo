@@ -9,7 +9,7 @@ export const storePartTableColumns: ColumnDef<StorePartSummary>[] = [
   createIdColumn<StorePartSummary>({
     accessorKey: 'part_number',
     header: 'Part #',
-    href: (row) => `/store/${row.part_number}?warehouse=${row.warehouse_id}`,
+    href: (row) => `/store/${row.id}?warehouse=${row.warehouse_id}`,
     value: (row) => row.part_number,
   }),
   { accessorKey: 'description', header: 'Description' },

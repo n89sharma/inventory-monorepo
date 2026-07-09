@@ -15,7 +15,6 @@ select
   u."name" as created_by,
   st.notes as notes
 from "StoreTransaction" st
-join "StorePart" sp on sp.id = st.store_part_id
 join "StoreTransactionType" stt on stt.id = st.transaction_type_id
 join "Warehouse" w on w.id = st.warehouse_id
 join "User" u on u.id = st.created_by_id
@@ -27,5 +26,5 @@ left join lateral (
   where asp2.store_transaction_id = st.id
   limit 1
 ) asp on true
-where sp.part_number = $1
+where st.store_part_id = $1
 order by st.created_at desc

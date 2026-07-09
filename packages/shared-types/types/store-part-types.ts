@@ -30,7 +30,7 @@ export const StorePartSummarySchema = z.object({
 })
 export type StorePartSummary = z.infer<typeof StorePartSummarySchema>
 
-// A ledger row within GET /store/:partNumber
+// A ledger row within GET /store/:partId
 export const StoreTransactionRowSchema = z.object({
   id: z.number(),
   store_transaction_number: z.string(),
@@ -50,7 +50,7 @@ export const StoreTransactionRowSchema = z.object({
 })
 export type StoreTransactionRow = z.infer<typeof StoreTransactionRowSchema>
 
-// GET /store/:partNumber — on_hand is derived on the frontend per selected warehouse
+// GET /store/:partId — on_hand is derived on the frontend per selected warehouse
 export const StorePartDetailSchema = z.object({
   id: z.number(),
   part_number: z.string(),
@@ -74,6 +74,7 @@ export type AddPurchase = z.infer<typeof AddPurchaseSchema>
 
 export const AddPurchaseResponseSchema = z.object({
   store_transaction_number: z.string(),
+  store_part_id: z.number(),
   part_number: z.string(),
 })
 export type AddPurchaseResponse = z.infer<typeof AddPurchaseResponseSchema>
