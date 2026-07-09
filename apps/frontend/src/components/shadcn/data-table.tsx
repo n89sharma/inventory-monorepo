@@ -17,7 +17,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useState, type CSSProperties } from 'react'
+import { memo, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 declare module '@tanstack/react-table' {
@@ -125,9 +125,24 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
   const [expanded, setExpanded] = useState<ExpandedState>({})
+  const headerScrollRef = useRef<HTMLDivElement>(null)
+  const bodyScrollRef = useRef<HTMLDivElement>(null)
+  const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
+
+  // The body reserves a scrollbar gutter (scrollbar-gutter: stable) so its content is
+  // narrower than the header by the scrollbar width. Match it with a spacer of the same
+  // width beside the header so header and body columns stay aligned at every scroll offset.
+  useLayoutEffect(() => {
+    const bodyEl = bodyScrollRef.current
+    if (bodyEl) setScrollbarWidth(bodyEl.offsetWidth - bodyEl.clientWidth)
+  }, [])
+
+  const syncHeaderScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    if (headerScrollRef.current) headerScrollRef.current.scrollLeft = event.currentTarget.scrollLeft
+  }
 
   const table = useReactTable({
     data,
@@ -178,27 +193,39 @@ export function DataTable<TData, TValue>({
             {tableFilter}
           </div>
         )}
-        <div className="overflow-auto" style={{ maxHeight: scrollMaxHeight }}>
-          <Table className="table-fixed !w-max min-w-full">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead
-                        key={header.id}
-                        style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                        className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
+        <div className="flex border-b">
+          <div ref={headerScrollRef} className="min-w-0 flex-1 overflow-x-hidden">
+            <Table className="table-fixed w-full" style={{ minWidth: table.getTotalSize() }}>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead
+                          key={header.id}
+                          style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
+                          className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+            </Table>
+          </div>
+          <div className="shrink-0 bg-muted" style={{ width: scrollbarWidth }} aria-hidden="true" />
+        </div>
+        <div
+          ref={bodyScrollRef}
+          className="overflow-auto [scrollbar-gutter:stable]"
+          style={{ maxHeight: scrollMaxHeight }}
+          onScroll={syncHeaderScroll}
+        >
+          <Table className="table-fixed w-full" style={{ minWidth: table.getTotalSize() }}>
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table
