@@ -1,12 +1,11 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
-import { SearchSelectOptionFilter } from '@/components/shared/search-select/search-select-option-filter'
+import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
-import { ANY_OPTION, getSelectOption, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { ColumnDef, Table } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory, Permission } from 'shared-types'
@@ -21,24 +20,6 @@ const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 // column picker, so hide it explicitly.
 const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
-
-function ModelTableFilter({ table }: { table: Table<AssetSummary> }) {
-  const column = table.getColumn('model')
-  if (!column) return null
-  const options = ([...column.getFacetedUniqueValues().keys()] as string[]).sort()
-  const selected = (column.getFilterValue() as string | undefined) ?? null
-  return (
-    <SearchSelectOptionFilter
-      selection={selected ? getSelectOption(selected) : ANY_OPTION}
-      onChange={(next) => column.setFilterValue(getSelectedOrNull(next) ?? undefined)}
-      options={options}
-      getLabel={(model) => model}
-      placeholder="Model"
-      clearLabel="Clear model"
-      className="w-50 rounded-lg bg-background"
-    />
-  )
-}
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
   section: DetailSection
@@ -179,7 +160,15 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         <DataTable
           columns={columns}
           data={entity.assets}
-          renderTableFilter={(table) => <ModelTableFilter table={table} />}
+          renderTableFilter={(table) => (
+            <ColumnFacetFilter
+              table={table}
+              columnId="model"
+              placeholder="Model"
+              clearLabel="Clear model"
+              className="w-50 rounded-lg bg-background"
+            />
+          )}
           onSelectionChange={setSelection}
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
           getRowHref={assetHref}

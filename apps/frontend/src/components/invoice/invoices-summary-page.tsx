@@ -1,8 +1,8 @@
 import { invoiceTableColumns } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
-import { Field, FieldLabel } from '@/components/shadcn/field'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { CollectionPage } from '@/components/collections/collection-page'
+import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { SearchBar } from '@/components/shared/search-bar'
 import { useInvoiceStore, type InvoiceTypeFilter } from '@/data/store/invoice-store'
 import { useAutoSearch } from '@/hooks/use-auto-search'
@@ -40,13 +40,22 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={(invoice) => `/invoices/${invoice.invoice_number}`}
+      renderTableFilter={(table) => (
+        <ColumnFacetFilter
+          table={table}
+          columnId="invoice_reference"
+          placeholder="Reference #"
+          clearLabel="Clear reference"
+          className="w-50 rounded-lg bg-background"
+        />
+      )}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate }}
           setSearchOptions={{ setFromDate, setToDate }}
           onSearch={onInvoiceSearch}
         >
-          <InvoiceTypeFilterField value={invoiceType} onChange={setInvoiceType} />
+          <InvoiceTypeToggle value={invoiceType} onChange={setInvoiceType} />
         </SearchBar>
       }
       actions={
@@ -63,7 +72,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   )
 }
 
-function InvoiceTypeFilterField({
+function InvoiceTypeToggle({
   value,
   onChange,
 }: {
@@ -71,20 +80,16 @@ function InvoiceTypeFilterField({
   onChange: (value: InvoiceTypeFilter) => void
 }): React.JSX.Element {
   return (
-    <Field className="w-fit">
-      <FieldLabel>Type</FieldLabel>
-      <ToggleGroup
-        type="single"
-        value={value}
-        onValueChange={(next) => {
-          if (next) onChange(next as InvoiceTypeFilter)
-        }}
-        variant="outline"
-        size="sm"
-      >
-        <ToggleGroupItem value={INVOICE_TYPE.purchase}>Purchase</ToggleGroupItem>
-        <ToggleGroupItem value={INVOICE_TYPE.sales}>Sales</ToggleGroupItem>
-      </ToggleGroup>
-    </Field>
+    <ToggleGroup
+      type="single"
+      value={value}
+      onValueChange={(next) => {
+        if (next) onChange(next as InvoiceTypeFilter)
+      }}
+      variant="outline"
+    >
+      <ToggleGroupItem value={INVOICE_TYPE.purchase}>Purchase</ToggleGroupItem>
+      <ToggleGroupItem value={INVOICE_TYPE.sales}>Sales</ToggleGroupItem>
+    </ToggleGroup>
   )
 }

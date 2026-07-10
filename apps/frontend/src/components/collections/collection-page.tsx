@@ -1,7 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { DataTable } from '@/components/shadcn/data-table'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Table } from '@tanstack/react-table'
 
 interface CollectionPageProps<TData, TValue> {
   title: string
@@ -12,6 +12,7 @@ interface CollectionPageProps<TData, TValue> {
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
   defaultSort?: { id: string; desc: boolean }
+  renderTableFilter?: (table: Table<TData>) => React.ReactNode
 }
 
 export function CollectionPage<TData, TValue>({
@@ -23,6 +24,7 @@ export function CollectionPage<TData, TValue>({
   onRowMouseEnter,
   getRowHref,
   defaultSort = { id: 'created_at', desc: true },
+  renderTableFilter,
 }: CollectionPageProps<TData, TValue>) {
   return (
     <>
@@ -40,6 +42,7 @@ export function CollectionPage<TData, TValue>({
           onRowMouseEnter={onRowMouseEnter}
           getRowHref={getRowHref}
           defaultSort={defaultSort}
+          renderTableFilter={renderTableFilter}
         />
       </PageContent>
     </>

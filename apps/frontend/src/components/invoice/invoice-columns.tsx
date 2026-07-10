@@ -19,6 +19,7 @@ export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
   {
     accessorKey: 'invoice_reference',
     header: 'Reference',
+    filterFn: 'equals',
     cell: ({ row }) => row.original.invoice_reference,
   },
   createdAtColumn as ColumnDef<InvoiceSummary>,
