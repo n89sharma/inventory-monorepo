@@ -7,6 +7,7 @@ import { TransferSummaryStrip } from '@/components/transfer/transfer-summary-str
 import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
+import { useCan } from '@/hooks/use-can'
 import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
@@ -18,6 +19,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   const mutations = useTransferMutations()
   const detail = useTransferDetail(transferNumber)
+  const canCreateEditTransfer = useCan('create_update_transfer')
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
@@ -30,7 +32,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       section="transfers"
       titleLabel="Transfer"
       collectionId={transferNumber}
-      permission="create_update_transfer"
+      canCreateEditEntity={canCreateEditTransfer}
       detail={detail}
       notFoundLabel="Transfer not found"
       refreshKey={transferDetailKey(transferNumber)}
@@ -55,14 +57,16 @@ export function TransferDetailsPage(): React.JSX.Element {
           onSave={(metadata) => mutations.updateMetadata(transferNumber, metadata)}
         />
       )}
-      renderAddAssetBar={(transfer) => (
-        <AddAssetBar
-          existingAssets={transfer.assets}
-          entityName="transfer"
-          onAddSingle={(asset) => mutations.addAsset(transferNumber, asset)}
-          onAddBatchFromHold={(assets) => mutations.addAssetBatch(transferNumber, assets)}
-        />
-      )}
+      renderAddAssetBar={(transfer) =>
+        canCreateEditTransfer && (
+          <AddAssetBar
+            existingAssets={transfer.assets}
+            entityName="transfer"
+            onAddSingle={(asset) => mutations.addAsset(transferNumber, asset)}
+            onAddBatchFromHold={(assets) => mutations.addAssetBatch(transferNumber, assets)}
+          />
+        )
+      }
     />
   )
 }

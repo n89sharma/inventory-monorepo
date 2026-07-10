@@ -96,3 +96,11 @@ name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
 - **Page state lives in the URL** (`lib/search-*-params.ts` pattern: `filtersToParams` /
   `paramsToFilters`) so views are shareable and survive back-navigation. Local `useState` only
   for transient state (typeahead text) — state the deviation explicitly.
+- **Permission gating: check at the lowest layer that can compute it.** A component that can name
+  its own RBAC permission calls `useCan` itself and hides its own actions (`BulkEditBar`). If the
+  permission needs parent context (which entity, instance state), the parent computes the boolean
+  (`useCan('create_update_x')`) and: `&&`-gates the whole child inline (`AddAssetBar`), or passes a
+  boolean prop only when the child hides an internal subset it can't compute (`CollectionEditBar`'s
+  `canCreateEditEntity`). Never pass a `Permission` string into a generic component — pass the
+  boolean. Instance-editability is injected via callback presence, not a flag (withhold
+  `onBulkRemove` when the record isn't editable; the bar still self-checks the RBAC).

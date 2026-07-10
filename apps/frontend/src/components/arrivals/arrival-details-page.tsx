@@ -66,7 +66,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       section="arrivals"
       titleLabel="Arrival"
       collectionId={arrivalNumber}
-      permission="create_update_arrival"
+      canCreateEditEntity={canEditArrival}
       detail={detail}
       notFoundLabel="Arrival not found"
       refreshKey={arrivalDetailKey(arrivalNumber)}
@@ -90,21 +90,25 @@ export function ArrivalDetailsPage(): React.JSX.Element {
           onSave={(metadata) => mutations.updateMetadata(arrivalNumber, metadata)}
         />
       )}
-      renderAddAssetBar={() => (
-        <div className="flex justify-end">
-          <Button type="button" variant="secondary" onClick={() => setIsAssetModalOpen(true)}>
-            <PlusIcon />
-            Create Asset
-          </Button>
-          <CreateAssetModal
-            open={isAssetModalOpen}
-            onOpenChange={handleModalOpenChange}
-            editingAsset={editingAssetForm}
-            onCreateAsset={(asset) => mutations.createAsset(arrivalNumber, asset)}
-            onUpdateAsset={(asset) => mutations.updateAsset(arrivalNumber, editingAssetId!, asset)}
-          />
-        </div>
-      )}
+      renderAddAssetBar={() =>
+        canEditArrival && (
+          <div className="flex justify-end">
+            <Button type="button" variant="secondary" onClick={() => setIsAssetModalOpen(true)}>
+              <PlusIcon />
+              Create Asset
+            </Button>
+            <CreateAssetModal
+              open={isAssetModalOpen}
+              onOpenChange={handleModalOpenChange}
+              editingAsset={editingAssetForm}
+              onCreateAsset={(asset) => mutations.createAsset(arrivalNumber, asset)}
+              onUpdateAsset={(asset) =>
+                mutations.updateAsset(arrivalNumber, editingAssetId!, asset)
+              }
+            />
+          </div>
+        )
+      }
     />
   )
 }

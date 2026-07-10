@@ -29,6 +29,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   const detail = useHoldDetail(holdNumber)
   const { userId: clerkUserId } = useAuth()
   const canEditAny = useCan('edit_any_hold')
+  const canCreateHold = useCan('create_update_hold')
   const [releaseOpen, setReleaseOpen] = useState(false)
 
   const isArchived = detail.data?.archived_at != null
@@ -37,6 +38,7 @@ export function HoldDetailsPage(): React.JSX.Element {
     ? !isArchived &&
       (canEditAny || (clerkUserId != null && detail.data.created_by.clerk_id === clerkUserId))
     : false
+  const canCreateEditHold = canCreateHold && canEditHold
 
   const handleRelease = async () => {
     try {
@@ -66,14 +68,15 @@ export function HoldDetailsPage(): React.JSX.Element {
         section="holds"
         titleLabel="Hold"
         collectionId={holdNumber}
-        permission="create_update_hold"
-        canEditEntity={canEditHold}
+        canCreateEditEntity={canCreateEditHold}
         detail={detail}
         notFoundLabel="Hold not found"
         refreshKey={holdDetailKey(holdNumber)}
         historyCacheKey={`hold-history:${holdNumber}`}
         historyFetcher={() => getHoldHistory(holdNumber)}
-        onBulkRemove={(assets) => mutations.bulkRemoveAssets(holdNumber, assets)}
+        onBulkRemove={
+          canEditHold ? (assets) => mutations.bulkRemoveAssets(holdNumber, assets) : undefined
+        }
         onFlushPending={mutations.flushPending}
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}
@@ -94,16 +97,18 @@ export function HoldDetailsPage(): React.JSX.Element {
             onSave={(metadata) => mutations.updateMetadata(holdNumber, metadata)}
           />
         )}
-        renderAddAssetBar={(hold) => (
-          <AddAssetBar
-            existingAssets={hold.assets}
-            entityName="hold"
-            onAddSingle={(asset) => mutations.addAsset(holdNumber, asset)}
-            validateAsset={(asset) =>
-              asset.hold_number ? `Asset ${asset.barcode} is already on a hold.` : null
-            }
-          />
-        )}
+        renderAddAssetBar={(hold) =>
+          canCreateEditHold && (
+            <AddAssetBar
+              existingAssets={hold.assets}
+              entityName="hold"
+              onAddSingle={(asset) => mutations.addAsset(holdNumber, asset)}
+              validateAsset={(asset) =>
+                asset.hold_number ? `Asset ${asset.barcode} is already on a hold.` : null
+              }
+            />
+          )
+        }
       />
       <ConfirmActionDialog
         open={releaseOpen}

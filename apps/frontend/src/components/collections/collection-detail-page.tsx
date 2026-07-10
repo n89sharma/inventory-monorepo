@@ -3,12 +3,11 @@ import { StickyDetailsPageHeader } from '@/components/collections/sticky-details
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { useCan } from '@/hooks/use-can'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import type { AssetSummary, CollectionHistory, Permission } from 'shared-types'
+import type { AssetSummary, CollectionHistory } from 'shared-types'
 import { DataTable, type DataTableSelection } from '../shadcn/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
@@ -25,8 +24,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   section: DetailSection
   titleLabel: string
   collectionId: string
-  permission: Permission
-  canEditEntity?: boolean
+  canCreateEditEntity: boolean
   detail: {
     data: TEntity | undefined
     error: Error | undefined
@@ -57,8 +55,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   section,
   titleLabel,
   collectionId,
-  permission,
-  canEditEntity,
+  canCreateEditEntity,
   detail,
   notFoundLabel,
   refreshKey,
@@ -75,7 +72,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   onRelease,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state } = useLocation()
-  const hasPermission = useCan(permission)
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [selection, setSelection] = useState<DataTableSelection<AssetSummary> | null>(null)
 
@@ -104,7 +100,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   if (!detail.data) return <div>{notFoundLabel}</div>
 
   const entity = detail.data
-  const canEdit = hasPermission && (canEditEntity ?? true)
 
   const selectedAssets = selection?.selectedRows ?? []
 
@@ -118,7 +113,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           <CollectionEditBar
             section={section}
             collectionId={collectionId}
-            canEdit={canEdit}
+            canCreateEditEntity={canCreateEditEntity}
             assets={entity.assets}
             selectedAssets={selectedAssets}
             historyCacheKey={historyCacheKey}
@@ -139,24 +134,22 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           open: isMetadataModalOpen,
           onOpenChange: setIsMetadataModalOpen,
         })}
-        {canEdit && renderAddAssetBar?.(entity)}
-        {canEdit && (
-          <BulkEditBar
-            selectedAssets={selectedAssets}
-            onClear={() => selection?.clearSelection()}
-            refreshKey={refreshKey}
-            currentCollectionType={section}
-            returnTo={`/${section}/${collectionId}`}
-            onBulkRemove={onBulkRemove}
-            totalCount={selection?.visibleCount}
-            hiddenCount={selection?.hiddenCount}
-            onSelectAll={() => selection?.selectAllVisible()}
-            extraActions={renderBulkExtraActions?.({
-              selectedAssets,
-              clearSelection: () => selection?.clearSelection(),
-            })}
-          />
-        )}
+        {renderAddAssetBar?.(entity)}
+        <BulkEditBar
+          selectedAssets={selectedAssets}
+          onClear={() => selection?.clearSelection()}
+          refreshKey={refreshKey}
+          currentCollectionType={section}
+          returnTo={`/${section}/${collectionId}`}
+          onBulkRemove={onBulkRemove}
+          totalCount={selection?.visibleCount}
+          hiddenCount={selection?.hiddenCount}
+          onSelectAll={() => selection?.selectAllVisible()}
+          extraActions={renderBulkExtraActions?.({
+            selectedAssets,
+            clearSelection: () => selection?.clearSelection(),
+          })}
+        />
         <DataTable
           columns={columns}
           data={entity.assets}

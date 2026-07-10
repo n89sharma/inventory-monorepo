@@ -38,7 +38,7 @@ const BARCODE_PRINT_SECTION = 'arrivals'
 type CollectionEditBarProps = {
   section: keyof typeof SECTION_CONFIG
   collectionId: string
-  canEdit: boolean
+  canCreateEditEntity: boolean
   assets?: AssetSummary[]
   selectedAssets?: AssetSummary[]
   historyCacheKey: string
@@ -50,7 +50,7 @@ type CollectionEditBarProps = {
 export function CollectionEditBar({
   section,
   collectionId,
-  canEdit,
+  canCreateEditEntity,
   assets,
   selectedAssets,
   historyCacheKey,
@@ -120,7 +120,7 @@ export function CollectionEditBar({
   const showPrint = section === BARCODE_PRINT_SECTION
   const printDisabled = !printableBarcodes || printableBarcodes.length === 0 || printLoading
 
-  const showRelease = canEdit && Boolean(onRelease)
+  const showRelease = canCreateEditEntity && Boolean(onRelease)
   const showDelete = !onRelease && canDelete
 
   return (
@@ -152,7 +152,7 @@ export function CollectionEditBar({
       <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
         <PrinterIcon />
       </Button>
-      {canEdit && (
+      {canCreateEditEntity && (
         <Button onClick={onEdit}>
           <PencilSimpleIcon />
           Edit

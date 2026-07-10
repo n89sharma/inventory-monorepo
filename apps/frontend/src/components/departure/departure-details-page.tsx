@@ -8,6 +8,7 @@ import { DepartureOutgoingStatusToggle } from '@/components/departure/departure-
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
+import { useCan } from '@/hooks/use-can'
 import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
@@ -19,6 +20,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   const mutations = useDepartureMutations()
   const detail = useDepartureDetail(departureNumber)
+  const canCreateEditDeparture = useCan('create_update_departure')
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) => createDepartureAssetSummaryColumns(assetHref),
@@ -30,7 +32,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
       section="departures"
       titleLabel="Departure"
       collectionId={departureNumber}
-      permission="create_update_departure"
+      canCreateEditEntity={canCreateEditDeparture}
       detail={detail}
       notFoundLabel="Departure not found"
       refreshKey={departureDetailKey(departureNumber)}
@@ -52,14 +54,16 @@ export function DepartureDetailsPage(): React.JSX.Element {
           onSave={(metadata) => mutations.updateMetadata(departureNumber, metadata)}
         />
       )}
-      renderAddAssetBar={(departure) => (
-        <AddAssetBar
-          existingAssets={departure.assets}
-          entityName="departure"
-          onAddSingle={(asset) => mutations.addAsset(departureNumber, asset)}
-          onAddBatchFromHold={(assets) => mutations.addAssetBatch(departureNumber, assets)}
-        />
-      )}
+      renderAddAssetBar={(departure) =>
+        canCreateEditDeparture && (
+          <AddAssetBar
+            existingAssets={departure.assets}
+            entityName="departure"
+            onAddSingle={(asset) => mutations.addAsset(departureNumber, asset)}
+            onAddBatchFromHold={(assets) => mutations.addAssetBatch(departureNumber, assets)}
+          />
+        )
+      }
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
         <DepartureOutgoingStatusToggle
           onApply={(status) => {

@@ -7,6 +7,7 @@ import { SummaryField } from '@/components/shared/cards/summary-field'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
+import { useCan } from '@/hooks/use-can'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
@@ -18,6 +19,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   const mutations = useInvoiceMutations()
   const detail = useInvoiceDetail(invoiceNumber)
+  const canCreateEditInvoice = useCan('create_update_invoice')
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
@@ -30,7 +32,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       section="invoices"
       titleLabel="Invoice"
       collectionId={invoiceNumber}
-      permission="create_update_invoice"
+      canCreateEditEntity={canCreateEditInvoice}
       detail={detail}
       notFoundLabel="Invoice not found"
       refreshKey={invoiceDetailKey(invoiceNumber)}
@@ -59,13 +61,15 @@ export function InvoiceDetailsPage(): React.JSX.Element {
           onSave={(metadata) => mutations.updateMetadata(invoiceNumber, metadata)}
         />
       )}
-      renderAddAssetBar={(invoice) => (
-        <AddAssetBar
-          existingAssets={invoice.assets}
-          entityName="invoice"
-          onAddSingle={(asset) => mutations.addAsset(invoiceNumber, asset)}
-        />
-      )}
+      renderAddAssetBar={(invoice) =>
+        canCreateEditInvoice && (
+          <AddAssetBar
+            existingAssets={invoice.assets}
+            entityName="invoice"
+            onAddSingle={(asset) => mutations.addAsset(invoiceNumber, asset)}
+          />
+        )
+      }
     />
   )
 }

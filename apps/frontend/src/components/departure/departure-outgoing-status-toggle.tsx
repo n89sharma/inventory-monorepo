@@ -1,4 +1,5 @@
 import { OUTGOING_STATUS_LABELS, OutgoingStatusSchema, type OutgoingStatus } from 'shared-types'
+import { useCan } from '@/hooks/use-can'
 import { ToggleGroup, ToggleGroupItem } from '../shadcn/toggle-group'
 
 const OUTGOING_STATUS_OPTIONS = OutgoingStatusSchema.options
@@ -10,6 +11,9 @@ type DepartureOutgoingStatusToggleProps = {
 export function DepartureOutgoingStatusToggle({
   onApply,
 }: DepartureOutgoingStatusToggleProps): React.ReactNode {
+  const canEdit = useCan('create_update_departure')
+  if (!canEdit) return null
+
   function handleValueChange(next: string) {
     const picked = OUTGOING_STATUS_OPTIONS.find((o) => o === next)
     if (picked) onApply(picked)
