@@ -152,7 +152,7 @@ export function AddAssetsByBarcodeOrSerial({
               value={displayValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              disabled={disabled || isLookingUp}
+              disabled={disabled}
               className={showLeadingIcon ? 'pl-8 pr-8' : 'pr-8'}
             />
             {isLookingUp && (
