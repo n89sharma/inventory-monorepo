@@ -1,5 +1,6 @@
 import type { AssetSummary } from 'shared-types'
-import { AddAssetsByBarcodeOrSerial, AddFromHoldButton } from './add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from './add-assets-by-barcode-or-serial'
+import { AddFromHoldButton } from './add-from-hold-button'
 
 interface AddAssetBarProps {
   existingAssets: AssetSummary[]

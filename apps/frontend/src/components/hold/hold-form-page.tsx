@@ -9,7 +9,7 @@ import {
   FieldSet,
 } from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
-import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { ControlledSelectOptionSearchSelect } from '@/components/shared/search-select/controlled-select-option-search-select'

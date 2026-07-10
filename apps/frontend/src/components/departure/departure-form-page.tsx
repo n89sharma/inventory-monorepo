@@ -10,10 +10,8 @@ import {
   FieldSet,
 } from '@/components/shadcn/field'
 import { Textarea } from '@/components/shadcn/textarea'
-import {
-  AddAssetsByBarcodeOrSerial,
-  AddFromHoldButton,
-} from '@/components/collections/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
+import { AddFromHoldButton } from '@/components/collections/add-from-hold-button'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { DepartureOutgoingStatusBar } from '@/components/departure/departure-outgoing-status-bar'

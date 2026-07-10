@@ -1,11 +1,9 @@
-import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { useAssetStore } from '@/data/store/asset-store'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { BarcodeIcon, CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { CommandResultList } from '../global-search/command-result-list'
-import { Button } from '../shadcn/button'
 import { Input } from '../shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 
@@ -182,41 +180,5 @@ export function AddAssetsByBarcodeOrSerial({
       </Popover>
       {assetError && <p className="text-destructive mt-1">{assetError}</p>}
     </div>
-  )
-}
-
-interface AddFromHoldButtonProps {
-  getAssets: () => AssetSummary[]
-  onAddAsset: (asset: AssetSummary) => void
-  disabled?: boolean
-  onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
-}
-
-export function AddFromHoldButton({
-  getAssets,
-  onAddAsset,
-  disabled,
-  onCommitBatch,
-}: AddFromHoldButtonProps): React.JSX.Element {
-  const [isHoldModalOpen, setIsHoldModalOpen] = useState(false)
-
-  return (
-    <>
-      <Button
-        variant="secondary"
-        type="button"
-        onClick={() => setIsHoldModalOpen(true)}
-        disabled={disabled}
-      >
-        Add from Hold
-      </Button>
-      <AddFromHoldModal
-        open={isHoldModalOpen}
-        onOpenChange={setIsHoldModalOpen}
-        getAssets={getAssets}
-        onAddAsset={onAddAsset}
-        onCommitBatch={onCommitBatch}
-      />
-    </>
   )
 }

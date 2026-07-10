@@ -12,7 +12,7 @@ import {
 } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-to-create-form'
+import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
