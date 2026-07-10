@@ -2,6 +2,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { specApplicability } from '@/lib/asset-spec-applicability'
 import { modelLabel } from '@/lib/reference-labels'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
@@ -117,6 +118,7 @@ export function CreateAssetModal({
     : null
   const currentBrandName = modelSelection?.brand_name ?? null
   const isColourModel = modelSelection?.is_colour ?? false
+  const applicable = specApplicability(modelSelection?.asset_type ?? null)
   const brandId = currentBrandName
     ? (brands.find((b) => b.name === currentBrandName)?.id ?? null)
     : null
@@ -153,15 +155,24 @@ export function CreateAssetModal({
   }
 
   async function onValidAsset(rawAsset: AssetForm) {
+    // Fields hidden for this asset type are left null by validation; coerce every
+    // numeric spec to a non-null number for the CreateAsset contract (0 for
+    // non-applicable), and drop the internal finisher when it doesn't apply.
+    const applicableForAsset = specApplicability(rawAsset.model?.asset_type ?? null)
     const asset: AssetForm = {
       ...rawAsset,
+      meterBlack: rawAsset.meterBlack ?? 0,
       meterColour: rawAsset.meterColour ?? 0,
+      cassettes: rawAsset.cassettes ?? 0,
+      component: applicableForAsset.internalFinisher ? rawAsset.component : null,
       drumLifeC: rawAsset.drumLifeC ?? 0,
       drumLifeM: rawAsset.drumLifeM ?? 0,
       drumLifeY: rawAsset.drumLifeY ?? 0,
+      drumLifeK: rawAsset.drumLifeK ?? 0,
       tonerLifeC: rawAsset.tonerLifeC ?? 0,
       tonerLifeM: rawAsset.tonerLifeM ?? 0,
       tonerLifeY: rawAsset.tonerLifeY ?? 0,
+      tonerLifeK: rawAsset.tonerLifeK ?? 0,
     }
     if (isEditMode && onUpdateAsset) {
       setIsSubmitting(true)
@@ -239,6 +250,7 @@ export function CreateAssetModal({
             control={newAssetForm.control}
             isColour={isColourModel}
             brandName={currentBrandName}
+            applicable={applicable}
             renderAfterReadiness={
               <HorizontalField label="Errors" required={isHasErrors}>
                 <Controller

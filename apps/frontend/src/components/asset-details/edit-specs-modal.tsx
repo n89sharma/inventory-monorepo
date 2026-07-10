@@ -11,6 +11,7 @@ import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog
 import { useAssetStore } from '@/data/store/asset-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { specApplicability } from '@/lib/asset-spec-applicability'
 import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
@@ -52,6 +53,7 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   tonerLifeY: null,
   tonerLifeK: null,
   isColour: false,
+  assetType: null,
 }
 
 export function EditSpecsModal({
@@ -98,6 +100,7 @@ export function EditSpecsModal({
       tonerLifeY: specs.toner_life_y,
       tonerLifeK: specs.toner_life_k,
       isColour: assetDetails.is_colour,
+      assetType: assetDetails.asset_type,
     }
   }, [assetDetails, readinesses, countries, components, coreFunctions, accessories])
 
@@ -110,6 +113,8 @@ export function EditSpecsModal({
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   if (!assetDetails) return null
+
+  const applicable = specApplicability(assetDetails.asset_type)
 
   async function onValid(formValues: SpecsForm) {
     if (!isSelected(formValues.readiness)) return
@@ -163,6 +168,7 @@ export function EditSpecsModal({
             control={form.control}
             isColour={assetDetails.is_colour}
             brandName={assetDetails.brand}
+            applicable={applicable}
             readinessDisabledStatuses={readinessDisabledStatuses}
           />
         </form>

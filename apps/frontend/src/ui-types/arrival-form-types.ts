@@ -18,6 +18,7 @@ import {
   UpdateErrorSchema,
 } from 'shared-types'
 import z from 'zod'
+import { specApplicability, type SpecApplicability } from '@/lib/asset-spec-applicability'
 import {
   isSelected,
   StatusSelectOptionSchema,
@@ -27,19 +28,6 @@ import {
 
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const CURRENT_YEAR = new Date().getFullYear()
-
-// Colour models require the colour meter and the C/M/Y channels for both drum
-// life and toner; K is always required (enforced inline on the field). Mono
-// models require black meter and K only.
-const COLOUR_REQUIRED_FIELDS = [
-  { field: 'meterColour', label: 'Colour meter' },
-  { field: 'drumLifeC', label: 'Drum life C' },
-  { field: 'drumLifeM', label: 'Drum life M' },
-  { field: 'drumLifeY', label: 'Drum life Y' },
-  { field: 'tonerLifeC', label: 'Toner life C' },
-  { field: 'tonerLifeM', label: 'Toner life M' },
-  { field: 'tonerLifeY', label: 'Toner life Y' },
-] as const
 
 // Technical-specification fields shared by the Create/Edit Asset modal and the
 // Edit Technical Specifications modal. Defined once so the validation rules stay
@@ -53,46 +41,66 @@ const specFieldsShape = {
     .min(MIN_MANUFACTURED_YEAR, `Year must be ${MIN_MANUFACTURED_YEAR} or later`)
     .max(CURRENT_YEAR, `Year cannot be in the future`)
     .nullable(),
-  meterBlack: z
-    .number()
-    .min(0)
-    .nullable()
-    .refine((v) => v != null && v != undefined, 'Black meter is required'),
+  meterBlack: z.number().min(0).nullable(),
   meterColour: z.number().min(0).nullable(),
-  cassettes: z
-    .number()
-    .min(0)
-    .nullable()
-    .refine((v) => v != null && v != undefined, 'Cassettes is required'),
+  cassettes: z.number().min(0).nullable(),
   component: ComponentSchema.nullable(),
   coreFunctions: z.array(CoreFunctionsSchema),
   drumLifeC: z.number().min(0).nullable(),
   drumLifeM: z.number().min(0).nullable(),
   drumLifeY: z.number().min(0).nullable(),
-  drumLifeK: z
-    .number()
-    .min(0)
-    .nullable()
-    .refine((v) => v != null, 'Drum life K required'),
+  drumLifeK: z.number().min(0).nullable(),
   tonerLifeC: z.number().min(0).nullable(),
   tonerLifeM: z.number().min(0).nullable(),
   tonerLifeY: z.number().min(0).nullable(),
-  tonerLifeK: z
-    .number()
-    .min(0)
-    .nullable()
-    .refine((v) => v != null, 'Toner life K required'),
+  tonerLifeK: z.number().min(0).nullable(),
 } as const
 
-function refineColourRequiredFields(
+// Meter fields apply only to metered asset types; cassettes and the drum/toner
+// consumables apply only to types that carry them (see specApplicability). Within
+// an applicable group, the K channel is always required, and colour models also
+// require the C/M/Y channels plus the colour meter. Non-applicable fields are
+// hidden in the UI and left unvalidated (coerced to 0 at the create boundary).
+const CONSUMABLE_COLOUR_REQUIRED_FIELDS = [
+  { field: 'drumLifeC', label: 'Drum life C' },
+  { field: 'drumLifeM', label: 'Drum life M' },
+  { field: 'drumLifeY', label: 'Drum life Y' },
+  { field: 'tonerLifeC', label: 'Toner life C' },
+  { field: 'tonerLifeM', label: 'Toner life M' },
+  { field: 'tonerLifeY', label: 'Toner life Y' },
+] as const
+
+function requireField(
   val: Record<string, unknown>,
+  field: string,
+  label: string,
+  ctx: z.RefinementCtx,
+) {
+  if (val[field] == null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: `${label} required` })
+  }
+}
+
+function refineSpecFields(
+  val: Record<string, unknown>,
+  applicable: SpecApplicability,
   isColour: boolean,
   ctx: z.RefinementCtx,
 ) {
-  if (!isColour) return
-  for (const { field, label } of COLOUR_REQUIRED_FIELDS) {
-    if (val[field] == null) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: `${label} required` })
+  if (applicable.meter) {
+    requireField(val, 'meterBlack', 'Black meter', ctx)
+    if (isColour) requireField(val, 'meterColour', 'Colour meter', ctx)
+  }
+  if (applicable.cassettes) {
+    requireField(val, 'cassettes', 'Cassettes', ctx)
+  }
+  if (applicable.consumables) {
+    requireField(val, 'drumLifeK', 'Drum life K', ctx)
+    requireField(val, 'tonerLifeK', 'Toner life K', ctx)
+    if (isColour) {
+      for (const { field, label } of CONSUMABLE_COLOUR_REQUIRED_FIELDS) {
+        requireField(val, field, label, ctx)
+      }
     }
   }
 }
@@ -124,19 +132,23 @@ export const AssetFormSchema = z
       })
     }
 
-    refineColourRequiredFields(val, val.model?.is_colour ?? false, ctx)
+    const applicable = specApplicability(val.model?.asset_type ?? null)
+    refineSpecFields(val, applicable, val.model?.is_colour ?? false, ctx)
   })
 
 // Edit Technical Specifications modal — the spec-field subset of an existing
-// asset. `isColour` is carried (not user-editable) so the colour-channel rule
-// matches the asset modal, which derives the same flag from the selected model.
+// asset. `isColour` and `assetType` are carried (not user-editable) so the
+// colour-channel and applicability rules match the asset modal, which derives the
+// same values from the selected model.
 export const SpecsFormSchema = z
   .object({
     ...specFieldsShape,
     isColour: z.boolean(),
+    assetType: z.string().nullable(),
   })
   .superRefine((val, ctx) => {
-    refineColourRequiredFields(val, val.isColour, ctx)
+    const applicable = specApplicability(val.assetType)
+    refineSpecFields(val, applicable, val.isColour, ctx)
   })
 
 // Arrival Form Page within Edit or Create Arrival
@@ -191,6 +203,7 @@ export type SpecsForm = {
   tonerLifeY: number | null
   tonerLifeK: number | null
   isColour: boolean
+  assetType: string | null
 }
 
 export type ArrivalForm = {

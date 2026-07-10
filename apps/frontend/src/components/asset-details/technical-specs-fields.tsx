@@ -11,6 +11,7 @@ import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { ReadinessPicker } from '@/components/shared/readiness/readiness-picker'
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import type { SpecApplicability } from '@/lib/asset-spec-applicability'
 import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import {
@@ -272,6 +273,7 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
   brandName: string | null
+  applicable: SpecApplicability
   readinessDisabledStatuses?: string[]
   renderAfterReadiness?: React.ReactNode
 }
@@ -290,6 +292,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   control,
   isColour,
   brandName,
+  applicable,
   readinessDisabledStatuses,
   renderAfterReadiness,
 }: TechnicalSpecsFieldsProps<T>) {
@@ -348,53 +351,70 @@ export function TechnicalSpecsFields<T extends FieldValues>({
         </HorizontalField>
       </div>
 
-      <HorizontalField label="Meter" required>
-        <div className="flex items-center gap-2">
-          {isColour && (
-            <ControlledMeterInput control={control} name={p('meterColour')} channel="C" />
-          )}
-          <ControlledMeterInput control={control} name={p('meterBlack')} channel="K" />
-          {isColour && (
-            <MeterTotal
-              control={control}
-              blackName={p('meterBlack')}
-              colourName={p('meterColour')}
-            />
-          )}
-        </div>
-      </HorizontalField>
+      {applicable.meter ? (
+        <HorizontalField label="Meter" required>
+          <div className="flex items-center gap-2">
+            {isColour && (
+              <ControlledMeterInput control={control} name={p('meterColour')} channel="C" />
+            )}
+            <ControlledMeterInput control={control} name={p('meterBlack')} channel="K" />
+            {isColour && (
+              <MeterTotal
+                control={control}
+                blackName={p('meterBlack')}
+                colourName={p('meterColour')}
+              />
+            )}
+          </div>
+        </HorizontalField>
+      ) : null}
 
-      <ConsumablesGrid visibleChannels={channels}>
-        <ControlledConsumablesRow
-          label="Drum life"
-          control={control}
-          names={{ c: p('drumLifeC'), m: p('drumLifeM'), y: p('drumLifeY'), k: p('drumLifeK') }}
-          visibleChannels={channels}
-          unit="K"
-          required
-        />
-        <ControlledConsumablesRow
-          label="Toner"
-          control={control}
-          names={{ c: p('tonerLifeC'), m: p('tonerLifeM'), y: p('tonerLifeY'), k: p('tonerLifeK') }}
-          visibleChannels={channels}
-          unit="%"
-          required
-        />
-      </ConsumablesGrid>
+      {applicable.consumables ? (
+        <ConsumablesGrid visibleChannels={channels}>
+          <ControlledConsumablesRow
+            label="Drum life"
+            control={control}
+            names={{ c: p('drumLifeC'), m: p('drumLifeM'), y: p('drumLifeY'), k: p('drumLifeK') }}
+            visibleChannels={channels}
+            unit="K"
+            required
+          />
+          <ControlledConsumablesRow
+            label="Toner"
+            control={control}
+            names={{
+              c: p('tonerLifeC'),
+              m: p('tonerLifeM'),
+              y: p('tonerLifeY'),
+              k: p('tonerLifeK'),
+            }}
+            visibleChannels={channels}
+            unit="%"
+            required
+          />
+        </ConsumablesGrid>
+      ) : null}
 
       <div className="flex flex-col gap-2">
-        <HorizontalField label="Cassettes" required>
-          <ControlledNumberInput control={control} name={p('cassettes')} className={INPUT_WIDTH} />
-        </HorizontalField>
-        <HorizontalField label="Internal Finisher">
-          <ControlledComponentSearch
-            control={control}
-            name={p('component')}
-            brandName={brandName}
-            className={INPUT_WIDTH}
-          />
-        </HorizontalField>
+        {applicable.cassettes ? (
+          <HorizontalField label="Cassettes" required>
+            <ControlledNumberInput
+              control={control}
+              name={p('cassettes')}
+              className={INPUT_WIDTH}
+            />
+          </HorizontalField>
+        ) : null}
+        {applicable.internalFinisher ? (
+          <HorizontalField label="Internal Finisher">
+            <ControlledComponentSearch
+              control={control}
+              name={p('component')}
+              brandName={brandName}
+              className={INPUT_WIDTH}
+            />
+          </HorizontalField>
+        ) : null}
         <HorizontalField label="Core Functions">
           <Controller
             name={p('coreFunctions')}
