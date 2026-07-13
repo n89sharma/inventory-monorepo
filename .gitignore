@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# npm workspaces: only the root lockfile is authoritative
+apps/*/package-lock.json
+packages/*/package-lock.json
+
 # Playwright
 /test-results/
 /playwright-report/
