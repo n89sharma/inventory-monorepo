@@ -5,7 +5,7 @@ export const AppRoles = [
   'leadership',
   'general_manager',
   'inventory_manager',
-  'accountant_shipping',
+  'senior_accountant',
   'accountant',
   'tech',
   'branch_manager',
