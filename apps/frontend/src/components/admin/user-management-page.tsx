@@ -10,6 +10,7 @@ import {
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shadcn/data-table'
+import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import {
   Dialog,
   DialogContent,
@@ -137,7 +138,29 @@ export function UserManagementPage() {
         </Toggle>
       </div>
 
-      <DataTable columns={columns} data={displayedUsers} initialPageSize={25} />
+      <DataTable
+        columns={columns}
+        data={displayedUsers}
+        initialPageSize={25}
+        renderTableFilter={(table) => (
+          <>
+            <ColumnTextFilter
+              table={table}
+              columnId="name"
+              placeholder="Name"
+              clearLabel="Clear name"
+              className="w-56"
+            />
+            <ColumnTextFilter
+              table={table}
+              columnId="email"
+              placeholder="Email"
+              clearLabel="Clear email"
+              className="w-56"
+            />
+          </>
+        )}
+      />
 
       {/* Edit Role modal */}
       <Dialog

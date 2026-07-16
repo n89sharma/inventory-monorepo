@@ -13,6 +13,7 @@ export function createUserPermissionTableColumns(
     {
       accessorKey: 'name',
       size: 180,
+      filterFn: 'includesString',
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -25,6 +26,7 @@ export function createUserPermissionTableColumns(
     {
       accessorKey: 'email',
       size: 220,
+      filterFn: 'includesString',
       header: ({ column }) => (
         <Button
           variant="ghost"
