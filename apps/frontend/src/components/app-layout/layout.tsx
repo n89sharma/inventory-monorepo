@@ -15,7 +15,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <Toaster />
       <div className="flex flex-col w-full min-w-0">
-        <Header className="sticky top-0 z-10 bg-background" />
+        <Header className="sticky top-0 z-30 bg-background" />
         <main id="main-content" className="w-full min-w-0 text-sm">
           {children}
         </main>
