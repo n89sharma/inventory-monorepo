@@ -20,6 +20,7 @@ import { Label } from '@/components/shadcn/label'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { useSavedViews } from '@/hooks/use-saved-view'
 import { useSavedViewMutations } from '@/hooks/use-saved-view-mutations'
+import { COLS_PARAM_KEY } from '@/lib/filters/parsers'
 import { BookmarksIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useState } from 'react'
@@ -123,11 +124,9 @@ function SaveViewDialog({
 export function SavedViewsButton({
   pageKey,
   visibleColumns,
-  onApplyColumns,
 }: {
   pageKey: SavedViewPageKey
   visibleColumns?: Set<string>
-  onApplyColumns?: (columnIds: readonly string[]) => void
 }): React.JSX.Element {
   const [, setSearchParams] = useSearchParams()
   const liveSearchParams = useOptimisticSearchParams()
@@ -136,8 +135,10 @@ export function SavedViewsButton({
   const [dialogOpen, setDialogOpen] = useState(false)
 
   function applyView(view: SavedViewSummary) {
-    setSearchParams(new URLSearchParams(view.query_string), { replace: true })
-    onApplyColumns?.(view.column_ids)
+    const params = new URLSearchParams(view.query_string)
+    if (view.column_ids.length > 0) params.set(COLS_PARAM_KEY, view.column_ids.join(','))
+    else params.delete(COLS_PARAM_KEY)
+    setSearchParams(params, { replace: true })
   }
 
   async function saveView(name: string) {

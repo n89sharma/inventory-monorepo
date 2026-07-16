@@ -1,8 +1,4 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import {
-  DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
-  resolveVisibleColumns,
-} from '@/components/table-columns/asset-table-columns'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
@@ -10,8 +6,7 @@ import { ExportAssetsButton } from '@/components/shared/export-assets-button'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
-import { useCan } from '@/hooks/use-can'
-import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
@@ -43,17 +38,12 @@ export function AssetSearchPage({
   children: React.ReactNode
 }): React.JSX.Element {
   const searchParams = useOptimisticSearchParams()
-  const can = useCan()
   const {
     visibleColumns,
     setVisibleColumns,
     columnVisibility,
     reset: resetColumns,
-  } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
-  const applyColumns = useCallback(
-    (columnIds: readonly string[]) => setVisibleColumns(resolveVisibleColumns(columnIds, can)),
-    [setVisibleColumns, can],
-  )
+  } = useColumnVisibilityParam(navContext)
   const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
   const effectiveColumnVisibility = useMemo<VisibilityState>(() => {
     if (!forceVisibleColumnIds?.length) return columnVisibility
@@ -86,11 +76,7 @@ export function AssetSearchPage({
               onVisibleChange={setVisibleColumns}
               onReset={resetColumns}
             />
-            <SavedViewsButton
-              pageKey={savedViewPageKey}
-              visibleColumns={visibleColumns}
-              onApplyColumns={applyColumns}
-            />
+            <SavedViewsButton pageKey={savedViewPageKey} visibleColumns={visibleColumns} />
             <ShareButton />
             <ExportAssetsButton
               loading={selection.exportLoading}

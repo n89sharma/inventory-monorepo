@@ -14,6 +14,10 @@ const FLAG_ON = '1'
 // CSV of integer ids, matching the legacy `encodeIds`/`decodeIds` format.
 export const parseAsIdList = parseAsArrayOf(parseAsInteger, ',')
 
+const parseAsStringList = parseAsArrayOf(parseAsString, ',')
+
+export const COLS_PARAM_KEY = 'cols'
+
 // Non-negative integer; anything negative or unparseable clears the param.
 const parseAsNonNegativeInt = createParser<number>({
   parse: (value) => {
@@ -73,6 +77,7 @@ export const FILTER_PARSERS = {
   origin: parseAsInteger,
   dest: parseAsInteger,
   invoicetype: parseAsInvoiceType,
+  cols: parseAsStringList,
   warehouse: parseAsIdList,
   search: parseAsString,
   range: parseAsInteger,
