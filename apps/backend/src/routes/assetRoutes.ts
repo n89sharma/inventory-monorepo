@@ -6,7 +6,6 @@ import {
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
-  exportAssetReport,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
@@ -39,7 +38,6 @@ router.get(
   validateQuery(SoldAssetQuerySchema),
   getSoldAssets,
 )
-router.post('/export', requirePermission('view_asset'), exportAssetReport)
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
 router.get(
   '/locations',

@@ -90,7 +90,7 @@ export function SearchAllPage(): React.JSX.Element {
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchAll(filters)
-  const selection = useAssetSelection(assets, visibleColumns)
+  const selection = useAssetSelection(assets, visibleColumns, 'all-assets.csv')
   const handleBulkPriceSave = useCallback(() => {
     mutate()
   }, [mutate])

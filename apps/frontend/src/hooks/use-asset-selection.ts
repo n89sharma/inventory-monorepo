@@ -1,15 +1,19 @@
-import { buildExportColumnKeys } from '@/components/table-columns/asset-table-columns'
-import { useAssetStore } from '@/data/store/asset-store'
+import { assetSearchRowsToCsv } from '@/components/table-columns/asset-search-report-columns'
+import { downloadFile } from '@/lib/download-file'
+import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 
 const MAX_EXPORT = 2000
+const CSV_MIME_TYPE = 'text/csv'
+const DEFAULT_EXPORT_FILENAME = 'assets.csv'
 
 export function useAssetSelection(
   assets: AssetSearchRow[],
   visibleColumns: Set<string>,
+  exportFilename: string = DEFAULT_EXPORT_FILENAME,
 ): {
   rowSelection: RowSelectionState
   setRowSelection: OnChangeFn<RowSelectionState>
@@ -18,7 +22,6 @@ export function useAssetSelection(
   exportDisabled: boolean
   handleExport: () => Promise<void>
 } {
-  const exportAssets = useAssetStore((state) => state.exportAssets)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [exportLoading, setExportLoading] = useState(false)
   const [prevAssets, setPrevAssets] = useState(assets)
@@ -29,13 +32,13 @@ export function useAssetSelection(
   }
 
   async function handleExport() {
-    const selectedBarcodes = Object.keys(rowSelection)
-    const barcodesToExport =
-      selectedBarcodes.length > 0 ? selectedBarcodes : assets.map((a) => a.barcode)
+    const selected = assets.filter((a) => rowSelection[a.barcode])
+    const rows = selected.length > 0 ? selected : assets
+    if (rows.length === 0) return
 
-    if (barcodesToExport.length > MAX_EXPORT) {
+    if (rows.length > MAX_EXPORT) {
       toast.error(
-        `Cannot export ${barcodesToExport.length} assets. Please select ${MAX_EXPORT} assets or less`,
+        `Cannot export ${rows.length} assets. Please select ${MAX_EXPORT} assets or less`,
         { position: 'top-center' },
       )
       return
@@ -43,12 +46,9 @@ export function useAssetSelection(
 
     setExportLoading(true)
     try {
-      await exportAssets(
-        barcodesToExport,
-        undefined,
-        undefined,
-        buildExportColumnKeys(visibleColumns),
-      )
+      await waitForNextPaint()
+      const csv = assetSearchRowsToCsv(rows, visibleColumns)
+      downloadFile(exportFilename, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {

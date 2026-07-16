@@ -19,7 +19,8 @@ import { createIdColumn } from './shared-columns'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
-const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date(), createdAt)
+export const stockDays = (createdAt: Date): number =>
+  differenceInCalendarDays(new Date(), createdAt)
 
 export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined

@@ -214,7 +214,7 @@ function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
   }
 }
 
-export async function getAssetDetailsBatch(barcodes: string[]): Promise<AssetDetails[]> {
+async function getAssetDetailsBatch(barcodes: string[]): Promise<AssetDetails[]> {
   const rows = await prisma.$queryRawTyped(getAssetDetailsBatchQuery(barcodes))
   return rows.map(mapAssetDetail)
 }

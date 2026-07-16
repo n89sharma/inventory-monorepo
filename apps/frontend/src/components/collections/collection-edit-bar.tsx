@@ -1,6 +1,7 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
 import { downloadFile } from '@/lib/download-file'
+import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import {
   BarcodeIcon,
   DotsThreeVerticalIcon,
@@ -33,14 +34,6 @@ import { CollectionHistorySheet } from './collection-history-sheet'
 const BARCODE_PRINT_SECTION = 'arrivals'
 const MAX_EXPORT_ASSETS = 2000
 const CSV_MIME_TYPE = 'text/csv'
-
-// CSV generation is synchronous; yield until the loading state has painted so the
-// spinner is visible before the (potentially large) build blocks the main thread.
-function waitForNextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-  })
-}
 
 type CollectionEditBarProps = {
   section: CollectionSection

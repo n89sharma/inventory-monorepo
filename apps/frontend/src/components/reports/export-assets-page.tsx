@@ -115,7 +115,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   const { visibleColumns, setVisibleColumns, columnVisibility, reset } = useColumnVisibility(
     ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS,
   )
-  const selection = useAssetSelection(assets, visibleColumns)
+  const selection = useAssetSelection(assets, visibleColumns, 'export-assets.csv')
 
   const searchParams = useOptimisticSearchParams()
   const getRowHref = useCallback(

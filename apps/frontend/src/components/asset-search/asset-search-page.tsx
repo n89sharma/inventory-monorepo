@@ -54,7 +54,7 @@ export function AssetSearchPage({
     (columnIds: readonly string[]) => setVisibleColumns(resolveVisibleColumns(columnIds, can)),
     [setVisibleColumns, can],
   )
-  const selection = useAssetSelection(assets, visibleColumns)
+  const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
   const effectiveColumnVisibility = useMemo<VisibilityState>(() => {
     if (!forceVisibleColumnIds?.length) return columnVisibility
     const out = { ...columnVisibility }

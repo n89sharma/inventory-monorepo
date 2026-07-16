@@ -7,7 +7,6 @@ import {
   BulkUpdateAssetPricingSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
-  ExportAssetsSchema,
   PrintBarcodesSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
@@ -35,7 +34,6 @@ import {
   getBarcodeLabels as getBarcodeLabelsSer,
   getSoldAssets as getSoldAssetsSer,
 } from '../services/assetReadService.js'
-import { exportAssetReport as exportAssetReportSer } from '../services/assetReportService.js'
 import { generateBarcodePdf as generateBarcodePdfSer } from '../services/barcodePrintService.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
@@ -366,15 +364,6 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
   const validated = UpdateAssetLocationSchema.parse(req.body)
   await updateAssetLocationSer(barcode, validated, res.locals.dbUserId)
   res.json(successResponse(null))
-})
-
-export const exportAssetReport = asyncHandler(async (req, res) => {
-  const { barcodes, variant, columnKeys } = ExportAssetsSchema.parse(req.body)
-  const csv = await exportAssetReportSer(barcodes, res.locals.dbUserRole, variant, columnKeys)
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-  res.setHeader('Content-Type', 'text/csv')
-  res.setHeader('Content-Disposition', `attachment; filename="assets-export-${timestamp}.csv"`)
-  res.send(csv)
 })
 
 export const printAssetBarcodes = asyncHandler(async (req, res) => {

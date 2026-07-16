@@ -1,6 +1,5 @@
 import { api } from '@/data/api/axios-client'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
-import { downloadFile } from '@/lib/download-file'
 import type {
   AssetDetails,
   AssetError,
@@ -20,7 +19,6 @@ import type {
   CreateComment,
   CreateSalvagedPart,
   OrgSummary,
-  ReportVariant,
   Status,
   UpdateAssetErrors,
   UpdateAssetLocation,
@@ -45,7 +43,6 @@ import {
   CommentSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
-  ExportAssetsSchema,
   PrintBarcodesSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
@@ -172,24 +169,6 @@ export async function getAllAssetDetails(barcode: string): Promise<AssetAllDetai
     harvestedParts: harvestedParts.status === 'fulfilled' ? harvestedParts.value : [],
     storeParts: storeParts.status === 'fulfilled' ? storeParts.value : [],
   }
-}
-
-export async function exportAssets(
-  barcodes: string[],
-  filename?: string,
-  variant?: ReportVariant,
-  columnKeys?: string[],
-): Promise<void> {
-  const exportAssetsBody = ExportAssetsSchema.parse({
-    barcodes,
-    variant,
-    columnKeys,
-  } satisfies z.input<typeof ExportAssetsSchema>)
-  const response = await api.post('/assets/export', exportAssetsBody, { responseType: 'blob' })
-  const disposition = response.headers['content-disposition'] as string | undefined
-  const resolvedFilename =
-    filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
-  downloadFile(resolvedFilename, new Blob([response.data], { type: 'text/csv' }))
 }
 
 export async function printBarcodes(barcodes: string[]): Promise<void> {

@@ -349,21 +349,3 @@ export function resolveVisibleColumns(
   }
   return resolved
 }
-
-const IDENTITY_REPORT_KEYS = ['barcode', 'brand', 'model'] as const
-
-const COLUMN_ID_TO_REPORT_KEYS: Partial<Record<AssetColumnId, readonly string[]>> = {
-  location: ['warehouse_code', 'zone', 'bin'],
-  held_by: ['hold_created_by'],
-  departed_at: ['departure_created_at'],
-  // stock_days, latest_comment default to [id] (new backend keys of the same name)
-}
-
-export function buildExportColumnKeys(visibleColumns: Set<string>): string[] {
-  const keys: string[] = [...IDENTITY_REPORT_KEYS]
-  for (const col of ASSET_TABLE_COLUMNS) {
-    if (!col.enabled || !visibleColumns.has(col.id)) continue
-    keys.push(...(COLUMN_ID_TO_REPORT_KEYS[col.id] ?? [col.id]))
-  }
-  return [...new Set(keys)]
-}

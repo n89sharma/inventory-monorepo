@@ -1,13 +1,11 @@
 import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import { toCsv, type CsvColumn } from '@/lib/csv'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import type { AssetSummary } from 'shared-types'
 
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
-export type AssetReportColumn = {
-  header: string
-  value: (asset: AssetSummary) => string
-}
+export type AssetReportColumn = CsvColumn<AssetSummary>
 
 const BARCODE_COLUMN: AssetReportColumn = { header: 'Barcode', value: (a) => a.barcode }
 const BRAND_COLUMN: AssetReportColumn = { header: 'Brand', value: (a) => formatTitleCase(a.brand) }
@@ -105,21 +103,6 @@ export const REPORT_COLUMNS_BY_SECTION = {
   holds: COMMON_REPORT_COLUMNS,
 } as const satisfies Record<CollectionSection, AssetReportColumn[]>
 
-const CSV_ROW_DELIMITER = '\r\n'
-const CSV_QUOTE_REQUIRED = /["\r\n,]/
-
-function toCsvField(value: string): string {
-  if (CSV_QUOTE_REQUIRED.test(value)) return `"${value.replace(/"/g, '""')}"`
-  return value
-}
-
-function toCsvRow(fields: string[]): string {
-  return fields.map(toCsvField).join(',')
-}
-
 export function collectionAssetsToCsv(section: CollectionSection, assets: AssetSummary[]): string {
-  const columns = REPORT_COLUMNS_BY_SECTION[section]
-  const header = toCsvRow(columns.map((c) => c.header))
-  const rows = assets.map((asset) => toCsvRow(columns.map((c) => c.value(asset))))
-  return [header, ...rows].join(CSV_ROW_DELIMITER)
+  return toCsv(REPORT_COLUMNS_BY_SECTION[section], assets)
 }
