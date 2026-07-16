@@ -13,6 +13,13 @@ export const InvoiceSummarySchema = CollectionSummarySchema.extend({
 })
 export type InvoiceSummary = z.infer<typeof InvoiceSummarySchema>
 
+export const InvoiceArrivalSchema = z.object({
+  arrival_number: z.string(),
+  transporter: z.string(),
+  destination_code: z.string(),
+})
+export type InvoiceArrival = z.infer<typeof InvoiceArrivalSchema>
+
 // GET /invoices/:invoiceNumber
 export const InvoiceDetailSchema = z.object({
   invoice_number: z.string(),
@@ -24,6 +31,7 @@ export const InvoiceDetailSchema = z.object({
   created_by: UserSchema,
   customer: OrgDetailSchema,
   assets: z.array(AssetSummarySchema),
+  arrivals: z.array(InvoiceArrivalSchema),
 })
 export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>
 

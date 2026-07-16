@@ -169,6 +169,27 @@ describe('invoiceService', () => {
     })
   })
 
+  it('returns the distinct arrivals of the invoiced assets', async () => {
+    const firstBatch = await createArrivedAssets(refs, 2)
+    const secondBatch = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [...firstBatch, ...secondBatch], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+
+    const invoice = await getInvoice(invoiceNumber, 'admin')
+
+    // two arrival batches -> two distinct arrivals, deduped despite 3 assets
+    expect(invoice.arrivals).toHaveLength(2)
+    for (const arrival of invoice.arrivals) {
+      expect(arrival.transporter).toBe(refs.transporter.name)
+      expect(arrival.destination_code).toBe(refs.warehouse.city_code)
+      expect(arrival.arrival_number).toMatch(/^A-/)
+    }
+    const arrivalNumbers = invoice.arrivals.map((a) => a.arrival_number)
+    expect(new Set(arrivalNumbers).size).toBe(2)
+  })
+
   it('numbers the invoice I-<7-digit sequence>', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const { invoiceNumber } = await createInvoice(

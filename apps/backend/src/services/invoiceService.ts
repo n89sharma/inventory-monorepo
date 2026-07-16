@@ -8,7 +8,7 @@ import {
   UpdateInvoiceMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
-import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
+import { getArrivalsForInvoice, getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { redactAssetCost } from '../lib/cost-redaction.js'
 import { decimalToNumber } from '../lib/decimal.js'
@@ -215,7 +215,7 @@ export async function getInvoice(
   invoiceNumber: string,
   role: AppRole | null,
 ): Promise<InvoiceDetail> {
-  const [invoice, assets] = await Promise.all([
+  const [invoice, assets, arrivals] = await Promise.all([
     prisma.invoice.findUnique({
       where: { invoice_number: invoiceNumber },
       include: {
@@ -225,6 +225,7 @@ export async function getInvoice(
       },
     }),
     prisma.$queryRawTyped(getAssetsForInvoice(invoiceNumber)),
+    prisma.$queryRawTyped(getArrivalsForInvoice(invoiceNumber)),
   ])
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
   return {
@@ -248,5 +249,6 @@ export async function getInvoice(
       ...mapAssetSummary(r),
       cost: redactAssetCost(buildAssetCost(r), role),
     })),
+    arrivals,
   }
 }

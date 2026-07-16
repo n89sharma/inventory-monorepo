@@ -5,6 +5,8 @@
 // @ts-nocheck 
 export * from "./sql/getArrivals.js"
 
+export * from "./sql/getArrivalsForInvoice.js"
+
 export * from "./sql/getAssetAccessories.js"
 
 export * from "./sql/getAssetByBarcode.js"
