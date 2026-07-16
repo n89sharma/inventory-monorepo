@@ -41,6 +41,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       onBulkRemove={(assets) => mutations.bulkRemoveAssets(invoiceNumber, assets)}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
+      renderTitle={(invoice) => ({
+        title: `Invoice ${invoice.invoice_reference}`,
+        copyValue: invoice.invoice_reference,
+      })}
       renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
       renderSubtitle={(invoice) => (
         <>
@@ -48,7 +52,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
             label={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
             value={invoice.customer.name}
           />
-          <SummaryField label="Reference" value={invoice.invoice_reference} />
+          <SummaryField label="System Invoice Number" value={invoiceNumber} />
           <SummaryField label="Date" value={formatDate(invoice.created_at)} />
           <SummaryField label="Type" value={formatTitleCase(invoice.invoice_type.type)} />
         </>

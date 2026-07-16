@@ -38,6 +38,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   onBulkRemove?: (assets: AssetSummary[]) => void
   onFlushPending?: (collectionId: string) => void
   buildColumns: (assetHref: (asset: AssetSummary) => string) => ColumnDef<AssetSummary>[]
+  renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
@@ -65,6 +66,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   onBulkRemove,
   onFlushPending,
   buildColumns,
+  renderTitle,
   renderSummaryStrip,
   renderSubtitle,
   renderMetadataModal,
@@ -104,12 +106,16 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
 
   const selectedAssets = selection?.selectedRows ?? []
 
+  const header = renderTitle
+    ? renderTitle(entity)
+    : { title: `${titleLabel} ${collectionId}`, copyValue: collectionId }
+
   return (
     <>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary(section)}
-        title={`${titleLabel} ${collectionId}`}
-        copyValue={collectionId}
+        title={header.title}
+        copyValue={header.copyValue}
         actions={
           <CollectionEditBar
             section={section}

@@ -10,17 +10,14 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { InvoiceSummary } from 'shared-types'
 
 export const invoiceTableColumns: ColumnDef<InvoiceSummary>[] = [
-  createIdColumn<InvoiceSummary>({
-    accessorKey: 'invoice_number',
-    header: 'Invoice Number',
-    href: (row) => `/invoices/${row.invoice_number}`,
-    value: (row) => row.invoice_number,
-  }),
   {
-    accessorKey: 'invoice_reference',
-    header: 'Reference',
+    ...createIdColumn<InvoiceSummary>({
+      accessorKey: 'invoice_reference',
+      header: 'Reference Invoice Number',
+      href: (row) => `/invoices/${row.invoice_number}`,
+      value: (row) => row.invoice_reference,
+    }),
     filterFn: 'includesString',
-    cell: ({ row }) => row.original.invoice_reference,
   },
   createdAtColumn as ColumnDef<InvoiceSummary>,
   createdByColumn as ColumnDef<InvoiceSummary>,

@@ -44,9 +44,9 @@ export function InvoicesSummaryPage(): React.JSX.Element {
         <ColumnTextFilter
           table={table}
           columnId="invoice_reference"
-          placeholder="Reference #"
-          clearLabel="Clear reference"
-          className="w-50"
+          placeholder="Reference Invoice Number"
+          clearLabel="Clear reference invoice number"
+          className="w-64"
         />
       )}
       searchBar={
