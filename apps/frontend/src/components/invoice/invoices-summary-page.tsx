@@ -2,7 +2,7 @@ import { invoiceTableColumns } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { CollectionPage } from '@/components/collections/collection-page'
-import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
+import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { SearchBar } from '@/components/shared/search-bar'
 import { useInvoiceStore, type InvoiceTypeFilter } from '@/data/store/invoice-store'
 import { useAutoSearch } from '@/hooks/use-auto-search'
@@ -41,12 +41,12 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={(invoice) => `/invoices/${invoice.invoice_number}`}
       renderTableFilter={(table) => (
-        <ColumnFacetFilter
+        <ColumnTextFilter
           table={table}
           columnId="invoice_reference"
           placeholder="Reference #"
           clearLabel="Clear reference"
-          className="w-50 rounded-lg bg-background"
+          className="w-50"
         />
       )}
       searchBar={

@@ -2,6 +2,7 @@ import { PageContent } from '@/components/app-layout/page-content'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
+import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -154,13 +155,22 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           columns={columns}
           data={entity.assets}
           renderTableFilter={(table) => (
-            <ColumnFacetFilter
-              table={table}
-              columnId="model"
-              placeholder="Model"
-              clearLabel="Clear model"
-              className="w-50 rounded-lg bg-background"
-            />
+            <>
+              <ColumnFacetFilter
+                table={table}
+                columnId="model"
+                placeholder="Model"
+                clearLabel="Clear model"
+                className="w-50 rounded-lg bg-background"
+              />
+              <ColumnTextFilter
+                table={table}
+                columnId="serial_number"
+                placeholder="Serial number"
+                clearLabel="Clear serial number"
+                className="w-50"
+              />
+            </>
           )}
           onSelectionChange={setSelection}
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}

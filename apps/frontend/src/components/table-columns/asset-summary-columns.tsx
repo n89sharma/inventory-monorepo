@@ -38,6 +38,7 @@ export function createAssetSummaryColumns(
     {
       accessorKey: 'serial_number',
       header: 'Serial Number',
+      filterFn: 'includesString',
       size: 100,
     },
     {

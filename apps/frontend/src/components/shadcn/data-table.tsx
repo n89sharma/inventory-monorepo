@@ -4,11 +4,11 @@ import type {
   ColumnFiltersState,
   ExpandedState,
   OnChangeFn,
+  Table as ReactTableInstance,
   Row,
   RowData,
   RowSelectionState,
   SortingState,
-  Table as ReactTableInstance,
   VisibilityState,
 } from '@tanstack/react-table'
 import {
@@ -225,7 +225,7 @@ export function DataTable<TData, TValue>({
               className="flex shrink-0 items-center justify-center pl-4"
               style={{ width: SELECT_COLUMN_SIZE }}
             >
-              <FunnelSimpleIcon className="size-6 text-muted-foreground" aria-hidden="true" />
+              <FunnelSimpleIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
             {renderTableFilter(table)}
           </div>
