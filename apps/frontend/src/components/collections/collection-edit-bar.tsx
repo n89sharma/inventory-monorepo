@@ -65,16 +65,17 @@ export function CollectionEditBar({
   const [exportLoading, setExportLoading] = useState(false)
   const [printLoading, setPrintLoading] = useState(false)
 
+  const exportableAssets = selectedAssets?.length ? selectedAssets : assets
   const printableBarcodes = (selectedAssets?.length ? selectedAssets : assets)?.map(
     (a) => a.barcode,
   )
 
   async function handleExport() {
-    if (!assets || assets.length === 0) return
+    if (!exportableAssets || exportableAssets.length === 0) return
 
-    if (assets.length > MAX_EXPORT_ASSETS) {
+    if (exportableAssets.length > MAX_EXPORT_ASSETS) {
       toast.error(
-        `Cannot export ${assets.length} assets. Please select ${MAX_EXPORT_ASSETS} assets or less`,
+        `Cannot export ${exportableAssets.length} assets. Please select ${MAX_EXPORT_ASSETS} assets or less`,
         { position: 'top-center' },
       )
       return
@@ -83,7 +84,7 @@ export function CollectionEditBar({
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = collectionAssetsToCsv(section, assets)
+      const csv = collectionAssetsToCsv(section, exportableAssets)
       downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
@@ -113,7 +114,7 @@ export function CollectionEditBar({
     }
   }
 
-  const exportDisabled = !assets || assets.length === 0 || exportLoading
+  const exportDisabled = !exportableAssets || exportableAssets.length === 0 || exportLoading
   const showPrint = section === BARCODE_PRINT_SECTION
   const printDisabled = !printableBarcodes || printableBarcodes.length === 0 || printLoading
 
