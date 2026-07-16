@@ -74,7 +74,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderBulkExtraActions,
   onRelease,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
-  const { state } = useLocation()
+  const { state, search } = useLocation()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [selection, setSelection] = useState<DataTableSelection<AssetSummary> | null>(null)
 
@@ -113,7 +113,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary(section)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary(section, search)}
         title={header.title}
         copyValue={header.copyValue}
         actions={

@@ -1,11 +1,15 @@
 import { holdTableColumns } from '@/components/hold/hold-columns'
-import { useHoldStore } from '@/data/store/hold-store'
 import { useActiveUsers } from '@/hooks/use-active-users'
-import { useAutoSearch } from '@/hooks/use-auto-search'
 import { useCan } from '@/hooks/use-can'
+import {
+  useCollectionDateRange,
+  useHeldByOptionParam,
+  useHeldForOptionParam,
+} from '@/lib/filters/hooks'
 import { preloadHoldDetail, useHoldsList } from '@/hooks/use-hold'
-import type { SearchOptions } from '@/ui-types/search-option-types'
+import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { Link } from 'react-router-dom'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
@@ -13,25 +17,13 @@ import { SearchBar } from '../shared/search-bar'
 import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
 
 export function HoldSummaryPage(): React.JSX.Element {
-  const fromDate = useHoldStore((state) => state.fromDate)
-  const toDate = useHoldStore((state) => state.toDate)
-  const setFromDate = useHoldStore((state) => state.setFromDate)
-  const setToDate = useHoldStore((state) => state.setToDate)
-  const holdBy = useHoldStore((state) => state.holdBy)
-  const holdFor = useHoldStore((state) => state.holdFor)
-  const setHoldBy = useHoldStore((state) => state.setHoldBy)
-  const setHoldFor = useHoldStore((state) => state.setHoldFor)
-  const hasSearched = useHoldStore((state) => state.hasSearched)
-  const setHasSearched = useHoldStore((state) => state.setHasSearched)
+  const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
+  const [holdBy, setHoldBy] = useHeldByOptionParam()
+  const [holdFor, setHoldFor] = useHeldForOptionParam()
   const activeUsers = useActiveUsers()
+  const searchParams = useOptimisticSearchParams()
 
   const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor)
-
-  async function onHoldSearch(_: SearchOptions) {
-    setHasSearched(true)
-  }
-
-  useAutoSearch(hasSearched, onHoldSearch, { setFromDate, setToDate, setHoldBy, setHoldFor })
 
   const canCreate = useCan('create_update_hold')
 
@@ -41,12 +33,11 @@ export function HoldSummaryPage(): React.JSX.Element {
       columns={holdTableColumns}
       data={holds}
       onRowMouseEnter={(hold) => preloadHoldDetail(hold.hold_number)}
-      getRowHref={(hold) => `/holds/${hold.hold_number}`}
+      getRowHref={(hold) => collectionDetailHref('holds', hold.hold_number, searchParams)}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, holdBy, holdFor }}
           setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
-          onSearch={onHoldSearch}
         >
           <SearchSelectOptionFilter
             selection={holdBy}

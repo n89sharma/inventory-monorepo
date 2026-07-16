@@ -1,8 +1,10 @@
-import { OrgSummarySchema } from 'shared-types'
+import { INVOICE_TYPE, OrgSummarySchema } from 'shared-types'
 import type { AssetSummary, InvoiceType, OrgSummary } from 'shared-types'
 import z from 'zod'
 import { AssetSummaryFormSchema } from './asset-summary-form-schema'
 import { SelectOptionSchema, isSelected, type SelectOption } from './select-option-types'
+
+export type InvoiceTypeFilter = typeof INVOICE_TYPE.purchase | typeof INVOICE_TYPE.sales
 
 const InvoiceTypeZod = z.object({ id: z.number(), type: z.string() })
 const InvoiceTypeSelectOptionSchema = SelectOptionSchema(InvoiceTypeZod)

@@ -34,6 +34,9 @@ export function getBreadcrumForAssetDetails(
   return [{ label: 'Home', href: '/' }]
 }
 
-export function getBreadcrumbForAssetSummary(section: NavigationSection): BreadcrumbSegment[] {
-  return [{ label: formatTitleCase(section), href: `/${section}` }]
+export function getBreadcrumbForAssetSummary(
+  section: NavigationSection,
+  listSearch: string,
+): BreadcrumbSegment[] {
+  return [{ label: formatTitleCase(section), href: `/${section}${listSearch}` }]
 }

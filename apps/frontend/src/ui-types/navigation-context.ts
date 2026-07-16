@@ -55,3 +55,13 @@ export function assetDetailHref(
   const queryString = query ? `?${query}` : ''
   return `${listBasePath(list)}/${list}/${barcode}${queryString}`
 }
+
+export function collectionDetailHref(
+  section: NavigationSection,
+  collectionId: string,
+  filters: URLSearchParams,
+): string {
+  const query = filters.toString()
+  const queryString = query ? `?${query}` : ''
+  return `/${section}/${collectionId}${queryString}`
+}

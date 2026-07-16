@@ -1,5 +1,12 @@
 import { format, isValid, parseISO } from 'date-fns'
-import { createParser, parseAsArrayOf, parseAsInteger, parseAsString } from 'nuqs'
+import {
+  createParser,
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  parseAsStringLiteral,
+} from 'nuqs'
+import { INVOICE_TYPE } from 'shared-types'
 
 const DATE_ONLY_FORMAT = 'yyyy-MM-dd'
 const FLAG_ON = '1'
@@ -32,6 +39,11 @@ const parseAsOnFlag = createParser<boolean>({
   serialize: () => FLAG_ON,
 })
 
+// Invoice type filter; rejects anything outside the allow-list (absence/junk =>
+// the default applied by the hook). Typed as the `'PURCHASE' | 'SALE'` union.
+const INVOICE_TYPE_VALUES = [INVOICE_TYPE.purchase, INVOICE_TYPE.sales] as const
+const parseAsInvoiceType = parseAsStringLiteral(INVOICE_TYPE_VALUES)
+
 // Single source of truth mapping every URL key to its parser. Both the resolver
 // hooks and the link serializers read from here so serialization stays identical.
 export const FILTER_PARSERS = {
@@ -58,6 +70,9 @@ export const FILTER_PARSERS = {
   year: parseAsInteger,
   sp: parseAsInteger,
   vendor: parseAsInteger,
+  origin: parseAsInteger,
+  dest: parseAsInteger,
+  invoicetype: parseAsInvoiceType,
   warehouse: parseAsIdList,
   search: parseAsString,
   range: parseAsInteger,

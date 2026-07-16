@@ -3,10 +3,18 @@ import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
 import { FILTER_PARSERS, parseAsIdList } from '@/lib/filters/parsers'
+import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
+import {
+  ANY_OPTION,
+  getSelectOption,
+  getSelectedOrNull,
+  type SelectOption,
+} from '@/ui-types/select-option-types'
 import { isAfter, isBefore, startOfDay, subDays, subMonths } from 'date-fns'
 import { parseAsInteger, useQueryState, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  INVOICE_TYPE,
   OUTGOING_STATUS,
   type AssetType,
   type Brand,
@@ -137,6 +145,22 @@ function useIdParam<T extends { id: number }>(
   return [resolved, setValue]
 }
 
+function useSelectOptionIdParam<T extends { id: number }>(
+  key: string,
+  list: T[],
+): [SelectOption<T>, (next: SelectOption<T>) => void] {
+  const [id, setId] = useQueryState(key, parseAsInteger)
+  const resolved = useMemo(() => resolveOne(id, list), [id, list])
+  const selection: SelectOption<T> = resolved ? getSelectOption(resolved) : ANY_OPTION
+  const setValue = useCallback(
+    (next: SelectOption<T>) => {
+      void setId(getSelectedOrNull(next)?.id ?? null)
+    },
+    [setId],
+  )
+  return [selection, setValue]
+}
+
 function useDebouncedNumberParam(key: string): [number | null, (next: number | null) => void] {
   const [committed, setCommitted] = useQueryState(key, FILTER_PARSERS.cas)
   const commit = useCallback((next: number | null) => void setCommitted(next), [setCommitted])
@@ -241,6 +265,48 @@ export function useHeldForParam(): [User | null, (next: User | null) => void] {
 export function useSalespersonParam(): [User | null, (next: User | null) => void] {
   const users = useUserStore((state) => state.users)
   return useIdParam('sp', users)
+}
+
+export function useOriginOptionParam(): [
+  SelectOption<Warehouse>,
+  (next: SelectOption<Warehouse>) => void,
+] {
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  return useSelectOptionIdParam('origin', warehouses)
+}
+
+export function useDestinationOptionParam(): [
+  SelectOption<Warehouse>,
+  (next: SelectOption<Warehouse>) => void,
+] {
+  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  return useSelectOptionIdParam('dest', warehouses)
+}
+
+export function useVendorOptionParam(): [
+  SelectOption<OrgSummary>,
+  (next: SelectOption<OrgSummary>) => void,
+] {
+  const organizations = useOrgStore((state) => state.organizations)
+  return useSelectOptionIdParam('vendor', organizations)
+}
+
+export function useCustomerOptionParam(): [
+  SelectOption<OrgSummary>,
+  (next: SelectOption<OrgSummary>) => void,
+] {
+  const organizations = useOrgStore((state) => state.organizations)
+  return useSelectOptionIdParam('customer', organizations)
+}
+
+export function useHeldByOptionParam(): [SelectOption<User>, (next: SelectOption<User>) => void] {
+  const users = useUserStore((state) => state.users)
+  return useSelectOptionIdParam('heldby', users)
+}
+
+export function useHeldForOptionParam(): [SelectOption<User>, (next: SelectOption<User>) => void] {
+  const users = useUserStore((state) => state.users)
+  return useSelectOptionIdParam('heldfor', users)
 }
 
 export function useCassettesParam(): [number | null, (next: number | null) => void] {
@@ -361,6 +427,52 @@ export function useDepartedRangeParam(): {
     if (toRaw === null) void setTo(to)
   }, [fromRaw, toRaw, from, to, setFrom, setTo])
   return { from, to, setRange }
+}
+
+const DEFAULT_COLLECTION_RANGE_DAYS = 60
+
+export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_RANGE_DAYS): {
+  fromDate: SelectOption<Date>
+  toDate: SelectOption<Date>
+  setFromDate: (next: SelectOption<Date>) => void
+  setToDate: (next: SelectOption<Date>) => void
+} {
+  const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
+  const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
+  const from = useMemo(
+    () => fromRaw ?? startOfDay(subDays(new Date(), defaultDays)),
+    [fromRaw, defaultDays],
+  )
+  const to = useMemo(() => toRaw ?? new Date(), [toRaw])
+  const setFromDate = useCallback(
+    (next: SelectOption<Date>) => void setFrom(getSelectedOrNull(next)),
+    [setFrom],
+  )
+  const setToDate = useCallback(
+    (next: SelectOption<Date>) => void setTo(getSelectedOrNull(next)),
+    [setTo],
+  )
+  useEffect(() => {
+    if (fromRaw === null) void setFrom(from)
+    if (toRaw === null) void setTo(to)
+  }, [fromRaw, toRaw, from, to, setFrom, setTo])
+  return {
+    fromDate: getSelectOption(from),
+    toDate: getSelectOption(to),
+    setFromDate,
+    setToDate,
+  }
+}
+
+export function useInvoiceTypeParam(): [InvoiceTypeFilter, (next: InvoiceTypeFilter) => void] {
+  const [raw, setRaw] = useQueryState('invoicetype', FILTER_PARSERS.invoicetype)
+  const invoiceType: InvoiceTypeFilter = raw ?? INVOICE_TYPE.purchase
+  const setInvoiceType = useCallback(
+    (next: InvoiceTypeFilter) =>
+      void setRaw(next === INVOICE_TYPE.sales ? INVOICE_TYPE.sales : null),
+    [setRaw],
+  )
+  return [invoiceType, setInvoiceType]
 }
 
 export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void] {

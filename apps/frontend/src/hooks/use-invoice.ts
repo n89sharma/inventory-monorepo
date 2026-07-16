@@ -1,5 +1,5 @@
 import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
-import type { InvoiceTypeFilter } from '@/data/store/invoice-store'
+import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'
 import useSWR, { mutate, preload } from 'swr'

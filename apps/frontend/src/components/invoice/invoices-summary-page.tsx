@@ -4,32 +4,22 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { SearchBar } from '@/components/shared/search-bar'
-import { useInvoiceStore, type InvoiceTypeFilter } from '@/data/store/invoice-store'
-import { useAutoSearch } from '@/hooks/use-auto-search'
 import { useCan } from '@/hooks/use-can'
+import { useCollectionDateRange, useInvoiceTypeParam } from '@/lib/filters/hooks'
 import { preloadInvoiceDetail, useInvoicesList } from '@/hooks/use-invoice'
-import type { SearchOptions } from '@/ui-types/search-option-types'
+import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
+import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { Link } from 'react-router-dom'
 import { INVOICE_TYPE } from 'shared-types'
 
 export function InvoicesSummaryPage(): React.JSX.Element {
-  const fromDate = useInvoiceStore((state) => state.fromDate)
-  const toDate = useInvoiceStore((state) => state.toDate)
-  const invoiceType = useInvoiceStore((state) => state.invoiceType)
-  const setFromDate = useInvoiceStore((state) => state.setFromDate)
-  const setToDate = useInvoiceStore((state) => state.setToDate)
-  const setInvoiceType = useInvoiceStore((state) => state.setInvoiceType)
-  const hasSearched = useInvoiceStore((state) => state.hasSearched)
-  const setHasSearched = useInvoiceStore((state) => state.setHasSearched)
+  const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
+  const [invoiceType, setInvoiceType] = useInvoiceTypeParam()
+  const searchParams = useOptimisticSearchParams()
 
   const { data: invoices = [] } = useInvoicesList(fromDate, toDate, invoiceType)
-
-  async function onInvoiceSearch(_: SearchOptions) {
-    setHasSearched(true)
-  }
-
-  useAutoSearch(hasSearched, onInvoiceSearch, { setFromDate, setToDate })
 
   const canCreate = useCan('create_update_invoice')
 
@@ -39,7 +29,9 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       columns={invoiceTableColumns}
       data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
-      getRowHref={(invoice) => `/invoices/${invoice.invoice_number}`}
+      getRowHref={(invoice) =>
+        collectionDetailHref('invoices', invoice.invoice_number, searchParams)
+      }
       renderTableFilter={(table) => (
         <ColumnTextFilter
           table={table}
@@ -53,7 +45,6 @@ export function InvoicesSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate }}
           setSearchOptions={{ setFromDate, setToDate }}
-          onSearch={onInvoiceSearch}
         >
           <InvoiceTypeToggle value={invoiceType} onChange={setInvoiceType} />
         </SearchBar>

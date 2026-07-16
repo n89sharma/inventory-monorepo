@@ -8,7 +8,7 @@ import { QuickSearchButtons } from './quick-search-buttons'
 interface SearchBarProps {
   searchOptions: SearchOptions
   setSearchOptions: SetSearchOptions
-  onSearch: (searchOptions: SearchOptions) => Promise<void>
+  onSearch?: (searchOptions: SearchOptions) => Promise<void>
   children?: React.ReactNode
 }
 
@@ -43,16 +43,17 @@ export function SearchBar({
     if (setCustomer) setCustomer(ANY_OPTION)
     if (setVendor) setVendor(ANY_OPTION)
 
-    await onSearch({
-      fromDate: from,
-      toDate: to,
-      origin: ANY_OPTION,
-      destination: ANY_OPTION,
-      holdBy: ANY_OPTION,
-      holdFor: ANY_OPTION,
-      customer: ANY_OPTION,
-      vendor: ANY_OPTION,
-    })
+    if (onSearch)
+      await onSearch({
+        fromDate: from,
+        toDate: to,
+        origin: ANY_OPTION,
+        destination: ANY_OPTION,
+        holdBy: ANY_OPTION,
+        holdFor: ANY_OPTION,
+        customer: ANY_OPTION,
+        vendor: ANY_OPTION,
+      })
   }
 
   return (
