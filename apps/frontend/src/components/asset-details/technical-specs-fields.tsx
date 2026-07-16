@@ -226,21 +226,21 @@ function getCoreFunctionOptions(cfs: CoreFunction[]) {
 function ControlledComponentSearch<T extends FieldValues>({
   control,
   name,
-  brandName,
+  brandId,
   className,
 }: {
   control: Control<T>
   name: Path<T>
-  brandName: string | null
+  brandId: number | null
   className?: string
 }) {
   const components = useReferenceDataStore((state) => state.components)
   const [query, setQuery] = useState('')
   const options = useMemo(
-    () => (brandName ? components.filter((c) => c.brand_name === brandName) : components),
-    [components, brandName],
+    () => (brandId ? components.filter((c) => c.brand_id === brandId) : components),
+    [components, brandId],
   )
-  const getLabel = (c: Component) => (brandName ? c.name : `${c.brand_name} — ${c.name}`)
+  const getLabel = (c: Component) => (brandId ? c.name : `${c.brand_name} — ${c.name}`)
   return (
     <Controller
       control={control}
@@ -272,7 +272,7 @@ function ControlledComponentSearch<T extends FieldValues>({
 interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
-  brandName: string | null
+  brandId: number | null
   applicable: SpecApplicability
   readinessDisabledStatuses?: string[]
   renderAfterReadiness?: React.ReactNode
@@ -291,7 +291,7 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
 export function TechnicalSpecsFields<T extends FieldValues>({
   control,
   isColour,
-  brandName,
+  brandId,
   applicable,
   readinessDisabledStatuses,
   renderAfterReadiness,
@@ -410,7 +410,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
             <ControlledComponentSearch
               control={control}
               name={p('component')}
-              brandName={brandName}
+              brandId={brandId}
               className={INPUT_WIDTH}
             />
           </HorizontalField>

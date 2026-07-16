@@ -249,7 +249,7 @@ export function CreateAssetModal({
           <TechnicalSpecsFields
             control={newAssetForm.control}
             isColour={isColourModel}
-            brandName={currentBrandName}
+            brandId={brandId}
             applicable={applicable}
             renderAfterReadiness={
               <HorizontalField label="Errors" required={isHasErrors}>

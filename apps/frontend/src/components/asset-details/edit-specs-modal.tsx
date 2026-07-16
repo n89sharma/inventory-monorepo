@@ -88,7 +88,7 @@ export function EditSpecsModal({
       cassettes: specs.cassettes,
       component:
         components.find(
-          (c) => c.brand_name === assetDetails.brand && c.name === specs.internal_finisher,
+          (c) => c.brand_id === assetDetails.brand_id && c.name === specs.internal_finisher,
         ) ?? null,
       coreFunctions: coreFunctions.filter((cf) => accessories.includes(cf.accessory)),
       drumLifeC: specs.drum_life_c,
@@ -167,7 +167,7 @@ export function EditSpecsModal({
           <TechnicalSpecsFields
             control={form.control}
             isColour={assetDetails.is_colour}
-            brandName={assetDetails.brand}
+            brandId={assetDetails.brand_id}
             applicable={applicable}
             readinessDisabledStatuses={readinessDisabledStatuses}
           />
