@@ -6,6 +6,7 @@ export const MIN_MANUFACTURED_YEAR = 1980
 export const MAX_MANUFACTURED_YEAR = 2100
 
 export const AssetLocationDetailsSchema = z.object({
+  warehouse_id: z.number(),
   warehouse_code: z.string(),
   warehouse_street: z.string(),
   zone: z.string(),
@@ -115,6 +116,7 @@ export const AssetDetailsSchema = z.object({
   readiness: z.string(),
   is_in_transit: z.boolean(),
   country_of_origin: z.string().nullable(),
+  country_of_origin_id: z.number().nullable(),
   manufactured_year: z.number().nullable(),
   weight: z.number(),
   size: z.number(),
@@ -131,6 +133,7 @@ export const AssetDetailsSchema = z.object({
   specs: z.object({
     cassettes: z.number().nullable(),
     internal_finisher: z.string().nullable(),
+    internal_finisher_id: z.number().nullable(),
     meter_black: z.number().nullable(),
     meter_colour: z.number().nullable(),
     meter_total: z.number().nullable(),
@@ -351,7 +354,7 @@ export const UpdateAssetSpecsSchema = z.object({
   toner_life_m: z.number().int().nonnegative().nullable(),
   toner_life_y: z.number().int().nonnegative().nullable(),
   toner_life_k: z.number().int().nonnegative().nullable(),
-  accessory_names: z.array(z.string()),
+  accessory_ids: z.array(z.number().int().positive()),
 })
 
 export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>

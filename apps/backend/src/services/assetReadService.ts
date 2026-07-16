@@ -10,6 +10,7 @@ import {
   AssetSearchRow,
   AssetTransfer,
   Comment,
+  CoreFunction,
   getInitials,
   ROLE_PERMISSIONS,
   type AppRole,
@@ -239,9 +240,8 @@ export async function getBarcodeLabels(barcodes: string[]): Promise<BarcodeLabel
   })
 }
 
-export async function getAccessories(barcode: string): Promise<string[]> {
-  const accessories = await prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
-  return accessories.map((a) => a.accessory)
+export async function getAccessories(barcode: string): Promise<CoreFunction[]> {
+  return prisma.$queryRawTyped(getAssetAccessoriesQuery(barcode))
 }
 
 export async function getErrors(barcode: string): Promise<AssetError[]> {

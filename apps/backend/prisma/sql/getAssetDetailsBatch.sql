@@ -9,6 +9,7 @@ select
   at.asset_type as asset_type,
   s.status  as status,
   rd.status  as readiness,
+  l.warehouse_id as warehouse_id,
   w.city_code as warehouse_code,
   w.street as warehouse_street,
   z.zone as zone,
@@ -16,6 +17,7 @@ select
   a.created_at as created_at,
   a.is_in_transit as is_in_transit,
   co."name" as country_of_origin,
+  a.country_of_origin_id as country_of_origin_id,
   a.manufactured_year as manufactured_year,
   m.weight as weight,
   m.size as size,
@@ -30,6 +32,7 @@ select
   -- technical spec
   ts.cassettes as ts_cassettes,
   cmp."name" as internal_finisher,
+  ts.component_id as internal_finisher_id,
   ts.meter_black as meter_black,
   ts.meter_colour as meter_colour,
   ts.meter_total as meter_total,

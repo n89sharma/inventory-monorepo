@@ -48,6 +48,7 @@ export async function mapDbModelToSummaryModel(modelId: number): Promise<ModelSu
 
   return {
     id: model.id,
+    brand_id: model.brand_id,
     brand_name: brand.name,
     model_name: model.name,
     asset_type: assetType.asset_type,

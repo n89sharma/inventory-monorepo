@@ -19,14 +19,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { useForm, type FieldErrors } from 'react-hook-form'
-import type { AssetDetails, AssetError } from 'shared-types'
+import type { AssetDetails, AssetError, CoreFunction } from 'shared-types'
 import { toast } from 'sonner'
 
 interface EditSpecsModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   assetDetails: AssetDetails | null
-  accessories: string[]
+  accessories: CoreFunction[]
   errors: AssetError[]
 }
 
@@ -64,7 +64,6 @@ export function EditSpecsModal({
   errors,
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
-  const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
   const components = useReferenceDataStore((state) => state.components)
@@ -81,16 +80,13 @@ export function EditSpecsModal({
     const readiness = readinesses.find((r) => r.status === assetDetails.readiness)
     return {
       readiness: readiness ? getSelectOption(readiness) : UNSELECTED,
-      countryOfOrigin: countries.find((c) => c.name === assetDetails.country_of_origin) ?? null,
+      countryOfOrigin: countries.find((c) => c.id === assetDetails.country_of_origin_id) ?? null,
       manufacturedYear: assetDetails.manufactured_year,
       meterBlack: specs.meter_black,
       meterColour: specs.meter_colour,
       cassettes: specs.cassettes,
-      component:
-        components.find(
-          (c) => c.brand_id === assetDetails.brand_id && c.name === specs.internal_finisher,
-        ) ?? null,
-      coreFunctions: coreFunctions.filter((cf) => accessories.includes(cf.accessory)),
+      component: components.find((c) => c.id === specs.internal_finisher_id) ?? null,
+      coreFunctions: accessories,
       drumLifeC: specs.drum_life_c,
       drumLifeM: specs.drum_life_m,
       drumLifeY: specs.drum_life_y,
@@ -102,7 +98,7 @@ export function EditSpecsModal({
       isColour: assetDetails.is_colour,
       assetType: assetDetails.asset_type,
     }
-  }, [assetDetails, readinesses, countries, components, coreFunctions, accessories])
+  }, [assetDetails, readinesses, countries, components, accessories])
 
   const form = useForm<SpecsForm>({
     resolver: zodResolver(SpecsFormSchema),
@@ -135,7 +131,7 @@ export function EditSpecsModal({
         toner_life_m: formValues.tonerLifeM,
         toner_life_y: formValues.tonerLifeY,
         toner_life_k: formValues.tonerLifeK,
-        accessory_names: formValues.coreFunctions.map((cf) => cf.accessory),
+        accessory_ids: formValues.coreFunctions.map((cf) => cf.id),
       })
       form.reset(formValues)
       toast.success('Specifications updated.', { position: 'top-center' })

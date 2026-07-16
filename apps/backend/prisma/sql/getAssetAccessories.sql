@@ -1,4 +1,5 @@
 SELECT
+  ac.id,
   ac.accessory
 from "AssetAccessory" aa
   join "Asset" at on at.id = aa.asset_id

@@ -16,6 +16,7 @@ import type {
   BulkUpdateAssetPricing,
   Component,
   Comment,
+  CoreFunction,
   CreateComment,
   CreateSalvagedPart,
   OrgSummary,
@@ -41,6 +42,7 @@ import {
   AssetTransferSchema,
   BulkUpdateAssetPricingSchema,
   CommentSchema,
+  CoreFunctionsSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
   PrintBarcodesSchema,
@@ -56,9 +58,9 @@ export async function getAssetDetail(params: { barcode: string }): Promise<Asset
   return AssetDetailsSchema.parse(data)
 }
 
-async function getAssetAccessories(params: { barcode: string }): Promise<string[]> {
-  const { data } = await api.get<string[]>(`/assets/${params.barcode}/accessories`)
-  return z.array(z.string()).parse(data)
+async function getAssetAccessories(params: { barcode: string }): Promise<CoreFunction[]> {
+  const { data } = await api.get<CoreFunction[]>(`/assets/${params.barcode}/accessories`)
+  return z.array(CoreFunctionsSchema).parse(data)
 }
 
 async function getAssetErrors(params: { barcode: string }): Promise<AssetError[]> {
@@ -140,7 +142,7 @@ export async function createAssetHarvestedPart(
 
 export type AssetAllDetails = {
   assetDetails: AssetDetails | null
-  accessories: string[]
+  accessories: CoreFunction[]
   errors: AssetError[]
   comments: Comment[]
   transfers: AssetTransfer[]

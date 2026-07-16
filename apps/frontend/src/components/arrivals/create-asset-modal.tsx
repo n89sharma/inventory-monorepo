@@ -90,7 +90,6 @@ export function CreateAssetModal({
   }
 
   const readinesses = useReferenceDataStore((state) => state.readinesses)
-  const brands = useReferenceDataStore((state) => state.brands)
   const models = useModelStore((state) => state.models)
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
 
@@ -116,16 +115,13 @@ export function CreateAssetModal({
   const currentReadinessStatus = isSelected(readinessSelection)
     ? readinessSelection.selected.status
     : null
-  const currentBrandName = modelSelection?.brand_name ?? null
+  const brandId = modelSelection?.brand_id ?? null
   const isColourModel = modelSelection?.is_colour ?? false
   const applicable = specApplicability(modelSelection?.asset_type ?? null)
-  const brandId = currentBrandName
-    ? (brands.find((b) => b.name === currentBrandName)?.id ?? null)
-    : null
   const isHasErrors = currentReadinessStatus === HAS_ERRORS_READINESS
 
   const prevReadinessRef = useRef<string | null | undefined>(undefined)
-  const prevBrandRef = useRef<string | null | undefined>(undefined)
+  const prevBrandRef = useRef<number | null | undefined>(undefined)
 
   useEffect(() => {
     const prev = prevReadinessRef.current
@@ -140,11 +136,11 @@ export function CreateAssetModal({
     // Going from "no model" → "a model" keeps any errors the user added before
     // picking the model; the backend will reject a brand mismatch on submit.
     const prev = prevBrandRef.current
-    if (prev && currentBrandName && prev !== currentBrandName) {
+    if (prev && brandId && prev !== brandId) {
       newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
     }
-    prevBrandRef.current = currentBrandName
-  }, [currentBrandName, newAssetForm])
+    prevBrandRef.current = brandId
+  }, [brandId, newAssetForm])
 
   async function printCreatedAssetBarcode(barcode: string) {
     try {

@@ -11,6 +11,7 @@ select
   acc.accessories as accessories,
   m.weight as weight,
   m.size as size,
+  l.warehouse_id as warehouse_id,
   w.city_code as warehouse_code,
   w.street as warehouse_street,
   z.zone as zone,

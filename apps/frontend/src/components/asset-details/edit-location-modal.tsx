@@ -56,8 +56,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
 
   const values = useMemo<LocationForm>(
     () => ({
-      warehouse:
-        warehouses.find((w) => w.city_code === assetDetails?.location?.warehouse_code) ?? null,
+      warehouse: warehouses.find((w) => w.id === assetDetails?.location?.warehouse_id) ?? null,
       zone: zones.find((z) => z.zone === BIN_ZONE) ?? null,
       bin: null,
     }),

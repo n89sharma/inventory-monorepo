@@ -214,6 +214,7 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
     warehouse2: toWarehouse(lax),
     model: {
       id: iradx4745i.id,
+      brand_id: canon.id,
       brand_name: canon.name,
       model_name: iradx4745i.name,
       asset_type: copier.asset_type,
@@ -393,6 +394,15 @@ export async function seedComponent(brandId: number, name: string): Promise<numb
   return component.id
 }
 
+export async function seedAccessory(name: string): Promise<number> {
+  const accessory = await prisma.accessory.upsert({
+    where: { accessory: name },
+    create: { accessory: name },
+    update: {},
+  })
+  return accessory.id
+}
+
 // A valid UpdateAssetSpecs payload; override individual fields per test.
 export function buildUpdateAssetSpecs(
   refs: ArrivalTestData,
@@ -414,7 +424,7 @@ export function buildUpdateAssetSpecs(
     toner_life_m: 0,
     toner_life_y: 0,
     toner_life_k: 0,
-    accessory_names: [],
+    accessory_ids: [],
     ...overrides,
   }
 }

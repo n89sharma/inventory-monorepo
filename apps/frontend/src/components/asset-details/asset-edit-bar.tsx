@@ -43,7 +43,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [printLoading, setPrintLoading] = useState(false)
 
-  const assetSummaries = assetDetails ? assetDetailsToSummary(assetDetails, accessories) : null
+  const assetSummaries = assetDetails
+    ? assetDetailsToSummary(
+        assetDetails,
+        accessories.map((a) => a.accessory),
+      )
+    : null
   const can = useCan()
 
   async function handlePrint() {

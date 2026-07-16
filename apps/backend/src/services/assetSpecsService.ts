@@ -54,10 +54,16 @@ export async function updateAssetSpecs(
 
   const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
 
-  const accessories = await prisma.accessory.findMany({
-    where: { accessory: { in: data.accessory_names } },
-    select: { id: true },
-  })
+  const accessoryIds = [...new Set(data.accessory_ids)]
+  if (accessoryIds.length > 0) {
+    const existing = await prisma.accessory.findMany({
+      where: { id: { in: accessoryIds } },
+      select: { id: true },
+    })
+    if (existing.length !== accessoryIds.length) {
+      throw new ValidationError('One or more accessories do not exist')
+    }
+  }
 
   await prisma.$transaction([
     prisma.asset.update({
@@ -103,8 +109,8 @@ export async function updateAssetSpecs(
       },
     }),
     prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
-    ...accessories.map((a) =>
-      prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: a.id } }),
+    ...accessoryIds.map((accessoryId) =>
+      prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: accessoryId } }),
     ),
   ])
 

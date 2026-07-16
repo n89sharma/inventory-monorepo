@@ -1,5 +1,6 @@
 select
   m.id as id,
+  m.brand_id as brand_id,
   b."name" as brand_name,
   m."name" as model_name,
   a.asset_type as asset_type,

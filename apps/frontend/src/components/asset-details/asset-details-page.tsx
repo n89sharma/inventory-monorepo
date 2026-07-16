@@ -394,7 +394,7 @@ export const AssetDetailsPage = () => {
                   />
                   <AccessoryRow
                     label="Core Functions"
-                    accessories={accessories ?? []}
+                    accessories={accessories.map((a) => a.accessory)}
                     rowClassName={ROW_GAP}
                   />
                 </DataRowContainer>

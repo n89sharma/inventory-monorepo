@@ -4,12 +4,14 @@ import {
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
   createArrivedAssets,
+  seedAccessory,
   seedArrivalTestData,
   seedBrand,
   seedComponent,
 } from '../../test/factories.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { getAccessories } from './assetReadService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
 
 describe('assetSpecsService', () => {
@@ -69,6 +71,33 @@ describe('assetSpecsService', () => {
       updateAssetSpecs(
         asset.barcode,
         buildUpdateAssetSpecs(refs, { component_id: componentId }),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ValidationError)
+  })
+
+  it('persists accessories by id and reads them back', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const tonerId = await seedAccessory('TestToner')
+    const drumId = await seedAccessory('TestDrum')
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { accessory_ids: [tonerId, drumId] }),
+      refs.userId,
+    )
+
+    const accessories = await getAccessories(asset.barcode)
+    expect(accessories.map((a) => a.id).sort()).toEqual([tonerId, drumId].sort())
+  })
+
+  it('rejects an accessory id that does not exist', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+
+    await expect(
+      updateAssetSpecs(
+        asset.barcode,
+        buildUpdateAssetSpecs(refs, { accessory_ids: [999999] }),
         refs.userId,
       ),
     ).rejects.toThrow(ValidationError)

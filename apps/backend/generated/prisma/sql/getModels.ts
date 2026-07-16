@@ -7,12 +7,13 @@ import * as $runtime from "@prisma/client/runtime/client"
 
 /**
  */
-export const getModels = $runtime.makeTypedQueryFactory("select\nm.id as id,\nb.\"name\" as brand_name,\nm.\"name\" as model_name,\na.asset_type as asset_type,\nweight as weight,\nsize as size,\nm.is_colour as is_colour\nfrom \"Model\" m\njoin \"AssetType\" a on a.id = m.asset_type_id\njoin \"Brand\" b on b.id = m.brand_id") as () => $runtime.TypedSql<getModels.Parameters, getModels.Result>
+export const getModels = $runtime.makeTypedQueryFactory("select\nm.id as id,\nm.brand_id as brand_id,\nb.\"name\" as brand_name,\nm.\"name\" as model_name,\na.asset_type as asset_type,\nweight as weight,\nsize as size,\nm.is_colour as is_colour\nfrom \"Model\" m\njoin \"AssetType\" a on a.id = m.asset_type_id\njoin \"Brand\" b on b.id = m.brand_id") as () => $runtime.TypedSql<getModels.Parameters, getModels.Result>
 
 export namespace getModels {
   export type Parameters = []
   export type Result = {
     id: number
+    brand_id: number
     brand_name: string
     model_name: string
     asset_type: string

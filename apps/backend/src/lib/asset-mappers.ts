@@ -4,6 +4,7 @@ import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generat
 import { decimalToNumber } from './decimal.js'
 
 type LocationRow = {
+  warehouse_id: number | null
   warehouse_code: string | null
   warehouse_street: string | null
   zone: string | null
@@ -11,8 +12,9 @@ type LocationRow = {
 }
 
 function buildLocation(r: LocationRow): AssetLocationDetails | null {
-  if (!r.warehouse_code || !r.warehouse_street || !r.zone) return null
+  if (r.warehouse_id === null || !r.warehouse_code || !r.warehouse_street || !r.zone) return null
   return {
+    warehouse_id: r.warehouse_id,
     warehouse_code: r.warehouse_code,
     warehouse_street: r.warehouse_street,
     zone: r.zone,
@@ -170,6 +172,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     readiness: r.readiness!,
     is_in_transit: r.is_in_transit!,
     country_of_origin: r.country_of_origin,
+    country_of_origin_id: r.country_of_origin_id,
     manufactured_year: r.manufactured_year,
     weight: r.weight!,
     size: r.size!,
@@ -186,6 +189,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     specs: {
       cassettes: r.ts_cassettes,
       internal_finisher: r.internal_finisher,
+      internal_finisher_id: r.internal_finisher_id,
       meter_black: r.meter_black,
       meter_colour: r.meter_colour,
       meter_total: r.meter_total,
