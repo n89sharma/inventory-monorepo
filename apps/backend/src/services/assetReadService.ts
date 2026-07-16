@@ -28,6 +28,7 @@ import {
   getSoldAssets as getSoldAssetsQuery,
 } from '../../generated/prisma/sql.js'
 import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { redactAssetCost } from '../lib/cost-redaction.js'
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
@@ -198,20 +199,9 @@ export async function getAssetDetail(barcode: string, role: AppRole | null): Pro
 }
 
 function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
-  const canViewSale = permissions.includes('view_sale_price')
-  const canViewPurchase = permissions.includes('view_purchase_price')
   return {
     ...detail,
-    cost: {
-      purchase_cost: canViewPurchase ? detail.cost.purchase_cost : null,
-      transport_cost: canViewPurchase ? detail.cost.transport_cost : null,
-      processing_cost: canViewPurchase ? detail.cost.processing_cost : null,
-      other_cost: canViewPurchase ? detail.cost.other_cost : null,
-      parts_cost: canViewPurchase ? detail.cost.parts_cost : null,
-      total_cost: canViewPurchase ? detail.cost.total_cost : null,
-      sale_price: canViewSale ? detail.cost.sale_price : null,
-    },
+    cost: redactAssetCost(detail.cost, role)!,
   }
 }
 

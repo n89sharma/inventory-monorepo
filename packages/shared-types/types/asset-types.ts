@@ -45,6 +45,18 @@ export const AssetSummarySchema = AssetIdentitySchema.extend({
 
 export type AssetSummary = z.infer<typeof AssetSummarySchema>
 
+export const AssetCostSchema = z.object({
+  purchase_cost: z.number().nullable(),
+  transport_cost: z.number().nullable(),
+  processing_cost: z.number().nullable(),
+  other_cost: z.number().nullable(),
+  parts_cost: z.number().nullable(),
+  total_cost: z.number().nullable(),
+  sale_price: z.number().nullable(),
+})
+
+export type AssetCost = z.infer<typeof AssetCostSchema>
+
 // Identity fields intentionally duplicated from AssetIdentitySchema — not extended.
 // AssetSearchRow is its own contract sized for the global Search results table.
 export const AssetSearchRowSchema = z.object({
@@ -121,15 +133,7 @@ export const AssetDetailsSchema = z.object({
   weight: z.number(),
   size: z.number(),
   location: AssetLocationDetailsSchema.nullable(),
-  cost: z.object({
-    purchase_cost: z.number().nullable(),
-    transport_cost: z.number().nullable(),
-    processing_cost: z.number().nullable(),
-    other_cost: z.number().nullable(),
-    parts_cost: z.number().nullable(),
-    total_cost: z.number().nullable(),
-    sale_price: z.number().nullable(),
-  }),
+  cost: AssetCostSchema,
   specs: z.object({
     cassettes: z.number().nullable(),
     internal_finisher: z.string().nullable(),
