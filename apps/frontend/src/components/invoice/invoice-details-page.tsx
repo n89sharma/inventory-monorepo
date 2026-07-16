@@ -1,6 +1,6 @@
 import { EditInvoiceMetadataModal } from '@/components/invoice/edit-invoice-metadata-modal'
 import { InvoiceSummaryStrip } from '@/components/invoice/invoice-summary-strip'
-import { createAssetSummaryColumns } from '@/components/table-columns/asset-summary-columns'
+import { createInvoiceAssetSummaryColumns } from '@/components/table-columns/asset-summary-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -20,11 +20,18 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const mutations = useInvoiceMutations()
   const detail = useInvoiceDetail(invoiceNumber)
   const canCreateEditInvoice = useCan('create_update_invoice')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(assetHref, (asset) => mutations.removeAsset(invoiceNumber, asset)),
-    [mutations, invoiceNumber],
+      createInvoiceAssetSummaryColumns(
+        assetHref,
+        (asset) => mutations.removeAsset(invoiceNumber, asset),
+        canViewPurchasePrice,
+        canViewSalePrice,
+      ),
+    [mutations, invoiceNumber, canViewPurchasePrice, canViewSalePrice],
   )
 
   return (

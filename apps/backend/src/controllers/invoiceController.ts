@@ -54,7 +54,7 @@ export const patchInvoiceAssets = asyncHandler(async (req, res) => {
 export const getInvoiceDetail = asyncHandler(
   async (req: Request, res: Response<ApiResponse<InvoiceDetail>>) => {
     const { invoiceNumber } = req.params
-    const data = await getInvoiceSer(invoiceNumber)
+    const data = await getInvoiceSer(invoiceNumber, res.locals.dbUserRole)
     res.json(successResponse(data))
   },
 )

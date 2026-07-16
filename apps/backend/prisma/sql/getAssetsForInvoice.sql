@@ -21,7 +21,14 @@ select
   a.is_in_transit as is_in_transit,
   pi.invoice_number as purchase_invoice_number,
   si.invoice_number as sales_invoice_number,
-  a.created_at as created_at
+  a.created_at as created_at,
+  c.purchase_cost as cost_purchase_cost,
+  c.transport_cost as cost_transport_cost,
+  c.processing_cost as cost_processing_cost,
+  c.other_cost as cost_other_cost,
+  c.parts_cost as cost_parts_cost,
+  c.total_cost as cost_total_cost,
+  c.sale_price as cost_sale_price
 from "Invoice" i
   join "Asset" a on (i.id = a.purchase_invoice_id or i.id = a.sales_invoice_id)
   join "TechnicalSpecification" t on t.asset_id = a.id
@@ -42,4 +49,5 @@ from "Invoice" i
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
   left join "Invoice" si on si.id = a.sales_invoice_id
+  left join "Cost" c on c.asset_id = a.id
 where i.invoice_number  = $1

@@ -86,7 +86,7 @@ describe('invoiceService', () => {
       refs.userId,
     )
 
-    const created = await getInvoice(invoiceNumber)
+    const created = await getInvoice(invoiceNumber, 'admin')
     expect(created.notes).toBe('initial note')
 
     await patchInvoiceMetadata(
@@ -94,14 +94,79 @@ describe('invoiceService', () => {
       { organization: refs.customer, is_cleared: created.is_cleared, comment: 'updated note' },
       refs.userId,
     )
-    expect((await getInvoice(invoiceNumber)).notes).toBe('updated note')
+    expect((await getInvoice(invoiceNumber, 'admin')).notes).toBe('updated note')
 
     await patchInvoiceMetadata(
       invoiceNumber,
       { organization: refs.customer, is_cleared: created.is_cleared, comment: null },
       refs.userId,
     )
-    expect((await getInvoice(invoiceNumber)).notes).toBeNull()
+    expect((await getInvoice(invoiceNumber, 'admin')).notes).toBeNull()
+  })
+
+  it('returns asset cost, redacted by role permissions', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    await prisma.cost.upsert({
+      where: { asset_id: asset.id },
+      create: {
+        asset_id: asset.id,
+        purchase_cost: 100,
+        transport_cost: 20,
+        processing_cost: 30,
+        other_cost: 5,
+        parts_cost: 15,
+        total_cost: 170,
+        sale_price: 500,
+      },
+      update: {
+        purchase_cost: 100,
+        transport_cost: 20,
+        processing_cost: 30,
+        other_cost: 5,
+        parts_cost: 15,
+        total_cost: 170,
+        sale_price: 500,
+      },
+    })
+
+    const asAdmin = await getInvoice(invoiceNumber, 'admin')
+    expect(asAdmin.assets[0].cost).toEqual({
+      purchase_cost: 100,
+      transport_cost: 20,
+      processing_cost: 30,
+      other_cost: 5,
+      parts_cost: 15,
+      total_cost: 170,
+      sale_price: 500,
+    })
+
+    // 'sales' has view_sale_price but not view_purchase_price
+    const asSales = await getInvoice(invoiceNumber, 'sales')
+    expect(asSales.assets[0].cost).toEqual({
+      purchase_cost: null,
+      transport_cost: null,
+      processing_cost: null,
+      other_cost: null,
+      parts_cost: null,
+      total_cost: null,
+      sale_price: 500,
+    })
+
+    // 'member' has neither price permission
+    const asMember = await getInvoice(invoiceNumber, 'member')
+    expect(asMember.assets[0].cost).toEqual({
+      purchase_cost: null,
+      transport_cost: null,
+      processing_cost: null,
+      other_cost: null,
+      parts_cost: null,
+      total_cost: null,
+      sale_price: null,
+    })
   })
 
   it('numbers the invoice I-<7-digit sequence>', async () => {

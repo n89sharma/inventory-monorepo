@@ -1,5 +1,6 @@
 import {
   AppRole,
+  AssetCost,
   AssetDelta,
   CreateInvoice,
   INVOICE_TYPE,
@@ -9,6 +10,8 @@ import {
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForInvoice } from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { redactAssetCost } from '../lib/cost-redaction.js'
+import { decimalToNumber } from '../lib/decimal.js'
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
@@ -188,7 +191,30 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   )
 }
 
-export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> {
+function buildAssetCost(r: {
+  cost_purchase_cost: Prisma.Decimal | null
+  cost_transport_cost: Prisma.Decimal | null
+  cost_processing_cost: Prisma.Decimal | null
+  cost_other_cost: Prisma.Decimal | null
+  cost_parts_cost: Prisma.Decimal | null
+  cost_total_cost: Prisma.Decimal | null
+  cost_sale_price: Prisma.Decimal | null
+}): AssetCost {
+  return {
+    purchase_cost: decimalToNumber(r.cost_purchase_cost),
+    transport_cost: decimalToNumber(r.cost_transport_cost),
+    processing_cost: decimalToNumber(r.cost_processing_cost),
+    other_cost: decimalToNumber(r.cost_other_cost),
+    parts_cost: decimalToNumber(r.cost_parts_cost),
+    total_cost: decimalToNumber(r.cost_total_cost),
+    sale_price: decimalToNumber(r.cost_sale_price),
+  }
+}
+
+export async function getInvoice(
+  invoiceNumber: string,
+  role: AppRole | null,
+): Promise<InvoiceDetail> {
   const [invoice, assets] = await Promise.all([
     prisma.invoice.findUnique({
       where: { invoice_number: invoiceNumber },
@@ -218,6 +244,9 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
       default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
     customer: invoice.organization,
-    assets: assets.map(mapAssetSummary),
+    assets: assets.map((r) => ({
+      ...mapAssetSummary(r),
+      cost: redactAssetCost(buildAssetCost(r), role),
+    })),
   }
 }

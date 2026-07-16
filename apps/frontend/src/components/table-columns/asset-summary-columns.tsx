@@ -2,11 +2,17 @@ import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-
 import { Button } from '@/components/shadcn/button'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
-import { formatDate, formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import {
+  formatDate,
+  formatLocation,
+  formatThousandsK,
+  formatTitleCase,
+  formatUSDWithSymbol,
+} from '@/lib/formatters'
 import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetCost, AssetSummary } from 'shared-types'
 import { createIdColumn, createSelectColumn } from './shared-columns'
 
 export function createAssetSummaryColumns(
@@ -206,4 +212,42 @@ export function createDepartureAssetSummaryColumns(
     onEdit,
     disabledRowId,
   )
+}
+
+const PURCHASE_COST_COLUMNS = [
+  ['purchase_cost', 'Purchase Cost'],
+  ['transport_cost', 'Transport Cost'],
+  ['processing_cost', 'Processing Cost'],
+  ['total_cost', 'Total Cost'],
+] as const satisfies ReadonlyArray<readonly [keyof AssetCost, string]>
+
+function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<AssetSummary> {
+  return {
+    id: field,
+    header,
+    cell: ({ row }) => formatUSDWithSymbol(row.original.cost?.[field] ?? null),
+    size: 90,
+  }
+}
+
+export function createInvoiceAssetSummaryColumns(
+  getHref: (asset: AssetSummary) => string,
+  onDelete: ((asset: AssetSummary) => void) | undefined,
+  canViewPurchasePrice: boolean,
+  canViewSalePrice: boolean,
+): ColumnDef<AssetSummary>[] {
+  const costColumns: ColumnDef<AssetSummary>[] = []
+  if (canViewPurchasePrice) {
+    costColumns.push(
+      ...PURCHASE_COST_COLUMNS.map(([field, header]) => createCostColumn(field, header)),
+    )
+  }
+  if (canViewSalePrice) {
+    costColumns.push(createCostColumn('sale_price', 'Sale Price'))
+  }
+  const baseColumns = createAssetSummaryColumns(getHref, onDelete)
+  if (costColumns.length === 0) return baseColumns
+  const locationIndex = baseColumns.findIndex((c) => c.id === 'location')
+  baseColumns.splice(locationIndex + 1, 0, ...costColumns)
+  return baseColumns
 }
