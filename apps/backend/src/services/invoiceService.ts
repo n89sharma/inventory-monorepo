@@ -77,6 +77,7 @@ export async function createInvoice(
         organization_id: data.organization_id,
         updated_by_id: userId,
         is_cleared: data.is_cleared,
+        notes: data.comment,
         invoice_type_id: data.invoice_type_id,
         created_at: now,
       },
@@ -134,6 +135,7 @@ export async function patchInvoiceMetadata(
     data: {
       organization_id: metadata.organization.id,
       is_cleared: metadata.is_cleared,
+      notes: metadata.comment,
     },
   })
 
@@ -204,6 +206,7 @@ export async function getInvoice(invoiceNumber: string): Promise<InvoiceDetail> 
     invoice_reference: invoice.invoice_reference,
     invoice_type: { id: invoice.invoice_type.id, type: invoice.invoice_type.type },
     is_cleared: invoice.is_cleared,
+    notes: invoice.notes,
     created_at: invoice.created_at,
     created_by: {
       id: invoice.updated_by.id,

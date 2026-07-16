@@ -15,6 +15,7 @@ export const InvoiceFormSchema = z.object({
     'Invoice type is required',
   ),
   is_cleared: z.boolean(),
+  comment: z.string(),
   assets: z.array(AssetSummaryFormSchema).nonempty('No assets in the invoice'),
 })
 
@@ -23,15 +24,18 @@ export type InvoiceForm = {
   organization: OrgSummary | null
   invoice_type: SelectOption<InvoiceType>
   is_cleared: boolean
+  comment: string
   assets: AssetSummary[]
 }
 
 export const InvoiceMetadataFormSchema = z.object({
   organization: OrgSummarySchema.nullable().refine((val) => !!val, 'Organization is required'),
   is_cleared: z.boolean(),
+  comment: z.string(),
 })
 
 export type InvoiceMetadataForm = {
   organization: OrgSummary | null
   is_cleared: boolean
+  comment: string
 }

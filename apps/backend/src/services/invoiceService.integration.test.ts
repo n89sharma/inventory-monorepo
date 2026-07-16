@@ -10,7 +10,7 @@ import {
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createInvoice } from './invoiceService.js'
+import { createInvoice, getInvoice, patchInvoiceMetadata } from './invoiceService.js'
 
 describe('invoiceService', () => {
   let refs: ArrivalTestData
@@ -74,6 +74,34 @@ describe('invoiceService', () => {
         refs.userId,
       ),
     ).resolves.toBeDefined()
+  })
+
+  it('persists notes on create and updates them via metadata patch', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      {
+        ...buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+        comment: 'initial note',
+      },
+      refs.userId,
+    )
+
+    const created = await getInvoice(invoiceNumber)
+    expect(created.notes).toBe('initial note')
+
+    await patchInvoiceMetadata(
+      invoiceNumber,
+      { organization: refs.customer, is_cleared: created.is_cleared, comment: 'updated note' },
+      refs.userId,
+    )
+    expect((await getInvoice(invoiceNumber)).notes).toBe('updated note')
+
+    await patchInvoiceMetadata(
+      invoiceNumber,
+      { organization: refs.customer, is_cleared: created.is_cleared, comment: null },
+      refs.userId,
+    )
+    expect((await getInvoice(invoiceNumber)).notes).toBeNull()
   })
 
   it('numbers the invoice I-<7-digit sequence>', async () => {

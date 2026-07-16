@@ -11,6 +11,7 @@ import {
   FieldSet,
 } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
+import { Textarea } from '@/components/shadcn/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
@@ -78,6 +79,7 @@ export function InvoiceFormPage({
       organization: null,
       invoice_type: purchaseType ? getSelectOption(purchaseType) : UNSELECTED,
       is_cleared: false,
+      comment: '',
       assets: defaultAssets ?? [],
     },
   })
@@ -168,6 +170,17 @@ export function InvoiceFormPage({
                       onCheckedChange={field.onChange}
                     />
                     <FieldLabel htmlFor="is_cleared">Cleared</FieldLabel>
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={form.control}
+                name="comment"
+                render={({ field }) => (
+                  <Field className="max-w-xl">
+                    <FieldLabel>Comments</FieldLabel>
+                    <Textarea placeholder="Invoice notes…" className="resize-none" {...field} />
                   </Field>
                 )}
               />

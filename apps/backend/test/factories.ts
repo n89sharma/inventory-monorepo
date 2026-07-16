@@ -328,6 +328,7 @@ export function buildCreateInvoiceInput(
     organization_id: refs.customer.id,
     invoice_type_id: invoiceTypeId,
     is_cleared: isCleared,
+    comment: null,
     assets: nonEmpty(assets),
   }
 }

@@ -394,6 +394,7 @@ model Invoice {
   id                Int      @id @default(autoincrement())
   invoice_number    String   @unique @db.VarChar(50)
   invoice_reference String   @db.Text
+  notes             String?
   organization_id   Int
   updated_by_id     Int
   is_cleared        Boolean

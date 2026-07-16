@@ -13,6 +13,7 @@ import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Input } from '../shadcn/input'
+import { Textarea } from '../shadcn/textarea'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
@@ -103,6 +104,16 @@ export function EditInvoiceMetadataModal({
                 </Field>
               )}
             />
+            <Controller
+              control={form.control}
+              name="comment"
+              render={({ field }) => (
+                <Field className="col-span-2">
+                  <FieldLabel>Comments</FieldLabel>
+                  <Textarea placeholder="Invoice notes…" className="resize-none" {...field} />
+                </Field>
+              )}
+            />
           </FieldGroup>
         </form>
         <DialogFooter>
@@ -136,5 +147,6 @@ function toFormValues(i: InvoiceDetail): InvoiceMetadataForm {
       name: i.customer.name,
     },
     is_cleared: i.is_cleared,
+    comment: i.notes ?? '',
   }
 }

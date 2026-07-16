@@ -19,6 +19,7 @@ export const InvoiceDetailSchema = z.object({
   invoice_reference: z.string(),
   invoice_type: z.object({ id: z.number().int(), type: z.string() }),
   is_cleared: z.boolean(),
+  notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: UserSchema,
   customer: OrgDetailSchema,
@@ -31,6 +32,7 @@ export const CreateInvoiceSchema = z.object({
   organization_id: z.number().int(),
   invoice_type_id: z.number().int(),
   is_cleared: z.boolean(),
+  comment: z.string().nullable(),
   assets: z.array(AssetSummarySchema).nonempty('No assets in the invoice').max(2000),
 })
 export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
@@ -39,5 +41,6 @@ export type CreateInvoice = z.infer<typeof CreateInvoiceSchema>
 export const UpdateInvoiceMetadataSchema = z.object({
   organization: OrgSummarySchema,
   is_cleared: z.boolean(),
+  comment: z.string().nullable(),
 })
 export type UpdateInvoiceMetadata = z.infer<typeof UpdateInvoiceMetadataSchema>

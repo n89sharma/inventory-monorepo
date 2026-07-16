@@ -33,6 +33,7 @@ export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceRespon
     organization_id: d.organization!.id,
     invoice_type_id: getIdOrNullFromSelection(d.invoice_type)!,
     is_cleared: d.is_cleared,
+    comment: d.comment,
     assets: d.assets as CreateInvoice['assets'],
   } satisfies CreateInvoice)
   const { data } = await api.post<CreateInvoiceResponse>('/invoices', createInvoiceBody)
@@ -71,6 +72,7 @@ export async function updateInvoiceMetadata(
   const updateInvoiceMetadataBody = UpdateInvoiceMetadataSchema.parse({
     organization: metadata.organization!,
     is_cleared: metadata.is_cleared,
+    comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateInvoiceMetadata)
   await api.patch(`/invoices/${invoiceNumber}/metadata`, updateInvoiceMetadataBody)
 }
