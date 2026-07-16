@@ -1,5 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
+import { downloadFile } from '@/lib/download-file'
 import type {
   AssetDetails,
   AssetError,
@@ -188,16 +189,7 @@ export async function exportAssets(
   const disposition = response.headers['content-disposition'] as string | undefined
   const resolvedFilename =
     filename ?? disposition?.match(/filename="([^"]+)"/)?.[1] ?? 'assets-export.csv'
-  const blob = new Blob([response.data], { type: 'text/csv' })
-
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = resolvedFilename
-  document.body.append(a)
-  a.click()
-  a.remove()
-  URL.revokeObjectURL(url)
+  downloadFile(resolvedFilename, new Blob([response.data], { type: 'text/csv' }))
 }
 
 export async function printBarcodes(barcodes: string[]): Promise<void> {

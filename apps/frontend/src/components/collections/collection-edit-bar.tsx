@@ -1,5 +1,6 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
+import { downloadFile } from '@/lib/download-file'
 import {
   BarcodeIcon,
   DotsThreeVerticalIcon,
@@ -11,7 +12,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { type AssetSummary, type CollectionHistory, type ReportVariant } from 'shared-types'
+import { type AssetSummary, type CollectionHistory } from 'shared-types'
 import { toast } from 'sonner'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
 import { Button } from '../shadcn/button'
@@ -23,20 +24,26 @@ import {
 } from '../shadcn/dropdown-menu'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
+import {
+  collectionAssetsToCsv,
+  type CollectionSection,
+} from '../table-columns/asset-summary-report-columns'
 import { CollectionHistorySheet } from './collection-history-sheet'
 
-const SECTION_CONFIG = {
-  arrivals: { reportVariant: 'arrival_report' },
-  transfers: { reportVariant: 'transfer_report' },
-  departures: { reportVariant: 'departure_report' },
-  holds: { reportVariant: 'hold_report' },
-  invoices: { reportVariant: 'invoice_report' },
-} as const satisfies Record<string, { reportVariant: ReportVariant }>
-
 const BARCODE_PRINT_SECTION = 'arrivals'
+const MAX_EXPORT_ASSETS = 2000
+const CSV_MIME_TYPE = 'text/csv'
+
+// CSV generation is synchronous; yield until the loading state has painted so the
+// spinner is visible before the (potentially large) build blocks the main thread.
+function waitForNextPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  })
+}
 
 type CollectionEditBarProps = {
-  section: keyof typeof SECTION_CONFIG
+  section: CollectionSection
   collectionId: string
   canCreateEditEntity: boolean
   assets?: AssetSummary[]
@@ -60,34 +67,31 @@ export function CollectionEditBar({
 }: CollectionEditBarProps): React.JSX.Element {
   const canDelete = useCan('delete_collection')
 
-  const exportAssets = useAssetStore((state) => state.exportAssets)
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
   const [printLoading, setPrintLoading] = useState(false)
 
-  const barcodes = assets?.map((a) => a.barcode)
   const printableBarcodes = (selectedAssets?.length ? selectedAssets : assets)?.map(
     (a) => a.barcode,
   )
 
   async function handleExport() {
-    if (!barcodes || barcodes.length === 0) return
+    if (!assets || assets.length === 0) return
 
-    if (barcodes.length > 2000) {
-      toast.error(`Cannot export ${barcodes.length} assets. Please select 2000 assets or less`, {
-        position: 'top-center',
-      })
+    if (assets.length > MAX_EXPORT_ASSETS) {
+      toast.error(
+        `Cannot export ${assets.length} assets. Please select ${MAX_EXPORT_ASSETS} assets or less`,
+        { position: 'top-center' },
+      )
       return
     }
 
     setExportLoading(true)
     try {
-      await exportAssets(
-        barcodes,
-        `${section}-${collectionId}.csv`,
-        SECTION_CONFIG[section].reportVariant,
-      )
+      await waitForNextPaint()
+      const csv = collectionAssetsToCsv(section, assets)
+      downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {
@@ -98,9 +102,9 @@ export function CollectionEditBar({
   async function handlePrint() {
     if (!printableBarcodes || printableBarcodes.length === 0) return
 
-    if (printableBarcodes.length > 2000) {
+    if (printableBarcodes.length > MAX_EXPORT_ASSETS) {
       toast.error(
-        `Cannot print ${printableBarcodes.length} barcodes. Please select 2000 assets or less`,
+        `Cannot print ${printableBarcodes.length} barcodes. Please select ${MAX_EXPORT_ASSETS} assets or less`,
         { position: 'top-center' },
       )
       return
@@ -116,7 +120,7 @@ export function CollectionEditBar({
     }
   }
 
-  const exportDisabled = !barcodes || barcodes.length === 0 || exportLoading
+  const exportDisabled = !assets || assets.length === 0 || exportLoading
   const showPrint = section === BARCODE_PRINT_SECTION
   const printDisabled = !printableBarcodes || printableBarcodes.length === 0 || printLoading
 
