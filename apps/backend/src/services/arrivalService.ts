@@ -224,7 +224,9 @@ function mapInputAssetToPrismaCreateAsset(
     created_at: currentDateTime,
     status: { connect: { status: arrivalStatus } },
     readiness: { connect: { id: asset.readiness.id } },
-    country_of_origin: { connect: { id: asset.countryOfOrigin.id } },
+    country_of_origin: asset.countryOfOrigin
+      ? { connect: { id: asset.countryOfOrigin.id } }
+      : undefined,
     manufactured_year: asset.manufacturedYear,
     asset_accessories: {
       create: asset.coreFunctions.map((c) => ({ accessory_id: c.id })),

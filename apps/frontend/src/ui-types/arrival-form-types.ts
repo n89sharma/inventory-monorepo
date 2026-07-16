@@ -34,7 +34,7 @@ const CURRENT_YEAR = new Date().getFullYear()
 // identical across all three modals — changing a rule here changes every modal.
 const specFieldsShape = {
   readiness: StatusSelectOptionSchema.refine((val) => isSelected(val), 'Readiness required'),
-  countryOfOrigin: CountrySchema.nullable().refine((val) => !!val, 'Country of origin is required'),
+  countryOfOrigin: CountrySchema.nullable(),
   manufacturedYear: z
     .number()
     .int()

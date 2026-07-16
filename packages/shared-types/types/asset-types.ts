@@ -214,7 +214,7 @@ export const CreateAssetSchema = z.object({
   meterColour: z.number().min(0, 'Meter must be positive'),
   cassettes: z.number().min(0, 'Cassettes are required'),
   readiness: StatusSchema,
-  countryOfOrigin: CountrySchema.refine((val) => !!val, 'Country of origin is required'),
+  countryOfOrigin: CountrySchema.nullable(),
   manufacturedYear: z
     .number()
     .int()

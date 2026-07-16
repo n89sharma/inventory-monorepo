@@ -331,7 +331,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
 
         {renderAfterReadiness}
 
-        <HorizontalField label="Country of Origin" required>
+        <HorizontalField label="Country of Origin">
           <ControlledSearchSelectField
             control={control}
             name={p('countryOfOrigin')}
