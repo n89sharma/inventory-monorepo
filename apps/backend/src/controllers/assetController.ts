@@ -31,10 +31,13 @@ import {
   getAssetsForSearchOnHand as getAssetsForSearchOnHandSer,
   getAssets as getAssetsSer,
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
-  getBarcodeLabels as getBarcodeLabelsSer,
+  getBarcodeContents as getBarcodeContentsSer,
   getSoldAssets as getSoldAssetsSer,
 } from '../services/assetReadService.js'
-import { generateBarcodePdf as generateBarcodePdfSer } from '../services/barcodePrintService.js'
+import {
+  ASSET_LABEL_LAYOUT,
+  generateBarcodePdf as generateBarcodePdfSer,
+} from '../services/barcodePrintService.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
   updateAssetPricing as updateAssetPricingSer,
@@ -368,8 +371,8 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
 
 export const printAssetBarcodes = asyncHandler(async (req, res) => {
   const { barcodes } = PrintBarcodesSchema.parse(req.body)
-  const labels = await getBarcodeLabelsSer(barcodes)
-  const pdf = await generateBarcodePdfSer(labels)
+  const contents = await getBarcodeContentsSer(barcodes)
+  const pdf = await generateBarcodePdfSer(contents, ASSET_LABEL_LAYOUT)
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
   res.setHeader('Content-Type', 'application/pdf')
   res.setHeader('Content-Disposition', `inline; filename="barcodes-${timestamp}.pdf"`)

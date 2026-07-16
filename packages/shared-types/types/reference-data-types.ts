@@ -77,6 +77,14 @@ export const ZoneSchema = z.object({
   zone: z.string(),
 })
 
+export const LocationSummarySchema = z.object({
+  id: z.number(),
+  warehouse_code: z.string(),
+  warehouse_street: z.string(),
+  zone: z.string(),
+  bin: z.string(),
+})
+
 export const CountrySchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -125,6 +133,7 @@ export type InvoiceType = z.infer<typeof InvoiceTypeSchema>
 export type Warehouse = z.infer<typeof WarehouseSchema>
 export type AssetLocation = z.infer<typeof AssetLocationSchema>
 export type Zone = z.infer<typeof ZoneSchema>
+export type LocationSummary = z.infer<typeof LocationSummarySchema>
 export type Error = z.infer<typeof ErrorSchema>
 export type Component = z.infer<typeof ComponentSchema>
 export type Country = z.infer<typeof CountrySchema>

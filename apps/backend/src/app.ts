@@ -13,6 +13,7 @@ import brandRoutes from './routes/brandRoutes.js'
 import departureRoutes from './routes/depatureRoutes.js'
 import holdRoutes from './routes/holdRoutes.js'
 import invoiceRoutes from './routes/invoiceRoutes.js'
+import locationRoutes from './routes/locationRoutes.js'
 import modelRoutes from './routes/modelRoutes.js'
 import organizationRoutes from './routes/organizationRoutes.js'
 import constantRoutes from './routes/referenceRoutes.js'
@@ -133,6 +134,7 @@ app.use('/departures', departureRoutes)
 app.use('/transfers', transferRoutes)
 app.use('/holds', holdRoutes)
 app.use('/invoices', invoiceRoutes)
+app.use('/locations', locationRoutes)
 app.use('/models', modelRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)

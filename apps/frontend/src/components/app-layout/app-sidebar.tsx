@@ -104,6 +104,7 @@ const SEARCH_ASSETS_SUB_ITEMS = [
 
 const SETTINGS_SUB_ITEMS = [
   { title: 'Catalog', url: '/settings/catalog' },
+  { title: 'Locations', url: '/settings/locations' },
   { title: 'Organizations', url: '/settings/organizations' },
   { title: 'Export Assets', url: '/settings/export-assets' },
 ]

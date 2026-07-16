@@ -1,5 +1,6 @@
 import { api } from '@/data/api/axios-client'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
+import { printPdfBlob } from '@/lib/print-pdf'
 import type {
   AssetDetails,
   AssetError,
@@ -177,32 +178,7 @@ export async function printBarcodes(barcodes: string[]): Promise<void> {
   const printBarcodesBody = PrintBarcodesSchema.parse({ barcodes } satisfies z.input<
     typeof PrintBarcodesSchema
   >)
-  const response = await api.post('/assets/barcodes/print', printBarcodesBody, {
-    responseType: 'blob',
-  })
-  const blob = new Blob([response.data], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-
-  const iframe = document.createElement('iframe')
-  iframe.style.display = 'none'
-  iframe.src = url
-  document.body.append(iframe)
-
-  const cleanup = (): void => {
-    URL.revokeObjectURL(url)
-    iframe.remove()
-  }
-
-  iframe.onload = (): void => {
-    const frameWindow = iframe.contentWindow
-    if (!frameWindow) {
-      cleanup()
-      return
-    }
-    frameWindow.addEventListener('afterprint', cleanup, { once: true })
-    frameWindow.focus()
-    frameWindow.print()
-  }
+  await printPdfBlob('/assets/barcodes/print', printBarcodesBody)
 }
 
 export async function getAssetHistory(barcode: string): Promise<AssetHistory> {

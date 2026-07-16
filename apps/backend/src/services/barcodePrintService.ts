@@ -1,14 +1,19 @@
 import { toBuffer } from 'bwip-js'
 import PDFDocument from 'pdfkit'
 
-export type BarcodeLabel = {
+export type BarcodeContent = {
   barcode: string
-  brand: string
-  model: string
-  serialNumber: string
-  meterTotal: number | null
-  meterBlack: number | null
-  meterColour: number | null
+  primary: string
+  secondary: string[]
+}
+
+export type LabelLayout = {
+  width: number
+  height: number
+  padding: number
+  barcodeDisplayWidth: number
+  primaryFontSize: number
+  secondaryFontSize: number
 }
 
 const BARCODE_OPTIONS = {
@@ -18,49 +23,42 @@ const BARCODE_OPTIONS = {
   includetext: false,
 } as const
 
-const LABEL_WIDTH = 288 // 4in at 72pt
-const LABEL_HEIGHT = 144 // 2in at 72pt
-const LABEL_PADDING = 6
-
-const BARCODE_DISPLAY_WIDTH = 240
-
-const BARCODE_FONT_SIZE = 16
-const CAPTION_FONT_SIZE = 13
-
 const CAPTION_GAP = 2
 const CAPTION_LINE_GAP = 1
 
 const PNG_WIDTH_OFFSET = 16
 const PNG_HEIGHT_OFFSET = 20
 
-const EMPTY_METER = '—'
+export const ASSET_LABEL_LAYOUT = {
+  width: 288, // 4in at 72pt
+  height: 144, // 2in at 72pt
+  padding: 6,
+  barcodeDisplayWidth: 240,
+  primaryFontSize: 16,
+  secondaryFontSize: 13,
+} as const satisfies LabelLayout
 
-function formatMeter(value: number | null): string {
-  return value ? formatThousandsK(value) : EMPTY_METER
-}
+export const LOCATION_LABEL_LAYOUT = {
+  width: 432, // 6in at 72pt
+  height: 288, // 4in at 72pt
+  padding: 12,
+  barcodeDisplayWidth: 360,
+  primaryFontSize: 48,
+  secondaryFontSize: 20,
+} as const satisfies LabelLayout
 
-function formatThousandsK(value: number): string {
-  if (value < 1000) return value.toString()
-  return (value / 1000).toFixed(0) + ' K'
-}
-
-function captionLines(label: BarcodeLabel): [string, string, string, string] {
-  const barcode = `${label.barcode}`
-  const model = `${label.brand} ${label.model}`
-  const serial = `${label.serialNumber}`
-  const meters = `T: ${formatMeter(label.meterTotal)} B: ${formatMeter(label.meterBlack)} C: ${formatMeter(label.meterColour)}`
-  return [barcode, model, serial, meters]
-}
-
-export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer> {
+export async function generateBarcodePdf(
+  contents: BarcodeContent[],
+  layout: LabelLayout,
+): Promise<Buffer> {
   const images = await Promise.all(
-    labels.map((label) => toBuffer({ ...BARCODE_OPTIONS, text: label.barcode })),
+    contents.map((content) => toBuffer({ ...BARCODE_OPTIONS, text: content.barcode })),
   )
 
   return await new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({
-      size: [LABEL_WIDTH, LABEL_HEIGHT],
-      margin: LABEL_PADDING,
+      size: [layout.width, layout.height],
+      margin: layout.padding,
     })
 
     const chunks: Buffer[] = []
@@ -68,48 +66,48 @@ export async function generateBarcodePdf(labels: BarcodeLabel[]): Promise<Buffer
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
-    const captionWidth = LABEL_WIDTH - LABEL_PADDING * 2
-    const barcodeLeft = (LABEL_WIDTH - BARCODE_DISPLAY_WIDTH) / 2
+    const captionWidth = layout.width - layout.padding * 2
+    const barcodeLeft = (layout.width - layout.barcodeDisplayWidth) / 2
 
-    labels.forEach((label, index) => {
+    contents.forEach((content, index) => {
       if (index > 0) doc.addPage()
 
       const png = images[index]
       const pixelWidth = png.readUInt32BE(PNG_WIDTH_OFFSET)
       const pixelHeight = png.readUInt32BE(PNG_HEIGHT_OFFSET)
-      const displayHeight = BARCODE_DISPLAY_WIDTH * (pixelHeight / pixelWidth)
+      const displayHeight = layout.barcodeDisplayWidth * (pixelHeight / pixelWidth)
 
-      const [barcode, model, serial, meters] = captionLines(label)
-      const detail = `${model}\n${serial}\n${meters}`
+      const detail = content.secondary.join('\n')
 
-      doc.font('Helvetica').fontSize(BARCODE_FONT_SIZE)
-      const barcodeHeight = doc.heightOfString(barcode, {
+      doc.font('Helvetica').fontSize(layout.primaryFontSize)
+      const primaryHeight = doc.heightOfString(content.primary, {
         width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
       })
-      doc.fontSize(CAPTION_FONT_SIZE)
-      const detailHeight = doc.heightOfString(detail, {
-        width: captionWidth,
-        lineGap: CAPTION_LINE_GAP,
-      })
-      const blockHeight = displayHeight + CAPTION_GAP + barcodeHeight + detailHeight
-      const blockTop = Math.max(LABEL_PADDING, (LABEL_HEIGHT - blockHeight) / 2)
+      doc.fontSize(layout.secondaryFontSize)
+      const detailHeight = detail
+        ? doc.heightOfString(detail, { width: captionWidth, lineGap: CAPTION_LINE_GAP })
+        : 0
+      const blockHeight = displayHeight + CAPTION_GAP + primaryHeight + detailHeight
+      const blockTop = Math.max(layout.padding, (layout.height - blockHeight) / 2)
 
-      doc.image(png, barcodeLeft, blockTop, { width: BARCODE_DISPLAY_WIDTH })
+      doc.image(png, barcodeLeft, blockTop, { width: layout.barcodeDisplayWidth })
 
       const captionTop = blockTop + displayHeight + CAPTION_GAP
-      doc.fontSize(BARCODE_FONT_SIZE)
-      doc.text(barcode, LABEL_PADDING, captionTop, {
+      doc.fontSize(layout.primaryFontSize)
+      doc.text(content.primary, layout.padding, captionTop, {
         width: captionWidth,
         lineGap: CAPTION_LINE_GAP,
         align: 'center',
       })
-      doc.fontSize(CAPTION_FONT_SIZE)
-      doc.text(detail, LABEL_PADDING, captionTop + barcodeHeight, {
-        width: captionWidth,
-        lineGap: CAPTION_LINE_GAP,
-        align: 'center',
-      })
+      if (detail) {
+        doc.fontSize(layout.secondaryFontSize)
+        doc.text(detail, layout.padding, captionTop + primaryHeight, {
+          width: captionWidth,
+          lineGap: CAPTION_LINE_GAP,
+          align: 'center',
+        })
+      }
     })
 
     doc.end()

@@ -47,6 +47,8 @@ export * from "./sql/getInStockSummary.js"
 
 export * from "./sql/getInvoices.js"
 
+export * from "./sql/getLocations.js"
+
 export * from "./sql/getLocationsByWarehouse.js"
 
 export * from "./sql/getModelLastSale.js"

@@ -154,6 +154,11 @@ const CatalogSettingsPage = lazy(() =>
     default: m.CatalogSettingsPage,
   })),
 )
+const LocationsSettingsPage = lazy(() =>
+  import('./components/settings/locations-settings-page').then((m) => ({
+    default: m.LocationsSettingsPage,
+  })),
+)
 const OrganizationsSettingsPage = lazy(() =>
   import('./components/settings/organizations-settings-page').then((m) => ({
     default: m.OrganizationsSettingsPage,
@@ -441,6 +446,14 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="update_settings">
                           <CatalogSettingsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/locations"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <LocationsSettingsPage />
                         </PermissionRoute>
                       }
                     />

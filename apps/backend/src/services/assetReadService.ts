@@ -32,7 +32,7 @@ import { redactAssetCost } from '../lib/cost-redaction.js'
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
-import { type BarcodeLabel } from './barcodePrintService.js'
+import { type BarcodeContent } from './barcodePrintService.js'
 
 function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSearchRow {
   const permissions = role ? ROLE_PERMISSIONS[role] : []
@@ -210,21 +210,26 @@ async function getAssetDetailsBatch(barcodes: string[]): Promise<AssetDetails[]>
   return rows.map(mapAssetDetail)
 }
 
-export async function getBarcodeLabels(barcodes: string[]): Promise<BarcodeLabel[]> {
+const EMPTY_METER = '—'
+
+function formatMeter(value: number | null): string {
+  if (!value) return EMPTY_METER
+  if (value < 1000) return value.toString()
+  return (value / 1000).toFixed(0) + ' K'
+}
+
+export async function getBarcodeContents(barcodes: string[]): Promise<BarcodeContent[]> {
   const details = await getAssetDetailsBatch(barcodes)
   const byBarcode = new Map(details.map((d) => [d.barcode, d]))
   return barcodes.flatMap((barcode) => {
     const detail = byBarcode.get(barcode)
     if (!detail) return []
+    const meters = `T: ${formatMeter(detail.specs.meter_total)} B: ${formatMeter(detail.specs.meter_black)} C: ${formatMeter(detail.specs.meter_colour)}`
     return [
       {
         barcode: detail.barcode,
-        brand: detail.brand,
-        model: detail.model,
-        serialNumber: detail.serial_number,
-        meterTotal: detail.specs.meter_total,
-        meterBlack: detail.specs.meter_black,
-        meterColour: detail.specs.meter_colour,
+        primary: detail.barcode,
+        secondary: [`${detail.brand} ${detail.model}`, detail.serial_number, meters],
       },
     ]
   })
