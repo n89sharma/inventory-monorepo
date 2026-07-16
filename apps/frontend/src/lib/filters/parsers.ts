@@ -48,6 +48,19 @@ const parseAsOnFlag = createParser<boolean>({
 const INVOICE_TYPE_VALUES = [INVOICE_TYPE.purchase, INVOICE_TYPE.sales] as const
 const parseAsInvoiceType = parseAsStringLiteral(INVOICE_TYPE_VALUES)
 
+const SORT_DELIMITER = '.'
+const parseAsSortDirection = parseAsStringLiteral(['asc', 'desc'] as const)
+
+const parseAsSort = createParser<{ id: string; desc: boolean }>({
+  parse: (value) => {
+    const [id = '', direction = ''] = value.split(SORT_DELIMITER)
+    if (!id) return null
+    return { id, desc: parseAsSortDirection.parse(direction) === 'desc' }
+  },
+  serialize: ({ id, desc }) => `${id}${SORT_DELIMITER}${desc ? 'desc' : 'asc'}`,
+  eq: (a, b) => a.id === b.id && a.desc === b.desc,
+})
+
 // Single source of truth mapping every URL key to its parser. Both the resolver
 // hooks and the link serializers read from here so serialization stays identical.
 export const FILTER_PARSERS = {
@@ -78,6 +91,7 @@ export const FILTER_PARSERS = {
   dest: parseAsInteger,
   invoicetype: parseAsInvoiceType,
   cols: parseAsStringList,
+  sort: parseAsSort,
   warehouse: parseAsIdList,
   search: parseAsString,
   range: parseAsInteger,

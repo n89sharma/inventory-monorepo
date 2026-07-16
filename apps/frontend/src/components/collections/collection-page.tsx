@@ -1,6 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { DataTable } from '@/components/shadcn/data-table'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import type { ColumnDef, Table } from '@tanstack/react-table'
 
 interface CollectionPageProps<TData, TValue> {
@@ -26,6 +27,7 @@ export function CollectionPage<TData, TValue>({
   defaultSort = { id: 'created_at', desc: true },
   renderTableFilter,
 }: CollectionPageProps<TData, TValue>) {
+  const [sorting, onSortingChange] = useTableSortParam(defaultSort)
   return (
     <>
       <StickyPageHeader>
@@ -42,6 +44,8 @@ export function CollectionPage<TData, TValue>({
           onRowMouseEnter={onRowMouseEnter}
           getRowHref={getRowHref}
           defaultSort={defaultSort}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           renderTableFilter={renderTableFilter}
         />
       </PageContent>

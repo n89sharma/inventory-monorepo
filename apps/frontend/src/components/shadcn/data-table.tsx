@@ -65,6 +65,8 @@ interface DataTableProps<TData, TValue> {
   onRowMouseEnter?: (row: TData) => void
   rowSelection?: RowSelectionState
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
   getRowId?: (originalRow: TData, index: number) => string
   initialPageSize?: number
   defaultSort?: { id: string; desc: boolean }
@@ -126,6 +128,8 @@ export function DataTable<TData, TValue>({
   onRowMouseEnter,
   rowSelection: controlledRowSelection,
   onRowSelectionChange: onControlledRowSelectionChange,
+  sorting: controlledSorting,
+  onSortingChange: onControlledSortingChange,
   getRowId,
   initialPageSize = 25,
   defaultSort,
@@ -138,7 +142,9 @@ export function DataTable<TData, TValue>({
   renderTableFilter,
   onSelectionChange,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>(defaultSort ? [defaultSort] : [])
+  const [internalSorting, setInternalSorting] = useState<SortingState>(
+    defaultSort ? [defaultSort] : [],
+  )
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
@@ -148,6 +154,8 @@ export function DataTable<TData, TValue>({
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
+  const sorting = controlledSorting ?? internalSorting
+  const onSortingChange = onControlledSortingChange ?? setInternalSorting
 
   // The body reserves a scrollbar gutter (scrollbar-gutter: stable) so its content is
   // narrower than the header by the scrollbar width. Match it with a spacer of the same
@@ -166,7 +174,7 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),

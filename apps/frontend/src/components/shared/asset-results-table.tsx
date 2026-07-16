@@ -2,7 +2,12 @@ import { createAssetSearchColumns } from '@/components/table-columns/asset-searc
 import { createSelectColumn } from '@/components/table-columns/shared-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
-import type { OnChangeFn, RowSelectionState, VisibilityState } from '@tanstack/react-table'
+import type {
+  OnChangeFn,
+  RowSelectionState,
+  SortingState,
+  VisibilityState,
+} from '@tanstack/react-table'
 import { memo, useMemo } from 'react'
 import type { AssetSearchRow, AssetSummary } from 'shared-types'
 
@@ -44,6 +49,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   getRowHref,
   getRowClassName,
   defaultSort = STOCK_DAYS_ASC_SORT,
+  sorting,
+  onSortingChange,
 }: {
   assets: AssetSearchRow[]
   rowSelection: RowSelectionState
@@ -53,6 +60,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   getRowHref: (asset: AssetSearchRow) => string
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
   defaultSort?: { id: string; desc: boolean }
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
 }) {
   const columns = useMemo(
     () => [createSelectColumn<AssetSearchRow>(), ...createAssetSearchColumns(getRowHref)],
@@ -85,6 +94,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         onRowSelectionChange={onRowSelectionChange}
         getRowId={getAssetRowId}
         defaultSort={defaultSort}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         pinLeft={PIN_LEFT}
         getRowHref={getRowHref}
         getRowClassName={getRowClassName}
