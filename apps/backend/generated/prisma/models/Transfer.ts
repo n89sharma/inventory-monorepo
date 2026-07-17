@@ -45,6 +45,7 @@ export type TransferSumAggregateOutputType = {
 export type TransferMinAggregateOutputType = {
   id: number | null
   transfer_number: string | null
+  status: string | null
   origin_id: number | null
   destination_id: number | null
   transporter_id: number | null
@@ -56,6 +57,7 @@ export type TransferMinAggregateOutputType = {
 export type TransferMaxAggregateOutputType = {
   id: number | null
   transfer_number: string | null
+  status: string | null
   origin_id: number | null
   destination_id: number | null
   transporter_id: number | null
@@ -67,6 +69,7 @@ export type TransferMaxAggregateOutputType = {
 export type TransferCountAggregateOutputType = {
   id: number
   transfer_number: number
+  status: number
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -96,6 +99,7 @@ export type TransferSumAggregateInputType = {
 export type TransferMinAggregateInputType = {
   id?: true
   transfer_number?: true
+  status?: true
   origin_id?: true
   destination_id?: true
   transporter_id?: true
@@ -107,6 +111,7 @@ export type TransferMinAggregateInputType = {
 export type TransferMaxAggregateInputType = {
   id?: true
   transfer_number?: true
+  status?: true
   origin_id?: true
   destination_id?: true
   transporter_id?: true
@@ -118,6 +123,7 @@ export type TransferMaxAggregateInputType = {
 export type TransferCountAggregateInputType = {
   id?: true
   transfer_number?: true
+  status?: true
   origin_id?: true
   destination_id?: true
   transporter_id?: true
@@ -216,6 +222,7 @@ export type TransferGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type TransferGroupByOutputType = {
   id: number
   transfer_number: string
+  status: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -250,6 +257,7 @@ export type TransferWhereInput = {
   NOT?: Prisma.TransferWhereInput | Prisma.TransferWhereInput[]
   id?: Prisma.IntFilter<"Transfer"> | number
   transfer_number?: Prisma.StringFilter<"Transfer"> | string
+  status?: Prisma.StringFilter<"Transfer"> | string
   origin_id?: Prisma.IntFilter<"Transfer"> | number
   destination_id?: Prisma.IntFilter<"Transfer"> | number
   transporter_id?: Prisma.IntFilter<"Transfer"> | number
@@ -266,6 +274,7 @@ export type TransferWhereInput = {
 export type TransferOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   transfer_number?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   origin_id?: Prisma.SortOrder
   destination_id?: Prisma.SortOrder
   transporter_id?: Prisma.SortOrder
@@ -285,6 +294,7 @@ export type TransferWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TransferWhereInput | Prisma.TransferWhereInput[]
   OR?: Prisma.TransferWhereInput[]
   NOT?: Prisma.TransferWhereInput | Prisma.TransferWhereInput[]
+  status?: Prisma.StringFilter<"Transfer"> | string
   origin_id?: Prisma.IntFilter<"Transfer"> | number
   destination_id?: Prisma.IntFilter<"Transfer"> | number
   transporter_id?: Prisma.IntFilter<"Transfer"> | number
@@ -301,6 +311,7 @@ export type TransferWhereUniqueInput = Prisma.AtLeast<{
 export type TransferOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   transfer_number?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   origin_id?: Prisma.SortOrder
   destination_id?: Prisma.SortOrder
   transporter_id?: Prisma.SortOrder
@@ -320,6 +331,7 @@ export type TransferScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TransferScalarWhereWithAggregatesInput | Prisma.TransferScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Transfer"> | number
   transfer_number?: Prisma.StringWithAggregatesFilter<"Transfer"> | string
+  status?: Prisma.StringWithAggregatesFilter<"Transfer"> | string
   origin_id?: Prisma.IntWithAggregatesFilter<"Transfer"> | number
   destination_id?: Prisma.IntWithAggregatesFilter<"Transfer"> | number
   transporter_id?: Prisma.IntWithAggregatesFilter<"Transfer"> | number
@@ -330,6 +342,7 @@ export type TransferScalarWhereWithAggregatesInput = {
 
 export type TransferCreateInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   origin: Prisma.WarehouseCreateNestedOneWithoutOrigin_transfersInput
@@ -342,6 +355,7 @@ export type TransferCreateInput = {
 export type TransferUncheckedCreateInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -353,6 +367,7 @@ export type TransferUncheckedCreateInput = {
 
 export type TransferUpdateInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput
@@ -365,6 +380,7 @@ export type TransferUpdateInput = {
 export type TransferUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -377,6 +393,7 @@ export type TransferUncheckedUpdateInput = {
 export type TransferCreateManyInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -387,6 +404,7 @@ export type TransferCreateManyInput = {
 
 export type TransferUpdateManyMutationInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -394,6 +412,7 @@ export type TransferUpdateManyMutationInput = {
 export type TransferUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -405,6 +424,7 @@ export type TransferUncheckedUpdateManyInput = {
 export type TransferCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transfer_number?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   origin_id?: Prisma.SortOrder
   destination_id?: Prisma.SortOrder
   transporter_id?: Prisma.SortOrder
@@ -424,6 +444,7 @@ export type TransferAvgOrderByAggregateInput = {
 export type TransferMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transfer_number?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   origin_id?: Prisma.SortOrder
   destination_id?: Prisma.SortOrder
   transporter_id?: Prisma.SortOrder
@@ -435,6 +456,7 @@ export type TransferMaxOrderByAggregateInput = {
 export type TransferMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   transfer_number?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   origin_id?: Prisma.SortOrder
   destination_id?: Prisma.SortOrder
   transporter_id?: Prisma.SortOrder
@@ -650,6 +672,7 @@ export type TransferUncheckedUpdateManyWithoutTransporterNestedInput = {
 
 export type TransferCreateWithoutAsset_transfersInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   origin: Prisma.WarehouseCreateNestedOneWithoutOrigin_transfersInput
@@ -661,6 +684,7 @@ export type TransferCreateWithoutAsset_transfersInput = {
 export type TransferUncheckedCreateWithoutAsset_transfersInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -687,6 +711,7 @@ export type TransferUpdateToOneWithWhereWithoutAsset_transfersInput = {
 
 export type TransferUpdateWithoutAsset_transfersInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput
@@ -698,6 +723,7 @@ export type TransferUpdateWithoutAsset_transfersInput = {
 export type TransferUncheckedUpdateWithoutAsset_transfersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -708,6 +734,7 @@ export type TransferUncheckedUpdateWithoutAsset_transfersInput = {
 
 export type TransferCreateWithoutOriginInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   destination: Prisma.WarehouseCreateNestedOneWithoutDestination_transfersInput
@@ -719,6 +746,7 @@ export type TransferCreateWithoutOriginInput = {
 export type TransferUncheckedCreateWithoutOriginInput = {
   id?: number
   transfer_number: string
+  status?: string
   destination_id: number
   transporter_id: number
   created_by_id: number
@@ -739,6 +767,7 @@ export type TransferCreateManyOriginInputEnvelope = {
 
 export type TransferCreateWithoutDestinationInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   origin: Prisma.WarehouseCreateNestedOneWithoutOrigin_transfersInput
@@ -750,6 +779,7 @@ export type TransferCreateWithoutDestinationInput = {
 export type TransferUncheckedCreateWithoutDestinationInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   transporter_id: number
   created_by_id: number
@@ -790,6 +820,7 @@ export type TransferScalarWhereInput = {
   NOT?: Prisma.TransferScalarWhereInput | Prisma.TransferScalarWhereInput[]
   id?: Prisma.IntFilter<"Transfer"> | number
   transfer_number?: Prisma.StringFilter<"Transfer"> | string
+  status?: Prisma.StringFilter<"Transfer"> | string
   origin_id?: Prisma.IntFilter<"Transfer"> | number
   destination_id?: Prisma.IntFilter<"Transfer"> | number
   transporter_id?: Prisma.IntFilter<"Transfer"> | number
@@ -816,6 +847,7 @@ export type TransferUpdateManyWithWhereWithoutDestinationInput = {
 
 export type TransferCreateWithoutCreated_byInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   origin: Prisma.WarehouseCreateNestedOneWithoutOrigin_transfersInput
@@ -827,6 +859,7 @@ export type TransferCreateWithoutCreated_byInput = {
 export type TransferUncheckedCreateWithoutCreated_byInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -863,6 +896,7 @@ export type TransferUpdateManyWithWhereWithoutCreated_byInput = {
 
 export type TransferCreateWithoutTransporterInput = {
   transfer_number: string
+  status?: string
   notes?: string | null
   created_at: Date | string
   origin: Prisma.WarehouseCreateNestedOneWithoutOrigin_transfersInput
@@ -874,6 +908,7 @@ export type TransferCreateWithoutTransporterInput = {
 export type TransferUncheckedCreateWithoutTransporterInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   created_by_id: number
@@ -911,6 +946,7 @@ export type TransferUpdateManyWithWhereWithoutTransporterInput = {
 export type TransferCreateManyOriginInput = {
   id?: number
   transfer_number: string
+  status?: string
   destination_id: number
   transporter_id: number
   created_by_id: number
@@ -921,6 +957,7 @@ export type TransferCreateManyOriginInput = {
 export type TransferCreateManyDestinationInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   transporter_id: number
   created_by_id: number
@@ -930,6 +967,7 @@ export type TransferCreateManyDestinationInput = {
 
 export type TransferUpdateWithoutOriginInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   destination?: Prisma.WarehouseUpdateOneRequiredWithoutDestination_transfersNestedInput
@@ -941,6 +979,7 @@ export type TransferUpdateWithoutOriginInput = {
 export type TransferUncheckedUpdateWithoutOriginInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -952,6 +991,7 @@ export type TransferUncheckedUpdateWithoutOriginInput = {
 export type TransferUncheckedUpdateManyWithoutOriginInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -961,6 +1001,7 @@ export type TransferUncheckedUpdateManyWithoutOriginInput = {
 
 export type TransferUpdateWithoutDestinationInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput
@@ -972,6 +1013,7 @@ export type TransferUpdateWithoutDestinationInput = {
 export type TransferUncheckedUpdateWithoutDestinationInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -983,6 +1025,7 @@ export type TransferUncheckedUpdateWithoutDestinationInput = {
 export type TransferUncheckedUpdateManyWithoutDestinationInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -993,6 +1036,7 @@ export type TransferUncheckedUpdateManyWithoutDestinationInput = {
 export type TransferCreateManyCreated_byInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -1002,6 +1046,7 @@ export type TransferCreateManyCreated_byInput = {
 
 export type TransferUpdateWithoutCreated_byInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput
@@ -1013,6 +1058,7 @@ export type TransferUpdateWithoutCreated_byInput = {
 export type TransferUncheckedUpdateWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1024,6 +1070,7 @@ export type TransferUncheckedUpdateWithoutCreated_byInput = {
 export type TransferUncheckedUpdateManyWithoutCreated_byInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1034,6 +1081,7 @@ export type TransferUncheckedUpdateManyWithoutCreated_byInput = {
 export type TransferCreateManyTransporterInput = {
   id?: number
   transfer_number: string
+  status?: string
   origin_id: number
   destination_id: number
   created_by_id: number
@@ -1043,6 +1091,7 @@ export type TransferCreateManyTransporterInput = {
 
 export type TransferUpdateWithoutTransporterInput = {
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutOrigin_transfersNestedInput
@@ -1054,6 +1103,7 @@ export type TransferUpdateWithoutTransporterInput = {
 export type TransferUncheckedUpdateWithoutTransporterInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1065,6 +1115,7 @@ export type TransferUncheckedUpdateWithoutTransporterInput = {
 export type TransferUncheckedUpdateManyWithoutTransporterInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   origin_id?: Prisma.IntFieldUpdateOperationsInput | number
   destination_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1106,6 +1157,7 @@ export type TransferCountOutputTypeCountAsset_transfersArgs<ExtArgs extends runt
 export type TransferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transfer_number?: boolean
+  status?: boolean
   origin_id?: boolean
   destination_id?: boolean
   transporter_id?: boolean
@@ -1123,6 +1175,7 @@ export type TransferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type TransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transfer_number?: boolean
+  status?: boolean
   origin_id?: boolean
   destination_id?: boolean
   transporter_id?: boolean
@@ -1138,6 +1191,7 @@ export type TransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type TransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   transfer_number?: boolean
+  status?: boolean
   origin_id?: boolean
   destination_id?: boolean
   transporter_id?: boolean
@@ -1153,6 +1207,7 @@ export type TransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type TransferSelectScalar = {
   id?: boolean
   transfer_number?: boolean
+  status?: boolean
   origin_id?: boolean
   destination_id?: boolean
   transporter_id?: boolean
@@ -1161,7 +1216,7 @@ export type TransferSelectScalar = {
   created_at?: boolean
 }
 
-export type TransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transfer_number" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "notes" | "created_at", ExtArgs["result"]["transfer"]>
+export type TransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transfer_number" | "status" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "notes" | "created_at", ExtArgs["result"]["transfer"]>
 export type TransferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -1195,6 +1250,7 @@ export type $TransferPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     transfer_number: string
+    status: string
     origin_id: number
     destination_id: number
     transporter_id: number
@@ -1631,6 +1687,7 @@ export interface Prisma__TransferClient<T, Null = never, ExtArgs extends runtime
 export interface TransferFieldRefs {
   readonly id: Prisma.FieldRef<"Transfer", 'Int'>
   readonly transfer_number: Prisma.FieldRef<"Transfer", 'String'>
+  readonly status: Prisma.FieldRef<"Transfer", 'String'>
   readonly origin_id: Prisma.FieldRef<"Transfer", 'Int'>
   readonly destination_id: Prisma.FieldRef<"Transfer", 'Int'>
   readonly transporter_id: Prisma.FieldRef<"Transfer", 'Int'>

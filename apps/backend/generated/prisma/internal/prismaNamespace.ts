@@ -3359,6 +3359,7 @@ export type AssetSalvagedPartScalarFieldEnum = (typeof AssetSalvagedPartScalarFi
 export const TransferScalarFieldEnum = {
   id: 'id',
   transfer_number: 'transfer_number',
+  status: 'status',
   origin_id: 'origin_id',
   destination_id: 'destination_id',
   transporter_id: 'transporter_id',

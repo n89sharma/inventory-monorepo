@@ -40,7 +40,7 @@ const ACCESSORIES_COLUMN: AssetReportColumn = {
 }
 const LOCATION_COLUMN: AssetReportColumn = {
   header: 'Location',
-  value: (a) => formatLocation(a.location),
+  value: (a) => formatLocation(a.location, a.is_in_transit),
 }
 const PURCHASE_INVOICE_COLUMN: AssetReportColumn = {
   header: 'Invoice',

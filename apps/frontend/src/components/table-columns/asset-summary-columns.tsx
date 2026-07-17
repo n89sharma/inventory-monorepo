@@ -88,7 +88,7 @@ export function createAssetSummaryColumns(
     {
       id: 'location',
       header: 'Location',
-      cell: ({ row }) => formatLocation(row.original.location),
+      cell: ({ row }) => formatLocation(row.original.location, row.original.is_in_transit),
     },
     // Hidden by default (see collection-detail-page columnVisibility); defined so
     // the detail tables can default-sort by asset creation date.

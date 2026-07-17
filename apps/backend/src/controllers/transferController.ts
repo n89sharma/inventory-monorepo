@@ -18,9 +18,11 @@ import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createTransfer as createTransferSer,
+  dispatchTransfer as dispatchTransferSer,
   getTransfer as getTransferSer,
   patchTransferAssets as patchTransferAssetsSer,
   patchTransferMetadata as patchTransferMetadataSer,
+  receiveTransfer as receiveTransferSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
@@ -76,6 +78,16 @@ export const patchTransferMetadata = asyncHandler(async (req, res) => {
 export const patchTransferAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchTransferAssetsSer(req.params.transferNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const dispatchTransfer = asyncHandler(async (req, res) => {
+  await dispatchTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const receiveTransfer = asyncHandler(async (req, res) => {
+  await receiveTransferSer(req.params.transferNumber, res.locals.dbUserId)
   res.status(204).send()
 })
 

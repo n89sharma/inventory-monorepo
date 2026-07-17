@@ -45,6 +45,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
     control: { open: boolean; onOpenChange: (open: boolean) => void },
   ) => React.ReactNode
   renderAddAssetBar?: (entity: TEntity) => React.ReactNode
+  renderHeaderActions?: (entity: TEntity) => React.ReactNode
   renderBulkExtraActions?: (args: {
     selectedAssets: AssetSummary[]
     clearSelection: () => void
@@ -70,6 +71,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderSubtitle,
   renderMetadataModal,
   renderAddAssetBar,
+  renderHeaderActions,
   renderBulkExtraActions,
   onRelease,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
@@ -116,17 +118,20 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         title={header.title}
         copyValue={header.copyValue}
         actions={
-          <CollectionEditBar
-            section={section}
-            collectionId={collectionId}
-            canCreateEditEntity={canCreateEditEntity}
-            assets={entity.assets}
-            selectedAssets={selectedAssets}
-            historyCacheKey={historyCacheKey}
-            historyFetcher={historyFetcher}
-            onEdit={() => setIsMetadataModalOpen(true)}
-            onRelease={onRelease}
-          />
+          <div className="flex items-center gap-2">
+            {renderHeaderActions?.(entity)}
+            <CollectionEditBar
+              section={section}
+              collectionId={collectionId}
+              canCreateEditEntity={canCreateEditEntity}
+              assets={entity.assets}
+              selectedAssets={selectedAssets}
+              historyCacheKey={historyCacheKey}
+              historyFetcher={historyFetcher}
+              onEdit={() => setIsMetadataModalOpen(true)}
+              onRelease={onRelease}
+            />
+          </div>
         }
         subtitle={
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">

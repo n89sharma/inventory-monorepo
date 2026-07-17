@@ -4,6 +4,7 @@ import {
   createdByColumn,
   createIdColumn,
 } from '@/components/table-columns/shared-columns'
+import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TransferSummary } from 'shared-types'
@@ -18,6 +19,12 @@ export function transferTableColumns(
       href: getHref,
       value: (row) => row.transfer_number,
     }),
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => <TransferStatusBadge status={row.original.status} />,
+      size: 90,
+    },
     createdAtColumn as ColumnDef<TransferSummary>,
     { accessorKey: 'origin_code', header: 'Origin', size: 90 },
     { accessorKey: 'destination_code', header: 'Destination', size: 90 },

@@ -22,6 +22,7 @@ import { createArrival, getArrival } from '../src/services/arrivalService.js'
 
 // Zone the arrival flow places assets in. Must match arrivalService.ts `arrivalZone`.
 const ARRIVAL_ZONE = 'ARRIVAL'
+const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
 // Zone whose bin value is honored on relocation (assetLocationService.ts `BIN_ZONE`).
 const BIN_ZONE = 'BIN'
 const YYZ_CODE = 'YYZ'
@@ -368,6 +369,22 @@ export async function getAssetCost(assetId: number): Promise<AssetCost | null> {
     total_cost: cost.total_cost?.toNumber() ?? null,
     sale_price: cost.sale_price?.toNumber() ?? null,
   }
+}
+
+export async function seedShippingAndReceivingLocation(warehouseId: number): Promise<number> {
+  const zone = await prisma.zone.upsert({
+    where: { zone: SHIPPING_AND_RECEIVING_ZONE },
+    create: { zone: SHIPPING_AND_RECEIVING_ZONE },
+    update: {},
+  })
+  const location = await prisma.location.upsert({
+    where: {
+      warehouse_id_zone_id_bin: { warehouse_id: warehouseId, zone_id: zone.id, bin: '' },
+    },
+    create: { warehouse_id: warehouseId, zone_id: zone.id, bin: '' },
+    update: {},
+  })
+  return location.id
 }
 
 // Seed a brand other than the default model brand, for cross-brand validation tests.

@@ -108,7 +108,7 @@ export function createAssetSearchColumns(
     {
       id: 'location',
       header: 'Location',
-      cell: ({ row }) => formatLocation(row.original.location),
+      cell: ({ row }) => formatLocation(row.original.location, row.original.is_in_transit),
     },
     {
       accessorKey: 'country_of_origin',

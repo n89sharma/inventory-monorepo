@@ -1,7 +1,9 @@
 import {
   createTransfer,
+  dispatchTransfer,
   getTransferDetail,
   patchTransferAssets,
+  receiveTransfer,
   updateTransferMetadata,
 } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
@@ -91,6 +93,20 @@ async function updateMetadata(transferNumber: string, metadata: TransferMetadata
   invalidateTransferLists()
 }
 
+async function dispatch(transferNumber: string, barcodes: string[]) {
+  await dispatchTransfer(transferNumber)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails(barcodes)
+  invalidateTransferLists()
+}
+
+async function receive(transferNumber: string, barcodes: string[]) {
+  await receiveTransfer(transferNumber)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails(barcodes)
+  invalidateTransferLists()
+}
+
 function removeAsset(transferNumber: string, asset: AssetSummary) {
   scheduleAssetRemoval(
     {
@@ -122,6 +138,8 @@ const mutations = {
   addAsset,
   addAssetBatch,
   updateMetadata,
+  dispatch,
+  receive,
   removeAsset,
   bulkRemoveAssets,
   flushPending: flushPendingRemovals,

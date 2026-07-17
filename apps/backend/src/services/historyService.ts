@@ -121,6 +121,7 @@ type InvoiceUpdateFields = Partial<{
 }>
 
 type TransferUpdateFields = Partial<{
+  status: string
   origin_id: number
   destination_id: number
   transporter_id: number
@@ -520,6 +521,7 @@ const INVOICE_UPDATE_SPEC: FieldSpec[] = [
 ]
 
 const TRANSFER_UPDATE_SPEC: FieldSpec[] = [
+  { field: 'status' },
   { field: 'origin_id', out: 'origin_city_code', resolve: 'warehouse', bothRequired: true },
   {
     field: 'destination_id',

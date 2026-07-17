@@ -1,6 +1,7 @@
 select
   t.id as id,
 	t.transfer_number as transfer_number,
+	t.status as status,
 	t.created_at as created_at,
 	wo.city_code as origin_code,
 	wo.street as origin_street,

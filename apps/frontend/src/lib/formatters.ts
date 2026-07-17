@@ -2,8 +2,10 @@ import { format } from 'date-fns'
 import type { AssetLocationDetails } from 'shared-types'
 
 const BIN_ZONE = 'BIN'
+const IN_TRANSIT_LOCATION_LABEL = 'In transit'
 
-export function formatLocation(location: AssetLocationDetails | null): string {
+export function formatLocation(location: AssetLocationDetails | null, isInTransit = false): string {
+  if (isInTransit) return IN_TRANSIT_LOCATION_LABEL
   if (!location) return ''
   if (location.zone === BIN_ZONE) {
     return `${location.warehouse_code} | ${location.bin}`

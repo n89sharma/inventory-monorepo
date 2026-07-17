@@ -24,7 +24,7 @@ export const ASSET_SEARCH_REPORT_COLUMNS: AssetSearchReportColumn[] = [
   { id: 'serial_number', header: 'Serial Number', value: (a) => a.serial_number },
   { id: 'status', header: 'Status', value: (a) => formatTitleCase(a.status) },
   { id: 'readiness', header: 'Readiness', value: (a) => getReadinessDisplay(a.readiness) },
-  { id: 'location', header: 'Location', value: (a) => formatLocation(a.location) },
+  { id: 'location', header: 'Location', value: (a) => formatLocation(a.location, a.is_in_transit) },
   {
     id: 'country_of_origin',
     header: 'Country of Origin',

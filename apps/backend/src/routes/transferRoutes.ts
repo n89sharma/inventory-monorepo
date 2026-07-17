@@ -2,11 +2,13 @@ import express from 'express'
 import {
   TransferQuerySchema,
   createTransfer,
+  dispatchTransfer,
   getTransferDetail,
   getTransferHistory,
   getTransfers,
   patchTransferAssets,
   patchTransferMetadata,
+  receiveTransfer,
 } from '../controllers/transferController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -34,6 +36,16 @@ router.patch(
   '/:transferNumber/metadata',
   requirePermission('create_update_transfer'),
   patchTransferMetadata,
+)
+router.post(
+  '/:transferNumber/dispatch',
+  requirePermission('create_update_transfer'),
+  dispatchTransfer,
+)
+router.post(
+  '/:transferNumber/receive',
+  requirePermission('create_update_transfer'),
+  receiveTransfer,
 )
 
 export default router

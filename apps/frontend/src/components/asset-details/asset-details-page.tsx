@@ -324,7 +324,7 @@ export const AssetDetailsPage = () => {
             status={assetDetails.status}
             assetType={assetDetails.asset_type}
             serialNumber={assetDetails.serial_number}
-            location={formatLocation(assetDetails.location)}
+            location={formatLocation(assetDetails.location, assetDetails.is_in_transit)}
           />
         }
       />

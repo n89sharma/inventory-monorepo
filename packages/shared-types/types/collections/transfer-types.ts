@@ -4,9 +4,16 @@ import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { WarehouseSchema } from '../reference-data-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
 
+// Transfer lifecycle. DB stores the raw string (Transfer.status); this is the compile-time
+// symbol for code that names a state. Wire fields stay z.string() like AssetSummary.status.
+export const TransferStatusSchema = z.enum(['DRAFT', 'IN_TRANSIT', 'COMPLETE'])
+export type TransferStatus = z.infer<typeof TransferStatusSchema>
+export const TRANSFER_STATUS = TransferStatusSchema.enum
+
 // GET /transfers?fromDate...&toDate...&origin...&destination...
 export const TransferSummarySchema = CollectionSummarySchema.extend({
   transfer_number: z.string(),
+  status: z.string(),
   origin_code: z.string(),
   origin_street: z.string(),
   destination_code: z.string(),
@@ -18,6 +25,7 @@ export type TransferSummary = z.infer<typeof TransferSummarySchema>
 // GET /transfers/:transferNumber
 export const TransferDetailSchema = z.object({
   transfer_number: z.string(),
+  status: z.string(),
   origin: WarehouseSchema,
   destination: WarehouseSchema,
   transporter: OrgDetailSchema,

@@ -56,6 +56,7 @@ function locationName(location: AssetLocation): string {
 }
 
 function currentLocationLabel(asset: AssetSummary): string {
+  if (asset.is_in_transit) return 'In transit'
   if (!asset.location) return 'No location'
   return asset.location.bin || asset.location.zone
 }

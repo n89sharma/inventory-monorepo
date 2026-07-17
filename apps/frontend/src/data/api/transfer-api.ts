@@ -96,3 +96,11 @@ export async function patchTransferAssets(
   const patchTransferAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/transfers/${transferNumber}/assets`, patchTransferAssetsBody)
 }
+
+export async function dispatchTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/dispatch`)
+}
+
+export async function receiveTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/receive`)
+}

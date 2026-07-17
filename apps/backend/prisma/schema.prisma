@@ -286,6 +286,7 @@ model AssetSalvagedPart {
 model Transfer {
   id              Int      @id @default(autoincrement())
   transfer_number String   @unique @db.VarChar(50)
+  status          String   @default("DRAFT") @db.VarChar(20)
   origin_id       Int
   destination_id  Int
   transporter_id  Int
