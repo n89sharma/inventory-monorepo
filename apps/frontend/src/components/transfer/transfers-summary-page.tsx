@@ -14,7 +14,9 @@ import { preloadTransferDetail, useTransfersList } from '@/hooks/use-transfer'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import type { TransferSummary } from 'shared-types'
 
 export function TransferSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -27,15 +29,20 @@ export function TransferSummaryPage(): React.JSX.Element {
 
   const canCreate = useCan('create_update_transfer')
 
+  const getRowHref = useCallback(
+    (transfer: TransferSummary) =>
+      collectionDetailHref('transfers', transfer.transfer_number, searchParams),
+    [searchParams],
+  )
+  const columns = useMemo(() => transferTableColumns(getRowHref), [getRowHref])
+
   return (
     <CollectionPage
       title="Transfers"
-      columns={transferTableColumns}
+      columns={columns}
       data={transfers}
       onRowMouseEnter={(transfer) => preloadTransferDetail(transfer.transfer_number)}
-      getRowHref={(transfer) =>
-        collectionDetailHref('transfers', transfer.transfer_number, searchParams)
-      }
+      getRowHref={getRowHref}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, destination }}

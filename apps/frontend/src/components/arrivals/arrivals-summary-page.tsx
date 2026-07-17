@@ -11,7 +11,9 @@ import {
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import type { ArrivalSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
@@ -30,15 +32,20 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
 
   const canCreate = useCan('create_update_arrival')
 
+  const getRowHref = useCallback(
+    (arrival: ArrivalSummary) =>
+      collectionDetailHref('arrivals', arrival.arrival_number, searchParams),
+    [searchParams],
+  )
+  const columns = useMemo(() => arrivalTableColumns(getRowHref), [getRowHref])
+
   return (
     <CollectionPage
       title="Arrivals"
-      columns={arrivalTableColumns}
+      columns={columns}
       data={arrivals}
       onRowMouseEnter={(arrival) => preloadArrivalDetail(arrival.arrival_number)}
-      getRowHref={(arrival) =>
-        collectionDetailHref('arrivals', arrival.arrival_number, searchParams)
-      }
+      getRowHref={getRowHref}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, destination, vendor }}

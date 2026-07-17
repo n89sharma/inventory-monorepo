@@ -11,8 +11,9 @@ import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { INVOICE_TYPE } from 'shared-types'
+import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
 export function InvoicesSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -23,15 +24,20 @@ export function InvoicesSummaryPage(): React.JSX.Element {
 
   const canCreate = useCan('create_update_invoice')
 
+  const getRowHref = useCallback(
+    (invoice: InvoiceSummary) =>
+      collectionDetailHref('invoices', invoice.invoice_number, searchParams),
+    [searchParams],
+  )
+  const columns = useMemo(() => invoiceTableColumns(getRowHref), [getRowHref])
+
   return (
     <CollectionPage
       title="Invoices"
-      columns={invoiceTableColumns}
+      columns={columns}
       data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
-      getRowHref={(invoice) =>
-        collectionDetailHref('invoices', invoice.invoice_number, searchParams)
-      }
+      getRowHref={getRowHref}
       renderTableFilter={(table) => (
         <ColumnTextFilter
           table={table}

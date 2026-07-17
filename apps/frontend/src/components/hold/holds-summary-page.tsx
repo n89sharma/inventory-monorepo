@@ -12,7 +12,9 @@ import { preloadHoldDetail, useHoldsList } from '@/hooks/use-hold'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import type { HoldSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
@@ -31,13 +33,19 @@ export function HoldSummaryPage(): React.JSX.Element {
 
   const canCreate = useCan('create_update_hold')
 
+  const getRowHref = useCallback(
+    (hold: HoldSummary) => collectionDetailHref('holds', hold.hold_number, searchParams),
+    [searchParams],
+  )
+  const columns = useMemo(() => holdTableColumns(getRowHref), [getRowHref])
+
   return (
     <CollectionPage
       title="Holds"
-      columns={holdTableColumns}
+      columns={columns}
       data={holds}
       onRowMouseEnter={(hold) => preloadHoldDetail(hold.hold_number)}
-      getRowHref={(hold) => collectionDetailHref('holds', hold.hold_number, searchParams)}
+      getRowHref={getRowHref}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, holdBy, holdFor, customer }}

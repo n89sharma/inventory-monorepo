@@ -16,7 +16,9 @@ import { preloadDepartureDetail, useDeparturesList } from '@/hooks/use-departure
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
+import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import type { DepartureSummary } from 'shared-types'
 
 export function DepartureSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -30,15 +32,20 @@ export function DepartureSummaryPage(): React.JSX.Element {
 
   const canCreate = useCan('create_update_departure')
 
+  const getRowHref = useCallback(
+    (departure: DepartureSummary) =>
+      collectionDetailHref('departures', departure.departure_number, searchParams),
+    [searchParams],
+  )
+  const columns = useMemo(() => departureTableColumns(getRowHref), [getRowHref])
+
   return (
     <CollectionPage
       title="Departures"
-      columns={departureTableColumns}
+      columns={columns}
       data={departures}
       onRowMouseEnter={(departure) => preloadDepartureDetail(departure.departure_number)}
-      getRowHref={(departure) =>
-        collectionDetailHref('departures', departure.departure_number, searchParams)
-      }
+      getRowHref={getRowHref}
       searchBar={
         <SearchBar
           searchOptions={{ fromDate, toDate, origin, customer }}
