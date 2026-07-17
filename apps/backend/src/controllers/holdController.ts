@@ -31,12 +31,14 @@ export const HoldQuerySchema = z
     toDate: z.string().optional(),
     holdBy: z.coerce.number().int().optional(),
     holdFor: z.coerce.number().int().optional(),
+    customer: z.coerce.number().int().optional(),
   })
   .transform((data) => ({
     fromDate: normalizeFromDate(data.fromDate),
     toDate: normalizeToDate(data.toDate),
     holdBy: data.holdBy,
     holdFor: data.holdFor,
+    customer: data.customer,
   }))
   .refine((data) => !isAfter(data.fromDate, data.toDate), {
     message: 'fromDate must be before toDate',
@@ -44,11 +46,11 @@ export const HoldQuerySchema = z
 
 export const getHolds = asyncHandler(
   async (req: Request, res: Response<ApiResponse<HoldSummary[]>>) => {
-    const { fromDate, toDate, holdBy, holdFor } = res.locals.query as z.infer<
+    const { fromDate, toDate, holdBy, holdFor, customer } = res.locals.query as z.infer<
       typeof HoldQuerySchema
     >
     const holds = await prisma.$queryRawTyped(
-      getHoldsDb(fromDate, toDate, holdBy ?? 0, holdFor ?? 0),
+      getHoldsDb(fromDate, toDate, holdBy ?? 0, holdFor ?? 0, customer ?? 0),
     )
     res.json(successResponse(holds))
   },

@@ -10,6 +10,7 @@ import type {
   CollectionHistory,
   CreateHold,
   HoldDetail,
+  OrgSummary,
   UpdateHoldMetadata,
   User,
 } from 'shared-types'
@@ -32,6 +33,7 @@ export async function getHolds(
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>,
+  customer: SelectOption<OrgSummary>,
 ): Promise<HoldSummary[]> {
   const { data } = await api.get<HoldSummary[]>(`/holds`, {
     params: {
@@ -39,6 +41,7 @@ export async function getHolds(
       toDate: getSelectedOrNull(toDate),
       holdBy: getIdOrNullFromSelection(holdBy),
       holdFor: getIdOrNullFromSelection(holdFor),
+      customer: getIdOrNullFromSelection(customer),
     },
   })
   return z.array(HoldSummarySchema).parse(data)

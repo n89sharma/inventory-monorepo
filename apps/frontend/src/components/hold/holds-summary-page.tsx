@@ -3,9 +3,11 @@ import { useActiveUsers } from '@/hooks/use-active-users'
 import { useCan } from '@/hooks/use-can'
 import {
   useCollectionDateRange,
+  useCustomerOptionParam,
   useHeldByOptionParam,
   useHeldForOptionParam,
 } from '@/lib/filters/hooks'
+import { useOrgStore } from '@/data/store/org-store'
 import { preloadHoldDetail, useHoldsList } from '@/hooks/use-hold'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
@@ -20,10 +22,12 @@ export function HoldSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
   const [holdBy, setHoldBy] = useHeldByOptionParam()
   const [holdFor, setHoldFor] = useHeldForOptionParam()
+  const [customer, setCustomer] = useCustomerOptionParam()
   const activeUsers = useActiveUsers()
+  const orgs = useOrgStore((state) => state.organizations)
   const searchParams = useOptimisticSearchParams()
 
-  const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor)
+  const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor, customer)
 
   const canCreate = useCan('create_update_hold')
 
@@ -36,8 +40,8 @@ export function HoldSummaryPage(): React.JSX.Element {
       getRowHref={(hold) => collectionDetailHref('holds', hold.hold_number, searchParams)}
       searchBar={
         <SearchBar
-          searchOptions={{ fromDate, toDate, holdBy, holdFor }}
-          setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor }}
+          searchOptions={{ fromDate, toDate, holdBy, holdFor, customer }}
+          setSearchOptions={{ setFromDate, setToDate, setHoldBy, setHoldFor, setCustomer }}
         >
           <SearchSelectOptionFilter
             selection={holdBy}
@@ -55,6 +59,15 @@ export function HoldSummaryPage(): React.JSX.Element {
             getLabel={(u) => u.name}
             placeholder="Hold For"
             clearLabel="Clear hold for"
+            className="w-48"
+          />
+          <SearchSelectOptionFilter
+            selection={customer}
+            onChange={setCustomer}
+            options={orgs}
+            getLabel={(o) => o.name}
+            placeholder="Customer"
+            clearLabel="Clear customer"
             className="w-48"
           />
         </SearchBar>

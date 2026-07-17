@@ -35,6 +35,7 @@ left join lateral (
 where h.created_at between $1 and $2
 and ($3 = 0 or ub.id = $3)
 and ($4 = 0 or uf.id = $4)
+and ($5 = 0 or c.id = $5)
 and h.archived_at is null
 order by h.created_at desc
 limit 500

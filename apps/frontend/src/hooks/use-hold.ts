@@ -1,7 +1,7 @@
 import { getHoldDetail, getHolds } from '@/data/api/hold-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
-import type { User } from 'shared-types'
+import type { OrgSummary, User } from 'shared-types'
 import useSWR, { mutate, preload } from 'swr'
 
 export const holdDetailKey = (holdNumber: string) => `hold:${holdNumber}`
@@ -22,6 +22,7 @@ type HoldListKey = readonly [
   string | null,
   number | null,
   number | null,
+  number | null,
 ]
 
 function holdListKey(
@@ -29,6 +30,7 @@ function holdListKey(
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>,
+  customer: SelectOption<OrgSummary>,
 ): HoldListKey | null {
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
@@ -39,6 +41,7 @@ function holdListKey(
     to?.toISOString() ?? null,
     getIdOrNullFromSelection(holdBy),
     getIdOrNullFromSelection(holdFor),
+    getIdOrNullFromSelection(customer),
   ]
 }
 
@@ -47,9 +50,10 @@ export function useHoldsList(
   toDate: SelectOption<Date>,
   holdBy: SelectOption<User>,
   holdFor: SelectOption<User>,
+  customer: SelectOption<OrgSummary>,
 ) {
-  return useSWR(holdListKey(fromDate, toDate, holdBy, holdFor), () =>
-    getHolds(fromDate, toDate, holdBy, holdFor),
+  return useSWR(holdListKey(fromDate, toDate, holdBy, holdFor, customer), () =>
+    getHolds(fromDate, toDate, holdBy, holdFor, customer),
   )
 }
 
