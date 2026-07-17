@@ -50,6 +50,61 @@ describe('holdService', () => {
     expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
   })
 
+  it('keeps the hold active when a removal leaves assets on it', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, assets), refs.userId)
+
+    await addRemoveCollectionFromAssetsAndRecord(
+      holdNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: [assets[0].id] },
+      refs.userId,
+    )
+
+    const hold = await prisma.hold.findUniqueOrThrow({
+      where: { hold_number: holdNumber },
+      select: { archived_at: true },
+    })
+    expect(hold.archived_at).toBeNull()
+  })
+
+  it('auto-archives the hold when its last asset is removed', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, assets), refs.userId)
+
+    await addRemoveCollectionFromAssetsAndRecord(
+      holdNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: assets.map((a) => a.id) },
+      refs.userId,
+    )
+
+    for (const asset of assets) {
+      expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
+    }
+    const hold = await prisma.hold.findUniqueOrThrow({
+      where: { hold_number: holdNumber },
+      select: { archived_at: true },
+    })
+    expect(hold.archived_at).not.toBeNull()
+  })
+
+  it('does not archive when a delta both empties and re-adds an asset', async () => {
+    const [existing, fresh] = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [existing]), refs.userId)
+
+    await addRemoveCollectionFromAssetsAndRecord(
+      holdNumber,
+      { assetIdsToAdd: [fresh.id], assetIdsToRemove: [existing.id] },
+      refs.userId,
+    )
+
+    const hold = await prisma.hold.findUniqueOrThrow({
+      where: { hold_number: holdNumber },
+      select: { archived_at: true },
+    })
+    expect(hold.archived_at).toBeNull()
+    expect(await getAssetStatus(fresh.id)).toBe(ASSET_STATUS.HELD)
+  })
+
   it('releases all held assets to IN_STOCK and stamps archived_at when archived', async () => {
     const assets = await createArrivedAssets(refs, 2)
     const holdNumber = await createHold(buildCreateHoldInput(refs, assets), refs.userId)

@@ -145,30 +145,44 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
   if (hold.archived_at) throw new ConflictError('Cannot edit an archived hold')
 
-  const { addedPriorAssets, removedPriorAssets } = await prisma.$transaction(async (tx) => {
-    const [addedPrior, removedPrior] = await Promise.all([
-      tx.asset.findMany({
-        where: { id: { in: delta.assetIdsToAdd } },
-        select: { id: true, status_id: true },
-      }),
-      tx.asset.findMany({
-        where: { id: { in: delta.assetIdsToRemove } },
-        select: { id: true, status_id: true },
-      }),
-    ])
-    await addRemoveCollectionFromAssets(tx, {
-      assetsToAdd: delta.assetIdsToAdd,
-      assetsToRemove: delta.assetIdsToRemove,
-      assetInCollectionWhere: { hold_id: { not: null } },
-      assetInCollectionError: (barcodes) =>
-        new ConflictError(
-          `The following assets already have an active hold: ${barcodes.join(', ')}`,
-        ),
-      add: { hold_id: hold.id, status_id: heldStatus.id },
-      remove: { hold_id: null, status_id: inStockStatus.id },
-    })
-    return { addedPriorAssets: addedPrior, removedPriorAssets: removedPrior }
-  })
+  const now = new Date()
+
+  const { addedPriorAssets, removedPriorAssets, archived } = await prisma.$transaction(
+    async (tx) => {
+      const [addedPrior, removedPrior] = await Promise.all([
+        tx.asset.findMany({
+          where: { id: { in: delta.assetIdsToAdd } },
+          select: { id: true, status_id: true },
+        }),
+        tx.asset.findMany({
+          where: { id: { in: delta.assetIdsToRemove } },
+          select: { id: true, status_id: true },
+        }),
+      ])
+      await addRemoveCollectionFromAssets(tx, {
+        assetsToAdd: delta.assetIdsToAdd,
+        assetsToRemove: delta.assetIdsToRemove,
+        assetInCollectionWhere: { hold_id: { not: null } },
+        assetInCollectionError: (barcodes) =>
+          new ConflictError(
+            `The following assets already have an active hold: ${barcodes.join(', ')}`,
+          ),
+        add: { hold_id: hold.id, status_id: heldStatus.id },
+        remove: { hold_id: null, status_id: inStockStatus.id },
+      })
+
+      let archived = false
+      if (delta.assetIdsToRemove.length > 0) {
+        const remaining = await tx.asset.count({ where: { hold_id: hold.id } })
+        if (remaining === 0) {
+          await tx.hold.update({ where: { id: hold.id }, data: { archived_at: now } })
+          archived = true
+        }
+      }
+
+      return { addedPriorAssets: addedPrior, removedPriorAssets: removedPrior, archived }
+    },
+  )
 
   await recordCollectionAssetDelta(
     'Hold',
@@ -181,6 +195,8 @@ export async function addRemoveCollectionFromAssetsAndRecord(
 
   await recordAssetStatusChange(addedPriorAssets, heldStatus.id, userId)
   await recordAssetStatusChange(removedPriorAssets, inStockStatus.id, userId)
+
+  if (archived) await recordHoldArchive(hold.id, now, userId)
 }
 
 export async function getHold(holdNumber: string): Promise<HoldDetail> {
