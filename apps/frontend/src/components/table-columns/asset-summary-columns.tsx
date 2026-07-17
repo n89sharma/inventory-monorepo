@@ -38,7 +38,7 @@ export function createAssetSummaryColumns(
     {
       accessorKey: 'model',
       header: 'Model',
-      filterFn: 'equals',
+      filterFn: 'includesString',
       size: 100,
     },
     {

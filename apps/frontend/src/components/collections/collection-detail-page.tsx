@@ -1,7 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
-import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
@@ -162,7 +161,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           data={entity.assets}
           renderTableFilter={(table) => (
             <>
-              <ColumnFacetFilter
+              <ColumnTextFilter
                 table={table}
                 columnId="model"
                 placeholder="Model"
