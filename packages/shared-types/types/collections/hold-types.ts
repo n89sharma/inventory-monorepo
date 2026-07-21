@@ -46,3 +46,10 @@ export const UpdateHoldMetadataSchema = z.object({
   notes: z.string().nullable(),
 })
 export type UpdateHoldMetadata = z.infer<typeof UpdateHoldMetadataSchema>
+
+// POST /holds/:holdNumber/move-assets — :holdNumber is the destination hold
+export const MoveHoldAssetsSchema = z.object({
+  sourceHoldNumber: z.string(),
+  assetIds: z.array(z.number().int()).min(1),
+})
+export type MoveHoldAssets = z.infer<typeof MoveHoldAssetsSchema>

@@ -6,11 +6,15 @@ import {
   getHoldHistory,
   getHolds,
   HoldQuerySchema,
+  moveHoldAssets,
   patchHoldAssets,
   patchHoldMetadata,
 } from '../controllers/holdController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
-import { requireHoldOwnership } from '../middleware/requireHoldOwnership.js'
+import {
+  requireHoldOwnership,
+  requireSourceHoldOwnership,
+} from '../middleware/requireHoldOwnership.js'
 import { requirePermission } from '../middleware/requirePermission.js'
 import { validateQuery } from '../middleware/validation.js'
 
@@ -33,6 +37,13 @@ router.patch(
   requirePermission('create_update_hold'),
   requireHoldOwnership,
   patchHoldMetadata,
+)
+router.post(
+  '/:holdNumber/move-assets',
+  requirePermission('create_update_hold'),
+  requireHoldOwnership,
+  requireSourceHoldOwnership,
+  moveHoldAssets,
 )
 router.patch(
   '/:holdNumber/archive',

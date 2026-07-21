@@ -2,6 +2,7 @@ import {
   archiveHold,
   createHold,
   getHoldDetail,
+  moveHoldAssets,
   patchHoldAssets,
   updateHoldMetadata,
 } from '@/data/api/hold-api'
@@ -90,6 +91,21 @@ function removeAsset(holdNumber: string, asset: AssetSummary) {
   )
 }
 
+async function moveAssets(
+  sourceHoldNumber: string,
+  destinationHoldNumber: string,
+  assets: AssetSummary[],
+) {
+  await moveHoldAssets(destinationHoldNumber, {
+    sourceHoldNumber,
+    assetIds: assets.map((a) => a.id),
+  })
+  mutate(holdDetailKey(sourceHoldNumber))
+  mutate(holdDetailKey(destinationHoldNumber))
+  invalidateAssetDetails(assets.map((a) => a.barcode))
+  invalidateHoldLists()
+}
+
 function bulkRemoveAssets(holdNumber: string, assets: AssetSummary[]) {
   scheduleBulkAssetRemoval(
     {
@@ -111,6 +127,7 @@ const mutations = {
   archive,
   removeAsset,
   bulkRemoveAssets,
+  moveAssets,
   flushPending: flushPendingRemovals,
 } as const
 

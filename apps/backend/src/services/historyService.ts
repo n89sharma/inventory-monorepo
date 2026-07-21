@@ -841,6 +841,16 @@ export async function recordCollectionUpdateOnAssets<K extends keyof AssetUpdate
   await recordBatchAssetUpdate(assetIdsToAdd, field, null as AssetUpdateFields[K], value, userId)
 }
 
+export async function recordCollectionMoveOnAssets<K extends keyof AssetUpdateFields>(
+  assetIds: number[],
+  field: K,
+  fromValue: AssetUpdateFields[K],
+  toValue: AssetUpdateFields[K],
+  userId: number,
+): Promise<void> {
+  await recordBatchAssetUpdate(assetIds, field, fromValue, toValue, userId)
+}
+
 export async function getCollectionHistory(
   entityType: HistoryEntityType,
   entityId: number,

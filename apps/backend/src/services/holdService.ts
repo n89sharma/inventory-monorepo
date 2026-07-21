@@ -12,6 +12,8 @@ import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import {
   recordAssetStatusChange,
+  recordAssetUpdateOnCollection,
+  recordCollectionMoveOnAssets,
   recordHoldArchive,
   recordHoldCreate,
   recordHoldUpdate,
@@ -197,6 +199,66 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   await recordAssetStatusChange(removedPriorAssets, inStockStatus.id, userId)
 
   if (archived) await recordHoldArchive(hold.id, now, userId)
+}
+
+export async function moveAssetsToHold(
+  sourceHoldNumber: string,
+  destinationHoldNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  if (sourceHoldNumber === destinationHoldNumber) {
+    throw new ConflictError('Source and destination holds are the same')
+  }
+
+  const [source, destination] = await Promise.all([
+    prisma.hold.findUnique({
+      where: { hold_number: sourceHoldNumber },
+      select: { id: true, archived_at: true },
+    }),
+    prisma.hold.findUnique({
+      where: { hold_number: destinationHoldNumber },
+      select: { id: true, archived_at: true },
+    }),
+  ])
+  if (!source) throw new NotFoundError(`Hold ${sourceHoldNumber} not found`)
+  if (!destination) throw new NotFoundError(`Hold ${destinationHoldNumber} not found`)
+  if (source.archived_at) throw new ConflictError('Cannot move assets out of an archived hold')
+  if (destination.archived_at) throw new ConflictError('Cannot move assets into an archived hold')
+
+  const now = new Date()
+
+  const { archived } = await prisma.$transaction(async (tx) => {
+    const assets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, hold_id: true },
+    })
+    if (assets.length !== assetIds.length || assets.some((a) => a.hold_id !== source.id)) {
+      throw new ConflictError(
+        `The following assets are no longer on hold ${sourceHoldNumber} and cannot be moved`,
+      )
+    }
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds }, hold_id: source.id },
+      data: { hold_id: destination.id },
+    })
+
+    const remaining = await tx.asset.count({ where: { hold_id: source.id } })
+    let archived = false
+    if (remaining === 0) {
+      await tx.hold.update({ where: { id: source.id }, data: { archived_at: now } })
+      archived = true
+    }
+
+    return { archived }
+  })
+
+  await recordCollectionMoveOnAssets(assetIds, 'hold_id', source.id, destination.id, userId)
+  await recordAssetUpdateOnCollection('Hold', source.id, [], assetIds, userId)
+  await recordAssetUpdateOnCollection('Hold', destination.id, assetIds, [], userId)
+
+  if (archived) await recordHoldArchive(source.id, now, userId)
 }
 
 export async function getHold(holdNumber: string): Promise<HoldDetail> {

@@ -17,7 +17,9 @@ import { toast } from 'sonner'
 import { createAssetSummaryColumns } from '../table-columns/asset-summary-columns'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
+import { Button } from '../shadcn/button'
 import { EditHoldMetadataModal } from './edit-hold-metadata-modal'
+import { MoveToHoldModal } from './move-to-hold-modal'
 
 const RELEASED_STATUS = 'RELEASED'
 
@@ -31,6 +33,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   const canEditAny = useCan('edit_any_hold')
   const canCreateHold = useCan('create_update_hold')
   const [releaseOpen, setReleaseOpen] = useState(false)
+  const [moveOpen, setMoveOpen] = useState(false)
 
   const isArchived = detail.data?.archived_at != null
 
@@ -77,6 +80,23 @@ export function HoldDetailsPage(): React.JSX.Element {
         onBulkRemove={
           canEditHold ? (assets) => mutations.bulkRemoveAssets(holdNumber, assets) : undefined
         }
+        renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
+          if (!canEditHold) return null
+          return (
+            <>
+              <Button variant="secondary" onClick={() => setMoveOpen(true)}>
+                Move to hold
+              </Button>
+              <MoveToHoldModal
+                open={moveOpen}
+                onOpenChange={setMoveOpen}
+                sourceHoldNumber={holdNumber}
+                selectedAssets={selectedAssets}
+                onConfirmSuccess={clearSelection}
+              />
+            </>
+          )
+        }}
         onFlushPending={mutations.flushPending}
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}

@@ -10,6 +10,7 @@ import type {
   CollectionHistory,
   CreateHold,
   HoldDetail,
+  MoveHoldAssets,
   OrgSummary,
   UpdateHoldMetadata,
   User,
@@ -20,6 +21,7 @@ import {
   CreateHoldSchema,
   HoldDetailSchema,
   HoldSummarySchema,
+  MoveHoldAssetsSchema,
   UpdateHoldMetadataSchema,
   type HoldSummary,
 } from 'shared-types'
@@ -87,4 +89,12 @@ export async function updateHoldMetadata(
 export async function patchHoldAssets(holdNumber: string, delta: AssetDelta): Promise<void> {
   const patchHoldAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/holds/${holdNumber}/assets`, patchHoldAssetsBody)
+}
+
+export async function moveHoldAssets(
+  destinationHoldNumber: string,
+  move: MoveHoldAssets,
+): Promise<void> {
+  const moveHoldAssetsBody = MoveHoldAssetsSchema.parse(move satisfies MoveHoldAssets)
+  await api.post(`/holds/${destinationHoldNumber}/move-assets`, moveHoldAssetsBody)
 }

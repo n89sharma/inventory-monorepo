@@ -7,6 +7,7 @@ import {
   CreateHoldSchema,
   HoldDetail,
   HoldSummary,
+  MoveHoldAssetsSchema,
   UpdateHoldMetadataSchema,
   successResponse,
 } from 'shared-types'
@@ -20,6 +21,7 @@ import {
   archiveHold as archiveHoldSer,
   createHold as createHoldSer,
   getHold as getHoldSer,
+  moveAssetsToHold as moveAssetsToHoldSer,
   addRemoveCollectionFromAssetsAndRecord as patchHoldAssetsSer,
   patchHoldMetadata as patchHoldMetadataSer,
 } from '../services/holdService.js'
@@ -71,6 +73,12 @@ export const patchHoldMetadata = asyncHandler(async (req, res) => {
 export const patchHoldAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchHoldAssetsSer(req.params.holdNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const moveHoldAssets = asyncHandler(async (req, res) => {
+  const { sourceHoldNumber, assetIds } = MoveHoldAssetsSchema.parse(req.body)
+  await moveAssetsToHoldSer(sourceHoldNumber, req.params.holdNumber, assetIds, res.locals.dbUserId)
   res.status(204).send()
 })
 
