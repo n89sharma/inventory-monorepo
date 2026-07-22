@@ -8,7 +8,7 @@ import { soldReportHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
-import { SortableHeader } from './shared-columns'
+import { sortableHeader } from './shared-columns'
 
 function isModelRow(row: InStockSummaryTableRow): row is InStockSummaryModelRow {
   return 'subRows' in row
@@ -105,12 +105,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   },
   {
     accessorKey: 'model_name',
-    header: ({ column }) => (
-      <SortableHeader
-        label="Model"
-        onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      />
-    ),
+    header: sortableHeader<InStockSummaryTableRow>('Model'),
     cell: ({ row }) => <ModelCell row={row} />,
     sortingFn: sortByModelName,
     size: 150,
@@ -123,12 +118,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   },
   {
     accessorKey: 'avg_purchase_cost',
-    header: ({ column }) => (
-      <SortableHeader
-        label="Avg Purchase Cost"
-        onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      />
-    ),
+    header: sortableHeader<InStockSummaryTableRow>('Avg Purchase Cost'),
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_purchase_cost),
     sortingFn: sortByPurchaseCost,
     size: 120,
@@ -136,12 +126,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   },
   {
     accessorKey: 'avg_total_cost',
-    header: ({ column }) => (
-      <SortableHeader
-        label="Avg Total Cost"
-        onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      />
-    ),
+    header: sortableHeader<InStockSummaryTableRow>('Avg Total Cost'),
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_total_cost),
     sortingFn: sortByTotalCost,
     size: 120,
@@ -149,12 +134,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   },
   {
     accessorKey: 'asset_count',
-    header: ({ column }) => (
-      <SortableHeader
-        label="Count"
-        onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      />
-    ),
+    header: sortableHeader<InStockSummaryTableRow>('Count'),
     cell: ({ row }) => row.original.asset_count,
     sortingFn: sortByModelCount,
     size: 90,

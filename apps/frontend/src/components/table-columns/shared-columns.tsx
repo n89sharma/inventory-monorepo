@@ -3,7 +3,7 @@ import { Checkbox } from '@/components/shadcn/checkbox'
 import { AssetTypeBreakdown } from '@/components/table-columns/asset-type-breakdown'
 import { formatDate } from '@/lib/formatters'
 import { ArrowsDownUpIcon } from '@phosphor-icons/react'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { CollectionSummarySchema } from 'shared-types'
@@ -75,7 +75,7 @@ export function createIdColumn<TData>({
   value,
 }: {
   accessorKey: string
-  header: string
+  header: ColumnDef<TData>['header']
   href: (row: TData) => string
   value: (row: TData) => string
 }): ColumnDef<TData> {
@@ -91,12 +91,21 @@ export function createIdColumn<TData>({
   }
 }
 
-export function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
+function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
   return (
     <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
       {label}
       <ArrowsDownUpIcon />
     </Button>
+  )
+}
+
+export function sortableHeader<TData>(label: string) {
+  return ({ column }: HeaderContext<TData, unknown>) => (
+    <SortableHeader
+      label={label}
+      onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+    />
   )
 }
 
@@ -106,12 +115,7 @@ export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
     const date = getValue<Date>()
     return date ? formatDate(date) : '-'
   },
-  header: ({ column }) => (
-    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-      Date
-      <ArrowsDownUpIcon />
-    </Button>
-  ),
+  header: sortableHeader<CollectionSummarySchema>('Date'),
   size: 140,
 }
 

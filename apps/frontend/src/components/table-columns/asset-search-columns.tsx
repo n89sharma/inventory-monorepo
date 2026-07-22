@@ -13,7 +13,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
-import { createIdColumn, SortableHeader } from './shared-columns'
+import { createIdColumn, sortableHeader } from './shared-columns'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
@@ -41,12 +41,7 @@ export function createAssetSearchColumns(
     },
     {
       accessorKey: 'model',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Model"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Model'),
       size: 100,
     },
     {
@@ -85,12 +80,7 @@ export function createAssetSearchColumns(
     },
     {
       accessorKey: 'readiness',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Readiness"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Readiness'),
       cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
       size: 80,
     },
@@ -107,168 +97,93 @@ export function createAssetSearchColumns(
     },
     {
       accessorKey: 'specs_meter_total',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Total Meter"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Total Meter'),
       cell: ({ row }) => formatThousandsK(row.original.specs_meter_total),
       size: 80,
     },
     {
       accessorKey: 'weight',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Weight"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Weight'),
       cell: ({ row }) => formatWeight(row.original.weight),
       size: 80,
     },
     {
       accessorKey: 'size',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Size"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Size'),
       cell: ({ row }) => row.original.size,
       size: 70,
     },
     {
       id: 'days_held',
       accessorFn: (row) => daysHeld(row.hold_created_at),
-      header: ({ column }) => (
-        <SortableHeader
-          label="Days Held"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Days Held'),
       cell: ({ row }) => daysHeld(row.original.hold_created_at) ?? '',
       sortUndefined: 'last',
       size: 80,
     },
     {
       accessorKey: 'specs_cassettes',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Cassettes"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Cassettes'),
       cell: ({ row }) => row.original.specs_cassettes ?? '',
       size: 80,
     },
     {
       accessorKey: 'specs_internal_finisher',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Internal Finisher"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Internal Finisher'),
       cell: ({ row }) => row.original.specs_internal_finisher ?? '',
       size: 80,
     },
     {
       accessorKey: 'specs_toner_life_c',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Toner Life C"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Toner Life C'),
       cell: ({ row }) => row.original.specs_toner_life_c ?? '',
       size: 80,
     },
     {
       accessorKey: 'specs_toner_life_m',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Toner Life M"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Toner Life M'),
       cell: ({ row }) => row.original.specs_toner_life_m ?? '',
       size: 80,
     },
     {
       accessorKey: 'specs_toner_life_y',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Toner Life Y"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Toner Life Y'),
       cell: ({ row }) => row.original.specs_toner_life_y ?? '',
       size: 80,
     },
     {
       accessorKey: 'specs_toner_life_k',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Toner Life K"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Toner Life K'),
       cell: ({ row }) => row.original.specs_toner_life_k ?? '',
       size: 80,
     },
     {
       accessorKey: 'cost_purchase_cost',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Purchase Cost"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Purchase Cost'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.cost_purchase_cost),
       size: 90,
     },
     {
       accessorKey: 'cost_transport_cost',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Transport Cost"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Transport Cost'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.cost_transport_cost),
       size: 90,
     },
     {
       accessorKey: 'cost_processing_cost',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Processing Cost"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Processing Cost'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.cost_processing_cost),
       size: 90,
     },
     {
       accessorKey: 'cost_total_cost',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Total Cost"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Total Cost'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.cost_total_cost),
       size: 90,
     },
     {
       accessorKey: 'cost_sale_price',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Sale Price"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Sale Price'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.cost_sale_price),
       size: 90,
     },
@@ -291,112 +206,62 @@ export function createAssetSearchColumns(
     },
     {
       accessorKey: 'held_by',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Held By"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Held By'),
       cell: ({ row }) => row.original.held_by ?? '',
       size: 120,
     },
     {
       accessorKey: 'hold_created_for',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Held For"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Held For'),
       cell: ({ row }) => row.original.hold_created_for ?? '',
       size: 120,
     },
     {
       accessorKey: 'hold_customer',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Hold Customer"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Hold Customer'),
       cell: ({ row }) => formatTitleCase(row.original.hold_customer ?? ''),
       size: 120,
     },
     {
       accessorKey: 'hold_created_at',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Hold Created"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Hold Created'),
       cell: ({ row }) => formatDate(row.original.hold_created_at),
       size: 100,
     },
     {
       accessorKey: 'vendor',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Vendor"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Vendor'),
       cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
       size: 120,
     },
     {
       accessorKey: 'created_at',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Created"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Created'),
       cell: ({ row }) => formatDate(row.original.created_at),
       size: 100,
     },
     {
       accessorKey: 'arrival_created_at',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Arrived At"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Arrived At'),
       cell: ({ row }) => formatDate(row.original.arrival_created_at),
       size: 100,
     },
     {
       id: 'stock_days',
       accessorFn: (row) => stockDays(row.created_at),
-      header: ({ column }) => (
-        <SortableHeader
-          label="Stock Days"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Stock Days'),
       cell: ({ row }) => stockDays(row.original.created_at),
       size: 80,
     },
     {
       accessorKey: 'customer',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Customer"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Customer'),
       cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
       size: 120,
     },
     {
       accessorKey: 'departed_at',
-      header: ({ column }) => (
-        <SortableHeader
-          label="Departed At"
-          onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        />
-      ),
+      header: sortableHeader<AssetSearchRow>('Departed At'),
       cell: ({ row }) => formatDate(row.original.departed_at),
       size: 100,
     },
