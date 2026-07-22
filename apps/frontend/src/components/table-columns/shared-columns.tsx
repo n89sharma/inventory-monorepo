@@ -2,8 +2,8 @@ import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { AssetTypeBreakdown } from '@/components/table-columns/asset-type-breakdown'
 import { formatDate } from '@/lib/formatters'
-import { ArrowsDownUpIcon } from '@phosphor-icons/react'
-import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
+import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon } from '@phosphor-icons/react'
+import type { ColumnDef, HeaderContext, SortDirection } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { CollectionSummarySchema } from 'shared-types'
@@ -91,11 +91,25 @@ export function createIdColumn<TData>({
   }
 }
 
-function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
+function SortIcon({ direction }: { direction: false | SortDirection }) {
+  if (direction === 'asc') return <ArrowUpIcon />
+  if (direction === 'desc') return <ArrowDownIcon />
+  return <ArrowsDownUpIcon />
+}
+
+function SortableHeader({
+  label,
+  direction,
+  onToggle,
+}: {
+  label: string
+  direction: false | SortDirection
+  onToggle: () => void
+}) {
   return (
     <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
       {label}
-      <ArrowsDownUpIcon />
+      <SortIcon direction={direction} />
     </Button>
   )
 }
@@ -104,6 +118,7 @@ export function sortableHeader<TData>(label: string) {
   return ({ column }: HeaderContext<TData, unknown>) => (
     <SortableHeader
       label={label}
+      direction={column.getIsSorted()}
       onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
     />
   )
