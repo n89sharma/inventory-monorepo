@@ -249,7 +249,7 @@ export function DataTable<TData, TValue>({
                         <TableHead
                           key={header.id}
                           style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                          className={`whitespace-normal text-center text-xs font-medium text-muted-foreground ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                          className={`whitespace-normal text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
                         >
                           {header.isPlaceholder
                             ? null
