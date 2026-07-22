@@ -1,4 +1,3 @@
-import { Button } from '@/components/shadcn/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
@@ -10,12 +9,11 @@ import {
   formatUSDWithSymbol,
   formatWeight,
 } from '@/lib/formatters'
-import { ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
-import { createIdColumn } from './shared-columns'
+import { createIdColumn, SortableHeader } from './shared-columns'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
@@ -24,15 +22,6 @@ export const stockDays = (createdAt: Date): number =>
 
 export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
-
-function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
-  return (
-    <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
-      {label}
-      <ArrowsDownUpIcon />
-    </Button>
-  )
-}
 
 export function createAssetSearchColumns(
   detailHref: (row: AssetSearchRow) => string,

@@ -91,6 +91,15 @@ export function createIdColumn<TData>({
   }
 }
 
+export function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
+  return (
+    <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
+      {label}
+      <ArrowsDownUpIcon />
+    </Button>
+  )
+}
+
 export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
   accessorKey: 'created_at',
   cell: ({ getValue }) => {

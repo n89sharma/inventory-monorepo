@@ -1,24 +1,13 @@
-import { createIdColumn } from './shared-columns'
+import { createIdColumn, SortableHeader } from './shared-columns'
 import { Badge } from '@/components/shadcn/badge'
-import { Button } from '@/components/shadcn/button'
 import {
   formatDate,
   formatThousandsK,
   formatTitleCase,
   formatUSDWithSymbol,
 } from '@/lib/formatters'
-import { ArrowsDownUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ModelSaleRow } from 'shared-types'
-
-function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
-  return (
-    <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
-      {label}
-      <ArrowsDownUpIcon />
-    </Button>
-  )
-}
 
 export function createModelSalesColumns(
   detailHref: (row: ModelSaleRow) => string,

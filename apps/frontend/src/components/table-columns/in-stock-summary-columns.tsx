@@ -1,4 +1,3 @@
-import { Button } from '@/components/shadcn/button'
 import type {
   InStockSummaryModelRow,
   InStockSummaryTableRow,
@@ -6,26 +5,13 @@ import type {
 import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { METER_BAND_LABELS } from '@/lib/meter-band-display'
 import { soldReportHref } from '@/lib/filters/serializers'
-import {
-  ArrowSquareOutIcon,
-  ArrowsDownUpIcon,
-  CaretDownIcon,
-  CaretRightIcon,
-} from '@phosphor-icons/react'
+import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
+import { SortableHeader } from './shared-columns'
 
 function isModelRow(row: InStockSummaryTableRow): row is InStockSummaryModelRow {
   return 'subRows' in row
-}
-
-function SortableHeader({ label, onToggle }: { label: string; onToggle: () => void }) {
-  return (
-    <Button variant="ghost" onClick={onToggle} className="h-auto whitespace-normal py-1">
-      {label}
-      <ArrowsDownUpIcon />
-    </Button>
-  )
 }
 
 // Sorts model rows by `compare`; band sub-rows always return 0 so they keep
