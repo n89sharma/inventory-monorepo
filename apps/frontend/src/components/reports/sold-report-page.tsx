@@ -31,7 +31,7 @@ import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { format, subMonths } from 'date-fns'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { ModelSaleRow, ModelSalesResult, ModelSummary } from 'shared-types'
 
@@ -41,10 +41,6 @@ const NO_MEDIAN = '—'
 const MONTH_YEAR_FORMAT = 'MMM yyyy'
 const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 const TABLE_PAGE_SIZE = 20
-const SUMMARY_HEIGHT_VAR = '--sold-report-summary-height'
-const TABLE_SCROLL_MAX_HEIGHT =
-  `calc(100vh - var(--app-header-height, 0px) - var(--details-header-height, 0px)` +
-  ` - var(${SUMMARY_HEIGHT_VAR}, 0px) - 7.5rem)`
 
 const MODEL_SALES_SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
 
@@ -96,32 +92,6 @@ function MeterBandsTable({ bands }: { bands: BandSummary[] }): React.JSX.Element
           ))}
         </TableBody>
       </Table>
-    </div>
-  )
-}
-
-function MeasuredSummary({ children }: { children: ReactNode }): React.JSX.Element {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const root = document.documentElement
-    const update = () => {
-      root.style.setProperty(SUMMARY_HEIGHT_VAR, `${el.offsetHeight}px`)
-    }
-    update()
-    const observer = new ResizeObserver(update)
-    observer.observe(el)
-    return () => {
-      observer.disconnect()
-      root.style.removeProperty(SUMMARY_HEIGHT_VAR)
-    }
-  }, [])
-
-  return (
-    <div ref={ref} className="flex flex-col gap-4">
-      {children}
     </div>
   )
 }
@@ -204,14 +174,14 @@ function SoldReportResults({
   }
   return (
     <div className="flex flex-col gap-1">
-      <MeasuredSummary>
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Last sold {formatSaleSummary(visibleSales[0])}</h2>
           <ViewStockButton count={data.in_stock_count} href={inStockHref} />
         </div>
         <MeterBandsTable bands={bands} />
         <RangeSentence count={visibleSales.length} range={range} />
-      </MeasuredSummary>
+      </div>
       <DataTable
         columns={columns}
         data={visibleSales}
@@ -219,7 +189,6 @@ function SoldReportResults({
         getRowHref={getRowHref}
         columnVisibility={columnVisibility}
         initialPageSize={TABLE_PAGE_SIZE}
-        scrollMaxHeight={TABLE_SCROLL_MAX_HEIGHT}
       />
     </div>
   )

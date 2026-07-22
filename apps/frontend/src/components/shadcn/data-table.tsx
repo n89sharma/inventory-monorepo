@@ -22,7 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { memo, useEffect, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 declare module '@tanstack/react-table' {
@@ -75,7 +75,6 @@ interface DataTableProps<TData, TValue> {
   getRowClassName?: (row: TData) => string | undefined
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
-  scrollMaxHeight?: string
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
   onSelectionChange?: (selection: DataTableSelection<TData>) => void
 }
@@ -93,9 +92,6 @@ function pinStyle<TData>(column: Column<TData>): CSSProperties {
     zIndex: 1,
   }
 }
-
-const SCROLL_BOX_MAX_HEIGHT =
-  'calc(100vh - var(--app-header-height, 0px) - var(--details-header-height, 0px) - 7rem)'
 
 function headerStickyStyle<TData>(column: Column<TData>): CSSProperties {
   if (column.getIsPinned() === 'left') {
@@ -138,7 +134,6 @@ export function DataTable<TData, TValue>({
   getRowClassName,
   getSubRows,
   columnVisibility,
-  scrollMaxHeight = SCROLL_BOX_MAX_HEIGHT,
   renderTableFilter,
   onSelectionChange,
 }: DataTableProps<TData, TValue>) {
@@ -148,26 +143,11 @@ export function DataTable<TData, TValue>({
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
-  const headerScrollRef = useRef<HTMLDivElement>(null)
-  const bodyScrollRef = useRef<HTMLDivElement>(null)
-  const [scrollbarWidth, setScrollbarWidth] = useState(0)
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
   const sorting = controlledSorting ?? internalSorting
   const onSortingChange = onControlledSortingChange ?? setInternalSorting
-
-  // The body reserves a scrollbar gutter (scrollbar-gutter: stable) so its content is
-  // narrower than the header by the scrollbar width. Match it with a spacer of the same
-  // width beside the header so header and body columns stay aligned at every scroll offset.
-  useLayoutEffect(() => {
-    const bodyEl = bodyScrollRef.current
-    if (bodyEl) setScrollbarWidth(bodyEl.offsetWidth - bodyEl.clientWidth)
-  }, [])
-
-  const syncHeaderScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    if (headerScrollRef.current) headerScrollRef.current.scrollLeft = event.currentTarget.scrollLeft
-  }
 
   const table = useReactTable({
     data,
@@ -238,39 +218,27 @@ export function DataTable<TData, TValue>({
             {renderTableFilter(table)}
           </div>
         )}
-        <div className="flex border-b">
-          <div ref={headerScrollRef} className="min-w-0 flex-1 overflow-x-hidden">
-            <Table className="table-fixed w-full" style={{ minWidth: table.getTotalSize() }}>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead
-                          key={header.id}
-                          style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                          className={`whitespace-normal text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-            </Table>
-          </div>
-          <div className="shrink-0 bg-muted" style={{ width: scrollbarWidth }} aria-hidden="true" />
-        </div>
-        <div
-          ref={bodyScrollRef}
-          className="overflow-auto [scrollbar-gutter:stable]"
-          style={{ maxHeight: scrollMaxHeight }}
-          onScroll={syncHeaderScroll}
-        >
+        <div className="overflow-x-auto">
           <Table className="table-fixed w-full" style={{ minWidth: table.getTotalSize() }}>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
+                        className={`whitespace-normal text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table
