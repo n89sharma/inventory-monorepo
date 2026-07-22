@@ -9,12 +9,12 @@ import {
   LockSimpleOpenIcon,
   PencilSimpleIcon,
   PrinterIcon,
-  SpinnerGapIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { type AssetSummary, type CollectionHistory } from 'shared-types'
 import { toast } from 'sonner'
+import { PendingIcon } from '@/components/shared/pending-icon'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
 import { Button } from '../shadcn/button'
 import {
@@ -133,7 +133,9 @@ export function CollectionEditBar({
           disabled={exportDisabled}
           aria-label="Export to CSV"
         >
-          {exportLoading ? <SpinnerGapIcon className="animate-spin" /> : <DownloadSimpleIcon />}
+          <PendingIcon pending={exportLoading}>
+            <DownloadSimpleIcon />
+          </PendingIcon>
         </Button>
       )}
       {showPrint && (
@@ -144,7 +146,9 @@ export function CollectionEditBar({
           disabled={printDisabled}
           aria-label="Print barcodes"
         >
-          {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <BarcodeIcon />}
+          <PendingIcon pending={printLoading}>
+            <BarcodeIcon />
+          </PendingIcon>
         </Button>
       )}
       <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">

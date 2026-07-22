@@ -143,6 +143,17 @@ function RangeSentence({
   )
 }
 
+function LastSaleNote({ lastSale }: { lastSale: ModelSaleRow | null }): React.JSX.Element {
+  if (!lastSale) {
+    return <p className="text-sm text-muted-foreground">No sales recorded for this model</p>
+  }
+  return (
+    <p className="text-sm text-muted-foreground">
+      Last sold {formatSaleSummary(lastSale)} — outside selected range
+    </p>
+  )
+}
+
 function EmptyWindowState({
   range,
   lastSale,
@@ -153,13 +164,7 @@ function EmptyWindowState({
   return (
     <div className="flex flex-col gap-1">
       <p className="text-sm">No sales in the last {range} mo</p>
-      {lastSale ? (
-        <p className="text-sm text-muted-foreground">
-          Last sold {formatSaleSummary(lastSale)} — outside selected range
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">No sales recorded for this model</p>
-      )}
+      <LastSaleNote lastSale={lastSale} />
     </div>
   )
 }

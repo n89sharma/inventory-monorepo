@@ -7,6 +7,11 @@ type ShareButtonProps = {
   className?: string
 }
 
+function ShareStateIcon({ shared }: { shared: boolean }): React.JSX.Element {
+  if (shared) return <CheckIcon />
+  return <ShareNetworkIcon />
+}
+
 export function ShareButton({ className }: ShareButtonProps): React.JSX.Element {
   const [shared, setShared] = useState(false)
 
@@ -23,7 +28,7 @@ export function ShareButton({ className }: ShareButtonProps): React.JSX.Element 
       className={cn(className)}
       aria-label="Copy page URL"
     >
-      {shared ? <CheckIcon /> : <ShareNetworkIcon />}
+      <ShareStateIcon shared={shared} />
     </Button>
   )
 }

@@ -6,7 +6,8 @@ import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter
 import { createSelectColumn } from '@/components/table-columns/shared-columns'
 import { printLocationBarcodes } from '@/data/api/location-api'
 import { useLocations } from '@/hooks/use-locations'
-import { BarcodeIcon, SpinnerGapIcon } from '@phosphor-icons/react'
+import { PendingIcon } from '@/components/shared/pending-icon'
+import { BarcodeIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import type { RowSelectionState } from '@tanstack/react-table'
@@ -58,7 +59,9 @@ export function LocationsSettingsPage(): React.JSX.Element {
           disabled={printLoading}
           aria-label="Print location barcodes"
         >
-          {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <BarcodeIcon />}
+          <PendingIcon pending={printLoading}>
+            <BarcodeIcon />
+          </PendingIcon>
         </Button>
       </div>
 

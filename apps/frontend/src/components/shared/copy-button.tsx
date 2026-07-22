@@ -7,6 +7,11 @@ type CopyButtonProps = {
   className?: string
 }
 
+function CopyStateIcon({ copied }: { copied: boolean }): React.JSX.Element {
+  if (copied) return <CheckIcon />
+  return <CopyIcon />
+}
+
 export function CopyButton({ value, className }: CopyButtonProps): React.JSX.Element {
   const [copied, setCopied] = useState(false)
 
@@ -23,7 +28,7 @@ export function CopyButton({ value, className }: CopyButtonProps): React.JSX.Ele
       className={cn('invisible group-hover:visible cursor-pointer', className)}
       aria-label={`Copy ${value}`}
     >
-      {copied ? <CheckIcon /> : <CopyIcon />}
+      <CopyStateIcon copied={copied} />
     </button>
   )
 }

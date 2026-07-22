@@ -27,6 +27,17 @@ function groupAssetsByInvoice(
   return buckets
 }
 
+function InvoiceBucketLabel({ bucket }: { bucket: InvoiceBucket }) {
+  if (bucket.invoice_number === null) {
+    return <span className="text-muted-foreground">No invoice ({bucket.count})</span>
+  }
+  return (
+    <Link to={`/invoices/${bucket.invoice_number}`} className="text-primary hover:underline">
+      {bucket.invoice_number} ({bucket.count})
+    </Link>
+  )
+}
+
 export function InvoiceSummaryField({
   assets,
   getInvoiceNumber,
@@ -46,16 +57,7 @@ export function InvoiceSummaryField({
         {invoiceBuckets.map((bucket, i) => (
           <span key={bucket.invoice_number ?? '__none__'}>
             {i > 0 && ', '}
-            {bucket.invoice_number === null ? (
-              <span className="text-muted-foreground">No invoice ({bucket.count})</span>
-            ) : (
-              <Link
-                to={`/invoices/${bucket.invoice_number}`}
-                className="text-primary hover:underline"
-              >
-                {bucket.invoice_number} ({bucket.count})
-              </Link>
-            )}
+            <InvoiceBucketLabel bucket={bucket} />
           </span>
         ))}
       </span>

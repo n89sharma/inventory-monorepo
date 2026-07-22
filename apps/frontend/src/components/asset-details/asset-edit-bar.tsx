@@ -7,7 +7,6 @@ import {
   MapPinIcon,
   PlusIcon,
   PrinterIcon,
-  SpinnerGapIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -22,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
+import { PendingIcon } from '../shared/pending-icon'
 import { ShareButton } from '../shared/share-button'
 import { EditLocationModal } from './edit-location-modal'
 
@@ -76,7 +76,9 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         disabled={printLoading}
         aria-label="Print barcode"
       >
-        {printLoading ? <SpinnerGapIcon className="animate-spin" /> : <BarcodeIcon />}
+        <PendingIcon pending={printLoading}>
+          <BarcodeIcon />
+        </PendingIcon>
       </Button>
       <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
         <PrinterIcon />

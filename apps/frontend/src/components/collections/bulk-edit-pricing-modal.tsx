@@ -13,7 +13,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatThousandsK } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import type { CellContext, ColumnDef } from '@tanstack/react-table'
+import type { CellContext, ColumnDef, Table } from '@tanstack/react-table'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
@@ -149,6 +149,53 @@ function checkDirty(rows: PricingRow[], initial: PricingRow[]): boolean {
   })
 }
 
+function PricingEditBody({ loading, table }: { loading: boolean; table: Table<PricingRow> }) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+        <CircleNotchIcon className="mr-2 animate-spin" />
+        Loading pricing…
+      </div>
+    )
+  }
+  return (
+    <div className="overflow-auto min-h-0 flex-1 rounded-md border">
+      <table className="w-full caption-bottom text-sm table-fixed">
+        <TableHeader>
+          {table.getHeaderGroups().map((hg) => (
+            <TableRow key={hg.id}>
+              {hg.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  style={{ width: header.getSize() }}
+                  className="sticky top-0 bg-background z-10"
+                >
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  style={{ width: cell.column.getSize() }}
+                  className={cell.column.id === 'model' ? 'whitespace-normal' : ''}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </table>
+    </div>
+  )
+}
+
 export function BulkEditPricingModal({
   open,
   onOpenChange,
@@ -252,47 +299,7 @@ export function BulkEditPricingModal({
             <DialogTitle>Bulk Edit Pricing</DialogTitle>
           </DialogHeader>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              <CircleNotchIcon className="mr-2 animate-spin" />
-              Loading pricing…
-            </div>
-          ) : (
-            <div className="overflow-auto min-h-0 flex-1 rounded-md border">
-              <table className="w-full caption-bottom text-sm table-fixed">
-                <TableHeader>
-                  {table.getHeaderGroups().map((hg) => (
-                    <TableRow key={hg.id}>
-                      {hg.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          style={{ width: header.getSize() }}
-                          className="sticky top-0 bg-background z-10"
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          style={{ width: cell.column.getSize() }}
-                          className={cell.column.id === 'model' ? 'whitespace-normal' : ''}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </table>
-            </div>
-          )}
+          <PricingEditBody loading={loading} table={table} />
 
           <DialogFooter>
             <Button

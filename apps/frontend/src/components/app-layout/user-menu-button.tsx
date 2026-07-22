@@ -11,6 +11,21 @@ import { SidebarMenuButton } from '@/components/shadcn/sidebar'
 import { useClerk, useUser } from '@clerk/react'
 import { EnvelopeIcon, SignOutIcon, UserIcon } from '@phosphor-icons/react'
 
+function SignInMethodLabel({ isMicrosoft }: { isMicrosoft: boolean | undefined }) {
+  if (isMicrosoft) {
+    return (
+      <>
+        Signed in via Microsoft <img src={microsoftLogo} alt="Microsoft" className="size-3" />
+      </>
+    )
+  }
+  return (
+    <>
+      Signed in via Email <EnvelopeIcon aria-hidden="true" className="size-3" />
+    </>
+  )
+}
+
 export function UserMenuButton() {
   const { user } = useUser()
   const { signOut } = useClerk()
@@ -33,16 +48,7 @@ export function UserMenuButton() {
       <DropdownMenuContent side="top" align="start" className="w-56">
         <DropdownMenuLabel className="flex flex-col leading-tight">
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            {isMicrosoft ? (
-              <>
-                Signed in via Microsoft{' '}
-                <img src={microsoftLogo} alt="Microsoft" className="size-3" />
-              </>
-            ) : (
-              <>
-                Signed in via Email <EnvelopeIcon aria-hidden="true" className="size-3" />
-              </>
-            )}
+            <SignInMethodLabel isMicrosoft={isMicrosoft} />
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

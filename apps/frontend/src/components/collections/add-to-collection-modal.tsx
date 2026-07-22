@@ -71,6 +71,70 @@ function getDetailFields(s: SelectedCollection): { label: string; value: string 
   }
 }
 
+function CollectionAssetsAddedMessage({
+  added,
+  skipped,
+  entity,
+  id,
+}: {
+  added: number
+  skipped: number
+  entity: LinkableEntity
+  id: string
+}) {
+  const assetNoun = `asset${added !== 1 ? 's' : ''}`
+  if (skipped > 0) {
+    return (
+      <>
+        {added} {assetNoun} added. {skipped} already present and skipped.
+      </>
+    )
+  }
+  return (
+    <>
+      {added} {assetNoun} added to {ENTITY_CONFIG[entity].label}{' '}
+      <EntityLink entity={entity} id={id} />.
+    </>
+  )
+}
+
+function CollectionSelectionStep({
+  selected,
+  onClear,
+  query,
+  onQueryChange,
+  isLoading,
+  results,
+  onSelect,
+}: {
+  selected: SelectedCollection | null
+  onClear: () => void
+  query: string
+  onQueryChange: (value: string) => void
+  isLoading: boolean
+  results: CollectionResults
+  onSelect: React.ComponentProps<typeof SearchView>['onSelect']
+}) {
+  if (selected !== null) {
+    return (
+      <DetailGrid
+        title={collectionLabel(selected)}
+        fields={getDetailFields(selected)}
+        onClear={onClear}
+      />
+    )
+  }
+  return (
+    <SearchView
+      query={query}
+      onQueryChange={onQueryChange}
+      isLoading={isLoading}
+      results={results}
+      onSelect={onSelect}
+    />
+  )
+}
+
 function InformationSection({
   assetCount,
   selected,
@@ -234,20 +298,16 @@ export function AddToCollectionModal({
           break
         }
       }
-      const assetNoun = `asset${added! !== 1 ? 's' : ''}`
       const ref = collectionRef(selected)
-      const msg =
-        skipped > 0 ? (
-          <>
-            {added!} {assetNoun} added. {skipped} already present and skipped.
-          </>
-        ) : (
-          <>
-            {added!} {assetNoun} added to {ENTITY_CONFIG[ref.entity].label}{' '}
-            <EntityLink entity={ref.entity} id={ref.id} />.
-          </>
-        )
-      toast.success(msg, { position: 'top-center' })
+      toast.success(
+        <CollectionAssetsAddedMessage
+          added={added!}
+          skipped={skipped}
+          entity={ref.entity}
+          id={ref.id}
+        />,
+        { position: 'top-center' },
+      )
       if (refreshKey) mutate(refreshKey)
       onConfirmSuccess()
       handleOpenChange(false)
@@ -294,21 +354,15 @@ export function AddToCollectionModal({
           isLoadingDetail={isLoadingDetail}
         />
 
-        {selected !== null ? (
-          <DetailGrid
-            title={collectionLabel(selected)}
-            fields={getDetailFields(selected)}
-            onClear={handleClearSelection}
-          />
-        ) : (
-          <SearchView
-            query={query}
-            onQueryChange={handleQueryChange}
-            isLoading={isLoading}
-            results={results}
-            onSelect={handleSelect}
-          />
-        )}
+        <CollectionSelectionStep
+          selected={selected}
+          onClear={handleClearSelection}
+          query={query}
+          onQueryChange={handleQueryChange}
+          isLoading={isLoading}
+          results={results}
+          onSelect={handleSelect}
+        />
 
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)}>

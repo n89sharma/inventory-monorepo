@@ -1,5 +1,6 @@
 import { Button } from '@/components/shadcn/button'
-import { DownloadSimpleIcon, SpinnerGapIcon } from '@phosphor-icons/react'
+import { PendingIcon } from '@/components/shared/pending-icon'
+import { DownloadSimpleIcon } from '@phosphor-icons/react'
 
 export function ExportAssetsButton({
   loading,
@@ -18,7 +19,9 @@ export function ExportAssetsButton({
       disabled={disabled}
       aria-label="Export to CSV"
     >
-      {loading ? <SpinnerGapIcon className="animate-spin" /> : <DownloadSimpleIcon />}
+      <PendingIcon pending={loading}>
+        <DownloadSimpleIcon />
+      </PendingIcon>
     </Button>
   )
 }

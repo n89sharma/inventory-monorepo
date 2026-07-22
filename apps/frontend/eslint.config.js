@@ -32,12 +32,21 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'import-x/no-cycle': ['error', { ignoreExternal: true }],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'ConditionalExpression[consequent.type=/^JSX(Element|Fragment)$/][alternate.type=/^JSX(Element|Fragment)$/]',
+          message:
+            'Do not use a ternary to switch between two rendered components. Extract a named sub-component that early-returns each branch (if/else). `cond ? <A/> : null` is fine.',
+        },
+      ],
     },
   },
   {
     // Column-def modules export ColumnDef factories whose cell/header renderers
     // can't be split out; they are not Fast Refresh boundaries by nature.
-    files: ['src/components/table-columns/**'],
+    files: ['src/components/table-columns/**', 'src/components/**/*-table-columns.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

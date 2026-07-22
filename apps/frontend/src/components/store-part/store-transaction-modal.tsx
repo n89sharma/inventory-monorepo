@@ -21,7 +21,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { Controller, useForm, type FieldErrors } from 'react-hook-form'
+import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form'
 import type { StorePart, StoreTransactionKind } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -58,6 +58,64 @@ interface StoreTransactionModalProps {
 
 function isNewPart(part: StoreTransactionForm['part']): boolean {
   return part !== null && !('id' in part)
+}
+
+function PartField({
+  lockedPart,
+  control,
+  kind,
+  allParts,
+  partQuery,
+  onQueryChange,
+}: {
+  lockedPart: StorePart | undefined
+  control: Control<StoreTransactionForm>
+  kind: StoreTransactionKind
+  allParts: StorePart[]
+  partQuery: string
+  onQueryChange: (query: string) => void
+}) {
+  if (lockedPart) {
+    return <span className="font-mono text-sm">{lockedPart.part_number}</span>
+  }
+  return (
+    <Controller
+      control={control}
+      name="part"
+      render={({ field, fieldState }) => (
+        <div className="flex flex-col gap-1">
+          <SearchSelectInput
+            selection={field.value}
+            query={partQuery}
+            onQueryChange={onQueryChange}
+            onSelectionChange={(value) => {
+              field.onChange(value)
+              onQueryChange('')
+            }}
+            onClear={() => {
+              field.onChange(null)
+              onQueryChange('')
+            }}
+            onCreateOption={
+              kind === 'PURCHASE'
+                ? (query) => {
+                    field.onChange({ part_number: query, description: '' })
+                    onQueryChange('')
+                  }
+                : undefined
+            }
+            createLabel={kind === 'PURCHASE' ? (query) => `Create part "${query}"` : undefined}
+            options={allParts}
+            getLabel={(p) => p.part_number}
+            placeholder="Search part number or description"
+            clearLabel="Clear part"
+            error={fieldState.invalid}
+          />
+          <FieldError errors={fieldState.error ? [fieldState.error] : []} />
+        </div>
+      )}
+    />
+  )
 }
 
 export function StoreTransactionModal({
@@ -163,48 +221,14 @@ export function StoreTransactionModal({
           </HorizontalField>
 
           <HorizontalField label="Part" required>
-            {lockedPart ? (
-              <span className="font-mono text-sm">{lockedPart.part_number}</span>
-            ) : (
-              <Controller
-                control={control}
-                name="part"
-                render={({ field, fieldState }) => (
-                  <div className="flex flex-col gap-1">
-                    <SearchSelectInput
-                      selection={field.value}
-                      query={partQuery}
-                      onQueryChange={setPartQuery}
-                      onSelectionChange={(value) => {
-                        field.onChange(value)
-                        setPartQuery('')
-                      }}
-                      onClear={() => {
-                        field.onChange(null)
-                        setPartQuery('')
-                      }}
-                      onCreateOption={
-                        kind === 'PURCHASE'
-                          ? (query) => {
-                              field.onChange({ part_number: query, description: '' })
-                              setPartQuery('')
-                            }
-                          : undefined
-                      }
-                      createLabel={
-                        kind === 'PURCHASE' ? (query) => `Create part "${query}"` : undefined
-                      }
-                      options={allParts}
-                      getLabel={(p) => p.part_number}
-                      placeholder="Search part number or description"
-                      clearLabel="Clear part"
-                      error={fieldState.invalid}
-                    />
-                    <FieldError errors={fieldState.error ? [fieldState.error] : []} />
-                  </div>
-                )}
-              />
-            )}
+            <PartField
+              lockedPart={lockedPart}
+              control={control}
+              kind={kind}
+              allParts={allParts}
+              partQuery={partQuery}
+              onQueryChange={setPartQuery}
+            />
           </HorizontalField>
 
           {isNewPart(part) && (

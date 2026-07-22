@@ -3,6 +3,29 @@ import { ArrowsDownUpIcon, CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { User } from 'shared-types'
 
+function ActivationButton({
+  user,
+  onDeactivate,
+  onReactivate,
+}: {
+  user: User
+  onDeactivate: (user: User) => void
+  onReactivate: (user: User) => void
+}) {
+  if (user.is_active) {
+    return (
+      <Button variant="destructive" size="sm" onClick={() => onDeactivate(user)}>
+        Deactivate
+      </Button>
+    )
+  }
+  return (
+    <Button variant="outline" size="sm" onClick={() => onReactivate(user)}>
+      Reactivate
+    </Button>
+  )
+}
+
 export function createUserPermissionTableColumns(
   currentUserId: number | null | undefined,
   onEditRole: (user: User) => void,
@@ -86,15 +109,7 @@ export function createUserPermissionTableColumns(
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>
               Edit
             </Button>
-            {user.is_active ? (
-              <Button variant="destructive" size="sm" onClick={() => onDeactivate(user)}>
-                Deactivate
-              </Button>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => onReactivate(user)}>
-                Reactivate
-              </Button>
-            )}
+            <ActivationButton user={user} onDeactivate={onDeactivate} onReactivate={onReactivate} />
           </div>
         )
       },

@@ -40,6 +40,52 @@ interface AddPartModalProps {
 // Floor the panel to the taller (Machine) tab so switching tabs never resizes the dialog.
 const TAB_BODY_MIN_HEIGHT = 'min-h-80'
 
+function DonorBarcodeField({
+  value,
+  onChange,
+  onClear,
+  recipientBarcode,
+}: {
+  value: string
+  onChange: (barcode: string) => void
+  onClear: () => void
+  recipientBarcode: string
+}) {
+  if (value) {
+    return (
+      <div className="flex h-8 items-center gap-2 rounded-lg border bg-transparent pl-2.5 pr-1 text-sm">
+        <span className="font-mono flex-1">{value}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Clear donor asset"
+          onClick={onClear}
+          className="size-6"
+        >
+          <XIcon aria-hidden="true" />
+        </Button>
+      </div>
+    )
+  }
+  return (
+    <AddAssetsByBarcodeOrSerial
+      getAssets={() => []}
+      onAddAsset={(asset) => onChange(asset.barcode)}
+      entityName="part transfer"
+      validateAsset={(asset) =>
+        asset.barcode === recipientBarcode ? 'Donor and recipient cannot be the same asset' : null
+      }
+      showLeadingIcon
+    />
+  )
+}
+
+function ExchangeToggleIcon({ isExchange }: { isExchange: boolean }) {
+  if (isExchange) return <ArrowsLeftRightIcon />
+  return <ArrowRightIcon />
+}
+
 export function AddPartModal({ open, onOpenChange, recipientBarcode }: AddPartModalProps) {
   if (!recipientBarcode) return null
 
@@ -121,36 +167,15 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
               name="donor_barcode"
               render={({ field, fieldState }) => (
                 <div className="flex-1">
-                  {field.value ? (
-                    <div className="flex h-8 items-center gap-2 rounded-lg border bg-transparent pl-2.5 pr-1 text-sm">
-                      <span className="font-mono flex-1">{field.value}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label="Clear donor asset"
-                        onClick={() => field.onChange('')}
-                        className="size-6"
-                      >
-                        <XIcon aria-hidden="true" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <AddAssetsByBarcodeOrSerial
-                      getAssets={() => []}
-                      onAddAsset={(asset) => {
-                        field.onChange(asset.barcode)
-                        form.clearErrors('donor_barcode')
-                      }}
-                      entityName="part transfer"
-                      validateAsset={(asset) =>
-                        asset.barcode === recipientBarcode
-                          ? 'Donor and recipient cannot be the same asset'
-                          : null
-                      }
-                      showLeadingIcon
-                    />
-                  )}
+                  <DonorBarcodeField
+                    value={field.value}
+                    onChange={(barcode) => {
+                      field.onChange(barcode)
+                      form.clearErrors('donor_barcode')
+                    }}
+                    onClear={() => field.onChange('')}
+                    recipientBarcode={recipientBarcode}
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </div>
               )}
@@ -167,7 +192,7 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
                   aria-label={field.value ? 'Switch to one-way transfer' : 'Switch to exchange'}
                   onClick={() => field.onChange(!field.value)}
                 >
-                  {field.value ? <ArrowsLeftRightIcon /> : <ArrowRightIcon />}
+                  <ExchangeToggleIcon isExchange={field.value} />
                 </Button>
               )}
             />

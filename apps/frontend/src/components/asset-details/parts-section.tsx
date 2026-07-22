@@ -34,6 +34,13 @@ export function PartsSection({
   )
 }
 
+function HarvestedPartBadge({ isDonor, isExchange }: { isDonor: boolean; isExchange: boolean }) {
+  if (isDonor) {
+    return <Badge variant="destructive">{isExchange ? 'Removed (exchange)' : 'Removed'}</Badge>
+  }
+  return <Badge variant="success">{isExchange ? 'Added (exchange)' : 'Added'}</Badge>
+}
+
 function getHarvestedPartBadge(
   transfer: AssetHarvestedPart,
   currentAsset: string,
@@ -42,12 +49,6 @@ function getHarvestedPartBadge(
   const isDonor = transfer.donor === currentAsset
   const counterpartBarcode = isDonor ? transfer.recipient : transfer.donor
 
-  const badge = isDonor ? (
-    <Badge variant="destructive">{transfer.is_exchange ? 'Removed (exchange)' : 'Removed'}</Badge>
-  ) : (
-    <Badge variant="success">{transfer.is_exchange ? 'Added (exchange)' : 'Added'}</Badge>
-  )
-
   return (
     <DataRow
       key={`${transfer.donor}${transfer.part}`}
@@ -55,7 +56,7 @@ function getHarvestedPartBadge(
       rowClassName={rowClassName}
     >
       <div className="flex items-center gap-2">
-        {badge}
+        <HarvestedPartBadge isDonor={isDonor} isExchange={transfer.is_exchange} />
         <Link
           to={`/search/all/${counterpartBarcode}`}
           className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"

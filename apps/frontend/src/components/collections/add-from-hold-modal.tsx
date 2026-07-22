@@ -19,6 +19,68 @@ function holdDetailFields(h: HoldSuggestion): { label: string; value: string | n
   ]
 }
 
+function HoldAssetsAddedMessage({
+  added,
+  skipped,
+  holdNumber,
+}: {
+  added: number
+  skipped: number
+  holdNumber: string
+}) {
+  const assetNoun = `asset${added !== 1 ? 's' : ''}`
+  if (skipped > 0) {
+    return (
+      <>
+        {added} {assetNoun} added. {skipped} duplicate{skipped !== 1 ? 's' : ''} skipped.
+      </>
+    )
+  }
+  return (
+    <>
+      {added} {assetNoun} added from Hold <EntityLink entity="hold" id={holdNumber} />.
+    </>
+  )
+}
+
+function HoldSelectionStep({
+  selected,
+  onClear,
+  query,
+  onQueryChange,
+  isLoading,
+  results,
+  onSelect,
+}: {
+  selected: HoldSuggestion | null
+  onClear: () => void
+  query: string
+  onQueryChange: (value: string) => void
+  isLoading: boolean
+  results: CollectionResults
+  onSelect: React.ComponentProps<typeof SearchView>['onSelect']
+}) {
+  if (selected !== null) {
+    return (
+      <DetailGrid
+        title={`Hold ${selected.hold_number}`}
+        fields={holdDetailFields(selected)}
+        onClear={onClear}
+      />
+    )
+  }
+  return (
+    <SearchView
+      label="Hold"
+      query={query}
+      onQueryChange={onQueryChange}
+      isLoading={isLoading}
+      results={results}
+      onSelect={onSelect}
+    />
+  )
+}
+
 interface AddFromHoldModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -59,19 +121,14 @@ export function AddFromHoldModal({
         toAdd.forEach((asset) => onAddAsset(asset))
       }
       const skipped = holdAssets.length - toAdd.length
-      const assetNoun = `asset${toAdd.length !== 1 ? 's' : ''}`
-      const msg =
-        skipped > 0 ? (
-          <>
-            {toAdd.length} {assetNoun} added. {skipped} duplicate{skipped !== 1 ? 's' : ''} skipped.
-          </>
-        ) : (
-          <>
-            {toAdd.length} {assetNoun} added from Hold{' '}
-            <EntityLink entity="hold" id={selected.hold_number} />.
-          </>
-        )
-      toast.success(msg, { position: 'top-center' })
+      toast.success(
+        <HoldAssetsAddedMessage
+          added={toAdd.length}
+          skipped={skipped}
+          holdNumber={selected.hold_number}
+        />,
+        { position: 'top-center' },
+      )
       handleOpenChange(false)
     } catch {
       toast.error('Failed to load hold.', { position: 'top-center' })
@@ -100,24 +157,17 @@ export function AddFromHoldModal({
           <DialogTitle>Add Assets from Hold</DialogTitle>
         </DialogHeader>
 
-        {selected !== null ? (
-          <DetailGrid
-            title={`Hold ${selected.hold_number}`}
-            fields={holdDetailFields(selected)}
-            onClear={handleClearSelection}
-          />
-        ) : (
-          <SearchView
-            label="Hold"
-            query={query}
-            onQueryChange={handleQueryChange}
-            isLoading={isLoading}
-            results={results}
-            onSelect={(c) => {
-              if (c.kind === 'hold') setSelected(c.data)
-            }}
-          />
-        )}
+        <HoldSelectionStep
+          selected={selected}
+          onClear={handleClearSelection}
+          query={query}
+          onQueryChange={handleQueryChange}
+          isLoading={isLoading}
+          results={results}
+          onSelect={(c) => {
+            if (c.kind === 'hold') setSelected(c.data)
+          }}
+        />
 
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)}>

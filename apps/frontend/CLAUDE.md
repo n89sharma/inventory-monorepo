@@ -59,11 +59,28 @@ nullable fields start `null`). The `*-api.ts` file bridges them.
 
 ## JSX conditionals
 
-- **Binary (show or fallback):** use a Guard component (`condition`, `fallback`, `children`).
-  Ref: `components/custom/asset-details/optional-section.tsx`. Use `?.` inside children (not `!`)
-  — children are evaluated eagerly. Use a ternary, never `&&` (which can render `0`/`false`).
-- **Three+ states (loading / empty / content):** extract a dedicated component with early
-  returns — never nest ternaries.
+Use the four techniques from the [React docs](https://react.dev/learn/conditional-rendering),
+picked by readability:
+
+1. **`if`/`else` with early `return`** — the most explicit; use it to return entirely different
+   trees. Extract a named sub-component when the branches carry real markup.
+
+2. **Ternary `? :`** — for two branches inline (a string, a number, or a single element vs
+   `null`). Use in moderation; extract a child component once it nests or grows.
+
+3. **Logical `&&`** — render something or nothing. Keep the left side a real boolean: write
+   `count > 0 && <X/>`, never `count && <X/>` (a `0`/`NaN` left side renders literally as `0`).
+
+4. **Returning `null`** — hide a component. Prefer excluding the component in the parent over
+   returning `null` from it.
+
+**Hard project rule (enforced by lint — `no-restricted-syntax`):** never use a ternary to switch
+between two rendered components. `cond ? <A/> : <B/>` is banned and fails the build. Extract a
+named sub-component that early-returns each branch (technique 1) so the parent reads as
+composition. `cond ? <A/> : null` is allowed (that's technique 2/3, not a two-component switch).
+Never nest ternaries. For the eager-children gotcha (a Guard component evaluates its `children`
+prop before the condition), use `?.` inside children, not `!` — ref
+`components/custom/asset-details/optional-section.tsx`.
 
 ## Patterns
 

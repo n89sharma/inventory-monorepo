@@ -12,6 +12,31 @@ import { SearchPopoverContent, type FlatResult } from './search-popover-content'
 const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoices'] as const
 type Tab = (typeof tabs)[number]
 
+function SearchInputAdornment({ query, onClear }: { query: string; onClear: () => void }) {
+  if (query) {
+    return (
+      <button
+        onClick={onClear}
+        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+        tabIndex={-1}
+        aria-label="Clear search"
+      >
+        <XIcon className="size-4" />
+      </button>
+    )
+  }
+  return (
+    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
+      <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
+        Ctrl
+      </kbd>
+      <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
+        K
+      </kbd>
+    </div>
+  )
+}
+
 export const GlobalSearch = ({ className }: { className?: string }) => {
   const [query, setQuery] = useState('')
   const { results, isLoading } = useGlobalSearch(query)
@@ -99,25 +124,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
               onKeyDown={handleKeyDown}
               className="pl-8 pr-20"
             />
-            {query ? (
-              <button
-                onClick={clearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                tabIndex={-1}
-                aria-label="Clear search"
-              >
-                <XIcon className="size-4" />
-              </button>
-            ) : (
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
-                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
-                  Ctrl
-                </kbd>
-                <kbd className="inline-flex items-center rounded border border-border bg-muted px-1 py-px text-[10px] font-medium text-muted-foreground">
-                  K
-                </kbd>
-              </div>
-            )}
+            <SearchInputAdornment query={query} onClear={clearSearch} />
           </div>
         </PopoverAnchor>
         <PopoverContent

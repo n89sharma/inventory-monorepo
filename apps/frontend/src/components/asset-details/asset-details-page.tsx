@@ -135,6 +135,11 @@ function RailField({ label, children }: { label: string; children: React.ReactNo
   )
 }
 
+function ErrorStatusBadge({ isFixed }: { isFixed: boolean }) {
+  if (isFixed) return <Badge variant="success">Fixed</Badge>
+  return <Badge variant="destructive">Open</Badge>
+}
+
 type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
 
 function buildAssetLifecycle(
@@ -419,11 +424,7 @@ export const AssetDetailsPage = () => {
                         label={e.code}
                         rowClassName={ROW_GAP}
                       >
-                        {e.is_fixed ? (
-                          <Badge variant="success">Fixed</Badge>
-                        ) : (
-                          <Badge variant="destructive">Open</Badge>
-                        )}
+                        <ErrorStatusBadge isFixed={e.is_fixed} />
                       </DataRow>
                     ))}
                   </DataRowContainer>

@@ -71,17 +71,16 @@ function AssetHistoryUpdateEntry({ record }: { record: UpdateRecord }) {
   )
 }
 
+function AssetHistoryEntry({ record }: { record: AssetHistoryRecord }) {
+  if (record.action_type === 'CREATE') return <AssetHistoryCreateEntry record={record} />
+  return <AssetHistoryUpdateEntry record={record} />
+}
+
 export function AssetHistoryList({ history }: { history: AssetHistory }) {
   return (
     <HistoryTimeline
       items={history}
-      renderEntry={(record) =>
-        record.action_type === 'CREATE' ? (
-          <AssetHistoryCreateEntry record={record} />
-        ) : (
-          <AssetHistoryUpdateEntry record={record} />
-        )
-      }
+      renderEntry={(record) => <AssetHistoryEntry record={record} />}
     />
   )
 }
