@@ -13,7 +13,7 @@ import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
 import type { AssetCost, AssetSummary } from 'shared-types'
-import { createIdColumn, createSelectColumn } from './shared-columns'
+import { createIdColumn, createSelectColumn, sortableHeader } from './shared-columns'
 
 export function createAssetSummaryColumns(
   getHref: (asset: AssetSummary) => string,
@@ -25,7 +25,7 @@ export function createAssetSummaryColumns(
     createSelectColumn<AssetSummary>(),
     createIdColumn<AssetSummary>({
       accessorKey: 'barcode',
-      header: 'Barcode',
+      header: sortableHeader<AssetSummary>('Barcode'),
       href: getHref,
       value: (row) => row.barcode,
     }),
@@ -37,13 +37,13 @@ export function createAssetSummaryColumns(
     },
     {
       accessorKey: 'model',
-      header: 'Model',
+      header: sortableHeader<AssetSummary>('Model'),
       filterFn: 'includesString',
       size: 100,
     },
     {
       accessorKey: 'serial_number',
-      header: 'Serial Number',
+      header: sortableHeader<AssetSummary>('Serial Number'),
       filterFn: 'includesString',
       size: 100,
     },

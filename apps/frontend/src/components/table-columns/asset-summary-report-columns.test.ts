@@ -1,4 +1,5 @@
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
+import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { AssetSummary } from 'shared-types'
 import {
@@ -13,15 +14,30 @@ import {
 } from './asset-summary-report-columns'
 
 const CREATED_AT_HEADER = 'Created'
+const ACTION_COLUMN_IDS = new Set(['select', 'edit', 'delete'])
 
-// The report must mirror exactly the columns the user sees, so pull the headers
-// straight off the live TanStack column defs: keep string headers (drops the
-// select checkbox / edit / delete action columns) and the hidden created_at.
+function headerLabel(column: ColumnDef<AssetSummary>): string {
+  const header = column.header
+  if (typeof header === 'string') return header
+  if (typeof header === 'function') {
+    const context = {
+      column: { toggleSorting: () => {}, getIsSorted: () => false },
+    } as unknown as HeaderContext<AssetSummary, unknown>
+    const node = header(context)
+    if (isValidElement(node)) return (node.props as { label?: string }).label ?? ''
+  }
+  return ''
+}
+
+// The report must mirror exactly the columns the user sees, so pull the labels
+// straight off the live TanStack column defs: skip the select / edit / delete
+// action columns and the hidden created_at, and resolve sortable (function)
+// headers to their label.
 function visibleTableHeaders(columns: ColumnDef<AssetSummary>[]): string[] {
   return columns
-    .map((column) => column.header)
-    .filter((header): header is string => typeof header === 'string')
-    .filter((header) => header !== CREATED_AT_HEADER)
+    .filter((column) => !ACTION_COLUMN_IDS.has(column.id ?? ''))
+    .map(headerLabel)
+    .filter((label) => label !== '' && label !== CREATED_AT_HEADER)
 }
 
 const noHref = () => ''
