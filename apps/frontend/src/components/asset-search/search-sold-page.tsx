@@ -53,9 +53,9 @@ export function SearchSoldPage(): React.JSX.Element {
               variant="outline"
               pressed={showOther}
               onPressedChange={setShowOther}
-              aria-label="Show harvested and scrapped assets"
+              aria-label="Show scrapped assets"
             >
-              {showOther ? 'Show Sold' : 'Show Harvested/Scrapped'}
+              {showOther ? 'Show Sold' : 'Show Scrapped'}
             </Toggle>
             <DepartedDateRangeFilter from={from} to={to} onChange={setRange} />
             <CustomerFilter

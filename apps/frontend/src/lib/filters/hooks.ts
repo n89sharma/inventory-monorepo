@@ -506,8 +506,10 @@ export function isValidSoldDateRange(from: Date, to: Date): boolean {
 }
 
 export function resolveSoldStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
-  const wanted = new Set<string>(
-    showOther ? [OUTGOING_STATUS.HARVESTED, OUTGOING_STATUS.SCRAPPED] : [OUTGOING_STATUS.SOLD],
-  )
-  return allStatuses.filter((status) => wanted.has(status.status))
+  const wanted = showOther ? OUTGOING_STATUS.SCRAPPED : OUTGOING_STATUS.SOLD
+  return allStatuses.filter((status) => status.status === wanted)
+}
+
+export function resolveHarvestedStatuses(allStatuses: Status[]): Status[] {
+  return allStatuses.filter((status) => status.status === OUTGOING_STATUS.HARVESTED)
 }
