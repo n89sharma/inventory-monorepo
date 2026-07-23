@@ -41,7 +41,7 @@ type InvoiceCreateState = {
   invoice_reference: string
   organization_id: number
   invoice_type_id: number
-  created_at: Date
+  invoice_date: string
 }
 
 type TransferCreateState = {
@@ -118,6 +118,8 @@ type HoldUpdateFields = Partial<{
 type InvoiceUpdateFields = Partial<{
   organization_id: number
   is_cleared: boolean
+  invoice_reference: string
+  invoice_date: string
 }>
 
 type TransferUpdateFields = Partial<{
@@ -518,6 +520,8 @@ const INVOICE_UPDATE_SPEC: FieldSpec[] = [
     bothRequired: true,
   },
   { field: 'is_cleared' },
+  { field: 'invoice_reference' },
+  { field: 'invoice_date' },
 ]
 
 const TRANSFER_UPDATE_SPEC: FieldSpec[] = [
@@ -561,7 +565,7 @@ const INVOICE_CREATE_SPEC: CreateFieldSpec<InvoiceCreateState>[] = [
   { out: 'invoice_reference', value: (s) => s.invoice_reference },
   { out: 'customer_name', resolve: 'organization', id: (s) => s.organization_id },
   { out: 'invoice_type', resolve: 'invoiceType', id: (s) => s.invoice_type_id },
-  { out: 'created_at', value: (s) => s.created_at },
+  { out: 'invoice_date', value: (s) => s.invoice_date },
 ]
 
 const TRANSFER_CREATE_SPEC: CreateFieldSpec<TransferCreateState>[] = [

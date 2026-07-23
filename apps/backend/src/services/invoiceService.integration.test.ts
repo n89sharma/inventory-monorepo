@@ -91,17 +91,61 @@ describe('invoiceService', () => {
 
     await patchInvoiceMetadata(
       invoiceNumber,
-      { organization: refs.customer, is_cleared: created.is_cleared, comment: 'updated note' },
+      {
+        organization: refs.customer,
+        invoice_reference: created.invoice_reference,
+        invoice_date: created.invoice_date,
+        is_cleared: created.is_cleared,
+        comment: 'updated note',
+      },
       refs.userId,
     )
     expect((await getInvoice(invoiceNumber, 'admin')).notes).toBe('updated note')
 
     await patchInvoiceMetadata(
       invoiceNumber,
-      { organization: refs.customer, is_cleared: created.is_cleared, comment: null },
+      {
+        organization: refs.customer,
+        invoice_reference: created.invoice_reference,
+        invoice_date: created.invoice_date,
+        is_cleared: created.is_cleared,
+        comment: null,
+      },
       refs.userId,
     )
     expect((await getInvoice(invoiceNumber, 'admin')).notes).toBeNull()
+  })
+
+  it('persists invoice_date on create and edits date + reference via metadata patch', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      {
+        ...buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+        invoice_reference: 'REF-BEFORE',
+        invoice_date: '2026-01-15',
+      },
+      refs.userId,
+    )
+
+    const created = await getInvoice(invoiceNumber, 'admin')
+    expect(created.invoice_date).toBe('2026-01-15')
+    expect(created.invoice_reference).toBe('REF-BEFORE')
+
+    await patchInvoiceMetadata(
+      invoiceNumber,
+      {
+        organization: refs.customer,
+        invoice_reference: 'REF-AFTER',
+        invoice_date: '2026-02-20',
+        is_cleared: created.is_cleared,
+        comment: created.notes,
+      },
+      refs.userId,
+    )
+
+    const updated = await getInvoice(invoiceNumber, 'admin')
+    expect(updated.invoice_date).toBe('2026-02-20')
+    expect(updated.invoice_reference).toBe('REF-AFTER')
   })
 
   it('returns asset cost, redacted by role permissions', async () => {

@@ -9,6 +9,7 @@ import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import { useCan } from '@/hooks/use-can'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
+import { parseISO } from 'date-fns'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { INVOICE_TYPE, type AssetSummary } from 'shared-types'
@@ -60,7 +61,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
             value={invoice.customer.name}
           />
           <SummaryField label="System Invoice Number" value={invoiceNumber} />
-          <SummaryField label="Date" value={formatDate(invoice.created_at)} />
+          <SummaryField label="Date" value={formatDate(parseISO(invoice.invoice_date))} />
           <SummaryField label="Type" value={formatTitleCase(invoice.invoice_type.type)} />
         </>
       )}

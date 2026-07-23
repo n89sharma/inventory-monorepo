@@ -4,6 +4,7 @@ import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceMetadataFormSchema, type InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { parseISO, startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { INVOICE_TYPE, type InvoiceDetail } from 'shared-types'
@@ -11,9 +12,10 @@ import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Checkbox } from '../shadcn/checkbox'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
+import { Field, FieldError, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Input } from '../shadcn/input'
 import { Textarea } from '../shadcn/textarea'
+import { ControlledDatePickerField } from '../shared/date-picker'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
@@ -32,6 +34,7 @@ export function EditInvoiceMetadataModal({
 }: EditInvoiceMetadataModalProps): React.JSX.Element {
   const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const today = startOfDay(new Date())
 
   const values = useMemo(() => toFormValues(invoice), [invoice])
   const form = useForm<InvoiceMetadataForm>({
@@ -74,14 +77,29 @@ export function EditInvoiceMetadataModal({
               <FieldLabel>Invoice Number</FieldLabel>
               <Input value={invoice.invoice_number} disabled readOnly />
             </Field>
-            <Field>
-              <FieldLabel>Invoice Reference</FieldLabel>
-              <Input value={invoice.invoice_reference} disabled readOnly />
-            </Field>
+            <Controller
+              control={form.control}
+              name="invoice_reference"
+              render={({ field, fieldState }) => (
+                <Field>
+                  <FieldLabel>Invoice Reference</FieldLabel>
+                  <Input placeholder="e.g. INV-001" aria-invalid={fieldState.invalid} {...field} />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
             <Field>
               <FieldLabel>Invoice Type</FieldLabel>
               <Input value={formatTitleCase(invoice.invoice_type.type)} disabled readOnly />
             </Field>
+            <ControlledDatePickerField
+              control={form.control}
+              name="invoice_date"
+              label="Invoice Date"
+              className="self-end pb-0.5"
+              disabled={{ after: today }}
+              endMonth={today}
+            />
             <ControlledSearchSelectInput
               control={form.control}
               name="organization"
@@ -141,6 +159,8 @@ export function EditInvoiceMetadataModal({
 
 function toFormValues(i: InvoiceDetail): InvoiceMetadataForm {
   return {
+    invoice_reference: i.invoice_reference,
+    invoice_date: parseISO(i.invoice_date),
     organization: {
       id: i.customer.id,
       account_number: i.customer.account_number,

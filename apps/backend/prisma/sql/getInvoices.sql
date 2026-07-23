@@ -31,6 +31,6 @@ from "Invoice" i
     where ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id
   ) ac on true
 where it.type = $3
-  and i.created_at between $1 and $2
-order by i.created_at desc
+  and i.invoice_date between $1 and $2
+order by i.invoice_date desc
 limit 500

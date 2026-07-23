@@ -1,5 +1,6 @@
 import { Button } from '@/components/shadcn/button'
 import { Calendar } from '@/components/shadcn/calendar'
+import { Field, FieldError } from '@/components/shadcn/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   getSelectedOrNull,
@@ -10,6 +11,7 @@ import {
 } from '@/ui-types/select-option-types'
 import { format } from 'date-fns'
 import type { Matcher } from 'react-day-picker'
+import { useController, type Control, type FieldValues, type Path } from 'react-hook-form'
 
 interface DatePickerFieldProps {
   label: string
@@ -56,5 +58,43 @@ export function DatePickerFieldInline({
         />
       </PopoverContent>
     </Popover>
+  )
+}
+
+interface ControlledDatePickerFieldProps<TForm extends FieldValues> {
+  control: Control<TForm>
+  name: Path<TForm>
+  label: string
+  className?: string
+  disabled?: Matcher | Matcher[]
+  startMonth?: Date
+  endMonth?: Date
+}
+
+export function ControlledDatePickerField<TForm extends FieldValues>({
+  control,
+  name,
+  label,
+  className,
+  disabled,
+  startMonth,
+  endMonth,
+}: ControlledDatePickerFieldProps<TForm>): React.JSX.Element {
+  const { field, fieldState } = useController({ control, name })
+  const value = field.value as Date | null
+
+  return (
+    <Field data-invalid={fieldState.invalid} className={className}>
+      <DatePickerFieldInline
+        id={name}
+        label={label}
+        date={value ? getSelectOption(value) : UNSELECTED}
+        setDate={(d) => field.onChange(getSelectedOrNull(d))}
+        disabled={disabled}
+        startMonth={startMonth}
+        endMonth={endMonth}
+      />
+      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+    </Field>
   )
 }

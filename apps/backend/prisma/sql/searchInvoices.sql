@@ -9,5 +9,5 @@ from "Invoice" i
   join "Organization" o on o.id = i.organization_id
   join "InvoiceType" it on it.id = i.invoice_type_id
 where i.invoice_number like $1 || '%'
-order by i.created_at desc
+order by i.invoice_date desc
 limit 3

@@ -327,6 +327,7 @@ export function buildCreateInvoiceInput(
 ): CreateInvoice {
   return {
     invoice_reference: 'TEST-REF',
+    invoice_date: '2026-01-15',
     organization_id: refs.customer.id,
     invoice_type_id: invoiceTypeId,
     is_cleared: isCleared,

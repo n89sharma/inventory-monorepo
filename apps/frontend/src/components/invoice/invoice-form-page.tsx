@@ -15,6 +15,7 @@ import { Textarea } from '@/components/shadcn/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
+import { ControlledDatePickerField } from '@/components/shared/date-picker'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useOrgStore } from '@/data/store/org-store'
@@ -25,6 +26,7 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { InvoiceFormSchema, type InvoiceForm } from '@/ui-types/invoice-form-types'
 import { getSelectedOrNull, getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { startOfDay } from 'date-fns'
 import { useMemo } from 'react'
 import {
   Controller,
@@ -70,12 +72,14 @@ export function InvoiceFormPage({
   const orgs = useOrgStore((state) => state.organizations)
   const invoiceTypes = useReferenceDataStore((state) => state.invoiceTypes)
   const purchaseType = invoiceTypes.find((t) => t.type === INVOICE_TYPE.purchase)
+  const today = startOfDay(new Date())
 
   const form = useForm<InvoiceForm>({
     resolver: zodResolver(InvoiceFormSchema),
     mode: 'onChange',
     defaultValues: {
       invoice_reference: '',
+      invoice_date: startOfDay(new Date()),
       organization: null,
       invoice_type: purchaseType ? getSelectOption(purchaseType) : UNSELECTED,
       is_cleared: false,
@@ -146,6 +150,15 @@ export function InvoiceFormPage({
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
+                />
+
+                <ControlledDatePickerField
+                  control={form.control}
+                  name="invoice_date"
+                  label="Invoice Date"
+                  className="max-w-60"
+                  disabled={{ after: today }}
+                  endMonth={today}
                 />
 
                 <ControlledSearchSelectInput

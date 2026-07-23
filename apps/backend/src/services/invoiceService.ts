@@ -30,6 +30,10 @@ import {
 const INVOICE_NUMBER_PREFIX = 'I-'
 const INVOICE_NUMBER_PAD = 7
 
+function toYmd(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
 async function getNewInvoiceNumber(): Promise<string> {
   const sequence = await getNextSequence('invoice')
   return `${INVOICE_NUMBER_PREFIX}${String(sequence).padStart(INVOICE_NUMBER_PAD, '0')}`
@@ -64,7 +68,6 @@ export async function createInvoice(
   userId: number,
 ): Promise<{ invoiceNumber: string }> {
   const assetIds = data.assets.map((a) => a.id)
-  const now = new Date()
 
   const invoiceType = await prisma.invoiceType.findUniqueOrThrow({
     where: { id: data.invoice_type_id },
@@ -82,7 +85,7 @@ export async function createInvoice(
         is_cleared: data.is_cleared,
         notes: data.comment,
         invoice_type_id: data.invoice_type_id,
-        created_at: now,
+        invoice_date: new Date(data.invoice_date),
       },
     })
 
@@ -111,7 +114,7 @@ export async function createInvoice(
       invoice_reference: data.invoice_reference,
       organization_id: data.organization_id,
       invoice_type_id: data.invoice_type_id,
-      created_at: now,
+      invoice_date: data.invoice_date,
     },
     userId,
   )
@@ -129,7 +132,13 @@ export async function patchInvoiceMetadata(
 ): Promise<void> {
   const current = await prisma.invoice.findUnique({
     where: { invoice_number: invoiceNumber },
-    select: { id: true, organization_id: true, is_cleared: true },
+    select: {
+      id: true,
+      organization_id: true,
+      is_cleared: true,
+      invoice_reference: true,
+      invoice_date: true,
+    },
   })
   if (!current) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
 
@@ -139,6 +148,8 @@ export async function patchInvoiceMetadata(
       organization_id: metadata.organization.id,
       is_cleared: metadata.is_cleared,
       notes: metadata.comment,
+      invoice_reference: metadata.invoice_reference,
+      invoice_date: new Date(metadata.invoice_date),
     },
   })
 
@@ -147,10 +158,14 @@ export async function patchInvoiceMetadata(
     {
       organization_id: current.organization_id,
       is_cleared: current.is_cleared,
+      invoice_reference: current.invoice_reference,
+      invoice_date: toYmd(current.invoice_date),
     },
     {
       organization_id: metadata.organization.id,
       is_cleared: metadata.is_cleared,
+      invoice_reference: metadata.invoice_reference,
+      invoice_date: metadata.invoice_date,
     },
     userId,
   )
@@ -234,6 +249,7 @@ export async function getInvoice(
     invoice_type: { id: invoice.invoice_type.id, type: invoice.invoice_type.type },
     is_cleared: invoice.is_cleared,
     notes: invoice.notes,
+    invoice_date: toYmd(invoice.invoice_date),
     created_at: invoice.created_at,
     created_by: {
       id: invoice.updated_by.id,

@@ -3432,6 +3432,7 @@ export const InvoiceScalarFieldEnum = {
   organization_id: 'organization_id',
   updated_by_id: 'updated_by_id',
   is_cleared: 'is_cleared',
+  invoice_date: 'invoice_date',
   created_at: 'created_at',
   invoice_type_id: 'invoice_type_id'
 } as const

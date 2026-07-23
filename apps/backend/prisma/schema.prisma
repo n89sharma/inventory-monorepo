@@ -399,7 +399,8 @@ model Invoice {
   organization_id   Int
   updated_by_id     Int
   is_cleared        Boolean
-  created_at        DateTime
+  invoice_date      DateTime @db.Date
+  created_at        DateTime @default(now())
   invoice_type_id   Int
 
   invoice_type    InvoiceType  @relation(fields: [invoice_type_id], references: [id])
@@ -408,6 +409,7 @@ model Invoice {
   purchase_assets Asset[]      @relation("PurchaseInvoice")
   sales_assets    Asset[]      @relation("SalesInvoice")
 
+  @@index([invoice_date(sort: Desc)])
   @@index([created_at(sort: Desc)])
   @@index([invoice_type_id])
   @@index([invoice_number])
