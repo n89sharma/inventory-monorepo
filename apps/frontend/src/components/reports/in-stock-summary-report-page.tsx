@@ -29,7 +29,6 @@ import type { AssetType, Brand, InStockSummaryReport, ModelSummary, Warehouse } 
 
 const EMPTY_ROWS: InStockSummaryReport = []
 const DEFAULT_SORT = { id: 'asset_count', desc: true }
-const TABLE_PAGE_SIZE = 50
 
 type InStockSummaryFilters = {
   warehouses: Warehouse[]
@@ -103,7 +102,6 @@ function InStockSummaryBody({
         getSubRows={getSubRows}
         getRowHref={getRowHref}
         columnVisibility={columnVisibility}
-        initialPageSize={TABLE_PAGE_SIZE}
       />
     </div>
   )

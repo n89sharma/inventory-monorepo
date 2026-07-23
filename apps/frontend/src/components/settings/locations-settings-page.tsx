@@ -72,7 +72,6 @@ export function LocationsSettingsPage(): React.JSX.Element {
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         pinLeft={LOCATION_PIN_LEFT}
-        initialPageSize={50}
         defaultSort={LOCATION_DEFAULT_SORT}
         renderTableFilter={(table) => (
           <>

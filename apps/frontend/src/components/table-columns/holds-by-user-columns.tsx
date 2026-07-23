@@ -80,28 +80,24 @@ export const HOLDS_BY_USER_COLUMNS: ColumnDef<HoldsReportRow>[] = [
     id: 'label',
     header: 'Salesperson / Customer',
     cell: ({ row }) => <LabelCell row={row} />,
-    size: 300,
     meta: { cellClassName: 'text-left' },
   },
   {
     id: 'assetCount',
     header: 'Assets',
     cell: ({ row }) => row.original.assetCount,
-    size: 80,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
     id: 'holdCount',
     header: 'Holds',
     cell: ({ row }) => row.original.holdCount,
-    size: 80,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
     id: 'medianHeldDays',
     header: 'Median Held Days',
     cell: ({ row }) => formatDays(row.original.medianHeldDays),
-    size: 140,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
 ]

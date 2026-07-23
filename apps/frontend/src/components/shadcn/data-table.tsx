@@ -68,7 +68,6 @@ interface DataTableProps<TData, TValue> {
   sorting?: SortingState
   onSortingChange?: OnChangeFn<SortingState>
   getRowId?: (originalRow: TData, index: number) => string
-  initialPageSize?: number
   defaultSort?: { id: string; desc: boolean }
   pinLeft?: string[]
   getRowHref?: (row: TData) => string
@@ -78,6 +77,8 @@ interface DataTableProps<TData, TValue> {
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
   onSelectionChange?: (selection: DataTableSelection<TData>) => void
 }
+
+const DEFAULT_PAGE_SIZE = 75
 
 const CELL_BG =
   'bg-[var(--row-bg,var(--color-background))] ' +
@@ -127,7 +128,6 @@ export function DataTable<TData, TValue>({
   sorting: controlledSorting,
   onSortingChange: onControlledSortingChange,
   getRowId,
-  initialPageSize = 25,
   defaultSort,
   pinLeft,
   getRowHref,
@@ -152,6 +152,7 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    defaultColumn: { size: undefined },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange,
@@ -176,7 +177,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: initialPageSize,
+        pageSize: DEFAULT_PAGE_SIZE,
         pageIndex: 0,
       },
       columnPinning: { left: pinLeft ?? [], right: [] },
@@ -219,7 +220,7 @@ export function DataTable<TData, TValue>({
           </div>
         )}
         <div className="overflow-x-auto">
-          <Table className="table-fixed w-full" style={{ minWidth: table.getTotalSize() }}>
+          <Table className={`table-auto w-max min-w-full`}>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -227,8 +228,11 @@ export function DataTable<TData, TValue>({
                     return (
                       <TableHead
                         key={header.id}
-                        style={{ width: header.getSize(), ...headerStickyStyle(header.column) }}
-                        className={`whitespace-normal text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                        style={{
+                          width: header.column.columnDef.size,
+                          ...headerStickyStyle(header.column),
+                        }}
+                        className={`whitespace-nowrap text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -362,8 +366,8 @@ function DataRowImpl<TData>({
       {row.getVisibleCells().map((cell) => (
         <TableCell
           key={cell.id}
-          style={{ width: cell.column.getSize(), ...pinStyle(cell.column) }}
-          className={`relative whitespace-normal text-center ${CELL_BG} ${pinShadowClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
+          style={{ width: cell.column.columnDef.size, ...pinStyle(cell.column) }}
+          className={`relative whitespace-nowrap text-center ${CELL_BG} ${pinShadowClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>

@@ -33,31 +33,26 @@ export function createAssetSummaryColumns(
       accessorKey: 'brand',
       header: 'Brand',
       cell: ({ row }) => formatTitleCase(row.original.brand),
-      size: 80,
     },
     {
       accessorKey: 'model',
       header: sortableHeader<AssetSummary>('Model'),
       filterFn: 'includesString',
-      size: 100,
     },
     {
       accessorKey: 'serial_number',
       header: sortableHeader<AssetSummary>('Serial Number'),
       filterFn: 'includesString',
-      size: 100,
     },
     {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
-      size: 80,
     },
     {
       accessorKey: 'readiness',
       header: 'Readiness',
       cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
-      size: 80,
     },
     {
       accessorKey: 'meter_total',
@@ -65,30 +60,27 @@ export function createAssetSummaryColumns(
         return formatThousandsK(row.getValue('meter_total'))
       },
       header: 'Total Meter',
-      size: 80,
     },
     {
       accessorKey: 'cassettes',
       header: 'Cassettes',
       cell: ({ row }) => row.original.cassettes ?? '',
-      size: 70,
     },
     {
       accessorKey: 'internal_finisher',
       header: 'Internal Finisher',
       cell: ({ row }) => row.original.internal_finisher ?? '',
-      size: 90,
     },
     {
       accessorKey: 'accessories',
       header: 'Accessories',
       cell: ({ row }) => row.original.accessories.join(', '),
-      size: 140,
     },
     {
       id: 'location',
-      header: 'Location',
-      cell: ({ row }) => formatLocation(row.original.location, row.original.is_in_transit),
+      accessorFn: (row) => formatLocation(row.location, row.is_in_transit),
+      header: sortableHeader<AssetSummary>('Location'),
+      cell: ({ getValue }) => getValue<string>(),
     },
     // Hidden by default (see collection-detail-page columnVisibility); defined so
     // the detail tables can default-sort by asset creation date.
@@ -96,7 +88,6 @@ export function createAssetSummaryColumns(
       accessorKey: 'created_at',
       header: 'Created',
       cell: ({ row }) => formatDate(row.original.created_at),
-      size: 100,
     },
   ]
 
@@ -114,7 +105,6 @@ export function createAssetSummaryColumns(
           <PencilSimpleIcon />
         </Button>
       ),
-      size: 50,
       enableSorting: false,
       enableHiding: false,
     })
@@ -135,7 +125,6 @@ export function createAssetSummaryColumns(
           <TrashIcon />
         </Button>
       ),
-      size: 50,
       enableSorting: false,
       enableHiding: false,
     })
@@ -160,7 +149,6 @@ function createInvoiceColumn(
         </Link>
       )
     },
-    size: 70,
   }
 }
 
@@ -226,7 +214,6 @@ function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<Ass
     id: field,
     header,
     cell: ({ row }) => formatUSDWithSymbol(row.original.cost?.[field] ?? null),
-    size: 90,
   }
 }
 

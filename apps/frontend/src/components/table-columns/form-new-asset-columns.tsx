@@ -21,40 +21,33 @@ export function getNewAssetTableColumns({
       accessorKey: 'model.brand_name',
       header: 'Brand',
       cell: ({ row }) => formatTitleCase(row.original.model?.brand_name ?? ''),
-      size: 80,
     },
     {
       accessorKey: 'model.model_name',
       header: 'Model',
-      size: 120,
     },
     {
       accessorKey: 'serialNumber',
       header: 'Serial Number',
-      size: 100,
     },
     {
       accessorKey: 'meterBlack',
       header: 'Meter Black',
       cell: ({ row }) => formatThousandsK(row.getValue('meterBlack')),
-      size: 70,
     },
     {
       accessorKey: 'meterColour',
       header: 'Meter Colour',
       cell: ({ row }) => formatThousandsK(row.getValue('meterColour')),
-      size: 70,
     },
     {
       id: 'component',
       header: 'Internal Finisher',
       accessorFn: (row) => formatTitleCase(row.component?.name ?? ''),
-      size: 70,
     },
     {
       accessorKey: 'cassettes',
       header: 'Cassettes',
-      size: 70,
     },
     {
       accessorKey: 'readiness.selected.status',
@@ -62,7 +55,6 @@ export function getNewAssetTableColumns({
       cell: ({ row }) => (
         <ReadinessPill status={getSelectedOrNull(row.original.readiness)?.status} />
       ),
-      size: 100,
     },
     {
       accessorKey: 'coreFunctions',
@@ -79,7 +71,6 @@ export function getNewAssetTableColumns({
           </div>
         )
       },
-      size: 140,
     },
     {
       header: 'Edit',
@@ -94,7 +85,6 @@ export function getNewAssetTableColumns({
           <PencilSimpleIcon />
         </Button>
       ),
-      size: 50,
     },
     {
       header: 'Remove',
@@ -108,7 +98,6 @@ export function getNewAssetTableColumns({
           <TrashIcon />
         </Button>
       ),
-      size: 50,
     },
   ]
 }

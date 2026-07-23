@@ -1,5 +1,4 @@
-import { Button } from '@/components/shadcn/button'
-import { ArrowsDownUpIcon } from '@phosphor-icons/react'
+import { sortableHeader } from '@/components/table-columns/shared-columns'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { LocationSummary } from 'shared-types'
 
@@ -8,40 +7,21 @@ export const locationTableColumns: ColumnDef<LocationSummary>[] = [
     accessorKey: 'warehouse_code',
     size: 160,
     filterFn: 'includesString',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Warehouse Code <ArrowsDownUpIcon />
-      </Button>
-    ),
+    header: sortableHeader<LocationSummary>('Warehouse Code'),
   },
   {
     accessorKey: 'warehouse_street',
-    size: 240,
     filterFn: 'includesString',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Warehouse Street <ArrowsDownUpIcon />
-      </Button>
-    ),
+    header: sortableHeader<LocationSummary>('Warehouse Street'),
   },
   {
     accessorKey: 'zone',
-    size: 160,
     filterFn: 'includesString',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Zone <ArrowsDownUpIcon />
-      </Button>
-    ),
+    header: sortableHeader<LocationSummary>('Zone'),
   },
   {
     accessorKey: 'bin',
-    size: 160,
     filterFn: 'includesString',
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Bin <ArrowsDownUpIcon />
-      </Button>
-    ),
+    header: sortableHeader<LocationSummary>('Bin'),
   },
 ]

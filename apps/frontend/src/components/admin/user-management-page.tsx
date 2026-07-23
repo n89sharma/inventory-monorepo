@@ -141,7 +141,6 @@ export function UserManagementPage() {
       <DataTable
         columns={columns}
         data={displayedUsers}
-        initialPageSize={25}
         renderTableFilter={(table) => (
           <>
             <ColumnTextFilter

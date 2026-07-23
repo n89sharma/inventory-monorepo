@@ -43,7 +43,6 @@ export function CatalogSettingsPage(): React.JSX.Element {
       <DataTable
         columns={modelTableColumns}
         data={sortedModels}
-        initialPageSize={50}
         defaultSort={MODEL_DEFAULT_SORT}
         renderTableFilter={(table) => (
           <>

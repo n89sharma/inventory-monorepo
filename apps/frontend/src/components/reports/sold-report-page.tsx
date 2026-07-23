@@ -40,7 +40,6 @@ const RANGE_OPTIONS = [6, 12] as const satisfies readonly SoldReportRange[]
 const NO_MEDIAN = '—'
 const MONTH_YEAR_FORMAT = 'MMM yyyy'
 const SALE_DATE_FORMAT = 'MMMM d, yyyy'
-const TABLE_PAGE_SIZE = 20
 
 const MODEL_SALES_SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
 
@@ -188,7 +187,6 @@ function SoldReportResults({
         defaultSort={{ id: 'departed_at', desc: true }}
         getRowHref={getRowHref}
         columnVisibility={columnVisibility}
-        initialPageSize={TABLE_PAGE_SIZE}
       />
     </div>
   )

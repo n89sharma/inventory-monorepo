@@ -23,11 +23,10 @@ export function transferTableColumns(
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => <TransferStatusBadge status={row.original.status} />,
-      size: 90,
     },
     createdAtColumn as ColumnDef<TransferSummary>,
-    { accessorKey: 'origin_code', header: 'Origin', size: 90 },
-    { accessorKey: 'destination_code', header: 'Destination', size: 90 },
+    { accessorKey: 'origin_code', header: 'Origin' },
+    { accessorKey: 'destination_code', header: 'Destination' },
     {
       accessorKey: 'transporter',
       header: 'Transporter',

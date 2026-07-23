@@ -1,5 +1,6 @@
 import { Button } from '@/components/shadcn/button'
-import { ArrowsDownUpIcon, CheckCircleIcon } from '@phosphor-icons/react'
+import { sortableHeader } from '@/components/table-columns/shared-columns'
+import { CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { User } from 'shared-types'
 
@@ -35,46 +36,21 @@ export function createUserPermissionTableColumns(
   return [
     {
       accessorKey: 'name',
-      size: 180,
       filterFn: 'includesString',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Name <ArrowsDownUpIcon />
-        </Button>
-      ),
+      header: sortableHeader<User>('Name'),
     },
     {
       accessorKey: 'email',
-      size: 220,
       filterFn: 'includesString',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Email <ArrowsDownUpIcon />
-        </Button>
-      ),
+      header: sortableHeader<User>('Email'),
     },
     {
       accessorKey: 'role',
-      size: 160,
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Role <ArrowsDownUpIcon />
-        </Button>
-      ),
+      header: sortableHeader<User>('Role'),
       cell: ({ row }) => row.original.role ?? '',
     },
     {
       id: 'clerk_user',
-      size: 100,
       header: () => <div className="px-3">Clerk user</div>,
       cell: ({ row }) => (
         <div className="flex gap-2 justify-center">
@@ -86,20 +62,11 @@ export function createUserPermissionTableColumns(
     },
     {
       accessorKey: 'is_active',
-      size: 100,
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Status <ArrowsDownUpIcon />
-        </Button>
-      ),
+      header: sortableHeader<User>('Status'),
       cell: ({ row }) => (row.original.is_active ? 'Active' : 'Inactive'),
     },
     {
       id: 'actions',
-      size: 180,
       header: 'Actions',
       cell: ({ row }) => {
         const user = row.original

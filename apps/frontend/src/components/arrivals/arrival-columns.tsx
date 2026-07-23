@@ -20,7 +20,7 @@ export function arrivalTableColumns(
     }),
     createdAtColumn as ColumnDef<ArrivalSummary>,
     createdByColumn as ColumnDef<ArrivalSummary>,
-    { accessorKey: 'destination_code', header: 'Warehouse', size: 80 },
+    { accessorKey: 'destination_code', header: 'Warehouse' },
     {
       accessorKey: 'transporter',
       header: 'Transporter',

@@ -83,45 +83,38 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     header: '',
     enableSorting: false,
     cell: ({ row }) => <ExpanderCell row={row} />,
-    size: 36,
   },
   {
     accessorKey: 'city_code',
     header: 'Warehouse',
     cell: ({ row }) => scopeCell(row, (r) => r.city_code),
-    size: 80,
   },
   {
     accessorKey: 'brand_name',
     header: 'Brand',
     cell: ({ row }) => scopeCell(row, (r) => formatTitleCase(r.brand_name)),
-    size: 100,
   },
   {
     accessorKey: 'asset_type',
     header: 'Asset Type',
     cell: ({ row }) => scopeCell(row, (r) => formatTitleCase(r.asset_type)),
-    size: 100,
   },
   {
     accessorKey: 'model_name',
     header: sortableHeader<InStockSummaryTableRow>('Model'),
     cell: ({ row }) => <ModelCell row={row} />,
     sortingFn: sortByModelName,
-    size: 150,
   },
   {
     id: 'meter_band',
     header: 'Meter Band',
     cell: ({ row }) => meterBandCell(row),
-    size: 100,
   },
   {
     accessorKey: 'avg_purchase_cost',
     header: sortableHeader<InStockSummaryTableRow>('Avg Purchase Cost'),
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_purchase_cost),
     sortingFn: sortByPurchaseCost,
-    size: 120,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
@@ -129,7 +122,6 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     header: sortableHeader<InStockSummaryTableRow>('Avg Total Cost'),
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_total_cost),
     sortingFn: sortByTotalCost,
-    size: 120,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
@@ -137,7 +129,6 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     header: sortableHeader<InStockSummaryTableRow>('Count'),
     cell: ({ row }) => row.original.asset_count,
     sortingFn: sortByModelCount,
-    size: 90,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
@@ -145,6 +136,5 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     header: 'Sold Report',
     enableSorting: false,
     cell: ({ row }) => <SoldReportCell row={row} />,
-    size: 90,
   },
 ]

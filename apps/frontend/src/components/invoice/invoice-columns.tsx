@@ -32,7 +32,6 @@ export function invoiceTableColumns(
     {
       accessorKey: 'is_cleared',
       header: 'Cleared',
-      size: 50,
       cell: ({ row }) => (
         <div className="flex justify-center">
           <Checkbox checked={row.original.is_cleared} />

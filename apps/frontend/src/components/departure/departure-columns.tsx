@@ -20,7 +20,7 @@ export function departureTableColumns(
     }),
     createdAtColumn as ColumnDef<DepartureSummary>,
     createdByColumn as ColumnDef<DepartureSummary>,
-    { accessorKey: 'origin_code', header: 'Warehouse', size: 90 },
+    { accessorKey: 'origin_code', header: 'Warehouse' },
     {
       accessorKey: 'transporter',
       header: 'Transporter',
