@@ -1,4 +1,4 @@
-import { sortableHeader } from '@/components/table-columns/shared-columns'
+import { sortableHeader } from '@/components/table-columns/column-primitives'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { LocationSummary } from 'shared-types'
 

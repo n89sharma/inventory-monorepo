@@ -13,7 +13,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
-import { createIdColumn, sortableHeader } from './shared-columns'
+import { createIdColumn, sortableHeader } from './column-primitives'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 

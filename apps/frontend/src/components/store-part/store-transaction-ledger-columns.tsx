@@ -1,5 +1,5 @@
 import { DestinationCell } from '@/components/store-part/destination-cell'
-import { sortableHeader } from '@/components/table-columns/shared-columns'
+import { sortableHeader } from '@/components/table-columns/column-primitives'
 import { formatDate, formatUSD } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { StoreTransactionRow } from 'shared-types'

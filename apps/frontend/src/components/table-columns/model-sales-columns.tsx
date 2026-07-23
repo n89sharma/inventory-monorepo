@@ -1,4 +1,4 @@
-import { createIdColumn, sortableHeader } from './shared-columns'
+import { createIdColumn, sortableHeader } from './column-primitives'
 import { Badge } from '@/components/shadcn/badge'
 import {
   formatDate,

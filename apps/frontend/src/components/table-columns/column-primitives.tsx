@@ -1,12 +1,9 @@
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { AssetTypeBreakdown } from '@/components/shared/asset-type-breakdown'
-import { formatDate } from '@/lib/formatters'
 import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef, HeaderContext, SortDirection } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import type { CollectionSummarySchema } from 'shared-types'
 
 const ID_COLUMN_SIZE = 120
 export const SELECT_COLUMN_SIZE = 44
@@ -122,27 +119,4 @@ export function sortableHeader<TData>(label: string) {
       onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
     />
   )
-}
-
-export const createdAtColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: 'created_at',
-  cell: ({ getValue }) => {
-    const date = getValue<Date>()
-    return date ? formatDate(date) : '-'
-  },
-  header: sortableHeader<CollectionSummarySchema>('Date'),
-  size: 140,
-}
-
-export const createdByColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: 'created_by',
-  header: 'Created By',
-  size: 120,
-}
-
-export const assetCountColumn: ColumnDef<CollectionSummarySchema> = {
-  accessorKey: 'asset_count',
-  header: 'Copiers / Total',
-  size: 110,
-  cell: ({ row }) => <AssetTypeBreakdown summary={row.original} />,
 }

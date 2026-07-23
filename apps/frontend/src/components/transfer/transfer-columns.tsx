@@ -1,9 +1,9 @@
+import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
   assetCountColumn,
   createdAtColumn,
   createdByColumn,
-  createIdColumn,
-} from '@/components/table-columns/shared-columns'
+} from '@/components/table-columns/collection-summary-columns'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'

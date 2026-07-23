@@ -41,7 +41,7 @@ import {
 } from '@/components/shadcn/table'
 
 import { Button } from '@/components/shadcn/button'
-import { SELECT_COLUMN_SIZE } from '@/components/table-columns/shared-columns'
+import { SELECT_COLUMN_SIZE } from '@/components/table-columns/column-primitives'
 import {
   CaretDoubleLeftIcon,
   CaretDoubleRightIcon,

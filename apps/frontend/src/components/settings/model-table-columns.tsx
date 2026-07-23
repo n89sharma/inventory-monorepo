@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { sortableHeader } from '@/components/table-columns/shared-columns'
+import { sortableHeader } from '@/components/table-columns/column-primitives'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ModelSummary } from 'shared-types'

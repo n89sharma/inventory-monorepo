@@ -13,7 +13,7 @@ import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
 import type { AssetCost, AssetSummary } from 'shared-types'
-import { createIdColumn, createSelectColumn, sortableHeader } from './shared-columns'
+import { createIdColumn, createSelectColumn, sortableHeader } from './column-primitives'
 
 export function createAssetSummaryColumns(
   getHref: (asset: AssetSummary) => string,

@@ -1,5 +1,5 @@
 import { Button } from '@/components/shadcn/button'
-import { sortableHeader } from '@/components/table-columns/shared-columns'
+import { sortableHeader } from '@/components/table-columns/column-primitives'
 import { CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { User } from 'shared-types'

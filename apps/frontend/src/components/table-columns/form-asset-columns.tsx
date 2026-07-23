@@ -6,7 +6,7 @@ import type { DepartureFormAsset } from '@/ui-types/departure-form-types'
 import { TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AssetSummary } from 'shared-types'
-import { createSelectColumn } from './shared-columns'
+import { createSelectColumn } from './column-primitives'
 
 function getCommonLeadingColumns<T extends AssetSummary>(): ColumnDef<T>[] {
   return [

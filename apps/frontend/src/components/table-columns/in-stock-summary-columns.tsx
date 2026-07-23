@@ -8,7 +8,7 @@ import { soldReportHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
-import { sortableHeader } from './shared-columns'
+import { sortableHeader } from './column-primitives'
 
 function isModelRow(row: InStockSummaryTableRow): row is InStockSummaryModelRow {
   return 'subRows' in row

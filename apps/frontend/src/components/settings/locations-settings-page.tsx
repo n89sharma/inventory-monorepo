@@ -3,7 +3,7 @@ import { locationTableColumns } from '@/components/settings/location-table-colum
 import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shadcn/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
-import { createSelectColumn } from '@/components/table-columns/shared-columns'
+import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { printLocationBarcodes } from '@/data/api/location-api'
 import { useLocations } from '@/hooks/use-locations'
 import { PendingIcon } from '@/components/shared/pending-icon'

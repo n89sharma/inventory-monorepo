@@ -1,5 +1,5 @@
 import { createAssetSearchColumns } from '@/components/table-columns/asset-search-columns'
-import { createSelectColumn } from '@/components/table-columns/shared-columns'
+import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { DataTable } from '@/components/shadcn/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import type {

@@ -1,4 +1,4 @@
-import { createIdColumn, sortableHeader } from '@/components/table-columns/shared-columns'
+import { createIdColumn, sortableHeader } from '@/components/table-columns/column-primitives'
 import { formatDate } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { StorePartSummary } from 'shared-types'
