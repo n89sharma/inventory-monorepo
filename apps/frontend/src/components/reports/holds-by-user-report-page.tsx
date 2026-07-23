@@ -3,7 +3,7 @@ import {
   HOLDS_BY_USER_COLUMNS,
   toHoldsReportRows,
   type HoldsReportRow,
-} from '@/components/table-columns/holds-by-user-columns'
+} from './holds-by-user-table-columns'
 import {
   Table,
   TableBody,
