@@ -1,4 +1,4 @@
-import { ASSET_TABLE_COLUMNS } from '@/components/table-columns/asset-column-registry'
+import { ASSET_COLUMN_REGISTRY } from '@/components/table-columns/asset-column-registry'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 
@@ -12,7 +12,7 @@ export function useColumnVisibility(defaultColumnIds: readonly string[]): {
 
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
-    for (const col of ASSET_TABLE_COLUMNS) {
+    for (const col of ASSET_COLUMN_REGISTRY) {
       out[col.id] = visibleColumns.has(col.id)
     }
     return out

@@ -1,10 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { Input } from '@/components/shadcn/input'
-import {
-  COLUMN_SECTIONS,
-  type AssetTableColumn,
-} from '@/components/table-columns/asset-column-registry'
+import { COLUMN_SECTIONS, type AssetColumn } from '@/components/table-columns/asset-column-registry'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
@@ -17,10 +14,10 @@ type ColumnPickerProps = {
   visibleColSet: Set<string>
   onVisibleChange: (next: Set<string>) => void
   onReset: () => void
-  columns: readonly AssetTableColumn[]
+  columns: readonly AssetColumn[]
 }
 
-function matchesQuery(column: AssetTableColumn, query: string): boolean {
+function matchesQuery(column: AssetColumn, query: string): boolean {
   if (query.length === 0) return true
   return column.label.toLowerCase().includes(query.toLowerCase())
 }
@@ -84,7 +81,7 @@ function ColumnRow({
   isOn,
   onToggle,
 }: {
-  column: AssetTableColumn
+  column: AssetColumn
   isOn: boolean
   onToggle: (checked: boolean) => void
 }): React.JSX.Element {

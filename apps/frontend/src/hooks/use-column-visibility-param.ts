@@ -1,5 +1,5 @@
 import {
-  ASSET_TABLE_COLUMNS,
+  ASSET_COLUMN_REGISTRY,
   DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
   resolveVisibleColumns,
 } from '@/components/table-columns/asset-column-registry'
@@ -44,7 +44,7 @@ export function useColumnVisibilityParam(navContext: SearchList): {
 
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
-    for (const col of ASSET_TABLE_COLUMNS) out[col.id] = visibleColumns.has(col.id)
+    for (const col of ASSET_COLUMN_REGISTRY) out[col.id] = visibleColumns.has(col.id)
     return out
   }, [visibleColumns])
 
