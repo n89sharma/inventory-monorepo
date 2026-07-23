@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { getDepartureFormAssetColumns } from '@/components/table-columns/form-asset-columns'
+import { getDepartureFormAssetColumns } from '@/components/table-columns/create-edit-collection-form-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
   Field,

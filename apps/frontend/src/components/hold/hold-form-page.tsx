@@ -25,7 +25,7 @@ import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
-import { getFormAssetColumns } from '../table-columns/form-asset-columns'
+import { getFormAssetColumns } from '../table-columns/create-edit-collection-form-columns'
 
 interface HoldFormPageProps {
   defaultValues?: HoldForm
