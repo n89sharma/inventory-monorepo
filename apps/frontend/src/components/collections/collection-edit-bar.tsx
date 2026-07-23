@@ -28,7 +28,7 @@ import { ShareButton } from '../shared/share-button'
 import {
   collectionAssetsToCsv,
   type CollectionSection,
-} from '../table-columns/collection-detail-asset-report-columns'
+} from '../table-columns/collection-detail-report-columns'
 import { CollectionHistorySheet } from './collection-history-sheet'
 
 const BARCODE_PRINT_SECTION = 'arrivals'

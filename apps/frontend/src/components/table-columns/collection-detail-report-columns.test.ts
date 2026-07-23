@@ -6,12 +6,12 @@ import {
   createArrivalAssetSummaryColumns,
   createAssetSummaryColumns,
   createDepartureAssetSummaryColumns,
-} from './collection-detail-asset-columns'
+} from './collection-detail-columns'
 import {
   REPORT_COLUMNS_BY_SECTION,
   collectionAssetsToCsv,
   type CollectionSection,
-} from './collection-detail-asset-report-columns'
+} from './collection-detail-report-columns'
 
 const CREATED_AT_HEADER = 'Created'
 const ACTION_COLUMN_IDS = new Set(['select', 'edit', 'delete'])
