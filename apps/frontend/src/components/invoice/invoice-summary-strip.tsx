@@ -1,9 +1,22 @@
 import { AssetCompositionField } from '@/components/shared/cards/asset-composition-field'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import type { InvoiceDetail } from 'shared-types'
+import { formatUSDWithSymbol } from '@/lib/formatters'
+import type { AssetCost, AssetSummary, InvoiceDetail } from 'shared-types'
 import { InvoiceArrivalsField } from './invoice-arrivals-field'
 
-export function InvoiceSummaryStrip({ invoice }: { invoice: InvoiceDetail }) {
+function sumCost(assets: AssetSummary[], field: keyof AssetCost): number {
+  return assets.reduce((total, asset) => total + (asset.cost?.[field] ?? 0), 0)
+}
+
+export function InvoiceSummaryStrip({
+  invoice,
+  canViewPurchasePrice,
+  canViewSalePrice,
+}: {
+  invoice: InvoiceDetail
+  canViewPurchasePrice: boolean
+  canViewSalePrice: boolean
+}) {
   const warehouses = [...new Set(invoice.arrivals.map((a) => a.destination_code))]
   const transporters = [...new Set(invoice.arrivals.map((a) => a.transporter))]
   return (
@@ -15,6 +28,28 @@ export function InvoiceSummaryStrip({ invoice }: { invoice: InvoiceDetail }) {
       <SummaryField label="Warehouse" value={warehouses.join(', ') || null} />
       <SummaryField label="Transporter" value={transporters.join(', ') || null} />
       <InvoiceArrivalsField arrivals={invoice.arrivals} />
+      {canViewPurchasePrice && (
+        <>
+          <SummaryField
+            label="Purchase Cost"
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'purchase_cost'))}
+          />
+          <SummaryField
+            label="Transport Cost"
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'transport_cost'))}
+          />
+          <SummaryField
+            label="Total Cost"
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'total_cost'))}
+          />
+        </>
+      )}
+      {canViewSalePrice && (
+        <SummaryField
+          label="Sale Price"
+          value={formatUSDWithSymbol(sumCost(invoice.assets, 'sale_price'))}
+        />
+      )}
     </div>
   )
 }

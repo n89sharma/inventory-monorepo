@@ -53,7 +53,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         title: `Invoice ${invoice.invoice_reference}`,
         copyValue: invoice.invoice_reference,
       })}
-      renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
+      renderSummaryStrip={(invoice) => (
+        <InvoiceSummaryStrip
+          invoice={invoice}
+          canViewPurchasePrice={canViewPurchasePrice}
+          canViewSalePrice={canViewSalePrice}
+        />
+      )}
       renderSubtitle={(invoice) => (
         <>
           <SummaryField
