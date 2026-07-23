@@ -9,7 +9,7 @@ import {
 } from '@/lib/formatters'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import type { AssetSearchRow } from 'shared-types'
-import { daysHeld, stockDays } from './asset-search-columns'
+import { daysHeld, stockDays } from './search-page-columns'
 
 type AssetSearchReportColumn = CsvColumn<AssetSearchRow> & {
   id: string

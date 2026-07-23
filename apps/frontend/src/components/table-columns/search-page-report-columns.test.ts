@@ -2,8 +2,8 @@ import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
-import { createAssetSearchColumns } from './asset-search-columns'
-import { ASSET_SEARCH_REPORT_COLUMNS, assetSearchRowsToCsv } from './asset-search-report-columns'
+import { createAssetSearchColumns } from './search-page-columns'
+import { ASSET_SEARCH_REPORT_COLUMNS, assetSearchRowsToCsv } from './search-page-report-columns'
 
 const noHref = () => ''
 

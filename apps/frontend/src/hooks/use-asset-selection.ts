@@ -1,4 +1,4 @@
-import { assetSearchRowsToCsv } from '@/components/table-columns/asset-search-report-columns'
+import { assetSearchRowsToCsv } from '@/components/table-columns/search-page-report-columns'
 import { downloadFile } from '@/lib/download-file'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
