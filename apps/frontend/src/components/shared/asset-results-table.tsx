@@ -26,7 +26,7 @@ function toAssetSummary(r: AssetSearchRow): AssetSummary {
     meter_total: r.specs_meter_total,
     cassettes: r.specs_cassettes,
     internal_finisher: r.specs_internal_finisher,
-    accessories: [],
+    accessories: r.accessories,
     weight: 0,
     size: 0,
     status: r.status,

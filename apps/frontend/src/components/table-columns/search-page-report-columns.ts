@@ -55,6 +55,7 @@ export const SEARCH_PAGE_REPORT_COLUMNS: SearchPageReportColumn[] = [
     header: 'Internal Finisher',
     value: (a) => a.specs_internal_finisher ?? '',
   },
+  { id: 'accessories', header: 'Accessories', value: (a) => a.accessories.join(', ') },
   {
     id: 'specs_toner_life_c',
     header: 'Toner Life C',

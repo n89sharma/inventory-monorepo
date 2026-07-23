@@ -74,6 +74,7 @@ export const AssetSearchRowSchema = z.object({
   specs_meter_total: z.number().nullable(),
   specs_cassettes: z.number().nullable(),
   specs_internal_finisher: z.string().nullable(),
+  accessories: z.array(z.string()),
   specs_toner_life_c: z.number().nullable(),
   specs_toner_life_m: z.number().nullable(),
   specs_toner_life_y: z.number().nullable(),

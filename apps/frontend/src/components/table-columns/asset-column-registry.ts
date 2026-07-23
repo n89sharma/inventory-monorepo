@@ -77,6 +77,13 @@ export const ASSET_COLUMN_REGISTRY = [
     enabled: true,
   },
   {
+    id: 'accessories',
+    label: 'Accessories',
+    section: 'specs',
+    defaultColumn: false,
+    enabled: true,
+  },
+  {
     id: 'specs_meter_total',
     label: 'Total Meter',
     section: 'specs',

@@ -124,6 +124,11 @@ export function createSearchPageColumns(
       cell: ({ row }) => row.original.specs_internal_finisher ?? '',
     },
     {
+      accessorKey: 'accessories',
+      header: 'Accessories',
+      cell: ({ row }) => row.original.accessories.join(', '),
+    },
+    {
       accessorKey: 'specs_toner_life_c',
       header: sortableHeader<AssetSearchRow>('Toner Life C'),
       cell: ({ row }) => row.original.specs_toner_life_c ?? '',

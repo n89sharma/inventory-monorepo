@@ -87,6 +87,7 @@ type AssetSearchRowDb = LocationRow & {
   specs_meter_total: number | null
   specs_cassettes: number | null
   specs_internal_finisher: string | null
+  accessories: string[] | null
   specs_toner_life_c: number | null
   specs_toner_life_m: number | null
   specs_toner_life_y: number | null
@@ -131,6 +132,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     specs_meter_total: r.specs_meter_total,
     specs_cassettes: r.specs_cassettes,
     specs_internal_finisher: r.specs_internal_finisher,
+    accessories: r.accessories ?? [],
     specs_toner_life_c: r.specs_toner_life_c,
     specs_toner_life_m: r.specs_toner_life_m,
     specs_toner_life_y: r.specs_toner_life_y,

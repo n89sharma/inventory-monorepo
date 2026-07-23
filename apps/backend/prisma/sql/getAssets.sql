@@ -21,6 +21,7 @@ select
   t.meter_total as specs_meter_total,
   t.cassettes as specs_cassettes,
   cmp."name" as specs_internal_finisher,
+  acc.accessories as accessories,
   t.toner_life_c as specs_toner_life_c,
   t.toner_life_m as specs_toner_life_m,
   t.toner_life_y as specs_toner_life_y,
@@ -46,6 +47,12 @@ select
 from "Asset" a
   join "TechnicalSpecification" t on t.asset_id = a.id
   left join "Component" cmp on cmp.id = t.component_id
+  left join lateral (
+    select coalesce(array_agg(ac.accessory order by ac.accessory), '{}') as accessories
+    from "AssetAccessory" aa
+      join "Accessory" ac on ac.id = aa.accessory_id
+    where aa.asset_id = a.id
+  ) acc on true
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
