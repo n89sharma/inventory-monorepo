@@ -169,16 +169,23 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             <>
               <ColumnTextFilter
                 table={table}
-                columnId="model"
-                placeholder="Model"
-                clearLabel="Clear model"
-                className="w-50 rounded-lg bg-background"
+                columnId="barcode"
+                placeholder="Barcode"
+                clearLabel="Clear barcode"
+                className="w-50"
               />
               <ColumnTextFilter
                 table={table}
                 columnId="serial_number"
                 placeholder="Serial number"
                 clearLabel="Clear serial number"
+                className="w-50"
+              />
+              <ColumnTextFilter
+                table={table}
+                columnId="model"
+                placeholder="Model"
+                clearLabel="Clear model"
                 className="w-50"
               />
             </>

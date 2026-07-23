@@ -34,6 +34,7 @@ export function createCollectionDetailColumns(
       header: sortableHeader<AssetSummary>('Barcode'),
       href: getHref,
       value: (row) => row.barcode,
+      filterFn: 'includesString',
     }),
     {
       accessorKey: 'serial_number',

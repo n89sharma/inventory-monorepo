@@ -74,15 +74,18 @@ export function createIdColumn<TData>({
   header,
   href,
   value,
+  filterFn,
 }: {
   accessorKey: string
   header: ColumnDef<TData>['header']
   href: (row: TData) => string
   value: (row: TData) => string
+  filterFn?: ColumnDef<TData>['filterFn']
 }): ColumnDef<TData> {
   return {
     accessorKey,
     header,
+    filterFn,
     size: ID_COLUMN_SIZE,
     cell: ({ row }) => (
       <Link to={href(row.original)} className="font-mono text-foreground hover:underline">
