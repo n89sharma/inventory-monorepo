@@ -1,7 +1,13 @@
-import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import {
+  formatLocation,
+  formatThousandsK,
+  formatTitleCase,
+  formatUSDWithSymbol,
+} from '@/lib/formatters'
 import { toCsv, type CsvColumn } from '@/lib/csv'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import type { AssetSummary } from 'shared-types'
+import { PURCHASE_COST_COLUMNS, SALE_PRICE_COLUMN } from './collection-detail-columns'
 
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
@@ -106,6 +112,30 @@ export const COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION = {
   holds: COMMON_REPORT_COLUMNS,
 } as const satisfies Record<CollectionSection, CollectionDetailReportColumn[]>
 
-export function collectionDetailToCsv(section: CollectionSection, assets: AssetSummary[]): string {
-  return toCsv(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section], assets)
+export function buildInvoiceCostReportColumns({
+  canViewPurchasePrice,
+  canViewSalePrice,
+}: {
+  canViewPurchasePrice: boolean
+  canViewSalePrice: boolean
+}): CollectionDetailReportColumn[] {
+  const columns: CollectionDetailReportColumn[] = []
+  if (canViewPurchasePrice) {
+    for (const [field, header] of PURCHASE_COST_COLUMNS) {
+      columns.push({ header, value: (a) => formatUSDWithSymbol(a.cost?.[field] ?? null) })
+    }
+  }
+  if (canViewSalePrice) {
+    const [field, header] = SALE_PRICE_COLUMN
+    columns.push({ header, value: (a) => formatUSDWithSymbol(a.cost?.[field] ?? null) })
+  }
+  return columns
+}
+
+export function collectionDetailToCsv(
+  section: CollectionSection,
+  assets: AssetSummary[],
+  extraColumns: CollectionDetailReportColumn[] = [],
+): string {
+  return toCsv([...COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section], ...extraColumns], assets)
 }

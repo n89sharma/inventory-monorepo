@@ -6,8 +6,10 @@ import {
   createArrivalDetailColumns,
   createCollectionDetailColumns,
   createDepartureDetailColumns,
+  createInvoiceDetailColumns,
 } from './collection-detail-columns'
 import {
+  buildInvoiceCostReportColumns,
   COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION,
   collectionDetailToCsv,
   type CollectionSection,
@@ -99,6 +101,15 @@ describe('report column parity with the detail table', () => {
       headers,
     )
   })
+
+  it('invoices with price permissions match the invoice table cost columns in order', () => {
+    const headers = visibleTableHeaders(createInvoiceDetailColumns(noHref, undefined, true, true))
+    const reportColumns = [
+      ...COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.invoices,
+      ...buildInvoiceCostReportColumns({ canViewPurchasePrice: true, canViewSalePrice: true }),
+    ]
+    expect(reportColumns.map((c) => c.header)).toEqual(headers)
+  })
 })
 
 describe('report column values carry the display formatters', () => {
@@ -148,5 +159,22 @@ describe('collectionDetailToCsv', () => {
     expect(lines[1]).toContain('BC-1')
     expect(lines[1]).toContain('45 K')
     expect(lines[1]).toContain('"Toner, Drum"')
+  })
+
+  it('appends the price columns for invoices when permitted', () => {
+    const costColumns = buildInvoiceCostReportColumns({
+      canViewPurchasePrice: true,
+      canViewSalePrice: true,
+    })
+    const csv = collectionDetailToCsv('invoices', [makeAsset()], costColumns)
+    expect(csv.trim().split('\n')[0].trim()).toBe(
+      'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
+    )
+  })
+
+  it('omits the price columns for invoices without extra columns', () => {
+    const header = collectionDetailToCsv('invoices', [makeAsset()]).trim().split('\n')[0]
+    expect(header).not.toContain('Purchase Cost')
+    expect(header).not.toContain('Sale Price')
   })
 })

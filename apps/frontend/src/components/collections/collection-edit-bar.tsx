@@ -26,6 +26,7 @@ import {
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
 import {
+  buildInvoiceCostReportColumns,
   collectionDetailToCsv,
   type CollectionSection,
 } from '../table-columns/collection-detail-report-columns'
@@ -59,6 +60,8 @@ export function CollectionEditBar({
   onRelease,
 }: CollectionEditBarProps): React.JSX.Element {
   const canDelete = useCan('delete_collection')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
 
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -81,10 +84,15 @@ export function CollectionEditBar({
       return
     }
 
+    const extraReportColumns =
+      section === 'invoices'
+        ? buildInvoiceCostReportColumns({ canViewPurchasePrice, canViewSalePrice })
+        : []
+
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = collectionDetailToCsv(section, exportableAssets)
+      const csv = collectionDetailToCsv(section, exportableAssets, extraReportColumns)
       downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })

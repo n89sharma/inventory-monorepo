@@ -209,12 +209,17 @@ export function createDepartureDetailColumns(
   )
 }
 
-const PURCHASE_COST_COLUMNS = [
+export const PURCHASE_COST_COLUMNS = [
   ['purchase_cost', 'Purchase Cost'],
   ['transport_cost', 'Transport Cost'],
   ['processing_cost', 'Processing Cost'],
   ['total_cost', 'Total Cost'],
 ] as const satisfies ReadonlyArray<readonly [keyof AssetCost, string]>
+
+export const SALE_PRICE_COLUMN = ['sale_price', 'Sale Price'] as const satisfies readonly [
+  keyof AssetCost,
+  string,
+]
 
 function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<AssetSummary> {
   return {
@@ -237,7 +242,7 @@ export function createInvoiceDetailColumns(
     )
   }
   if (canViewSalePrice) {
-    costColumns.push(createCostColumn('sale_price', 'Sale Price'))
+    costColumns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1]))
   }
   const baseColumns = createCollectionDetailColumns(getHref, onDelete)
   if (costColumns.length === 0) return baseColumns
