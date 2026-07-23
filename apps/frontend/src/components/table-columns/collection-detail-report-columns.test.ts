@@ -133,8 +133,8 @@ describe('report column values carry the display formatters', () => {
     const asset = makeAsset({ purchase_invoice_number: 'PI-100', sales_invoice_number: 'SI-200' })
     expect(valueFor('arrivals', 'Invoice', asset)).toBe('PI-100')
     expect(valueFor('departures', 'Invoice', asset)).toBe('SI-200')
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals[4].header).toBe('Invoice')
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures[4].header).toBe('Invoice')
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals[3].header).toBe('Invoice')
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures[3].header).toBe('Invoice')
   })
 })
 
@@ -143,7 +143,7 @@ describe('collectionDetailToCsv', () => {
     const csv = collectionDetailToCsv('holds', [makeAsset()])
     const lines = csv.trim().split('\n')
     expect(lines[0].trim()).toBe(
-      'Barcode,Brand,Model,Serial Number,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location',
+      'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location',
     )
     expect(lines[1]).toContain('BC-1')
     expect(lines[1]).toContain('45 K')

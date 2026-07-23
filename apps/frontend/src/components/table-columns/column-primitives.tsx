@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom'
 
 const ID_COLUMN_SIZE = 120
 export const SELECT_COLUMN_SIZE = 44
+export const MODEL_COLUMN_SIZE = 100
+export const SERIAL_NUMBER_COLUMN_SIZE = 150
+
+export const PINNED_ASSET_COLUMN_IDS = ['select', 'barcode', 'serial_number', 'model']
 
 function SelectHitArea({ onActivate, children }: { onActivate: () => void; children: ReactNode }) {
   return (

@@ -1,5 +1,8 @@
 import { createSearchPageColumns } from '@/components/table-columns/search-page-columns'
-import { createSelectColumn } from '@/components/table-columns/column-primitives'
+import {
+  createSelectColumn,
+  PINNED_ASSET_COLUMN_IDS,
+} from '@/components/table-columns/column-primitives'
 import { DataTable } from '@/components/shadcn/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import type {
@@ -13,7 +16,6 @@ import type { AssetSearchRow, AssetSummary } from 'shared-types'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const STOCK_DAYS_ASC_SORT = { id: 'stock_days', desc: false } as const
-const PIN_LEFT = ['select', 'barcode', 'serial_number', 'model']
 
 function toAssetSummary(r: AssetSearchRow): AssetSummary {
   return {
@@ -96,7 +98,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         defaultSort={defaultSort}
         sorting={sorting}
         onSortingChange={onSortingChange}
-        pinLeft={PIN_LEFT}
+        pinLeft={PINNED_ASSET_COLUMN_IDS}
         getRowHref={getRowHref}
         getRowClassName={getRowClassName}
         columnVisibility={columnVisibility}

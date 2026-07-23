@@ -4,6 +4,7 @@ import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-seg
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
+import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -187,6 +188,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           getRowHref={assetHref}
           getRowId={getAssetRowId}
           defaultSort={DEFAULT_ASSET_SORT}
+          pinLeft={PINNED_ASSET_COLUMN_IDS}
           columnVisibility={ASSET_COLUMN_VISIBILITY}
         />
       </PageContent>

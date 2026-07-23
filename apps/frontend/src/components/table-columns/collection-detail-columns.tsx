@@ -13,7 +13,13 @@ import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
 import type { AssetCost, AssetSummary } from 'shared-types'
-import { createIdColumn, createSelectColumn, sortableHeader } from './column-primitives'
+import {
+  createIdColumn,
+  createSelectColumn,
+  MODEL_COLUMN_SIZE,
+  SERIAL_NUMBER_COLUMN_SIZE,
+  sortableHeader,
+} from './column-primitives'
 
 export function createCollectionDetailColumns(
   getHref: (asset: AssetSummary) => string,
@@ -30,19 +36,21 @@ export function createCollectionDetailColumns(
       value: (row) => row.barcode,
     }),
     {
-      accessorKey: 'brand',
-      header: 'Brand',
-      cell: ({ row }) => formatTitleCase(row.original.brand),
+      accessorKey: 'serial_number',
+      header: sortableHeader<AssetSummary>('Serial Number'),
+      filterFn: 'includesString',
+      size: SERIAL_NUMBER_COLUMN_SIZE,
     },
     {
       accessorKey: 'model',
       header: sortableHeader<AssetSummary>('Model'),
       filterFn: 'includesString',
+      size: MODEL_COLUMN_SIZE,
     },
     {
-      accessorKey: 'serial_number',
-      header: sortableHeader<AssetSummary>('Serial Number'),
-      filterFn: 'includesString',
+      accessorKey: 'brand',
+      header: 'Brand',
+      cell: ({ row }) => formatTitleCase(row.original.brand),
     },
     {
       accessorKey: 'status',
@@ -160,10 +168,8 @@ function createCollectionDetailColumnsWithInvoice(
   disabledRowId?: number | null,
 ): ColumnDef<AssetSummary>[] {
   const baseColumns = createCollectionDetailColumns(getHref, onDelete, onEdit, disabledRowId)
-  const serialIndex = baseColumns.findIndex(
-    (c) => 'accessorKey' in c && c.accessorKey === 'serial_number',
-  )
-  baseColumns.splice(serialIndex + 1, 0, invoiceColumn)
+  const modelIndex = baseColumns.findIndex((c) => 'accessorKey' in c && c.accessorKey === 'model')
+  baseColumns.splice(modelIndex + 1, 0, invoiceColumn)
   return baseColumns
 }
 

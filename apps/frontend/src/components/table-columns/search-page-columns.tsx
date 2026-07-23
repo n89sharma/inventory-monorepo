@@ -13,7 +13,12 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { differenceInCalendarDays } from 'date-fns'
 import { Link } from 'react-router-dom'
 import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
-import { createIdColumn, sortableHeader } from './column-primitives'
+import {
+  createIdColumn,
+  MODEL_COLUMN_SIZE,
+  SERIAL_NUMBER_COLUMN_SIZE,
+  sortableHeader,
+} from './column-primitives'
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
@@ -41,7 +46,7 @@ export function createSearchPageColumns(
     {
       accessorKey: 'model',
       header: sortableHeader<AssetSearchRow>('Model'),
-      size: 100,
+      size: MODEL_COLUMN_SIZE,
     },
     {
       accessorKey: 'asset_type',
@@ -51,7 +56,7 @@ export function createSearchPageColumns(
     {
       accessorKey: 'serial_number',
       header: 'Serial Number',
-      size: 150,
+      size: SERIAL_NUMBER_COLUMN_SIZE,
     },
     {
       accessorKey: 'status',
