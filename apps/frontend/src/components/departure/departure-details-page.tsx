@@ -1,6 +1,6 @@
 import { DepartureSummaryStrip } from '@/components/departure/departure-summary-strip'
 import { EditDepartureMetadataModal } from '@/components/departure/edit-departure-metadata-modal'
-import { createDepartureAssetSummaryColumns } from '@/components/table-columns/collection-detail-columns'
+import { createDepartureDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -23,7 +23,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const canCreateEditDeparture = useCan('create_update_departure')
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) => createDepartureAssetSummaryColumns(assetHref),
+    (assetHref: (asset: AssetSummary) => string) => createDepartureDetailColumns(assetHref),
     [],
   )
 

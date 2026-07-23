@@ -14,7 +14,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
-import { createAssetSummaryColumns } from '../table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { Button } from '../shadcn/button'
@@ -58,7 +58,7 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(
+      createCollectionDetailColumns(
         assetHref,
         canEditHold ? (asset) => mutations.removeAsset(holdNumber, asset) : undefined,
       ),

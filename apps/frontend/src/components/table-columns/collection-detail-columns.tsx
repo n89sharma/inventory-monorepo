@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 import type { AssetCost, AssetSummary } from 'shared-types'
 import { createIdColumn, createSelectColumn, sortableHeader } from './column-primitives'
 
-export function createAssetSummaryColumns(
+export function createCollectionDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete?: (asset: AssetSummary) => void,
   onEdit?: (asset: AssetSummary) => void,
@@ -152,14 +152,14 @@ function createInvoiceColumn(
   }
 }
 
-function createAssetSummaryColumnsWithInvoice(
+function createCollectionDetailColumnsWithInvoice(
   invoiceColumn: ColumnDef<AssetSummary>,
   getHref: (asset: AssetSummary) => string,
   onDelete?: (asset: AssetSummary) => void,
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null,
 ): ColumnDef<AssetSummary>[] {
-  const baseColumns = createAssetSummaryColumns(getHref, onDelete, onEdit, disabledRowId)
+  const baseColumns = createCollectionDetailColumns(getHref, onDelete, onEdit, disabledRowId)
   const serialIndex = baseColumns.findIndex(
     (c) => 'accessorKey' in c && c.accessorKey === 'serial_number',
   )
@@ -167,7 +167,7 @@ function createAssetSummaryColumnsWithInvoice(
   return baseColumns
 }
 
-export function createArrivalAssetSummaryColumns(
+export function createArrivalDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete?: (asset: AssetSummary) => void,
   onEdit?: (asset: AssetSummary) => void,
@@ -177,7 +177,7 @@ export function createArrivalAssetSummaryColumns(
     'purchase_invoice_number',
     (a) => a.purchase_invoice_number,
   )
-  return createAssetSummaryColumnsWithInvoice(
+  return createCollectionDetailColumnsWithInvoice(
     invoiceColumn,
     getHref,
     onDelete,
@@ -186,14 +186,14 @@ export function createArrivalAssetSummaryColumns(
   )
 }
 
-export function createDepartureAssetSummaryColumns(
+export function createDepartureDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete?: (asset: AssetSummary) => void,
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null,
 ): ColumnDef<AssetSummary>[] {
   const invoiceColumn = createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number)
-  return createAssetSummaryColumnsWithInvoice(
+  return createCollectionDetailColumnsWithInvoice(
     invoiceColumn,
     getHref,
     onDelete,
@@ -217,7 +217,7 @@ function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<Ass
   }
 }
 
-export function createInvoiceAssetSummaryColumns(
+export function createInvoiceDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete: ((asset: AssetSummary) => void) | undefined,
   canViewPurchasePrice: boolean,
@@ -232,7 +232,7 @@ export function createInvoiceAssetSummaryColumns(
   if (canViewSalePrice) {
     costColumns.push(createCostColumn('sale_price', 'Sale Price'))
   }
-  const baseColumns = createAssetSummaryColumns(getHref, onDelete)
+  const baseColumns = createCollectionDetailColumns(getHref, onDelete)
   if (costColumns.length === 0) return baseColumns
   const locationIndex = baseColumns.findIndex((c) => c.id === 'location')
   baseColumns.splice(locationIndex + 1, 0, ...costColumns)

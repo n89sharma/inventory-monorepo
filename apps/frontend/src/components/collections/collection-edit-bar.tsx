@@ -26,7 +26,7 @@ import {
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
 import {
-  collectionAssetsToCsv,
+  collectionDetailToCsv,
   type CollectionSection,
 } from '../table-columns/collection-detail-report-columns'
 import { CollectionHistorySheet } from './collection-history-sheet'
@@ -84,7 +84,7 @@ export function CollectionEditBar({
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = collectionAssetsToCsv(section, exportableAssets)
+      const csv = collectionDetailToCsv(section, exportableAssets)
       downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })

@@ -5,53 +5,56 @@ import type { AssetSummary } from 'shared-types'
 
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
-export type AssetReportColumn = CsvColumn<AssetSummary>
+export type CollectionDetailReportColumn = CsvColumn<AssetSummary>
 
-const BARCODE_COLUMN: AssetReportColumn = { header: 'Barcode', value: (a) => a.barcode }
-const BRAND_COLUMN: AssetReportColumn = { header: 'Brand', value: (a) => formatTitleCase(a.brand) }
-const MODEL_COLUMN: AssetReportColumn = { header: 'Model', value: (a) => a.model }
-const SERIAL_NUMBER_COLUMN: AssetReportColumn = {
+const BARCODE_COLUMN: CollectionDetailReportColumn = { header: 'Barcode', value: (a) => a.barcode }
+const BRAND_COLUMN: CollectionDetailReportColumn = {
+  header: 'Brand',
+  value: (a) => formatTitleCase(a.brand),
+}
+const MODEL_COLUMN: CollectionDetailReportColumn = { header: 'Model', value: (a) => a.model }
+const SERIAL_NUMBER_COLUMN: CollectionDetailReportColumn = {
   header: 'Serial Number',
   value: (a) => a.serial_number,
 }
-const STATUS_COLUMN: AssetReportColumn = {
+const STATUS_COLUMN: CollectionDetailReportColumn = {
   header: 'Status',
   value: (a) => formatTitleCase(a.status),
 }
-const READINESS_COLUMN: AssetReportColumn = {
+const READINESS_COLUMN: CollectionDetailReportColumn = {
   header: 'Readiness',
   value: (a) => getReadinessDisplay(a.readiness),
 }
-const TOTAL_METER_COLUMN: AssetReportColumn = {
+const TOTAL_METER_COLUMN: CollectionDetailReportColumn = {
   header: 'Total Meter',
   value: (a) => formatThousandsK(a.meter_total),
 }
-const CASSETTES_COLUMN: AssetReportColumn = {
+const CASSETTES_COLUMN: CollectionDetailReportColumn = {
   header: 'Cassettes',
   value: (a) => (a.cassettes == null ? '' : String(a.cassettes)),
 }
-const INTERNAL_FINISHER_COLUMN: AssetReportColumn = {
+const INTERNAL_FINISHER_COLUMN: CollectionDetailReportColumn = {
   header: 'Internal Finisher',
   value: (a) => a.internal_finisher ?? '',
 }
-const ACCESSORIES_COLUMN: AssetReportColumn = {
+const ACCESSORIES_COLUMN: CollectionDetailReportColumn = {
   header: 'Accessories',
   value: (a) => a.accessories.join(', '),
 }
-const LOCATION_COLUMN: AssetReportColumn = {
+const LOCATION_COLUMN: CollectionDetailReportColumn = {
   header: 'Location',
   value: (a) => formatLocation(a.location, a.is_in_transit),
 }
-const PURCHASE_INVOICE_COLUMN: AssetReportColumn = {
+const PURCHASE_INVOICE_COLUMN: CollectionDetailReportColumn = {
   header: 'Invoice',
   value: (a) => a.purchase_invoice_number ?? '',
 }
-const SALES_INVOICE_COLUMN: AssetReportColumn = {
+const SALES_INVOICE_COLUMN: CollectionDetailReportColumn = {
   header: 'Invoice',
   value: (a) => a.sales_invoice_number ?? '',
 }
 
-const COMMON_REPORT_COLUMNS: AssetReportColumn[] = [
+const COMMON_REPORT_COLUMNS: CollectionDetailReportColumn[] = [
   BARCODE_COLUMN,
   BRAND_COLUMN,
   MODEL_COLUMN,
@@ -65,7 +68,7 @@ const COMMON_REPORT_COLUMNS: AssetReportColumn[] = [
   LOCATION_COLUMN,
 ]
 
-const ARRIVAL_REPORT_COLUMNS: AssetReportColumn[] = [
+const ARRIVAL_REPORT_COLUMNS: CollectionDetailReportColumn[] = [
   BARCODE_COLUMN,
   BRAND_COLUMN,
   MODEL_COLUMN,
@@ -80,7 +83,7 @@ const ARRIVAL_REPORT_COLUMNS: AssetReportColumn[] = [
   LOCATION_COLUMN,
 ]
 
-const DEPARTURE_REPORT_COLUMNS: AssetReportColumn[] = [
+const DEPARTURE_REPORT_COLUMNS: CollectionDetailReportColumn[] = [
   BARCODE_COLUMN,
   BRAND_COLUMN,
   MODEL_COLUMN,
@@ -95,14 +98,14 @@ const DEPARTURE_REPORT_COLUMNS: AssetReportColumn[] = [
   LOCATION_COLUMN,
 ]
 
-export const REPORT_COLUMNS_BY_SECTION = {
+export const COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION = {
   arrivals: ARRIVAL_REPORT_COLUMNS,
   transfers: COMMON_REPORT_COLUMNS,
   departures: DEPARTURE_REPORT_COLUMNS,
   invoices: COMMON_REPORT_COLUMNS,
   holds: COMMON_REPORT_COLUMNS,
-} as const satisfies Record<CollectionSection, AssetReportColumn[]>
+} as const satisfies Record<CollectionSection, CollectionDetailReportColumn[]>
 
-export function collectionAssetsToCsv(section: CollectionSection, assets: AssetSummary[]): string {
-  return toCsv(REPORT_COLUMNS_BY_SECTION[section], assets)
+export function collectionDetailToCsv(section: CollectionSection, assets: AssetSummary[]): string {
+  return toCsv(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section], assets)
 }

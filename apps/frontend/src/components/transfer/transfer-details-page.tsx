@@ -1,4 +1,4 @@
-import { createAssetSummaryColumns } from '@/components/table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -26,7 +26,7 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createAssetSummaryColumns(
+      createCollectionDetailColumns(
         assetHref,
         canEditAssets ? (asset) => mutations.removeAsset(transferNumber, asset) : undefined,
       ),

@@ -10,7 +10,7 @@ import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
-import { createArrivalAssetSummaryColumns } from '../table-columns/collection-detail-columns'
+import { createArrivalDetailColumns } from '../table-columns/collection-detail-columns'
 import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
@@ -52,7 +52,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createArrivalAssetSummaryColumns(
+      createArrivalDetailColumns(
         assetHref,
         (asset) => mutations.removeAsset(arrivalNumber, asset),
         canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,

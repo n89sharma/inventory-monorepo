@@ -3,13 +3,13 @@ import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { AssetSummary } from 'shared-types'
 import {
-  createArrivalAssetSummaryColumns,
-  createAssetSummaryColumns,
-  createDepartureAssetSummaryColumns,
+  createArrivalDetailColumns,
+  createCollectionDetailColumns,
+  createDepartureDetailColumns,
 } from './collection-detail-columns'
 import {
-  REPORT_COLUMNS_BY_SECTION,
-  collectionAssetsToCsv,
+  COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION,
+  collectionDetailToCsv,
   type CollectionSection,
 } from './collection-detail-report-columns'
 
@@ -74,30 +74,38 @@ function makeAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
 
 describe('report column parity with the detail table', () => {
   it('common sections match the base table columns in order', () => {
-    const headers = visibleTableHeaders(createAssetSummaryColumns(noHref))
+    const headers = visibleTableHeaders(createCollectionDetailColumns(noHref))
     for (const section of [
       'transfers',
       'holds',
       'invoices',
     ] as const satisfies CollectionSection[]) {
-      expect(REPORT_COLUMNS_BY_SECTION[section].map((c) => c.header)).toEqual(headers)
+      expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section].map((c) => c.header)).toEqual(
+        headers,
+      )
     }
   })
 
   it('arrivals match the arrival table columns in order', () => {
-    const headers = visibleTableHeaders(createArrivalAssetSummaryColumns(noHref))
-    expect(REPORT_COLUMNS_BY_SECTION.arrivals.map((c) => c.header)).toEqual(headers)
+    const headers = visibleTableHeaders(createArrivalDetailColumns(noHref))
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals.map((c) => c.header)).toEqual(
+      headers,
+    )
   })
 
   it('departures match the departure table columns in order', () => {
-    const headers = visibleTableHeaders(createDepartureAssetSummaryColumns(noHref))
-    expect(REPORT_COLUMNS_BY_SECTION.departures.map((c) => c.header)).toEqual(headers)
+    const headers = visibleTableHeaders(createDepartureDetailColumns(noHref))
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures.map((c) => c.header)).toEqual(
+      headers,
+    )
   })
 })
 
 describe('report column values carry the display formatters', () => {
   function valueFor(section: CollectionSection, header: string, asset: AssetSummary): string {
-    const column = REPORT_COLUMNS_BY_SECTION[section].find((c) => c.header === header)
+    const column = COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section].find(
+      (c) => c.header === header,
+    )
     if (!column) throw new Error(`Missing column ${header}`)
     return column.value(asset)
   }
@@ -125,14 +133,14 @@ describe('report column values carry the display formatters', () => {
     const asset = makeAsset({ purchase_invoice_number: 'PI-100', sales_invoice_number: 'SI-200' })
     expect(valueFor('arrivals', 'Invoice', asset)).toBe('PI-100')
     expect(valueFor('departures', 'Invoice', asset)).toBe('SI-200')
-    expect(REPORT_COLUMNS_BY_SECTION.arrivals[4].header).toBe('Invoice')
-    expect(REPORT_COLUMNS_BY_SECTION.departures[4].header).toBe('Invoice')
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals[4].header).toBe('Invoice')
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures[4].header).toBe('Invoice')
   })
 })
 
-describe('collectionAssetsToCsv', () => {
+describe('collectionDetailToCsv', () => {
   it('writes a header row and one row per asset', () => {
-    const csv = collectionAssetsToCsv('holds', [makeAsset()])
+    const csv = collectionDetailToCsv('holds', [makeAsset()])
     const lines = csv.trim().split('\n')
     expect(lines[0].trim()).toBe(
       'Barcode,Brand,Model,Serial Number,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location',
