@@ -32,6 +32,7 @@ import {
   recordAssetUpdate,
   recordAssetUpdateOnCollection,
   recordBatchAssetCreate,
+  recordCollectionMoveOnAssets,
 } from './historyService.js'
 
 const arrivalZone = 'ARRIVAL'
@@ -395,6 +396,51 @@ export async function addRemoveCollectionFromAssetsAndRecord(
     delta.assetIdsToRemove,
     userId,
   )
+}
+
+export async function moveAssetsToArrival(
+  sourceArrivalNumber: string,
+  destinationArrivalNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  if (sourceArrivalNumber === destinationArrivalNumber) {
+    throw new ConflictError('Source and destination arrivals are the same')
+  }
+
+  const [source, destination] = await Promise.all([
+    prisma.arrival.findUnique({
+      where: { arrival_number: sourceArrivalNumber },
+      select: { id: true },
+    }),
+    prisma.arrival.findUnique({
+      where: { arrival_number: destinationArrivalNumber },
+      select: { id: true },
+    }),
+  ])
+  if (!source) throw new NotFoundError(`Arrival ${sourceArrivalNumber} not found`)
+  if (!destination) throw new NotFoundError(`Arrival ${destinationArrivalNumber} not found`)
+
+  await prisma.$transaction(async (tx) => {
+    const assets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, arrival_id: true },
+    })
+    if (assets.length !== assetIds.length || assets.some((a) => a.arrival_id !== source.id)) {
+      throw new ConflictError(
+        `The following assets are no longer on arrival ${sourceArrivalNumber} and cannot be moved`,
+      )
+    }
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds }, arrival_id: source.id },
+      data: { arrival_id: destination.id },
+    })
+  })
+
+  await recordCollectionMoveOnAssets(assetIds, 'arrival_id', source.id, destination.id, userId)
+  await recordAssetUpdateOnCollection('Arrival', source.id, [], assetIds, userId)
+  await recordAssetUpdateOnCollection('Arrival', destination.id, assetIds, [], userId)
 }
 
 async function updateArrivalAssetCoreFields(

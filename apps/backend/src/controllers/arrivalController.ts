@@ -5,6 +5,7 @@ import {
   CollectionHistory,
   CreateArrivalSchema,
   CreateAssetSchema,
+  MoveArrivalAssetsSchema,
   UpdateArrivalMetadataSchema,
   UpdateAssetSchema,
   successResponse,
@@ -20,6 +21,7 @@ import {
   createSingleArrivalAsset as createSingleArrivalAssetSer,
   getArrivalAssetForUpdate as getArrivalAssetForUpdateSer,
   getArrival as getArrivalSer,
+  moveAssetsToArrival as moveAssetsToArrivalSer,
   addRemoveCollectionFromAssetsAndRecord as patchArrivalAssetsSer,
   patchArrivalMetadata as patchArrivalMetadataSer,
   updateArrivalAsset as updateArrivalAssetSer,
@@ -57,6 +59,17 @@ export const patchArrivalMetadata = asyncHandler(async (req, res) => {
 export const patchArrivalAssets = asyncHandler(async (req, res) => {
   const delta = AssetDeltaSchema.parse(req.body)
   await patchArrivalAssetsSer(req.params.arrivalNumber, delta, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const moveArrivalAssets = asyncHandler(async (req, res) => {
+  const { sourceArrivalNumber, assetIds } = MoveArrivalAssetsSchema.parse(req.body)
+  await moveAssetsToArrivalSer(
+    sourceArrivalNumber,
+    req.params.arrivalNumber,
+    assetIds,
+    res.locals.dbUserId,
+  )
   res.status(204).send()
 })
 

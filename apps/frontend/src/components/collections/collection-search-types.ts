@@ -1,4 +1,5 @@
 import type {
+  ArrivalSuggestion,
   DepartureSuggestion,
   HoldSuggestion,
   InvoiceSuggestion,
@@ -6,12 +7,14 @@ import type {
 } from 'shared-types'
 
 export type SelectedCollection =
+  | { kind: 'arrival'; data: ArrivalSuggestion }
   | { kind: 'departure'; data: DepartureSuggestion }
   | { kind: 'transfer'; data: TransferSuggestion }
   | { kind: 'hold'; data: HoldSuggestion }
   | { kind: 'invoice'; data: InvoiceSuggestion }
 
 export type CollectionResults = {
+  arrivals: ArrivalSuggestion[]
   departures: DepartureSuggestion[]
   transfers: TransferSuggestion[]
   holds: HoldSuggestion[]
@@ -19,6 +22,7 @@ export type CollectionResults = {
 }
 
 export const emptyResults: CollectionResults = {
+  arrivals: [],
   departures: [],
   transfers: [],
   holds: [],

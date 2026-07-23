@@ -27,6 +27,8 @@ function collectionLabel(s: SelectedCollection): string {
 
 function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: string } {
   switch (s.kind) {
+    case 'arrival':
+      return { entity: 'arrival', id: s.data.arrival_number }
     case 'departure':
       return { entity: 'departure', id: s.data.departure_number }
     case 'transfer':
@@ -40,6 +42,12 @@ function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: str
 
 function getDetailFields(s: SelectedCollection): { label: string; value: string | null }[] {
   switch (s.kind) {
+    case 'arrival':
+      return [
+        { label: 'Vendor', value: s.data.vendor },
+        { label: 'Warehouse', value: s.data.warehouse_code },
+        { label: 'Date', value: formatDate(s.data.created_at) },
+      ]
     case 'departure':
       return [
         { label: 'Origin', value: s.data.origin_code },
@@ -212,6 +220,7 @@ export function AddToCollectionModal({
     const t = setTimeout(async () => {
       const res = await getGlobalSearchResults(query)
       setResults({
+        arrivals: [],
         departures: canCreateDeparture ? res.departures : [],
         transfers: canCreateTransfer ? res.transfers : [],
         holds: canCreateHold ? res.holds : [],
@@ -239,6 +248,8 @@ export function AddToCollectionModal({
     try {
       let existing: AssetSummary[]
       switch (collection.kind) {
+        case 'arrival':
+          throw new Error('Arrivals are not a valid target for adding assets')
         case 'hold':
           existing = await holdMutations.getAssets(collection.data.hold_number)
           break
@@ -269,6 +280,8 @@ export function AddToCollectionModal({
       let added: number
       let skipped: number
       switch (selected.kind) {
+        case 'arrival':
+          throw new Error('Arrivals are not a valid target for adding assets')
         case 'hold': {
           ;({ added, skipped } = await holdMutations.addAssets(
             selected.data.hold_number,

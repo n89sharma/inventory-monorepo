@@ -56,3 +56,10 @@ export const UpdateArrivalMetadataSchema = z.object({
   comment: z.string().nullable(),
 })
 export type UpdateArrivalMetadata = z.infer<typeof UpdateArrivalMetadataSchema>
+
+// POST /arrivals/:arrivalNumber/move-assets — :arrivalNumber is the destination arrival
+export const MoveArrivalAssetsSchema = z.object({
+  sourceArrivalNumber: z.string(),
+  assetIds: z.array(z.number().int()).min(1),
+})
+export type MoveArrivalAssets = z.infer<typeof MoveArrivalAssetsSchema>

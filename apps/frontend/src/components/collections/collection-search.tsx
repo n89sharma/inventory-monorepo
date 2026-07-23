@@ -4,7 +4,11 @@ import type { CollectionResults, SelectedCollection } from './collection-search-
 
 function hasAnyResults(r: CollectionResults): boolean {
   return (
-    r.departures.length > 0 || r.transfers.length > 0 || r.holds.length > 0 || r.invoices.length > 0
+    r.arrivals.length > 0 ||
+    r.departures.length > 0 ||
+    r.transfers.length > 0 ||
+    r.holds.length > 0 ||
+    r.invoices.length > 0
   )
 }
 
@@ -38,6 +42,14 @@ function ResultsList({
 }) {
   return (
     <div className="flex flex-col">
+      {results.arrivals.map((a) => (
+        <ResultButton
+          key={a.id}
+          label={`Arrival ${a.arrival_number}`}
+          sub={a.vendor}
+          onClick={() => onSelect({ kind: 'arrival', data: a })}
+        />
+      ))}
       {results.departures.map((d) => (
         <ResultButton
           key={d.id}

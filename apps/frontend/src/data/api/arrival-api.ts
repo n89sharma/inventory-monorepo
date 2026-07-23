@@ -15,6 +15,7 @@ import type {
   CollectionHistory,
   CreateArrival,
   CreateAsset,
+  MoveArrivalAssets,
   OrgSummary,
   UpdateArrivalMetadata,
   UpdateAsset,
@@ -28,6 +29,7 @@ import {
   CollectionHistorySchema,
   CreateArrivalSchema,
   CreateAssetSchema,
+  MoveArrivalAssetsSchema,
   UpdateArrivalMetadataSchema,
   UpdateAssetSchema,
 } from 'shared-types'
@@ -112,6 +114,14 @@ export async function updateArrivalMetadata(
 export async function patchArrivalAssets(arrivalNumber: string, delta: AssetDelta): Promise<void> {
   const patchArrivalAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/arrivals/${arrivalNumber}/assets`, patchArrivalAssetsBody)
+}
+
+export async function moveArrivalAssets(
+  destinationArrivalNumber: string,
+  move: MoveArrivalAssets,
+): Promise<void> {
+  const moveArrivalAssetsBody = MoveArrivalAssetsSchema.parse(move satisfies MoveArrivalAssets)
+  await api.post(`/arrivals/${destinationArrivalNumber}/move-assets`, moveArrivalAssetsBody)
 }
 
 export async function createSingleArrivalAsset(

@@ -2,6 +2,7 @@ import {
   createArrival,
   createSingleArrivalAsset,
   getArrivalAssetForUpdate,
+  moveArrivalAssets,
   patchArrivalAssets,
   updateArrivalAsset,
   updateArrivalMetadata,
@@ -86,6 +87,21 @@ function bulkRemoveAssets(arrivalNumber: string, assets: AssetSummary[]) {
   )
 }
 
+async function moveAssets(
+  sourceArrivalNumber: string,
+  destinationArrivalNumber: string,
+  assets: AssetSummary[],
+) {
+  await moveArrivalAssets(destinationArrivalNumber, {
+    sourceArrivalNumber,
+    assetIds: assets.map((a) => a.id),
+  })
+  mutate(arrivalDetailKey(sourceArrivalNumber))
+  mutate(arrivalDetailKey(destinationArrivalNumber))
+  invalidateAssetDetails(assets.map((a) => a.barcode))
+  invalidateArrivalLists()
+}
+
 const mutations = {
   create,
   updateMetadata,
@@ -94,6 +110,7 @@ const mutations = {
   updateAsset,
   removeAsset,
   bulkRemoveAssets,
+  moveAssets,
   flushPending: flushPendingRemovals,
 } as const
 

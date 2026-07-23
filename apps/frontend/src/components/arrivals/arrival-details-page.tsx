@@ -15,6 +15,7 @@ import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
 import { EditArrivalMetadataModal } from './edit-arrival-metadata-modal'
+import { MoveToArrivalModal } from './move-to-arrival-modal'
 
 export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
@@ -27,6 +28,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
   const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
+  const [moveOpen, setMoveOpen] = useState(false)
 
   const handleEditAsset = useCallback(
     async (assetId: number) => {
@@ -73,6 +75,23 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       historyCacheKey={`arrival-history:${arrivalNumber}`}
       historyFetcher={() => getArrivalHistory(arrivalNumber)}
       onBulkRemove={(assets) => mutations.bulkRemoveAssets(arrivalNumber, assets)}
+      renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
+        if (!canEditArrival) return null
+        return (
+          <>
+            <Button variant="secondary" onClick={() => setMoveOpen(true)}>
+              Move to arrival
+            </Button>
+            <MoveToArrivalModal
+              open={moveOpen}
+              onOpenChange={setMoveOpen}
+              sourceArrivalNumber={arrivalNumber}
+              selectedAssets={selectedAssets}
+              onConfirmSuccess={clearSelection}
+            />
+          </>
+        )
+      }}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
       renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}

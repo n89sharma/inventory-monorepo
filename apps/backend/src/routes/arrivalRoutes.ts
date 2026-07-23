@@ -6,6 +6,7 @@ import {
   getArrivalAssetForUpdate,
   getArrivalHistory,
   getArrivals,
+  moveArrivalAssets,
   patchArrivalAssets,
   patchArrivalMetadata,
   updateArrivalAsset,
@@ -41,6 +42,11 @@ router.post(
   '/:arrivalNumber/assets',
   requirePermission('create_update_arrival'),
   createSingleArrivalAsset,
+)
+router.post(
+  '/:arrivalNumber/move-assets',
+  requirePermission('create_update_arrival'),
+  moveArrivalAssets,
 )
 router.get(
   '/:arrivalNumber/assets/:assetId/edit',
