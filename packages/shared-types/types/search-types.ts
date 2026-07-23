@@ -45,6 +45,7 @@ export type HoldSuggestion = z.infer<typeof HoldSuggestionSchema>
 export const InvoiceSuggestionSchema = z.object({
   id: z.number(),
   invoice_number: z.string(),
+  invoice_reference: z.string(),
   organization: z.string(),
   invoice_type: z.string(),
   created_at: z.coerce.date(),

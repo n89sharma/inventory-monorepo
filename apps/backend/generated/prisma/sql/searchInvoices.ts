@@ -8,13 +8,14 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param q
  */
-export const searchInvoices = $runtime.makeTypedQueryFactory("select\ni.id as id,\ni.invoice_number as invoice_number,\no.name as organization,\nit.type as invoice_type,\ni.created_at as created_at\nfrom \"Invoice\" i\njoin \"Organization\" o on o.id = i.organization_id\njoin \"InvoiceType\" it on it.id = i.invoice_type_id\nwhere i.invoice_number like $1 || '%'\norder by i.invoice_date desc\nlimit 3") as (q: string) => $runtime.TypedSql<searchInvoices.Parameters, searchInvoices.Result>
+export const searchInvoices = $runtime.makeTypedQueryFactory("select id, invoice_number, invoice_reference, organization, invoice_type, created_at\nfrom (\nselect\ni.id as id,\ni.invoice_number as invoice_number,\ni.invoice_reference as invoice_reference,\no.name as organization,\nit.type as invoice_type,\ni.created_at as created_at,\n(i.invoice_reference_normalized like '%' || $1 || '%') as is_substring,\n(i.invoice_reference_normalized = $1) as is_exact,\n(i.invoice_reference_normalized like $1 || '%') as is_prefix,\nsimilarity(i.invoice_reference_normalized, $1) as score,\nbool_or(i.invoice_reference_normalized like '%' || $1 || '%') over () as any_substring\nfrom \"Invoice\" i\njoin \"Organization\" o on o.id = i.organization_id\njoin \"InvoiceType\" it on it.id = i.invoice_type_id\nwhere i.invoice_reference_normalized like '%' || $1 || '%'\nor i.invoice_reference_normalized % $1\n) candidates\nwhere is_substring or not any_substring\norder by is_exact desc, is_prefix desc, score desc, created_at desc\nlimit 10") as (q: string) => $runtime.TypedSql<searchInvoices.Parameters, searchInvoices.Result>
 
 export namespace searchInvoices {
   export type Parameters = [q: string]
   export type Result = {
     id: number
     invoice_number: string
+    invoice_reference: string
     organization: string
     invoice_type: string
     created_at: Date

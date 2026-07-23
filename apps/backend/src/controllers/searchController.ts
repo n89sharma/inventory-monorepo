@@ -39,7 +39,9 @@ export const globalSearch = asyncHandler(async (req, res) => {
     wanted.has('departures') ? prisma.$queryRawTyped(searchDepartures(upper)) : Promise.resolve([]),
     wanted.has('transfers') ? prisma.$queryRawTyped(searchTransfers(upper)) : Promise.resolve([]),
     wanted.has('holds') ? prisma.$queryRawTyped(searchHolds(upper)) : Promise.resolve([]),
-    wanted.has('invoices') ? prisma.$queryRawTyped(searchInvoices(upper)) : Promise.resolve([]),
+    wanted.has('invoices') && normalized
+      ? prisma.$queryRawTyped(searchInvoices(normalized))
+      : Promise.resolve([]),
   ])
   res.json(successResponse({ assets, arrivals, departures, transfers, holds, invoices }))
 })

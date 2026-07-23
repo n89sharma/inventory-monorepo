@@ -393,7 +393,8 @@ export const InvoiceScalarFieldEnum = {
   is_cleared: 'is_cleared',
   invoice_date: 'invoice_date',
   created_at: 'created_at',
-  invoice_type_id: 'invoice_type_id'
+  invoice_type_id: 'invoice_type_id',
+  invoice_reference_normalized: 'invoice_reference_normalized'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]

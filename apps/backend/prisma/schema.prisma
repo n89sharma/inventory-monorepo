@@ -403,12 +403,15 @@ model Invoice {
   created_at        DateTime @default(now())
   invoice_type_id   Int
 
+  invoice_reference_normalized String? @default(dbgenerated()) @map("invoice_reference_normalized")
+
   invoice_type    InvoiceType  @relation(fields: [invoice_type_id], references: [id])
   organization    Organization @relation(fields: [organization_id], references: [id])
   updated_by      User         @relation(fields: [updated_by_id], references: [id])
   purchase_assets Asset[]      @relation("PurchaseInvoice")
   sales_assets    Asset[]      @relation("SalesInvoice")
 
+  @@index([invoice_reference_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([invoice_date(sort: Desc)])
   @@index([created_at(sort: Desc)])
   @@index([invoice_type_id])

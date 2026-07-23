@@ -157,6 +157,7 @@ export function SearchPopoverContent({
           getKey={(s) => String(s.id)}
           getValue={(s) => s.invoice_number}
           getColumns={(s) => [
+            s.invoice_reference,
             s.invoice_number,
             formatDate(s.created_at),
             s.organization,
