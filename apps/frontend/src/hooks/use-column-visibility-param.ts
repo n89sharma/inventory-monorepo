@@ -2,7 +2,7 @@ import {
   ASSET_TABLE_COLUMNS,
   DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
   resolveVisibleColumns,
-} from '@/components/table-columns/asset-table-columns'
+} from '@/components/table-columns/asset-column-registry'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
 import type { SearchList } from '@/ui-types/navigation-context'

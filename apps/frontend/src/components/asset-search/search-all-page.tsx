@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/table-columns/asset-table-columns'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/table-columns/asset-column-registry'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
