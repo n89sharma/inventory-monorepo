@@ -1,6 +1,6 @@
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { AssetTypeBreakdown } from '@/components/table-columns/asset-type-breakdown'
+import { AssetTypeBreakdown } from '@/components/shared/asset-type-breakdown'
 import { formatDate } from '@/lib/formatters'
 import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon } from '@phosphor-icons/react'
 import type { ColumnDef, HeaderContext, SortDirection } from '@tanstack/react-table'
