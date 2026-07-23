@@ -36,6 +36,7 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     status: 'IN_STOCK',
     readiness: 'PP_OK',
     location: {
+      warehouse_id: 1,
       warehouse_code: 'NYC',
       warehouse_street: '1 Main St',
       zone: 'RECEIVING',
@@ -50,6 +51,7 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     specs_meter_total: 12000,
     specs_cassettes: 2,
     specs_internal_finisher: 'FIN-1',
+    accessories: ['Toner', 'Drum'],
     specs_toner_life_c: 80,
     specs_toner_life_m: 70,
     specs_toner_life_y: 60,
@@ -102,6 +104,7 @@ describe('asset-search report columns', () => {
       reportColumn('location').value(
         makeRow({
           location: {
+            warehouse_id: 1,
             warehouse_code: 'NYC',
             warehouse_street: '1 Main St',
             zone: 'BIN',

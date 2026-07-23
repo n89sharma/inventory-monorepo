@@ -61,6 +61,7 @@ function makeAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
     status: 'IN_STOCK',
     readiness: 'PP_OK',
     location: {
+      warehouse_id: 1,
       warehouse_code: 'NYC',
       warehouse_street: '1 Main St',
       zone: 'RECEIVING',
@@ -129,7 +130,13 @@ describe('report column values carry the display formatters', () => {
   it('formats location as the single displayed string', () => {
     expect(valueFor('holds', 'Location', makeAsset())).toBe('NYC | Receiving')
     const binAsset = makeAsset({
-      location: { warehouse_code: 'NYC', warehouse_street: '1 Main St', zone: 'BIN', bin: 'A12' },
+      location: {
+        warehouse_id: 1,
+        warehouse_code: 'NYC',
+        warehouse_street: '1 Main St',
+        zone: 'BIN',
+        bin: 'A12',
+      },
     })
     expect(valueFor('holds', 'Location', binAsset)).toBe('NYC | A12')
     expect(valueFor('holds', 'Location', makeAsset({ location: null }))).toBe('')
