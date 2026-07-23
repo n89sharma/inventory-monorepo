@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
-import { getNewAssetTableColumns } from '../table-columns/new-asset-form-columns'
+import { getNewAssetFormColumns } from '../table-columns/new-asset-form-columns'
 import { Button } from '../shadcn/button'
 import { DataTable } from '../shadcn/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
@@ -59,7 +59,7 @@ export function ArrivalFormPage({
   const [editingAssetIndex, setEditingAssetIndex] = useState<number | null>(null)
   const assetTableColumns = useMemo(
     () =>
-      getNewAssetTableColumns({
+      getNewAssetFormColumns({
         onDelete: (id) => deleteAsset(id),
         onEdit: (index) => {
           setEditingAssetIndex(index)

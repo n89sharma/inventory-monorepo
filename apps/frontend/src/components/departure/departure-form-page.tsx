@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { getDepartureFormAssetColumns } from '@/components/table-columns/create-edit-collection-form-columns'
+import { getDepartureCreateEditCollectionFormColumns } from '@/components/table-columns/create-edit-collection-form-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
   Field,
@@ -73,7 +73,10 @@ export function DepartureFormPage({
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const assetTableColumns = useMemo(() => getDepartureFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(
+    () => getDepartureCreateEditCollectionFormColumns(deleteAsset),
+    [deleteAsset],
+  )
 
   const selectedCount = assets.filter((a) => rowSelection[a.barcode]).length
 

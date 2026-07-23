@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { getFormAssetColumns } from '@/components/table-columns/create-edit-collection-form-columns'
+import { getCreateEditCollectionFormColumns } from '@/components/table-columns/create-edit-collection-form-columns'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
   Field,
@@ -62,7 +62,10 @@ export function TransferFormPage({
   const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
 
-  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(
+    () => getCreateEditCollectionFormColumns(deleteAsset),
+    [deleteAsset],
+  )
 
   function getDefaultTransfer(): TransferForm {
     return {

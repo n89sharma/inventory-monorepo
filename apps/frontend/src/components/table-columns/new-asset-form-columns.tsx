@@ -8,14 +8,14 @@ import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CoreFunction } from 'shared-types'
 
-interface GetNewAssetTableColumnProps {
+interface GetNewAssetFormColumnsProps {
   onDelete: (index: number) => void
   onEdit: (index: number) => void
 }
-export function getNewAssetTableColumns({
+export function getNewAssetFormColumns({
   onDelete,
   onEdit,
-}: GetNewAssetTableColumnProps): ColumnDef<AssetForm>[] {
+}: GetNewAssetFormColumnsProps): ColumnDef<AssetForm>[] {
   return [
     {
       accessorKey: 'model.brand_name',

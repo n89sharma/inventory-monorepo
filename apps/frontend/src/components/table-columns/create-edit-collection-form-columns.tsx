@@ -68,7 +68,9 @@ function getDeleteColumn<T>(onDelete: (index: number) => void): ColumnDef<T> {
   }
 }
 
-export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDef<AssetSummary>[] {
+export function getCreateEditCollectionFormColumns(
+  onDelete: (index: number) => void,
+): ColumnDef<AssetSummary>[] {
   return [
     ...getCommonLeadingColumns<AssetSummary>(),
     {
@@ -82,7 +84,7 @@ export function getFormAssetColumns(onDelete: (index: number) => void): ColumnDe
   ]
 }
 
-export function getDepartureFormAssetColumns(
+export function getDepartureCreateEditCollectionFormColumns(
   onDelete: (index: number) => void,
 ): ColumnDef<DepartureFormAsset>[] {
   return [

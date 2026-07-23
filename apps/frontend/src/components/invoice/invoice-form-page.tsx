@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { getFormAssetColumns } from '@/components/table-columns/create-edit-collection-form-columns'
+import { getCreateEditCollectionFormColumns } from '@/components/table-columns/create-edit-collection-form-columns'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { DataTable } from '@/components/shadcn/data-table'
 import {
@@ -94,7 +94,10 @@ export function InvoiceFormPage({
   } = useFieldArray({ control: form.control, name: 'assets' })
   const { isSubmitting, isDirty, isValid } = form.formState
   const guard = useNavigationGuard({ isDirty: isDirty && !isSubmitting })
-  const assetTableColumns = useMemo(() => getFormAssetColumns(deleteAsset), [deleteAsset])
+  const assetTableColumns = useMemo(
+    () => getCreateEditCollectionFormColumns(deleteAsset),
+    [deleteAsset],
+  )
 
   const invoiceType = useWatch({ control: form.control, name: 'invoice_type' })
   const selectedInvoiceTypeName = getSelectedOrNull(invoiceType)?.type
