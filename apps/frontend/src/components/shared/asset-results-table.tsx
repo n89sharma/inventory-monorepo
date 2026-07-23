@@ -1,4 +1,4 @@
-import { createAssetSearchColumns } from '@/components/table-columns/search-page-columns'
+import { createSearchPageColumns } from '@/components/table-columns/search-page-columns'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { DataTable } from '@/components/shadcn/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
@@ -64,7 +64,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onSortingChange?: OnChangeFn<SortingState>
 }) {
   const columns = useMemo(
-    () => [createSelectColumn<AssetSearchRow>(), ...createAssetSearchColumns(getRowHref)],
+    () => [createSelectColumn<AssetSearchRow>(), ...createSearchPageColumns(getRowHref)],
     [getRowHref],
   )
 

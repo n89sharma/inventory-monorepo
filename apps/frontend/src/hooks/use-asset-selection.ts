@@ -1,4 +1,4 @@
-import { assetSearchRowsToCsv } from '@/components/table-columns/search-page-report-columns'
+import { searchPageRowsToCsv } from '@/components/table-columns/search-page-report-columns'
 import { downloadFile } from '@/lib/download-file'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
@@ -47,7 +47,7 @@ export function useAssetSelection(
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = assetSearchRowsToCsv(rows, visibleColumns)
+      const csv = searchPageRowsToCsv(rows, visibleColumns)
       downloadFile(exportFilename, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })

@@ -11,12 +11,12 @@ import { getReadinessDisplay } from '@/components/shared/readiness/readiness-con
 import type { AssetSearchRow } from 'shared-types'
 import { daysHeld, stockDays } from './search-page-columns'
 
-type AssetSearchReportColumn = CsvColumn<AssetSearchRow> & {
+type SearchPageReportColumn = CsvColumn<AssetSearchRow> & {
   id: string
   alwaysVisible?: boolean
 }
 
-export const ASSET_SEARCH_REPORT_COLUMNS: AssetSearchReportColumn[] = [
+export const SEARCH_PAGE_REPORT_COLUMNS: SearchPageReportColumn[] = [
   { id: 'barcode', header: 'Barcode', alwaysVisible: true, value: (a) => a.barcode },
   { id: 'brand', header: 'Brand', value: (a) => formatTitleCase(a.brand) },
   { id: 'model', header: 'Model', alwaysVisible: true, value: (a) => a.model },
@@ -127,8 +127,8 @@ export const ASSET_SEARCH_REPORT_COLUMNS: AssetSearchReportColumn[] = [
   { id: 'latest_comment', header: 'Last Comment', value: (a) => a.latest_comment ?? '' },
 ]
 
-export function assetSearchRowsToCsv(rows: AssetSearchRow[], visibleColumns: Set<string>): string {
-  const columns = ASSET_SEARCH_REPORT_COLUMNS.filter(
+export function searchPageRowsToCsv(rows: AssetSearchRow[], visibleColumns: Set<string>): string {
+  const columns = SEARCH_PAGE_REPORT_COLUMNS.filter(
     (c) => c.alwaysVisible || visibleColumns.has(c.id),
   )
   return toCsv(columns, rows)

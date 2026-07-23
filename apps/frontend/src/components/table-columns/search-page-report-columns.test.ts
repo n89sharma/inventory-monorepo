@@ -2,8 +2,8 @@ import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
-import { createAssetSearchColumns } from './search-page-columns'
-import { ASSET_SEARCH_REPORT_COLUMNS, assetSearchRowsToCsv } from './search-page-report-columns'
+import { createSearchPageColumns } from './search-page-columns'
+import { SEARCH_PAGE_REPORT_COLUMNS, searchPageRowsToCsv } from './search-page-report-columns'
 
 const noHref = () => ''
 
@@ -76,17 +76,17 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
   }
 }
 
-function reportColumn(id: string): (typeof ASSET_SEARCH_REPORT_COLUMNS)[number] {
-  const found = ASSET_SEARCH_REPORT_COLUMNS.find((c) => c.id === id)
+function reportColumn(id: string): (typeof SEARCH_PAGE_REPORT_COLUMNS)[number] {
+  const found = SEARCH_PAGE_REPORT_COLUMNS.find((c) => c.id === id)
   if (!found) throw new Error(`No report column: ${id}`)
   return found
 }
 
 describe('asset-search report columns', () => {
   it('mirrors the live search table columns in id and header order', () => {
-    const liveColumns = createAssetSearchColumns(noHref)
-    expect(liveColumns.map(columnId)).toEqual(ASSET_SEARCH_REPORT_COLUMNS.map((c) => c.id))
-    expect(liveColumns.map(headerLabel)).toEqual(ASSET_SEARCH_REPORT_COLUMNS.map((c) => c.header))
+    const liveColumns = createSearchPageColumns(noHref)
+    expect(liveColumns.map(columnId)).toEqual(SEARCH_PAGE_REPORT_COLUMNS.map((c) => c.id))
+    expect(liveColumns.map(headerLabel)).toEqual(SEARCH_PAGE_REPORT_COLUMNS.map((c) => c.header))
   })
 
   it('carries the table display formatters', () => {
@@ -119,7 +119,7 @@ describe('asset-search report columns', () => {
   })
 
   it('emits only visible columns, keeping barcode and model always on', () => {
-    const header = assetSearchRowsToCsv([makeRow()], new Set(['status'])).split('\r\n')[0]
+    const header = searchPageRowsToCsv([makeRow()], new Set(['status'])).split('\r\n')[0]
     expect(header).toBe('Barcode,Model,Status')
   })
 })

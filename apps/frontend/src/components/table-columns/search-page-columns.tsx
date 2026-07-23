@@ -23,7 +23,7 @@ export const stockDays = (createdAt: Date): number =>
 export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
 
-export function createAssetSearchColumns(
+export function createSearchPageColumns(
   detailHref: (row: AssetSearchRow) => string,
 ): ColumnDef<AssetSearchRow>[] {
   return [
