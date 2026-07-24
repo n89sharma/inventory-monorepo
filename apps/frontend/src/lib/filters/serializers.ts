@@ -1,7 +1,20 @@
+import type { AssetColumnId } from '@/components/table-columns/asset-column-registry'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-sales-summary'
 import { createSerializer } from 'nuqs'
 import type { AssetType, Brand, InStockSummaryRow, MeterBand, Warehouse } from 'shared-types'
+
+const HELD_REPORT_COLUMN_IDS = [
+  'serial_number',
+  'status',
+  'held_by',
+  'hold_created_for',
+  'hold_customer',
+  'hold_created_at',
+  'days_held',
+] as const satisfies readonly AssetColumnId[]
+
+const HELD_REPORT_SORT = { id: 'days_held', desc: true } as const
 
 const STORE_LIST_PATH = '/store'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
@@ -38,6 +51,8 @@ const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
 const serializeHeld = createSerializer({
   heldfor: FILTER_PARSERS.heldfor,
   holdcustomer: FILTER_PARSERS.holdcustomer,
+  cols: FILTER_PARSERS.cols,
+  sort: FILTER_PARSERS.sort,
 })
 
 export function buildStoreListPath(warehouse: Warehouse | null): string {
@@ -93,6 +108,8 @@ export function buildSearchOnHandUrl(selection: {
   return serializeHeld(ONHAND_PATH, {
     heldfor: selection.heldForId ?? null,
     holdcustomer: selection.holdCustomerId ?? null,
+    cols: [...HELD_REPORT_COLUMN_IDS],
+    sort: HELD_REPORT_SORT,
   })
 }
 
