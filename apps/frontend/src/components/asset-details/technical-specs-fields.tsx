@@ -331,24 +331,28 @@ export function TechnicalSpecsFields<T extends FieldValues>({
 
         {renderAfterReadiness}
 
-        <HorizontalField label="Country of Origin">
-          <ControlledSearchSelectField
-            control={control}
-            name={p('countryOfOrigin')}
-            options={countries}
-            getLabel={(c: Country) => formatTitleCase(c.name)}
-            clearLabel="Clear country of origin"
-            className={INPUT_WIDTH}
-          />
-        </HorizontalField>
+        {applicable.manufacturingOrigin ? (
+          <>
+            <HorizontalField label="Country of Origin">
+              <ControlledSearchSelectField
+                control={control}
+                name={p('countryOfOrigin')}
+                options={countries}
+                getLabel={(c: Country) => formatTitleCase(c.name)}
+                clearLabel="Clear country of origin"
+                className={INPUT_WIDTH}
+              />
+            </HorizontalField>
 
-        <HorizontalField label="Manufactured Year">
-          <ControlledNumberInput
-            control={control}
-            name={p('manufacturedYear')}
-            className={INPUT_WIDTH}
-          />
-        </HorizontalField>
+            <HorizontalField label="Manufactured Year">
+              <ControlledNumberInput
+                control={control}
+                name={p('manufacturedYear')}
+                className={INPUT_WIDTH}
+              />
+            </HorizontalField>
+          </>
+        ) : null}
       </div>
 
       {applicable.meter ? (
