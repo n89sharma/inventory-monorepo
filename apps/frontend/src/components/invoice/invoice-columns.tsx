@@ -62,6 +62,7 @@ export function invoiceTableColumns(
   includeArrivalColumns: boolean,
 ): ColumnDef<InvoiceSummary>[] {
   return [
+    invoiceDateColumn,
     {
       ...createIdColumn<InvoiceSummary>({
         accessorKey: 'invoice_reference',
@@ -71,17 +72,16 @@ export function invoiceTableColumns(
       }),
       filterFn: 'includesString',
     },
-    invoiceDateColumn,
     {
       accessorKey: 'organization',
       header: sortableHeader<InvoiceSummary>(organizationHeader),
       cell: ({ row }) => formatTitleCase(row.original.organization ?? ''),
       filterFn: 'includesString',
     },
-    ...(includeClearedColumn ? [clearedColumn] : []),
-    assetCountColumn as ColumnDef<InvoiceSummary>,
     ...(includeArrivalColumns ? [warehouseColumn, arrivalNumbersColumn, transportersColumn] : []),
+    ...(includeClearedColumn ? [clearedColumn] : []),
     notesColumn,
+    assetCountColumn as ColumnDef<InvoiceSummary>,
     createdByColumn as ColumnDef<InvoiceSummary>,
   ]
 }
