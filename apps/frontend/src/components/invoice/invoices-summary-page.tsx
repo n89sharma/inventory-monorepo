@@ -30,7 +30,12 @@ export function InvoicesSummaryPage(): React.JSX.Element {
     [searchParams],
   )
   const columns = useMemo(
-    () => invoiceTableColumns(getRowHref, ORGANIZATION_HEADER[invoiceType]),
+    () =>
+      invoiceTableColumns(
+        getRowHref,
+        ORGANIZATION_HEADER[invoiceType],
+        invoiceType === INVOICE_TYPE.purchase,
+      ),
     [getRowHref, invoiceType],
   )
 
@@ -42,13 +47,22 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
       renderTableFilter={(table) => (
-        <ColumnTextFilter
-          table={table}
-          columnId="invoice_reference"
-          placeholder="Reference Invoice Number"
-          clearLabel="Clear reference invoice number"
-          className="w-64"
-        />
+        <div className="flex gap-2">
+          <ColumnTextFilter
+            table={table}
+            columnId="invoice_reference"
+            placeholder="Reference Invoice Number"
+            clearLabel="Clear reference invoice number"
+            className="w-64"
+          />
+          <ColumnTextFilter
+            table={table}
+            columnId="organization"
+            placeholder={`${ORGANIZATION_HEADER[invoiceType]} name`}
+            clearLabel={`Clear ${ORGANIZATION_HEADER[invoiceType].toLowerCase()} name`}
+            className="w-64"
+          />
+        </div>
       )}
       searchBar={
         <SearchBar

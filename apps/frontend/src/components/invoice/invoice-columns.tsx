@@ -1,4 +1,4 @@
-import { createIdColumn } from '@/components/table-columns/column-primitives'
+import { createIdColumn, sortableHeader } from '@/components/table-columns/column-primitives'
 import {
   assetCountColumn,
   createdAtColumn,
@@ -9,9 +9,20 @@ import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { InvoiceSummary } from 'shared-types'
 
+const clearedColumn: ColumnDef<InvoiceSummary> = {
+  accessorKey: 'is_cleared',
+  header: 'Cleared',
+  cell: ({ row }) => (
+    <div className="flex justify-center">
+      <Checkbox checked={row.original.is_cleared} />
+    </div>
+  ),
+}
+
 export function invoiceTableColumns(
   getHref: (row: InvoiceSummary) => string,
   organizationHeader: string,
+  includeClearedColumn: boolean,
 ): ColumnDef<InvoiceSummary>[] {
   return [
     {
@@ -24,26 +35,14 @@ export function invoiceTableColumns(
       filterFn: 'includesString',
     },
     createdAtColumn as ColumnDef<InvoiceSummary>,
-    createdByColumn as ColumnDef<InvoiceSummary>,
     {
       accessorKey: 'organization',
-      header: organizationHeader,
+      header: sortableHeader<InvoiceSummary>(organizationHeader),
       cell: ({ row }) => formatTitleCase(row.original.organization ?? ''),
+      filterFn: 'includesString',
     },
-    {
-      accessorKey: 'is_cleared',
-      header: 'Cleared',
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          <Checkbox checked={row.original.is_cleared} />
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'invoice_type',
-      header: 'Invoice Type',
-      cell: ({ row }) => formatTitleCase(row.original.invoice_type ?? ''),
-    },
+    ...(includeClearedColumn ? [clearedColumn] : []),
     assetCountColumn as ColumnDef<InvoiceSummary>,
+    createdByColumn as ColumnDef<InvoiceSummary>,
   ]
 }
