@@ -11,7 +11,7 @@ import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { ReadinessPicker } from '@/components/shared/readiness/readiness-picker'
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import type { SpecApplicability } from '@/lib/asset-spec-applicability'
+import type { SpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
 import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import {
@@ -273,7 +273,7 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
   brandId: number | null
-  applicable: SpecApplicability
+  visibility: SpecificationFieldVisibility
   readinessDisabledStatuses?: string[]
   renderAfterReadiness?: React.ReactNode
 }
@@ -292,7 +292,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   control,
   isColour,
   brandId,
-  applicable,
+  visibility,
   readinessDisabledStatuses,
   renderAfterReadiness,
 }: TechnicalSpecsFieldsProps<T>) {
@@ -331,7 +331,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
 
         {renderAfterReadiness}
 
-        {applicable.manufacturingOrigin ? (
+        {visibility.manufacturingOrigin ? (
           <>
             <HorizontalField label="Country of Origin">
               <ControlledSearchSelectField
@@ -355,7 +355,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
         ) : null}
       </div>
 
-      {applicable.meter ? (
+      {visibility.meter ? (
         <HorizontalField label="Meter" required>
           <div className="flex items-center gap-2">
             {isColour && (
@@ -373,7 +373,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
         </HorizontalField>
       ) : null}
 
-      {applicable.consumables ? (
+      {visibility.consumables ? (
         <ConsumablesGrid visibleChannels={channels}>
           <ControlledConsumablesRow
             label="Drum life"
@@ -400,7 +400,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
       ) : null}
 
       <div className="flex flex-col gap-2">
-        {applicable.cassettes ? (
+        {visibility.cassettes ? (
           <HorizontalField label="Cassettes" required>
             <ControlledNumberInput
               control={control}
@@ -409,7 +409,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
             />
           </HorizontalField>
         ) : null}
-        {applicable.internalFinisher ? (
+        {visibility.internalFinisher ? (
           <HorizontalField label="Internal Finisher">
             <ControlledComponentSearch
               control={control}
@@ -419,24 +419,26 @@ export function TechnicalSpecsFields<T extends FieldValues>({
             />
           </HorizontalField>
         ) : null}
-        <HorizontalField label="Core Functions">
-          <Controller
-            name={p('coreFunctions')}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <MultipleSelector
-                options={getCoreFunctionOptions(selectableCoreFunctions)}
-                placeholder="Select functions…"
-                emptyIndicator={<p>No results found.</p>}
-                value={getCoreFunctionOptions(value as CoreFunction[])}
-                onChange={(options) => {
-                  const selectedIds = options.map((o) => o.id)
-                  onChange(coreFunctions.filter((c) => selectedIds.includes(c.id)))
-                }}
-              />
-            )}
-          />
-        </HorizontalField>
+        {visibility.coreFunctions ? (
+          <HorizontalField label="Core Functions">
+            <Controller
+              name={p('coreFunctions')}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <MultipleSelector
+                  options={getCoreFunctionOptions(selectableCoreFunctions)}
+                  placeholder="Select functions…"
+                  emptyIndicator={<p>No results found.</p>}
+                  value={getCoreFunctionOptions(value as CoreFunction[])}
+                  onChange={(options) => {
+                    const selectedIds = options.map((o) => o.id)
+                    onChange(coreFunctions.filter((c) => selectedIds.includes(c.id)))
+                  }}
+                />
+              )}
+            />
+          </HorizontalField>
+        ) : null}
       </div>
     </>
   )

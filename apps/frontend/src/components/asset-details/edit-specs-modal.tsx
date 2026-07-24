@@ -11,7 +11,7 @@ import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog
 import { useAssetStore } from '@/data/store/asset-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
-import { specApplicability } from '@/lib/asset-spec-applicability'
+import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
 import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
@@ -110,7 +110,7 @@ export function EditSpecsModal({
 
   if (!assetDetails) return null
 
-  const applicable = specApplicability(assetDetails.asset_type)
+  const visibility = getSpecificationFieldVisibility(assetDetails.asset_type)
 
   async function onValid(formValues: SpecsForm) {
     if (!isSelected(formValues.readiness)) return
@@ -164,7 +164,7 @@ export function EditSpecsModal({
             control={form.control}
             isColour={assetDetails.is_colour}
             brandId={assetDetails.brand_id}
-            applicable={applicable}
+            visibility={visibility}
             readinessDisabledStatuses={readinessDisabledStatuses}
           />
         </form>

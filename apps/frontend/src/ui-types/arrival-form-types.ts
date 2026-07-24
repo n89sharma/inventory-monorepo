@@ -18,7 +18,10 @@ import {
   UpdateErrorSchema,
 } from 'shared-types'
 import z from 'zod'
-import { specApplicability, type SpecApplicability } from '@/lib/asset-spec-applicability'
+import {
+  getSpecificationFieldVisibility,
+  type SpecificationFieldVisibility,
+} from '@/lib/asset-spec-applicability'
 import {
   isSelected,
   StatusSelectOptionSchema,
@@ -57,7 +60,7 @@ const specFieldsShape = {
 } as const
 
 // Meter fields apply only to metered asset types; cassettes and the drum/toner
-// consumables apply only to types that carry them (see specApplicability). Within
+// consumables apply only to types that carry them (see getSpecificationFieldVisibility). Within
 // an applicable group, the K channel is always required, and colour models also
 // require the C/M/Y channels plus the colour meter. Non-applicable fields are
 // hidden in the UI and left unvalidated (coerced to 0 at the create boundary).
@@ -83,18 +86,18 @@ function requireField(
 
 function refineSpecFields(
   val: Record<string, unknown>,
-  applicable: SpecApplicability,
+  visibility: SpecificationFieldVisibility,
   isColour: boolean,
   ctx: z.RefinementCtx,
 ) {
-  if (applicable.meter) {
+  if (visibility.meter) {
     requireField(val, 'meterBlack', 'Black meter', ctx)
     if (isColour) requireField(val, 'meterColour', 'Colour meter', ctx)
   }
-  if (applicable.cassettes) {
+  if (visibility.cassettes) {
     requireField(val, 'cassettes', 'Cassettes', ctx)
   }
-  if (applicable.consumables) {
+  if (visibility.consumables) {
     requireField(val, 'drumLifeK', 'Drum life K', ctx)
     requireField(val, 'tonerLifeK', 'Toner life K', ctx)
     if (isColour) {
@@ -132,8 +135,8 @@ export const AssetFormSchema = z
       })
     }
 
-    const applicable = specApplicability(val.model?.asset_type ?? null)
-    refineSpecFields(val, applicable, val.model?.is_colour ?? false, ctx)
+    const visibility = getSpecificationFieldVisibility(val.model?.asset_type ?? null)
+    refineSpecFields(val, visibility, val.model?.is_colour ?? false, ctx)
   })
 
 // Edit Technical Specifications modal — the spec-field subset of an existing
@@ -147,8 +150,8 @@ export const SpecsFormSchema = z
     assetType: z.string().nullable(),
   })
   .superRefine((val, ctx) => {
-    const applicable = specApplicability(val.assetType)
-    refineSpecFields(val, applicable, val.isColour, ctx)
+    const visibility = getSpecificationFieldVisibility(val.assetType)
+    refineSpecFields(val, visibility, val.isColour, ctx)
   })
 
 // Arrival Form Page within Edit or Create Arrival
