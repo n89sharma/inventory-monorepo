@@ -1,6 +1,5 @@
 import { invoiceTableColumns } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
-import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { SearchBar } from '@/components/shared/search-bar'
@@ -41,7 +40,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
 
   return (
     <CollectionPage
-      title="Invoices"
+      title={INVOICE_PAGE_TITLE[invoiceType]}
       columns={columns}
       data={invoices}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
@@ -86,6 +85,16 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   )
 }
 
+const INVOICE_PAGE_TITLE = {
+  [INVOICE_TYPE.purchase]: 'Purchase Invoices',
+  [INVOICE_TYPE.sales]: 'Sales Invoices',
+} as const satisfies Record<InvoiceTypeFilter, string>
+
+const INVOICE_TYPE_TOGGLE_LABEL = {
+  [INVOICE_TYPE.purchase]: 'Show Sales',
+  [INVOICE_TYPE.sales]: 'Show Purchase',
+} as const satisfies Record<InvoiceTypeFilter, string>
+
 function InvoiceTypeToggle({
   value,
   onChange,
@@ -93,17 +102,10 @@ function InvoiceTypeToggle({
   value: InvoiceTypeFilter
   onChange: (value: InvoiceTypeFilter) => void
 }): React.JSX.Element {
+  const nextType = value === INVOICE_TYPE.purchase ? INVOICE_TYPE.sales : INVOICE_TYPE.purchase
   return (
-    <ToggleGroup
-      type="single"
-      value={value}
-      onValueChange={(next) => {
-        if (next) onChange(next as InvoiceTypeFilter)
-      }}
-      variant="outline"
-    >
-      <ToggleGroupItem value={INVOICE_TYPE.purchase}>Purchase</ToggleGroupItem>
-      <ToggleGroupItem value={INVOICE_TYPE.sales}>Sales</ToggleGroupItem>
-    </ToggleGroup>
+    <Button variant="outline" onClick={() => onChange(nextType)}>
+      {INVOICE_TYPE_TOGGLE_LABEL[value]}
+    </Button>
   )
 }
