@@ -10,7 +10,6 @@ import {
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
-import { getInvoices as getInvoicesDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
 import { InvoiceListQuerySchema } from '../middleware/validation.js'
@@ -18,6 +17,7 @@ import { prisma } from '../prisma.js'
 import {
   createInvoice as createInvoiceSer,
   getInvoice as getInvoiceSer,
+  getInvoices as getInvoicesSer,
   addRemoveCollectionFromAssetsAndRecord as patchInvoiceAssetsSer,
   patchInvoiceMetadata as patchInvoiceMetadataSer,
 } from '../services/invoiceService.js'
@@ -34,7 +34,7 @@ export const getInvoices = asyncHandler(
     const { fromDate, toDate, invoiceType } = res.locals.query as z.infer<
       typeof InvoiceListQuerySchema
     >
-    const invoices = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
+    const invoices = await getInvoicesSer(fromDate, toDate, invoiceType)
     res.json(successResponse(invoices))
   },
 )

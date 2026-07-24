@@ -19,6 +19,7 @@ export const InvoiceSummarySchema = CollectionSummarySchema.extend({
   organization: z.string(),
   is_cleared: z.boolean(),
   invoice_type: z.string(),
+  invoice_date: z.string(),
 })
 export type InvoiceSummary = z.infer<typeof InvoiceSummarySchema>
 

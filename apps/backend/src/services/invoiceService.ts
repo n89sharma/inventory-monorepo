@@ -5,10 +5,15 @@ import {
   CreateInvoice,
   INVOICE_TYPE,
   InvoiceDetail,
+  InvoiceSummary,
   UpdateInvoiceMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
-import { getArrivalsForInvoice, getAssetsForInvoice } from '../../generated/prisma/sql.js'
+import {
+  getArrivalsForInvoice,
+  getAssetsForInvoice,
+  getInvoices as getInvoicesDb,
+} from '../../generated/prisma/sql.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
 import { redactAssetCost } from '../lib/cost-redaction.js'
 import { decimalToNumber } from '../lib/decimal.js'
@@ -224,6 +229,15 @@ function buildAssetCost(r: {
     total_cost: decimalToNumber(r.cost_total_cost),
     sale_price: decimalToNumber(r.cost_sale_price),
   }
+}
+
+export async function getInvoices(
+  fromDate: Date,
+  toDate: Date,
+  invoiceType: string,
+): Promise<InvoiceSummary[]> {
+  const rows = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
+  return rows.map((row) => ({ ...row, invoice_date: toYmd(row.invoice_date) }))
 }
 
 export async function getInvoice(
