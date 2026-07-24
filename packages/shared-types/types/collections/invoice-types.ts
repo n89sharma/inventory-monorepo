@@ -21,6 +21,7 @@ export const InvoiceSummarySchema = CollectionSummarySchema.extend({
   invoice_type: z.string(),
   invoice_date: z.string(),
   notes: z.string().nullable(),
+  destination_codes: z.array(z.string()),
   arrival_numbers: z.array(z.string()),
   transporters: z.array(z.string()),
 })

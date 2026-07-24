@@ -14,6 +14,7 @@ select
   ac.finisher_count as finisher_count,
   ac.accessory_count as accessory_count,
   ac.other_count as other_count,
+  arr.destination_codes as destination_codes,
   arr.arrival_numbers as arrival_numbers,
   arr.transporters as transporters
 from "Invoice" i
@@ -36,11 +37,13 @@ from "Invoice" i
   ) ac on true
   left join lateral (
     select
+      array_agg(distinct w.city_code order by w.city_code) as destination_codes,
       array_agg(distinct ar.arrival_number order by ar.arrival_number) as arrival_numbers,
       array_agg(distinct t."name" order by t."name") as transporters
     from "Asset" a
     join "Arrival" ar on ar.id = a.arrival_id
     join "Organization" t on t.id = ar.transporter_id
+    join "Warehouse" w on w.id = ar.destination_id
     where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
   ) arr on true
 where it.type = $3

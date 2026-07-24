@@ -240,6 +240,7 @@ export async function getInvoices(
   return rows.map((row) => ({
     ...row,
     invoice_date: toYmd(row.invoice_date),
+    destination_codes: row.destination_codes ?? [],
     arrival_numbers: row.arrival_numbers ?? [],
     transporters: row.transporters ?? [],
   }))

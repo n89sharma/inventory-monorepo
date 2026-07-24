@@ -27,6 +27,13 @@ const clearedColumn: ColumnDef<InvoiceSummary> = {
   ),
 }
 
+const warehouseColumn: ColumnDef<InvoiceSummary> = {
+  accessorKey: 'destination_codes',
+  header: 'Warehouse',
+  enableSorting: false,
+  cell: ({ row }) => row.original.destination_codes.join(', '),
+}
+
 const arrivalNumbersColumn: ColumnDef<InvoiceSummary> = {
   accessorKey: 'arrival_numbers',
   header: 'Arrival IDs',
@@ -73,7 +80,7 @@ export function invoiceTableColumns(
     },
     ...(includeClearedColumn ? [clearedColumn] : []),
     assetCountColumn as ColumnDef<InvoiceSummary>,
-    ...(includeArrivalColumns ? [arrivalNumbersColumn, transportersColumn] : []),
+    ...(includeArrivalColumns ? [warehouseColumn, arrivalNumbersColumn, transportersColumn] : []),
     notesColumn,
     createdByColumn as ColumnDef<InvoiceSummary>,
   ]
