@@ -5,7 +5,7 @@ import {
 } from '@/components/table-columns/collection-summary-columns'
 import { ArrivalLinks } from '@/components/shared/arrival-links'
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { formatDate, formatTitleCase } from '@/lib/formatters'
+import { formatDate, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import { parseISO } from 'date-fns'
 import type { InvoiceSummary } from 'shared-types'
@@ -48,6 +48,26 @@ const transportersColumn: ColumnDef<InvoiceSummary> = {
   cell: ({ row }) => row.original.transporters.join(', '),
 }
 
+function currencyColumn(
+  accessorKey: keyof InvoiceSummary,
+  header: string,
+): ColumnDef<InvoiceSummary> {
+  return {
+    accessorKey,
+    header,
+    enableSorting: false,
+    cell: ({ getValue }) => {
+      const amount = getValue<number | null>()
+      return amount === null ? null : formatUSDWithSymbol(amount)
+    },
+  }
+}
+
+const purchaseCostColumn = currencyColumn('purchase_cost', 'Purchase Cost')
+const transportCostColumn = currencyColumn('transport_cost', 'Transport Cost')
+const totalCostColumn = currencyColumn('total_cost', 'Total Cost')
+const salePriceColumn = currencyColumn('sale_price', 'Sale Price')
+
 const notesColumn: ColumnDef<InvoiceSummary> = {
   accessorKey: 'notes',
   header: 'Notes',
@@ -60,6 +80,8 @@ export function invoiceTableColumns(
   organizationHeader: string,
   includeClearedColumn: boolean,
   includeArrivalColumns: boolean,
+  canViewPurchasePrice: boolean,
+  canViewSalePrice: boolean,
 ): ColumnDef<InvoiceSummary>[] {
   return [
     invoiceDateColumn,
@@ -80,6 +102,8 @@ export function invoiceTableColumns(
     },
     ...(includeArrivalColumns ? [warehouseColumn, arrivalNumbersColumn, transportersColumn] : []),
     ...(includeClearedColumn ? [clearedColumn] : []),
+    ...(canViewPurchasePrice ? [purchaseCostColumn, transportCostColumn, totalCostColumn] : []),
+    ...(canViewSalePrice ? [salePriceColumn] : []),
     notesColumn,
     assetCountColumn as ColumnDef<InvoiceSummary>,
     createdByColumn as ColumnDef<InvoiceSummary>,

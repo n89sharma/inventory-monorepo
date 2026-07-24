@@ -16,7 +16,11 @@ select
   ac.other_count as other_count,
   arr.destination_codes as destination_codes,
   arr.arrival_numbers as arrival_numbers,
-  arr.transporters as transporters
+  arr.transporters as transporters,
+  cost.purchase_cost as purchase_cost,
+  cost.transport_cost as transport_cost,
+  cost.total_cost as total_cost,
+  cost.sale_price as sale_price
 from "Invoice" i
   join "InvoiceType" it on it.id = i.invoice_type_id
   join "Organization" o on o.id = i.organization_id
@@ -46,6 +50,16 @@ from "Invoice" i
     join "Warehouse" w on w.id = ar.destination_id
     where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
   ) arr on true
+  left join lateral (
+    select
+      sum(c.purchase_cost) as purchase_cost,
+      sum(c.transport_cost) as transport_cost,
+      sum(c.total_cost) as total_cost,
+      sum(c.sale_price) as sale_price
+    from "Asset" a
+    join "Cost" c on c.asset_id = a.id
+    where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
+  ) cost on true
 where it.type = $3
   and i.invoice_date between $1 and $2
 order by i.invoice_date desc

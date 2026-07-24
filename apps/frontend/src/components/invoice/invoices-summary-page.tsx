@@ -22,6 +22,8 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   const { data: invoices = [] } = useInvoicesList(fromDate, toDate, invoiceType)
 
   const canCreate = useCan('create_update_invoice')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
 
   const getRowHref = useCallback(
     (invoice: InvoiceSummary) =>
@@ -30,8 +32,15 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   )
   const columns = useMemo(() => {
     const isPurchase = invoiceType === INVOICE_TYPE.purchase
-    return invoiceTableColumns(getRowHref, ORGANIZATION_HEADER[invoiceType], isPurchase, isPurchase)
-  }, [getRowHref, invoiceType])
+    return invoiceTableColumns(
+      getRowHref,
+      ORGANIZATION_HEADER[invoiceType],
+      isPurchase,
+      isPurchase,
+      canViewPurchasePrice,
+      canViewSalePrice,
+    )
+  }, [getRowHref, invoiceType, canViewPurchasePrice, canViewSalePrice])
 
   return (
     <CollectionPage

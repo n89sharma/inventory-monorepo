@@ -34,7 +34,7 @@ export const getInvoices = asyncHandler(
     const { fromDate, toDate, invoiceType } = res.locals.query as z.infer<
       typeof InvoiceListQuerySchema
     >
-    const invoices = await getInvoicesSer(fromDate, toDate, invoiceType)
+    const invoices = await getInvoicesSer(fromDate, toDate, invoiceType, res.locals.dbUserRole)
     res.json(successResponse(invoices))
   },
 )

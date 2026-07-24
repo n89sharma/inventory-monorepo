@@ -6,6 +6,7 @@ import {
   INVOICE_TYPE,
   InvoiceDetail,
   InvoiceSummary,
+  ROLE_PERMISSIONS,
   UpdateInvoiceMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
@@ -235,7 +236,11 @@ export async function getInvoices(
   fromDate: Date,
   toDate: Date,
   invoiceType: string,
+  role: AppRole | null,
 ): Promise<InvoiceSummary[]> {
+  const permissions = role ? ROLE_PERMISSIONS[role] : []
+  const canViewPurchase = permissions.includes('view_purchase_price')
+  const canViewSale = permissions.includes('view_sale_price')
   const rows = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
   return rows.map((row) => ({
     ...row,
@@ -243,6 +248,10 @@ export async function getInvoices(
     destination_codes: row.destination_codes ?? [],
     arrival_numbers: row.arrival_numbers ?? [],
     transporters: row.transporters ?? [],
+    purchase_cost: canViewPurchase ? (decimalToNumber(row.purchase_cost) ?? 0) : null,
+    transport_cost: canViewPurchase ? (decimalToNumber(row.transport_cost) ?? 0) : null,
+    total_cost: canViewPurchase ? (decimalToNumber(row.total_cost) ?? 0) : null,
+    sale_price: canViewSale ? (decimalToNumber(row.sale_price) ?? 0) : null,
   }))
 }
 
