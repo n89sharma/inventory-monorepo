@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { ArrivalLinks } from '@/components/shared/arrival-links'
 import type { InvoiceArrival } from 'shared-types'
 
 export function InvoiceArrivalsField({ arrivals }: { arrivals: InvoiceArrival[] }) {
@@ -6,19 +6,7 @@ export function InvoiceArrivalsField({ arrivals }: { arrivals: InvoiceArrival[] 
   return (
     <div className="flex items-baseline gap-1.5">
       <span className="text-muted-foreground">Arrival</span>
-      <span>
-        {arrivals.map((arrival, i) => (
-          <span key={arrival.arrival_number}>
-            {i > 0 && ', '}
-            <Link
-              to={`/arrivals/${arrival.arrival_number}`}
-              className="text-primary hover:underline"
-            >
-              {arrival.arrival_number}
-            </Link>
-          </span>
-        ))}
-      </span>
+      <ArrivalLinks arrivalNumbers={arrivals.map((arrival) => arrival.arrival_number)} />
     </div>
   )
 }

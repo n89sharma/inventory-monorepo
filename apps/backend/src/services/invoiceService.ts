@@ -237,7 +237,12 @@ export async function getInvoices(
   invoiceType: string,
 ): Promise<InvoiceSummary[]> {
   const rows = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
-  return rows.map((row) => ({ ...row, invoice_date: toYmd(row.invoice_date) }))
+  return rows.map((row) => ({
+    ...row,
+    invoice_date: toYmd(row.invoice_date),
+    arrival_numbers: row.arrival_numbers ?? [],
+    transporters: row.transporters ?? [],
+  }))
 }
 
 export async function getInvoice(

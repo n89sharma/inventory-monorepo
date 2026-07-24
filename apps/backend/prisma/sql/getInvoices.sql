@@ -13,7 +13,9 @@ select
   ac.copier_count as copier_count,
   ac.finisher_count as finisher_count,
   ac.accessory_count as accessory_count,
-  ac.other_count as other_count
+  ac.other_count as other_count,
+  arr.arrival_numbers as arrival_numbers,
+  arr.transporters as transporters
 from "Invoice" i
   join "InvoiceType" it on it.id = i.invoice_type_id
   join "Organization" o on o.id = i.organization_id
@@ -32,6 +34,15 @@ from "Invoice" i
     join "AssetType" atype on atype.id = m.asset_type_id
     where ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id
   ) ac on true
+  left join lateral (
+    select
+      array_agg(distinct ar.arrival_number order by ar.arrival_number) as arrival_numbers,
+      array_agg(distinct t."name" order by t."name") as transporters
+    from "Asset" a
+    join "Arrival" ar on ar.id = a.arrival_id
+    join "Organization" t on t.id = ar.transporter_id
+    where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
+  ) arr on true
 where it.type = $3
   and i.invoice_date between $1 and $2
 order by i.invoice_date desc

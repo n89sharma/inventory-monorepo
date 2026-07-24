@@ -3,6 +3,7 @@ import {
   assetCountColumn,
   createdByColumn,
 } from '@/components/table-columns/collection-summary-columns'
+import { ArrivalLinks } from '@/components/shared/arrival-links'
 import { Checkbox } from '@/components/shadcn/checkbox'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -24,6 +25,20 @@ const clearedColumn: ColumnDef<InvoiceSummary> = {
       <Checkbox checked={row.original.is_cleared} />
     </div>
   ),
+}
+
+const arrivalNumbersColumn: ColumnDef<InvoiceSummary> = {
+  accessorKey: 'arrival_numbers',
+  header: 'Arrival IDs',
+  enableSorting: false,
+  cell: ({ row }) => <ArrivalLinks arrivalNumbers={row.original.arrival_numbers} />,
+}
+
+const transportersColumn: ColumnDef<InvoiceSummary> = {
+  accessorKey: 'transporters',
+  header: 'Transporters',
+  enableSorting: false,
+  cell: ({ row }) => row.original.transporters.join(', '),
 }
 
 const notesColumn: ColumnDef<InvoiceSummary> = {
@@ -57,6 +72,8 @@ export function invoiceTableColumns(
     },
     ...(includeClearedColumn ? [clearedColumn] : []),
     assetCountColumn as ColumnDef<InvoiceSummary>,
+    arrivalNumbersColumn,
+    transportersColumn,
     notesColumn,
     createdByColumn as ColumnDef<InvoiceSummary>,
   ]

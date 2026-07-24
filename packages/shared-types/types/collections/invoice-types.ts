@@ -21,6 +21,8 @@ export const InvoiceSummarySchema = CollectionSummarySchema.extend({
   invoice_type: z.string(),
   invoice_date: z.string(),
   notes: z.string().nullable(),
+  arrival_numbers: z.array(z.string()),
+  transporters: z.array(z.string()),
 })
 export type InvoiceSummary = z.infer<typeof InvoiceSummarySchema>
 
