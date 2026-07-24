@@ -28,15 +28,10 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       collectionDetailHref('invoices', invoice.invoice_number, searchParams),
     [searchParams],
   )
-  const columns = useMemo(
-    () =>
-      invoiceTableColumns(
-        getRowHref,
-        ORGANIZATION_HEADER[invoiceType],
-        invoiceType === INVOICE_TYPE.purchase,
-      ),
-    [getRowHref, invoiceType],
-  )
+  const columns = useMemo(() => {
+    const isPurchase = invoiceType === INVOICE_TYPE.purchase
+    return invoiceTableColumns(getRowHref, ORGANIZATION_HEADER[invoiceType], isPurchase, isPurchase)
+  }, [getRowHref, invoiceType])
 
   return (
     <CollectionPage

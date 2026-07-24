@@ -52,6 +52,7 @@ export function invoiceTableColumns(
   getHref: (row: InvoiceSummary) => string,
   organizationHeader: string,
   includeClearedColumn: boolean,
+  includeArrivalColumns: boolean,
 ): ColumnDef<InvoiceSummary>[] {
   return [
     {
@@ -72,8 +73,7 @@ export function invoiceTableColumns(
     },
     ...(includeClearedColumn ? [clearedColumn] : []),
     assetCountColumn as ColumnDef<InvoiceSummary>,
-    arrivalNumbersColumn,
-    transportersColumn,
+    ...(includeArrivalColumns ? [arrivalNumbersColumn, transportersColumn] : []),
     notesColumn,
     createdByColumn as ColumnDef<InvoiceSummary>,
   ]
