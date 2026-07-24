@@ -26,6 +26,13 @@ const clearedColumn: ColumnDef<InvoiceSummary> = {
   ),
 }
 
+const notesColumn: ColumnDef<InvoiceSummary> = {
+  accessorKey: 'notes',
+  header: 'Notes',
+  enableSorting: false,
+  cell: ({ row }) => row.original.notes,
+}
+
 export function invoiceTableColumns(
   getHref: (row: InvoiceSummary) => string,
   organizationHeader: string,
@@ -50,6 +57,7 @@ export function invoiceTableColumns(
     },
     ...(includeClearedColumn ? [clearedColumn] : []),
     assetCountColumn as ColumnDef<InvoiceSummary>,
+    notesColumn,
     createdByColumn as ColumnDef<InvoiceSummary>,
   ]
 }

@@ -6,6 +6,7 @@ select
   u."name" as created_by,
   i.created_at as created_at,
   i.invoice_date as invoice_date,
+  i.notes as notes,
   i.is_cleared as is_cleared,
   it.type as invoice_type,
   ac.asset_count as asset_count,
