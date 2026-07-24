@@ -94,6 +94,7 @@ export const FILTER_PARSERS = {
   sort: parseAsSort,
   warehouse: parseAsIdList,
   search: parseAsString,
+  invoiceref: parseAsString,
   range: parseAsInteger,
   specs: parseAsOnFlag,
 }

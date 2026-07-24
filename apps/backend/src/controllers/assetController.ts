@@ -154,6 +154,11 @@ export const DepartedAssetQuerySchema = z.object({
   cassettes: z.string().optional().transform(Number),
   componentId: z.string().optional().transform(Number),
   customerId: z.string().optional().transform(Number),
+  invoiceRef: z
+    .string()
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]*$/)
+    .optional(),
   fromDate: z.coerce.date(),
   toDate: z.coerce.date(),
 })
@@ -183,6 +188,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
     cassettes,
     componentId,
     customerId,
+    invoiceRef,
     fromDate,
     toDate,
   } = res.locals.query as z.infer<typeof DepartedAssetQuerySchema>
@@ -201,6 +207,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
     departedFrom,
     departedTo,
     isNaN(customerId) ? -1 : customerId,
+    invoiceRef ?? '',
     res.locals.dbUserRole,
   )
   res.json(successResponse(data))

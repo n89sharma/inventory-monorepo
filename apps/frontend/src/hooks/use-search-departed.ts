@@ -16,6 +16,7 @@ export type SearchDepartedFilters = AssetFilters & {
   fromDate: Date
   toDate: Date
   customer: OrgSummary | null
+  invoiceReference: string
 }
 
 const SEARCH_DEPARTED_KEY = 'search-departed-assets'
@@ -44,6 +45,7 @@ export function useSearchDeparted(filters: SearchDepartedFilters) {
         f.cassettes,
         f.internalFinisher,
         f.customer,
+        f.invoiceReference,
         statuses,
         f.fromDate,
         f.toDate,

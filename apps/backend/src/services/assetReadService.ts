@@ -129,6 +129,7 @@ export async function getDepartedAssets(
   departedFrom: Date,
   departedTo: Date,
   customerIdParam: number,
+  invoiceReference: string,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
@@ -146,6 +147,7 @@ export async function getDepartedAssets(
       brandIds,
       assetTypeIds,
       customerIdParam,
+      normalizeForSearch(invoiceReference),
     ),
   )
   return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))

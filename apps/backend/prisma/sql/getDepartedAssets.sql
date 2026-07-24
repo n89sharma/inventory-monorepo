@@ -84,6 +84,7 @@ from d
   left join "Location" l on l.id = a.location_id
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
+  left join "Invoice" si on si.id = a.sales_invoice_id
   left join "Hold" h on h.id = a.hold_id
   left join "User" hu on hu.id = h.created_by_id
   left join "User" hu2 on hu2.id = h.created_for_id
@@ -110,4 +111,5 @@ where ($3 = '' or m."name" ilike '%' || $3 || '%')
   and (array_length($11::int[], 1) is null or b.id = any($11::int[]))
   and (array_length($12::int[], 1) is null or at.id = any($12::int[]))
   and ($13 = -1 or do_.id = $13)
+  and ($14 = '' or si.invoice_reference_normalized like '%' || $14 || '%')
 order by d.created_at desc

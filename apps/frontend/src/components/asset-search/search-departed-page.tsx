@@ -1,6 +1,7 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
+import { InvoiceReferenceFilter } from '@/components/shared/filters/invoice-reference-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
@@ -9,6 +10,7 @@ import {
   useAssetFilters,
   useCustomerParam,
   useDepartedRangeParam,
+  useInvoiceRefParam,
   useShowOtherParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
@@ -24,10 +26,19 @@ export function SearchDepartedPage(): React.JSX.Element {
   const [showOther, setShowOther] = useShowOtherParam()
   const { from, to, setRange } = useDepartedRangeParam()
   const [customer, setCustomer] = useCustomerParam()
+  const [invoiceReference, setInvoiceReference] = useInvoiceRefParam()
 
   const filters = useMemo(
-    () => ({ ...assetFilters, warehouses, showOther, fromDate: from, toDate: to, customer }),
-    [assetFilters, warehouses, showOther, from, to, customer],
+    () => ({
+      ...assetFilters,
+      warehouses,
+      showOther,
+      fromDate: from,
+      toDate: to,
+      customer,
+      invoiceReference,
+    }),
+    [assetFilters, warehouses, showOther, from, to, customer, invoiceReference],
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchDeparted(filters)
@@ -62,6 +73,11 @@ export function SearchDepartedPage(): React.JSX.Element {
               selection={customer}
               onSelectionChange={setCustomer}
               onClear={() => setCustomer(null)}
+            />
+            <InvoiceReferenceFilter
+              value={invoiceReference}
+              onChange={setInvoiceReference}
+              onClear={() => setInvoiceReference('')}
             />
           </>
         }

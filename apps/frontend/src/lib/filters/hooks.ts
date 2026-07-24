@@ -41,6 +41,7 @@ const inStockOnlyParser = FILTER_PARSERS.instock.withDefault(false)
 const showOtherParser = FILTER_PARSERS.other.withDefault(false)
 const specsParser = FILTER_PARSERS.specs.withDefault(false)
 const searchParser = FILTER_PARSERS.search.withDefault('')
+const invoiceRefParser = FILTER_PARSERS.invoiceref.withDefault('')
 const MODEL_PARSERS = { model: FILTER_PARSERS.model, q: FILTER_PARSERS.q }
 
 function resolveOne<T extends { id: number }>(id: number | null, list: T[]): T | null {
@@ -482,6 +483,16 @@ export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => 
 
 export function useStoreSearchParam(): [string, (next: string) => void] {
   const [committed, setCommitted] = useQueryState('search', searchParser)
+  const commit = useCallback(
+    (next: string) => void setCommitted(next.length > 0 ? next : null),
+    [setCommitted],
+  )
+  const [draft, setDraft] = useDebouncedParam(committed, commit)
+  return [draft, setDraft]
+}
+
+export function useInvoiceRefParam(): [string, (next: string) => void] {
+  const [committed, setCommitted] = useQueryState('invoiceref', invoiceRefParser)
   const commit = useCallback(
     (next: string) => void setCommitted(next.length > 0 ? next : null),
     [setCommitted],
