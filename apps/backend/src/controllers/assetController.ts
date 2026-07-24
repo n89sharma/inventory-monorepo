@@ -32,7 +32,7 @@ import {
   getAssets as getAssetsSer,
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
   getBarcodeContents as getBarcodeContentsSer,
-  getSoldAssets as getSoldAssetsSer,
+  getDepartedAssets as getDepartedAssetsSer,
 } from '../services/assetReadService.js'
 import {
   ASSET_LABEL_LAYOUT,
@@ -137,7 +137,7 @@ export const getAssets = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const SoldAssetQuerySchema = z.object({
+export const DepartedAssetQuerySchema = z.object({
   model: z
     .string()
     .min(3)
@@ -158,7 +158,10 @@ export const SoldAssetQuerySchema = z.object({
   toDate: z.coerce.date(),
 })
 
-function resolveSoldRange(fromDate: Date, toDate: Date): { departedFrom: Date; departedTo: Date } {
+function resolveDepartedSearchRange(
+  fromDate: Date,
+  toDate: Date,
+): { departedFrom: Date; departedTo: Date } {
   const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
   const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
   if (isAfter(departedFrom, toDate)) {
@@ -167,7 +170,7 @@ function resolveSoldRange(fromDate: Date, toDate: Date): { departedFrom: Date; d
   return { departedFrom, departedTo: toDate }
 }
 
-export const getSoldAssets = asyncHandler(async (req, res) => {
+export const getDepartedAssets = asyncHandler(async (req, res) => {
   const {
     model,
     statusIds,
@@ -182,9 +185,9 @@ export const getSoldAssets = asyncHandler(async (req, res) => {
     customerId,
     fromDate,
     toDate,
-  } = res.locals.query as z.infer<typeof SoldAssetQuerySchema>
-  const { departedFrom, departedTo } = resolveSoldRange(fromDate, toDate)
-  const data = await getSoldAssetsSer(
+  } = res.locals.query as z.infer<typeof DepartedAssetQuerySchema>
+  const { departedFrom, departedTo } = resolveDepartedSearchRange(fromDate, toDate)
+  const data = await getDepartedAssetsSer(
     model ?? '',
     statusIds,
     readinessIds,

@@ -4,7 +4,7 @@ import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-da
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
-import { useSearchSold } from '@/hooks/use-search-sold'
+import { useSearchDeparted } from '@/hooks/use-search-departed'
 import {
   useAssetFilters,
   useCustomerParam,
@@ -18,7 +18,7 @@ import type { AssetSearchRow } from 'shared-types'
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true } as const
 
-export function SearchSoldPage(): React.JSX.Element {
+export function SearchDepartedPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [showOther, setShowOther] = useShowOtherParam()
@@ -30,16 +30,16 @@ export function SearchSoldPage(): React.JSX.Element {
     [assetFilters, warehouses, showOther, from, to, customer],
   )
 
-  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchSold(filters)
+  const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchDeparted(filters)
   const handleBulkPriceSave = useCallback(() => {
     mutate()
   }, [mutate])
 
   return (
     <AssetSearchPage
-      title="Sold"
-      navContext="sold"
-      savedViewPageKey="search_sold"
+      title="Departed"
+      navContext="departed"
+      savedViewPageKey="search_departed"
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}

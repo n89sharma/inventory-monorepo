@@ -113,8 +113,10 @@ const SearchOnHandPage = lazy(() =>
     default: m.SearchOnHandPage,
   })),
 )
-const SearchSoldPage = lazy(() =>
-  import('./components/asset-search/search-sold-page').then((m) => ({ default: m.SearchSoldPage })),
+const SearchDepartedPage = lazy(() =>
+  import('./components/asset-search/search-departed-page').then((m) => ({
+    default: m.SearchDepartedPage,
+  })),
 )
 const SearchHarvestedPage = lazy(() =>
   import('./components/asset-search/search-harvested-page').then((m) => ({
@@ -429,15 +431,15 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/search/sold"
+                      path="/search/departed"
                       element={
                         <PermissionRoute permission="view_asset">
-                          <SearchSoldPage />
+                          <SearchDepartedPage />
                         </PermissionRoute>
                       }
                     />
                     <Route
-                      path="/search/sold/:assetId"
+                      path="/search/departed/:assetId"
                       element={
                         <PermissionRoute permission="view_asset">
                           <AssetDetailsPage />

@@ -1,5 +1,5 @@
 import { DatePickerFieldInline } from '@/components/shared/date-picker'
-import { getDepartedFloor, isValidSoldDateRange } from '@/lib/filters/hooks'
+import { getDepartedFloor, isValidDepartedDateRange } from '@/lib/filters/hooks'
 import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 
 const INVALID_RANGE_MESSAGE = 'Only data from the last 18 months can be shown'
@@ -15,7 +15,7 @@ export function DepartedDateRangeFilter({
 }): React.JSX.Element {
   const floor = getDepartedFloor()
   const today = new Date()
-  const valid = isValidSoldDateRange(from, to)
+  const valid = isValidDepartedDateRange(from, to)
 
   return (
     <div className="flex flex-col gap-1">

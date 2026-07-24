@@ -11,7 +11,7 @@ export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
 }
 
-const SEARCH_LISTS = ['onhand', 'all', 'sold-report', 'sold', 'harvested'] as const
+const SEARCH_LISTS = ['onhand', 'all', 'sold-report', 'departed', 'harvested'] as const
 
 export type SearchList = (typeof SEARCH_LISTS)[number]
 
@@ -19,7 +19,7 @@ export const SEARCH_LIST_LABELS = {
   onhand: 'On Hand',
   all: 'All Assets',
   'sold-report': 'Sold Report',
-  sold: 'Sold',
+  departed: 'Departed',
   harvested: 'Harvested',
 } as const satisfies Record<SearchList, string>
 

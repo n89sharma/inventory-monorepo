@@ -315,7 +315,7 @@ const ONHAND_DEFAULT_COLUMN_IDS = [
   'latest_comment',
 ] as const satisfies readonly AssetColumnId[]
 
-const SOLD_DEFAULT_COLUMN_IDS = [
+const DEPARTED_DEFAULT_COLUMN_IDS = [
   'status',
   'specs_meter_total',
   'customer',
@@ -339,7 +339,7 @@ export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   all: DEFAULT_VISIBLE_COLUMN_IDS,
   onhand: ONHAND_DEFAULT_COLUMN_IDS,
-  sold: SOLD_DEFAULT_COLUMN_IDS,
+  departed: DEPARTED_DEFAULT_COLUMN_IDS,
   harvested: HARVESTED_DEFAULT_COLUMN_IDS,
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>

@@ -99,7 +99,7 @@ const sidebarItems = [
 
 const SEARCH_ASSETS_SUB_ITEMS = [
   { title: 'On-Hand', url: '/search/onhand' },
-  { title: 'Sold', url: '/search/sold' },
+  { title: 'Departed', url: '/search/departed' },
   { title: 'Harvested', url: '/search/harvested' },
 ]
 

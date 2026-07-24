@@ -39,6 +39,8 @@ export * from "./sql/getAssetStoreParts.js"
 
 export * from "./sql/getAssetTransfers.js"
 
+export * from "./sql/getDepartedAssets.js"
+
 export * from "./sql/getDepartures.js"
 
 export * from "./sql/getHolds.js"
@@ -62,8 +64,6 @@ export * from "./sql/getModelSales.js"
 export * from "./sql/getOrganizations.js"
 
 export * from "./sql/getProfitabilityCube.js"
-
-export * from "./sql/getSoldAssets.js"
 
 export * from "./sql/getStorePartLedger.js"
 

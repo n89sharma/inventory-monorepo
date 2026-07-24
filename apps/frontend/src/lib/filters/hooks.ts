@@ -501,11 +501,11 @@ export function getDepartedFloor(): Date {
   return startOfDay(subMonths(new Date(), MAX_DEPARTED_MONTHS))
 }
 
-export function isValidSoldDateRange(from: Date, to: Date): boolean {
+export function isValidDepartedDateRange(from: Date, to: Date): boolean {
   return !isBefore(from, getDepartedFloor()) && !isAfter(from, to)
 }
 
-export function resolveSoldStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
+export function resolveDepartedStatuses(showOther: boolean, allStatuses: Status[]): Status[] {
   const wanted = showOther ? OUTGOING_STATUS.SCRAPPED : OUTGOING_STATUS.SOLD
   return allStatuses.filter((status) => status.status === wanted)
 }

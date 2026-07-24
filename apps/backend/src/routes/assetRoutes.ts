@@ -2,7 +2,7 @@ import express from 'express'
 import {
   AssetQuerySchema,
   LocationsByWarehouseQuerySchema,
-  SoldAssetQuerySchema,
+  DepartedAssetQuerySchema,
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
@@ -16,7 +16,7 @@ import {
   getAssetTransfers,
   getAssets,
   getLocationsByWarehouse,
-  getSoldAssets,
+  getDepartedAssets,
   printAssetBarcodes,
   updateAssetErrors,
   updateAssetLocation,
@@ -33,10 +33,10 @@ router.use(requireAuth)
 
 router.get('/', requirePermission('view_asset'), validateQuery(AssetQuerySchema), getAssets)
 router.get(
-  '/sold',
+  '/departed',
   requirePermission('view_asset'),
-  validateQuery(SoldAssetQuerySchema),
-  getSoldAssets,
+  validateQuery(DepartedAssetQuerySchema),
+  getDepartedAssets,
 )
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
 router.get(

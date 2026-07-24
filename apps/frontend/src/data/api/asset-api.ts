@@ -211,7 +211,7 @@ export async function getAssetsForSearchAll(
   return z.array(AssetSearchRowSchema).parse(data)
 }
 
-export async function getAssetsForSold(
+export async function getAssetsForDeparted(
   warehouses: Warehouse[],
   brand: Brand | null,
   assetTypes: AssetType[],
@@ -226,7 +226,7 @@ export async function getAssetsForSold(
   fromDate: Date,
   toDate: Date,
 ): Promise<AssetSearchRow[]> {
-  const { data } = await api.get<AssetSearchRow[]>(`/assets/sold`, {
+  const { data } = await api.get<AssetSearchRow[]>(`/assets/departed`, {
     params: {
       warehouseIds: warehouses.map((w) => w.id),
       brandIds: brand ? [brand.id] : [],

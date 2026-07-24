@@ -1,4 +1,4 @@
--- Departure-driven variant of getAssets.sql for the Sold search page.
+-- Departure-driven variant of getAssets.sql for the Departed search page.
 -- Drives FROM "Departure" over a mandatory, sargable date window (d.created_at >= $1 and <= $2)
 -- so the Departure.created_at btree is used, instead of seq-scanning every Asset.
 -- The bounds are timestamps (startOfDay/endOfDay applied in the service), NOT ::date casts:

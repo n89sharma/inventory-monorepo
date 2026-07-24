@@ -25,7 +25,7 @@ import {
   getAssetsBySerialNumber as getAssetsBySerialNumberQuery,
   getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
-  getSoldAssets as getSoldAssetsQuery,
+  getDepartedAssets as getDepartedAssetsQuery,
 } from '../../generated/prisma/sql.js'
 import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactAssetCost } from '../lib/cost-redaction.js'
@@ -115,7 +115,7 @@ export async function getAssetsBySerialNumber(
   return { assets, notFound }
 }
 
-export async function getSoldAssets(
+export async function getDepartedAssets(
   model: string,
   statusIds: number[],
   readinessIds: number[],
@@ -132,7 +132,7 @@ export async function getSoldAssets(
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
-    getSoldAssetsQuery(
+    getDepartedAssetsQuery(
       startOfDay(departedFrom),
       endOfDay(departedTo),
       model,
