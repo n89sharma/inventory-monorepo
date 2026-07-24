@@ -11,6 +11,7 @@ import type { InvoiceSummary } from 'shared-types'
 
 export function invoiceTableColumns(
   getHref: (row: InvoiceSummary) => string,
+  organizationHeader: string,
 ): ColumnDef<InvoiceSummary>[] {
   return [
     {
@@ -26,7 +27,7 @@ export function invoiceTableColumns(
     createdByColumn as ColumnDef<InvoiceSummary>,
     {
       accessorKey: 'organization',
-      header: 'Organization',
+      header: organizationHeader,
       cell: ({ row }) => formatTitleCase(row.original.organization ?? ''),
     },
     {

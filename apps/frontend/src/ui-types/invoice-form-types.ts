@@ -7,6 +7,11 @@ import { SelectOptionSchema, isSelected, type SelectOption } from './select-opti
 
 export type InvoiceTypeFilter = typeof INVOICE_TYPE.purchase | typeof INVOICE_TYPE.sales
 
+export const ORGANIZATION_HEADER = {
+  [INVOICE_TYPE.purchase]: 'Vendor',
+  [INVOICE_TYPE.sales]: 'Customer',
+} as const satisfies Record<InvoiceTypeFilter, string>
+
 const InvoiceTypeZod = z.object({ id: z.number(), type: z.string() })
 const InvoiceTypeSelectOptionSchema = SelectOptionSchema(InvoiceTypeZod)
 

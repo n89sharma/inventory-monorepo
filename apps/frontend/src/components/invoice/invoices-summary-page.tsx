@@ -7,7 +7,7 @@ import { SearchBar } from '@/components/shared/search-bar'
 import { useCan } from '@/hooks/use-can'
 import { useCollectionDateRange, useInvoiceTypeParam } from '@/lib/filters/hooks'
 import { preloadInvoiceDetail, useInvoicesList } from '@/hooks/use-invoice'
-import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
+import { ORGANIZATION_HEADER, type InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
@@ -29,7 +29,10 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       collectionDetailHref('invoices', invoice.invoice_number, searchParams),
     [searchParams],
   )
-  const columns = useMemo(() => invoiceTableColumns(getRowHref), [getRowHref])
+  const columns = useMemo(
+    () => invoiceTableColumns(getRowHref, ORGANIZATION_HEADER[invoiceType]),
+    [getRowHref, invoiceType],
+  )
 
   return (
     <CollectionPage
