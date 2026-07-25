@@ -6,6 +6,7 @@ import {
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
+  getHoldArchivedAt,
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
@@ -23,14 +24,6 @@ async function getHoldId(holdNumber: string): Promise<number> {
     select: { id: true },
   })
   return hold.id
-}
-
-async function getHoldArchivedAt(holdNumber: string): Promise<Date | null> {
-  const hold = await prisma.hold.findUniqueOrThrow({
-    where: { hold_number: holdNumber },
-    select: { archived_at: true },
-  })
-  return hold.archived_at
 }
 
 async function getMaxHistoryId(): Promise<number> {

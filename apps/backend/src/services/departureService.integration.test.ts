@@ -3,9 +3,12 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   buildCreateDepartureInput,
+  buildCreateHoldInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  getAssetHoldId,
   getAssetStatus,
+  getHoldArchivedAt,
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
@@ -14,6 +17,7 @@ import {
   createDeparture,
   setDepartureOutgoingStatus,
 } from './departureService.js'
+import { createHold } from './holdService.js'
 
 describe('departureService', () => {
   let refs: ArrivalTestData
@@ -112,6 +116,79 @@ describe('departureService', () => {
         refs.userId,
       ),
     ).rejects.toThrow(ConflictError)
+  })
+
+  it('releases a held asset and archives the hold it emptied', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
+
+    await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: asset.id, outgoing_status: OUTGOING_STATUS.SCRAPPED },
+      ]),
+      refs.userId,
+    )
+
+    expect(await getAssetHoldId(asset.id)).toBeNull()
+    expect(await getAssetStatus(asset.id)).toBe(OUTGOING_STATUS.SCRAPPED)
+    expect(await getHoldArchivedAt(holdNumber)).not.toBeNull()
+  })
+
+  it('keeps a hold active when only some of its assets depart', async () => {
+    const [departing, staying] = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(
+      buildCreateHoldInput(refs, [departing, staying]),
+      refs.userId,
+    )
+
+    await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: departing.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    expect(await getAssetHoldId(departing.id)).toBeNull()
+    expect(await getAssetHoldId(staying.id)).not.toBeNull()
+    expect(await getHoldArchivedAt(holdNumber)).toBeNull()
+  })
+
+  it('archives every hold a single departure empties', async () => {
+    const [first, second] = await createArrivedAssets(refs, 2)
+    const firstHoldNumber = await createHold(buildCreateHoldInput(refs, [first]), refs.userId)
+    const secondHoldNumber = await createHold(buildCreateHoldInput(refs, [second]), refs.userId)
+
+    await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: first.id, outgoing_status: OUTGOING_STATUS.SOLD },
+        { id: second.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+      ]),
+      refs.userId,
+    )
+
+    expect(await getHoldArchivedAt(firstHoldNumber)).not.toBeNull()
+    expect(await getHoldArchivedAt(secondHoldNumber)).not.toBeNull()
+  })
+
+  it('releases a held asset added to an existing departure', async () => {
+    const [first] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: first.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    const [held] = await createArrivedAssets(refs, 1)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
+
+    await addAssetsToDepartureAndRecord(
+      departureNumber,
+      { assetIdsToAdd: [held.id], assetIdsToRemove: [] },
+      refs.userId,
+    )
+
+    expect(await getAssetHoldId(held.id)).toBeNull()
+    expect(await getAssetStatus(held.id)).toBe(DEFAULT_OUTGOING_STATUS)
+    expect(await getHoldArchivedAt(holdNumber)).not.toBeNull()
   })
 
   it('numbers the departure D-<cityCode>-<7-digit sequence>', async () => {

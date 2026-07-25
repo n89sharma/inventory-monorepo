@@ -456,6 +456,22 @@ export async function getAssetStatus(assetId: number): Promise<string> {
   return asset.status.status
 }
 
+export async function getAssetHoldId(assetId: number): Promise<number | null> {
+  const asset = await prisma.asset.findUniqueOrThrow({
+    where: { id: assetId },
+    select: { hold_id: true },
+  })
+  return asset.hold_id
+}
+
+export async function getHoldArchivedAt(holdNumber: string): Promise<Date | null> {
+  const hold = await prisma.hold.findUniqueOrThrow({
+    where: { hold_number: holdNumber },
+    select: { archived_at: true },
+  })
+  return hold.archived_at
+}
+
 // Delete all transactional data in FK-safe order, leaving idempotent reference rows.
 export async function cleanupTransactionalData(): Promise<void> {
   await prisma.savedView.deleteMany()

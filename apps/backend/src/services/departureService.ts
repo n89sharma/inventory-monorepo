@@ -22,6 +22,7 @@ import {
   recordDepartureCreate,
   recordDepartureUpdate,
 } from './historyService.js'
+import { archiveHoldsEmptiedByReleasedAssets, recordHoldRelease } from './holdService.js'
 
 export async function getDeparture(departureNumber: string): Promise<DepartureDetail> {
   const [departure, assets] = await Promise.all([
@@ -61,48 +62,52 @@ export async function createDeparture(departure: CreateDeparture, userId: number
   if (unseededStatuses.length > 0)
     throw new Error(`Outgoing statuses not seeded in DB: ${unseededStatuses.join(', ')}`)
 
-  const { newDeparture, priorStatusByAsset } = await prisma.$transaction(async (tx) => {
-    await assertAssetsNotInCollection(
-      tx,
-      assetIds,
-      { departure_id: { not: null } },
-      (barcodes) =>
-        new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
-    )
+  const { newDeparture, priorStatusByAsset, holdRelease } = await prisma.$transaction(
+    async (tx) => {
+      await assertAssetsNotInCollection(
+        tx,
+        assetIds,
+        { departure_id: { not: null } },
+        (barcodes) =>
+          new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
+      )
 
-    const created = await tx.departure.create({
-      data: {
-        departure_number: departureNumber,
-        origin: { connect: { id: departure.origin.id } },
-        destination: { connect: { id: departure.customer.id } },
-        transporter: { connect: { id: departure.transporter.id } },
-        created_by: { connect: { id: userId } },
-        notes: departure.comment,
-        created_at: currentDateTime,
-      },
-    })
-
-    const priorAssets = await tx.asset.findMany({
-      where: { id: { in: assetIds } },
-      select: { id: true, status_id: true },
-    })
-
-    for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
-      if (!assetsForStatus) continue
-      await tx.asset.updateMany({
-        where: { id: { in: assetsForStatus.map((a) => a.id) } },
+      const created = await tx.departure.create({
         data: {
-          departure_id: created.id,
-          status_id: statusIdByName.get(outgoingStatus)!,
+          departure_number: departureNumber,
+          origin: { connect: { id: departure.origin.id } },
+          destination: { connect: { id: departure.customer.id } },
+          transporter: { connect: { id: departure.transporter.id } },
+          created_by: { connect: { id: userId } },
+          notes: departure.comment,
+          created_at: currentDateTime,
         },
       })
-    }
 
-    return {
-      newDeparture: created,
-      priorStatusByAsset: new Map(priorAssets.map((a) => [a.id, a.status_id])),
-    }
-  })
+      const priorAssets = await tx.asset.findMany({
+        where: { id: { in: assetIds } },
+        select: { id: true, status_id: true, hold_id: true },
+      })
+
+      for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
+        if (!assetsForStatus) continue
+        await tx.asset.updateMany({
+          where: { id: { in: assetsForStatus.map((a) => a.id) } },
+          data: {
+            departure_id: created.id,
+            status_id: statusIdByName.get(outgoingStatus)!,
+            hold_id: null,
+          },
+        })
+      }
+
+      return {
+        newDeparture: created,
+        priorStatusByAsset: new Map(priorAssets.map((a) => [a.id, a.status_id])),
+        holdRelease: await archiveHoldsEmptiedByReleasedAssets(tx, priorAssets, currentDateTime),
+      }
+    },
+  )
 
   await recordDepartureCreate(
     newDeparture.id,
@@ -123,6 +128,8 @@ export async function createDeparture(departure: CreateDeparture, userId: number
     [],
     userId,
   )
+
+  await recordHoldRelease(holdRelease, currentDateTime, userId)
 
   for (const [outgoingStatus, assetsForStatus] of Object.entries(assetsPerOutgoingStatus)) {
     if (!assetsForStatus) continue
@@ -192,10 +199,12 @@ export async function addAssetsToDepartureAndRecord(
     select: { id: true },
   })
 
-  const priorAssets = await prisma.$transaction(async (tx) => {
+  const currentDateTime = new Date()
+
+  const { priorAssets, holdRelease } = await prisma.$transaction(async (tx) => {
     const prior = await tx.asset.findMany({
       where: { id: { in: delta.assetIdsToAdd } },
-      select: { id: true, status_id: true },
+      select: { id: true, status_id: true, hold_id: true },
     })
     await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
@@ -203,10 +212,13 @@ export async function addAssetsToDepartureAndRecord(
       assetInCollectionWhere: { departure_id: { not: null } },
       assetInCollectionError: (barcodes) =>
         new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
-      add: { departure_id: departure.id, status_id: addStatus.id },
+      add: { departure_id: departure.id, status_id: addStatus.id, hold_id: null },
       remove: {},
     })
-    return prior
+    return {
+      priorAssets: prior,
+      holdRelease: await archiveHoldsEmptiedByReleasedAssets(tx, prior, currentDateTime),
+    }
   })
 
   await recordCollectionAssetDelta(
@@ -217,6 +229,8 @@ export async function addAssetsToDepartureAndRecord(
     [],
     userId,
   )
+
+  await recordHoldRelease(holdRelease, currentDateTime, userId)
 
   await recordAssetStatusChange(priorAssets, addStatus.id, userId)
 }

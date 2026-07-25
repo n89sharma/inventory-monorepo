@@ -6,6 +6,7 @@ import {
   HoldDetail,
   UpdateHoldMetadata,
 } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -86,6 +87,58 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
   await recordAssetStatusChange(priorAssets, heldStatus.id, userId)
 
   return holdNumber
+}
+
+export type HoldRelease = {
+  releasedAssetIdsByHold: Map<number, number[]>
+  emptiedHoldIds: number[]
+}
+
+export async function archiveHoldsEmptiedByReleasedAssets(
+  tx: Prisma.TransactionClient,
+  releasedAssets: { id: number; hold_id: number | null }[],
+  archivedAt: Date,
+): Promise<HoldRelease> {
+  const releasedAssetIdsByHold = new Map<number, number[]>()
+  for (const asset of releasedAssets) {
+    if (asset.hold_id === null) continue
+    const assetIds = releasedAssetIdsByHold.get(asset.hold_id)
+    if (assetIds) assetIds.push(asset.id)
+    else releasedAssetIdsByHold.set(asset.hold_id, [asset.id])
+  }
+
+  const holdIds = [...releasedAssetIdsByHold.keys()]
+  if (holdIds.length === 0) return { releasedAssetIdsByHold, emptiedHoldIds: [] }
+
+  const occupied = await tx.asset.findMany({
+    where: { hold_id: { in: holdIds } },
+    select: { hold_id: true },
+    distinct: ['hold_id'],
+  })
+  const occupiedHoldIds = new Set(occupied.map((a) => a.hold_id))
+  const emptiedHoldIds = holdIds.filter((id) => !occupiedHoldIds.has(id))
+
+  if (emptiedHoldIds.length > 0) {
+    await tx.hold.updateMany({
+      where: { id: { in: emptiedHoldIds }, archived_at: null },
+      data: { archived_at: archivedAt },
+    })
+  }
+
+  return { releasedAssetIdsByHold, emptiedHoldIds }
+}
+
+export async function recordHoldRelease(
+  release: HoldRelease,
+  archivedAt: Date,
+  userId: number,
+): Promise<void> {
+  for (const [holdId, assetIds] of release.releasedAssetIdsByHold) {
+    await recordCollectionAssetDelta('Hold', 'hold_id', holdId, [], assetIds, userId)
+  }
+  for (const holdId of release.emptiedHoldIds) {
+    await recordHoldArchive(holdId, archivedAt, userId)
+  }
 }
 
 async function getNewHoldNumber(): Promise<string> {
