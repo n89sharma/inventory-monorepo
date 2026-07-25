@@ -14,6 +14,8 @@ import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
+const PINNED_COLUMN_IDS = ['invoice_date', 'invoice_reference']
+
 export function InvoicesSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
   const [invoiceType, setInvoiceType] = useInvoiceTypeParam()
@@ -47,6 +49,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       title={INVOICE_PAGE_TITLE[invoiceType]}
       columns={columns}
       data={invoices}
+      pinLeft={PINNED_COLUMN_IDS}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
       renderTableFilter={(table) => (
