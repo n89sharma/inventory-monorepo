@@ -4,6 +4,7 @@ import {
   TRANSFER_STATUS,
   TransferDetail,
   UpdateTransferMetadata,
+  UpdateTransferNotes,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
@@ -129,6 +130,21 @@ export async function patchTransferMetadata(
     },
     userId,
   )
+}
+
+export async function patchTransferNotes(
+  transferNumber: string,
+  notes: UpdateTransferNotes,
+): Promise<void> {
+  const transfer = await prisma.transfer.findUnique({
+    where: { transfer_number: transferNumber },
+    select: { id: true },
+  })
+  if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+  await prisma.transfer.update({
+    where: { id: transfer.id },
+    data: { notes: notes.comment },
+  })
 }
 
 export async function patchTransferAssets(

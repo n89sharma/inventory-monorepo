@@ -64,3 +64,9 @@ export const UpdateTransferMetadataSchema = z
     path: ['destination'],
   })
 export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema>
+
+// PATCH /transfers/:transferNumber/notes
+export const UpdateTransferNotesSchema = z.object({
+  comment: z.string().nullable(),
+})
+export type UpdateTransferNotes = z.infer<typeof UpdateTransferNotesSchema>

@@ -13,6 +13,7 @@ import type {
   TransferDetail,
   TransferSummary,
   UpdateTransferMetadata,
+  UpdateTransferNotes,
   Warehouse,
 } from 'shared-types'
 import {
@@ -23,6 +24,7 @@ import {
   TransferDetailSchema,
   TransferSummarySchema,
   UpdateTransferMetadataSchema,
+  UpdateTransferNotesSchema,
 } from 'shared-types'
 import { z } from 'zod'
 
@@ -87,6 +89,13 @@ export async function updateTransferMetadata(
     comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateTransferMetadata)
   await api.patch(`/transfers/${transferNumber}/metadata`, updateTransferMetadataBody)
+}
+
+export async function updateTransferNotes(transferNumber: string, comment: string): Promise<void> {
+  const updateTransferNotesBody = UpdateTransferNotesSchema.parse({
+    comment: comment === '' ? null : comment,
+  } satisfies UpdateTransferNotes)
+  await api.patch(`/transfers/${transferNumber}/notes`, updateTransferNotesBody)
 }
 
 export async function patchTransferAssets(

@@ -8,6 +8,7 @@ import {
   getTransfers,
   patchTransferAssets,
   patchTransferMetadata,
+  patchTransferNotes,
   receiveTransfer,
 } from '../controllers/transferController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -36,6 +37,11 @@ router.patch(
   '/:transferNumber/metadata',
   requirePermission('create_update_transfer'),
   patchTransferMetadata,
+)
+router.patch(
+  '/:transferNumber/notes',
+  requirePermission('create_update_transfer'),
+  patchTransferNotes,
 )
 router.post(
   '/:transferNumber/dispatch',

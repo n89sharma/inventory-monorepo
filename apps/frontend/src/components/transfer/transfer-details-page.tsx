@@ -3,6 +3,7 @@ import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
+import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
 import { TransferSummaryStrip } from '@/components/transfer/transfer-summary-strip'
 import { getTransferHistory } from '@/data/api/transfer-api'
@@ -12,7 +13,8 @@ import { useCan } from '@/hooks/use-can'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { TRANSFER_STATUS, type AssetSummary } from 'shared-types'
+import { TRANSFER_STATUS, type AssetSummary, type TransferDetail } from 'shared-types'
+import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 
 export function TransferDetailsPage(): React.JSX.Element {
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
@@ -38,7 +40,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       section="transfers"
       titleLabel="Transfer"
       collectionId={transferNumber}
-      canCreateEditEntity={canEditAssets}
+      canCreateEditEntity={canCreateEditTransfer}
       detail={detail}
       notFoundLabel="Transfer not found"
       refreshKey={transferDetailKey(transferNumber)}
@@ -77,11 +79,11 @@ export function TransferDetailsPage(): React.JSX.Element {
         </>
       )}
       renderMetadataModal={(transfer, control) => (
-        <EditTransferMetadataModal
-          open={control.open}
-          onOpenChange={control.onOpenChange}
+        <TransferEditModal
           transfer={transfer}
-          onSave={(metadata) => mutations.updateMetadata(transferNumber, metadata)}
+          control={control}
+          onSaveMetadata={(metadata) => mutations.updateMetadata(transferNumber, metadata)}
+          onSaveNotes={(comment) => mutations.updateNotes(transferNumber, comment)}
         />
       )}
       renderAddAssetBar={(transfer) =>
@@ -94,6 +96,39 @@ export function TransferDetailsPage(): React.JSX.Element {
           />
         )
       }
+    />
+  )
+}
+
+interface TransferEditModalProps {
+  transfer: TransferDetail
+  control: { open: boolean; onOpenChange: (open: boolean) => void }
+  onSaveMetadata: (metadata: TransferMetadataForm) => Promise<void>
+  onSaveNotes: (comment: string) => Promise<void>
+}
+
+function TransferEditModal({
+  transfer,
+  control,
+  onSaveMetadata,
+  onSaveNotes,
+}: TransferEditModalProps): React.JSX.Element {
+  if (transfer.status === TRANSFER_STATUS.DRAFT) {
+    return (
+      <EditTransferMetadataModal
+        open={control.open}
+        onOpenChange={control.onOpenChange}
+        transfer={transfer}
+        onSave={onSaveMetadata}
+      />
+    )
+  }
+  return (
+    <EditTransferNotesModal
+      open={control.open}
+      onOpenChange={control.onOpenChange}
+      transfer={transfer}
+      onSave={onSaveNotes}
     />
   )
 }

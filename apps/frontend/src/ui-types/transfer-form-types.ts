@@ -61,3 +61,6 @@ export type TransferMetadataForm = {
   transporter: OrgSummary | null
   comment: string
 }
+
+export const TransferNotesFormSchema = z.object({ comment: z.string() })
+export type TransferNotesForm = z.infer<typeof TransferNotesFormSchema>

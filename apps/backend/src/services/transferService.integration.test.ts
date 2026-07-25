@@ -13,8 +13,18 @@ import {
   createTransfer,
   dispatchTransfer,
   patchTransferAssets,
+  patchTransferMetadata,
+  patchTransferNotes,
   receiveTransfer,
 } from './transferService.js'
+
+async function getTransferNotes(transferNumber: string): Promise<string | null> {
+  const transfer = await prisma.transfer.findUniqueOrThrow({
+    where: { transfer_number: transferNumber },
+    select: { notes: true },
+  })
+  return transfer.notes
+}
 
 async function getTransferStatus(transferNumber: string): Promise<string> {
   const transfer = await prisma.transfer.findUniqueOrThrow({
@@ -118,6 +128,38 @@ describe('transferService', () => {
       expect(state.is_in_transit).toBe(false)
       expect(state.location_id).toBe(srLocationId)
     }
+  })
+
+  it('updates notes on a completed transfer', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId)
+    await receiveTransfer(transferNumber, refs.userId)
+
+    await patchTransferNotes(transferNumber, { comment: 'delivered with damage' })
+
+    expect(await getTransferStatus(transferNumber)).toBe('COMPLETE')
+    expect(await getTransferNotes(transferNumber)).toBe('delivered with damage')
+  })
+
+  it('rejects editing metadata after dispatch', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId)
+
+    await expect(
+      patchTransferMetadata(
+        transferNumber,
+        {
+          origin: refs.warehouse,
+          destination: refs.warehouse2,
+          transporter: refs.transporter,
+          comment: 'too late',
+        },
+        refs.userId,
+      ),
+    ).rejects.toBeInstanceOf(ConflictError)
   })
 
   it('rejects dispatching a transfer that is already in transit', async () => {

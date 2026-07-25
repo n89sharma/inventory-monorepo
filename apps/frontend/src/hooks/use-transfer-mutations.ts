@@ -5,6 +5,7 @@ import {
   patchTransferAssets,
   receiveTransfer,
   updateTransferMetadata,
+  updateTransferNotes,
 } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { transferDetailKey, invalidateTransferLists } from '@/hooks/use-transfer'
@@ -93,6 +94,12 @@ async function updateMetadata(transferNumber: string, metadata: TransferMetadata
   invalidateTransferLists()
 }
 
+async function updateNotes(transferNumber: string, comment: string) {
+  await updateTransferNotes(transferNumber, comment)
+  mutate(transferDetailKey(transferNumber))
+  invalidateTransferLists()
+}
+
 async function dispatch(transferNumber: string, barcodes: string[]) {
   await dispatchTransfer(transferNumber)
   mutate(transferDetailKey(transferNumber))
@@ -138,6 +145,7 @@ const mutations = {
   addAsset,
   addAssetBatch,
   updateMetadata,
+  updateNotes,
   dispatch,
   receive,
   removeAsset,

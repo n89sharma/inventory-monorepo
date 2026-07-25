@@ -8,6 +8,7 @@ import {
   TransferDetail,
   TransferSummary,
   UpdateTransferMetadataSchema,
+  UpdateTransferNotesSchema,
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
@@ -22,6 +23,7 @@ import {
   getTransfer as getTransferSer,
   patchTransferAssets as patchTransferAssetsSer,
   patchTransferMetadata as patchTransferMetadataSer,
+  patchTransferNotes as patchTransferNotesSer,
   receiveTransfer as receiveTransferSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -72,6 +74,12 @@ export const createTransfer = asyncHandler(async (req, res) => {
 export const patchTransferMetadata = asyncHandler(async (req, res) => {
   const metadata = UpdateTransferMetadataSchema.parse(req.body)
   await patchTransferMetadataSer(req.params.transferNumber, metadata, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const patchTransferNotes = asyncHandler(async (req, res) => {
+  const notes = UpdateTransferNotesSchema.parse(req.body)
+  await patchTransferNotesSer(req.params.transferNumber, notes)
   res.status(204).send()
 })
 
