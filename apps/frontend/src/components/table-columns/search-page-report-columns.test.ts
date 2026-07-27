@@ -2,7 +2,7 @@ import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
-import { ASSET_COLUMN_REGISTRY, COLUMN_SECTIONS } from './asset-column-registry'
+import { ASSET_COLUMN_REGISTRY, COLUMN_SECTIONS } from './asset-search-columns'
 import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 

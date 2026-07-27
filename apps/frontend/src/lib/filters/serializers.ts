@@ -1,4 +1,4 @@
-import type { AssetColumnId } from '@/components/table-columns/asset-column-registry'
+import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-sales-summary'
 import { createSerializer } from 'nuqs'

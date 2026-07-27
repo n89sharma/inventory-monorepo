@@ -1,7 +1,7 @@
 import {
   ASSET_COLUMN_REGISTRY,
   resolveVisibleColumns,
-} from '@/components/table-columns/asset-column-registry'
+} from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
 import type { VisibilityState } from '@tanstack/react-table'

@@ -4,7 +4,7 @@ import { useCan } from '@/hooks/use-can'
 import {
   ASSET_COLUMN_REGISTRY,
   type AssetColumn,
-} from '@/components/table-columns/asset-column-registry'
+} from '@/components/table-columns/asset-search-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'

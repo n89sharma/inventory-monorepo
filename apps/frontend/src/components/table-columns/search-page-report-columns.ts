@@ -16,7 +16,7 @@ type SearchPageReportColumn = CsvColumn<AssetSearchRow> & {
   alwaysVisible?: boolean
 }
 
-export const SEARCH_PAGE_REPORT_COLUMNS: SearchPageReportColumn[] = [
+const SEARCH_PAGE_REPORT_COLUMNS: SearchPageReportColumn[] = [
   { id: 'barcode', header: 'Barcode', alwaysVisible: true, value: (a) => a.barcode },
   { id: 'brand', header: 'Brand', value: (a) => formatTitleCase(a.brand) },
   { id: 'model', header: 'Model', alwaysVisible: true, value: (a) => a.model },
