@@ -3,7 +3,6 @@ import {
   createAssetHarvestedPart as createAssetHarvestedPartApi,
   printBarcodes as printBarcodesApi,
   getAssetDetail as getAssetDetailApi,
-  getLocationsByWarehouse as getLocationsByWarehouseApi,
   postComment as postCommentApi,
   updateAssetErrors as updateAssetErrorsApi,
   updateAssetLocation as updateAssetLocationApi,
@@ -17,7 +16,6 @@ import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
   AssetDetails,
-  AssetLocation,
   AssetSummary,
   BulkUpdateAssetPricing,
   CreateComment,
@@ -49,7 +47,6 @@ interface AssetStore {
   updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<void>
   getAssetByBarcode: (barcode: string, skipErrorToast?: boolean) => Promise<AssetSummary>
   getAssetDetail: (barcode: string) => Promise<AssetDetails>
-  getLocationsByWarehouse: (warehouseId: number) => Promise<AssetLocation[]>
   printBarcodes: (barcodes: string[]) => Promise<void>
   bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
@@ -100,8 +97,6 @@ export const useAssetStore = create<AssetStore>(() => ({
   getAssetByBarcode: (barcode, skipErrorToast) => getAssetByBarcodeApi(barcode, skipErrorToast),
 
   getAssetDetail: (barcode) => getAssetDetailApi({ barcode }),
-
-  getLocationsByWarehouse: (warehouseId) => getLocationsByWarehouseApi(warehouseId),
 
   printBarcodes: (barcodes) => printBarcodesApi(barcodes),
 

@@ -13,6 +13,7 @@ import {
 } from '@/components/shadcn/select'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { useWarehouseLocations } from '@/hooks/use-locations'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { cn } from '@/lib/utils'
 import {
@@ -33,6 +34,7 @@ const BIN_ZONE = 'BIN'
 const SCAN_SANITIZER = /[^a-zA-Z0-9._-]/g
 const LOCATION_ERROR_DELAY_MS = 500
 const ASSET_LOOKUP_DELAY_MS = 500
+const EMPTY_LOCATIONS: AssetLocation[] = []
 
 interface PutAwayForm {
   location: string
@@ -190,7 +192,6 @@ function AssetField({
 }
 
 export function PutAwayPage(): React.JSX.Element {
-  const getLocationsByWarehouse = useAssetStore((state) => state.getLocationsByWarehouse)
   const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
   const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
 
@@ -205,8 +206,9 @@ export function PutAwayPage(): React.JSX.Element {
     null
   const warehouseId = selectedWarehouse?.id
 
-  const [locations, setLocations] = useState<AssetLocation[]>([])
-  const [fetchingLocations, setFetchingLocations] = useState(false)
+  const { data: locations = EMPTY_LOCATIONS, isLoading: fetchingLocations } = useWarehouseLocations(
+    warehouseId ?? null,
+  )
   const [selectedLocation, setSelectedLocation] = useState<AssetLocation | null>(null)
   const [scannedAsset, setScannedAsset] = useState<AssetSummary | null>(null)
   const [lookingUp, setLookingUp] = useState(false)
@@ -227,26 +229,7 @@ export function PutAwayPage(): React.JSX.Element {
     form.reset({ location: '', asset: '' })
     setSelectedLocation(null)
     setScannedAsset(null)
-    if (!warehouseId) {
-      setLocations([])
-      return
-    }
-    let cancelled = false
-    setFetchingLocations(true)
-    getLocationsByWarehouse(warehouseId)
-      .then((all) => {
-        if (!cancelled) setLocations(all)
-      })
-      .catch(() => {
-        /* interceptor already showed the error toast */
-      })
-      .finally(() => {
-        if (!cancelled) setFetchingLocations(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [warehouseId, getLocationsByWarehouse, form])
+  }, [warehouseId, form])
 
   useEffect(() => {
     form.setFocus('location')
