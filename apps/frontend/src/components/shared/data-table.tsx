@@ -6,6 +6,7 @@ import type {
   ExpandedState,
   OnChangeFn,
   Table as ReactTableInstance,
+  TableOptions,
   Row,
   RowSelectionState,
   SortingState,
@@ -15,8 +16,6 @@ import {
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
@@ -70,6 +69,9 @@ interface DataTableProps<TData, TValue> {
   columnVisibility?: VisibilityState
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
   onSelectionChange?: (selection: DataTableSelection<TData>) => void
+  // Faceting walks the filtered rows once per column to collect distinct values, so it
+  // is only wired up by tables that render a facet-driven filter.
+  facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
 }
 
 const DEFAULT_PAGE_SIZE = 75
@@ -113,6 +115,7 @@ export function DataTable<TData, TValue>({
   columnVisibility,
   renderTableFilter,
   onSelectionChange,
+  facetedRowModels,
 }: DataTableProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>(
     defaultSort ? [defaultSort] : [],
@@ -144,8 +147,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    ...facetedRowModels,
     enableRowSelection: true,
     onRowSelectionChange,
     getRowId,

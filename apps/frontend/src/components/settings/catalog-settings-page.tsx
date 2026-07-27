@@ -8,9 +8,15 @@ import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filt
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { useModelStore } from '@/data/store/model-store'
 import { PlusIcon } from '@phosphor-icons/react'
+import { getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
+import type { ModelSummary } from 'shared-types'
 
 const MODEL_DEFAULT_SORT = { id: 'brand_name', desc: false }
+const MODEL_FACETED_ROW_MODELS = {
+  getFacetedRowModel: getFacetedRowModel<ModelSummary>(),
+  getFacetedUniqueValues: getFacetedUniqueValues<ModelSummary>(),
+}
 
 export function CatalogSettingsPage(): React.JSX.Element {
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
@@ -44,6 +50,7 @@ export function CatalogSettingsPage(): React.JSX.Element {
         columns={modelTableColumns}
         data={sortedModels}
         defaultSort={MODEL_DEFAULT_SORT}
+        facetedRowModels={MODEL_FACETED_ROW_MODELS}
         renderTableFilter={(table) => (
           <>
             <ColumnTextFilter
