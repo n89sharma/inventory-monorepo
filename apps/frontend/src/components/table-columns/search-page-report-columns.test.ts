@@ -2,7 +2,7 @@ import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
-import { ASSET_COLUMN_REGISTRY, COLUMN_SECTIONS } from './asset-search-columns'
+import { ASSET_SEARCH_COLUMNS, COLUMN_SECTIONS } from './asset-search-columns'
 import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 
@@ -201,12 +201,12 @@ describe('asset-search report columns', () => {
 describe('asset column registry', () => {
   it('has a live table column for every registry entry', () => {
     const liveIds = new Set(liveColumnIds())
-    const missing = ASSET_COLUMN_REGISTRY.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
+    const missing = ASSET_SEARCH_COLUMNS.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
     expect(missing).toEqual([])
   })
 
   it('has a registry entry for every table column but the always-visible ones', () => {
-    const registryIds = new Set<string>(ASSET_COLUMN_REGISTRY.map((c) => c.id))
+    const registryIds = new Set<string>(ASSET_SEARCH_COLUMNS.map((c) => c.id))
     const unregistered = liveColumnIds().filter((id) => !registryIds.has(id))
     expect(unregistered).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
   })
@@ -214,7 +214,7 @@ describe('asset column registry', () => {
   it('groups the pickable columns by section, in picker order', () => {
     const grouped = COLUMN_SECTIONS.map((section) => ({
       section: section.id,
-      ids: ASSET_COLUMN_REGISTRY.filter((c) => c.section === section.id).map((c) => c.id),
+      ids: ASSET_SEARCH_COLUMNS.filter((c) => c.section === section.id).map((c) => c.id),
     }))
     expect(grouped).toEqual([
       {

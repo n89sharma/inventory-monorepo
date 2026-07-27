@@ -2,8 +2,8 @@ import { Button } from '@/components/shadcn/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import { useCan } from '@/hooks/use-can'
 import {
-  ASSET_COLUMN_REGISTRY,
-  type AssetColumn,
+  ASSET_SEARCH_COLUMNS,
+  type AssetSearchColumn,
 } from '@/components/table-columns/asset-search-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
@@ -21,9 +21,9 @@ export function ColumnPickerButton({
   onReset,
 }: ColumnPickerButtonProps): React.JSX.Element {
   const can = useCan()
-  const permittedColumns = useMemo<readonly AssetColumn[]>(
+  const permittedColumns = useMemo<readonly AssetSearchColumn[]>(
     () =>
-      (ASSET_COLUMN_REGISTRY as readonly AssetColumn[]).filter(
+      (ASSET_SEARCH_COLUMNS as readonly AssetSearchColumn[]).filter(
         (c) => !c.permission || can(c.permission),
       ),
     [can],

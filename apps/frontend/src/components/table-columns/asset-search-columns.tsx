@@ -11,7 +11,7 @@ export type ColumnSectionId =
   | 'general'
   | 'last_comment'
 
-export type AssetColumn = {
+export type AssetSearchColumn = {
   readonly id: string
   readonly label: string
   readonly section: ColumnSectionId
@@ -30,7 +30,7 @@ export const COLUMN_SECTIONS = [
   { id: 'last_comment', label: 'Last Comment' },
 ] as const satisfies readonly { id: ColumnSectionId; label: string }[]
 
-export const ASSET_COLUMN_REGISTRY = [
+export const ASSET_SEARCH_COLUMNS = [
   // General
   { id: 'brand', label: 'Brand', section: 'general', defaultColumn: false },
   { id: 'asset_type', label: 'Asset Type', section: 'general', defaultColumn: false },
@@ -122,11 +122,11 @@ export const ASSET_COLUMN_REGISTRY = [
 
   // Last Comment
   { id: 'latest_comment', label: 'Last Comment', section: 'last_comment', defaultColumn: false },
-] as const satisfies readonly AssetColumn[]
+] as const satisfies readonly AssetSearchColumn[]
 
-export type AssetColumnId = (typeof ASSET_COLUMN_REGISTRY)[number]['id']
+export type AssetColumnId = (typeof ASSET_SEARCH_COLUMNS)[number]['id']
 
-const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_COLUMN_REGISTRY.filter(
+const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_SEARCH_COLUMNS.filter(
   (c) => c.defaultColumn,
 ).map((c) => c.id)
 
@@ -168,8 +168,8 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
 
-const COLUMN_BY_ID = new Map<string, AssetColumn>(
-  (ASSET_COLUMN_REGISTRY as readonly AssetColumn[]).map((c) => [c.id, c]),
+const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(
+  (ASSET_SEARCH_COLUMNS as readonly AssetSearchColumn[]).map((c) => [c.id, c]),
 )
 
 // Filters a stored/shared set of column ids down to what the current viewer may see:

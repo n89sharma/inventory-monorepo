@@ -1,5 +1,5 @@
 import {
-  ASSET_COLUMN_REGISTRY,
+  ASSET_SEARCH_COLUMNS,
   resolveVisibleColumns,
 } from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
@@ -41,7 +41,7 @@ export function useColumnVisibilityParam(defaultIds: readonly string[]): {
 
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
-    for (const col of ASSET_COLUMN_REGISTRY) out[col.id] = visibleColumns.has(col.id)
+    for (const col of ASSET_SEARCH_COLUMNS) out[col.id] = visibleColumns.has(col.id)
     return out
   }, [visibleColumns])
 
