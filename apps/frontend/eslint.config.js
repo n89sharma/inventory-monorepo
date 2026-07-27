@@ -26,13 +26,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // React Compiler rules introduced in eslint-plugin-react-hooks v7. Every other
-      // new rule in the preset already passes and stays on. These two have existing
-      // violations; enable each one in its own commit alongside the fixes.
-      // TODO(react-hooks-v7): 1 violation left — add-assets-by-barcode-or-serial
-      // (popover open state; fix is deriving it during render).
-      'react-hooks/set-state-in-effect': 'off',
-      // TODO(react-hooks-v7): 5 violations — 3x react-hook-form watch(), 2x useReactTable.
+      // React Compiler rule from eslint-plugin-react-hooks v7. Every other rule in the
+      // preset is enabled. TODO(react-hooks-v7): 5 warnings — 3x react-hook-form
+      // watch(), 2x useReactTable. Note a skipped component is not analysed by the
+      // other rules either, so enabling this will surface further violations.
       'react-hooks/incompatible-library': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [

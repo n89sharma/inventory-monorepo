@@ -40,7 +40,7 @@ export function AddAssetsByBarcodeOrSerial({
   const [searchQuery, setSearchQuery] = useState('')
   const [assetError, setAssetError] = useState<string | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
-  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [suggestionsAllowed, setSuggestionsAllowed] = useState(true)
   const { results } = useGlobalSearch(searchQuery, ASSET_SEARCH_TYPES)
   const suggestions = results.assets
 
@@ -71,7 +71,6 @@ export function AddAssetsByBarcodeOrSerial({
       }
       setDisplayValue('')
       setSearchQuery('')
-      setPopoverOpen(false)
       inputRef.current?.focus()
     } catch {
       setAssetError('Asset not found.')
@@ -90,52 +89,52 @@ export function AddAssetsByBarcodeOrSerial({
       ),
     [suggestions, normalizedQuery],
   )
+  const hasExactMatch = exactMatches.length === 1
   const autoAddedQueryRef = useRef<string | null>(null)
   const onAutoAdd = useEffectEvent((barcode: string) => addByBarcode(barcode))
+
+  // An exact match is added automatically, so its suggestion list is never offered.
+  const suggestionsAvailable = !!normalizedQuery && !hasExactMatch && suggestions.length > 0
+  const popoverOpen = suggestionsAvailable && suggestionsAllowed
 
   useEffect(() => {
     if (!normalizedQuery) {
       autoAddedQueryRef.current = null
-      setPopoverOpen(false)
       return
     }
-    if (exactMatches.length === 1) {
-      if (autoAddedQueryRef.current !== normalizedQuery) {
-        autoAddedQueryRef.current = normalizedQuery
-        onAutoAdd(exactMatches[0].barcode)
-      }
-      setPopoverOpen(false)
-      return
+    if (hasExactMatch && autoAddedQueryRef.current !== normalizedQuery) {
+      autoAddedQueryRef.current = normalizedQuery
+      onAutoAdd(exactMatches[0].barcode)
     }
-    setPopoverOpen(suggestions.length > 0)
-  }, [suggestions, exactMatches, normalizedQuery])
+  }, [exactMatches, hasExactMatch, normalizedQuery])
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(BARCODE_INPUT_SANITIZER, '').toUpperCase()
     setDisplayValue(val)
     setSearchQuery(val)
     setAssetError(null)
+    setSuggestionsAllowed(true)
   }
 
   function handleSuggestionSelect(suggestion: BarcodeSuggestion) {
-    setPopoverOpen(false)
+    setSuggestionsAllowed(false)
     addByBarcode(suggestion.barcode)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
-      setPopoverOpen(false)
-      if (exactMatches.length === 1) addByBarcode(exactMatches[0].barcode)
+      setSuggestionsAllowed(false)
+      if (hasExactMatch) addByBarcode(exactMatches[0].barcode)
       else if (displayValue) addByBarcode(displayValue)
     } else if (e.key === 'Escape') {
-      setPopoverOpen(false)
+      setSuggestionsAllowed(false)
     }
   }
 
   return (
     <div className={className}>
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <Popover open={popoverOpen} onOpenChange={(open) => setSuggestionsAllowed(open)}>
         <PopoverTrigger asChild>
           <div />
         </PopoverTrigger>
