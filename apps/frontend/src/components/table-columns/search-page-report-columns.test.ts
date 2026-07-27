@@ -199,11 +199,9 @@ describe('asset-search report columns', () => {
 })
 
 describe('asset column registry', () => {
-  it('has a live table column for every pickable registry entry', () => {
+  it('has a live table column for every registry entry', () => {
     const liveIds = new Set(liveColumnIds())
-    const missing = ASSET_COLUMN_REGISTRY.filter((c) => c.enabled && !liveIds.has(c.id)).map(
-      (c) => c.id,
-    )
+    const missing = ASSET_COLUMN_REGISTRY.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
     expect(missing).toEqual([])
   })
 
@@ -213,33 +211,10 @@ describe('asset column registry', () => {
     expect(unregistered).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
   })
 
-  // Entries the picker cannot offer and no table column renders. Every id here is
-  // unreachable in the UI; the list must only ever shrink.
-  it('lists the registry entries that render nothing', () => {
-    const liveIds = new Set(liveColumnIds())
-    const unrendered = ASSET_COLUMN_REGISTRY.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
-    expect(unrendered).toEqual([
-      'arrival_arrival_number',
-      'arrival_warehouse',
-      'arrival_transporter',
-      'arrival_created_by',
-      'departure_departure_number',
-      'departure_warehouse',
-      'departure_transporter',
-      'departure_created_by',
-      'hold_from_dt',
-      'hold_to_dt',
-      'hold_notes',
-      'purchase_invoice_is_cleared',
-    ])
-  })
-
   it('groups the pickable columns by section, in picker order', () => {
     const grouped = COLUMN_SECTIONS.map((section) => ({
       section: section.id,
-      ids: ASSET_COLUMN_REGISTRY.filter((c) => c.section === section.id && c.enabled).map(
-        (c) => c.id,
-      ),
+      ids: ASSET_COLUMN_REGISTRY.filter((c) => c.section === section.id).map((c) => c.id),
     }))
     expect(grouped).toEqual([
       {
@@ -285,7 +260,14 @@ describe('asset column registry', () => {
       { section: 'departure', ids: ['customer', 'departed_at'] },
       {
         section: 'hold',
-        ids: ['held_by', 'hold_created_for', 'hold_customer', 'hold_created_at', 'days_held'],
+        ids: [
+          'hold_hold_number',
+          'held_by',
+          'hold_created_for',
+          'hold_customer',
+          'hold_created_at',
+          'days_held',
+        ],
       },
       { section: 'invoice', ids: ['purchase_invoice_invoice_number'] },
       { section: 'last_comment', ids: ['latest_comment'] },

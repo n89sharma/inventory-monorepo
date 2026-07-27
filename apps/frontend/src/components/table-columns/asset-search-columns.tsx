@@ -16,7 +16,6 @@ export type AssetColumn = {
   readonly label: string
   readonly section: ColumnSectionId
   readonly defaultColumn: boolean
-  readonly enabled: boolean
   readonly permission?: Permission
 }
 
@@ -33,93 +32,32 @@ export const COLUMN_SECTIONS = [
 
 export const ASSET_COLUMN_REGISTRY = [
   // General
-  { id: 'brand', label: 'Brand', section: 'general', defaultColumn: false, enabled: true },
-  {
-    id: 'asset_type',
-    label: 'Asset Type',
-    section: 'general',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'serial_number',
-    label: 'Serial Number',
-    section: 'general',
-    defaultColumn: true,
-    enabled: true,
-  },
-  { id: 'status', label: 'Status', section: 'general', defaultColumn: true, enabled: true },
-  { id: 'readiness', label: 'Readiness', section: 'general', defaultColumn: true, enabled: true },
-  { id: 'location', label: 'Location', section: 'general', defaultColumn: false, enabled: true },
-  { id: 'stock_days', label: 'Stock Days', section: 'general', defaultColumn: true, enabled: true },
-  { id: 'created_at', label: 'Created', section: 'general', defaultColumn: false, enabled: true },
+  { id: 'brand', label: 'Brand', section: 'general', defaultColumn: false },
+  { id: 'asset_type', label: 'Asset Type', section: 'general', defaultColumn: false },
+  { id: 'serial_number', label: 'Serial Number', section: 'general', defaultColumn: true },
+  { id: 'status', label: 'Status', section: 'general', defaultColumn: true },
+  { id: 'readiness', label: 'Readiness', section: 'general', defaultColumn: true },
+  { id: 'location', label: 'Location', section: 'general', defaultColumn: false },
+  { id: 'stock_days', label: 'Stock Days', section: 'general', defaultColumn: true },
+  { id: 'created_at', label: 'Created', section: 'general', defaultColumn: false },
 
   // Specs
-  {
-    id: 'country_of_origin',
-    label: 'Country of Origin',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'specs_cassettes',
-    label: 'Cassettes',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
+  { id: 'country_of_origin', label: 'Country of Origin', section: 'specs', defaultColumn: false },
+  { id: 'specs_cassettes', label: 'Cassettes', section: 'specs', defaultColumn: false },
   {
     id: 'specs_internal_finisher',
     label: 'Internal Finisher',
     section: 'specs',
     defaultColumn: false,
-    enabled: true,
   },
-  {
-    id: 'accessories',
-    label: 'Accessories',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'specs_meter_total',
-    label: 'Total Meter',
-    section: 'specs',
-    defaultColumn: true,
-    enabled: true,
-  },
-  { id: 'weight', label: 'Weight', section: 'specs', defaultColumn: false, enabled: true },
-  { id: 'size', label: 'Size', section: 'specs', defaultColumn: false, enabled: true },
-  {
-    id: 'specs_toner_life_c',
-    label: 'Toner Life C',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'specs_toner_life_m',
-    label: 'Toner Life M',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'specs_toner_life_y',
-    label: 'Toner Life Y',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'specs_toner_life_k',
-    label: 'Toner Life K',
-    section: 'specs',
-    defaultColumn: false,
-    enabled: true,
-  },
+  { id: 'accessories', label: 'Accessories', section: 'specs', defaultColumn: false },
+  { id: 'specs_meter_total', label: 'Total Meter', section: 'specs', defaultColumn: true },
+  { id: 'weight', label: 'Weight', section: 'specs', defaultColumn: false },
+  { id: 'size', label: 'Size', section: 'specs', defaultColumn: false },
+  { id: 'specs_toner_life_c', label: 'Toner Life C', section: 'specs', defaultColumn: false },
+  { id: 'specs_toner_life_m', label: 'Toner Life M', section: 'specs', defaultColumn: false },
+  { id: 'specs_toner_life_y', label: 'Toner Life Y', section: 'specs', defaultColumn: false },
+  { id: 'specs_toner_life_k', label: 'Toner Life K', section: 'specs', defaultColumn: false },
 
   // Cost
   {
@@ -127,7 +65,6 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Purchase Cost',
     section: 'cost',
     defaultColumn: false,
-    enabled: true,
     permission: 'view_purchase_price',
   },
   {
@@ -135,7 +72,6 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Transport Cost',
     section: 'cost',
     defaultColumn: false,
-    enabled: true,
     permission: 'view_purchase_price',
   },
   {
@@ -143,7 +79,6 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Processing Cost',
     section: 'cost',
     defaultColumn: false,
-    enabled: true,
     permission: 'view_purchase_price',
   },
   {
@@ -151,7 +86,6 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Total Cost',
     section: 'cost',
     defaultColumn: false,
-    enabled: true,
     permission: 'view_purchase_price',
   },
   {
@@ -159,120 +93,24 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Sale Price',
     section: 'cost',
     defaultColumn: false,
-    enabled: true,
     permission: 'view_sale_price',
   },
 
   // Arrival
-  {
-    id: 'arrival_arrival_number',
-    label: 'Arrival #',
-    section: 'arrival',
-    defaultColumn: false,
-    enabled: false,
-  },
-  { id: 'vendor', label: 'Vendor', section: 'arrival', defaultColumn: false, enabled: true },
-  {
-    id: 'arrival_warehouse',
-    label: 'Arrival Warehouse',
-    section: 'arrival',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'arrival_transporter',
-    label: 'Arrival Transporter',
-    section: 'arrival',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'arrival_created_by',
-    label: 'Arrived By',
-    section: 'arrival',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'arrival_created_at',
-    label: 'Arrived At',
-    section: 'arrival',
-    defaultColumn: false,
-    enabled: true,
-  },
+  { id: 'vendor', label: 'Vendor', section: 'arrival', defaultColumn: false },
+  { id: 'arrival_created_at', label: 'Arrived At', section: 'arrival', defaultColumn: false },
 
   // Departure
-  {
-    id: 'departure_departure_number',
-    label: 'Departure #',
-    section: 'departure',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'departure_warehouse',
-    label: 'Departure Warehouse',
-    section: 'departure',
-    defaultColumn: false,
-    enabled: false,
-  },
-  { id: 'customer', label: 'Customer', section: 'departure', defaultColumn: false, enabled: true },
-  {
-    id: 'departure_transporter',
-    label: 'Departure Transporter',
-    section: 'departure',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'departure_created_by',
-    label: 'Departed By',
-    section: 'departure',
-    defaultColumn: false,
-    enabled: false,
-  },
-  {
-    id: 'departed_at',
-    label: 'Departed At',
-    section: 'departure',
-    defaultColumn: false,
-    enabled: true,
-  },
+  { id: 'customer', label: 'Customer', section: 'departure', defaultColumn: false },
+  { id: 'departed_at', label: 'Departed At', section: 'departure', defaultColumn: false },
 
   // Hold
-  {
-    id: 'hold_hold_number',
-    label: 'Hold #',
-    section: 'hold',
-    defaultColumn: false,
-    enabled: false,
-  },
-  { id: 'held_by', label: 'Held By', section: 'hold', defaultColumn: false, enabled: true },
-  {
-    id: 'hold_created_for',
-    label: 'Held For',
-    section: 'hold',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'hold_customer',
-    label: 'Hold Customer',
-    section: 'hold',
-    defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'hold_created_at',
-    label: 'Hold Created',
-    section: 'hold',
-    defaultColumn: false,
-    enabled: true,
-  },
-  { id: 'days_held', label: 'Days Held', section: 'hold', defaultColumn: false, enabled: true },
-  { id: 'hold_from_dt', label: 'Hold From', section: 'hold', defaultColumn: false, enabled: false },
-  { id: 'hold_to_dt', label: 'Hold To', section: 'hold', defaultColumn: false, enabled: false },
-  { id: 'hold_notes', label: 'Hold Notes', section: 'hold', defaultColumn: false, enabled: false },
+  { id: 'hold_hold_number', label: 'Hold #', section: 'hold', defaultColumn: false },
+  { id: 'held_by', label: 'Held By', section: 'hold', defaultColumn: false },
+  { id: 'hold_created_for', label: 'Held For', section: 'hold', defaultColumn: false },
+  { id: 'hold_customer', label: 'Hold Customer', section: 'hold', defaultColumn: false },
+  { id: 'hold_created_at', label: 'Hold Created', section: 'hold', defaultColumn: false },
+  { id: 'days_held', label: 'Days Held', section: 'hold', defaultColumn: false },
 
   // Invoice
   {
@@ -280,24 +118,10 @@ export const ASSET_COLUMN_REGISTRY = [
     label: 'Invoice #',
     section: 'invoice',
     defaultColumn: false,
-    enabled: true,
-  },
-  {
-    id: 'purchase_invoice_is_cleared',
-    label: 'Invoice Cleared',
-    section: 'invoice',
-    defaultColumn: false,
-    enabled: false,
   },
 
   // Last Comment
-  {
-    id: 'latest_comment',
-    label: 'Last Comment',
-    section: 'last_comment',
-    defaultColumn: false,
-    enabled: true,
-  },
+  { id: 'latest_comment', label: 'Last Comment', section: 'last_comment', defaultColumn: false },
 ] as const satisfies readonly AssetColumn[]
 
 export type AssetColumnId = (typeof ASSET_COLUMN_REGISTRY)[number]['id']

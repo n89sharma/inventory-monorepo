@@ -28,7 +28,6 @@ export function ColumnPickerButton({
       ),
     [can],
   )
-  const enabledCount = permittedColumns.filter((c) => c.enabled).length
   const visibleCount = permittedColumns.filter((c) => visible.has(c.id)).length
   return (
     <Popover>
@@ -36,7 +35,7 @@ export function ColumnPickerButton({
         <Button variant="outline" size="default" className="gap-1.5">
           <ColumnsIcon />
           <span>
-            Columns ({visibleCount} / {enabledCount})
+            Columns ({visibleCount} / {permittedColumns.length})
           </span>
         </Button>
       </PopoverTrigger>

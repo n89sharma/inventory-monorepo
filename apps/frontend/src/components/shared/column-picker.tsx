@@ -48,29 +48,27 @@ function SearchBar({
 function SectionHeader({
   label,
   visibleCount,
-  enabledCount,
+  columnCount,
   onToggle,
 }: {
   label: string
   visibleCount: number
-  enabledCount: number
+  columnCount: number
   onToggle: () => void
 }): React.JSX.Element {
-  const isInteractive = enabledCount > 0
   return (
     <button
       type="button"
       onClick={onToggle}
-      disabled={!isInteractive}
       className={cn(
         'flex w-full items-center justify-between rounded px-2 py-1.5',
         'text-xs font-medium uppercase tracking-wide text-muted-foreground',
-        isInteractive ? 'hover:bg-accent hover:text-accent-foreground' : 'cursor-default',
+        'hover:bg-accent hover:text-accent-foreground',
       )}
     >
       <span>{label}</span>
       <span className="tabular-nums">
-        {visibleCount}/{enabledCount}
+        {visibleCount}/{columnCount}
       </span>
     </button>
   )
@@ -89,16 +87,10 @@ function ColumnRow({
     <label
       className={cn(
         'flex items-center gap-2 rounded px-2 py-1 text-sm',
-        column.enabled
-          ? 'cursor-pointer hover:bg-accent hover:text-accent-foreground'
-          : 'cursor-not-allowed text-muted-foreground/60',
+        'cursor-pointer hover:bg-accent hover:text-accent-foreground',
       )}
     >
-      <Checkbox
-        checked={isOn}
-        disabled={!column.enabled}
-        onCheckedChange={(checked) => onToggle(!!checked)}
-      />
+      <Checkbox checked={isOn} onCheckedChange={(checked) => onToggle(!!checked)} />
       <span className="truncate">{column.label}</span>
     </label>
   )
@@ -130,12 +122,9 @@ export function ColumnPicker({
   const groupedSections = useMemo(
     () =>
       COLUMN_SECTIONS.map((section) => {
-        const columns = allColumns.filter(
-          (c) => c.section === section.id && c.enabled && matchesQuery(c, query),
-        )
-        const enabled = columns.filter((c) => c.enabled)
-        const visibleEnabled = enabled.filter((c) => visibleColSet.has(c.id))
-        return { section, columns, enabled, visibleEnabled }
+        const columns = allColumns.filter((c) => c.section === section.id && matchesQuery(c, query))
+        const visibleColumns = columns.filter((c) => visibleColSet.has(c.id))
+        return { section, columns, visibleColumns }
       }).filter((g) => g.columns.length > 0),
     [query, visibleColSet, allColumns],
   )
@@ -165,16 +154,16 @@ export function ColumnPicker({
 
       <div className="max-h-[440px] overflow-y-auto -mx-0.5 px-0.5">
         {hasAnyMatch ? (
-          groupedSections.map(({ section, columns, enabled, visibleEnabled }) => {
-            const allEnabledOn = enabled.length > 0 && visibleEnabled.length === enabled.length
-            const enabledIds = enabled.map((c) => c.id)
+          groupedSections.map(({ section, columns, visibleColumns }) => {
+            const allOn = visibleColumns.length === columns.length
+            const columnIds = columns.map((c) => c.id)
             return (
               <div key={section.id} className="mb-1 last:mb-0">
                 <SectionHeader
                   label={section.label}
-                  visibleCount={visibleEnabled.length}
-                  enabledCount={enabled.length}
-                  onToggle={() => toggleSection(enabledIds, allEnabledOn)}
+                  visibleCount={visibleColumns.length}
+                  columnCount={columns.length}
+                  onToggle={() => toggleSection(columnIds, allOn)}
                 />
                 {columns.map((col) => (
                   <ColumnRow
