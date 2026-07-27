@@ -9,7 +9,7 @@ import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportAssetsButton } from '@/components/shared/export-assets-button'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
-import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { CopyIcon, SpinnerGapIcon, WarningIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
@@ -112,7 +112,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   const assets = data?.assets ?? EMPTY_ASSETS
   const notFound = data?.notFound ?? EMPTY_NOT_FOUND
 
-  const { visibleColumns, setVisibleColumns, columnVisibility, reset } = useColumnVisibility(
+  const { visibleColumns, setVisibleColumns, columnVisibility, reset } = useColumnVisibilityParam(
     ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS,
   )
   const selection = useAssetSelection(assets, visibleColumns, 'export-assets.csv')

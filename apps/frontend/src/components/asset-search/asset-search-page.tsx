@@ -6,6 +6,7 @@ import { ExportAssetsButton } from '@/components/shared/export-assets-button'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/table-columns/asset-column-registry'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
@@ -46,7 +47,7 @@ export function AssetSearchPage({
     setVisibleColumns,
     columnVisibility,
     reset: resetColumns,
-  } = useColumnVisibilityParam(navContext)
+  } = useColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
   const [sorting, onSortingChange] = useTableSortParam(defaultSort ?? DEFAULT_ASSET_SORT)
   const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
   const effectiveColumnVisibility = useMemo<VisibilityState>(() => {

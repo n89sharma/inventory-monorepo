@@ -11,7 +11,7 @@ import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
-import { useColumnVisibility } from '@/hooks/use-column-visibility'
+import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { useSearchAll } from '@/hooks/use-search-all'
 import { useAssetFilters, useStatusesParam, useWarehousesParam } from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
@@ -77,7 +77,7 @@ export function SearchAllPage(): React.JSX.Element {
     setVisibleColumns,
     columnVisibility,
     reset: resetColumns,
-  } = useColumnVisibility(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
+  } = useColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
 
   const { options: statusOptions, dividerAfterIds: statusDividerAfterIds } = useOrderedStatuses()
 

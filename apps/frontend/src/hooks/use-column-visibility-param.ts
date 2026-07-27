@@ -1,11 +1,9 @@
 import {
   ASSET_COLUMN_REGISTRY,
-  DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
   resolveVisibleColumns,
 } from '@/components/table-columns/asset-column-registry'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
-import type { SearchList } from '@/ui-types/navigation-context'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useQueryState } from 'nuqs'
 import { useCallback, useMemo } from 'react'
@@ -19,7 +17,7 @@ function isDefaultSet(ids: string[], defaultIds: readonly string[]): boolean {
   return ids.every((id) => defaults.has(id))
 }
 
-export function useColumnVisibilityParam(navContext: SearchList): {
+export function useColumnVisibilityParam(defaultIds: readonly string[]): {
   visibleColumns: Set<string>
   setVisibleColumns: (columns: Set<string>) => void
   columnVisibility: VisibilityState
@@ -27,7 +25,6 @@ export function useColumnVisibilityParam(navContext: SearchList): {
 } {
   const can = useCan()
   const [cols, setCols] = useQueryState(COLS_PARAM_KEY, COLS_PARSER)
-  const defaultIds = DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext]
 
   const visibleColumns = useMemo(
     () => (cols.length > 0 ? resolveVisibleColumns(cols, can) : new Set(defaultIds)),
