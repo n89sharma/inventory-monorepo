@@ -66,7 +66,7 @@ export function ArrivalFormPage({
           setIsAssetModalOpen(true)
         },
       }),
-    [deleteAsset],
+    [deleteAsset, setEditingAssetIndex, setIsAssetModalOpen],
   )
   const editingAsset =
     editingAssetIndex !== null ? form.getValues('assets')[editingAssetIndex] : null
