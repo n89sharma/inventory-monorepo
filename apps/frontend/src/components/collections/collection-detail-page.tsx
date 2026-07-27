@@ -5,11 +5,11 @@ import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, RowSelectionState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory } from 'shared-types'
-import { DataTable, type DataTableSelection } from '@/components/shared/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
@@ -20,6 +20,7 @@ const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 // column picker, so hide it explicitly.
 const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
+const EMPTY_ROW_IDS: string[] = []
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
   section: DetailSection
@@ -78,7 +79,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state, search } = useLocation()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
-  const [selection, setSelection] = useState<DataTableSelection<AssetSummary> | null>(null)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [filteredRowIds, setFilteredRowIds] = useState<string[]>(EMPTY_ROW_IDS)
 
   const assetHref = useMemo(
     () => (asset: AssetSummary) => `/${section}/${collectionId}/${asset.barcode}`,
@@ -106,7 +108,10 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
 
   const entity = detail.data
 
-  const selectedAssets = selection?.selectedRows ?? []
+  const selectedAssets = entity.assets.filter((asset) => rowSelection[asset.barcode])
+  const clearSelection = () => setRowSelection({})
+  const selectAllFiltered = () =>
+    setRowSelection(Object.fromEntries(filteredRowIds.map((id) => [id, true])))
 
   const header = renderTitle
     ? renderTitle(entity)
@@ -149,17 +154,17 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         {renderAddAssetBar?.(entity)}
         <BulkEditBar
           selectedAssets={selectedAssets}
-          onClear={() => selection?.clearSelection()}
+          onClear={clearSelection}
           refreshKey={refreshKey}
           currentCollectionType={section}
           returnTo={`/${section}/${collectionId}`}
           onBulkRemove={onBulkRemove}
-          totalCount={selection?.visibleCount}
-          hiddenCount={selection?.hiddenCount}
-          onSelectAll={() => selection?.selectAllVisible()}
+          totalCount={filteredRowIds.length}
+          hiddenCount={entity.assets.length - filteredRowIds.length}
+          onSelectAll={selectAllFiltered}
           extraActions={renderBulkExtraActions?.({
             selectedAssets,
-            clearSelection: () => selection?.clearSelection(),
+            clearSelection,
           })}
         />
         <DataTable
@@ -190,7 +195,9 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
               />
             </>
           )}
-          onSelectionChange={setSelection}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          onFilteredRowIdsChange={setFilteredRowIds}
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
           getRowHref={assetHref}
           getRowId={getAssetRowId}

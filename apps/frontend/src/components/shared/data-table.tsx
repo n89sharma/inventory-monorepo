@@ -43,15 +43,6 @@ import {
   FunnelSimpleIcon,
 } from '@phosphor-icons/react'
 
-export type DataTableSelection<TData> = {
-  selectedRows: TData[]
-  visibleCount: number
-  totalCount: number
-  hiddenCount: number
-  selectAllVisible: () => void
-  clearSelection: () => void
-}
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -68,7 +59,9 @@ interface DataTableProps<TData, TValue> {
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
-  onSelectionChange?: (selection: DataTableSelection<TData>) => void
+  // Row ids surviving the column filters, in filtered order. Reported because the
+  // filter state lives in here; the caller owns rowSelection and derives the rest.
+  onFilteredRowIdsChange?: (rowIds: string[]) => void
   // Faceting walks the filtered rows once per column to collect distinct values, so it
   // is only wired up by tables that render a facet-driven filter.
   facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
@@ -114,7 +107,7 @@ export function DataTable<TData, TValue>({
   getSubRows,
   columnVisibility,
   renderTableFilter,
-  onSelectionChange,
+  onFilteredRowIdsChange,
   facetedRowModels,
 }: DataTableProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>(
@@ -172,19 +165,9 @@ export function DataTable<TData, TValue>({
   })
 
   useEffect(() => {
-    if (!onSelectionChange) return
-    const visibleRows = table.getFilteredRowModel().rows
-    const totalCount = table.getCoreRowModel().rows.length
-    onSelectionChange({
-      selectedRows: table.getFilteredSelectedRowModel().rows.map((row) => row.original),
-      visibleCount: visibleRows.length,
-      totalCount,
-      hiddenCount: totalCount - visibleRows.length,
-      selectAllVisible: () =>
-        table.setRowSelection(Object.fromEntries(visibleRows.map((row) => [row.id, true]))),
-      clearSelection: () => table.resetRowSelection(),
-    })
-  }, [onSelectionChange, table, rowSelection, columnFilters, data])
+    if (!onFilteredRowIdsChange) return
+    onFilteredRowIdsChange(table.getFilteredRowModel().rows.map((row) => row.id))
+  }, [onFilteredRowIdsChange, table, columnFilters, data])
 
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
