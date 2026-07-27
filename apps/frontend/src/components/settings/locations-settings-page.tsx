@@ -16,6 +16,7 @@ import type { LocationSummary } from 'shared-types'
 const LOCATION_DEFAULT_SORT = { id: 'warehouse_code', desc: false }
 const LOCATION_PIN_LEFT = ['select', 'warehouse_code']
 const EMPTY_LOCATIONS: LocationSummary[] = []
+const getLocationRowId = (location: LocationSummary) => String(location.id)
 
 export function LocationsSettingsPage(): React.JSX.Element {
   const { data: locations = EMPTY_LOCATIONS } = useLocations()
@@ -68,7 +69,7 @@ export function LocationsSettingsPage(): React.JSX.Element {
       <DataTable
         columns={columns}
         data={locations}
-        getRowId={(location) => String(location.id)}
+        getRowId={getLocationRowId}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         pinLeft={LOCATION_PIN_LEFT}

@@ -22,7 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useEffect, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 declare module '@tanstack/react-table' {
@@ -149,6 +149,14 @@ export function DataTable<TData, TValue>({
   const sorting = controlledSorting ?? internalSorting
   const onSortingChange = onControlledSortingChange ?? setInternalSorting
 
+  // Hover only triggers a prefetch, so its identity never affects what a row renders.
+  // Holding it in a ref lets callers pass an inline arrow without breaking DataRow's memo.
+  const onRowMouseEnterRef = useRef(onRowMouseEnter)
+  useEffect(() => {
+    onRowMouseEnterRef.current = onRowMouseEnter
+  })
+  const handleRowMouseEnter = useCallback((row: TData) => onRowMouseEnterRef.current?.(row), [])
+
   const table = useReactTable({
     data,
     columns,
@@ -253,7 +261,7 @@ export function DataTable<TData, TValue>({
                       row={row}
                       isSelected={row.getIsSelected()}
                       isExpanded={row.getIsExpanded()}
-                      onRowMouseEnter={onRowMouseEnter}
+                      onRowMouseEnter={handleRowMouseEnter}
                       getRowHref={getRowHref}
                       getRowClassName={getRowClassName}
                       columnVisibility={columnVisibility}

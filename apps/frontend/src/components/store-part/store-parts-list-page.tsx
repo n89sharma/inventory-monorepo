@@ -16,6 +16,10 @@ function storePartSearchText(row: StorePartSummary): string {
   return `${row.part_number} ${row.description}`
 }
 
+function storePartHref(row: StorePartSummary): string {
+  return buildStorePartPath(row.id, row.warehouse_id)
+}
+
 export function StorePartsListPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useStoreWarehousesParam()
   const [search, setSearch] = useStoreSearchParam()
@@ -62,7 +66,7 @@ export function StorePartsListPage(): React.JSX.Element {
         data={filteredRows}
         defaultSort={{ id: 'on_hand', desc: true }}
         onRowMouseEnter={(row) => preloadStorePartDetail(row.id)}
-        getRowHref={(row) => buildStorePartPath(row.id, row.warehouse_id)}
+        getRowHref={storePartHref}
         actions={
           <Button
             onClick={() => setAddOpen(true)}

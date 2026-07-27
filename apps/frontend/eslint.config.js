@@ -41,6 +41,12 @@ export default tseslint.config(
           message:
             'Do not use a ternary to switch between two rendered components. Extract a named sub-component that early-returns each branch (if/else). `cond ? <A/> : null` is fine.',
         },
+        {
+          selector:
+            'JSXOpeningElement[name.name=/^(DataTable|CollectionPage|CollectionDetailPage|AssetResultsTable)$/] > JSXAttribute[name.name=/^(getRowHref|getRowClassName|getSubRows|getRowId)$/] > JSXExpressionContainer > :matches(ArrowFunctionExpression, FunctionExpression)',
+          message:
+            'This prop feeds row rendering or the table options, so an inline function breaks DataRow memoization on every render. Hoist it to module scope or useCallback. (onRowMouseEnter is exempt: DataTable holds it in a ref.)',
+        },
       ],
     },
   },
