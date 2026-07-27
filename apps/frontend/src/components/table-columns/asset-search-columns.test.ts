@@ -1,4 +1,10 @@
-import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
+import {
+  createTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  type ColumnDef,
+  type HeaderContext,
+} from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
@@ -38,6 +44,21 @@ function liveColumnIds(): string[] {
 function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: string } {
   const [header, data] = searchPageRowsToCsv([row], new Set(ids)).split(CSV_ROW_DELIMITER)
   return { header, data }
+}
+
+// Sorts through the real TanStack pipeline rather than the accessors directly, so the
+// column defs' accessorKey/accessorFn split and sortUndefined are exercised as shipped.
+function sortedBarcodes(rows: AssetSearchRow[], columnId: string, desc = false): string[] {
+  const table = createTable<AssetSearchRow>({
+    data: rows,
+    columns: createSearchPageColumns(noHref),
+    state: { sorting: [{ id: columnId, desc }] },
+    onStateChange: () => {},
+    renderFallbackValue: null,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  })
+  return table.getSortedRowModel().rows.map((row) => row.original.barcode)
 }
 
 function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
@@ -196,6 +217,122 @@ describe('asset-search report columns', () => {
     const { header } = csvFor(makeRow(), ['status'])
     expect(header).toBe('Barcode,Model,Status')
   })
+
+  // The CSV preserves whatever order it is handed. It does not sort, so the row order
+  // of an export is decided entirely by the caller — see useAssetSelection.
+  it('writes rows in the order it is given', () => {
+    const older = makeRow({ barcode: 'OLD', created_at: new Date(2026, 2, 5) })
+    const newer = makeRow({ barcode: 'NEW', created_at: new Date(2026, 6, 15) })
+    const barcodesOf = (rows: AssetSearchRow[]) =>
+      searchPageRowsToCsv(rows, new Set(['status']))
+        .split(CSV_ROW_DELIMITER)
+        .slice(1)
+        .map((line) => line.split(',')[0])
+
+    expect(barcodesOf([older, newer])).toEqual(['OLD', 'NEW'])
+    expect(barcodesOf([newer, older])).toEqual(['NEW', 'OLD'])
+  })
+})
+
+describe('asset search column sorting', () => {
+  it('orders numeric columns by magnitude, not as text', () => {
+    // 2, 10 and 9 days of stock: sorted as text 10 would lead.
+    const rows = [
+      makeRow({ barcode: 'TWO', created_at: new Date(2026, 6, 25) }),
+      makeRow({ barcode: 'TEN', created_at: new Date(2026, 6, 17) }),
+      makeRow({ barcode: 'NINE', created_at: new Date(2026, 6, 18) }),
+    ]
+    expect(sortedBarcodes(rows, 'stock_days')).toEqual(['TWO', 'NINE', 'TEN'])
+    expect(sortedBarcodes(rows, 'stock_days', true)).toEqual(['TEN', 'NINE', 'TWO'])
+  })
+
+  it('orders costs by magnitude, not by their formatted string', () => {
+    // "$9.00" sorts after "$10.00" and "$200.00" as text.
+    const rows = [
+      makeRow({ barcode: 'TWO_HUNDRED', cost_purchase_cost: 200 }),
+      makeRow({ barcode: 'NINE', cost_purchase_cost: 9 }),
+      makeRow({ barcode: 'TEN', cost_purchase_cost: 10 }),
+    ]
+    expect(sortedBarcodes(rows, 'cost_purchase_cost')).toEqual(['NINE', 'TEN', 'TWO_HUNDRED'])
+  })
+
+  it('orders the meter by its raw reading, not by the thousands-formatted text', () => {
+    // Displayed as "900", "1 K" and "12 K", which sort in a different order as text.
+    const rows = [
+      makeRow({ barcode: 'TWELVE_K', specs_meter_total: 12000 }),
+      makeRow({ barcode: 'NINE_HUNDRED', specs_meter_total: 900 }),
+      makeRow({ barcode: 'ONE_K', specs_meter_total: 1200 }),
+    ]
+    expect(sortedBarcodes(rows, 'specs_meter_total')).toEqual(['NINE_HUNDRED', 'ONE_K', 'TWELVE_K'])
+  })
+
+  it('orders weight by magnitude, not by its formatted string', () => {
+    // "1,000 lbs" sorts between "100 lbs" and "90 lbs" as text.
+    const rows = [
+      makeRow({ barcode: 'THOUSAND', weight: 1000 }),
+      makeRow({ barcode: 'NINETY', weight: 90 }),
+      makeRow({ barcode: 'HUNDRED', weight: 100 }),
+    ]
+    expect(sortedBarcodes(rows, 'weight')).toEqual(['NINETY', 'HUNDRED', 'THOUSAND'])
+  })
+
+  it('orders date columns chronologically, not by their formatted month name', () => {
+    // Formatted as "March 05, 2026", "April 10, 2026", "July 15, 2026": as text April leads.
+    const rows = [
+      makeRow({ barcode: 'JULY', created_at: new Date(2026, 6, 15) }),
+      makeRow({ barcode: 'MARCH', created_at: new Date(2026, 2, 5) }),
+      makeRow({ barcode: 'APRIL', created_at: new Date(2026, 3, 10) }),
+    ]
+    expect(sortedBarcodes(rows, 'created_at')).toEqual(['MARCH', 'APRIL', 'JULY'])
+    expect(sortedBarcodes(rows, 'created_at', true)).toEqual(['JULY', 'APRIL', 'MARCH'])
+  })
+
+  it('orders every other date column chronologically too', () => {
+    const dateColumns = ['departed_at', 'arrival_created_at', 'hold_created_at'] as const
+    for (const columnId of dateColumns) {
+      const rows = [
+        makeRow({ barcode: 'JULY', [columnId]: new Date(2026, 6, 15) }),
+        makeRow({ barcode: 'MARCH', [columnId]: new Date(2026, 2, 5) }),
+        makeRow({ barcode: 'APRIL', [columnId]: new Date(2026, 3, 10) }),
+      ]
+      expect(sortedBarcodes(rows, columnId)).toEqual(['MARCH', 'APRIL', 'JULY'])
+    }
+  })
+
+  it('keeps assets with no hold last in both directions of days held', () => {
+    const rows = [
+      makeRow({ barcode: 'UNHELD', hold_created_at: null }),
+      makeRow({ barcode: 'THIRTY', hold_created_at: new Date(2026, 5, 27) }),
+      makeRow({ barcode: 'FIVE', hold_created_at: new Date(2026, 6, 22) }),
+    ]
+    expect(sortedBarcodes(rows, 'days_held')).toEqual(['FIVE', 'THIRTY', 'UNHELD'])
+    expect(sortedBarcodes(rows, 'days_held', true)).toEqual(['THIRTY', 'FIVE', 'UNHELD'])
+  })
+
+  it('orders location by the string the cell displays', () => {
+    const at = (warehouse_code: string, zone: string) => ({
+      warehouse_id: 1,
+      warehouse_code,
+      warehouse_street: '1 Main St',
+      zone,
+      bin: 'A12',
+    })
+    const rows = [
+      makeRow({ barcode: 'NYC', location: at('NYC', 'RECEIVING') }),
+      makeRow({ barcode: 'ATL', location: at('ATL', 'RECEIVING') }),
+      makeRow({ barcode: 'TRANSIT', location: at('ATL', 'RECEIVING'), is_in_transit: true }),
+    ]
+    expect(sortedBarcodes(rows, 'location')).toEqual(['ATL', 'TRANSIT', 'NYC'])
+  })
+
+  it('orders text columns alphabetically', () => {
+    const rows = [
+      makeRow({ barcode: 'CHARLIE', held_by: 'Charlie' }),
+      makeRow({ barcode: 'ALICE', held_by: 'Alice' }),
+      makeRow({ barcode: 'BOB', held_by: 'Bob' }),
+    ]
+    expect(sortedBarcodes(rows, 'held_by')).toEqual(['ALICE', 'BOB', 'CHARLIE'])
+  })
 })
 
 describe('asset search columns', () => {
@@ -206,18 +343,6 @@ describe('asset search columns', () => {
   it('marks exactly barcode and model always visible', () => {
     const alwaysVisible = ASSET_SEARCH_COLUMNS.filter((c) => c.alwaysVisible).map((c) => c.id)
     expect(alwaysVisible).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
-  })
-
-  it('gives every sortable column a raw accessor, never its formatted text', () => {
-    const row = makeRow()
-    const numericOrDated = ASSET_SEARCH_COLUMNS.filter((c) => c.sortable && c.accessor)
-    for (const column of numericOrDated) {
-      expect(typeof column.accessor?.(row)).not.toBe('object')
-    }
-    const daysHeldColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'days_held')
-    const stockDaysColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'stock_days')
-    expect(daysHeldColumn?.accessor?.(row)).toBe(26)
-    expect(stockDaysColumn?.accessor?.(row)).toBe(12)
   })
 
   it('groups the pickable columns by section, in picker order', () => {
