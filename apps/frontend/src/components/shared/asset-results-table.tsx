@@ -3,7 +3,7 @@ import {
   createSelectColumn,
   PINNED_ASSET_COLUMN_IDS,
 } from '@/components/table-columns/column-primitives'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import type {
   OnChangeFn,

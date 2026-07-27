@@ -65,6 +65,7 @@ export default tseslint.config(
     // state change, but v9 is still beta (latest is 8.21.3). Scoped to the files that
     // call useReactTable directly so the rule keeps guarding everywhere else.
     files: [
+      'src/components/shared/data-table.tsx',
       'src/components/collections/bulk-edit-pricing-modal.tsx',
       'src/components/reports/holds-by-user-report-page.tsx',
     ],

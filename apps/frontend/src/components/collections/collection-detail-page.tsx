@@ -9,7 +9,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory } from 'shared-types'
-import { DataTable, type DataTableSelection } from '../shadcn/data-table'
+import { DataTable, type DataTableSelection } from '@/components/shared/data-table'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 

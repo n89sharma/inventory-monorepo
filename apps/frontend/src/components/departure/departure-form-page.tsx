@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { getDepartureCreateEditCollectionFormColumns } from '@/components/table-columns/create-edit-collection-form-columns'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import {
   Field,
   FieldError,

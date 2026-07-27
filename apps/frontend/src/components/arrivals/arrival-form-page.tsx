@@ -13,7 +13,7 @@ import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook
 import { toast } from 'sonner'
 import { getNewAssetFormColumns } from '../table-columns/new-asset-form-columns'
 import { Button } from '../shadcn/button'
-import { DataTable } from '../shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'

@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { StoreTransactionModal } from '@/components/store-part/store-transaction-modal'

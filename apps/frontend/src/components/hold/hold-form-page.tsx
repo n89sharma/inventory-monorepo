@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import {
   Field,
   FieldError,

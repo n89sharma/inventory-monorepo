@@ -1,7 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { getCreateEditCollectionFormColumns } from '@/components/table-columns/create-edit-collection-form-columns'
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import {
   Field,
   FieldError,

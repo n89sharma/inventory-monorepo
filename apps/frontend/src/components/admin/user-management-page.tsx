@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import {
   Dialog,

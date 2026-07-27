@@ -2,7 +2,7 @@ import { PageContent } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { createModelSalesColumns } from './model-sales-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import {
   Table,
   TableBody,

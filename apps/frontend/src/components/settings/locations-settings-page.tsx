@@ -1,7 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { locationTableColumns } from '@/components/settings/location-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shadcn/data-table'
+import { DataTable } from '@/components/shared/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { printLocationBarcodes } from '@/data/api/location-api'
