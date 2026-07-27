@@ -43,7 +43,7 @@ import {
   TruckTrailerIcon,
   WarehouseIcon,
 } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const STORE_PATH = '/store'
@@ -123,6 +123,20 @@ const REPORTS_SUB_ITEMS = [
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 
+// Opens the group when its section becomes active, while leaving a manual
+// collapse in place until the user navigates into the section again.
+function useGroupOpenOnActive(isActive: boolean): [boolean, (open: boolean) => void] {
+  const [open, setOpen] = useState(isActive)
+  const [prevActive, setPrevActive] = useState(isActive)
+
+  if (isActive !== prevActive) {
+    setPrevActive(isActive)
+    if (isActive) setOpen(true)
+  }
+
+  return [open, setOpen]
+}
+
 export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const defaultWarehouse = useProfileDefaultWarehouse()
@@ -157,7 +171,7 @@ export function AppSidebar(): React.JSX.Element {
   }
 
   const isSettingsActive = location.pathname.startsWith('/settings')
-  const [settingsOpen, setSettingsOpen] = useState(isSettingsActive)
+  const [settingsOpen, setSettingsOpen] = useGroupOpenOnActive(isSettingsActive)
 
   const reportItemVisible: Record<ReportPermission, boolean> = {
     view_reports: canViewReports,
@@ -166,22 +180,10 @@ export function AppSidebar(): React.JSX.Element {
   }
 
   const isReportsActive = location.pathname.startsWith('/reports')
-  const [reportsOpen, setReportsOpen] = useState(isReportsActive)
+  const [reportsOpen, setReportsOpen] = useGroupOpenOnActive(isReportsActive)
 
   const isSearchAssetsActive = location.pathname.startsWith('/search')
-  const [searchAssetsOpen, setSearchAssetsOpen] = useState(isSearchAssetsActive)
-
-  useEffect(() => {
-    if (isSettingsActive) setSettingsOpen(true)
-  }, [isSettingsActive])
-
-  useEffect(() => {
-    if (isReportsActive) setReportsOpen(true)
-  }, [isReportsActive])
-
-  useEffect(() => {
-    if (isSearchAssetsActive) setSearchAssetsOpen(true)
-  }, [isSearchAssetsActive])
+  const [searchAssetsOpen, setSearchAssetsOpen] = useGroupOpenOnActive(isSearchAssetsActive)
 
   return (
     <Sidebar collapsible="icon">

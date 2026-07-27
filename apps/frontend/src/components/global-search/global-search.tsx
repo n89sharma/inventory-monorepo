@@ -60,10 +60,12 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  useEffect(() => {
+  const [prevResults, setPrevResults] = useState(results)
+  if (results !== prevResults) {
+    setPrevResults(results)
     const firstWithResults = tabs.find((tab) => results[tab].length > 0)
     if (firstWithResults) setActiveTab(firstWithResults)
-  }, [results])
+  }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()

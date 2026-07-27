@@ -29,7 +29,9 @@ export default tseslint.config(
       // React Compiler rules introduced in eslint-plugin-react-hooks v7. Every other
       // new rule in the preset already passes and stays on. These two have existing
       // violations; enable each one in its own commit alongside the fixes.
-      // TODO(react-hooks-v7): 7 violations — cascading-render effects.
+      // TODO(react-hooks-v7): 2 violations left — edit-location-modal (fetch effect
+      // owning server state; fix is SWR) and add-assets-by-barcode-or-serial
+      // (popover open state; fix is deriving it during render).
       'react-hooks/set-state-in-effect': 'off',
       // TODO(react-hooks-v7): 5 violations — 3x react-hook-form watch(), 2x useReactTable.
       'react-hooks/incompatible-library': 'off',
