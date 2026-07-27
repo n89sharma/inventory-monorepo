@@ -27,7 +27,7 @@ export function useColumnVisibilityParam(defaultIds: readonly string[]): {
   const [cols, setCols] = useQueryState(COLS_PARAM_KEY, COLS_PARSER)
 
   const visibleColumns = useMemo(
-    () => (cols.length > 0 ? resolveVisibleColumns(cols, can) : new Set(defaultIds)),
+    () => resolveVisibleColumns(cols.length > 0 ? cols : defaultIds, can),
     [cols, can, defaultIds],
   )
 
