@@ -1,4 +1,5 @@
 import type {
+  Cell,
   Column,
   ColumnDef,
   ColumnFiltersState,
@@ -78,38 +79,21 @@ const CELL_BG =
   'group-hover/row:bg-[var(--row-bg-hover,var(--color-muted))] ' +
   'group-data-[state=selected]/row:bg-[var(--row-bg-hover,var(--color-muted))]'
 
-function pinStyle<TData>(column: Column<TData>): CSSProperties {
+const PIN_EDGE_SHADOW = 'shadow-[inset_-1px_0_0_var(--border)]'
+const HEADER_Z_INDEX = 10
+const PINNED_HEADER_Z_INDEX = 11
+const PINNED_CELL_Z_INDEX = 1
+
+// Spread over a base style: contributes nothing unless the column is pinned, so the
+// caller supplies the z-index that a pinned cell needs to win over its own layer.
+function pinnedLeftStyle<TData>(column: Column<TData>, zIndex: number): CSSProperties {
   if (column.getIsPinned() !== 'left') return {}
-  return {
-    position: 'sticky',
-    left: column.getStart('left'),
-    zIndex: 1,
-  }
+  return { position: 'sticky', left: column.getStart('left'), zIndex }
 }
 
-function headerStickyStyle<TData>(column: Column<TData>): CSSProperties {
-  if (column.getIsPinned() === 'left') {
-    return {
-      position: 'sticky',
-      top: 0,
-      left: column.getStart('left'),
-      zIndex: 11,
-    }
-  }
-  return { position: 'sticky', top: 0, zIndex: 10 }
-}
-
-function pinHeaderClass<TData>(column: Column<TData>): string {
-  const shadow =
-    column.getIsPinned() === 'left' && column.getIsLastColumn('left')
-      ? 'shadow-[inset_-1px_0_0_var(--border)]'
-      : ''
-  return `bg-muted ${shadow}`.trim()
-}
-
-function pinShadowClass<TData>(column: Column<TData>): string {
-  if (column.getIsPinned() !== 'left') return ''
-  return column.getIsLastColumn('left') ? 'shadow-[inset_-1px_0_0_var(--border)]' : ''
+function pinEdgeClass<TData>(column: Column<TData>): string {
+  const isPinnedEdge = column.getIsPinned() === 'left' && column.getIsLastColumn('left')
+  return isPinnedEdge ? PIN_EDGE_SHADOW : ''
 }
 
 export function DataTable<TData, TValue>({
@@ -231,9 +215,12 @@ export function DataTable<TData, TValue>({
                         key={header.id}
                         style={{
                           width: header.column.columnDef.size,
-                          ...headerStickyStyle(header.column),
+                          position: 'sticky',
+                          top: 0,
+                          zIndex: HEADER_Z_INDEX,
+                          ...pinnedLeftStyle(header.column, PINNED_HEADER_Z_INDEX),
                         }}
-                        className={`whitespace-nowrap text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinHeaderClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                        className={`whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -257,7 +244,7 @@ export function DataTable<TData, TValue>({
                       onRowMouseEnter={handleRowMouseEnter}
                       getRowHref={getRowHref}
                       getRowClassName={getRowClassName}
-                      columnVisibility={columnVisibility}
+                      cells={row.getVisibleCells()}
                     />
                   ))
               ) : (
@@ -327,6 +314,7 @@ export function DataTable<TData, TValue>({
 
 function DataRowImpl<TData>({
   row,
+  cells,
   isSelected,
   isExpanded,
   onRowMouseEnter,
@@ -334,12 +322,12 @@ function DataRowImpl<TData>({
   getRowClassName,
 }: {
   row: Row<TData>
+  cells: Cell<TData, unknown>[]
   isSelected: boolean
   isExpanded?: boolean
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
   getRowClassName?: (row: TData) => string | undefined
-  columnVisibility?: VisibilityState
 }) {
   const navigate = useNavigate()
   const canExpand = row.getCanExpand()
@@ -367,11 +355,14 @@ function DataRowImpl<TData>({
         window.open(getRowHref(row.original), '_blank')
       }}
     >
-      {row.getVisibleCells().map((cell) => (
+      {cells.map((cell) => (
         <TableCell
           key={cell.id}
-          style={{ width: cell.column.columnDef.size, ...pinStyle(cell.column) }}
-          className={`relative whitespace-nowrap text-center ${CELL_BG} ${pinShadowClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
+          style={{
+            width: cell.column.columnDef.size,
+            ...pinnedLeftStyle(cell.column, PINNED_CELL_Z_INDEX),
+          }}
+          className={`relative whitespace-nowrap text-center ${CELL_BG} ${pinEdgeClass(cell.column)} ${cell.column.columnDef.meta?.cellClassName ?? ''}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
