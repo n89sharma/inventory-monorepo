@@ -1,7 +1,7 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { BarcodeIcon, CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { CommandResultList } from '../global-search/command-result-list'
 import { Input } from '../shadcn/input'
@@ -91,8 +91,7 @@ export function AddAssetsByBarcodeOrSerial({
     [suggestions, normalizedQuery],
   )
   const autoAddedQueryRef = useRef<string | null>(null)
-  const addByBarcodeRef = useRef(addByBarcode)
-  addByBarcodeRef.current = addByBarcode
+  const onAutoAdd = useEffectEvent((barcode: string) => addByBarcode(barcode))
 
   useEffect(() => {
     if (!normalizedQuery) {
@@ -103,7 +102,7 @@ export function AddAssetsByBarcodeOrSerial({
     if (exactMatches.length === 1) {
       if (autoAddedQueryRef.current !== normalizedQuery) {
         autoAddedQueryRef.current = normalizedQuery
-        addByBarcodeRef.current(exactMatches[0].barcode)
+        onAutoAdd(exactMatches[0].barcode)
       }
       setPopoverOpen(false)
       return

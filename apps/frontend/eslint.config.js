@@ -35,8 +35,6 @@ export default tseslint.config(
       'react-hooks/incompatible-library': 'off',
       // TODO(react-hooks-v7): 2 violations — arrival-form-page.
       'react-hooks/preserve-manual-memoization': 'off',
-      // TODO(react-hooks-v7): 1 violation — add-assets-by-barcode-or-serial.
-      'react-hooks/refs': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [
         'error',
