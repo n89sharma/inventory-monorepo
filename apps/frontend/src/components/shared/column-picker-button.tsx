@@ -23,9 +23,7 @@ export function ColumnPickerButton({
   const can = useCan()
   const permittedColumns = useMemo<readonly AssetSearchColumn[]>(
     () =>
-      (ASSET_SEARCH_COLUMNS as readonly AssetSearchColumn[]).filter(
-        (c) => !c.permission || can(c.permission),
-      ),
+      ASSET_SEARCH_COLUMNS.filter((c) => !c.alwaysVisible && (!c.permission || can(c.permission))),
     [can],
   )
   const visibleCount = permittedColumns.filter((c) => visible.has(c.id)).length

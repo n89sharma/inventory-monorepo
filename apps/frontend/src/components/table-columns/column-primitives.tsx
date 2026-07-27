@@ -5,12 +5,21 @@ import type { ColumnDef, HeaderContext, SortDirection } from '@tanstack/react-ta
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-const ID_COLUMN_SIZE = 120
+export const ID_COLUMN_SIZE = 120
+const ID_LINK_CLASS = 'font-mono text-foreground hover:underline'
 export const SELECT_COLUMN_SIZE = 44
 export const MODEL_COLUMN_SIZE = 100
 export const SERIAL_NUMBER_COLUMN_SIZE = 150
 
 export const PINNED_ASSET_COLUMN_IDS = ['select', 'barcode', 'serial_number', 'model']
+
+export function IdLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link to={to} className={ID_LINK_CLASS}>
+      {children}
+    </Link>
+  )
+}
 
 function SelectHitArea({ onActivate, children }: { onActivate: () => void; children: ReactNode }) {
   return (
@@ -87,11 +96,7 @@ export function createIdColumn<TData>({
     header,
     filterFn,
     size: ID_COLUMN_SIZE,
-    cell: ({ row }) => (
-      <Link to={href(row.original)} className="font-mono text-foreground hover:underline">
-        {value(row.original)}
-      </Link>
-    ),
+    cell: ({ row }) => <IdLink to={href(row.original)}>{value(row.original)}</IdLink>,
   }
 }
 

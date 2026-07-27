@@ -41,7 +41,10 @@ export function useColumnVisibilityParam(defaultIds: readonly string[]): {
 
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
-    for (const col of ASSET_SEARCH_COLUMNS) out[col.id] = visibleColumns.has(col.id)
+    for (const column of ASSET_SEARCH_COLUMNS) {
+      if (column.alwaysVisible) continue
+      out[column.id] = visibleColumns.has(column.id)
+    }
     return out
   }, [visibleColumns])
 

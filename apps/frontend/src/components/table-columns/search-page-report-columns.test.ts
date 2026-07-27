@@ -198,23 +198,34 @@ describe('asset-search report columns', () => {
   })
 })
 
-describe('asset column registry', () => {
-  it('has a live table column for every registry entry', () => {
-    const liveIds = new Set(liveColumnIds())
-    const missing = ASSET_SEARCH_COLUMNS.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
-    expect(missing).toEqual([])
+describe('asset search columns', () => {
+  it('renders the table in the order the columns are declared', () => {
+    expect(liveColumnIds()).toEqual(ASSET_SEARCH_COLUMNS.map((c) => c.id))
   })
 
-  it('has a registry entry for every table column but the always-visible ones', () => {
-    const registryIds = new Set<string>(ASSET_SEARCH_COLUMNS.map((c) => c.id))
-    const unregistered = liveColumnIds().filter((id) => !registryIds.has(id))
-    expect(unregistered).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
+  it('marks exactly barcode and model always visible', () => {
+    const alwaysVisible = ASSET_SEARCH_COLUMNS.filter((c) => c.alwaysVisible).map((c) => c.id)
+    expect(alwaysVisible).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
+  })
+
+  it('gives every sortable column a raw accessor, never its formatted text', () => {
+    const row = makeRow()
+    const numericOrDated = ASSET_SEARCH_COLUMNS.filter((c) => c.sortable && c.accessor)
+    for (const column of numericOrDated) {
+      expect(typeof column.accessor?.(row)).not.toBe('object')
+    }
+    const daysHeldColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'days_held')
+    const stockDaysColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'stock_days')
+    expect(daysHeldColumn?.accessor?.(row)).toBe(26)
+    expect(stockDaysColumn?.accessor?.(row)).toBe(12)
   })
 
   it('groups the pickable columns by section, in picker order', () => {
     const grouped = COLUMN_SECTIONS.map((section) => ({
       section: section.id,
-      ids: ASSET_SEARCH_COLUMNS.filter((c) => c.section === section.id).map((c) => c.id),
+      ids: ASSET_SEARCH_COLUMNS.filter((c) => !c.alwaysVisible && c.section === section.id).map(
+        (c) => c.id,
+      ),
     }))
     expect(grouped).toEqual([
       {
@@ -226,20 +237,20 @@ describe('asset column registry', () => {
           'status',
           'readiness',
           'location',
-          'stock_days',
           'created_at',
+          'stock_days',
         ],
       },
       {
         section: 'specs',
         ids: [
           'country_of_origin',
-          'specs_cassettes',
-          'specs_internal_finisher',
-          'accessories',
           'specs_meter_total',
           'weight',
           'size',
+          'specs_cassettes',
+          'specs_internal_finisher',
+          'accessories',
           'specs_toner_life_c',
           'specs_toner_life_m',
           'specs_toner_life_y',
@@ -261,12 +272,12 @@ describe('asset column registry', () => {
       {
         section: 'hold',
         ids: [
+          'days_held',
           'hold_hold_number',
           'held_by',
           'hold_created_for',
           'hold_customer',
           'hold_created_at',
-          'days_held',
         ],
       },
       { section: 'invoice', ids: ['purchase_invoice_invoice_number'] },

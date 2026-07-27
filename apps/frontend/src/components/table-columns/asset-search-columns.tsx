@@ -1,5 +1,32 @@
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
+import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
+import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
+import { StatusBadge } from '@/components/shared/status-badge'
+import {
+  formatDate,
+  formatLocation,
+  formatThousandsK,
+  formatTitleCase,
+  formatUSDWithSymbol,
+  formatWeight,
+} from '@/lib/formatters'
 import type { SearchList } from '@/ui-types/navigation-context'
-import type { Permission } from 'shared-types'
+import { differenceInCalendarDays } from 'date-fns'
+import type { ReactNode } from 'react'
+import { ASSET_STATUS, type AssetSearchRow, type Permission } from 'shared-types'
+import {
+  ID_COLUMN_SIZE,
+  IdLink,
+  MODEL_COLUMN_SIZE,
+  SERIAL_NUMBER_COLUMN_SIZE,
+} from './column-primitives'
+
+const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
+
+const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date(), createdAt)
+
+export const daysHeld = (heldOn: Date | null): number | undefined =>
+  heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
 
 export type ColumnSectionId =
   | 'specs'
@@ -11,12 +38,28 @@ export type ColumnSectionId =
   | 'general'
   | 'last_comment'
 
+// What the barcode cell needs from the page rendering it: every list links an asset
+// back to its own section, so the href cannot be static.
+export type AssetCellContext = { detailHref: (row: AssetSearchRow) => string }
+
 export type AssetSearchColumn = {
   readonly id: string
   readonly label: string
   readonly section: ColumnSectionId
   readonly defaultColumn: boolean
   readonly permission?: Permission
+  // Shown unconditionally and never offered in the picker: barcode, model.
+  readonly alwaysVisible?: boolean
+  readonly sortable?: boolean
+  readonly size?: number
+  readonly sortUndefined?: 'last'
+  // Raw value TanStack sorts and filters on. Omit when `id` is an AssetSearchRow key,
+  // so numbers and dates keep sorting as numbers and dates rather than as text.
+  readonly accessor?: (row: AssetSearchRow) => unknown
+  // The column's string form: the CSV field, and the table cell when `cell` is absent.
+  readonly text: (row: AssetSearchRow) => string
+  // Display override when the cell is not plain text.
+  readonly cell?: (row: AssetSearchRow, context: AssetCellContext) => ReactNode
 }
 
 export const COLUMN_SECTIONS = [
@@ -30,42 +73,218 @@ export const COLUMN_SECTIONS = [
   { id: 'last_comment', label: 'Last Comment' },
 ] as const satisfies readonly { id: ColumnSectionId; label: string }[]
 
-export const ASSET_SEARCH_COLUMNS = [
-  // General
-  { id: 'brand', label: 'Brand', section: 'general', defaultColumn: false },
-  { id: 'asset_type', label: 'Asset Type', section: 'general', defaultColumn: false },
-  { id: 'serial_number', label: 'Serial Number', section: 'general', defaultColumn: true },
-  { id: 'status', label: 'Status', section: 'general', defaultColumn: true },
-  { id: 'readiness', label: 'Readiness', section: 'general', defaultColumn: true },
-  { id: 'location', label: 'Location', section: 'general', defaultColumn: false },
-  { id: 'stock_days', label: 'Stock Days', section: 'general', defaultColumn: true },
-  { id: 'created_at', label: 'Created', section: 'general', defaultColumn: false },
+function StatusCell({ asset }: { asset: AssetSearchRow }): ReactNode {
+  const { status, held_by, hold_hold_number } = asset
+  if (status !== ASSET_STATUS.HELD || !held_by || !hold_hold_number) {
+    return <StatusBadge status={status} />
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-block">
+          <StatusBadge status={status} />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>
+        Held by {held_by} ({hold_hold_number})
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
-  // Specs
-  { id: 'country_of_origin', label: 'Country of Origin', section: 'specs', defaultColumn: false },
-  { id: 'specs_cassettes', label: 'Cassettes', section: 'specs', defaultColumn: false },
+function HoldNumberCell({ holdNumber }: { holdNumber: string | null }): ReactNode {
+  if (!holdNumber) return ''
+  return <IdLink to={holdDetailHref(holdNumber)}>{holdNumber}</IdLink>
+}
+
+function LastCommentCell({ comment }: { comment: string | null }): ReactNode {
+  if (!comment) return ''
+  return (
+    <div className="text-left text-xs">
+      <div className="whitespace-pre-wrap">{comment}</div>
+    </div>
+  )
+}
+
+function optionalNumber(value: number | null): string {
+  return value == null ? '' : String(value)
+}
+
+// Kept un-annotated so AssetColumnId can read the literal ids off it. Consumers use the
+// widened ASSET_SEARCH_COLUMNS below, where the optional fields exist on every element.
+const ASSET_SEARCH_COLUMN_LITERALS = [
+  {
+    id: 'barcode',
+    label: 'Barcode',
+    section: 'general',
+    defaultColumn: false,
+    alwaysVisible: true,
+    size: ID_COLUMN_SIZE,
+    text: (a) => a.barcode,
+    cell: (a, { detailHref }) => <IdLink to={detailHref(a)}>{a.barcode}</IdLink>,
+  },
+  {
+    id: 'brand',
+    label: 'Brand',
+    section: 'general',
+    defaultColumn: false,
+    text: (a) => formatTitleCase(a.brand),
+  },
+  {
+    id: 'model',
+    label: 'Model',
+    section: 'general',
+    defaultColumn: false,
+    alwaysVisible: true,
+    sortable: true,
+    size: MODEL_COLUMN_SIZE,
+    text: (a) => a.model,
+  },
+  {
+    id: 'asset_type',
+    label: 'Asset Type',
+    section: 'general',
+    defaultColumn: false,
+    text: (a) => formatTitleCase(a.asset_type),
+  },
+  {
+    id: 'serial_number',
+    label: 'Serial Number',
+    section: 'general',
+    defaultColumn: true,
+    size: SERIAL_NUMBER_COLUMN_SIZE,
+    text: (a) => a.serial_number,
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    section: 'general',
+    defaultColumn: true,
+    text: (a) => formatTitleCase(a.status),
+    cell: (a) => <StatusCell asset={a} />,
+  },
+  {
+    id: 'readiness',
+    label: 'Readiness',
+    section: 'general',
+    defaultColumn: true,
+    sortable: true,
+    text: (a) => getReadinessDisplay(a.readiness),
+    cell: (a) => <ReadinessIcon status={a.readiness} />,
+  },
+  {
+    id: 'location',
+    label: 'Location',
+    section: 'general',
+    defaultColumn: false,
+    sortable: true,
+    accessor: (a) => formatLocation(a.location, a.is_in_transit),
+    text: (a) => formatLocation(a.location, a.is_in_transit),
+  },
+  {
+    id: 'country_of_origin',
+    label: 'Country of Origin',
+    section: 'specs',
+    defaultColumn: false,
+    text: (a) => formatTitleCase(a.country_of_origin ?? ''),
+  },
+  {
+    id: 'specs_meter_total',
+    label: 'Total Meter',
+    section: 'specs',
+    defaultColumn: true,
+    sortable: true,
+    text: (a) => formatThousandsK(a.specs_meter_total),
+  },
+  {
+    id: 'weight',
+    label: 'Weight',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatWeight(a.weight),
+  },
+  {
+    id: 'size',
+    label: 'Size',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => String(a.size),
+  },
+  {
+    id: 'days_held',
+    label: 'Days Held',
+    section: 'hold',
+    defaultColumn: false,
+    sortable: true,
+    sortUndefined: 'last',
+    accessor: (a) => daysHeld(a.hold_created_at),
+    text: (a) => optionalNumber(daysHeld(a.hold_created_at) ?? null),
+  },
+  {
+    id: 'specs_cassettes',
+    label: 'Cassettes',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => optionalNumber(a.specs_cassettes),
+  },
   {
     id: 'specs_internal_finisher',
     label: 'Internal Finisher',
     section: 'specs',
     defaultColumn: false,
+    sortable: true,
+    text: (a) => a.specs_internal_finisher ?? '',
   },
-  { id: 'accessories', label: 'Accessories', section: 'specs', defaultColumn: false },
-  { id: 'specs_meter_total', label: 'Total Meter', section: 'specs', defaultColumn: true },
-  { id: 'weight', label: 'Weight', section: 'specs', defaultColumn: false },
-  { id: 'size', label: 'Size', section: 'specs', defaultColumn: false },
-  { id: 'specs_toner_life_c', label: 'Toner Life C', section: 'specs', defaultColumn: false },
-  { id: 'specs_toner_life_m', label: 'Toner Life M', section: 'specs', defaultColumn: false },
-  { id: 'specs_toner_life_y', label: 'Toner Life Y', section: 'specs', defaultColumn: false },
-  { id: 'specs_toner_life_k', label: 'Toner Life K', section: 'specs', defaultColumn: false },
-
-  // Cost
+  {
+    id: 'accessories',
+    label: 'Accessories',
+    section: 'specs',
+    defaultColumn: false,
+    text: (a) => a.accessories.join(', '),
+  },
+  {
+    id: 'specs_toner_life_c',
+    label: 'Toner Life C',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => optionalNumber(a.specs_toner_life_c),
+  },
+  {
+    id: 'specs_toner_life_m',
+    label: 'Toner Life M',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => optionalNumber(a.specs_toner_life_m),
+  },
+  {
+    id: 'specs_toner_life_y',
+    label: 'Toner Life Y',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => optionalNumber(a.specs_toner_life_y),
+  },
+  {
+    id: 'specs_toner_life_k',
+    label: 'Toner Life K',
+    section: 'specs',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => optionalNumber(a.specs_toner_life_k),
+  },
   {
     id: 'cost_purchase_cost',
     label: 'Purchase Cost',
     section: 'cost',
     defaultColumn: false,
     permission: 'view_purchase_price',
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_purchase_cost),
   },
   {
     id: 'cost_transport_cost',
@@ -73,6 +292,8 @@ export const ASSET_SEARCH_COLUMNS = [
     section: 'cost',
     defaultColumn: false,
     permission: 'view_purchase_price',
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_transport_cost),
   },
   {
     id: 'cost_processing_cost',
@@ -80,6 +301,8 @@ export const ASSET_SEARCH_COLUMNS = [
     section: 'cost',
     defaultColumn: false,
     permission: 'view_purchase_price',
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_processing_cost),
   },
   {
     id: 'cost_total_cost',
@@ -87,6 +310,8 @@ export const ASSET_SEARCH_COLUMNS = [
     section: 'cost',
     defaultColumn: false,
     permission: 'view_purchase_price',
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_total_cost),
   },
   {
     id: 'cost_sale_price',
@@ -94,37 +319,118 @@ export const ASSET_SEARCH_COLUMNS = [
     section: 'cost',
     defaultColumn: false,
     permission: 'view_sale_price',
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_sale_price),
   },
-
-  // Arrival
-  { id: 'vendor', label: 'Vendor', section: 'arrival', defaultColumn: false },
-  { id: 'arrival_created_at', label: 'Arrived At', section: 'arrival', defaultColumn: false },
-
-  // Departure
-  { id: 'customer', label: 'Customer', section: 'departure', defaultColumn: false },
-  { id: 'departed_at', label: 'Departed At', section: 'departure', defaultColumn: false },
-
-  // Hold
-  { id: 'hold_hold_number', label: 'Hold #', section: 'hold', defaultColumn: false },
-  { id: 'held_by', label: 'Held By', section: 'hold', defaultColumn: false },
-  { id: 'hold_created_for', label: 'Held For', section: 'hold', defaultColumn: false },
-  { id: 'hold_customer', label: 'Hold Customer', section: 'hold', defaultColumn: false },
-  { id: 'hold_created_at', label: 'Hold Created', section: 'hold', defaultColumn: false },
-  { id: 'days_held', label: 'Days Held', section: 'hold', defaultColumn: false },
-
-  // Invoice
+  {
+    id: 'hold_hold_number',
+    label: 'Hold #',
+    section: 'hold',
+    defaultColumn: false,
+    text: (a) => a.hold_hold_number ?? '',
+    cell: (a) => <HoldNumberCell holdNumber={a.hold_hold_number} />,
+  },
+  {
+    id: 'held_by',
+    label: 'Held By',
+    section: 'hold',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => a.held_by ?? '',
+  },
+  {
+    id: 'hold_created_for',
+    label: 'Held For',
+    section: 'hold',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => a.hold_created_for ?? '',
+  },
+  {
+    id: 'hold_customer',
+    label: 'Hold Customer',
+    section: 'hold',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatTitleCase(a.hold_customer ?? ''),
+  },
+  {
+    id: 'hold_created_at',
+    label: 'Hold Created',
+    section: 'hold',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatDate(a.hold_created_at),
+  },
+  {
+    id: 'vendor',
+    label: 'Vendor',
+    section: 'arrival',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatTitleCase(a.vendor ?? ''),
+  },
+  {
+    id: 'created_at',
+    label: 'Created',
+    section: 'general',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatDate(a.created_at),
+  },
+  {
+    id: 'arrival_created_at',
+    label: 'Arrived At',
+    section: 'arrival',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatDate(a.arrival_created_at),
+  },
+  {
+    id: 'stock_days',
+    label: 'Stock Days',
+    section: 'general',
+    defaultColumn: true,
+    sortable: true,
+    accessor: (a) => stockDays(a.created_at),
+    text: (a) => String(stockDays(a.created_at)),
+  },
+  {
+    id: 'customer',
+    label: 'Customer',
+    section: 'departure',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatTitleCase(a.customer ?? ''),
+  },
+  {
+    id: 'departed_at',
+    label: 'Departed At',
+    section: 'departure',
+    defaultColumn: false,
+    sortable: true,
+    text: (a) => formatDate(a.departed_at),
+  },
   {
     id: 'purchase_invoice_invoice_number',
     label: 'Invoice #',
     section: 'invoice',
     defaultColumn: false,
+    text: (a) => a.purchase_invoice_invoice_number ?? '',
   },
-
-  // Last Comment
-  { id: 'latest_comment', label: 'Last Comment', section: 'last_comment', defaultColumn: false },
+  {
+    id: 'latest_comment',
+    label: 'Last Comment',
+    section: 'last_comment',
+    defaultColumn: false,
+    text: (a) => a.latest_comment ?? '',
+    cell: (a) => <LastCommentCell comment={a.latest_comment} />,
+  },
 ] as const satisfies readonly AssetSearchColumn[]
 
-export type AssetColumnId = (typeof ASSET_SEARCH_COLUMNS)[number]['id']
+export type AssetColumnId = (typeof ASSET_SEARCH_COLUMN_LITERALS)[number]['id']
+
+export const ASSET_SEARCH_COLUMNS: readonly AssetSearchColumn[] = ASSET_SEARCH_COLUMN_LITERALS
 
 const DEFAULT_VISIBLE_COLUMN_IDS: readonly string[] = ASSET_SEARCH_COLUMNS.filter(
   (c) => c.defaultColumn,
@@ -168,9 +474,7 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
 
-const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(
-  (ASSET_SEARCH_COLUMNS as readonly AssetSearchColumn[]).map((c) => [c.id, c]),
-)
+const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(ASSET_SEARCH_COLUMNS.map((c) => [c.id, c]))
 
 // Filters a stored/shared set of column ids down to what the current viewer may see:
 // drops unknown ids (columns removed since the view was saved) and permission-gated
