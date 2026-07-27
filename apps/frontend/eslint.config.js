@@ -26,6 +26,19 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // React Compiler rules introduced in eslint-plugin-react-hooks v7. Every other
+      // new rule in the preset already passes and stays on. These five have existing
+      // violations; enable each one in its own commit alongside the fixes.
+      // TODO(react-hooks-v7): 7 violations — cascading-render effects.
+      'react-hooks/set-state-in-effect': 'off',
+      // TODO(react-hooks-v7): 5 violations — react-hook-form watch(); fix is useWatch.
+      'react-hooks/incompatible-library': 'off',
+      // TODO(react-hooks-v7): 2 violations — arrival-form-page.
+      'react-hooks/preserve-manual-memoization': 'off',
+      // TODO(react-hooks-v7): 2 violations — getDefaultValues() called during render.
+      'react-hooks/immutability': 'off',
+      // TODO(react-hooks-v7): 1 violation — add-assets-by-barcode-or-serial.
+      'react-hooks/refs': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [
         'error',
