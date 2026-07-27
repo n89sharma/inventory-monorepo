@@ -6,7 +6,6 @@ import type {
   OnChangeFn,
   Table as ReactTableInstance,
   Row,
-  RowData,
   RowSelectionState,
   SortingState,
   VisibilityState,
@@ -24,12 +23,6 @@ import {
 } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    cellClassName?: string
-  }
-}
 
 import {
   Table,
