@@ -1,9 +1,15 @@
 import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow } from 'shared-types'
+import { ASSET_COLUMN_REGISTRY, COLUMN_SECTIONS } from './asset-column-registry'
 import { createSearchPageColumns } from './search-page-columns'
-import { SEARCH_PAGE_REPORT_COLUMNS, searchPageRowsToCsv } from './search-page-report-columns'
+import { searchPageRowsToCsv } from './search-page-report-columns'
+
+const CSV_ROW_DELIMITER = '\r\n'
+const ALWAYS_VISIBLE_COLUMN_IDS = ['barcode', 'model']
+// Frozen so the stock_days and days_held columns, which count from today, are deterministic.
+const NOW = new Date(2026, 6, 27)
 
 const noHref = () => ''
 
@@ -23,6 +29,15 @@ function headerLabel(column: ColumnDef<AssetSearchRow>): string {
     if (isValidElement(node)) return (node.props as { label?: string }).label ?? ''
   }
   return ''
+}
+
+function liveColumnIds(): string[] {
+  return createSearchPageColumns(noHref).map(columnId)
+}
+
+function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: string } {
+  const [header, data] = searchPageRowsToCsv([row], new Set(ids)).split(CSV_ROW_DELIMITER)
+  return { header, data }
 }
 
 function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
@@ -78,51 +93,202 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
   }
 }
 
-function reportColumn(id: string): (typeof SEARCH_PAGE_REPORT_COLUMNS)[number] {
-  const found = SEARCH_PAGE_REPORT_COLUMNS.find((c) => c.id === id)
-  if (!found) throw new Error(`No report column: ${id}`)
-  return found
-}
+beforeEach(() => {
+  vi.useFakeTimers()
+  vi.setSystemTime(NOW)
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('asset-search report columns', () => {
-  it('mirrors the live search table columns in id and header order', () => {
+  it('exports one CSV column per live table column, in table order', () => {
     const liveColumns = createSearchPageColumns(noHref)
-    expect(liveColumns.map(columnId)).toEqual(SEARCH_PAGE_REPORT_COLUMNS.map((c) => c.id))
-    expect(liveColumns.map(headerLabel)).toEqual(SEARCH_PAGE_REPORT_COLUMNS.map((c) => c.header))
+    const { header } = csvFor(makeRow(), liveColumns.map(columnId))
+    expect(header.split(',')).toEqual(liveColumns.map(headerLabel))
   })
 
-  it('carries the table display formatters', () => {
-    expect(reportColumn('specs_meter_total').value(makeRow({ specs_meter_total: 12000 }))).toBe(
-      '12 K',
+  it('writes the full header row', () => {
+    const { header } = csvFor(makeRow(), liveColumnIds())
+    expect(header).toBe(
+      'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
+        'Country of Origin,Total Meter,Weight,Size,Days Held,Cassettes,Internal Finisher,' +
+        'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,Purchase Cost,' +
+        'Transport Cost,Processing Cost,Total Cost,Sale Price,Hold #,Held By,Held For,' +
+        'Hold Customer,Hold Created,Vendor,Created,Arrived At,Stock Days,Customer,' +
+        'Departed At,Invoice #,Last Comment',
     )
-    expect(reportColumn('specs_meter_total').value(makeRow({ specs_meter_total: null }))).toBe('')
-    expect(reportColumn('cost_purchase_cost').value(makeRow({ cost_purchase_cost: 1234 }))).toBe(
-      '$1,234.00',
+  })
+
+  it('runs every column value through its display formatter', () => {
+    const { data } = csvFor(makeRow(), liveColumnIds())
+    expect(data).toBe(
+      'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
+        'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
+        '"Toner, Drum",80,70,60,50,"$1,234.00",' +
+        '$200.00,$100.00,"$1,534.00","$3,000.00",H-1,Alice,Bob,' +
+        'Acme Corp,"July 01, 2026",Big Vendor,"July 15, 2026","July 05, 2026",12,Retail Co,' +
+        '"July 10, 2026",PI-100,Looks good',
     )
-    expect(reportColumn('cost_purchase_cost').value(makeRow({ cost_purchase_cost: null }))).toBe('')
-    expect(
-      reportColumn('location').value(
-        makeRow({
-          location: {
-            warehouse_id: 1,
-            warehouse_code: 'NYC',
-            warehouse_street: '1 Main St',
-            zone: 'BIN',
-            bin: 'A12',
-          },
-        }),
-      ),
-    ).toBe('NYC | A12')
-    expect(reportColumn('location').value(makeRow({ location: null }))).toBe('')
-    expect(reportColumn('readiness').value(makeRow({ readiness: 'PP_OK' }))).toBe('PP OK')
-    expect(reportColumn('created_at').value(makeRow({ created_at: new Date(2026, 6, 15) }))).toBe(
-      'July 15, 2026',
+  })
+
+  it('emits an empty field for every nullable column left null', () => {
+    const nulled = makeRow({
+      location: null,
+      country_of_origin: null,
+      specs_meter_total: null,
+      specs_cassettes: null,
+      specs_internal_finisher: null,
+      accessories: [],
+      specs_toner_life_c: null,
+      specs_toner_life_m: null,
+      specs_toner_life_y: null,
+      specs_toner_life_k: null,
+      cost_purchase_cost: null,
+      cost_transport_cost: null,
+      cost_processing_cost: null,
+      cost_total_cost: null,
+      cost_sale_price: null,
+      hold_hold_number: null,
+      held_by: null,
+      hold_created_for: null,
+      hold_customer: null,
+      hold_created_at: null,
+      vendor: null,
+      customer: null,
+      departed_at: null,
+      arrival_created_at: null,
+      purchase_invoice_invoice_number: null,
+      latest_comment: null,
+    })
+    const { data } = csvFor(nulled, liveColumnIds())
+    expect(data).toBe(
+      'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
+        ',,"1,234 lbs",5,,,,' +
+        ',,,,,,' +
+        ',,,,,,,' +
+        ',,,"July 15, 2026",,12,,' +
+        ',,',
     )
-    expect(reportColumn('vendor').value(makeRow({ vendor: 'BIG_VENDOR' }))).toBe('Big Vendor')
+  })
+
+  it('reads the bin when the location zone is BIN', () => {
+    const binRow = makeRow({
+      location: {
+        warehouse_id: 1,
+        warehouse_code: 'NYC',
+        warehouse_street: '1 Main St',
+        zone: 'BIN',
+        bin: 'A12',
+      },
+    })
+    expect(csvFor(binRow, ['location']).data).toBe('BC-1,IR-2020,NYC | A12')
+  })
+
+  it('reports an in-transit asset regardless of its stored location', () => {
+    expect(csvFor(makeRow({ is_in_transit: true }), ['location']).data).toBe(
+      'BC-1,IR-2020,In transit',
+    )
   })
 
   it('emits only visible columns, keeping barcode and model always on', () => {
-    const header = searchPageRowsToCsv([makeRow()], new Set(['status'])).split('\r\n')[0]
+    const { header } = csvFor(makeRow(), ['status'])
     expect(header).toBe('Barcode,Model,Status')
+  })
+})
+
+describe('asset column registry', () => {
+  it('has a live table column for every pickable registry entry', () => {
+    const liveIds = new Set(liveColumnIds())
+    const missing = ASSET_COLUMN_REGISTRY.filter((c) => c.enabled && !liveIds.has(c.id)).map(
+      (c) => c.id,
+    )
+    expect(missing).toEqual([])
+  })
+
+  it('has a registry entry for every table column but the always-visible ones', () => {
+    const registryIds = new Set<string>(ASSET_COLUMN_REGISTRY.map((c) => c.id))
+    const unregistered = liveColumnIds().filter((id) => !registryIds.has(id))
+    expect(unregistered).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
+  })
+
+  // Entries the picker cannot offer and no table column renders. Every id here is
+  // unreachable in the UI; the list must only ever shrink.
+  it('lists the registry entries that render nothing', () => {
+    const liveIds = new Set(liveColumnIds())
+    const unrendered = ASSET_COLUMN_REGISTRY.filter((c) => !liveIds.has(c.id)).map((c) => c.id)
+    expect(unrendered).toEqual([
+      'arrival_arrival_number',
+      'arrival_warehouse',
+      'arrival_transporter',
+      'arrival_created_by',
+      'departure_departure_number',
+      'departure_warehouse',
+      'departure_transporter',
+      'departure_created_by',
+      'hold_from_dt',
+      'hold_to_dt',
+      'hold_notes',
+      'purchase_invoice_is_cleared',
+    ])
+  })
+
+  it('groups the pickable columns by section, in picker order', () => {
+    const grouped = COLUMN_SECTIONS.map((section) => ({
+      section: section.id,
+      ids: ASSET_COLUMN_REGISTRY.filter((c) => c.section === section.id && c.enabled).map(
+        (c) => c.id,
+      ),
+    }))
+    expect(grouped).toEqual([
+      {
+        section: 'general',
+        ids: [
+          'brand',
+          'asset_type',
+          'serial_number',
+          'status',
+          'readiness',
+          'location',
+          'stock_days',
+          'created_at',
+        ],
+      },
+      {
+        section: 'specs',
+        ids: [
+          'country_of_origin',
+          'specs_cassettes',
+          'specs_internal_finisher',
+          'accessories',
+          'specs_meter_total',
+          'weight',
+          'size',
+          'specs_toner_life_c',
+          'specs_toner_life_m',
+          'specs_toner_life_y',
+          'specs_toner_life_k',
+        ],
+      },
+      {
+        section: 'cost',
+        ids: [
+          'cost_purchase_cost',
+          'cost_transport_cost',
+          'cost_processing_cost',
+          'cost_total_cost',
+          'cost_sale_price',
+        ],
+      },
+      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
+      { section: 'departure', ids: ['customer', 'departed_at'] },
+      {
+        section: 'hold',
+        ids: ['held_by', 'hold_created_for', 'hold_customer', 'hold_created_at', 'days_held'],
+      },
+      { section: 'invoice', ids: ['purchase_invoice_invoice_number'] },
+      { section: 'last_comment', ids: ['latest_comment'] },
+    ])
   })
 })
