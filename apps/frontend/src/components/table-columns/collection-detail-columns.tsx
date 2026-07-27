@@ -21,13 +21,9 @@ import {
   sortableHeader,
 } from './column-primitives'
 
-export function createCollectionDetailColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
-  const columns: ColumnDef<AssetSummary>[] = [
+// The columns every detail table opens with, and the anchor the invoice column sits after.
+function identityColumns(getHref: (asset: AssetSummary) => string): ColumnDef<AssetSummary>[] {
+  return [
     createSelectColumn<AssetSummary>(),
     createIdColumn<AssetSummary>({
       accessorKey: 'barcode',
@@ -48,6 +44,12 @@ export function createCollectionDetailColumns(
       filterFn: 'includesString',
       size: MODEL_COLUMN_SIZE,
     },
+  ]
+}
+
+// Ends on location, the anchor the cost columns sit after.
+function specColumns(): ColumnDef<AssetSummary>[] {
+  return [
     {
       accessorKey: 'brand',
       header: 'Brand',
@@ -91,15 +93,23 @@ export function createCollectionDetailColumns(
       header: sortableHeader<AssetSummary>('Location'),
       cell: ({ getValue }) => getValue<string>(),
     },
-    // Hidden by default (see collection-detail-page columnVisibility); defined so
-    // the detail tables can default-sort by asset creation date.
-    {
-      accessorKey: 'created_at',
-      header: 'Created',
-      cell: ({ row }) => formatDate(row.original.created_at),
-    },
   ]
+}
 
+// Hidden by default (see collection-detail-page columnVisibility); defined so
+// the detail tables can default-sort by asset creation date.
+const CREATED_AT_COLUMN: ColumnDef<AssetSummary> = {
+  accessorKey: 'created_at',
+  header: 'Created',
+  cell: ({ row }) => formatDate(row.original.created_at),
+}
+
+function actionColumns(
+  onEdit?: (asset: AssetSummary) => void,
+  onDelete?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null,
+): ColumnDef<AssetSummary>[] {
+  const columns: ColumnDef<AssetSummary>[] = []
   if (onEdit) {
     columns.push({
       id: 'edit',
@@ -118,7 +128,6 @@ export function createCollectionDetailColumns(
       enableHiding: false,
     })
   }
-
   if (onDelete) {
     columns.push({
       id: 'delete',
@@ -138,8 +147,21 @@ export function createCollectionDetailColumns(
       enableHiding: false,
     })
   }
-
   return columns
+}
+
+export function createCollectionDetailColumns(
+  getHref: (asset: AssetSummary) => string,
+  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSummary) => void,
+  disabledRowId?: number | null,
+): ColumnDef<AssetSummary>[] {
+  return [
+    ...identityColumns(getHref),
+    ...specColumns(),
+    CREATED_AT_COLUMN,
+    ...actionColumns(onEdit, onDelete, disabledRowId),
+  ]
 }
 
 function createInvoiceColumn(
@@ -161,36 +183,19 @@ function createInvoiceColumn(
   }
 }
 
-function createCollectionDetailColumnsWithInvoice(
-  invoiceColumn: ColumnDef<AssetSummary>,
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
-  const baseColumns = createCollectionDetailColumns(getHref, onDelete, onEdit, disabledRowId)
-  const modelIndex = baseColumns.findIndex((c) => 'accessorKey' in c && c.accessorKey === 'model')
-  baseColumns.splice(modelIndex + 1, 0, invoiceColumn)
-  return baseColumns
-}
-
 export function createArrivalDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete?: (asset: AssetSummary) => void,
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null,
 ): ColumnDef<AssetSummary>[] {
-  const invoiceColumn = createInvoiceColumn(
-    'purchase_invoice_number',
-    (a) => a.purchase_invoice_number,
-  )
-  return createCollectionDetailColumnsWithInvoice(
-    invoiceColumn,
-    getHref,
-    onDelete,
-    onEdit,
-    disabledRowId,
-  )
+  return [
+    ...identityColumns(getHref),
+    createInvoiceColumn('purchase_invoice_number', (a) => a.purchase_invoice_number),
+    ...specColumns(),
+    CREATED_AT_COLUMN,
+    ...actionColumns(onEdit, onDelete, disabledRowId),
+  ]
 }
 
 export function createDepartureDetailColumns(
@@ -199,14 +204,13 @@ export function createDepartureDetailColumns(
   onEdit?: (asset: AssetSummary) => void,
   disabledRowId?: number | null,
 ): ColumnDef<AssetSummary>[] {
-  const invoiceColumn = createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number)
-  return createCollectionDetailColumnsWithInvoice(
-    invoiceColumn,
-    getHref,
-    onDelete,
-    onEdit,
-    disabledRowId,
-  )
+  return [
+    ...identityColumns(getHref),
+    createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number),
+    ...specColumns(),
+    CREATED_AT_COLUMN,
+    ...actionColumns(onEdit, onDelete, disabledRowId),
+  ]
 }
 
 export const PURCHASE_COST_COLUMNS = [
@@ -229,24 +233,31 @@ function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<Ass
   }
 }
 
+function costColumns(
+  canViewPurchasePrice: boolean,
+  canViewSalePrice: boolean,
+): ColumnDef<AssetSummary>[] {
+  const columns: ColumnDef<AssetSummary>[] = []
+  if (canViewPurchasePrice) {
+    columns.push(...PURCHASE_COST_COLUMNS.map(([field, header]) => createCostColumn(field, header)))
+  }
+  if (canViewSalePrice) {
+    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1]))
+  }
+  return columns
+}
+
 export function createInvoiceDetailColumns(
   getHref: (asset: AssetSummary) => string,
   onDelete: ((asset: AssetSummary) => void) | undefined,
   canViewPurchasePrice: boolean,
   canViewSalePrice: boolean,
 ): ColumnDef<AssetSummary>[] {
-  const costColumns: ColumnDef<AssetSummary>[] = []
-  if (canViewPurchasePrice) {
-    costColumns.push(
-      ...PURCHASE_COST_COLUMNS.map(([field, header]) => createCostColumn(field, header)),
-    )
-  }
-  if (canViewSalePrice) {
-    costColumns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1]))
-  }
-  const baseColumns = createCollectionDetailColumns(getHref, onDelete)
-  if (costColumns.length === 0) return baseColumns
-  const locationIndex = baseColumns.findIndex((c) => c.id === 'location')
-  baseColumns.splice(locationIndex + 1, 0, ...costColumns)
-  return baseColumns
+  return [
+    ...identityColumns(getHref),
+    ...specColumns(),
+    ...costColumns(canViewPurchasePrice, canViewSalePrice),
+    CREATED_AT_COLUMN,
+    ...actionColumns(undefined, onDelete),
+  ]
 }
