@@ -20,9 +20,10 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { useWarehouseLocations } from '@/hooks/use-locations'
 import { formatTitleCase } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import type { AssetDetails, AssetLocation, Warehouse, Zone } from 'shared-types'
 import { toast } from 'sonner'
@@ -49,7 +50,6 @@ function filterBinInput(val: string): string {
 
 export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLocationModalProps) {
   const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
-  const getLocationsByWarehouse = useAssetStore((state) => state.getLocationsByWarehouse)
   const warehouses = useReferenceDataStore((state) => state.warehouses)
   const zones = useReferenceDataStore((state) => state.zones)
   const activeWarehouses = useActiveWarehouses()
@@ -68,35 +68,18 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const selectedZone = useWatch({ control: form.control, name: 'zone' })
   const selectedBin = useWatch({ control: form.control, name: 'bin' })
 
-  const [binLocations, setBinLocations] = useState<AssetLocation[]>([])
   const [binQuery, setBinQuery] = useState('')
-  const [fetchingLocations, setFetchingLocations] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
-  useEffect(() => {
-    if (!selectedWarehouse) {
-      setBinLocations([])
-      return
-    }
-    let cancelled = false
-    setFetchingLocations(true)
-    setBinLocations([])
-    getLocationsByWarehouse(selectedWarehouse.id)
-      .then((all) => {
-        if (!cancelled) setBinLocations(all.filter((l) => l.zone === BIN_ZONE))
-      })
-      .catch(() => {
-        /* interceptor already showed the error toast */
-      })
-      .finally(() => {
-        if (!cancelled) setFetchingLocations(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [selectedWarehouse, getLocationsByWarehouse])
+  const { data: warehouseLocations, isLoading: fetchingLocations } = useWarehouseLocations(
+    selectedWarehouse?.id ?? null,
+  )
+  const binLocations = useMemo(
+    () => (warehouseLocations ?? []).filter((l) => l.zone === BIN_ZONE),
+    [warehouseLocations],
+  )
 
   if (!assetDetails) return null
 
