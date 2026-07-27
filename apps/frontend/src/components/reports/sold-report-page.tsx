@@ -42,6 +42,7 @@ const MONTH_YEAR_FORMAT = 'MMM yyyy'
 const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 
 const MODEL_SALES_SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
+const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true }
 
 function formatSaleSummary(sale: ModelSaleRow): string {
   return `for $${formatUSD(sale.sale_price)} on ${format(sale.departed_at, SALE_DATE_FORMAT)}`
@@ -184,7 +185,7 @@ function SoldReportResults({
       <DataTable
         columns={columns}
         data={visibleSales}
-        defaultSort={{ id: 'departed_at', desc: true }}
+        defaultSort={DEPARTED_AT_DESC_SORT}
         getRowHref={getRowHref}
         columnVisibility={columnVisibility}
       />
