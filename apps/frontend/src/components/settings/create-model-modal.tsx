@@ -22,6 +22,17 @@ interface CreateModelModalProps {
   onOpenChange: (open: boolean) => void
 }
 
+function getDefaultValues(): ModelForm {
+  return {
+    name: '',
+    weight: 0,
+    size: 0,
+    brand: null,
+    assetType: UNSELECTED,
+    is_colour: false,
+  }
+}
+
 export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps): React.JSX.Element {
   const brands = useReferenceDataStore((state) => state.brands)
   const assetTypes = useReferenceDataStore((state) => state.assetTypes)
@@ -35,17 +46,6 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
   useEffect(() => {
     if (open) form.reset(getDefaultValues())
   }, [open, form])
-
-  function getDefaultValues(): ModelForm {
-    return {
-      name: '',
-      weight: 0,
-      size: 0,
-      brand: null,
-      assetType: UNSELECTED,
-      is_colour: false,
-    }
-  }
 
   async function onValidSubmit(data: ModelForm) {
     try {

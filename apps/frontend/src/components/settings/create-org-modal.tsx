@@ -15,6 +15,21 @@ interface CreateOrgModalProps {
   onOpenChange: (open: boolean) => void
 }
 
+function getDefaultValues(): OrgForm {
+  return {
+    account_number: '',
+    name: '',
+    contact_name: null,
+    phone: null,
+    mobile: null,
+    primary_email: null,
+    address: null,
+    city: null,
+    province: null,
+    country: null,
+  }
+}
+
 export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): React.JSX.Element {
   const createOrg = useOrgStore((state) => state.createOrg)
 
@@ -26,21 +41,6 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
   useEffect(() => {
     if (open) form.reset(getDefaultValues())
   }, [open, form])
-
-  function getDefaultValues(): OrgForm {
-    return {
-      account_number: '',
-      name: '',
-      contact_name: null,
-      phone: null,
-      mobile: null,
-      primary_email: null,
-      address: null,
-      city: null,
-      province: null,
-      country: null,
-    }
-  }
 
   async function onValidSubmit(data: OrgForm) {
     try {
