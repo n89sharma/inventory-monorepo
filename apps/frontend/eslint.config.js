@@ -26,11 +26,7 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // React Compiler rule from eslint-plugin-react-hooks v7. Every other rule in the
-      // preset is enabled. TODO(react-hooks-v7): 5 warnings — 3x react-hook-form
-      // watch(), 2x useReactTable. Note a skipped component is not analysed by the
-      // other rules either, so enabling this will surface further violations.
-      'react-hooks/incompatible-library': 'off',
+      'react-hooks/incompatible-library': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -54,6 +50,20 @@ export default tseslint.config(
     files: ['src/components/table-columns/**', 'src/components/**/*-table-columns.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    // React Compiler skips any component calling useReactTable, because the table
+    // instance is created once and mutated in place, so values read off it cannot be
+    // memoized safely. TanStack fixes this in v9 by returning a fresh reference per
+    // state change, but v9 is still beta (latest is 8.21.3). Scoped to the files that
+    // call useReactTable directly so the rule keeps guarding everywhere else.
+    files: [
+      'src/components/collections/bulk-edit-pricing-modal.tsx',
+      'src/components/reports/holds-by-user-report-page.tsx',
+    ],
+    rules: {
+      'react-hooks/incompatible-library': 'off',
     },
   },
 )

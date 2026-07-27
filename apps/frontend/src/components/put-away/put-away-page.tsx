@@ -24,8 +24,8 @@ import {
   WarningIcon,
   XIcon,
 } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { useEffect, useMemo, useState } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { AssetLocation, AssetSummary, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -35,6 +35,14 @@ const SCAN_SANITIZER = /[^a-zA-Z0-9._-]/g
 const LOCATION_ERROR_DELAY_MS = 500
 const ASSET_LOOKUP_DELAY_MS = 500
 const EMPTY_LOCATIONS: AssetLocation[] = []
+
+function findScannedLocation(locations: AssetLocation[], scanned: string): AssetLocation | null {
+  if (!scanned) return null
+  const binMatch = locations.find((l) => l.bin === scanned)
+  if (binMatch) return binMatch
+  const zoneMatch = locations.find((l) => l.bin === '' && l.zone === scanned && l.zone !== BIN_ZONE)
+  return zoneMatch ?? null
+}
 
 interface PutAwayForm {
   location: string
@@ -209,14 +217,19 @@ export function PutAwayPage(): React.JSX.Element {
   const { data: locations = EMPTY_LOCATIONS, isLoading: fetchingLocations } = useWarehouseLocations(
     warehouseId ?? null,
   )
-  const [selectedLocation, setSelectedLocation] = useState<AssetLocation | null>(null)
-  const [scannedAsset, setScannedAsset] = useState<AssetSummary | null>(null)
+  const [fetchedAsset, setFetchedAsset] = useState<AssetSummary | null>(null)
   const [lookingUp, setLookingUp] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const form = useForm<PutAwayForm>({ defaultValues: { location: '', asset: '' } })
-  const locationValue = form.watch('location')
-  const assetValue = form.watch('asset')
+  const locationValue = useWatch({ control: form.control, name: 'location' })
+  const assetValue = useWatch({ control: form.control, name: 'asset' })
+
+  const selectedLocation = useMemo(
+    () => findScannedLocation(locations, locationValue),
+    [locations, locationValue],
+  )
+  const scannedAsset = assetValue ? fetchedAsset : null
 
   const locationSuccess = !!selectedLocation && !form.formState.errors.location
   const assetSuccess = !!scannedAsset && !form.formState.errors.asset
@@ -227,8 +240,6 @@ export function PutAwayPage(): React.JSX.Element {
 
   useEffect(() => {
     form.reset({ location: '', asset: '' })
-    setSelectedLocation(null)
-    setScannedAsset(null)
   }, [warehouseId, form])
 
   useEffect(() => {
@@ -237,32 +248,23 @@ export function PutAwayPage(): React.JSX.Element {
 
   useEffect(() => {
     if (!locationValue) {
-      setSelectedLocation(null)
       form.clearErrors('location')
       return
     }
-    const binMatch = locations.find((l) => l.bin === locationValue)
-    const zoneMatch = locations.find(
-      (l) => l.bin === '' && l.zone === locationValue && l.zone !== BIN_ZONE,
-    )
-    const match = binMatch ?? zoneMatch
-    if (match) {
-      setSelectedLocation(match)
+    if (selectedLocation) {
       form.clearErrors('location')
       form.setFocus('asset')
       return
     }
-    setSelectedLocation(null)
     const timer = setTimeout(
       () => form.setError('location', { type: 'manual', message: 'Location not available' }),
       LOCATION_ERROR_DELAY_MS,
     )
     return () => clearTimeout(timer)
-  }, [locationValue, locations, form])
+  }, [locationValue, selectedLocation, form])
 
   useEffect(() => {
     if (!assetValue) {
-      setScannedAsset(null)
       form.clearErrors('asset')
       return
     }
@@ -272,12 +274,12 @@ export function PutAwayPage(): React.JSX.Element {
       getAssetByBarcode(assetValue, true)
         .then((asset) => {
           if (cancelled) return
-          setScannedAsset(asset)
+          setFetchedAsset(asset)
           form.clearErrors('asset')
         })
         .catch(() => {
           if (cancelled) return
-          setScannedAsset(null)
+          setFetchedAsset(null)
           form.setError('asset', { type: 'manual', message: 'Asset not found' })
         })
         .finally(() => {
@@ -292,14 +294,12 @@ export function PutAwayPage(): React.JSX.Element {
 
   function resetAsset() {
     form.setValue('asset', '')
-    setScannedAsset(null)
     form.clearErrors('asset')
     form.setFocus('asset')
   }
 
   function clearLocation() {
     form.setValue('location', '')
-    setSelectedLocation(null)
     form.clearErrors('location')
     form.setFocus('location')
   }

@@ -21,7 +21,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { Controller, useForm, type Control, type FieldErrors } from 'react-hook-form'
+import { Controller, useForm, useWatch, type Control, type FieldErrors } from 'react-hook-form'
 import type { StorePart, StoreTransactionKind } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -131,10 +131,16 @@ export function StoreTransactionModal({
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch } = useForm<StoreTransactionForm>({
+  const { control, handleSubmit, reset, setValue } = useForm<StoreTransactionForm>({
     resolver: zodResolver(StoreTransactionFormSchema),
     defaultValues: EMPTY_STORE_TRANSACTION_FORM,
   })
+
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setPartQuery('')
+  }
 
   useEffect(() => {
     if (open) {
@@ -143,13 +149,12 @@ export function StoreTransactionModal({
           ? { ...EMPTY_STORE_TRANSACTION_FORM, part: lockedPart }
           : EMPTY_STORE_TRANSACTION_FORM,
       )
-      setPartQuery('')
     }
   }, [open, lockedPart, reset])
 
-  const kind = watch('kind')
-  const part = watch('part')
-  const quantity = watch('quantity')
+  const kind = useWatch({ control, name: 'kind' })
+  const part = useWatch({ control, name: 'part' })
+  const quantity = useWatch({ control, name: 'quantity' })
 
   const selectedPartId = part !== null && 'id' in part ? part.id : null
   const onHand = selectedPartId === null ? null : (onHandByPartId[selectedPartId] ?? 0)

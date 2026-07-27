@@ -27,7 +27,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon, ArrowsLeftRightIcon, CircleNotchIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
-import { Controller, useForm, type FieldErrors } from 'react-hook-form'
+import { Controller, useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { CreateSalvagedPartSchema, type CreateSalvagedPart, type Warehouse } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -261,22 +261,25 @@ function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue, watch } = useForm<AddStorePartForm>({
+  const { control, handleSubmit, reset, setValue } = useForm<AddStorePartForm>({
     resolver: zodResolver(AddStorePartFormSchema),
     defaultValues: EMPTY_ADD_STORE_PART_FORM,
   })
 
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setPartQuery('')
+  }
+
   useEffect(() => {
-    if (open) {
-      reset({ ...EMPTY_ADD_STORE_PART_FORM, warehouse: defaultWarehouse })
-      setPartQuery('')
-    }
+    if (open) reset({ ...EMPTY_ADD_STORE_PART_FORM, warehouse: defaultWarehouse })
   }, [open, reset, defaultWarehouse])
 
-  const warehouse = watch('warehouse')
-  const part = watch('part')
-  const quantity = watch('quantity')
-  const unitCost = watch('unitCost')
+  const warehouse = useWatch({ control, name: 'warehouse' })
+  const part = useWatch({ control, name: 'part' })
+  const quantity = useWatch({ control, name: 'quantity' })
+  const unitCost = useWatch({ control, name: 'unitCost' })
 
   const partOptions = useMemo(
     () => (warehouse ? allRows.filter((row) => row.warehouse_id === warehouse.id) : []),
