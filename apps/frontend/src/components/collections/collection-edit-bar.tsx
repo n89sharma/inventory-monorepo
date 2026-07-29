@@ -12,7 +12,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { type AssetSummary, type CollectionHistory } from 'shared-types'
+import { MAX_BULK_ASSET_COUNT, type AssetSummary, type CollectionHistory } from 'shared-types'
 import { toast } from 'sonner'
 import { PendingIcon } from '@/components/shared/pending-icon'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
@@ -33,7 +33,6 @@ import {
 import { CollectionHistorySheet } from './collection-history-sheet'
 
 const BARCODE_PRINT_SECTION = 'arrivals'
-const MAX_EXPORT_ASSETS = 2000
 const CSV_MIME_TYPE = 'text/csv'
 
 type CollectionEditBarProps = {
@@ -76,9 +75,9 @@ export function CollectionEditBar({
   async function handleExport() {
     if (!exportableAssets || exportableAssets.length === 0) return
 
-    if (exportableAssets.length > MAX_EXPORT_ASSETS) {
+    if (exportableAssets.length > MAX_BULK_ASSET_COUNT) {
       toast.error(
-        `Cannot export ${exportableAssets.length} assets. Please select ${MAX_EXPORT_ASSETS} assets or less`,
+        `Cannot export ${exportableAssets.length} assets. Please select ${MAX_BULK_ASSET_COUNT} assets or less`,
         { position: 'top-center' },
       )
       return
@@ -104,9 +103,9 @@ export function CollectionEditBar({
   async function handlePrint() {
     if (!printableBarcodes || printableBarcodes.length === 0) return
 
-    if (printableBarcodes.length > MAX_EXPORT_ASSETS) {
+    if (printableBarcodes.length > MAX_BULK_ASSET_COUNT) {
       toast.error(
-        `Cannot print ${printableBarcodes.length} barcodes. Please select ${MAX_EXPORT_ASSETS} assets or less`,
+        `Cannot print ${printableBarcodes.length} barcodes. Please select ${MAX_BULK_ASSET_COUNT} assets or less`,
         { position: 'top-center' },
       )
       return

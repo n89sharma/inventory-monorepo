@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-const MAX_EXPORT_BARCODES = 2000
+export const MAX_BULK_ASSET_COUNT = 2000
 
 export const PrintBarcodesSchema = z.object({
-  barcodes: z.array(z.string()).min(1).max(MAX_EXPORT_BARCODES),
+  barcodes: z.array(z.string()).min(1).max(MAX_BULK_ASSET_COUNT),
 })
 
 export type PrintBarcodes = z.infer<typeof PrintBarcodesSchema>

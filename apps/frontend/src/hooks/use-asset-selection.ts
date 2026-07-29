@@ -3,10 +3,9 @@ import { downloadFile } from '@/lib/download-file'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import { useState } from 'react'
-import type { AssetSearchRow } from 'shared-types'
+import { MAX_BULK_ASSET_COUNT, type AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 
-const MAX_EXPORT = 2000
 const CSV_MIME_TYPE = 'text/csv'
 const DEFAULT_EXPORT_FILENAME = 'assets.csv'
 
@@ -36,9 +35,9 @@ export function useAssetSelection(
     const rows = selected.length > 0 ? selected : assets
     if (rows.length === 0) return
 
-    if (rows.length > MAX_EXPORT) {
+    if (rows.length > MAX_BULK_ASSET_COUNT) {
       toast.error(
-        `Cannot export ${rows.length} assets. Please select ${MAX_EXPORT} assets or less`,
+        `Cannot export ${rows.length} assets. Please select ${MAX_BULK_ASSET_COUNT} assets or less`,
         { position: 'top-center' },
       )
       return
