@@ -1,5 +1,7 @@
+import { InvoicePriceCell } from '@/components/invoice/invoice-price-cell'
 import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-field'
 import { Button } from '@/components/shadcn/button'
+import type { EditablePriceField } from '@/components/shared/price-input'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
@@ -225,7 +227,35 @@ export const SALE_PRICE_COLUMN = ['sale_price', 'Sale Price'] as const satisfies
   string,
 ]
 
-function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<AssetSummary> {
+// total_cost is derived server-side, so it stays read-only even in price-edit mode.
+const EDITABLE_COST_FIELDS: ReadonlySet<string> = new Set<EditablePriceField>([
+  'purchase_cost',
+  'transport_cost',
+  'processing_cost',
+  'sale_price',
+])
+
+const EDITABLE_COST_COLUMN_SIZE = 110
+
+function isEditableCostField(field: keyof AssetCost): field is EditablePriceField {
+  return EDITABLE_COST_FIELDS.has(field)
+}
+
+function createCostColumn(
+  field: keyof AssetCost,
+  header: string,
+  priceEditEnabled: boolean,
+): ColumnDef<AssetSummary> {
+  if (priceEditEnabled && isEditableCostField(field)) {
+    return {
+      id: field,
+      header,
+      size: EDITABLE_COST_COLUMN_SIZE,
+      cell: ({ row, table }) => (
+        <InvoicePriceCell asset={row.original} field={field} label={header} table={table} />
+      ),
+    }
+  }
   return {
     id: field,
     header,
@@ -236,13 +266,18 @@ function createCostColumn(field: keyof AssetCost, header: string): ColumnDef<Ass
 function costColumns(
   canViewPurchasePrice: boolean,
   canViewSalePrice: boolean,
+  priceEditEnabled: boolean,
 ): ColumnDef<AssetSummary>[] {
   const columns: ColumnDef<AssetSummary>[] = []
   if (canViewPurchasePrice) {
-    columns.push(...PURCHASE_COST_COLUMNS.map(([field, header]) => createCostColumn(field, header)))
+    columns.push(
+      ...PURCHASE_COST_COLUMNS.map(([field, header]) =>
+        createCostColumn(field, header, priceEditEnabled),
+      ),
+    )
   }
   if (canViewSalePrice) {
-    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1]))
+    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1], priceEditEnabled))
   }
   return columns
 }
@@ -252,11 +287,12 @@ export function createInvoiceDetailColumns(
   onDelete: ((asset: AssetSummary) => void) | undefined,
   canViewPurchasePrice: boolean,
   canViewSalePrice: boolean,
+  priceEditEnabled: boolean,
 ): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     ...specColumns(),
-    ...costColumns(canViewPurchasePrice, canViewSalePrice),
+    ...costColumns(canViewPurchasePrice, canViewSalePrice, priceEditEnabled),
     CREATED_AT_COLUMN,
     ...actionColumns(undefined, onDelete),
   ]

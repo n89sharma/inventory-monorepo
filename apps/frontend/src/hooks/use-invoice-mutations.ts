@@ -4,7 +4,9 @@ import {
   patchInvoiceAssets,
   updateInvoiceMetadata,
 } from '@/data/api/invoice-api'
+import { patchAssetPricing } from '@/data/api/asset-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
+import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invoiceDetailKey, invalidateInvoiceLists } from '@/hooks/use-invoice'
 import {
   flushPendingRemovals,
@@ -12,7 +14,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
-import type { AssetSummary, InvoiceDetail } from 'shared-types'
+import type { AssetSummary, InvoiceDetail, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: InvoiceForm) {
@@ -63,6 +65,26 @@ async function addAsset(invoiceNumber: string, asset: AssetSummary) {
   }
 }
 
+// The response carries the server-recomputed cost, so the invoice cache is patched in
+// place rather than refetched — a blur on every cell would otherwise refetch the invoice.
+async function updatePrice(invoiceNumber: string, barcode: string, patch: PatchAssetPricing) {
+  const cost = await patchAssetPricing(barcode, patch)
+  invalidateAssetDetails([barcode])
+  invalidateAssetHistory([barcode])
+  await mutate<InvoiceDetail>(
+    invoiceDetailKey(invoiceNumber),
+    (current) =>
+      current && {
+        ...current,
+        assets: current.assets.map((asset) =>
+          asset.barcode === barcode ? { ...asset, cost } : asset,
+        ),
+      },
+    { revalidate: false },
+  )
+  invalidateInvoiceLists()
+}
+
 async function updateMetadata(invoiceNumber: string, metadata: InvoiceMetadataForm) {
   await updateInvoiceMetadata(invoiceNumber, metadata)
   mutate(invoiceDetailKey(invoiceNumber))
@@ -98,6 +120,7 @@ const mutations = {
   getAssets,
   addAssets,
   addAsset,
+  updatePrice,
   updateMetadata,
   removeAsset,
   bulkRemoveAssets,

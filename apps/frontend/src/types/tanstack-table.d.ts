@@ -1,4 +1,5 @@
 import type { RowData } from '@tanstack/react-table'
+import type { EditablePriceField } from '@/components/shared/price-input'
 
 export {}
 
@@ -9,5 +10,15 @@ declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     cellClassName?: string
+  }
+
+  // One interface is shared by every table in the app, so each member is optional and
+  // only the tables that supply it can read it back.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface TableMeta<TData extends RowData> {
+    // Bulk pricing modal: updates a local draft row, no server write.
+    updatePriceDraft?: (barcode: string, field: EditablePriceField, value: string) => void
+    // Invoice detail table: commits one field to the server on blur.
+    savePriceField?: (barcode: string, field: EditablePriceField, value: number) => Promise<void>
   }
 }

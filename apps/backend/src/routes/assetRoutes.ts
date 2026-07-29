@@ -17,6 +17,7 @@ import {
   getAssets,
   getLocationsByWarehouse,
   getDepartedAssets,
+  patchAssetPricing,
   printAssetBarcodes,
   updateAssetErrors,
   updateAssetLocation,
@@ -54,6 +55,7 @@ router.put('/:barcode/errors', requirePermission('update_tech_specs'), updateAss
 router.put('/:barcode/location', requirePermission('update_location'), updateAssetLocation)
 router.put('/bulk/pricing', requirePermission('edit_prices'), bulkUpdateAssetPricing)
 router.put('/:barcode/pricing', requirePermission('edit_prices'), updateAssetPricing)
+router.patch('/:barcode/pricing', requirePermission('edit_prices'), patchAssetPricing)
 router.put('/:barcode/specs', requirePermission('update_tech_specs'), updateAssetSpecs)
 router.get('/:barcode/comments', requirePermission('view_asset'), getAssetComments)
 router.post('/:barcode/comments', requirePermission('view_asset'), createAssetComment)

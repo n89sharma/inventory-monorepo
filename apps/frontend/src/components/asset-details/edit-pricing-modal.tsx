@@ -6,9 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/shadcn/dialog'
-import { Input } from '@/components/shadcn/input'
 import { FormSection } from '@/components/asset-details/form-section'
 import { HorizontalField } from '@/components/shared/horizontal-field'
+import { PriceInput } from '@/components/shared/price-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
@@ -58,13 +58,6 @@ function toPricingFields(assetDetails: AssetDetails | null): PricingFields {
   }
 }
 
-function sanitize(value: string): string {
-  const cleaned = value.replace(/[^\d.]/g, '')
-  const firstDot = cleaned.indexOf('.')
-  if (firstDot === -1) return cleaned
-  return cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '')
-}
-
 function toNum(value: string | undefined): number {
   return parseFloat(value ?? '') || 0
 }
@@ -84,18 +77,12 @@ function PriceField({
         control={control}
         name={name}
         render={({ field }) => (
-          <div className={`relative ${INPUT_WIDTH}`}>
-            <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
-              $
-            </span>
-            <Input
-              value={field.value}
-              onChange={(e) => field.onChange(sanitize(e.target.value))}
-              inputMode="decimal"
-              placeholder="0.00"
-              className="pl-7 tabular-nums"
-            />
-          </div>
+          <PriceInput
+            value={field.value}
+            onChange={field.onChange}
+            label={label}
+            className={INPUT_WIDTH}
+          />
         )}
       />
     </HorizontalField>

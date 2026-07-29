@@ -5,7 +5,7 @@ import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table'
+import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory } from 'shared-types'
@@ -39,6 +39,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   onBulkRemove?: (assets: AssetSummary[]) => void
   onFlushPending?: (collectionId: string) => void
   buildColumns: (assetHref: (asset: AssetSummary) => string) => ColumnDef<AssetSummary>[]
+  tableMeta?: TableMeta<AssetSummary>
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
@@ -68,6 +69,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   onBulkRemove,
   onFlushPending,
   buildColumns,
+  tableMeta,
   renderTitle,
   renderSummaryStrip,
   renderSubtitle,
@@ -204,6 +206,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           defaultSort={DEFAULT_ASSET_SORT}
           pinLeft={PINNED_ASSET_COLUMN_IDS}
           columnVisibility={ASSET_COLUMN_VISIBILITY}
+          meta={tableMeta}
         />
       </PageContent>
     </>

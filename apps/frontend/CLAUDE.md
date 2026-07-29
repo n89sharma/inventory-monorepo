@@ -47,9 +47,14 @@ sources of truth. Don't do it.
 Every `*-api.ts` function must (1) build outgoing bodies with
 `const fnBody = Schema.parse({...} satisfies Type)` — `satisfies` for compile-time field
 enforcement, `.parse()` for runtime validation; and (2) parse every response with
-`Schema.parse(data.data)` before returning. No bare `return data.data`, no inline object literals
+`Schema.parse(data)` before returning. No bare `return data`, no inline object literals
 passed to `api.post`/`put`. No schema yet? Add one to `shared-types` (or a local `z.object({...})`
 for endpoint-specific wrappers like `{ id: number }`).
+
+**Never write `data.data`.** The `axios-client.ts` response interceptor already unwraps the
+`{ success, data }` envelope, so `data` _is_ the payload. Reaching for `.data` again yields
+`undefined`, and the `.parse()` then throws _after_ a successful write — the request lands, the
+caller sees a rejected promise, and no error toast fires (the throw is client-side).
 
 ## Types: shared vs UI
 

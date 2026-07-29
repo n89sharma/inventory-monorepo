@@ -6,8 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/shadcn/dialog'
-import { Input } from '@/components/shadcn/input'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
+import { PriceInput, type EditablePriceField } from '@/components/shared/price-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
@@ -40,51 +40,17 @@ type PricingRow = {
   sale_price: string
 }
 
-type EditablePriceField =
-  | 'purchase_cost'
-  | 'transport_cost'
-  | 'processing_cost'
-  | 'other_cost'
-  | 'sale_price'
-
-type TableMeta = {
-  updateField: (barcode: string, field: EditablePriceField, value: string) => void
-}
-
-function sanitize(value: string): string {
-  const cleaned = value.replace(/[^\d.]/g, '')
-  const firstDot = cleaned.indexOf('.')
-  if (firstDot === -1) return cleaned
-  return cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '')
-}
-
-function PriceCell({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  return (
-    <div className="relative">
-      <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-        $
-      </span>
-      <Input
-        value={value}
-        onChange={(e) => onChange(sanitize(e.target.value))}
-        inputMode="decimal"
-        placeholder="0.00"
-        className="h-8 pl-5"
-      />
-    </div>
-  )
-}
-
 function makeEditableColumn(field: EditablePriceField, header: string): ColumnDef<PricingRow> {
   return {
     accessorKey: field,
     header,
     cell: ({ row, table }: CellContext<PricingRow, unknown>) => (
-      <PriceCell
+      <PriceInput
         value={row.original[field]}
-        onChange={(v) =>
-          (table.options.meta as TableMeta).updateField(row.original.barcode, field, v)
+        onChange={(value) =>
+          table.options.meta?.updatePriceDraft?.(row.original.barcode, field, value)
         }
+        label={`${header} for ${row.original.barcode}`}
       />
     ),
     size: 100,
@@ -257,7 +223,7 @@ export function BulkEditPricingModal({
     })
   }, [open, getAssetDetail])
 
-  function updateField(barcode: string, field: EditablePriceField, value: string) {
+  function updatePriceDraft(barcode: string, field: EditablePriceField, value: string) {
     setRows((prev) => prev.map((r) => (r.barcode === barcode ? { ...r, [field]: value } : r)))
   }
 
@@ -265,7 +231,7 @@ export function BulkEditPricingModal({
     data: rows,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    meta: { updateField } satisfies TableMeta,
+    meta: { updatePriceDraft },
   })
 
   async function handleSave() {

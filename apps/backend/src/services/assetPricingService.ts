@@ -1,81 +1,76 @@
-import { BulkUpdateAssetPricing, UpdateAssetPricing } from 'shared-types'
+import { AssetCost, BulkUpdateAssetPricing, PatchAssetPricing } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
+import { decimalToNumber } from '../lib/decimal.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetUpdate } from './historyService.js'
 
-export async function updateAssetPricing(
+const COST_SELECT = {
+  purchase_cost: true,
+  transport_cost: true,
+  processing_cost: true,
+  other_cost: true,
+  parts_cost: true,
+  total_cost: true,
+  sale_price: true,
+} as const
+
+type CostRow = Record<keyof AssetCost, Prisma.Decimal | null>
+
+function toAssetCost(row: CostRow | null): AssetCost {
+  return {
+    purchase_cost: decimalToNumber(row?.purchase_cost ?? null),
+    transport_cost: decimalToNumber(row?.transport_cost ?? null),
+    processing_cost: decimalToNumber(row?.processing_cost ?? null),
+    other_cost: decimalToNumber(row?.other_cost ?? null),
+    parts_cost: decimalToNumber(row?.parts_cost ?? null),
+    total_cost: decimalToNumber(row?.total_cost ?? null),
+    sale_price: decimalToNumber(row?.sale_price ?? null),
+  }
+}
+
+// A field the patch omits keeps its current value, null included; only the total is
+// derived, and it reads a missing component as zero.
+function mergePricing(current: AssetCost, patch: PatchAssetPricing): AssetCost {
+  const merged = {
+    purchase_cost: patch.purchase_cost ?? current.purchase_cost,
+    transport_cost: patch.transport_cost ?? current.transport_cost,
+    processing_cost: patch.processing_cost ?? current.processing_cost,
+    other_cost: patch.other_cost ?? current.other_cost,
+    parts_cost: patch.parts_cost ?? current.parts_cost,
+    sale_price: patch.sale_price ?? current.sale_price,
+  }
+  const total_cost =
+    (merged.purchase_cost ?? 0) +
+    (merged.transport_cost ?? 0) +
+    (merged.processing_cost ?? 0) +
+    (merged.other_cost ?? 0) +
+    (merged.parts_cost ?? 0)
+  return { ...merged, total_cost }
+}
+
+export async function patchAssetPricing(
   barcode: string,
-  data: UpdateAssetPricing,
+  patch: PatchAssetPricing,
   userId: number,
-): Promise<void> {
+): Promise<AssetCost> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-  const currentCost = await prisma.cost.findUnique({
-    where: { asset_id: asset.id },
-    select: {
-      purchase_cost: true,
-      transport_cost: true,
-      processing_cost: true,
-      other_cost: true,
-      parts_cost: true,
-      total_cost: true,
-      sale_price: true,
-    },
-  })
-
-  const total_cost =
-    data.purchase_cost +
-    data.transport_cost +
-    data.processing_cost +
-    data.other_cost +
-    data.parts_cost
+  const currentCost = toAssetCost(
+    await prisma.cost.findUnique({ where: { asset_id: asset.id }, select: COST_SELECT }),
+  )
+  const newCost = mergePricing(currentCost, patch)
 
   await prisma.cost.upsert({
     where: { asset_id: asset.id },
-    update: {
-      purchase_cost: data.purchase_cost,
-      transport_cost: data.transport_cost,
-      processing_cost: data.processing_cost,
-      other_cost: data.other_cost,
-      parts_cost: data.parts_cost,
-      total_cost,
-      sale_price: data.sale_price,
-    },
-    create: {
-      asset_id: asset.id,
-      purchase_cost: data.purchase_cost,
-      transport_cost: data.transport_cost,
-      processing_cost: data.processing_cost,
-      other_cost: data.other_cost,
-      parts_cost: data.parts_cost,
-      total_cost,
-      sale_price: data.sale_price,
-    },
+    update: newCost,
+    create: { asset_id: asset.id, ...newCost },
   })
 
-  await recordAssetUpdate(
-    asset.id,
-    {
-      purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
-      transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
-      processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
-      other_cost: currentCost?.other_cost?.toNumber() ?? null,
-      parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
-      total_cost: currentCost?.total_cost?.toNumber() ?? null,
-      sale_price: currentCost?.sale_price?.toNumber() ?? null,
-    },
-    {
-      purchase_cost: data.purchase_cost,
-      transport_cost: data.transport_cost,
-      processing_cost: data.processing_cost,
-      other_cost: data.other_cost,
-      parts_cost: data.parts_cost,
-      total_cost,
-      sale_price: data.sale_price,
-    },
-    userId,
-  )
+  await recordAssetUpdate(asset.id, currentCost, newCost, userId)
+
+  return newCost
 }
 
 export async function bulkUpdateAssetPricing(
@@ -95,18 +90,9 @@ export async function bulkUpdateAssetPricing(
 
   const currentCosts = await prisma.cost.findMany({
     where: { asset_id: { in: assets.map((a) => a.id) } },
-    select: {
-      asset_id: true,
-      purchase_cost: true,
-      transport_cost: true,
-      processing_cost: true,
-      other_cost: true,
-      parts_cost: true,
-      total_cost: true,
-      sale_price: true,
-    },
+    select: { asset_id: true, ...COST_SELECT },
   })
-  const costMap = new Map(currentCosts.map((c) => [c.asset_id, c]))
+  const costMap = new Map(currentCosts.map((c) => [c.asset_id, toAssetCost(c)]))
 
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
@@ -145,7 +131,7 @@ export async function bulkUpdateAssetPricing(
   await Promise.all(
     items.map((item) => {
       const assetId = assetMap.get(item.barcode)!
-      const currentCost = costMap.get(assetId)
+      const currentCost = costMap.get(assetId) ?? toAssetCost(null)
       const total_cost =
         item.purchase_cost +
         item.transport_cost +
@@ -154,15 +140,7 @@ export async function bulkUpdateAssetPricing(
         item.parts_cost
       return recordAssetUpdate(
         assetId,
-        {
-          purchase_cost: currentCost?.purchase_cost?.toNumber() ?? null,
-          transport_cost: currentCost?.transport_cost?.toNumber() ?? null,
-          processing_cost: currentCost?.processing_cost?.toNumber() ?? null,
-          other_cost: currentCost?.other_cost?.toNumber() ?? null,
-          parts_cost: currentCost?.parts_cost?.toNumber() ?? null,
-          total_cost: currentCost?.total_cost?.toNumber() ?? null,
-          sale_price: currentCost?.sale_price?.toNumber() ?? null,
-        },
+        currentCost,
         {
           purchase_cost: item.purchase_cost,
           transport_cost: item.transport_cost,

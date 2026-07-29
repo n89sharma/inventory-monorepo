@@ -2,6 +2,7 @@ import { api } from '@/data/api/axios-client'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
 import { printPdfBlob } from '@/lib/print-pdf'
 import type {
+  AssetCost,
   AssetDetails,
   AssetError,
   AssetHarvestedPart,
@@ -21,6 +22,7 @@ import type {
   CreateComment,
   CreateSalvagedPart,
   OrgSummary,
+  PatchAssetPricing,
   Status,
   UpdateAssetErrors,
   UpdateAssetLocation,
@@ -32,6 +34,7 @@ import type {
 } from 'shared-types'
 
 import {
+  AssetCostSchema,
   AssetDetailsSchema,
   AssetErrorSchema,
   AssetHarvestedPartSchema,
@@ -46,6 +49,7 @@ import {
   CoreFunctionsSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
+  PatchAssetPricingSchema,
   PrintBarcodesSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
@@ -94,6 +98,15 @@ export async function updateAssetErrors(barcode: string, errors: UpdateError[]):
 export async function updateAssetPricing(barcode: string, data: UpdateAssetPricing): Promise<void> {
   const updateAssetPricingBody = UpdateAssetPricingSchema.parse(data satisfies UpdateAssetPricing)
   await api.put(`/assets/${barcode}/pricing`, updateAssetPricingBody)
+}
+
+export async function patchAssetPricing(
+  barcode: string,
+  patch: PatchAssetPricing,
+): Promise<AssetCost> {
+  const patchAssetPricingBody = PatchAssetPricingSchema.parse(patch satisfies PatchAssetPricing)
+  const { data } = await api.patch(`/assets/${barcode}/pricing`, patchAssetPricingBody)
+  return AssetCostSchema.parse(data)
 }
 
 export async function bulkUpdateAssetPricing(

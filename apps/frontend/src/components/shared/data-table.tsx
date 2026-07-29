@@ -6,6 +6,7 @@ import type {
   ExpandedState,
   OnChangeFn,
   Table as ReactTableInstance,
+  TableMeta,
   TableOptions,
   Row,
   RowSelectionState,
@@ -65,6 +66,9 @@ interface DataTableProps<TData, TValue> {
   // Faceting walks the filtered rows once per column to collect distinct values, so it
   // is only wired up by tables that render a facet-driven filter.
   facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
+  // Callbacks a cell renderer reaches through table.options.meta. Read at event time off
+  // the live table instance, so DataRow's memo never serves a stale one.
+  meta?: TableMeta<TData>
 }
 
 const DEFAULT_PAGE_SIZE = 75
@@ -109,6 +113,7 @@ export function DataTable<TData, TValue>({
   renderTableFilter,
   onFilteredRowIdsChange,
   facetedRowModels,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>(
     defaultSort ? [defaultSort] : [],
@@ -141,6 +146,7 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     ...facetedRowModels,
+    meta,
     enableRowSelection: true,
     onRowSelectionChange,
     getRowId,
@@ -358,7 +364,7 @@ function DataRowImpl<TData>({
 
 const DataRow = memo(DataRowImpl) as typeof DataRowImpl
 
-const INTERACTIVE_SELECTOR = 'a, button, [role=checkbox]'
+const INTERACTIVE_SELECTOR = 'a, button, input, textarea, select, [role=checkbox]'
 
 function hasTextSelection(): boolean {
   const selection = window.getSelection()

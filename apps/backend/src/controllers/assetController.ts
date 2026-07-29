@@ -5,6 +5,7 @@ import {
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
   BulkUpdateAssetPricingSchema,
+  PatchAssetPricingSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
   PrintBarcodesSchema,
@@ -40,7 +41,7 @@ import {
 } from '../services/barcodePrintService.js'
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingSer,
-  updateAssetPricing as updateAssetPricingSer,
+  patchAssetPricing as patchAssetPricingSer,
 } from '../services/assetPricingService.js'
 import { updateAssetErrors as updateAssetErrorsSer } from '../services/assetErrorService.js'
 import { createComment as createCommentSer } from '../services/assetCommentService.js'
@@ -349,8 +350,15 @@ export const updateAssetErrors = asyncHandler(async (req, res) => {
 export const updateAssetPricing = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetPricingSchema.parse(req.body)
-  await updateAssetPricingSer(barcode, validated, res.locals.dbUserId)
+  await patchAssetPricingSer(barcode, validated, res.locals.dbUserId)
   res.json(successResponse(null))
+})
+
+export const patchAssetPricing = asyncHandler(async (req, res) => {
+  const { barcode } = req.params
+  const validated = PatchAssetPricingSchema.parse(req.body)
+  const cost = await patchAssetPricingSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(cost))
 })
 
 export const bulkUpdateAssetPricing = asyncHandler(async (req, res) => {

@@ -335,6 +335,13 @@ export const UpdateAssetPricingSchema = z.object({
 
 export type UpdateAssetPricing = z.infer<typeof UpdateAssetPricingSchema>
 
+export const PatchAssetPricingSchema = UpdateAssetPricingSchema.partial().refine(
+  (patch) => Object.keys(patch).length > 0,
+  { message: 'At least one price field is required' },
+)
+
+export type PatchAssetPricing = z.infer<typeof PatchAssetPricingSchema>
+
 export const BulkUpdateAssetPricingSchema = z.object({
   items: z
     .array(z.object({ barcode: z.string() }).merge(UpdateAssetPricingSchema))

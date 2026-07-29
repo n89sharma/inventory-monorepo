@@ -8,7 +8,7 @@ import {
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { NotFoundError } from '../lib/errors.js'
-import { updateAssetPricing } from './assetPricingService.js'
+import { patchAssetPricing } from './assetPricingService.js'
 import { createDeparture } from './departureService.js'
 import { getModelSales } from './modelSalesService.js'
 
@@ -38,18 +38,7 @@ describe('modelSalesService', () => {
 
   it('includes a sold asset with a sale price in the sales list', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    await updateAssetPricing(
-      asset.barcode,
-      {
-        purchase_cost: 100,
-        transport_cost: 0,
-        processing_cost: 0,
-        other_cost: 0,
-        parts_cost: 0,
-        sale_price: 500,
-      },
-      refs.userId,
-    )
+    await patchAssetPricing(asset.barcode, { purchase_cost: 100, sale_price: 500 }, refs.userId)
     await createDeparture(
       buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
       refs.userId,
