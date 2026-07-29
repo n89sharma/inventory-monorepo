@@ -32,13 +32,13 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createInvoiceDetailColumns(
-        assetHref,
-        (asset) => mutations.removeAsset(invoiceNumber, asset),
+      createInvoiceDetailColumns({
+        getHref: assetHref,
+        onDelete: (asset) => mutations.removeAsset(invoiceNumber, asset),
         canViewPurchasePrice,
         canViewSalePrice,
         priceEditEnabled,
-      ),
+      }),
     [mutations, invoiceNumber, canViewPurchasePrice, canViewSalePrice, priceEditEnabled],
   )
 

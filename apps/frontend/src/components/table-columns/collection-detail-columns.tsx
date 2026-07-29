@@ -263,11 +263,17 @@ function createCostColumn(
   }
 }
 
-function costColumns(
-  canViewPurchasePrice: boolean,
-  canViewSalePrice: boolean,
-  priceEditEnabled: boolean,
-): ColumnDef<AssetSummary>[] {
+interface CostColumnOptions {
+  canViewPurchasePrice: boolean
+  canViewSalePrice: boolean
+  priceEditEnabled: boolean
+}
+
+function costColumns({
+  canViewPurchasePrice,
+  canViewSalePrice,
+  priceEditEnabled,
+}: CostColumnOptions): ColumnDef<AssetSummary>[] {
   const columns: ColumnDef<AssetSummary>[] = []
   if (canViewPurchasePrice) {
     columns.push(
@@ -282,18 +288,19 @@ function costColumns(
   return columns
 }
 
+interface InvoiceDetailColumnOptions extends CostColumnOptions {
+  getHref: (asset: AssetSummary) => string
+  onDelete?: (asset: AssetSummary) => void
+}
+
 export function createInvoiceDetailColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete: ((asset: AssetSummary) => void) | undefined,
-  canViewPurchasePrice: boolean,
-  canViewSalePrice: boolean,
-  priceEditEnabled: boolean,
+  options: InvoiceDetailColumnOptions,
 ): ColumnDef<AssetSummary>[] {
   return [
-    ...identityColumns(getHref),
+    ...identityColumns(options.getHref),
     ...specColumns(),
-    ...costColumns(canViewPurchasePrice, canViewSalePrice, priceEditEnabled),
+    ...costColumns(options),
     CREATED_AT_COLUMN,
-    ...actionColumns(undefined, onDelete),
+    ...actionColumns(undefined, options.onDelete),
   ]
 }

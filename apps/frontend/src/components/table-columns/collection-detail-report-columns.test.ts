@@ -105,7 +105,12 @@ describe('report column parity with the detail table', () => {
 
   it('invoices with price permissions match the invoice table cost columns in order', () => {
     const headers = visibleTableHeaders(
-      createInvoiceDetailColumns(noHref, undefined, true, true, false),
+      createInvoiceDetailColumns({
+        getHref: noHref,
+        canViewPurchasePrice: true,
+        canViewSalePrice: true,
+        priceEditEnabled: false,
+      }),
     )
     const reportColumns = [
       ...COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.invoices,
