@@ -150,6 +150,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   senior_accountant: [
     'view_asset',
     'view_collections',
+    'view_reports',
     'create_update_arrival',
     'create_update_hold',
     'create_update_transfer',
