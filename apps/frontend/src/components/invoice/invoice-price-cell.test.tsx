@@ -46,17 +46,24 @@ function makeAsset(cost: AssetCost | null): AssetSummary {
   }
 }
 
+interface RenderedCell {
+  input: HTMLInputElement
+  // Re-renders with a different saved cost, standing in for a background revalidation.
+  revalidate: (cost: AssetCost | null) => void
+}
+
 function renderCell(
   savePriceField: TableMeta<AssetSummary>['savePriceField'],
   cost: AssetCost | null = makeCost(),
-): HTMLInputElement {
+): RenderedCell {
   const table = { options: { meta: { savePriceField } } } as Table<AssetSummary>
-  render(
-    <InvoicePriceCell asset={makeAsset(cost)} field="purchase_cost" label={LABEL} table={table} />,
+  const cell = (next: AssetCost | null) => (
+    <InvoicePriceCell asset={makeAsset(next)} field="purchase_cost" label={LABEL} table={table} />
   )
+  const { rerender } = render(cell(cost))
   const input = screen.getByLabelText(FIELD_LABEL)
   if (!(input instanceof HTMLInputElement)) throw new Error('Expected a price input')
-  return input
+  return { input, revalidate: (next) => rerender(cell(next)) }
 }
 
 function type(input: HTMLInputElement, value: string) {
@@ -67,7 +74,7 @@ function type(input: HTMLInputElement, value: string) {
 describe('InvoicePriceCell', () => {
   it('commits the parsed value on blur', async () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     type(input, '150.50')
     input.blur()
@@ -79,7 +86,7 @@ describe('InvoicePriceCell', () => {
 
   it('does not commit when the value is unchanged', () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     input.focus()
     input.blur()
@@ -89,7 +96,7 @@ describe('InvoicePriceCell', () => {
 
   it('commits a blank input as zero', async () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     type(input, '')
     input.blur()
@@ -99,7 +106,7 @@ describe('InvoicePriceCell', () => {
 
   it('strips characters that are not part of a decimal', async () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     type(input, '1a2.3.4')
     expect(input).toHaveValue('12.34')
@@ -112,7 +119,7 @@ describe('InvoicePriceCell', () => {
 
   it('keeps the typed value and marks the field invalid when the save fails', async () => {
     const savePriceField = vi.fn().mockRejectedValue(new Error('nope'))
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     type(input, '175')
     input.blur()
@@ -121,20 +128,66 @@ describe('InvoicePriceCell', () => {
     expect(input).toHaveValue('175')
   })
 
-  it('restores the saved value on Escape without committing', () => {
+  it('restores the typed value when a revalidation lands during a failed save', async () => {
+    let rejectSave: (reason: Error) => void = () => {}
+    const savePriceField = vi.fn(
+      () =>
+        new Promise<void>((_, reject) => {
+          rejectSave = reject
+        }),
+    )
+    const { input, revalidate } = renderCell(savePriceField)
+
+    type(input, '175')
+    input.blur()
+    await waitFor(() => expect(savePriceField).toHaveBeenCalled())
+
+    revalidate(makeCost({ purchase_cost: 250 }))
+    await waitFor(() => expect(input).toHaveValue('250'))
+
+    rejectSave(new Error('nope'))
+
+    await waitFor(() => expect(input).toHaveValue('175'))
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('marks the field invalid when the table meta has no save callback', async () => {
+    const { input } = renderCell(undefined)
+
+    type(input, '175')
+    input.blur()
+
+    await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'true'))
+    expect(input).toHaveValue('175')
+  })
+
+  it('restores the saved value on Escape without committing or blurring', () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField)
+    const { input } = renderCell(savePriceField)
 
     type(input, '999')
     fireEvent.keyDown(input, { key: 'Escape' })
 
     expect(input).toHaveValue('100')
+    expect(input).toHaveFocus()
+    expect(savePriceField).not.toHaveBeenCalled()
+  })
+
+  it('does not commit when the cell is left after an Escape', async () => {
+    const savePriceField = vi.fn().mockResolvedValue(undefined)
+    const { input } = renderCell(savePriceField)
+
+    type(input, '999')
+    fireEvent.keyDown(input, { key: 'Escape' })
+    input.blur()
+
+    await waitFor(() => expect(input).toHaveValue('100'))
     expect(savePriceField).not.toHaveBeenCalled()
   })
 
   it('treats a missing cost as zero', async () => {
     const savePriceField = vi.fn().mockResolvedValue(undefined)
-    const input = renderCell(savePriceField, null)
+    const { input } = renderCell(savePriceField, null)
 
     expect(input).toHaveValue('0')
     type(input, '40')
