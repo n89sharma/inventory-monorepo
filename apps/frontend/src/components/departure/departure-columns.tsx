@@ -1,8 +1,8 @@
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
-  assetCountColumn,
-  createdAtColumn,
-  createdByColumn,
+  assetCountColumnDef,
+  createdAtColumnDef,
+  createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -18,8 +18,8 @@ export function departureTableColumns(
       href: getHref,
       value: (row) => row.departure_number,
     }),
-    createdAtColumn as ColumnDef<DepartureSummary>,
-    createdByColumn as ColumnDef<DepartureSummary>,
+    createdAtColumnDef as ColumnDef<DepartureSummary>,
+    createdByColumnDef as ColumnDef<DepartureSummary>,
     { accessorKey: 'origin_code', header: 'Warehouse' },
     {
       accessorKey: 'transporter',
@@ -31,6 +31,6 @@ export function departureTableColumns(
       header: 'Customer',
       cell: ({ row }) => formatTitleCase(row.original.destination ?? ''),
     },
-    assetCountColumn as ColumnDef<DepartureSummary>,
+    assetCountColumnDef as ColumnDef<DepartureSummary>,
   ]
 }

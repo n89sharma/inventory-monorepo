@@ -1,111 +1,146 @@
-import { createIdColumn, sortableHeader } from '@/components/table-columns/column-primitives'
+import { ArrivalLinks } from '@/components/shared/arrival-links'
+import { Checkbox } from '@/components/shadcn/checkbox'
 import {
   assetCountColumn,
   createdByColumn,
 } from '@/components/table-columns/collection-summary-columns'
-import { ArrivalLinks } from '@/components/shared/arrival-links'
-import { Checkbox } from '@/components/shadcn/checkbox'
+import { ID_COLUMN_SIZE, IdLink } from '@/components/table-columns/column-primitives'
+import type { SummaryColumn } from '@/components/table-columns/summary-column'
 import { formatDate, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
-import type { ColumnDef } from '@tanstack/react-table'
 import { parseISO } from 'date-fns'
-import type { InvoiceSummary } from 'shared-types'
+import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
+import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 
-const invoiceDateColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'invoice_date',
-  header: sortableHeader<InvoiceSummary>('Date'),
-  cell: ({ row }) => formatDate(parseISO(row.original.invoice_date)),
+type InvoiceCellContext = {
+  getHref: (invoice: InvoiceSummary) => string
+}
+
+type InvoiceSummaryColumn = SummaryColumn<InvoiceSummary, InvoiceCellContext>
+
+const CLEARED_TEXT = { true: 'Yes', false: 'No' } as const
+const LIST_SEPARATOR = ', '
+
+const INVOICE_DATE_COLUMN: InvoiceSummaryColumn = {
+  id: 'invoice_date',
+  label: 'Date',
+  text: (invoice) => formatDate(parseISO(invoice.invoice_date)),
+  sortable: true,
   size: 140,
 }
 
-const clearedColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'is_cleared',
-  header: 'Cleared',
-  cell: ({ row }) => (
+const REFERENCE_COLUMN: InvoiceSummaryColumn = {
+  id: 'invoice_reference',
+  label: 'Reference Invoice Number',
+  text: (invoice) => invoice.invoice_reference,
+  cell: (invoice, { getHref }) => (
+    <IdLink to={getHref(invoice)}>{invoice.invoice_reference}</IdLink>
+  ),
+  filterFn: 'includesString',
+  size: ID_COLUMN_SIZE,
+}
+
+function organizationColumn(label: string): InvoiceSummaryColumn {
+  return {
+    id: 'organization',
+    label,
+    text: (invoice) => formatTitleCase(invoice.organization ?? ''),
+    sortable: true,
+    filterFn: 'includesString',
+  }
+}
+
+const WAREHOUSE_COLUMN: InvoiceSummaryColumn = {
+  id: 'destination_codes',
+  label: 'Warehouse',
+  text: (invoice) => invoice.destination_codes.join(LIST_SEPARATOR),
+}
+
+const ARRIVAL_NUMBERS_COLUMN: InvoiceSummaryColumn = {
+  id: 'arrival_numbers',
+  label: 'Arrival IDs',
+  text: (invoice) => invoice.arrival_numbers.join(LIST_SEPARATOR),
+  cell: (invoice) => <ArrivalLinks arrivalNumbers={invoice.arrival_numbers} />,
+}
+
+const TRANSPORTERS_COLUMN: InvoiceSummaryColumn = {
+  id: 'transporters',
+  label: 'Transporters',
+  text: (invoice) => invoice.transporters.join(LIST_SEPARATOR),
+}
+
+const CLEARED_COLUMN: InvoiceSummaryColumn = {
+  id: 'is_cleared',
+  label: 'Cleared',
+  text: (invoice) => CLEARED_TEXT[invoice.is_cleared ? 'true' : 'false'],
+  cell: (invoice) => (
     <div className="flex justify-center">
-      <Checkbox checked={row.original.is_cleared} />
+      <Checkbox checked={invoice.is_cleared} />
     </div>
   ),
 }
 
-const warehouseColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'destination_codes',
-  header: 'Warehouse',
-  enableSorting: false,
-  cell: ({ row }) => row.original.destination_codes.join(', '),
-}
-
-const arrivalNumbersColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'arrival_numbers',
-  header: 'Arrival IDs',
-  enableSorting: false,
-  cell: ({ row }) => <ArrivalLinks arrivalNumbers={row.original.arrival_numbers} />,
-}
-
-const transportersColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'transporters',
-  header: 'Transporters',
-  enableSorting: false,
-  cell: ({ row }) => row.original.transporters.join(', '),
-}
-
 function currencyColumn(
-  accessorKey: keyof InvoiceSummary,
-  header: string,
-): ColumnDef<InvoiceSummary> {
+  id: keyof InvoiceSummary,
+  label: string,
+  permission: InvoiceSummaryColumn['permission'],
+): InvoiceSummaryColumn {
   return {
-    accessorKey,
-    header,
-    enableSorting: false,
-    cell: ({ getValue }) => {
-      const amount = getValue<number | null>()
-      return amount === null ? null : formatUSDWithSymbol(amount)
+    id,
+    label,
+    permission,
+    text: (invoice) => {
+      const amount = invoice[id]
+      return typeof amount === 'number' ? formatUSDWithSymbol(amount) : ''
     },
   }
 }
 
-const purchaseCostColumn = currencyColumn('purchase_cost', 'Purchase Cost')
-const transportCostColumn = currencyColumn('transport_cost', 'Transport Cost')
-const totalCostColumn = currencyColumn('total_cost', 'Total Cost')
-const salePriceColumn = currencyColumn('sale_price', 'Sale Price')
+const PURCHASE_COST_COLUMN = currencyColumn('purchase_cost', 'Purchase Cost', 'view_purchase_price')
+const TRANSPORT_COST_COLUMN = currencyColumn(
+  'transport_cost',
+  'Transport Cost',
+  'view_purchase_price',
+)
+const TOTAL_COST_COLUMN = currencyColumn('total_cost', 'Total Cost', 'view_purchase_price')
+const SALE_PRICE_COLUMN = currencyColumn('sale_price', 'Sale Price', 'view_sale_price')
 
-const notesColumn: ColumnDef<InvoiceSummary> = {
-  accessorKey: 'notes',
-  header: 'Notes',
-  enableSorting: false,
-  cell: ({ row }) => row.original.notes,
+const NOTES_COLUMN: InvoiceSummaryColumn = {
+  id: 'notes',
+  label: 'Notes',
+  text: (invoice) => invoice.notes ?? '',
 }
 
-export function invoiceTableColumns(
-  getHref: (row: InvoiceSummary) => string,
-  organizationHeader: string,
-  includeClearedColumn: boolean,
-  includeArrivalColumns: boolean,
-  canViewPurchasePrice: boolean,
-  canViewSalePrice: boolean,
-): ColumnDef<InvoiceSummary>[] {
-  return [
-    invoiceDateColumn,
-    {
-      ...createIdColumn<InvoiceSummary>({
-        accessorKey: 'invoice_reference',
-        header: 'Reference Invoice Number',
-        href: getHref,
-        value: (row) => row.invoice_reference,
-      }),
-      filterFn: 'includesString',
-    },
-    {
-      accessorKey: 'organization',
-      header: sortableHeader<InvoiceSummary>(organizationHeader),
-      cell: ({ row }) => formatTitleCase(row.original.organization ?? ''),
-      filterFn: 'includesString',
-    },
-    ...(includeArrivalColumns ? [warehouseColumn, arrivalNumbersColumn, transportersColumn] : []),
-    ...(includeClearedColumn ? [clearedColumn] : []),
-    ...(canViewPurchasePrice ? [purchaseCostColumn, transportCostColumn, totalCostColumn] : []),
-    ...(canViewSalePrice ? [salePriceColumn] : []),
-    notesColumn,
-    assetCountColumn as ColumnDef<InvoiceSummary>,
-    createdByColumn as ColumnDef<InvoiceSummary>,
-  ]
-}
+const PURCHASE_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
+  INVOICE_DATE_COLUMN,
+  REFERENCE_COLUMN,
+  organizationColumn('Vendor'),
+  WAREHOUSE_COLUMN,
+  ARRIVAL_NUMBERS_COLUMN,
+  TRANSPORTERS_COLUMN,
+  CLEARED_COLUMN,
+  PURCHASE_COST_COLUMN,
+  TRANSPORT_COST_COLUMN,
+  TOTAL_COST_COLUMN,
+  SALE_PRICE_COLUMN,
+  NOTES_COLUMN,
+  assetCountColumn(),
+  createdByColumn(),
+]
+
+const SALES_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
+  INVOICE_DATE_COLUMN,
+  REFERENCE_COLUMN,
+  organizationColumn('Customer'),
+  PURCHASE_COST_COLUMN,
+  TRANSPORT_COST_COLUMN,
+  TOTAL_COST_COLUMN,
+  SALE_PRICE_COLUMN,
+  NOTES_COLUMN,
+  assetCountColumn(),
+  createdByColumn(),
+]
+
+export const INVOICE_COLUMNS_BY_TYPE = {
+  [INVOICE_TYPE.purchase]: PURCHASE_INVOICE_COLUMNS,
+  [INVOICE_TYPE.sales]: SALES_INVOICE_COLUMNS,
+} as const satisfies Record<InvoiceTypeFilter, readonly InvoiceSummaryColumn[]>

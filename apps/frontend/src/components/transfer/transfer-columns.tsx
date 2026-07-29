@@ -1,8 +1,8 @@
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
-  assetCountColumn,
-  createdAtColumn,
-  createdByColumn,
+  assetCountColumnDef,
+  createdAtColumnDef,
+  createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { formatTitleCase } from '@/lib/formatters'
@@ -24,7 +24,7 @@ export function transferTableColumns(
       header: 'Status',
       cell: ({ row }) => <TransferStatusBadge status={row.original.status} />,
     },
-    createdAtColumn as ColumnDef<TransferSummary>,
+    createdAtColumnDef as ColumnDef<TransferSummary>,
     { accessorKey: 'origin_code', header: 'Origin' },
     { accessorKey: 'destination_code', header: 'Destination' },
     {
@@ -32,7 +32,7 @@ export function transferTableColumns(
       header: 'Transporter',
       cell: ({ row }) => formatTitleCase(row.original.transporter ?? ''),
     },
-    createdByColumn as ColumnDef<TransferSummary>,
-    assetCountColumn as ColumnDef<TransferSummary>,
+    createdByColumnDef as ColumnDef<TransferSummary>,
+    assetCountColumnDef as ColumnDef<TransferSummary>,
   ]
 }

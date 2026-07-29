@@ -1,8 +1,9 @@
-import { invoiceTableColumns } from '@/components/invoice/invoice-columns'
+import { INVOICE_COLUMNS_BY_TYPE } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { SearchBar } from '@/components/shared/search-bar'
+import { toColumnDefs, visibleSummaryColumns } from '@/components/table-columns/summary-column'
 import { useCan } from '@/hooks/use-can'
 import { useCollectionDateRange, useInvoiceTypeParam } from '@/lib/filters/hooks'
 import { preloadInvoiceDetail, useInvoicesList } from '@/hooks/use-invoice'
@@ -24,25 +25,21 @@ export function InvoicesSummaryPage(): React.JSX.Element {
   const { data: invoices = [] } = useInvoicesList(fromDate, toDate, invoiceType)
 
   const canCreate = useCan('create_update_invoice')
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
+  const can = useCan()
 
   const getRowHref = useCallback(
     (invoice: InvoiceSummary) =>
       collectionDetailHref('invoices', invoice.invoice_number, searchParams),
     [searchParams],
   )
-  const columns = useMemo(() => {
-    const isPurchase = invoiceType === INVOICE_TYPE.purchase
-    return invoiceTableColumns(
-      getRowHref,
-      ORGANIZATION_HEADER[invoiceType],
-      isPurchase,
-      isPurchase,
-      canViewPurchasePrice,
-      canViewSalePrice,
-    )
-  }, [getRowHref, invoiceType, canViewPurchasePrice, canViewSalePrice])
+  const visibleColumns = useMemo(
+    () => visibleSummaryColumns(INVOICE_COLUMNS_BY_TYPE[invoiceType], can),
+    [invoiceType, can],
+  )
+  const columns = useMemo(
+    () => toColumnDefs(visibleColumns, { getHref: getRowHref }),
+    [visibleColumns, getRowHref],
+  )
 
   return (
     <CollectionPage

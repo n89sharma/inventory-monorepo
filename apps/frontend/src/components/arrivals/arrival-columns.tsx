@@ -1,8 +1,8 @@
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
-  assetCountColumn,
-  createdAtColumn,
-  createdByColumn,
+  assetCountColumnDef,
+  createdAtColumnDef,
+  createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -18,8 +18,8 @@ export function arrivalTableColumns(
       href: getHref,
       value: (row) => row.arrival_number,
     }),
-    createdAtColumn as ColumnDef<ArrivalSummary>,
-    createdByColumn as ColumnDef<ArrivalSummary>,
+    createdAtColumnDef as ColumnDef<ArrivalSummary>,
+    createdByColumnDef as ColumnDef<ArrivalSummary>,
     { accessorKey: 'destination_code', header: 'Warehouse' },
     {
       accessorKey: 'transporter',
@@ -31,6 +31,6 @@ export function arrivalTableColumns(
       header: 'Vendor',
       cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
     },
-    assetCountColumn as ColumnDef<ArrivalSummary>,
+    assetCountColumnDef as ColumnDef<ArrivalSummary>,
   ]
 }
