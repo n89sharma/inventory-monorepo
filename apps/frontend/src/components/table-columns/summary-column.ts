@@ -1,3 +1,4 @@
+import type { CsvColumn } from '@/lib/csv'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import type { Permission } from 'shared-types'
@@ -34,5 +35,14 @@ export function toColumnDefs<TRow, TContext>(
     filterFn: column.filterFn,
     cell: ({ row }) =>
       column.cell ? column.cell(row.original, context) : column.text(row.original),
+  }))
+}
+
+export function toSummaryCsvColumns<TRow, TContext>(
+  columns: readonly SummaryColumn<TRow, TContext>[],
+): CsvColumn<TRow>[] {
+  return columns.map((column) => ({
+    header: column.csvHeader ?? column.label,
+    value: column.text,
   }))
 }

@@ -2,20 +2,33 @@ import { INVOICE_COLUMNS_BY_TYPE } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
+import { ExportAssetsButton } from '@/components/shared/export-assets-button'
 import { SearchBar } from '@/components/shared/search-bar'
-import { toColumnDefs, visibleSummaryColumns } from '@/components/table-columns/summary-column'
+import {
+  toColumnDefs,
+  toSummaryCsvColumns,
+  visibleSummaryColumns,
+} from '@/components/table-columns/summary-column'
 import { useCan } from '@/hooks/use-can'
 import { useCollectionDateRange, useInvoiceTypeParam } from '@/lib/filters/hooks'
 import { preloadInvoiceDetail, useInvoicesList } from '@/hooks/use-invoice'
+import { toCsv } from '@/lib/csv'
+import { downloadFile } from '@/lib/download-file'
+import { waitForNextPaint } from '@/lib/wait-for-next-paint'
+import { getSelectedOrNull } from '@/ui-types/select-option-types'
 import { ORGANIZATION_HEADER, type InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
+import { format } from 'date-fns'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
 const PINNED_COLUMN_IDS = ['invoice_date', 'invoice_reference']
+const CSV_MIME_TYPE = 'text/csv'
+const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 
 export function InvoicesSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -40,6 +53,25 @@ export function InvoicesSummaryPage(): React.JSX.Element {
     () => toColumnDefs(visibleColumns, { getHref: getRowHref }),
     [visibleColumns, getRowHref],
   )
+
+  const [exportLoading, setExportLoading] = useState(false)
+
+  async function handleExport() {
+    if (invoices.length === 0) return
+    setExportLoading(true)
+    try {
+      await waitForNextPaint()
+      const csv = toCsv(toSummaryCsvColumns(visibleColumns), invoices)
+      downloadFile(
+        exportFilename(invoiceType, getSelectedOrNull(fromDate), getSelectedOrNull(toDate)),
+        new Blob([csv], { type: CSV_MIME_TYPE }),
+      )
+    } catch {
+      toast.error('Failed to export invoices', { position: 'top-center' })
+    } finally {
+      setExportLoading(false)
+    }
+  }
 
   return (
     <CollectionPage
@@ -76,17 +108,39 @@ export function InvoicesSummaryPage(): React.JSX.Element {
         </SearchBar>
       }
       actions={
-        canCreate ? (
-          <Button asChild>
-            <Link to="/invoices/new">
-              <PlusIcon />
-              Create Invoice
-            </Link>
-          </Button>
-        ) : undefined
+        <div className="flex items-center gap-2">
+          <ExportAssetsButton
+            loading={exportLoading}
+            disabled={invoices.length === 0 || exportLoading}
+            onClick={handleExport}
+          />
+          {canCreate && (
+            <Button asChild>
+              <Link to="/invoices/new">
+                <PlusIcon />
+                Create Invoice
+              </Link>
+            </Button>
+          )}
+        </div>
       }
     />
   )
+}
+
+const INVOICE_EXPORT_NAME = {
+  [INVOICE_TYPE.purchase]: 'purchase-invoices',
+  [INVOICE_TYPE.sales]: 'sales-invoices',
+} as const satisfies Record<InvoiceTypeFilter, string>
+
+function exportFilename(
+  invoiceType: InvoiceTypeFilter,
+  fromDate: Date | null,
+  toDate: Date | null,
+): string {
+  const name = INVOICE_EXPORT_NAME[invoiceType]
+  if (fromDate === null || toDate === null) return `${name}.csv`
+  return `${name}-${format(fromDate, FILENAME_DATE_FORMAT)}-${format(toDate, FILENAME_DATE_FORMAT)}.csv`
 }
 
 const INVOICE_PAGE_TITLE = {
