@@ -2,7 +2,7 @@ import { INVOICE_COLUMNS_BY_TYPE } from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
-import { ExportAssetsButton } from '@/components/shared/export-assets-button'
+import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { SearchBar } from '@/components/shared/search-bar'
 import {
   toColumnDefs,
@@ -109,7 +109,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       }
       actions={
         <div className="flex items-center gap-2">
-          <ExportAssetsButton
+          <ExportCsvButton
             loading={exportLoading}
             disabled={invoices.length === 0 || exportLoading}
             onClick={handleExport}

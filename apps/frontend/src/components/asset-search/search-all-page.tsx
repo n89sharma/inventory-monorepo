@@ -4,7 +4,7 @@ import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
-import { ExportAssetsButton } from '@/components/shared/export-assets-button'
+import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { MultiSelectOptionsInline } from '@/components/shared/search-select/multi-select-options'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
@@ -121,7 +121,7 @@ export function SearchAllPage(): React.JSX.Element {
             />
             <SavedViewsButton pageKey="search_all" />
             <ShareButton />
-            <ExportAssetsButton
+            <ExportCsvButton
               loading={selection.exportLoading}
               disabled={selection.exportDisabled}
               onClick={selection.handleExport}

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/shadcn/textarea'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
-import { ExportAssetsButton } from '@/components/shared/export-assets-button'
+import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
@@ -146,7 +146,7 @@ export function ExportAssetsPage(): React.JSX.Element {
               onVisibleChange={setVisibleColumns}
               onReset={reset}
             />
-            <ExportAssetsButton
+            <ExportCsvButton
               loading={selection.exportLoading}
               disabled={selection.exportDisabled}
               onClick={selection.handleExport}

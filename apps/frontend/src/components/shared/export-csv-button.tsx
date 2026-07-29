@@ -2,7 +2,7 @@ import { Button } from '@/components/shadcn/button'
 import { PendingIcon } from '@/components/shared/pending-icon'
 import { DownloadSimpleIcon } from '@phosphor-icons/react'
 
-export function ExportAssetsButton({
+export function ExportCsvButton({
   loading,
   disabled,
   onClick,
