@@ -47,7 +47,8 @@ export type AssetSearchColumn = {
   readonly label: string
   readonly section: ColumnSectionId
   readonly defaultColumn: boolean
-  readonly permission?: Permission
+  // Every listed permission is required; a viewer missing any one loses the column.
+  readonly permissions?: readonly Permission[]
   // Shown unconditionally and never offered in the picker: barcode, model.
   readonly alwaysVisible?: boolean
   readonly sortable?: boolean
@@ -282,7 +283,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Purchase Cost',
     section: 'cost',
     defaultColumn: false,
-    permission: 'view_purchase_price',
+    permissions: ['view_purchase_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_purchase_cost),
   },
@@ -291,7 +292,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Transport Cost',
     section: 'cost',
     defaultColumn: false,
-    permission: 'view_purchase_price',
+    permissions: ['view_purchase_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_transport_cost),
   },
@@ -300,7 +301,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Processing Cost',
     section: 'cost',
     defaultColumn: false,
-    permission: 'view_purchase_price',
+    permissions: ['view_purchase_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_processing_cost),
   },
@@ -309,7 +310,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Total Cost',
     section: 'cost',
     defaultColumn: false,
-    permission: 'view_purchase_price',
+    permissions: ['view_purchase_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_total_cost),
   },
@@ -318,7 +319,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Sale Price',
     section: 'cost',
     defaultColumn: false,
-    permission: 'view_sale_price',
+    permissions: ['view_sale_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_sale_price),
   },
@@ -476,6 +477,13 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
 
 const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(ASSET_SEARCH_COLUMNS.map((c) => [c.id, c]))
 
+export function canViewColumn(
+  column: AssetSearchColumn,
+  can: (permission: Permission) => boolean,
+): boolean {
+  return column.permissions?.every((permission) => can(permission)) ?? true
+}
+
 // Filters a stored/shared set of column ids down to what the current viewer may see:
 // drops unknown ids (columns removed since the view was saved) and permission-gated
 // columns the viewer lacks. Applied when restoring a saved view.
@@ -487,7 +495,7 @@ export function resolveVisibleColumns(
   for (const id of columnIds) {
     const column = COLUMN_BY_ID.get(id)
     if (!column) continue
-    if (column.permission && !can(column.permission)) continue
+    if (!canViewColumn(column, can)) continue
     resolved.add(id)
   }
   return resolved
