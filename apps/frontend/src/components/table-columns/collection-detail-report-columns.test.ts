@@ -109,7 +109,6 @@ describe('report column parity with the detail table', () => {
         getHref: noHref,
         canViewPurchasePrice: true,
         canViewSalePrice: true,
-        priceEditEnabled: false,
       }),
     )
     const reportColumns = [

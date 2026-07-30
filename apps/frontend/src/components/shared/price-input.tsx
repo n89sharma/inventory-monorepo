@@ -19,12 +19,13 @@ interface PriceInputProps {
   value: string
   onChange: (value: string) => void
   onBlur?: () => void
-  onFocus?: () => void
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
   invalid?: boolean
   saving?: boolean
   label?: string
   className?: string
+  autoFocus?: boolean
 }
 
 export function PriceInput({
@@ -37,6 +38,7 @@ export function PriceInput({
   saving,
   label,
   className,
+  autoFocus,
 }: PriceInputProps): React.JSX.Element {
   return (
     <div className={`relative ${className ?? ''}`}>
@@ -48,6 +50,7 @@ export function PriceInput({
         onFocus={onFocus}
         onKeyDown={onKeyDown}
         inputMode="decimal"
+        autoFocus={autoFocus}
         placeholder={PLACEHOLDER}
         aria-label={label}
         aria-invalid={invalid}

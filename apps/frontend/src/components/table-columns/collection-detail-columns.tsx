@@ -1,7 +1,7 @@
 import { InvoicePriceCell } from '@/components/invoice/invoice-price-cell'
 import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-field'
 import { Button } from '@/components/shadcn/button'
-import { isEditablePriceField } from '@/lib/price-cell-navigation'
+import { isEditablePriceField, type PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
@@ -232,15 +232,21 @@ const EDITABLE_COST_COLUMN_SIZE = 110
 function createCostColumn(
   field: keyof AssetCost,
   header: string,
-  priceEditEnabled: boolean,
+  priceEditorRegistry: PriceCellEditorRegistry | undefined,
 ): ColumnDef<AssetSummary> {
-  if (priceEditEnabled && isEditablePriceField(field)) {
+  if (priceEditorRegistry && isEditablePriceField(field)) {
     return {
       id: field,
       header,
       size: EDITABLE_COST_COLUMN_SIZE,
       cell: ({ row, table }) => (
-        <InvoicePriceCell asset={row.original} field={field} label={header} table={table} />
+        <InvoicePriceCell
+          row={row}
+          field={field}
+          label={header}
+          table={table}
+          editorRegistry={priceEditorRegistry}
+        />
       ),
     }
   }
@@ -254,24 +260,25 @@ function createCostColumn(
 interface CostColumnOptions {
   canViewPurchasePrice: boolean
   canViewSalePrice: boolean
-  priceEditEnabled: boolean
+  // Supplied only when the user holds edit_prices; absent renders read-only cost text.
+  priceEditorRegistry?: PriceCellEditorRegistry
 }
 
 function costColumns({
   canViewPurchasePrice,
   canViewSalePrice,
-  priceEditEnabled,
+  priceEditorRegistry,
 }: CostColumnOptions): ColumnDef<AssetSummary>[] {
   const columns: ColumnDef<AssetSummary>[] = []
   if (canViewPurchasePrice) {
     columns.push(
       ...PURCHASE_COST_COLUMNS.map(([field, header]) =>
-        createCostColumn(field, header, priceEditEnabled),
+        createCostColumn(field, header, priceEditorRegistry),
       ),
     )
   }
   if (canViewSalePrice) {
-    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1], priceEditEnabled))
+    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1], priceEditorRegistry))
   }
   return columns
 }

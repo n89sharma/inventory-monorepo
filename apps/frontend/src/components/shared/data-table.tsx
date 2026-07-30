@@ -226,10 +226,11 @@ export function DataTable<TData, TValue>({
               {table.getRowModel().rows?.length ? (
                 table
                   .getRowModel()
-                  .rows.map((row) => (
+                  .rows.map((row, rowPosition) => (
                     <DataRow
                       key={row.id}
                       row={row}
+                      rowPosition={rowPosition}
                       isSelected={row.getIsSelected()}
                       isExpanded={row.getIsExpanded()}
                       onRowMouseEnter={handleRowMouseEnter}
@@ -305,6 +306,10 @@ export function DataTable<TData, TValue>({
 
 function DataRowImpl<TData>({
   row,
+  // Sorting and pagination reorder the same Row instances, so without the visual position in
+  // the props this memo never busts on a reorder — which strands anything a cell derives from
+  // its position, such as an editable grid's single keyboard entry point.
+  rowPosition,
   cells,
   isSelected,
   isExpanded,
@@ -313,6 +318,7 @@ function DataRowImpl<TData>({
   getRowClassName,
 }: {
   row: Row<TData>
+  rowPosition: number
   cells: Cell<TData, unknown>[]
   isSelected: boolean
   isExpanded?: boolean
@@ -324,6 +330,7 @@ function DataRowImpl<TData>({
   const canExpand = row.getCanExpand()
   return (
     <TableRow
+      data-row-position={rowPosition}
       data-state={isSelected && 'selected'}
       data-expanded={isExpanded || undefined}
       className={`group/row ${getRowHref || canExpand ? 'cursor-pointer' : ''} ${getRowClassName?.(row.original) ?? ''}`.trim()}
