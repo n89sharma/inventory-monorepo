@@ -30,16 +30,19 @@ export const daysHeld = (heldOn: Date | null): number | undefined =>
 
 const MARGIN_PERMISSIONS = ['view_sale_price', 'view_purchase_price'] as const
 const MARGIN_PERCENT_FRACTION_DIGITS = 1
+const TOTAL_LOSS_MARGIN_PERCENT = -100
 
 const grossMargin = (salePrice: number | null, totalCost: number | null): number | undefined => {
   if (salePrice == null || totalCost == null) return undefined
-  if (salePrice === 0) return 0
   return salePrice - totalCost
 }
 
+// A zero sale price has no percentage to divide into, so a cost written off against
+// nothing counts as a total loss, and a costless asset as flat.
 const marginPercent = (salePrice: number | null, totalCost: number | null): number | undefined => {
   if (salePrice == null || totalCost == null) return undefined
-  if (salePrice === 0) return 0
+  if (salePrice === 0 && totalCost === 0) return 0
+  if (salePrice === 0) return TOTAL_LOSS_MARGIN_PERCENT
   return ((salePrice - totalCost) / salePrice) * 100
 }
 

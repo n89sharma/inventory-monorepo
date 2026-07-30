@@ -359,10 +359,14 @@ describe('margin columns', () => {
     )
   })
 
-  // A zero sale price would otherwise divide by zero; both columns report zero rather
-  // than the full cost as a loss.
-  it('reports zero for both columns when the sale price is zero', () => {
-    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 500 })).toBe('BC-1,IR-2020,$0.00,0.0%')
+  it('writes off the whole cost when an asset left at a zero sale price', () => {
+    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 500 })).toBe(
+      'BC-1,IR-2020,-$500.00,-100.0%',
+    )
+  })
+
+  it('reports flat rather than a total loss when both the sale price and cost are zero', () => {
+    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 0 })).toBe('BC-1,IR-2020,$0.00,0.0%')
   })
 
   it('leaves both columns empty when either input is missing', () => {
