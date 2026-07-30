@@ -90,7 +90,7 @@ function makeAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
 }
 
 const TABLE_COLUMNS_BY_SECTION = {
-  arrivals: () => createArrivalDetailColumns({ getHref: noHref }),
+  arrivals: (prices) => createArrivalDetailColumns({ getHref: noHref, ...prices }),
   transfers: (prices) => createTransferDetailColumns({ getHref: noHref, ...prices }),
   departures: (prices) => createDepartureDetailColumns({ getHref: noHref, ...prices }),
   invoices: (prices) => createInvoiceDetailColumns({ getHref: noHref, ...prices }),
@@ -111,8 +111,8 @@ const PRICE_PERMISSION_CASES: PricePermissions[] = [
 
 const PURCHASE_COST_HEADERS = ['Purchase Cost', 'Transport Cost', 'Processing Cost', 'Total Cost']
 const SALE_PRICE_HEADER = 'Sale Price'
-const PRICED_SECTIONS = ['transfers', 'departures', 'invoices'] as const
-const UNPRICED_SECTIONS = ['arrivals', 'holds'] as const
+const PRICED_SECTIONS = ['arrivals', 'transfers', 'departures', 'invoices'] as const
+const UNPRICED_SECTIONS = ['holds'] as const
 
 function reportHeaders(section: CollectionSection, prices: PricePermissions): string[] {
   return COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section](prices).map((c) => c.header)
@@ -241,6 +241,13 @@ describe('collectionDetailToCsv', () => {
     const csv = collectionDetailToCsv('transfers', [makeAsset()], ALL_PRICES)
     expect(csv.trim().split('\n')[0].trim()).toBe(
       'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
+    )
+  })
+
+  it('keeps the arrival invoice column ahead of the price columns', () => {
+    const csv = collectionDetailToCsv('arrivals', [makeAsset()], ALL_PRICES)
+    expect(csv.trim().split('\n')[0].trim()).toBe(
+      'Barcode,Serial Number,Model,Invoice,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
     )
   })
 

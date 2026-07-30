@@ -1,4 +1,5 @@
 import {
+  AppRole,
   ArrivalDetail,
   ASSET_STATUS,
   AssetDelta,
@@ -16,7 +17,8 @@ import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/s
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
+import { redactAssetCost } from '../lib/cost-redaction.js'
 import {
   addRemoveCollectionFromAssets,
   recordCollectionAssetDelta,
@@ -80,7 +82,10 @@ const assetIncludeArgs = {
 
 type UpdateArrivalAssetDb = AssetGetPayload<typeof assetIncludeArgs>
 
-export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> {
+export async function getArrival(
+  arrivalNumber: string,
+  role: AppRole | null,
+): Promise<ArrivalDetail> {
   const [arrival, assets] = await Promise.all([
     prisma.arrival.findUnique({
       where: { arrival_number: arrivalNumber },
@@ -97,7 +102,10 @@ export async function getArrival(arrivalNumber: string): Promise<ArrivalDetail> 
     comment: arrival.notes,
     created_at: arrival.created_at,
     created_by: arrival.created_by.name,
-    assets: assets.map(mapAssetSummary),
+    assets: assets.map((r) => ({
+      ...mapAssetSummary(r),
+      cost: redactAssetCost(mapAssetCost(r), role),
+    })),
   }
 }
 

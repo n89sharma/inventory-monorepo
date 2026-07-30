@@ -4,11 +4,14 @@ import {
   ArrivalTestData,
   buildCreateArrivalInput,
   cleanupTransactionalData,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createArrival, moveAssetsToArrival } from './arrivalService.js'
+import { createArrival, getArrival, moveAssetsToArrival } from './arrivalService.js'
 
 async function getArrivalId(arrivalNumber: string): Promise<number> {
   const arrival = await prisma.arrival.findUniqueOrThrow({
@@ -136,5 +139,44 @@ describe('moveAssetsToArrival', () => {
     await expect(moveAssetsToArrival(source, destination, [foreign], refs.userId)).rejects.toThrow(
       ConflictError,
     )
+  })
+})
+
+describe('getArrival', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('returns asset cost, redacted by role permissions', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const [assetId] = await getArrivalAssetIds(arrivalNumber)
+    await seedAssetCost(assetId)
+
+    const asAdmin = await getArrival(arrivalNumber, 'admin')
+    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
+
+    // 'sales' has view_sale_price but not view_purchase_price
+    const asSales = await getArrival(arrivalNumber, 'sales')
+    expect(asSales.assets[0].cost).toEqual({
+      ...REDACTED_ASSET_COST,
+      sale_price: SEEDED_ASSET_COST.sale_price,
+    })
+
+    // 'member' has neither price permission
+    const asMember = await getArrival(arrivalNumber, 'member')
+    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('returns a null-valued cost for an asset with no cost recorded', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+
+    const arrival = await getArrival(arrivalNumber, 'admin')
+    expect(arrival.assets[0].cost).toEqual(REDACTED_ASSET_COST)
   })
 })

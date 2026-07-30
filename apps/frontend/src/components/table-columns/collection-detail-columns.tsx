@@ -192,23 +192,26 @@ function createInvoiceColumn(
   }
 }
 
+interface PricedCollectionDetailColumnOptions
+  extends CollectionDetailColumnOptions, PricePermissions {}
+
 export function createArrivalDetailColumns({
   getHref,
   onDelete,
   onEdit,
   disabledRowId,
-}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+  canViewPurchasePrice,
+  canViewSalePrice,
+}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     createInvoiceColumn('purchase_invoice_number', (a) => a.purchase_invoice_number),
     ...specColumns(),
+    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
     CREATED_AT_COLUMN,
     ...actionColumns(onEdit, onDelete, disabledRowId),
   ]
 }
-
-interface PricedCollectionDetailColumnOptions
-  extends CollectionDetailColumnOptions, PricePermissions {}
 
 export function createDepartureDetailColumns({
   getHref,

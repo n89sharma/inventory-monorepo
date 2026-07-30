@@ -131,7 +131,7 @@ export const COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION: Record<
   CollectionSection,
   (prices: PricePermissions) => CollectionDetailReportColumn[]
 > = {
-  arrivals: () => ARRIVAL_REPORT_COLUMNS,
+  arrivals: (prices) => [...ARRIVAL_REPORT_COLUMNS, ...costReportColumns(prices)],
   transfers: (prices) => [...COMMON_REPORT_COLUMNS, ...costReportColumns(prices)],
   departures: (prices) => [...DEPARTURE_REPORT_COLUMNS, ...costReportColumns(prices)],
   invoices: (prices) => [...COMMON_REPORT_COLUMNS, ...costReportColumns(prices)],

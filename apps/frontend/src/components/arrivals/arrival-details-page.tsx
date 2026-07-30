@@ -23,6 +23,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const mutations = useArrivalMutations()
   const canEditArrival = useCan('create_update_arrival')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
   const detail = useArrivalDetail(arrivalNumber)
 
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
@@ -59,8 +61,18 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         onDelete: (asset) => mutations.removeAsset(arrivalNumber, asset),
         onEdit: canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
         disabledRowId: editingAssetId,
+        canViewPurchasePrice,
+        canViewSalePrice,
       }),
-    [mutations, arrivalNumber, canEditArrival, editingAssetId, handleEditAsset],
+    [
+      mutations,
+      arrivalNumber,
+      canEditArrival,
+      editingAssetId,
+      handleEditAsset,
+      canViewPurchasePrice,
+      canViewSalePrice,
+    ],
   )
 
   return (

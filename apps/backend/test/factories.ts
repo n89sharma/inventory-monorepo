@@ -280,7 +280,7 @@ export async function createArrivedAssets(
   count = 1,
 ): Promise<AssetSummary[]> {
   const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, count), refs.userId)
-  const { assets } = await getArrival(arrivalNumber)
+  const { assets } = await getArrival(arrivalNumber, 'admin')
   return assets
 }
 
