@@ -1,19 +1,33 @@
 import type { ColumnDef, HeaderContext } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
-import type { AssetSummary } from 'shared-types'
+import type { AssetCost, AssetSummary } from 'shared-types'
 import {
   createArrivalDetailColumns,
   createCollectionDetailColumns,
   createDepartureDetailColumns,
   createInvoiceDetailColumns,
+  createTransferDetailColumns,
+  type PricePermissions,
 } from './collection-detail-columns'
 import {
-  buildInvoiceCostReportColumns,
   COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION,
   collectionDetailToCsv,
   type CollectionSection,
 } from './collection-detail-report-columns'
+
+const ALL_PRICES: PricePermissions = { canViewPurchasePrice: true, canViewSalePrice: true }
+const NO_PRICES: PricePermissions = { canViewPurchasePrice: false, canViewSalePrice: false }
+
+const EMPTY_COST: AssetCost = {
+  purchase_cost: null,
+  transport_cost: null,
+  processing_cost: null,
+  other_cost: null,
+  parts_cost: null,
+  total_cost: null,
+  sale_price: null,
+}
 
 const CREATED_AT_HEADER = 'Created'
 const ACTION_COLUMN_IDS = new Set(['select', 'edit', 'delete'])
@@ -75,53 +89,91 @@ function makeAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
   }
 }
 
+const TABLE_COLUMNS_BY_SECTION = {
+  arrivals: () => createArrivalDetailColumns({ getHref: noHref }),
+  transfers: (prices) => createTransferDetailColumns({ getHref: noHref, ...prices }),
+  departures: (prices) => createDepartureDetailColumns({ getHref: noHref, ...prices }),
+  invoices: (prices) => createInvoiceDetailColumns({ getHref: noHref, ...prices }),
+  holds: () => createCollectionDetailColumns({ getHref: noHref }),
+} as const satisfies Record<
+  CollectionSection,
+  (prices: PricePermissions) => ColumnDef<AssetSummary>[]
+>
+
+const SECTIONS = Object.keys(TABLE_COLUMNS_BY_SECTION) as CollectionSection[]
+
+const PRICE_PERMISSION_CASES: PricePermissions[] = [
+  { canViewPurchasePrice: false, canViewSalePrice: false },
+  { canViewPurchasePrice: true, canViewSalePrice: false },
+  { canViewPurchasePrice: false, canViewSalePrice: true },
+  { canViewPurchasePrice: true, canViewSalePrice: true },
+]
+
+const PURCHASE_COST_HEADERS = ['Purchase Cost', 'Transport Cost', 'Processing Cost', 'Total Cost']
+const SALE_PRICE_HEADER = 'Sale Price'
+const PRICED_SECTIONS = ['transfers', 'departures', 'invoices'] as const
+const UNPRICED_SECTIONS = ['arrivals', 'holds'] as const
+
+function reportHeaders(section: CollectionSection, prices: PricePermissions): string[] {
+  return COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section](prices).map((c) => c.header)
+}
+
 describe('report column parity with the detail table', () => {
-  it('common sections match the base table columns in order', () => {
-    const headers = visibleTableHeaders(createCollectionDetailColumns({ getHref: noHref }))
-    for (const section of [
-      'transfers',
-      'holds',
-      'invoices',
-    ] as const satisfies CollectionSection[]) {
-      expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section].map((c) => c.header)).toEqual(
-        headers,
-      )
+  for (const section of SECTIONS) {
+    for (const prices of PRICE_PERMISSION_CASES) {
+      const permissionLabel = `purchase=${prices.canViewPurchasePrice} sale=${prices.canViewSalePrice}`
+      it(`${section} match the table columns in order (${permissionLabel})`, () => {
+        expect(reportHeaders(section, prices)).toEqual(
+          visibleTableHeaders(TABLE_COLUMNS_BY_SECTION[section](prices)),
+        )
+      })
+    }
+  }
+
+  // Parity alone would also pass if both sides simply dropped the prices, so pin the
+  // permission-driven presence separately.
+  it.each(PRICED_SECTIONS)('%s carry the price columns when permitted', (section) => {
+    const headers = reportHeaders(section, {
+      canViewPurchasePrice: true,
+      canViewSalePrice: true,
+    })
+    expect(headers.slice(-5)).toEqual([...PURCHASE_COST_HEADERS, SALE_PRICE_HEADER])
+  })
+
+  it.each(PRICED_SECTIONS)('%s show only the sale price with only that permission', (section) => {
+    const headers = reportHeaders(section, {
+      canViewPurchasePrice: false,
+      canViewSalePrice: true,
+    })
+    expect(headers).toContain(SALE_PRICE_HEADER)
+    expect(headers).not.toContain('Purchase Cost')
+    expect(headers).not.toContain('Total Cost')
+  })
+
+  it.each(PRICED_SECTIONS)('%s drop every price column without permission', (section) => {
+    const headers = reportHeaders(section, {
+      canViewPurchasePrice: false,
+      canViewSalePrice: false,
+    })
+    for (const header of [...PURCHASE_COST_HEADERS, SALE_PRICE_HEADER]) {
+      expect(headers).not.toContain(header)
     }
   })
 
-  it('arrivals match the arrival table columns in order', () => {
-    const headers = visibleTableHeaders(createArrivalDetailColumns({ getHref: noHref }))
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals.map((c) => c.header)).toEqual(
-      headers,
-    )
-  })
-
-  it('departures match the departure table columns in order', () => {
-    const headers = visibleTableHeaders(createDepartureDetailColumns({ getHref: noHref }))
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures.map((c) => c.header)).toEqual(
-      headers,
-    )
-  })
-
-  it('invoices with price permissions match the invoice table cost columns in order', () => {
-    const headers = visibleTableHeaders(
-      createInvoiceDetailColumns({
-        getHref: noHref,
-        canViewPurchasePrice: true,
-        canViewSalePrice: true,
-      }),
-    )
-    const reportColumns = [
-      ...COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.invoices,
-      ...buildInvoiceCostReportColumns({ canViewPurchasePrice: true, canViewSalePrice: true }),
-    ]
-    expect(reportColumns.map((c) => c.header)).toEqual(headers)
+  it.each(UNPRICED_SECTIONS)('%s never carry price columns', (section) => {
+    const headers = reportHeaders(section, {
+      canViewPurchasePrice: true,
+      canViewSalePrice: true,
+    })
+    for (const header of [...PURCHASE_COST_HEADERS, SALE_PRICE_HEADER]) {
+      expect(headers).not.toContain(header)
+    }
   })
 })
 
 describe('report column values carry the display formatters', () => {
   function valueFor(section: CollectionSection, header: string, asset: AssetSummary): string {
-    const column = COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section].find(
+    const column = COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section](ALL_PRICES).find(
       (c) => c.header === header,
     )
     if (!column) throw new Error(`Missing column ${header}`)
@@ -157,14 +209,18 @@ describe('report column values carry the display formatters', () => {
     const asset = makeAsset({ purchase_invoice_number: 'PI-100', sales_invoice_number: 'SI-200' })
     expect(valueFor('arrivals', 'Invoice', asset)).toBe('PI-100')
     expect(valueFor('departures', 'Invoice', asset)).toBe('SI-200')
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals[3].header).toBe('Invoice')
-    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures[3].header).toBe('Invoice')
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals(ALL_PRICES)[3].header).toBe(
+      'Invoice',
+    )
+    expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures(ALL_PRICES)[3].header).toBe(
+      'Invoice',
+    )
   })
 })
 
 describe('collectionDetailToCsv', () => {
   it('writes a header row and one row per asset', () => {
-    const csv = collectionDetailToCsv('holds', [makeAsset()])
+    const csv = collectionDetailToCsv('holds', [makeAsset()], ALL_PRICES)
     const lines = csv.trim().split('\n')
     expect(lines[0].trim()).toBe(
       'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location',
@@ -175,19 +231,42 @@ describe('collectionDetailToCsv', () => {
   })
 
   it('appends the price columns for invoices when permitted', () => {
-    const costColumns = buildInvoiceCostReportColumns({
-      canViewPurchasePrice: true,
-      canViewSalePrice: true,
-    })
-    const csv = collectionDetailToCsv('invoices', [makeAsset()], costColumns)
+    const csv = collectionDetailToCsv('invoices', [makeAsset()], ALL_PRICES)
     expect(csv.trim().split('\n')[0].trim()).toBe(
       'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
     )
   })
 
-  it('omits the price columns for invoices without extra columns', () => {
-    const header = collectionDetailToCsv('invoices', [makeAsset()]).trim().split('\n')[0]
-    expect(header).not.toContain('Purchase Cost')
-    expect(header).not.toContain('Sale Price')
+  it('appends the price columns for transfers when permitted', () => {
+    const csv = collectionDetailToCsv('transfers', [makeAsset()], ALL_PRICES)
+    expect(csv.trim().split('\n')[0].trim()).toBe(
+      'Barcode,Serial Number,Model,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
+    )
+  })
+
+  it('keeps the departure invoice column ahead of the price columns', () => {
+    const csv = collectionDetailToCsv('departures', [makeAsset()], ALL_PRICES)
+    expect(csv.trim().split('\n')[0].trim()).toBe(
+      'Barcode,Serial Number,Model,Invoice,Brand,Status,Readiness,Total Meter,Cassettes,Internal Finisher,Accessories,Location,Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price',
+    )
+  })
+
+  it('omits the price columns without the viewing permissions', () => {
+    for (const section of PRICED_SECTIONS) {
+      const header = collectionDetailToCsv(section, [makeAsset()], NO_PRICES).trim().split('\n')[0]
+      expect(header).not.toContain('Purchase Cost')
+      expect(header).not.toContain('Sale Price')
+    }
+  })
+
+  it('writes the formatted amounts, not raw numbers', () => {
+    const csv = collectionDetailToCsv(
+      'departures',
+      [makeAsset({ cost: { ...EMPTY_COST, purchase_cost: 1234.5, sale_price: 2000 } })],
+      ALL_PRICES,
+    )
+    const row = csv.trim().split('\n')[1]
+    expect(row).toContain('$1,234.50')
+    expect(row).toContain('$2,000.00')
   })
 })

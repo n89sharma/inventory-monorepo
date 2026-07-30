@@ -346,6 +346,37 @@ export interface AssetCost {
   sale_price: number | null
 }
 
+export const SEEDED_ASSET_COST: AssetCost = {
+  purchase_cost: 100,
+  transport_cost: 20,
+  processing_cost: 30,
+  other_cost: 5,
+  parts_cost: 15,
+  total_cost: 170,
+  sale_price: 500,
+}
+
+export const REDACTED_ASSET_COST: AssetCost = {
+  purchase_cost: null,
+  transport_cost: null,
+  processing_cost: null,
+  other_cost: null,
+  parts_cost: null,
+  total_cost: null,
+  sale_price: null,
+}
+
+export async function seedAssetCost(
+  assetId: number,
+  cost: AssetCost = SEEDED_ASSET_COST,
+): Promise<void> {
+  await prisma.cost.upsert({
+    where: { asset_id: assetId },
+    create: { asset_id: assetId, ...cost },
+    update: cost,
+  })
+}
+
 // Read an asset's Cost row as plain numbers (assertion helper).
 export async function getAssetCost(assetId: number): Promise<AssetCost | null> {
   const cost = await prisma.cost.findUnique({

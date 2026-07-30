@@ -9,12 +9,16 @@ import {
   getAssetHoldId,
   getAssetStatus,
   getHoldArchivedAt,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import {
   addAssetsToDepartureAndRecord,
   createDeparture,
+  getDeparture,
   setDepartureOutgoingStatus,
 } from './departureService.js'
 import { createHold } from './holdService.js'
@@ -32,6 +36,40 @@ describe('departureService', () => {
 
   afterAll(async () => {
     await cleanupTransactionalData()
+  })
+
+  it('returns asset cost, redacted by role permissions', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    await seedAssetCost(asset.id)
+
+    const asAdmin = await getDeparture(departureNumber, 'admin')
+    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
+
+    // 'sales' has view_sale_price but not view_purchase_price
+    const asSales = await getDeparture(departureNumber, 'sales')
+    expect(asSales.assets[0].cost).toEqual({
+      ...REDACTED_ASSET_COST,
+      sale_price: SEEDED_ASSET_COST.sale_price,
+    })
+
+    // 'member' has neither price permission
+    const asMember = await getDeparture(departureNumber, 'member')
+    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('returns a null cost for an asset that has no Cost row', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    const departure = await getDeparture(departureNumber, 'admin')
+    expect(departure.assets[0].cost).toEqual(REDACTED_ASSET_COST)
   })
 
   it('applies each asset its own outgoing status on creation', async () => {

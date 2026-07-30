@@ -7,7 +7,11 @@ import {
 import { toCsv, type CsvColumn } from '@/lib/csv'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import type { AssetSummary } from 'shared-types'
-import { PURCHASE_COST_COLUMNS, SALE_PRICE_COLUMN } from './collection-detail-columns'
+import {
+  PURCHASE_COST_COLUMNS,
+  SALE_PRICE_COLUMN,
+  type PricePermissions,
+} from './collection-detail-columns'
 
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
@@ -104,21 +108,10 @@ const DEPARTURE_REPORT_COLUMNS: CollectionDetailReportColumn[] = [
   LOCATION_COLUMN,
 ]
 
-export const COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION = {
-  arrivals: ARRIVAL_REPORT_COLUMNS,
-  transfers: COMMON_REPORT_COLUMNS,
-  departures: DEPARTURE_REPORT_COLUMNS,
-  invoices: COMMON_REPORT_COLUMNS,
-  holds: COMMON_REPORT_COLUMNS,
-} as const satisfies Record<CollectionSection, CollectionDetailReportColumn[]>
-
-export function buildInvoiceCostReportColumns({
+function costReportColumns({
   canViewPurchasePrice,
   canViewSalePrice,
-}: {
-  canViewPurchasePrice: boolean
-  canViewSalePrice: boolean
-}): CollectionDetailReportColumn[] {
+}: PricePermissions): CollectionDetailReportColumn[] {
   const columns: CollectionDetailReportColumn[] = []
   if (canViewPurchasePrice) {
     for (const [field, header] of PURCHASE_COST_COLUMNS) {
@@ -132,10 +125,23 @@ export function buildInvoiceCostReportColumns({
   return columns
 }
 
+// Each section states its own full list, in the order its table renders them, so no caller
+// has to know which sections carry prices.
+export const COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION: Record<
+  CollectionSection,
+  (prices: PricePermissions) => CollectionDetailReportColumn[]
+> = {
+  arrivals: () => ARRIVAL_REPORT_COLUMNS,
+  transfers: (prices) => [...COMMON_REPORT_COLUMNS, ...costReportColumns(prices)],
+  departures: (prices) => [...DEPARTURE_REPORT_COLUMNS, ...costReportColumns(prices)],
+  invoices: (prices) => [...COMMON_REPORT_COLUMNS, ...costReportColumns(prices)],
+  holds: () => COMMON_REPORT_COLUMNS,
+}
+
 export function collectionDetailToCsv(
   section: CollectionSection,
   assets: AssetSummary[],
-  extraColumns: CollectionDetailReportColumn[] = [],
+  prices: PricePermissions,
 ): string {
-  return toCsv([...COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section], ...extraColumns], assets)
+  return toCsv(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION[section](prices), assets)
 }

@@ -6,7 +6,10 @@ import {
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -154,63 +157,21 @@ describe('invoiceService', () => {
       buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
       refs.userId,
     )
-    await prisma.cost.upsert({
-      where: { asset_id: asset.id },
-      create: {
-        asset_id: asset.id,
-        purchase_cost: 100,
-        transport_cost: 20,
-        processing_cost: 30,
-        other_cost: 5,
-        parts_cost: 15,
-        total_cost: 170,
-        sale_price: 500,
-      },
-      update: {
-        purchase_cost: 100,
-        transport_cost: 20,
-        processing_cost: 30,
-        other_cost: 5,
-        parts_cost: 15,
-        total_cost: 170,
-        sale_price: 500,
-      },
-    })
+    await seedAssetCost(asset.id)
 
     const asAdmin = await getInvoice(invoiceNumber, 'admin')
-    expect(asAdmin.assets[0].cost).toEqual({
-      purchase_cost: 100,
-      transport_cost: 20,
-      processing_cost: 30,
-      other_cost: 5,
-      parts_cost: 15,
-      total_cost: 170,
-      sale_price: 500,
-    })
+    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
 
     // 'sales' has view_sale_price but not view_purchase_price
     const asSales = await getInvoice(invoiceNumber, 'sales')
     expect(asSales.assets[0].cost).toEqual({
-      purchase_cost: null,
-      transport_cost: null,
-      processing_cost: null,
-      other_cost: null,
-      parts_cost: null,
-      total_cost: null,
-      sale_price: 500,
+      ...REDACTED_ASSET_COST,
+      sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
     // 'member' has neither price permission
     const asMember = await getInvoice(invoiceNumber, 'member')
-    expect(asMember.assets[0].cost).toEqual({
-      purchase_cost: null,
-      transport_cost: null,
-      processing_cost: null,
-      other_cost: null,
-      parts_cost: null,
-      total_cost: null,
-      sale_price: null,
-    })
+    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
   })
 
   it('returns the distinct arrivals of the invoiced assets', async () => {

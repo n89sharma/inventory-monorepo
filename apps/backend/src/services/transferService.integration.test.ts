@@ -4,7 +4,10 @@ import {
   buildCreateTransferInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -12,6 +15,7 @@ import { prisma } from '../prisma.js'
 import {
   createTransfer,
   dispatchTransfer,
+  getTransfer,
   patchTransferAssets,
   patchTransferMetadata,
   patchTransferNotes,
@@ -56,6 +60,40 @@ describe('transferService', () => {
 
   afterAll(async () => {
     await cleanupTransactionalData()
+  })
+
+  it('returns asset cost, redacted by role permissions', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await seedAssetCost(asset.id)
+
+    const asAdmin = await getTransfer(transferNumber, 'admin')
+    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
+
+    // 'sales' has view_sale_price but not view_purchase_price
+    const asSales = await getTransfer(transferNumber, 'sales')
+    expect(asSales.assets[0].cost).toEqual({
+      ...REDACTED_ASSET_COST,
+      sale_price: SEEDED_ASSET_COST.sale_price,
+    })
+
+    // 'member' has neither price permission
+    const asMember = await getTransfer(transferNumber, 'member')
+    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('returns a null cost for an asset that has no Cost row', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+
+    const transfer = await getTransfer(transferNumber, 'admin')
+    expect(transfer.assets[0].cost).toEqual(REDACTED_ASSET_COST)
   })
 
   it('links each asset to the transfer via the asset_transfers join', async () => {

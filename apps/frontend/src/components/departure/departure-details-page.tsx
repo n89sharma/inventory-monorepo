@@ -21,11 +21,17 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const mutations = useDepartureMutations()
   const detail = useDepartureDetail(departureNumber)
   const canCreateEditDeparture = useCan('create_update_departure')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createDepartureDetailColumns({ getHref: assetHref }),
-    [],
+      createDepartureDetailColumns({
+        getHref: assetHref,
+        canViewPurchasePrice,
+        canViewSalePrice,
+      }),
+    [canViewPurchasePrice, canViewSalePrice],
   )
 
   return (

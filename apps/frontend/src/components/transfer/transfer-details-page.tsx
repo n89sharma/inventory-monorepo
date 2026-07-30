@@ -1,4 +1,4 @@
-import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
+import { createTransferDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -23,18 +23,22 @@ export function TransferDetailsPage(): React.JSX.Element {
   const mutations = useTransferMutations()
   const detail = useTransferDetail(transferNumber)
   const canCreateEditTransfer = useCan('create_update_transfer')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+  const canViewSalePrice = useCan('view_sale_price')
   const isDraft = detail.data?.status === TRANSFER_STATUS.DRAFT
   const canEditAssets = canCreateEditTransfer && isDraft
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createCollectionDetailColumns({
+      createTransferDetailColumns({
         getHref: assetHref,
         onDelete: canEditAssets
           ? (asset) => mutations.removeAsset(transferNumber, asset)
           : undefined,
+        canViewPurchasePrice,
+        canViewSalePrice,
       }),
-    [mutations, transferNumber, canEditAssets],
+    [mutations, transferNumber, canEditAssets, canViewPurchasePrice, canViewSalePrice],
   )
 
   return (

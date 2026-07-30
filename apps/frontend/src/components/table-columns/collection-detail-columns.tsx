@@ -207,16 +207,39 @@ export function createArrivalDetailColumns({
   ]
 }
 
+interface PricedCollectionDetailColumnOptions
+  extends CollectionDetailColumnOptions, PricePermissions {}
+
 export function createDepartureDetailColumns({
   getHref,
   onDelete,
   onEdit,
   disabledRowId,
-}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+  canViewPurchasePrice,
+  canViewSalePrice,
+}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number),
     ...specColumns(),
+    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
+    CREATED_AT_COLUMN,
+    ...actionColumns(onEdit, onDelete, disabledRowId),
+  ]
+}
+
+export function createTransferDetailColumns({
+  getHref,
+  onDelete,
+  onEdit,
+  disabledRowId,
+  canViewPurchasePrice,
+  canViewSalePrice,
+}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+  return [
+    ...identityColumns(getHref),
+    ...specColumns(),
+    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
     CREATED_AT_COLUMN,
     ...actionColumns(onEdit, onDelete, disabledRowId),
   ]
@@ -264,9 +287,12 @@ function createCostColumn(
   }
 }
 
-interface CostColumnOptions {
+export interface PricePermissions {
   canViewPurchasePrice: boolean
   canViewSalePrice: boolean
+}
+
+interface CostColumnOptions extends PricePermissions {
   // Supplied only when the user holds edit_prices; absent renders read-only cost text.
   priceEditorRegistry?: PriceCellEditorRegistry
 }
