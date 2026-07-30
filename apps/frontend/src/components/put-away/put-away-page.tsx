@@ -239,10 +239,6 @@ export function PutAwayPage(): React.JSX.Element {
     scannedAsset.location.warehouse_code !== selectedWarehouse.city_code
 
   useEffect(() => {
-    form.reset({ location: '', asset: '' })
-  }, [warehouseId, form])
-
-  useEffect(() => {
     form.setFocus('location')
   }, [form])
 
@@ -298,6 +294,11 @@ export function PutAwayPage(): React.JSX.Element {
     form.setFocus('asset')
   }
 
+  function selectWarehouse(value: string) {
+    setSelectedWarehouseId(Number(value))
+    form.reset({ location: '', asset: '' })
+  }
+
   function clearLocation() {
     form.setValue('location', '')
     form.clearErrors('location')
@@ -330,7 +331,7 @@ export function PutAwayPage(): React.JSX.Element {
           <h1 className="text-2xl font-semibold">{PAGE_TITLE}</h1>
           <Select
             value={selectedWarehouse ? String(selectedWarehouse.id) : ''}
-            onValueChange={(value) => setSelectedWarehouseId(Number(value))}
+            onValueChange={selectWarehouse}
           >
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Select a warehouse" />

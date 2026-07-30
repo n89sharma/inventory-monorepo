@@ -47,6 +47,12 @@ export default tseslint.config(
           message:
             'This prop feeds row rendering or the table options, so an inline function breaks DataRow memoization on every render. Hoist it to module scope or useCallback. (onRowMouseEnter is exempt: DataTable holds it in a ref.)',
         },
+        {
+          selector:
+            'CallExpression[callee.name=/^use(Layout)?Effect$/] :matches(CallExpression[callee.name="reset"], CallExpression[callee.property.name="reset"])',
+          message:
+            'Do not reset a form from an effect. Any object dependency (a prop, an SWR payload) re-fires the effect on an unrelated re-render — a Clerk token refresh alone clears the form. Seed react-hook-form with defaultValues in a component mounted only while the dialog is open, so unmounting does the reset. For a form that must track server data, pass values with resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH.',
+        },
       ],
     },
   },
