@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/shared/status-badge'
 import {
   formatDate,
   formatLocation,
+  formatMarginPercent,
   formatThousandsK,
   formatTitleCase,
   formatUSDWithSymbol,
@@ -29,7 +30,6 @@ export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
 
 const MARGIN_PERMISSIONS = ['view_sale_price', 'view_purchase_price'] as const
-const MARGIN_PERCENT_FRACTION_DIGITS = 1
 const TOTAL_LOSS_MARGIN_PERCENT = -100
 
 const grossMargin = (salePrice: number | null, totalCost: number | null): number | undefined => {
@@ -45,9 +45,6 @@ const marginPercent = (salePrice: number | null, totalCost: number | null): numb
   if (salePrice === 0) return TOTAL_LOSS_MARGIN_PERCENT
   return ((salePrice - totalCost) / salePrice) * 100
 }
-
-const formatMarginPercent = (value: number | undefined): string =>
-  value === undefined ? '' : `${value.toFixed(MARGIN_PERCENT_FRACTION_DIGITS)}%`
 
 export type ColumnSectionId =
   | 'specs'

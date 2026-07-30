@@ -41,6 +41,13 @@ export function formatUSDWithSymbol(value: number | null): string {
   return value < 0 ? `-${magnitude}` : magnitude
 }
 
+const MARGIN_PERCENT_FRACTION_DIGITS = 1
+
+export function formatMarginPercent(value: number | undefined): string {
+  if (value === undefined) return ''
+  return `${value.toFixed(MARGIN_PERCENT_FRACTION_DIGITS)}%`
+}
+
 export function formatTitleCase(str: string): string {
   return str
     .toLowerCase()

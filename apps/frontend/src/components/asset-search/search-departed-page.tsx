@@ -1,4 +1,5 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
+import { DepartedSummaryStrip } from '@/components/asset-search/departed-summary-strip'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
 import { InvoiceReferenceFilter } from '@/components/shared/filters/invoice-reference-filter'
@@ -64,6 +65,7 @@ export function SearchDepartedPage(): React.JSX.Element {
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
       defaultSort={DEPARTED_AT_DESC_SORT}
+      summaryStrip={<DepartedSummaryStrip assets={assets} />}
     >
       <AssetFilterBar
         scopeFilterGroups={SCOPE_FILTER_GROUPS}

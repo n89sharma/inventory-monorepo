@@ -28,6 +28,7 @@ export function AssetSearchPage({
   defaultSort,
   getRowClassName,
   forceVisibleColumnIds,
+  summaryStrip,
   children,
 }: {
   title: string
@@ -39,6 +40,7 @@ export function AssetSearchPage({
   defaultSort?: { id: string; desc: boolean }
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
   forceVisibleColumnIds?: readonly string[]
+  summaryStrip?: React.ReactNode
   children: React.ReactNode
 }): React.JSX.Element {
   const searchParams = useOptimisticSearchParams()
@@ -95,6 +97,7 @@ export function AssetSearchPage({
         </form>
       </StickyPageHeader>
       <PageContent className={`flex flex-col gap-2 ${selection.hasSelection ? 'pb-24' : ''}`}>
+        {summaryStrip}
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
           <AssetResultsTable
             assets={assets}
