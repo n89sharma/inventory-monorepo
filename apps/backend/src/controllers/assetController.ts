@@ -5,6 +5,7 @@ import {
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
   BulkUpdateAssetPricingSchema,
+  MAX_DEPARTED_WINDOW_MONTHS,
   PatchAssetPricingSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
@@ -81,8 +82,6 @@ export const AssetQuerySchema = z.object({
   fromDate: z.coerce.date().optional(),
   toDate: z.coerce.date().optional(),
 })
-
-const MAX_DEPARTED_WINDOW_MONTHS = 18
 
 function resolveDepartedRange(
   fromDate: Date | undefined,

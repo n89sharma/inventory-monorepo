@@ -1,8 +1,9 @@
 import { DatePickerFieldInline } from '@/components/shared/date-picker'
 import { getDepartedFloor, isValidDepartedDateRange } from '@/lib/filters/hooks'
 import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
+import { MAX_DEPARTED_WINDOW_MONTHS } from 'shared-types'
 
-const INVALID_RANGE_MESSAGE = 'Only data from the last 18 months can be shown'
+const INVALID_RANGE_MESSAGE = `Only data from the last ${MAX_DEPARTED_WINDOW_MONTHS} months can be shown`
 
 export function DepartedDateRangeFilter({
   from,

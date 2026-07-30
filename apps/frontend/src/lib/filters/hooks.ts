@@ -15,6 +15,7 @@ import { parseAsInteger, useQueryState, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   INVOICE_TYPE,
+  MAX_DEPARTED_WINDOW_MONTHS,
   OUTGOING_STATUS,
   type AssetType,
   type Brand,
@@ -28,7 +29,6 @@ import {
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
-const MAX_DEPARTED_MONTHS = 18
 const DEFAULT_FROM_DAYS = 30
 
 export type SoldReportRange = 6 | 12
@@ -549,7 +549,7 @@ export function useActiveFilters(groups: FilterParamGroups): {
 }
 
 export function getDepartedFloor(): Date {
-  return startOfDay(subMonths(new Date(), MAX_DEPARTED_MONTHS))
+  return startOfDay(subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS))
 }
 
 export function isValidDepartedDateRange(from: Date, to: Date): boolean {
