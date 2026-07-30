@@ -42,8 +42,11 @@ import {
   type ProfitabilityTable,
 } from '@/lib/profitability-aggregate'
 import { cn } from '@/lib/utils'
+import { departedDrilldownHref } from '@/lib/filters/serializers'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
+import { endOfMonth, endOfYear } from 'date-fns'
+import { useCallback, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
@@ -51,6 +54,7 @@ const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
 
 const NO_VALUE = '—'
+const TOTAL_LABEL = 'Total'
 const MARGIN_PCT_HEADER = 'Margin %'
 const MARGIN_PCT_FRACTION_DIGITS = 1
 const NEGATIVE_CLASS = 'text-destructive'
@@ -201,8 +205,25 @@ function ProfitabilitySummaryCards({
   )
 }
 
-function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX.Element {
+function RangeLink({ href, label }: { href: string; label: string }): React.JSX.Element {
+  return (
+    <Link to={href} className="hover:underline">
+      {label}
+    </Link>
+  )
+}
+
+function ProfitabilityTable({
+  table,
+  year,
+  getRangeHref,
+}: {
+  table: ProfitabilityTable
+  year: number
+  getRangeHref: (from: Date, to: Date) => string
+}): React.JSX.Element {
   const months = table.months.filter(monthHasActivity)
+  const yearStart = new Date(year, 0, 1)
   return (
     <Table>
       <TableHeader>
@@ -219,31 +240,41 @@ function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX
         </TableRow>
       </TableHeader>
       <TableBody>
-        {months.map((row) => (
-          <TableRow key={row.month}>
-            <TableCell className="font-medium">{MONTH_LABELS[row.month - 1]}</TableCell>
-            {METRIC_COLUMNS.map((column) => (
-              <TableCell
-                key={column.key}
-                className={cn(
-                  'text-right tabular-nums',
-                  column.highlightNegative && row[column.key] < 0 && NEGATIVE_CLASS,
-                )}
-              >
-                {formatMetric(row[column.key], column.format)}
+        {months.map((row) => {
+          const monthStart = new Date(year, row.month - 1, 1)
+          return (
+            <TableRow key={row.month}>
+              <TableCell className="font-medium">
+                <RangeLink
+                  href={getRangeHref(monthStart, endOfMonth(monthStart))}
+                  label={MONTH_LABELS[row.month - 1]}
+                />
               </TableCell>
-            ))}
-            <TableCell
-              className={cn('text-right tabular-nums', row.gross_margin < 0 && NEGATIVE_CLASS)}
-            >
-              {formatMarginPct(row.gross_revenue, row.gross_margin)}
-            </TableCell>
-          </TableRow>
-        ))}
+              {METRIC_COLUMNS.map((column) => (
+                <TableCell
+                  key={column.key}
+                  className={cn(
+                    'text-right tabular-nums',
+                    column.highlightNegative && row[column.key] < 0 && NEGATIVE_CLASS,
+                  )}
+                >
+                  {formatMetric(row[column.key], column.format)}
+                </TableCell>
+              ))}
+              <TableCell
+                className={cn('text-right tabular-nums', row.gross_margin < 0 && NEGATIVE_CLASS)}
+              >
+                {formatMarginPct(row.gross_revenue, row.gross_margin)}
+              </TableCell>
+            </TableRow>
+          )
+        })}
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell className={cn('font-semibold', STICKY_FOOTER_CLASS)}>Total</TableCell>
+          <TableCell className={cn('font-semibold', STICKY_FOOTER_CLASS)}>
+            <RangeLink href={getRangeHref(yearStart, endOfYear(yearStart))} label={TOTAL_LABEL} />
+          </TableCell>
           {METRIC_COLUMNS.map((column) => (
             <TableCell
               key={column.key}
@@ -273,10 +304,14 @@ function ProfitabilityTable({ table }: { table: ProfitabilityTable }): React.JSX
 
 function ProfitabilityReportBody({
   table,
+  year,
+  getRangeHref,
   hasActiveFilters,
   onClearFilters,
 }: {
   table: ProfitabilityTable
+  year: number
+  getRangeHref: (from: Date, to: Date) => string
   hasActiveFilters: boolean
   onClearFilters: () => void
 }): React.JSX.Element {
@@ -292,7 +327,7 @@ function ProfitabilityReportBody({
       </div>
     )
   }
-  return <ProfitabilityTable table={table} />
+  return <ProfitabilityTable table={table} year={year} getRangeHref={getRangeHref} />
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
@@ -311,6 +346,11 @@ export function ProfitabilityReportPage(): React.JSX.Element {
       brandId: brand?.id ?? null,
     }),
     [year, warehouses, salesRep, vendor, brand],
+  )
+
+  const getRangeHref = useCallback(
+    (from: Date, to: Date) => departedDrilldownHref(from, to, warehouses, brand),
+    [warehouses, brand],
   )
 
   const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(year)
@@ -354,6 +394,8 @@ export function ProfitabilityReportPage(): React.JSX.Element {
           <ProfitabilitySummaryCards totals={table.totals} />
           <ProfitabilityReportBody
             table={table}
+            year={year}
+            getRangeHref={getRangeHref}
             hasActiveFilters={activeFilterCount > 0}
             onClearFilters={clearFilters}
           />

@@ -19,6 +19,7 @@ const HELD_REPORT_SORT = { id: 'days_held', desc: true } as const
 const STORE_LIST_PATH = '/store'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
 const ONHAND_PATH = '/search/onhand'
+const DEPARTED_PATH = '/search/departed'
 const SOLD_REPORT_PATH = '/reports/sold-report'
 const PROFITABILITY_REPORT_PATH = '/reports/profitability'
 
@@ -46,6 +47,12 @@ const serializeDrilldown = createSerializer({
   model: FILTER_PARSERS.model,
   meter_min: FILTER_PARSERS.meter_min,
   meter_max: FILTER_PARSERS.meter_max,
+})
+const serializeDeparted = createSerializer({
+  wh: FILTER_PARSERS.wh,
+  from: FILTER_PARSERS.from,
+  to: FILTER_PARSERS.to,
+  brand: FILTER_PARSERS.brand,
 })
 const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
 const serializeHeld = createSerializer({
@@ -90,6 +97,20 @@ export function inStockDrilldownHref(row: InStockSummaryRow): string {
     model: row.model_id,
     meter_min: bounds?.min ?? null,
     meter_max: bounds?.max ?? null,
+  })
+}
+
+export function departedDrilldownHref(
+  from: Date,
+  to: Date,
+  warehouses: Warehouse[],
+  brand: Brand | null,
+): string {
+  return serializeDeparted(DEPARTED_PATH, {
+    wh: warehouses.length > 0 ? warehouses.map((warehouse) => warehouse.id) : null,
+    from,
+    to,
+    brand: brand?.id ?? null,
   })
 }
 
