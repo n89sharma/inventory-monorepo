@@ -7,7 +7,8 @@ import {
   DialogTitle,
 } from '@/components/shadcn/dialog'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
-import { PriceInput, type EditablePriceField } from '@/components/shared/price-input'
+import { PriceInput } from '@/components/shared/price-input'
+import type { EditablePriceField } from '@/lib/price-cell-navigation'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'

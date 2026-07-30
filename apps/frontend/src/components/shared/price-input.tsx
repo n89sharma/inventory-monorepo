@@ -1,13 +1,6 @@
 import { Input } from '@/components/shadcn/input'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 
-export type EditablePriceField =
-  | 'purchase_cost'
-  | 'transport_cost'
-  | 'processing_cost'
-  | 'other_cost'
-  | 'sale_price'
-
 const PLACEHOLDER = '0.00'
 const PREFIX_CLASS =
   'text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm'

@@ -1,5 +1,5 @@
 import type { RowData } from '@tanstack/react-table'
-import type { EditablePriceField } from '@/components/shared/price-input'
+import type { EditablePriceField } from '@/lib/price-cell-navigation'
 
 export {}
 

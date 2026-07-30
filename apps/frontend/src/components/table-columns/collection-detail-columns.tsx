@@ -1,7 +1,7 @@
 import { InvoicePriceCell } from '@/components/invoice/invoice-price-cell'
 import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-field'
 import { Button } from '@/components/shadcn/button'
-import type { EditablePriceField } from '@/components/shared/price-input'
+import { isEditablePriceField } from '@/lib/price-cell-navigation'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
@@ -227,26 +227,14 @@ export const SALE_PRICE_COLUMN = ['sale_price', 'Sale Price'] as const satisfies
   string,
 ]
 
-// total_cost is derived server-side, so it stays read-only even in price-edit mode.
-const EDITABLE_COST_FIELDS: ReadonlySet<string> = new Set<EditablePriceField>([
-  'purchase_cost',
-  'transport_cost',
-  'processing_cost',
-  'sale_price',
-])
-
 const EDITABLE_COST_COLUMN_SIZE = 110
-
-function isEditableCostField(field: keyof AssetCost): field is EditablePriceField {
-  return EDITABLE_COST_FIELDS.has(field)
-}
 
 function createCostColumn(
   field: keyof AssetCost,
   header: string,
   priceEditEnabled: boolean,
 ): ColumnDef<AssetSummary> {
-  if (priceEditEnabled && isEditableCostField(field)) {
+  if (priceEditEnabled && isEditablePriceField(field)) {
     return {
       id: field,
       header,

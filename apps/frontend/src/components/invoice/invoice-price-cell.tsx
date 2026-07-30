@@ -1,4 +1,5 @@
-import { PriceInput, type EditablePriceField } from '@/components/shared/price-input'
+import { PriceInput } from '@/components/shared/price-input'
+import type { EditablePriceField } from '@/lib/price-cell-navigation'
 import type { Table } from '@tanstack/react-table'
 import { useEffect, useRef, useState } from 'react'
 import type { AssetSummary } from 'shared-types'
