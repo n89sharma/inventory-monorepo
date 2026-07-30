@@ -13,6 +13,7 @@ import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatUSD } from '@/lib/formatters'
+import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
@@ -106,7 +107,10 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
   const updateAssetPricing = useAssetStore((state) => state.updateAssetPricing)
 
   const values = useMemo(() => toPricingFields(assetDetails), [assetDetails])
-  const form = useForm<PricingFields>({ values })
+  const form = useForm<PricingFields>({
+    values,
+    resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH,
+  })
   const isSubmitting = form.formState.isSubmitting
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())

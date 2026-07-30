@@ -12,6 +12,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
+import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
@@ -103,6 +104,7 @@ export function EditSpecsModal({
   const form = useForm<SpecsForm>({
     resolver: zodResolver(SpecsFormSchema),
     values,
+    resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH,
   })
   const isSubmitting = form.formState.isSubmitting
 

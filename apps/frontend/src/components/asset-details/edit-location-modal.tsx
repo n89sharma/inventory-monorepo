@@ -22,6 +22,7 @@ import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useWarehouseLocations } from '@/hooks/use-locations'
 import { formatTitleCase } from '@/lib/formatters'
+import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -63,7 +64,10 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
     [assetDetails, warehouses, zones],
   )
 
-  const form = useForm<LocationForm>({ values })
+  const form = useForm<LocationForm>({
+    values,
+    resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH,
+  })
   const selectedWarehouse = useWatch({ control: form.control, name: 'warehouse' })
   const selectedZone = useWatch({ control: form.control, name: 'zone' })
   const selectedBin = useWatch({ control: form.control, name: 'bin' })

@@ -9,6 +9,7 @@ import {
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useMemo, useState } from 'react'
+import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { useForm, useWatch } from 'react-hook-form'
 import type { AssetDetails, AssetError, UpdateError } from 'shared-types'
 import { toast } from 'sonner'
@@ -42,7 +43,10 @@ export function EditErrorsModal({
   const [saving, setSaving] = useState(false)
 
   const values = useMemo(() => toErrorsForm(errors), [errors])
-  const form = useForm<ErrorsForm>({ values })
+  const form = useForm<ErrorsForm>({
+    values,
+    resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH,
+  })
   const localErrors = useWatch({ control: form.control, name: 'errors' })
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
