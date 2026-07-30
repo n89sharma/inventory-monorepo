@@ -17,6 +17,7 @@ import {
   useInStockOnlyParam,
   usePriceCheckParam,
   useWarehousesParam,
+  type FilterParamGroups,
 } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
@@ -26,6 +27,14 @@ const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 const PURCHASE_COST_COLUMN_ID = 'cost_purchase_cost'
 const PRICE_CHECK_COLUMN_IDS = [PURCHASE_COST_COLUMN_ID] as const
 const DAYS_HELD_WARNING_THRESHOLD = 30
+const SCOPE_FILTER_GROUPS = [
+  ['wh'],
+  ['instock'],
+  ['pricecheck'],
+  ['heldby'],
+  ['heldfor'],
+  ['holdcustomer'],
+] as const satisfies FilterParamGroups
 const ROW_WARNING_CLASS = 'data-row-warning'
 
 function heldRowClassName(asset: AssetSearchRow): string | undefined {
@@ -87,6 +96,7 @@ export function SearchOnHandPage(): React.JSX.Element {
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
     >
       <AssetFilterBar
+        scopeFilterGroups={SCOPE_FILTER_GROUPS}
         scopeFilters={
           <>
             <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />

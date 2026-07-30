@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table'
+import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { MetricCard } from './metric-card'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
@@ -159,25 +160,6 @@ function ProfitabilityFilterBar(): React.JSX.Element {
       />
 
       <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
-    </div>
-  )
-}
-
-function ActiveFilterBar({
-  count,
-  onClear,
-}: {
-  count: number
-  onClear: () => void
-}): React.JSX.Element {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs text-muted-foreground">
-        {count} {count === 1 ? 'filter' : 'filters'} active
-      </span>
-      <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={onClear}>
-        Clear all
-      </Button>
     </div>
   )
 }

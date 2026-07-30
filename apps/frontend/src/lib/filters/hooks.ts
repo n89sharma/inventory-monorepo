@@ -508,6 +508,46 @@ export function resolveWarehouseScope(
   return selected.length > 0 ? selected : activeWarehouses
 }
 
+export type FilterParamKey = keyof typeof FILTER_PARSERS
+
+// One group per filter control the user sees, so a control owning two params — a meter
+// range, or the model picker's selection plus its free-text query — counts once.
+export type FilterParamGroups = readonly (readonly FilterParamKey[])[]
+
+function isFilterApplied(value: unknown): boolean {
+  if (value === null || value === undefined) return false
+  if (Array.isArray(value)) return value.length > 0
+  if (typeof value === 'string') return value.length > 0
+  if (typeof value === 'boolean') return value
+  return true
+}
+
+export function countActiveFilterGroups(
+  groups: FilterParamGroups,
+  values: Partial<Record<FilterParamKey, unknown>>,
+): number {
+  return groups.filter((group) => group.some((key) => isFilterApplied(values[key]))).length
+}
+
+export function useActiveFilters(groups: FilterParamGroups): {
+  count: number
+  clearAll: () => void
+} {
+  const keys = useMemo(() => groups.flat(), [groups])
+  const parsers = useMemo(
+    () => Object.fromEntries(keys.map((key) => [key, FILTER_PARSERS[key]])),
+    [keys],
+  )
+  const [values, setValues] = useQueryStates(parsers)
+
+  const clearAll = useCallback(
+    () => void setValues(Object.fromEntries(keys.map((key) => [key, null]))),
+    [keys, setValues],
+  )
+
+  return { count: countActiveFilterGroups(groups, values), clearAll }
+}
+
 export function getDepartedFloor(): Date {
   return startOfDay(subMonths(new Date(), MAX_DEPARTED_MONTHS))
 }

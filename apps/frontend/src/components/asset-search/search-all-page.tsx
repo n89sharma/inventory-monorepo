@@ -13,7 +13,12 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { useSearchAll } from '@/hooks/use-search-all'
-import { useAssetFilters, useStatusesParam, useWarehousesParam } from '@/lib/filters/hooks'
+import {
+  useAssetFilters,
+  useStatusesParam,
+  useWarehousesParam,
+  type FilterParamGroups,
+} from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
@@ -25,6 +30,7 @@ const EMPTY_ASSETS: AssetSearchRow[] = []
 const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 const STATUS_TOP_ORDER = [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER] as const
 const STATUS_DIVIDER_AFTER = new Set<string>([ASSET_STATUS.HELD, ASSET_STATUS.ON_ORDER])
+const SCOPE_FILTER_GROUPS = [['wh'], ['status']] as const satisfies FilterParamGroups
 
 function useOrderedStatuses(): { options: Status[]; dividerAfterIds: number[] } {
   const rawStatuses = useReferenceDataStore((state) => state.statuses)
@@ -131,6 +137,7 @@ export function SearchAllPage(): React.JSX.Element {
         <form className="flex flex-col gap-2" onSubmit={(e) => e.preventDefault()}>
           <AssetFilterBar
             modelPlaceholder="Model *"
+            scopeFilterGroups={SCOPE_FILTER_GROUPS}
             scopeFilters={
               <>
                 <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
