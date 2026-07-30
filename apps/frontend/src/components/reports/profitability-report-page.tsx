@@ -33,7 +33,7 @@ import {
   useWarehousesParam,
   useYearParam,
 } from '@/lib/filters/hooks'
-import { formatUSD } from '@/lib/formatters'
+import { formatUSDWithSymbol } from '@/lib/formatters'
 import {
   aggregateCube,
   type MonthRow,
@@ -88,14 +88,9 @@ const METRIC_COLUMNS = [
 
 const EMPTY_CUBE: ProfitabilityCubeRow[] = []
 
-function formatMoney(value: number): string {
-  const magnitude = formatUSD(Math.abs(value))
-  return value < 0 ? `-$${magnitude}` : `$${magnitude}`
-}
-
 function formatMetric(value: number, format: 'money' | 'count'): string {
   if (format === 'count') return String(value)
-  return formatMoney(value)
+  return formatUSDWithSymbol(value)
 }
 
 function formatMarginPct(grossRevenue: number, grossMargin: number): string {
@@ -191,10 +186,10 @@ function ProfitabilitySummaryCards({
   const marginClass = totals.gross_margin < 0 ? NEGATIVE_CLASS : undefined
   return (
     <div className="flex flex-wrap gap-3">
-      <MetricCard label="Gross Revenue" value={formatMoney(totals.gross_revenue)} />
+      <MetricCard label="Gross Revenue" value={formatUSDWithSymbol(totals.gross_revenue)} />
       <MetricCard
         label="Gross Margin"
-        value={formatMoney(totals.gross_margin)}
+        value={formatUSDWithSymbol(totals.gross_margin)}
         valueClassName={marginClass}
       />
       <MetricCard

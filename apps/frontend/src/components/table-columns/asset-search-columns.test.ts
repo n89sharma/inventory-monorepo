@@ -7,13 +7,19 @@ import {
 } from '@tanstack/react-table'
 import { isValidElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { AssetSearchRow } from 'shared-types'
-import { ASSET_SEARCH_COLUMNS, COLUMN_SECTIONS } from './asset-search-columns'
+import type { AssetSearchRow, Permission } from 'shared-types'
+import { ASSET_SEARCH_COLUMNS, canViewColumn, COLUMN_SECTIONS } from './asset-search-columns'
 import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 
 const CSV_ROW_DELIMITER = '\r\n'
 const ALWAYS_VISIBLE_COLUMN_IDS = ['barcode', 'model']
+const MARGIN_COLUMN_IDS = ['gross_margin', 'margin_percent']
+
+const allows =
+  (granted: readonly Permission[]) =>
+  (permission: Permission): boolean =>
+    granted.includes(permission)
 // Frozen so the stock_days and days_held columns, which count from today, are deterministic.
 const NOW = new Date(2026, 6, 27)
 
@@ -136,7 +142,8 @@ describe('asset-search report columns', () => {
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
         'Country of Origin,Total Meter,Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,Purchase Cost,' +
-        'Transport Cost,Processing Cost,Total Cost,Sale Price,Hold #,Held By,Held For,' +
+        'Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,Margin %,' +
+        'Hold #,Held By,Held For,' +
         'Hold Customer,Hold Created,Vendor,Created,Arrived At,Stock Days,Customer,' +
         'Departed At,Invoice #,Last Comment',
     )
@@ -148,7 +155,8 @@ describe('asset-search report columns', () => {
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
         'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,"$1,234.00",' +
-        '$200.00,$100.00,"$1,534.00","$3,000.00",H-1,Alice,Bob,' +
+        '$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",48.9%,' +
+        'H-1,Alice,Bob,' +
         'Acme Corp,"July 01, 2026",Big Vendor,"July 15, 2026","July 05, 2026",12,Retail Co,' +
         '"July 10, 2026",PI-100,Looks good',
     )
@@ -188,7 +196,7 @@ describe('asset-search report columns', () => {
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
         ',,"1,234 lbs",5,,,,' +
         ',,,,,,' +
-        ',,,,,,,' +
+        ',,,,,,,,,' +
         ',,,"July 15, 2026",,12,,' +
         ',,',
     )
@@ -335,6 +343,57 @@ describe('asset search column sorting', () => {
   })
 })
 
+describe('margin columns', () => {
+  const marginCsv = (overrides: Partial<AssetSearchRow>) =>
+    csvFor(makeRow(overrides), MARGIN_COLUMN_IDS).data
+
+  it('reports the margin and its percentage of the sale price', () => {
+    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: 1000 })).toBe(
+      'BC-1,IR-2020,$400.00,28.6%',
+    )
+  })
+
+  it('keeps the minus outside the dollar sign when an asset sold below cost', () => {
+    expect(marginCsv({ cost_sale_price: 800, cost_total_cost: 1000 })).toBe(
+      'BC-1,IR-2020,-$200.00,-25.0%',
+    )
+  })
+
+  // A zero sale price would otherwise divide by zero; both columns report zero rather
+  // than the full cost as a loss.
+  it('reports zero for both columns when the sale price is zero', () => {
+    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 500 })).toBe('BC-1,IR-2020,$0.00,0.0%')
+  })
+
+  it('leaves both columns empty when either input is missing', () => {
+    expect(marginCsv({ cost_sale_price: null, cost_total_cost: 500 })).toBe('BC-1,IR-2020,,')
+    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: null })).toBe('BC-1,IR-2020,,')
+  })
+
+  it('orders by the computed number, not its formatted text, keeping unpriced assets last', () => {
+    // Formatted as "$90.00", "$100.00" and "" — a different order as text.
+    const rows = [
+      makeRow({ barcode: 'HUNDRED', cost_sale_price: 1100, cost_total_cost: 1000 }),
+      makeRow({ barcode: 'UNPRICED', cost_sale_price: null, cost_total_cost: 1000 }),
+      makeRow({ barcode: 'NINETY', cost_sale_price: 1090, cost_total_cost: 1000 }),
+    ]
+    expect(sortedBarcodes(rows, 'gross_margin')).toEqual(['NINETY', 'HUNDRED', 'UNPRICED'])
+    expect(sortedBarcodes(rows, 'gross_margin', true)).toEqual(['HUNDRED', 'NINETY', 'UNPRICED'])
+  })
+
+  it('hides both columns unless the viewer may see sale price and purchase cost', () => {
+    const marginColumns = ASSET_SEARCH_COLUMNS.filter((c) => MARGIN_COLUMN_IDS.includes(c.id))
+    expect(marginColumns).toHaveLength(MARGIN_COLUMN_IDS.length)
+
+    for (const column of marginColumns) {
+      expect(canViewColumn(column, allows([]))).toBe(false)
+      expect(canViewColumn(column, allows(['view_sale_price']))).toBe(false)
+      expect(canViewColumn(column, allows(['view_purchase_price']))).toBe(false)
+      expect(canViewColumn(column, allows(['view_sale_price', 'view_purchase_price']))).toBe(true)
+    }
+  })
+})
+
 describe('asset search columns', () => {
   it('renders the table in the order the columns are declared', () => {
     expect(liveColumnIds()).toEqual(ASSET_SEARCH_COLUMNS.map((c) => c.id))
@@ -390,6 +449,8 @@ describe('asset search columns', () => {
           'cost_processing_cost',
           'cost_total_cost',
           'cost_sale_price',
+          'gross_margin',
+          'margin_percent',
         ],
       },
       { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },

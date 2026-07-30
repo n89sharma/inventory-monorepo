@@ -34,9 +34,11 @@ export function formatUSD(value: number | null): string {
   return currencyValue
 }
 
+// The minus sits outside the symbol, so a loss reads -$200.00 rather than $-200.00.
 export function formatUSDWithSymbol(value: number | null): string {
   if (value === null) return ''
-  return `$${formatUSD(value)}`
+  const magnitude = `$${formatUSD(Math.abs(value))}`
+  return value < 0 ? `-${magnitude}` : magnitude
 }
 
 export function formatTitleCase(str: string): string {

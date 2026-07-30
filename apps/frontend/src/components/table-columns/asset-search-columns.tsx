@@ -28,6 +28,24 @@ const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date
 export const daysHeld = (heldOn: Date | null): number | undefined =>
   heldOn ? differenceInCalendarDays(new Date(), heldOn) : undefined
 
+const MARGIN_PERMISSIONS = ['view_sale_price', 'view_purchase_price'] as const
+const MARGIN_PERCENT_FRACTION_DIGITS = 1
+
+const grossMargin = (salePrice: number | null, totalCost: number | null): number | undefined => {
+  if (salePrice == null || totalCost == null) return undefined
+  if (salePrice === 0) return 0
+  return salePrice - totalCost
+}
+
+const marginPercent = (salePrice: number | null, totalCost: number | null): number | undefined => {
+  if (salePrice == null || totalCost == null) return undefined
+  if (salePrice === 0) return 0
+  return ((salePrice - totalCost) / salePrice) * 100
+}
+
+const formatMarginPercent = (value: number | undefined): string =>
+  value === undefined ? '' : `${value.toFixed(MARGIN_PERCENT_FRACTION_DIGITS)}%`
+
 export type ColumnSectionId =
   | 'specs'
   | 'cost'
@@ -324,6 +342,28 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => formatUSDWithSymbol(a.cost_sale_price),
   },
   {
+    id: 'gross_margin',
+    label: 'Gross Margin',
+    section: 'cost',
+    defaultColumn: false,
+    permissions: MARGIN_PERMISSIONS,
+    sortable: true,
+    sortUndefined: 'last',
+    accessor: (a) => grossMargin(a.cost_sale_price, a.cost_total_cost),
+    text: (a) => formatUSDWithSymbol(grossMargin(a.cost_sale_price, a.cost_total_cost) ?? null),
+  },
+  {
+    id: 'margin_percent',
+    label: 'Margin %',
+    section: 'cost',
+    defaultColumn: false,
+    permissions: MARGIN_PERMISSIONS,
+    sortable: true,
+    sortUndefined: 'last',
+    accessor: (a) => marginPercent(a.cost_sale_price, a.cost_total_cost),
+    text: (a) => formatMarginPercent(marginPercent(a.cost_sale_price, a.cost_total_cost)),
+  },
+  {
     id: 'hold_hold_number',
     label: 'Hold #',
     section: 'hold',
@@ -452,6 +492,8 @@ const DEPARTED_DEFAULT_COLUMN_IDS = [
   'customer',
   'departed_at',
   'cost_sale_price',
+  'gross_margin',
+  'margin_percent',
 ] as const satisfies readonly AssetColumnId[]
 
 const HARVESTED_DEFAULT_COLUMN_IDS = [
