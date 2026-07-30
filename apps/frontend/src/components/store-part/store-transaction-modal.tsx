@@ -20,7 +20,7 @@ import {
 } from '@/ui-types/store-part-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm, useWatch, type Control, type FieldErrors } from 'react-hook-form'
 import type { StorePart, StoreTransactionKind } from 'shared-types'
 import { toast } from 'sonner'
@@ -55,6 +55,8 @@ interface StoreTransactionModalProps {
   // On-hand for this warehouse, keyed by part id — used to guard a SALE against overselling.
   onHandByPartId: Record<number, number>
 }
+
+type StoreTransactionFormBodyProps = Omit<StoreTransactionModalProps, 'open'>
 
 function isNewPart(part: StoreTransactionForm['part']): boolean {
   return part !== null && !('id' in part)
@@ -121,36 +123,35 @@ function PartField({
 export function StoreTransactionModal({
   open,
   onOpenChange,
+  ...bodyProps
+}: StoreTransactionModalProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
+        <StoreTransactionFormBody onOpenChange={onOpenChange} {...bodyProps} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function StoreTransactionFormBody({
+  onOpenChange,
   warehouseId,
   warehouseLabel,
   allParts,
   lockedPart,
   onHandByPartId,
-}: StoreTransactionModalProps) {
+}: StoreTransactionFormBodyProps) {
   const { recordStoreTransaction } = useStorePartMutations()
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue } = useForm<StoreTransactionForm>({
+  const { control, handleSubmit, setValue } = useForm<StoreTransactionForm>({
     resolver: zodResolver(StoreTransactionFormSchema),
-    defaultValues: EMPTY_STORE_TRANSACTION_FORM,
+    defaultValues: lockedPart
+      ? { ...EMPTY_STORE_TRANSACTION_FORM, part: lockedPart }
+      : EMPTY_STORE_TRANSACTION_FORM,
   })
-
-  const [prevOpen, setPrevOpen] = useState(open)
-  if (open !== prevOpen) {
-    setPrevOpen(open)
-    if (open) setPartQuery('')
-  }
-
-  useEffect(() => {
-    if (open) {
-      reset(
-        lockedPart
-          ? { ...EMPTY_STORE_TRANSACTION_FORM, part: lockedPart }
-          : EMPTY_STORE_TRANSACTION_FORM,
-      )
-    }
-  }, [open, lockedPart, reset])
 
   const kind = useWatch({ control, name: 'kind' })
   const part = useWatch({ control, name: 'part' })
@@ -194,146 +195,144 @@ export function StoreTransactionModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{TITLE_BY_KIND[kind]}</DialogTitle>
-        </DialogHeader>
+    <>
+      <DialogHeader>
+        <DialogTitle>{TITLE_BY_KIND[kind]}</DialogTitle>
+      </DialogHeader>
 
-        <form
-          id="store-transaction-form"
-          onSubmit={handleSubmit(onValid, onInvalid)}
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1"
-        >
-          <HorizontalField label="Type" required>
-            <ToggleGroup
-              type="single"
-              value={kind}
-              onValueChange={handleKindChange}
-              variant="outline"
-              size="sm"
-            >
-              {KIND_OPTIONS.map((opt) => (
-                <ToggleGroupItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </HorizontalField>
-
-          <HorizontalField label="Warehouse">
-            <span className="text-sm">{warehouseLabel}</span>
-          </HorizontalField>
-
-          <HorizontalField label="Part" required>
-            <PartField
-              lockedPart={lockedPart}
-              control={control}
-              kind={kind}
-              allParts={allParts}
-              partQuery={partQuery}
-              onQueryChange={setPartQuery}
-            />
-          </HorizontalField>
-
-          {isNewPart(part) && (
-            <HorizontalField label="Description" required>
-              <Input
-                value={part && !('id' in part) ? part.description : ''}
-                onChange={(e) => {
-                  if (part && !('id' in part)) {
-                    setValue(
-                      'part',
-                      { ...part, description: e.target.value },
-                      { shouldValidate: true },
-                    )
-                  }
-                }}
-                placeholder="Part description"
-              />
-            </HorizontalField>
-          )}
-
-          <HorizontalField label="Quantity" required>
-            <div className="flex flex-col gap-1">
-              <Controller
-                control={control}
-                name="quantity"
-                render={({ field }) => (
-                  <Input
-                    type="number"
-                    min={1}
-                    step={1}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="0"
-                    className="max-w-[160px] tabular-nums"
-                  />
-                )}
-              />
-              {kind === 'SALE' && onHand !== null && (
-                <span
-                  className={`text-xs ${overStock ? 'text-destructive' : 'text-muted-foreground'}`}
-                >
-                  On hand: {onHand}
-                </span>
-              )}
-            </div>
-          </HorizontalField>
-
-          <HorizontalField label={MONEY_LABEL_BY_KIND[kind]}>
-            <Controller
-              control={control}
-              name="unitCost"
-              render={({ field }) => (
-                <div className="relative max-w-[160px]">
-                  <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="0.00"
-                    className="pl-7 tabular-nums"
-                  />
-                </div>
-              )}
-            />
-          </HorizontalField>
-
-          <HorizontalField label="Notes">
-            <Controller
-              control={control}
-              name="notes"
-              render={({ field }) => <Textarea {...field} placeholder="Optional" rows={2} />}
-            />
-          </HorizontalField>
-        </form>
-
-        <DialogFooter>
-          <Button
+      <form
+        id="store-transaction-form"
+        onSubmit={handleSubmit(onValid, onInvalid)}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1"
+      >
+        <HorizontalField label="Type" required>
+          <ToggleGroup
+            type="single"
+            value={kind}
+            onValueChange={handleKindChange}
             variant="outline"
-            type="button"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
+            size="sm"
           >
-            Cancel
-          </Button>
-          <Button type="submit" form="store-transaction-form" disabled={saving || overStock}>
-            {saving ? (
-              <>
-                <CircleNotchIcon className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              TITLE_BY_KIND[kind]
+            {KIND_OPTIONS.map((opt) => (
+              <ToggleGroupItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </HorizontalField>
+
+        <HorizontalField label="Warehouse">
+          <span className="text-sm">{warehouseLabel}</span>
+        </HorizontalField>
+
+        <HorizontalField label="Part" required>
+          <PartField
+            lockedPart={lockedPart}
+            control={control}
+            kind={kind}
+            allParts={allParts}
+            partQuery={partQuery}
+            onQueryChange={setPartQuery}
+          />
+        </HorizontalField>
+
+        {isNewPart(part) && (
+          <HorizontalField label="Description" required>
+            <Input
+              value={part && !('id' in part) ? part.description : ''}
+              onChange={(e) => {
+                if (part && !('id' in part)) {
+                  setValue(
+                    'part',
+                    { ...part, description: e.target.value },
+                    { shouldValidate: true },
+                  )
+                }
+              }}
+              placeholder="Part description"
+            />
+          </HorizontalField>
+        )}
+
+        <HorizontalField label="Quantity" required>
+          <div className="flex flex-col gap-1">
+            <Controller
+              control={control}
+              name="quantity"
+              render={({ field }) => (
+                <Input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="0"
+                  className="max-w-[160px] tabular-nums"
+                />
+              )}
+            />
+            {kind === 'SALE' && onHand !== null && (
+              <span
+                className={`text-xs ${overStock ? 'text-destructive' : 'text-muted-foreground'}`}
+              >
+                On hand: {onHand}
+              </span>
             )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </HorizontalField>
+
+        <HorizontalField label={MONEY_LABEL_BY_KIND[kind]}>
+          <Controller
+            control={control}
+            name="unitCost"
+            render={({ field }) => (
+              <div className="relative max-w-[160px]">
+                <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+                  $
+                </span>
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="0.00"
+                  className="pl-7 tabular-nums"
+                />
+              </div>
+            )}
+          />
+        </HorizontalField>
+
+        <HorizontalField label="Notes">
+          <Controller
+            control={control}
+            name="notes"
+            render={({ field }) => <Textarea {...field} placeholder="Optional" rows={2} />}
+          />
+        </HorizontalField>
+      </form>
+
+      <DialogFooter>
+        <Button
+          variant="outline"
+          type="button"
+          onClick={() => onOpenChange(false)}
+          disabled={saving}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" form="store-transaction-form" disabled={saving || overStock}>
+          {saving ? (
+            <>
+              <CircleNotchIcon className="animate-spin" />
+              Saving...
+            </>
+          ) : (
+            TITLE_BY_KIND[kind]
+          )}
+        </Button>
+      </DialogFooter>
+    </>
   )
 }

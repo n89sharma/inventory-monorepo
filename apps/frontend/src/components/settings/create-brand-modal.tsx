@@ -2,7 +2,6 @@ import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { flattenFieldErrors } from '@/lib/utils'
 import { BrandFormSchema, type BrandForm } from '@/ui-types/brand-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
 import { useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
@@ -16,16 +15,27 @@ interface CreateBrandModalProps {
 }
 
 export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps): React.JSX.Element {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Create Brand</DialogTitle>
+        </DialogHeader>
+        <CreateBrandFormBody onOpenChange={onOpenChange} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CreateBrandFormBody({
+  onOpenChange,
+}: Pick<CreateBrandModalProps, 'onOpenChange'>): React.JSX.Element {
   const createBrand = useReferenceDataStore((state) => state.createBrand)
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(BrandFormSchema),
     defaultValues: { name: '' },
   })
-
-  useEffect(() => {
-    if (open) form.reset({ name: '' })
-  }, [open, form])
 
   async function onValidSubmit(data: BrandForm) {
     try {
@@ -46,31 +56,26 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Create Brand</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <FieldGroup>
-            <ControlledInputWithClear
-              control={form.control}
-              name="name"
-              fieldLabel="Name"
-              fieldRequired={true}
-              inputType="string"
-            />
-          </FieldGroup>
-        </form>
-        <DialogFooter>
-          <Button variant="secondary" onClick={submitForm} type="button">
-            Save Brand
-          </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
-            Cancel
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <FieldGroup>
+          <ControlledInputWithClear
+            control={form.control}
+            name="name"
+            fieldLabel="Name"
+            fieldRequired={true}
+            inputType="string"
+          />
+        </FieldGroup>
+      </form>
+      <DialogFooter>
+        <Button variant="secondary" onClick={submitForm} type="button">
+          Save Brand
+        </Button>
+        <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
+          Cancel
+        </Button>
+      </DialogFooter>
+    </>
   )
 }

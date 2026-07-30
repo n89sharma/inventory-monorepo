@@ -26,7 +26,7 @@ import {
 } from '@/ui-types/store-part-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon, ArrowsLeftRightIcon, CircleNotchIcon, XIcon } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { CreateSalvagedPartSchema, type CreateSalvagedPart, type Warehouse } from 'shared-types'
 import { toast } from 'sonner'
@@ -103,19 +103,11 @@ export function AddPartModal({ open, onOpenChange, recipientBarcode }: AddPartMo
           </TabsList>
 
           <TabsContent value="machine" className={cn('flex flex-1 flex-col', TAB_BODY_MIN_HEIGHT)}>
-            <MachineTab
-              recipientBarcode={recipientBarcode}
-              open={open}
-              onClose={() => onOpenChange(false)}
-            />
+            <MachineTab recipientBarcode={recipientBarcode} onClose={() => onOpenChange(false)} />
           </TabsContent>
 
           <TabsContent value="store" className={cn('flex flex-1 flex-col', TAB_BODY_MIN_HEIGHT)}>
-            <StoreTab
-              recipientBarcode={recipientBarcode}
-              open={open}
-              onClose={() => onOpenChange(false)}
-            />
+            <StoreTab recipientBarcode={recipientBarcode} onClose={() => onOpenChange(false)} />
           </TabsContent>
         </Tabs>
       </DialogContent>
@@ -125,11 +117,10 @@ export function AddPartModal({ open, onOpenChange, recipientBarcode }: AddPartMo
 
 interface TabProps {
   recipientBarcode: string
-  open: boolean
   onClose: () => void
 }
 
-function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
+function MachineTab({ recipientBarcode, onClose }: TabProps) {
   const createAssetHarvestedPart = useAssetStore((state) => state.createAssetHarvestedPart)
 
   const form = useForm<CreateSalvagedPart>({
@@ -138,10 +129,6 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
   })
 
   const { isSubmitting } = form.formState
-
-  useEffect(() => {
-    if (open) form.reset()
-  }, [open, form])
 
   async function handleSave(data: CreateSalvagedPart) {
     if (data.donor_barcode === recipientBarcode) {
@@ -254,27 +241,17 @@ function MachineTab({ recipientBarcode, open, onClose }: TabProps) {
   )
 }
 
-function StoreTab({ recipientBarcode, open, onClose }: TabProps) {
+function StoreTab({ recipientBarcode, onClose }: TabProps) {
   const addStorePartToAsset = useAssetStore((state) => state.addStorePartToAsset)
   const { data: allRows = [] } = useStorePartsList()
   const defaultWarehouse = useProfileDefaultWarehouse()
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, reset, setValue } = useForm<AddStorePartForm>({
+  const { control, handleSubmit, setValue } = useForm<AddStorePartForm>({
     resolver: zodResolver(AddStorePartFormSchema),
-    defaultValues: EMPTY_ADD_STORE_PART_FORM,
+    defaultValues: { ...EMPTY_ADD_STORE_PART_FORM, warehouse: defaultWarehouse },
   })
-
-  const [prevOpen, setPrevOpen] = useState(open)
-  if (open !== prevOpen) {
-    setPrevOpen(open)
-    if (open) setPartQuery('')
-  }
-
-  useEffect(() => {
-    if (open) reset({ ...EMPTY_ADD_STORE_PART_FORM, warehouse: defaultWarehouse })
-  }, [open, reset, defaultWarehouse])
 
   const warehouse = useWatch({ control, name: 'warehouse' })
   const part = useWatch({ control, name: 'part' })
