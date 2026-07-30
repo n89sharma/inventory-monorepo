@@ -58,10 +58,10 @@ export function HoldDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createCollectionDetailColumns(
-        assetHref,
-        canEditHold ? (asset) => mutations.removeAsset(holdNumber, asset) : undefined,
-      ),
+      createCollectionDetailColumns({
+        getHref: assetHref,
+        onDelete: canEditHold ? (asset) => mutations.removeAsset(holdNumber, asset) : undefined,
+      }),
     [mutations, holdNumber, canEditHold],
   )
 

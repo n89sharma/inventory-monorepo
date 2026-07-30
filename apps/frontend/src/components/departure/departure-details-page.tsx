@@ -23,7 +23,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const canCreateEditDeparture = useCan('create_update_departure')
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) => createDepartureDetailColumns(assetHref),
+    (assetHref: (asset: AssetSummary) => string) =>
+      createDepartureDetailColumns({ getHref: assetHref }),
     [],
   )
 

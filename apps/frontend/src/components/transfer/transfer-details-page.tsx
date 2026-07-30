@@ -28,10 +28,12 @@ export function TransferDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createCollectionDetailColumns(
-        assetHref,
-        canEditAssets ? (asset) => mutations.removeAsset(transferNumber, asset) : undefined,
-      ),
+      createCollectionDetailColumns({
+        getHref: assetHref,
+        onDelete: canEditAssets
+          ? (asset) => mutations.removeAsset(transferNumber, asset)
+          : undefined,
+      }),
     [mutations, transferNumber, canEditAssets],
   )
 

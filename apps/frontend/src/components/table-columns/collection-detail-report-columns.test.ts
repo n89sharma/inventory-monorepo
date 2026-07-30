@@ -77,7 +77,7 @@ function makeAsset(overrides: Partial<AssetSummary> = {}): AssetSummary {
 
 describe('report column parity with the detail table', () => {
   it('common sections match the base table columns in order', () => {
-    const headers = visibleTableHeaders(createCollectionDetailColumns(noHref))
+    const headers = visibleTableHeaders(createCollectionDetailColumns({ getHref: noHref }))
     for (const section of [
       'transfers',
       'holds',
@@ -90,14 +90,14 @@ describe('report column parity with the detail table', () => {
   })
 
   it('arrivals match the arrival table columns in order', () => {
-    const headers = visibleTableHeaders(createArrivalDetailColumns(noHref))
+    const headers = visibleTableHeaders(createArrivalDetailColumns({ getHref: noHref }))
     expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.arrivals.map((c) => c.header)).toEqual(
       headers,
     )
   })
 
   it('departures match the departure table columns in order', () => {
-    const headers = visibleTableHeaders(createDepartureDetailColumns(noHref))
+    const headers = visibleTableHeaders(createDepartureDetailColumns({ getHref: noHref }))
     expect(COLLECTION_DETAIL_REPORT_COLUMNS_BY_SECTION.departures.map((c) => c.header)).toEqual(
       headers,
     )

@@ -54,12 +54,12 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
-      createArrivalDetailColumns(
-        assetHref,
-        (asset) => mutations.removeAsset(arrivalNumber, asset),
-        canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
-        editingAssetId,
-      ),
+      createArrivalDetailColumns({
+        getHref: assetHref,
+        onDelete: (asset) => mutations.removeAsset(arrivalNumber, asset),
+        onEdit: canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
+        disabledRowId: editingAssetId,
+      }),
     [mutations, arrivalNumber, canEditArrival, editingAssetId, handleEditAsset],
   )
 

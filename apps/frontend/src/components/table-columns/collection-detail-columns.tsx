@@ -152,12 +152,19 @@ function actionColumns(
   return columns
 }
 
-export function createCollectionDetailColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
+interface CollectionDetailColumnOptions {
+  getHref: (asset: AssetSummary) => string
+  onDelete?: (asset: AssetSummary) => void
+  onEdit?: (asset: AssetSummary) => void
+  disabledRowId?: number | null
+}
+
+export function createCollectionDetailColumns({
+  getHref,
+  onDelete,
+  onEdit,
+  disabledRowId,
+}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     ...specColumns(),
@@ -185,12 +192,12 @@ function createInvoiceColumn(
   }
 }
 
-export function createArrivalDetailColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
+export function createArrivalDetailColumns({
+  getHref,
+  onDelete,
+  onEdit,
+  disabledRowId,
+}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     createInvoiceColumn('purchase_invoice_number', (a) => a.purchase_invoice_number),
@@ -200,12 +207,12 @@ export function createArrivalDetailColumns(
   ]
 }
 
-export function createDepartureDetailColumns(
-  getHref: (asset: AssetSummary) => string,
-  onDelete?: (asset: AssetSummary) => void,
-  onEdit?: (asset: AssetSummary) => void,
-  disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
+export function createDepartureDetailColumns({
+  getHref,
+  onDelete,
+  onEdit,
+  disabledRowId,
+}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
   return [
     ...identityColumns(getHref),
     createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number),
