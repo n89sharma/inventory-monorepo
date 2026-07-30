@@ -20,11 +20,11 @@ import { Label } from '@/components/shadcn/label'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { useSavedViews } from '@/hooks/use-saved-view'
 import { useSavedViewMutations } from '@/hooks/use-saved-view-mutations'
-import { COLS_PARAM_KEY } from '@/lib/filters/parsers'
+import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
 import { BookmarksIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { useQueryStates } from 'nuqs'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 import type { SavedViewPageKey, SavedViewSummary } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -128,7 +128,7 @@ export function SavedViewsButton({
   pageKey: SavedViewPageKey
   visibleColumns?: Set<string>
 }): React.JSX.Element {
-  const [, setSearchParams] = useSearchParams()
+  const [, setFilterParams] = useQueryStates(FILTER_PARSERS)
   const liveSearchParams = useOptimisticSearchParams()
   const { data: views = EMPTY_VIEWS } = useSavedViews(pageKey)
   const { create, remove } = useSavedViewMutations()
@@ -136,9 +136,14 @@ export function SavedViewsButton({
 
   function applyView(view: SavedViewSummary) {
     const params = new URLSearchParams(view.query_string)
-    if (view.column_ids.length > 0) params.set(COLS_PARAM_KEY, view.column_ids.join(','))
-    else params.delete(COLS_PARAM_KEY)
-    setSearchParams(params, { replace: true })
+    const values = Object.fromEntries(
+      Object.entries(FILTER_PARSERS).map(([key, parser]) => {
+        const raw = params.get(key)
+        return [key, raw === null ? null : parser.parse(raw)]
+      }),
+    )
+    values[COLS_PARAM_KEY] = view.column_ids.length > 0 ? view.column_ids : null
+    void setFilterParams(values)
   }
 
   async function saveView(name: string) {
