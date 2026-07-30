@@ -1,6 +1,5 @@
 import {
   AppRole,
-  AssetCost,
   AssetDelta,
   CreateInvoice,
   INVOICE_TYPE,
@@ -15,7 +14,7 @@ import {
   getAssetsForInvoice,
   getInvoices as getInvoicesDb,
 } from '../../generated/prisma/sql.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
 import { redactAssetCost } from '../lib/cost-redaction.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import {
@@ -212,26 +211,6 @@ export async function addRemoveCollectionFromAssetsAndRecord(
   )
 }
 
-function buildAssetCost(r: {
-  cost_purchase_cost: Prisma.Decimal | null
-  cost_transport_cost: Prisma.Decimal | null
-  cost_processing_cost: Prisma.Decimal | null
-  cost_other_cost: Prisma.Decimal | null
-  cost_parts_cost: Prisma.Decimal | null
-  cost_total_cost: Prisma.Decimal | null
-  cost_sale_price: Prisma.Decimal | null
-}): AssetCost {
-  return {
-    purchase_cost: decimalToNumber(r.cost_purchase_cost),
-    transport_cost: decimalToNumber(r.cost_transport_cost),
-    processing_cost: decimalToNumber(r.cost_processing_cost),
-    other_cost: decimalToNumber(r.cost_other_cost),
-    parts_cost: decimalToNumber(r.cost_parts_cost),
-    total_cost: decimalToNumber(r.cost_total_cost),
-    sale_price: decimalToNumber(r.cost_sale_price),
-  }
-}
-
 export async function getInvoices(
   fromDate: Date,
   toDate: Date,
@@ -292,7 +271,7 @@ export async function getInvoice(
     customer: invoice.organization,
     assets: assets.map((r) => ({
       ...mapAssetSummary(r),
-      cost: redactAssetCost(buildAssetCost(r), role),
+      cost: redactAssetCost(mapAssetCost(r), role),
     })),
     arrivals,
   }

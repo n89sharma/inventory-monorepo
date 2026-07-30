@@ -1,4 +1,5 @@
 import {
+  AppRole,
   AssetDelta,
   CreateTransfer,
   TRANSFER_STATUS,
@@ -10,7 +11,8 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
+import { redactAssetCost } from '../lib/cost-redaction.js'
 import {
   recordAssetUpdateOnCollection,
   recordTransferCreate,
@@ -20,7 +22,10 @@ import { prisma } from '../prisma.js'
 
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
 
-export async function getTransfer(transferNumber: string): Promise<TransferDetail> {
+export async function getTransfer(
+  transferNumber: string,
+  role: AppRole | null,
+): Promise<TransferDetail> {
   const [transfer, assets] = await Promise.all([
     prisma.transfer.findUnique({
       where: { transfer_number: transferNumber },
@@ -38,7 +43,10 @@ export async function getTransfer(transferNumber: string): Promise<TransferDetai
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets: assets.map(mapAssetSummary),
+    assets: assets.map((r) => ({
+      ...mapAssetSummary(r),
+      cost: redactAssetCost(mapAssetCost(r), role),
+    })),
   }
 }
 

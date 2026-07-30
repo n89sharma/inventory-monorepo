@@ -60,7 +60,7 @@ export const getTransfers = asyncHandler(
 export const getTransferDetail = asyncHandler(
   async (req: Request, res: Response<ApiResponse<TransferDetail>>) => {
     const { transferNumber } = req.params
-    const data = await getTransferSer(transferNumber)
+    const data = await getTransferSer(transferNumber, res.locals.dbUserRole)
     res.json(successResponse(data))
   },
 )

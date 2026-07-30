@@ -1,4 +1,5 @@
 import {
+  AppRole,
   AssetDelta,
   CreateDeparture,
   DEFAULT_OUTGOING_STATUS,
@@ -8,7 +9,8 @@ import {
   UpdateDepartureMetadata,
 } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
+import { redactAssetCost } from '../lib/cost-redaction.js'
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
@@ -24,7 +26,10 @@ import {
 } from './historyService.js'
 import { archiveHoldsEmptiedByReleasedAssets, recordHoldRelease } from './holdService.js'
 
-export async function getDeparture(departureNumber: string): Promise<DepartureDetail> {
+export async function getDeparture(
+  departureNumber: string,
+  role: AppRole | null,
+): Promise<DepartureDetail> {
   const [departure, assets] = await Promise.all([
     prisma.departure.findUnique({
       where: { departure_number: departureNumber },
@@ -41,7 +46,10 @@ export async function getDeparture(departureNumber: string): Promise<DepartureDe
     notes: departure.notes,
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
-    assets: assets.map(mapAssetSummary),
+    assets: assets.map((r) => ({
+      ...mapAssetSummary(r),
+      cost: redactAssetCost(mapAssetCost(r), role),
+    })),
   }
 }
 

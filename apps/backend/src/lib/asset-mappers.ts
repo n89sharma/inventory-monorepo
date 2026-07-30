@@ -1,4 +1,10 @@
-import { AssetDetails, AssetLocationDetails, AssetSearchRow, AssetSummary } from 'shared-types'
+import {
+  AssetCost,
+  AssetDetails,
+  AssetLocationDetails,
+  AssetSearchRow,
+  AssetSummary,
+} from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generated/prisma/sql.js'
 import { decimalToNumber } from './decimal.js'
@@ -66,6 +72,28 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
     sales_invoice_number: r.sales_invoice_number,
     is_in_transit: r.is_in_transit,
     created_at: r.created_at,
+  }
+}
+
+type AssetCostRow = {
+  cost_purchase_cost: Prisma.Decimal | null
+  cost_transport_cost: Prisma.Decimal | null
+  cost_processing_cost: Prisma.Decimal | null
+  cost_other_cost: Prisma.Decimal | null
+  cost_parts_cost: Prisma.Decimal | null
+  cost_total_cost: Prisma.Decimal | null
+  cost_sale_price: Prisma.Decimal | null
+}
+
+export function mapAssetCost(r: AssetCostRow): AssetCost {
+  return {
+    purchase_cost: decimalToNumber(r.cost_purchase_cost),
+    transport_cost: decimalToNumber(r.cost_transport_cost),
+    processing_cost: decimalToNumber(r.cost_processing_cost),
+    other_cost: decimalToNumber(r.cost_other_cost),
+    parts_cost: decimalToNumber(r.cost_parts_cost),
+    total_cost: decimalToNumber(r.cost_total_cost),
+    sale_price: decimalToNumber(r.cost_sale_price),
   }
 }
 
