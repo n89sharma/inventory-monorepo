@@ -23,11 +23,13 @@ import {
 } from '@/components/shadcn/table'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { MetricCard } from './metric-card'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
+  isValidDepartedDateRange,
   useBrandParam,
   useSalespersonParam,
   useVendorParam,
@@ -48,7 +50,7 @@ import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { endOfMonth, endOfYear } from 'date-fns'
 import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import type { ProfitabilityCubeRow } from 'shared-types'
+import { MAX_DEPARTED_WINDOW_MONTHS, type ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
 const CURRENT_YEAR = new Date().getFullYear()
@@ -56,6 +58,7 @@ const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR -
 
 const NO_VALUE = '—'
 const TOTAL_LABEL = 'Total'
+const OUT_OF_WINDOW_MESSAGE = `Asset details are only kept for the last ${MAX_DEPARTED_WINDOW_MONTHS} months`
 const MARGIN_PCT_HEADER = 'Margin %'
 const MARGIN_PCT_FRACTION_DIGITS = 1
 const NEGATIVE_CLASS = 'text-destructive'
@@ -187,7 +190,19 @@ function ProfitabilitySummaryCards({
   )
 }
 
-function RangeLink({ href, label }: { href: string; label: string }): React.JSX.Element {
+function UnreachableRange({ label }: { label: string }): React.JSX.Element {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="text-muted-foreground">{label}</span>
+      </TooltipTrigger>
+      <TooltipContent>{OUT_OF_WINDOW_MESSAGE}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+function RangeLink({ href, label }: { href: string | null; label: string }): React.JSX.Element {
+  if (href === null) return <UnreachableRange label={label} />
   return (
     <Link to={href} className="hover:underline">
       {label}
@@ -202,7 +217,7 @@ function ProfitabilityTable({
 }: {
   table: ProfitabilityTable
   year: number
-  getRangeHref: (from: Date, to: Date) => string
+  getRangeHref: (from: Date, to: Date) => string | null
 }): React.JSX.Element {
   const months = table.months.filter(monthHasActivity)
   const yearStart = new Date(year, 0, 1)
@@ -293,7 +308,7 @@ function ProfitabilityReportBody({
 }: {
   table: ProfitabilityTable
   year: number
-  getRangeHref: (from: Date, to: Date) => string
+  getRangeHref: (from: Date, to: Date) => string | null
   hasActiveFilters: boolean
   onClearFilters: () => void
 }): React.JSX.Element {
@@ -330,8 +345,13 @@ export function ProfitabilityReportPage(): React.JSX.Element {
     [year, warehouses, salesRep, vendor, brand],
   )
 
+  // Gated on the same predicate the departed page uses to decide whether to fetch, so a
+  // rendered link can never land on a search that refuses to run.
   const getRangeHref = useCallback(
-    (from: Date, to: Date) => departedDrilldownHref(from, to, warehouses, brand),
+    (from: Date, to: Date) =>
+      isValidDepartedDateRange(from, to)
+        ? departedDrilldownHref(from, to, warehouses, brand)
+        : null,
     [warehouses, brand],
   )
 
