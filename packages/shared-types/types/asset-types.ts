@@ -7,7 +7,7 @@ export const MAX_MANUFACTURED_YEAR = 2100
 
 // How far back a departed-asset search may reach. Bounds the date window that
 // getDepartedAssets.sql range-scans, so both sides must agree on it.
-export const MAX_DEPARTED_WINDOW_MONTHS = 18
+export const MAX_DEPARTED_WINDOW_MONTHS = 24
 
 export const AssetLocationDetailsSchema = z.object({
   warehouse_id: z.number(),
