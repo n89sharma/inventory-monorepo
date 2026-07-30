@@ -28,10 +28,10 @@ describe('summariseDepartedAssets', () => {
     expect(summary.grossRevenue).toBe(1400)
     expect(summary.cogs).toBe(1000)
     expect(summary.grossMargin).toBe(400)
-    expect(summary.nonZeroPriceAssets).toBe(1)
+    expect(summary.pricedAssets).toBe(1)
   })
 
-  // Total Assets is the whole list; the priced count says how much of it the money describes.
+  // The strip renders these as "1 / 3 priced", so both halves have to be right.
   it('counts every displayed asset, priced or not', () => {
     const summary = summariseDepartedAssets([
       asset(1400, 1000),
@@ -39,7 +39,7 @@ describe('summariseDepartedAssets', () => {
       asset(null, null),
     ])
     expect(summary.totalAssets).toBe(3)
-    expect(summary.nonZeroPriceAssets).toBe(1)
+    expect(summary.pricedAssets).toBe(1)
   })
 
   it('reports a negative margin when the assets sold below cost', () => {
@@ -52,7 +52,7 @@ describe('summariseDepartedAssets', () => {
     const summary = summariseDepartedAssets([])
     expect(summary).toEqual({
       totalAssets: 0,
-      nonZeroPriceAssets: 0,
+      pricedAssets: 0,
       grossRevenue: 0,
       cogs: 0,
       grossMargin: 0,

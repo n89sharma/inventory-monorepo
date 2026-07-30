@@ -16,8 +16,10 @@ export function DepartedSummaryStrip({ assets }: { assets: AssetSearchRow[] }): 
       <SummaryField label="COGS" value={formatUSDWithSymbol(summary.cogs)} />
       <SummaryField label="Gross Margin" value={formatUSDWithSymbol(summary.grossMargin)} />
       <SummaryField label="Margin %" value={formatMarginPercent(summary.marginPercent)} />
-      <SummaryField label="Total Assets" value={String(summary.totalAssets)} />
-      <SummaryField label="Non Zero Price Assets" value={String(summary.nonZeroPriceAssets)} />
+      <SummaryField
+        label="Assets"
+        value={`${summary.pricedAssets} / ${summary.totalAssets} priced`}
+      />
     </div>
   )
 }
