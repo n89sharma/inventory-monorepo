@@ -237,7 +237,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <SavedViewsButton pageKey="sold_report" />
+            <SavedViewsButton pageKey="model_price_history" />
             <ShareButton />
           </div>
         </div>
