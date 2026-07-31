@@ -1,15 +1,15 @@
 import { subMonths } from 'date-fns'
-import { ASSET_STATUS, type ModelSaleRow, type ModelSalesResult } from 'shared-types'
+import { ASSET_STATUS, type ModelPriceHistoryResult, type ModelPriceHistoryRow } from 'shared-types'
 import {
   getModelLastSale as getModelLastSaleQuery,
-  getModelSales as getModelSalesQuery,
+  getModelPriceHistory as getModelPriceHistoryQuery,
 } from '../../generated/prisma/sql.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
 const SALES_WINDOW_MONTHS = 12
 
-function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
+function mapModelPriceHistoryRow(row: getModelPriceHistoryQuery.Result): ModelPriceHistoryRow {
   return {
     barcode: row.barcode,
     departed_at: row.departed_at,
@@ -24,7 +24,7 @@ function mapModelSaleRow(row: getModelSalesQuery.Result): ModelSaleRow {
   }
 }
 
-export async function getModelSales(modelId: number): Promise<ModelSalesResult> {
+export async function getModelPriceHistory(modelId: number): Promise<ModelPriceHistoryResult> {
   const fromDate = subMonths(new Date(), SALES_WINDOW_MONTHS)
   const soldStatus = await prisma.status.findUniqueOrThrow({
     where: { status: ASSET_STATUS.SOLD },
@@ -32,7 +32,7 @@ export async function getModelSales(modelId: number): Promise<ModelSalesResult> 
   })
   const [model, sales, lastSaleRows, in_stock_count] = await Promise.all([
     prisma.model.findUnique({ where: { id: modelId }, select: { id: true } }),
-    prisma.$queryRawTyped(getModelSalesQuery(modelId, fromDate, soldStatus.id)),
+    prisma.$queryRawTyped(getModelPriceHistoryQuery(modelId, fromDate, soldStatus.id)),
     prisma.$queryRawTyped(getModelLastSaleQuery(modelId, soldStatus.id)),
     prisma.asset.count({
       where: { model_id: modelId, status: { status: ASSET_STATUS.IN_STOCK } },
@@ -41,8 +41,8 @@ export async function getModelSales(modelId: number): Promise<ModelSalesResult> 
   if (!model) throw new NotFoundError(`Model ${modelId} not found`)
   const lastSale = lastSaleRows[0]
   return {
-    sales: sales.map(mapModelSaleRow),
-    last_sale: lastSale ? mapModelSaleRow(lastSale) : null,
+    sales: sales.map(mapModelPriceHistoryRow),
+    last_sale: lastSale ? mapModelPriceHistoryRow(lastSale) : null,
     in_stock_count,
   }
 }

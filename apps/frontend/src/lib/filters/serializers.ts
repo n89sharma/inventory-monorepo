@@ -1,6 +1,6 @@
 import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
-import { METER_BANDS } from '@/lib/model-sales-summary'
+import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
 import type { AssetType, Brand, InStockSummaryRow, MeterBand, Warehouse } from 'shared-types'
 

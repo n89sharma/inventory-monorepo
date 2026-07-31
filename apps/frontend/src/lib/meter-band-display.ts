@@ -1,4 +1,4 @@
-import { METER_BANDS } from '@/lib/model-sales-summary'
+import { METER_BANDS } from '@/lib/model-price-history-summary'
 import type { MeterBand } from 'shared-types'
 
 export const METER_BAND_LABELS = {

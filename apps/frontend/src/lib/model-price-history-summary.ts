@@ -1,6 +1,6 @@
-import type { SoldReportRange } from '@/lib/filters/hooks'
+import type { PriceHistoryRange } from '@/lib/filters/hooks'
 import { isAfter, subMonths } from 'date-fns'
-import type { ModelSaleRow } from 'shared-types'
+import type { ModelPriceHistoryRow } from 'shared-types'
 
 export const METER_BANDS = [
   { name: 'Low count', label: '<70K', min: null, max: 70_000 },
@@ -22,10 +22,10 @@ export type BandSummary = {
 }
 
 export function filterByMonths(
-  sales: ModelSaleRow[],
-  months: SoldReportRange,
+  sales: ModelPriceHistoryRow[],
+  months: PriceHistoryRange,
   now: Date = new Date(),
-): ModelSaleRow[] {
+): ModelPriceHistoryRow[] {
   const cutoff = subMonths(now, months)
   return sales.filter((sale) => isAfter(sale.departed_at, cutoff))
 }
@@ -44,7 +44,7 @@ function isInBand(meter: number, band: { min: number | null; max: number | null 
   return true
 }
 
-export function summarizeBands(sales: ModelSaleRow[]): BandSummary[] {
+export function summarizeBands(sales: ModelPriceHistoryRow[]): BandSummary[] {
   return METER_BANDS.map((band) => {
     const inBand = sales.filter((sale) => sale.meter !== null && isInBand(sale.meter, band))
     const purchasePrices = inBand

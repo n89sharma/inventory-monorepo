@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const ModelSaleRowSchema = z.object({
+export const ModelPriceHistoryRowSchema = z.object({
   barcode: z.string(),
   departed_at: z.coerce.date(),
   purchase_price: z.number().nullable(),
@@ -12,11 +12,11 @@ export const ModelSaleRowSchema = z.object({
   internal_finisher: z.string().nullable(),
   core_functions: z.array(z.string()),
 })
-export type ModelSaleRow = z.infer<typeof ModelSaleRowSchema>
+export type ModelPriceHistoryRow = z.infer<typeof ModelPriceHistoryRowSchema>
 
-export const ModelSalesResultSchema = z.object({
-  sales: z.array(ModelSaleRowSchema),
-  last_sale: ModelSaleRowSchema.nullable(),
+export const ModelPriceHistoryResultSchema = z.object({
+  sales: z.array(ModelPriceHistoryRowSchema),
+  last_sale: ModelPriceHistoryRowSchema.nullable(),
   in_stock_count: z.number(),
 })
-export type ModelSalesResult = z.infer<typeof ModelSalesResultSchema>
+export type ModelPriceHistoryResult = z.infer<typeof ModelPriceHistoryResultSchema>

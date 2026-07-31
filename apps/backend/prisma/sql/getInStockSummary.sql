@@ -1,5 +1,5 @@
 -- $1 = IN_STOCK status ids. Meter-band thresholds mirror METER_BANDS
--- (apps/frontend/src/lib/model-sales-summary.ts): max is exclusive.
+-- (apps/frontend/src/lib/model-price-history-summary.ts): max is exclusive.
 select
   w.id                          as warehouse_id,
   w.city_code                   as city_code,

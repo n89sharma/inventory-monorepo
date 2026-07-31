@@ -10,11 +10,11 @@ import {
 import { NotFoundError } from '../lib/errors.js'
 import { patchAssetPricing } from './assetPricingService.js'
 import { createDeparture } from './departureService.js'
-import { getModelSales } from './modelSalesService.js'
+import { getModelPriceHistory } from './modelPriceHistoryService.js'
 
 const MISSING_ID = 999999
 
-describe('modelSalesService', () => {
+describe('modelPriceHistoryService', () => {
   let refs: ArrivalTestData
 
   beforeAll(async () => {
@@ -32,7 +32,7 @@ describe('modelSalesService', () => {
   it('reports the in-stock count for the model', async () => {
     await createArrivedAssets(refs, 3)
 
-    const result = await getModelSales(refs.model.id)
+    const result = await getModelPriceHistory(refs.model.id)
     expect(result.in_stock_count).toBe(3)
   })
 
@@ -44,7 +44,7 @@ describe('modelSalesService', () => {
       refs.userId,
     )
 
-    const result = await getModelSales(refs.model.id)
+    const result = await getModelPriceHistory(refs.model.id)
     expect(result.sales).toHaveLength(1)
     expect(result.sales[0].sale_price).toBe(500)
     expect(result.last_sale).not.toBeNull()
@@ -52,6 +52,6 @@ describe('modelSalesService', () => {
   })
 
   it('throws NotFoundError for an unknown model', async () => {
-    await expect(getModelSales(MISSING_ID)).rejects.toThrow(NotFoundError)
+    await expect(getModelPriceHistory(MISSING_ID)).rejects.toThrow(NotFoundError)
   })
 })

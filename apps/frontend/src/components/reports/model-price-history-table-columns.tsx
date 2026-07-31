@@ -7,13 +7,13 @@ import {
   formatUSDWithSymbol,
 } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { ModelSaleRow } from 'shared-types'
+import type { ModelPriceHistoryRow } from 'shared-types'
 
-export function createModelSalesColumns(
-  detailHref: (row: ModelSaleRow) => string,
-): ColumnDef<ModelSaleRow>[] {
+export function createModelPriceHistoryColumns(
+  detailHref: (row: ModelPriceHistoryRow) => string,
+): ColumnDef<ModelPriceHistoryRow>[] {
   return [
-    createIdColumn<ModelSaleRow>({
+    createIdColumn<ModelPriceHistoryRow>({
       accessorKey: 'barcode',
       header: 'Barcode',
       href: detailHref,
@@ -21,32 +21,32 @@ export function createModelSalesColumns(
     }),
     {
       accessorKey: 'departed_at',
-      header: sortableHeader<ModelSaleRow>('Date Sold'),
+      header: sortableHeader<ModelPriceHistoryRow>('Date Sold'),
       cell: ({ row }) => formatDate(row.original.departed_at),
     },
     {
       accessorKey: 'purchase_price',
-      header: sortableHeader<ModelSaleRow>('Purchase Price'),
+      header: sortableHeader<ModelPriceHistoryRow>('Purchase Price'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.purchase_price),
     },
     {
       accessorKey: 'sale_price',
-      header: sortableHeader<ModelSaleRow>('Sale Price'),
+      header: sortableHeader<ModelPriceHistoryRow>('Sale Price'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.sale_price),
     },
     {
       accessorKey: 'meter',
-      header: sortableHeader<ModelSaleRow>('Meter'),
+      header: sortableHeader<ModelPriceHistoryRow>('Meter'),
       cell: ({ row }) => formatThousandsK(row.original.meter),
     },
     {
       accessorKey: 'customer',
-      header: sortableHeader<ModelSaleRow>('Customer'),
+      header: sortableHeader<ModelPriceHistoryRow>('Customer'),
       cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
     },
     {
       accessorKey: 'salesperson',
-      header: sortableHeader<ModelSaleRow>('Salesperson'),
+      header: sortableHeader<ModelPriceHistoryRow>('Salesperson'),
       cell: ({ row }) => row.original.salesperson ?? '',
     },
     {

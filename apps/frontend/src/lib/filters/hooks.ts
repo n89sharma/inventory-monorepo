@@ -31,8 +31,8 @@ export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
 const DEFAULT_FROM_DAYS = 30
 
-export type SoldReportRange = 6 | 12
-const DEFAULT_SOLD_RANGE: SoldReportRange = 6
+export type PriceHistoryRange = 6 | 12
+const DEFAULT_PRICE_HISTORY_RANGE: PriceHistoryRange = 6
 
 const ID_LIST_DEFAULT: number[] = []
 const idListParser = parseAsIdList.withDefault(ID_LIST_DEFAULT)
@@ -377,11 +377,14 @@ export function useSpecsVisibleParam(): [boolean, (next: boolean) => void] {
   return [on, setValue]
 }
 
-export function useSoldReportRangeParam(): [SoldReportRange, (next: SoldReportRange) => void] {
+export function usePriceHistoryRangeParam(): [
+  PriceHistoryRange,
+  (next: PriceHistoryRange) => void,
+] {
   const [raw, setRaw] = useQueryState('range', FILTER_PARSERS.range)
-  const range: SoldReportRange = raw === 12 ? 12 : DEFAULT_SOLD_RANGE
+  const range: PriceHistoryRange = raw === 12 ? 12 : DEFAULT_PRICE_HISTORY_RANGE
   const setRange = useCallback(
-    (next: SoldReportRange) => void setRaw(next === 12 ? 12 : null),
+    (next: PriceHistoryRange) => void setRaw(next === 12 ? 12 : null),
     [setRaw],
   )
   return [range, setRange]

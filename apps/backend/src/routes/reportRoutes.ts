@@ -1,12 +1,12 @@
 import express from 'express'
 import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
+  ModelPriceHistoryQuerySchema,
   ProfitabilityReportQuerySchema,
-  SoldReportQuerySchema,
   getHeldReport,
   getInStockSummaryReport,
+  getModelPriceHistory,
   getProfitabilityReport,
-  getSoldReport,
 } from '../controllers/reportController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -30,10 +30,10 @@ router.get('/held', requirePermission('view_reports'), getHeldReport)
 router.get('/in-stock-summary', requirePermission('view_reports'), getInStockSummaryReport)
 
 router.get(
-  '/sold-report',
+  '/model-price-history',
   requirePermission('view_sale_price'),
-  validateQuery(SoldReportQuerySchema),
-  getSoldReport,
+  validateQuery(ModelPriceHistoryQuerySchema),
+  getModelPriceHistory,
 )
 
 export default router

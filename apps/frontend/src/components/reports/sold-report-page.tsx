@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
-import { createModelSalesColumns } from './model-sales-table-columns'
+import { createModelPriceHistoryColumns } from './model-price-history-table-columns'
 import { Button } from '@/components/shadcn/button'
 import { DataTable, TABLE_HEAD_CLASS } from '@/components/shared/data-table'
 import {
@@ -16,16 +16,16 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
-import { useModelSales } from '@/hooks/use-model-sales'
+import { useModelPriceHistory } from '@/hooks/use-model-price-history'
 import {
   useModelParam,
-  useSoldReportRangeParam,
+  usePriceHistoryRangeParam,
   useSpecsVisibleParam,
-  type SoldReportRange,
+  type PriceHistoryRange,
 } from '@/lib/filters/hooks'
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
 import { formatUSD } from '@/lib/formatters'
-import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-sales-summary'
+import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-price-history-summary'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
@@ -33,10 +33,10 @@ import { format, subMonths } from 'date-fns'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { ModelSaleRow, ModelSalesResult, ModelSummary } from 'shared-types'
+import type { ModelPriceHistoryResult, ModelPriceHistoryRow, ModelSummary } from 'shared-types'
 
-const EMPTY_SALES: ModelSaleRow[] = []
-const RANGE_OPTIONS = [6, 12] as const satisfies readonly SoldReportRange[]
+const EMPTY_SALES: ModelPriceHistoryRow[] = []
+const RANGE_OPTIONS = [6, 12] as const satisfies readonly PriceHistoryRange[]
 const NO_MEDIAN = '—'
 const MONTH_YEAR_FORMAT = 'MMM yyyy'
 const SALE_DATE_FORMAT = 'MMMM d, yyyy'
@@ -44,7 +44,7 @@ const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 const MODEL_SALES_SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true }
 
-function formatSaleSummary(sale: ModelSaleRow): string {
+function formatSaleSummary(sale: ModelPriceHistoryRow): string {
   return `for $${formatUSD(sale.sale_price)} on ${format(sale.departed_at, SALE_DATE_FORMAT)}`
 }
 
@@ -101,7 +101,7 @@ function RangeSentence({
   range,
 }: {
   count: number
-  range: SoldReportRange
+  range: PriceHistoryRange
 }): React.JSX.Element {
   const now = new Date()
   const from = format(subMonths(now, range), MONTH_YEAR_FORMAT)
@@ -113,7 +113,7 @@ function RangeSentence({
   )
 }
 
-function LastSaleNote({ lastSale }: { lastSale: ModelSaleRow | null }): React.JSX.Element {
+function LastSaleNote({ lastSale }: { lastSale: ModelPriceHistoryRow | null }): React.JSX.Element {
   if (!lastSale) {
     return <p className="text-sm text-muted-foreground">No sales recorded for this model</p>
   }
@@ -128,8 +128,8 @@ function EmptyWindowState({
   range,
   lastSale,
 }: {
-  range: SoldReportRange
-  lastSale: ModelSaleRow | null
+  range: PriceHistoryRange
+  lastSale: ModelPriceHistoryRow | null
 }): React.JSX.Element {
   return (
     <div className="flex flex-col gap-1">
@@ -149,16 +149,16 @@ function SoldReportResults({
   columnVisibility,
   getRowHref,
 }: {
-  data: ModelSalesResult | undefined
+  data: ModelPriceHistoryResult | undefined
   model: ModelSummary | null
-  range: SoldReportRange
-  visibleSales: ModelSaleRow[]
+  range: PriceHistoryRange
+  visibleSales: ModelPriceHistoryRow[]
   bands: BandSummary[]
   inStockHref: string
   columnVisibility: VisibilityState
-  getRowHref: (row: ModelSaleRow) => string
+  getRowHref: (row: ModelPriceHistoryRow) => string
 }): React.JSX.Element | null {
-  const columns = useMemo(() => createModelSalesColumns(getRowHref), [getRowHref])
+  const columns = useMemo(() => createModelPriceHistoryColumns(getRowHref), [getRowHref])
 
   if (model === null) {
     return <p className="text-sm text-muted-foreground">Select a model to see its recent sales.</p>
@@ -198,10 +198,10 @@ export function SoldReportPage(): React.JSX.Element {
   const [modelQuery, setModelQuery] = useState('')
 
   const { model, setModel, clear } = useModelParam()
-  const [range, setRange] = useSoldReportRangeParam()
+  const [range, setRange] = usePriceHistoryRangeParam()
   const [specsVisible, setSpecsVisible] = useSpecsVisibleParam()
 
-  const { data, isLoading } = useModelSales(model?.id ?? null)
+  const { data, isLoading } = useModelPriceHistory(model?.id ?? null)
 
   const sales12 = data?.sales ?? EMPTY_SALES
   const sales6 = useMemo(() => filterByMonths(sales12, 6), [sales12])
@@ -217,7 +217,7 @@ export function SoldReportPage(): React.JSX.Element {
   )
 
   const getRowHref = useCallback(
-    (row: ModelSaleRow) => assetDetailHref('sold-report', row.barcode, searchParams),
+    (row: ModelPriceHistoryRow) => assetDetailHref('sold-report', row.barcode, searchParams),
     [searchParams],
   )
 
