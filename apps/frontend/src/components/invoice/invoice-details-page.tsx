@@ -8,13 +8,12 @@ import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { useCan } from '@/hooks/use-can'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
+import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
-import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
-import type { TableMeta } from '@tanstack/react-table'
 import { parseISO } from 'date-fns'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { INVOICE_TYPE, type AssetSummary } from 'shared-types'
+import { INVOICE_TYPE, type AssetSummary, type PatchAssetPricing } from 'shared-types'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
@@ -25,8 +24,12 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const canCreateEditInvoice = useCan('create_update_invoice')
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewSalePrice = useCan('view_sale_price')
-  const canEditPrice = useCan('edit_prices')
-  const priceEditorRegistry = useMemo(() => createPriceCellEditorRegistry(), [])
+  const savePrice = useCallback(
+    (barcode: string, patch: PatchAssetPricing) =>
+      mutations.updatePrice(invoiceNumber, barcode, patch),
+    [mutations, invoiceNumber],
+  )
+  const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
@@ -35,24 +38,9 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         onDelete: (asset) => mutations.removeAsset(invoiceNumber, asset),
         canViewPurchasePrice,
         canViewSalePrice,
-        priceEditorRegistry: canEditPrice ? priceEditorRegistry : undefined,
+        priceEditorRegistry,
       }),
-    [
-      mutations,
-      invoiceNumber,
-      canViewPurchasePrice,
-      canViewSalePrice,
-      canEditPrice,
-      priceEditorRegistry,
-    ],
-  )
-
-  const tableMeta = useMemo<TableMeta<AssetSummary>>(
-    () => ({
-      savePriceField: (barcode, field, value) =>
-        mutations.updatePrice(invoiceNumber, barcode, { [field]: value }),
-    }),
-    [mutations, invoiceNumber],
+    [mutations, invoiceNumber, canViewPurchasePrice, canViewSalePrice, priceEditorRegistry],
   )
 
   return (
