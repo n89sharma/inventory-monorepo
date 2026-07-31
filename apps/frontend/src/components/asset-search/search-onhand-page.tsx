@@ -2,9 +2,11 @@ import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { Toggle } from '@/components/shadcn/toggle'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
+import { ExclusiveOptionsFilter } from '@/components/shared/filters/exclusive-options-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { daysHeld } from '@/components/table-columns/asset-search-columns'
+import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useSearchOnHand } from '@/hooks/use-search-onhand'
@@ -14,13 +16,14 @@ import {
   useHeldByParam,
   useHeldForParam,
   useHoldCustomerParam,
-  useInStockOnlyParam,
   usePriceCheckParam,
+  useStatusesParam,
   useWarehousesParam,
   type FilterParamGroups,
 } from '@/lib/filters/hooks'
+import { formatTitleCase } from '@/lib/formatters'
 import { useCallback, useMemo } from 'react'
-import { ASSET_STATUS, type AssetSearchRow } from 'shared-types'
+import { ON_HAND_STATUS_VALUES, type AssetSearchRow, type Status } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
@@ -29,29 +32,44 @@ const PRICE_CHECK_COLUMN_IDS = [PURCHASE_COST_COLUMN_ID] as const
 const DAYS_HELD_WARNING_THRESHOLD = 30
 const SCOPE_FILTER_GROUPS = [
   ['wh'],
-  ['instock'],
+  ['status'],
   ['pricecheck'],
   ['heldby'],
   ['heldfor'],
   ['holdcustomer'],
 ] as const satisfies FilterParamGroups
 const ROW_WARNING_CLASS = 'data-row-warning'
+const ALL_STATUSES_LABEL = 'All'
+const STATUS_GROUP_LABEL = 'Filter by status'
 
 function heldRowClassName(asset: AssetSearchRow): string | undefined {
   const days = daysHeld(asset.hold_created_at)
   return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
 }
 
+// Ordered by ON_HAND_STATUS_VALUES rather than by the reference-data store.
+function useOnHandStatuses(): Status[] {
+  const statuses = useReferenceDataStore((state) => state.statuses)
+  return useMemo(
+    () =>
+      ON_HAND_STATUS_VALUES.map((value) => statuses.find((s) => s.status === value)).filter(
+        (status): status is Status => status !== undefined,
+      ),
+    [statuses],
+  )
+}
+
 export function SearchOnHandPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
   const [warehouses, setWarehouses] = useWarehousesParam()
-  const [inStockOnly, setInStockOnly] = useInStockOnlyParam()
+  const [statuses, setStatuses] = useStatusesParam()
   const [priceCheck, setPriceCheck] = usePriceCheckParam()
   const [, setAssetTypes] = useAssetTypesParam()
   const [heldBy, setHeldBy] = useHeldByParam()
   const [heldFor, setHeldFor] = useHeldForParam()
   const [holdCustomer, setHoldCustomer] = useHoldCustomerParam()
   const copierType = useDefaultAssetType()
+  const onHandStatuses = useOnHandStatuses()
 
   const handlePriceCheckChange = useCallback(
     (next: boolean) => {
@@ -78,9 +96,9 @@ export function SearchOnHandPage(): React.JSX.Element {
       assets.filter(
         (a) =>
           (!priceCheck || a.cost_purchase_cost == null || a.cost_purchase_cost === 0) &&
-          (!inStockOnly || a.status === ASSET_STATUS.IN_STOCK),
+          (statuses.length === 0 || statuses.some((s) => s.status === a.status)),
       ),
-    [assets, priceCheck, inStockOnly],
+    [assets, priceCheck, statuses],
   )
 
   return (
@@ -100,14 +118,14 @@ export function SearchOnHandPage(): React.JSX.Element {
         scopeFilters={
           <>
             <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
-            <Toggle
-              variant="outline"
-              pressed={inStockOnly}
-              onPressedChange={setInStockOnly}
-              aria-label="Show only in-stock assets"
-            >
-              {inStockOnly ? 'Show All' : 'Show In Stock'}
-            </Toggle>
+            <ExclusiveOptionsFilter
+              options={onHandStatuses}
+              selection={statuses}
+              onSelectionChange={setStatuses}
+              getLabel={(s) => formatTitleCase(s.status)}
+              allLabel={ALL_STATUSES_LABEL}
+              groupLabel={STATUS_GROUP_LABEL}
+            />
             {canViewPurchasePrice ? (
               <Toggle
                 variant="outline"

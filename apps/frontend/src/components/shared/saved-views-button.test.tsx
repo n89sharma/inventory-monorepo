@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
     id: 1,
     name: 'Toronto in-stock',
     page_key: 'search_onhand',
-    query_string: 'wh=9&instock=1',
+    query_string: 'wh=9&status=4',
     column_ids: ['serial_number', 'status'],
   },
 }))
@@ -71,7 +71,7 @@ describe('SavedViewsButton', () => {
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
     const { searchParams } = onUrlUpdate.mock.calls[0]![0]
     expect(searchParams.get('wh')).toBe('9')
-    expect(searchParams.get('instock')).toBe('1')
+    expect(searchParams.get('status')).toBe('4')
     expect(searchParams.get('cols')).toBe(mocks.view.column_ids.join(','))
     expect(searchParams.get('type')).toBeNull()
   })
