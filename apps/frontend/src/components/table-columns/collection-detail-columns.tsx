@@ -1,4 +1,4 @@
-import { InvoicePriceCell } from '@/components/invoice/invoice-price-cell'
+import { AssetPriceCell } from '@/components/shared/asset-price-cell'
 import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-field'
 import { Button } from '@/components/shadcn/button'
 import { isEditablePriceField, type PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
@@ -273,7 +273,7 @@ function createCostColumn(
       header,
       size: EDITABLE_COST_COLUMN_SIZE,
       cell: ({ row, table }) => (
-        <InvoicePriceCell
+        <AssetPriceCell
           row={row}
           field={field}
           label={header}

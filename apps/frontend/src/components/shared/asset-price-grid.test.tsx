@@ -99,7 +99,7 @@ async function expectEditing(label: string, barcode: string) {
   })
 }
 
-describe('the invoice price grid', () => {
+describe('the asset price grid', () => {
   it('opens only the clicked cell', async () => {
     renderGrid()
 

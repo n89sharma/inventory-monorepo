@@ -87,7 +87,7 @@ function PriceButton({
   )
 }
 
-interface InvoicePriceCellProps {
+interface AssetPriceCellProps {
   row: Row<AssetSummary>
   field: EditablePriceField
   label: string
@@ -95,13 +95,13 @@ interface InvoicePriceCellProps {
   editorRegistry: PriceCellEditorRegistry
 }
 
-export function InvoicePriceCell({
+export function AssetPriceCell({
   row,
   field,
   label,
   table,
   editorRegistry,
-}: InvoicePriceCellProps): React.JSX.Element {
+}: AssetPriceCellProps): React.JSX.Element {
   const asset = row.original
   const savedValue = asset.cost?.[field] ?? 0
   const [value, setValue] = useState(String(savedValue))

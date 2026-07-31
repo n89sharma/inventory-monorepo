@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { Row, Table, TableMeta } from '@tanstack/react-table'
 import type { AssetCost, AssetSummary } from 'shared-types'
 import { describe, expect, it, vi } from 'vitest'
-import { InvoicePriceCell } from './invoice-price-cell'
+import { AssetPriceCell } from './asset-price-cell'
 
 const LABEL = 'Purchase Cost'
 const BARCODE = 'BC-1'
@@ -60,7 +60,7 @@ function renderCell(
   cost: AssetCost | null = makeCost(),
 ): RenderedCell {
   // A single-cell grid: every direction resolves to null, so movement is covered by
-  // price-cell-navigation.test.ts and invoice-price-grid.test.tsx instead.
+  // price-cell-navigation.test.ts and asset-price-grid.test.tsx instead.
   const table = {
     options: { meta: { savePriceField } },
     getRowModel: () => ({ rows: [{ id: BARCODE }] }),
@@ -68,7 +68,7 @@ function renderCell(
   } as unknown as Table<AssetSummary>
   const registry = createPriceCellEditorRegistry()
   const cell = (next: AssetCost | null) => (
-    <InvoicePriceCell
+    <AssetPriceCell
       row={{ id: BARCODE, original: makeAsset(next) } as Row<AssetSummary>}
       field="purchase_cost"
       label={LABEL}
@@ -100,7 +100,7 @@ function currentField(): HTMLElement {
   return screen.getByLabelText(FIELD_LABEL)
 }
 
-describe('InvoicePriceCell', () => {
+describe('AssetPriceCell', () => {
   it('shows the formatted amount as a button until it is clicked', () => {
     const { readButton, openEditor } = renderCell(vi.fn())
 
