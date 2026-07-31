@@ -73,7 +73,6 @@ export default tseslint.config(
     files: [
       'src/components/shared/data-table.tsx',
       'src/components/collections/bulk-edit-pricing-modal.tsx',
-      'src/components/reports/held-report-page.tsx',
     ],
     rules: {
       'react-hooks/incompatible-library': 'off',

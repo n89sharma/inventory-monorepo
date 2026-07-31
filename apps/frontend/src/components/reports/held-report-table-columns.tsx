@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom'
 
 const DAYS_SUFFIX = 'd'
 const INDENT_PER_DEPTH_REM = 2.5
+const MEDIAN_HELD_WARNING_THRESHOLD = 30
+const ROW_WARNING_CLASS = 'data-row-warning'
 
 export type HeldReportTableRow = {
   rowId: string
@@ -39,6 +41,19 @@ export function toHeldReportTableRows(salespeople: SalespersonHoldsGroup[]): Hel
       }),
     })),
   }))
+}
+
+export function getHeldReportRowId(row: HeldReportTableRow): string {
+  return row.rowId
+}
+
+export function getHeldReportSubRows(row: HeldReportTableRow): HeldReportTableRow[] | undefined {
+  return row.subRows
+}
+
+export function getHeldReportRowClassName(row: HeldReportTableRow): string | undefined {
+  if (row.medianHeldDays > MEDIAN_HELD_WARNING_THRESHOLD) return ROW_WARNING_CLASS
+  return undefined
 }
 
 function formatDays(value: number): string {
