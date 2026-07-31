@@ -7,8 +7,13 @@ import {
 } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
+import {
+  flushPendingPriceInvalidation,
+  saveAssetPrice,
+  type PriceSaveSpec,
+} from '@/lib/asset-price-save'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import type { AssetSummary, DepartureDetail, OutgoingStatus } from 'shared-types'
+import type { AssetSummary, DepartureDetail, OutgoingStatus, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: DepartureForm) {
@@ -98,6 +103,28 @@ async function setOutgoingStatus(
   invalidateDepartureLists()
 }
 
+function priceSaveSpec(departureNumber: string): PriceSaveSpec {
+  return {
+    detailCacheKey: departureDetailKey(departureNumber),
+    invalidateLists: invalidateDepartureLists,
+  }
+}
+
+function updatePrice(
+  departureNumber: string,
+  barcode: string,
+  patch: PatchAssetPricing,
+): Promise<void> {
+  return saveAssetPrice(priceSaveSpec(departureNumber), barcode, patch)
+}
+
+// Departures have no removal flow, so the only deferred work is the price list invalidation.
+// Module-level so the identity stays stable: CollectionDetailPage's unmount effect depends on
+// this callback and would otherwise flush on every render.
+function flushPending(departureNumber: string) {
+  flushPendingPriceInvalidation(priceSaveSpec(departureNumber))
+}
+
 const mutations = {
   create,
   getAssets,
@@ -105,7 +132,9 @@ const mutations = {
   addAsset,
   addAssetBatch,
   updateMetadata,
+  updatePrice,
   setOutgoingStatus,
+  flushPending,
 } as const
 
 export function useDepartureMutations() {

@@ -9,10 +9,11 @@ import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useCan } from '@/hooks/use-can'
+import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSummary, PatchAssetPricing } from 'shared-types'
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
@@ -24,14 +25,22 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewSalePrice = useCan('view_sale_price')
 
+  const savePrice = useCallback(
+    (barcode: string, patch: PatchAssetPricing) =>
+      mutations.updatePrice(departureNumber, barcode, patch),
+    [mutations, departureNumber],
+  )
+  const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
       createDepartureDetailColumns({
         getHref: assetHref,
         canViewPurchasePrice,
         canViewSalePrice,
+        priceEditorRegistry,
       }),
-    [canViewPurchasePrice, canViewSalePrice],
+    [canViewPurchasePrice, canViewSalePrice, priceEditorRegistry],
   )
 
   return (
@@ -45,7 +54,9 @@ export function DepartureDetailsPage(): React.JSX.Element {
       refreshKey={departureDetailKey(departureNumber)}
       historyCacheKey={`departure-history:${departureNumber}`}
       historyFetcher={() => getDepartureHistory(departureNumber)}
+      onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
+      tableMeta={tableMeta}
       renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={(departure) => (
         <>

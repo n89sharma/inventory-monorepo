@@ -4,12 +4,13 @@ import { getArrivalHistory } from '@/data/api/arrival-api'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { useCan } from '@/hooks/use-can'
+import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSummary, PatchAssetPricing } from 'shared-types'
 import { createArrivalDetailColumns } from '../table-columns/collection-detail-columns'
 import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
@@ -54,6 +55,13 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     }
   }
 
+  const savePrice = useCallback(
+    (barcode: string, patch: PatchAssetPricing) =>
+      mutations.updatePrice(arrivalNumber, barcode, patch),
+    [mutations, arrivalNumber],
+  )
+  const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
       createArrivalDetailColumns({
@@ -63,6 +71,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         disabledRowId: editingAssetId,
         canViewPurchasePrice,
         canViewSalePrice,
+        priceEditorRegistry,
       }),
     [
       mutations,
@@ -72,6 +81,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       handleEditAsset,
       canViewPurchasePrice,
       canViewSalePrice,
+      priceEditorRegistry,
     ],
   )
 
@@ -106,6 +116,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       }}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
+      tableMeta={tableMeta}
       renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
       renderSubtitle={(arrival) => (
         <>

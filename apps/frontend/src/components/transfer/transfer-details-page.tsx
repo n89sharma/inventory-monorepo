@@ -10,10 +10,16 @@ import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { useCan } from '@/hooks/use-can'
+import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { TRANSFER_STATUS, type AssetSummary, type TransferDetail } from 'shared-types'
+import {
+  TRANSFER_STATUS,
+  type AssetSummary,
+  type PatchAssetPricing,
+  type TransferDetail,
+} from 'shared-types'
 import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 
 export function TransferDetailsPage(): React.JSX.Element {
@@ -28,6 +34,13 @@ export function TransferDetailsPage(): React.JSX.Element {
   const isDraft = detail.data?.status === TRANSFER_STATUS.DRAFT
   const canEditAssets = canCreateEditTransfer && isDraft
 
+  const savePrice = useCallback(
+    (barcode: string, patch: PatchAssetPricing) =>
+      mutations.updatePrice(transferNumber, barcode, patch),
+    [mutations, transferNumber],
+  )
+  const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
       createTransferDetailColumns({
@@ -37,8 +50,16 @@ export function TransferDetailsPage(): React.JSX.Element {
           : undefined,
         canViewPurchasePrice,
         canViewSalePrice,
+        priceEditorRegistry,
       }),
-    [mutations, transferNumber, canEditAssets, canViewPurchasePrice, canViewSalePrice],
+    [
+      mutations,
+      transferNumber,
+      canEditAssets,
+      canViewPurchasePrice,
+      canViewSalePrice,
+      priceEditorRegistry,
+    ],
   )
 
   return (
@@ -57,6 +78,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       }
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
+      tableMeta={tableMeta}
       renderHeaderActions={(transfer) => (
         <TransferLifecycleActions
           status={transfer.status}

@@ -1,6 +1,11 @@
 import { TooltipProvider } from '@/components/shadcn/tooltip'
 import { DataTable } from '@/components/shared/data-table'
-import { createInvoiceDetailColumns } from '@/components/table-columns/collection-detail-columns'
+import {
+  createArrivalDetailColumns,
+  createDepartureDetailColumns,
+  createInvoiceDetailColumns,
+  createTransferDetailColumns,
+} from '@/components/table-columns/collection-detail-columns'
 import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { TableMeta } from '@tanstack/react-table'
@@ -60,26 +65,41 @@ function fieldOf(label: string, barcode: string): HTMLElement {
   return screen.getByLabelText(`${label} for ${barcode}`)
 }
 
-function renderGrid(savePriceField: TableMeta<AssetSummary>['savePriceField'] = vi.fn()) {
-  const columns = createInvoiceDetailColumns({
-    getHref: getAssetHref,
-    canViewPurchasePrice: true,
-    canViewSalePrice: true,
-    priceEditorRegistry: createPriceCellEditorRegistry(),
-  })
-  render(
-    <MemoryRouter>
-      <TooltipProvider>
-        <DataTable
-          columns={columns}
-          data={ASSETS}
-          getRowId={getAssetRowId}
-          columnVisibility={ASSET_COLUMN_VISIBILITY}
-          meta={{ savePriceField }}
-        />
-      </TooltipProvider>
-    </MemoryRouter>,
-  )
+// Every priced detail table builds its cost columns from the same helper, so the grid behaviour
+// is asserted against all four rather than trusting invoices to stand in for the rest.
+const PRICED_COLUMN_BUILDERS = {
+  arrivals: createArrivalDetailColumns,
+  transfers: createTransferDetailColumns,
+  departures: createDepartureDetailColumns,
+  invoices: createInvoiceDetailColumns,
+} as const
+
+type PricedSection = keyof typeof PRICED_COLUMN_BUILDERS
+
+const PRICED_SECTIONS = Object.keys(PRICED_COLUMN_BUILDERS) as PricedSection[]
+
+function makeRenderGrid(section: PricedSection) {
+  return (savePriceField: TableMeta<AssetSummary>['savePriceField'] = vi.fn()) => {
+    const columns = PRICED_COLUMN_BUILDERS[section]({
+      getHref: getAssetHref,
+      canViewPurchasePrice: true,
+      canViewSalePrice: true,
+      priceEditorRegistry: createPriceCellEditorRegistry(),
+    })
+    render(
+      <MemoryRouter>
+        <TooltipProvider>
+          <DataTable
+            columns={columns}
+            data={ASSETS}
+            getRowId={getAssetRowId}
+            columnVisibility={ASSET_COLUMN_VISIBILITY}
+            meta={{ savePriceField }}
+          />
+        </TooltipProvider>
+      </MemoryRouter>,
+    )
+  }
 }
 
 // Opens the editor the way a user does, and waits for autoFocus to land the caret.
@@ -99,7 +119,9 @@ async function expectEditing(label: string, barcode: string) {
   })
 }
 
-describe('the asset price grid', () => {
+describe.each(PRICED_SECTIONS)('the asset price grid on %s', (section) => {
+  const renderGrid = makeRenderGrid(section)
+
   it('opens only the clicked cell', async () => {
     renderGrid()
 

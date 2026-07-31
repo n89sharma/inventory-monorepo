@@ -193,58 +193,43 @@ function createInvoiceColumn(
 }
 
 interface PricedCollectionDetailColumnOptions
-  extends CollectionDetailColumnOptions, PricePermissions {}
+  extends CollectionDetailColumnOptions, CostColumnOptions {}
 
-export function createArrivalDetailColumns({
-  getHref,
-  onDelete,
-  onEdit,
-  disabledRowId,
-  canViewPurchasePrice,
-  canViewSalePrice,
-}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+export function createArrivalDetailColumns(
+  options: PricedCollectionDetailColumnOptions,
+): ColumnDef<AssetSummary>[] {
   return [
-    ...identityColumns(getHref),
+    ...identityColumns(options.getHref),
     createInvoiceColumn('purchase_invoice_number', (a) => a.purchase_invoice_number),
     ...specColumns(),
-    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
+    ...costColumns(options),
     CREATED_AT_COLUMN,
-    ...actionColumns(onEdit, onDelete, disabledRowId),
+    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
   ]
 }
 
-export function createDepartureDetailColumns({
-  getHref,
-  onDelete,
-  onEdit,
-  disabledRowId,
-  canViewPurchasePrice,
-  canViewSalePrice,
-}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+export function createDepartureDetailColumns(
+  options: PricedCollectionDetailColumnOptions,
+): ColumnDef<AssetSummary>[] {
   return [
-    ...identityColumns(getHref),
+    ...identityColumns(options.getHref),
     createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number),
     ...specColumns(),
-    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
+    ...costColumns(options),
     CREATED_AT_COLUMN,
-    ...actionColumns(onEdit, onDelete, disabledRowId),
+    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
   ]
 }
 
-export function createTransferDetailColumns({
-  getHref,
-  onDelete,
-  onEdit,
-  disabledRowId,
-  canViewPurchasePrice,
-  canViewSalePrice,
-}: PricedCollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
+export function createTransferDetailColumns(
+  options: PricedCollectionDetailColumnOptions,
+): ColumnDef<AssetSummary>[] {
   return [
-    ...identityColumns(getHref),
+    ...identityColumns(options.getHref),
     ...specColumns(),
-    ...costColumns({ canViewPurchasePrice, canViewSalePrice }),
+    ...costColumns(options),
     CREATED_AT_COLUMN,
-    ...actionColumns(onEdit, onDelete, disabledRowId),
+    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
   ]
 }
 

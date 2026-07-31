@@ -10,12 +10,17 @@ import {
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { arrivalDetailKey, invalidateArrivalLists } from '@/hooks/use-arrival'
 import {
+  flushPendingPriceInvalidation,
+  saveAssetPrice,
+  type PriceSaveSpec,
+} from '@/lib/asset-price-save'
+import {
   flushPendingRemovals,
   scheduleAssetRemoval,
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
-import type { ArrivalDetail, AssetSummary } from 'shared-types'
+import type { ArrivalDetail, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: ArrivalForm) {
@@ -87,6 +92,28 @@ function bulkRemoveAssets(arrivalNumber: string, assets: AssetSummary[]) {
   )
 }
 
+function priceSaveSpec(arrivalNumber: string): PriceSaveSpec {
+  return {
+    detailCacheKey: arrivalDetailKey(arrivalNumber),
+    invalidateLists: invalidateArrivalLists,
+  }
+}
+
+function updatePrice(
+  arrivalNumber: string,
+  barcode: string,
+  patch: PatchAssetPricing,
+): Promise<void> {
+  return saveAssetPrice(priceSaveSpec(arrivalNumber), barcode, patch)
+}
+
+// Module-level so the identity stays stable: CollectionDetailPage's unmount effect depends on
+// this callback and would otherwise flush on every render.
+function flushPending(arrivalNumber: string) {
+  flushPendingRemovals(arrivalNumber)
+  flushPendingPriceInvalidation(priceSaveSpec(arrivalNumber))
+}
+
 async function moveAssets(
   sourceArrivalNumber: string,
   destinationArrivalNumber: string,
@@ -108,10 +135,11 @@ const mutations = {
   createAsset,
   getAssetForEdit,
   updateAsset,
+  updatePrice,
   removeAsset,
   bulkRemoveAssets,
   moveAssets,
-  flushPending: flushPendingRemovals,
+  flushPending,
 } as const
 
 export function useArrivalMutations() {
