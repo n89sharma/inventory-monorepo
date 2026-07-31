@@ -20,7 +20,7 @@ const STORE_LIST_PATH = '/store'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
 const ONHAND_PATH = '/search/onhand'
 const DEPARTED_PATH = '/search/departed'
-const SOLD_REPORT_PATH = '/reports/sold-report'
+export const MODEL_PRICE_HISTORY_PATH = '/reports/model-price-history'
 const PROFITABILITY_REPORT_PATH = '/reports/profitability'
 
 const BAND_BOUNDS = {
@@ -114,8 +114,8 @@ export function departedDrilldownHref(
   })
 }
 
-export function soldReportHref(modelId: number): string {
-  return serializeModel(SOLD_REPORT_PATH, { model: modelId })
+export function modelPriceHistoryHref(modelId: number): string {
+  return serializeModel(MODEL_PRICE_HISTORY_PATH, { model: modelId })
 }
 
 export function buildOnHandModelPath(modelId: number): string {

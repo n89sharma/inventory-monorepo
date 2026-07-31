@@ -151,9 +151,9 @@ const PutAwayPage = lazy(() =>
 const SearchAllPage = lazy(() =>
   import('./components/asset-search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
 )
-const SoldReportPage = lazy(() =>
-  import('./components/reports/sold-report-page').then((m) => ({
-    default: m.SoldReportPage,
+const ModelPriceHistoryPage = lazy(() =>
+  import('./components/reports/model-price-history-page').then((m) => ({
+    default: m.ModelPriceHistoryPage,
   })),
 )
 const CatalogSettingsPage = lazy(() =>
@@ -373,15 +373,15 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/reports/sold-report"
+                      path="/reports/model-price-history"
                       element={
                         <PermissionRoute permission="view_sale_price">
-                          <SoldReportPage />
+                          <ModelPriceHistoryPage />
                         </PermissionRoute>
                       }
                     />
                     <Route
-                      path="/reports/sold-report/:assetId"
+                      path="/reports/model-price-history/:assetId"
                       element={
                         <PermissionRoute permission="view_asset">
                           <AssetDetailsPage />

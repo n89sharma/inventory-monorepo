@@ -11,19 +11,19 @@ export function isCollection(navigationSection: NavigationSection) {
   return navigationSection !== 'search' && navigationSection !== 'home'
 }
 
-const SEARCH_LISTS = ['onhand', 'all', 'sold-report', 'departed', 'harvested'] as const
+const SEARCH_LISTS = ['onhand', 'all', 'model-price-history', 'departed', 'harvested'] as const
 
 export type SearchList = (typeof SEARCH_LISTS)[number]
 
 export const SEARCH_LIST_LABELS = {
   onhand: 'On Hand',
   all: 'All Assets',
-  'sold-report': 'Sold Report',
+  'model-price-history': 'Model Price History',
   departed: 'Departed',
   harvested: 'Harvested',
 } as const satisfies Record<SearchList, string>
 
-const REPORT_LISTS = new Set<SearchList>(['sold-report'])
+const REPORT_LISTS = new Set<SearchList>(['model-price-history'])
 
 export function listBasePath(list: SearchList): string {
   return REPORT_LISTS.has(list) ? '/reports' : '/search'

@@ -24,6 +24,7 @@ import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import {
+  MODEL_PRICE_HISTORY_PATH,
   buildAssetSearchPath,
   buildInStockSummaryPath,
   buildProfitabilityReportPath,
@@ -111,14 +112,13 @@ const SETTINGS_SUB_ITEMS = [
 ]
 
 const HELD_REPORT_PATH = '/reports/held'
-const SOLD_REPORT_PATH = '/reports/sold-report'
 
 type ReportPermission = 'view_reports' | 'view_sale_price' | 'view_profitability_report'
 
 const REPORTS_SUB_ITEMS = [
   { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
   { title: 'Held', url: HELD_REPORT_PATH, permission: 'view_reports' },
-  { title: 'Sold', url: SOLD_REPORT_PATH, permission: 'view_sale_price' },
+  { title: 'Price History', url: MODEL_PRICE_HISTORY_PATH, permission: 'view_sale_price' },
   { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_profitability_report' },
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
 
@@ -302,7 +302,7 @@ export function AppSidebar(): React.JSX.Element {
                           (item) => {
                             const to = reportItemPath(item.url)
                             const isActive =
-                              item.url === SOLD_REPORT_PATH
+                              item.url === MODEL_PRICE_HISTORY_PATH
                                 ? location.pathname.startsWith(item.url)
                                 : location.pathname === item.url
                             return (

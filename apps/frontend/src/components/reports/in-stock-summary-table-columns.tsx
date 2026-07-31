@@ -4,7 +4,7 @@ import type {
 } from '@/lib/in-stock-summary-grouping'
 import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { METER_BAND_LABELS } from '@/lib/meter-band-display'
-import { soldReportHref } from '@/lib/filters/serializers'
+import { modelPriceHistoryHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
@@ -55,13 +55,13 @@ function meterBandCell(row: Row<InStockSummaryTableRow>): string {
   return METER_BAND_LABELS[bandRow.meter_band]
 }
 
-function SoldReportCell({ row }: { row: Row<InStockSummaryTableRow> }): React.JSX.Element | null {
+function PriceHistoryCell({ row }: { row: Row<InStockSummaryTableRow> }): React.JSX.Element | null {
   if (!isModelRow(row.original)) return null
   const { model_id, model_name } = row.original
   return (
     <Link
-      to={soldReportHref(model_id)}
-      aria-label={`Sold report for ${model_name}`}
+      to={modelPriceHistoryHref(model_id)}
+      aria-label={`Price history for ${model_name}`}
       className="inline-flex text-muted-foreground hover:text-foreground"
     >
       <ArrowSquareOutIcon className="size-4" />
@@ -132,9 +132,9 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
-    id: 'sold_report',
-    header: 'Sold Report',
+    id: 'price_history',
+    header: 'Price History',
     enableSorting: false,
-    cell: ({ row }) => <SoldReportCell row={row} />,
+    cell: ({ row }) => <PriceHistoryCell row={row} />,
   },
 ]

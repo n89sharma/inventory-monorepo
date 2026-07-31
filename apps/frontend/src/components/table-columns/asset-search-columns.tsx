@@ -514,7 +514,7 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   onhand: ONHAND_DEFAULT_COLUMN_IDS,
   departed: DEPARTED_DEFAULT_COLUMN_IDS,
   harvested: HARVESTED_DEFAULT_COLUMN_IDS,
-  'sold-report': DEFAULT_VISIBLE_COLUMN_IDS,
+  'model-price-history': DEFAULT_VISIBLE_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly string[]>
 
 const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(ASSET_SEARCH_COLUMNS.map((c) => [c.id, c]))

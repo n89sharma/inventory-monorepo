@@ -41,7 +41,7 @@ const NO_MEDIAN = '—'
 const MONTH_YEAR_FORMAT = 'MMM yyyy'
 const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 
-const MODEL_SALES_SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
+const SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true }
 
 function formatSaleSummary(sale: ModelPriceHistoryRow): string {
@@ -139,7 +139,7 @@ function EmptyWindowState({
   )
 }
 
-function SoldReportResults({
+function ModelPriceHistoryResults({
   data,
   model,
   range,
@@ -161,7 +161,7 @@ function SoldReportResults({
   const columns = useMemo(() => createModelPriceHistoryColumns(getRowHref), [getRowHref])
 
   if (model === null) {
-    return <p className="text-sm text-muted-foreground">Select a model to see its recent sales.</p>
+    return <p className="text-sm text-muted-foreground">Select a model to see its price history.</p>
   }
   if (data === undefined) return null
   if (visibleSales.length === 0) {
@@ -193,7 +193,7 @@ function SoldReportResults({
   )
 }
 
-export function SoldReportPage(): React.JSX.Element {
+export function ModelPriceHistoryPage(): React.JSX.Element {
   const searchParams = useOptimisticSearchParams()
   const [modelQuery, setModelQuery] = useState('')
 
@@ -212,12 +212,13 @@ export function SoldReportPage(): React.JSX.Element {
   const inStockHref = model ? buildOnHandModelPath(model.id) : ''
 
   const columnVisibility = useMemo<VisibilityState>(
-    () => Object.fromEntries(MODEL_SALES_SPEC_COLUMN_IDS.map((id) => [id, specsVisible])),
+    () => Object.fromEntries(SPEC_COLUMN_IDS.map((id) => [id, specsVisible])),
     [specsVisible],
   )
 
   const getRowHref = useCallback(
-    (row: ModelPriceHistoryRow) => assetDetailHref('sold-report', row.barcode, searchParams),
+    (row: ModelPriceHistoryRow) =>
+      assetDetailHref('model-price-history', row.barcode, searchParams),
     [searchParams],
   )
 
@@ -226,7 +227,7 @@ export function SoldReportPage(): React.JSX.Element {
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">Sold Report</h1>
+            <h1 className="text-2xl font-semibold">Model Price History</h1>
             {isLoading && (
               <SpinnerGapIcon
                 className="animate-spin text-muted-foreground"
@@ -267,7 +268,7 @@ export function SoldReportPage(): React.JSX.Element {
               if (value === '') return
               setRange(value === '12' ? 12 : 6)
             }}
-            aria-label="Sales window"
+            aria-label="Price history range"
           >
             {RANGE_OPTIONS.map((option) => (
               <ToggleGroupItem key={option} value={String(option)}>
@@ -288,7 +289,7 @@ export function SoldReportPage(): React.JSX.Element {
       </StickyPageHeader>
       <PageContent className="flex flex-col gap-2">
         <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <SoldReportResults
+          <ModelPriceHistoryResults
             data={data}
             model={model}
             range={range}
