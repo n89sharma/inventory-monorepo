@@ -73,6 +73,9 @@ interface DataTableProps<TData, TValue> {
 
 const DEFAULT_PAGE_SIZE = 75
 
+export const TABLE_HEAD_CLASS =
+  'whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
+
 const CELL_BG =
   'bg-[var(--row-bg,var(--color-background))] ' +
   'group-hover/row:bg-[var(--row-bg-hover,var(--color-muted))] ' +
@@ -211,7 +214,7 @@ export function DataTable<TData, TValue>({
                           zIndex: HEADER_Z_INDEX,
                           ...pinnedLeftStyle(header.column, PINNED_HEADER_Z_INDEX),
                         }}
-                        className={`whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
+                        className={`${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
                       >
                         {header.isPlaceholder
                           ? null

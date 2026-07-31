@@ -2,7 +2,7 @@ import { PageContent } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { createModelSalesColumns } from './model-sales-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shared/data-table'
+import { DataTable, TABLE_HEAD_CLASS } from '@/components/shared/data-table'
 import {
   Table,
   TableBody,
@@ -69,11 +69,11 @@ function MeterBandsTable({ bands }: { bands: BandSummary[] }): React.JSX.Element
       <Table className="w-fit text-sm">
         <TableHeader>
           <TableRow>
-            <TableHead />
-            <TableHead />
-            <TableHead className="text-center">Purchase price</TableHead>
-            <TableHead className="text-center">Sale price</TableHead>
-            <TableHead className="text-center">Sales</TableHead>
+            <TableHead className={TABLE_HEAD_CLASS} />
+            <TableHead className={TABLE_HEAD_CLASS} />
+            <TableHead className={TABLE_HEAD_CLASS}>Purchase price</TableHead>
+            <TableHead className={TABLE_HEAD_CLASS}>Sale price</TableHead>
+            <TableHead className={TABLE_HEAD_CLASS}>Sales</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
