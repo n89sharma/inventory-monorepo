@@ -40,6 +40,8 @@ export const AssetStatusSchema = z.enum([...IN_HOUSE_STATUS_VALUES, ...OUTGOING_
 export type AssetStatus = z.infer<typeof AssetStatusSchema>
 export const ASSET_STATUS = AssetStatusSchema.enum
 
+export const ON_HAND_STATUS_VALUES = [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD] as const
+
 export const DEFAULT_OUTGOING_STATUS: OutgoingStatus = OUTGOING_STATUS.SOLD
 
 export const OUTGOING_STATUS_LABELS = {

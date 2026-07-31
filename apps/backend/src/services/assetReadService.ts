@@ -1,6 +1,5 @@
 import { endOfDay, startOfDay } from 'date-fns'
 import {
-  ASSET_STATUS,
   AssetDetails,
   AssetError,
   AssetHarvestedPart,
@@ -12,6 +11,7 @@ import {
   Comment,
   CoreFunction,
   getInitials,
+  ON_HAND_STATUS_VALUES,
   ROLE_PERMISSIONS,
   type AppRole,
 } from 'shared-types'
@@ -169,7 +169,7 @@ export async function getAssetsForSearchOnHand(
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
-    where: { status: { in: [ASSET_STATUS.IN_STOCK, ASSET_STATUS.HELD] } },
+    where: { status: { in: [...ON_HAND_STATUS_VALUES] } },
     select: { id: true },
   })
   return getAssets(
