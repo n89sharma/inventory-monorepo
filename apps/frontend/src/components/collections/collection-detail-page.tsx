@@ -10,10 +10,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { AssetSummary, CollectionHistory } from 'shared-types'
 import { DataTable } from '@/components/shared/data-table'
+import { Toggle } from '@/components/shadcn/toggle'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
 type DetailSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
+
+// Raw database casing; the title-cased reference-data value ('Copier') would never match.
+const COPIER_ASSET_TYPE = 'COPIER'
 
 const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 // created_at drives the default sort but is not shown; the detail tables have no
@@ -21,6 +25,7 @@ const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
 const EMPTY_ROW_IDS: string[] = []
+const EMPTY_ASSETS: AssetSummary[] = []
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
   section: DetailSection
@@ -83,12 +88,22 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [filteredRowIds, setFilteredRowIds] = useState<string[]>(EMPTY_ROW_IDS)
+  const [copiersOnly, setCopiersOnly] = useState(false)
 
   const assetHref = useMemo(
     () => (asset: AssetSummary) => `/${section}/${collectionId}/${asset.barcode}`,
     [section, collectionId],
   )
   const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
+
+  // Memoised because DataTable reports its filtered row ids from an effect keyed on `data`;
+  // a fresh array each render would loop that effect against the state it sets.
+  const assets = detail.data?.assets
+  const visibleAssets = useMemo(() => {
+    if (!assets) return EMPTY_ASSETS
+    if (!copiersOnly) return assets
+    return assets.filter((asset) => asset.asset_type === COPIER_ASSET_TYPE)
+  }, [assets, copiersOnly])
 
   useEffect(() => {
     const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
@@ -171,7 +186,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         />
         <DataTable
           columns={columns}
-          data={entity.assets}
+          data={visibleAssets}
           renderTableFilter={(table) => (
             <>
               <ColumnTextFilter
@@ -195,6 +210,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
                 clearLabel="Clear model"
                 className="w-50"
               />
+              <CopierFilterToggle pressed={copiersOnly} onPressedChange={setCopiersOnly} />
             </>
           )}
           rowSelection={rowSelection}
@@ -210,5 +226,27 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         />
       </PageContent>
     </>
+  )
+}
+
+interface CopierFilterToggleProps {
+  pressed: boolean
+  onPressedChange: (pressed: boolean) => void
+}
+
+function CopierFilterToggle({
+  pressed,
+  onPressedChange,
+}: CopierFilterToggleProps): React.JSX.Element {
+  return (
+    <Toggle
+      variant="outline"
+      pressed={pressed}
+      onPressedChange={onPressedChange}
+      aria-label="Show only copiers"
+      className="bg-background"
+    >
+      {pressed ? 'Show All' : 'Show Copiers'}
+    </Toggle>
   )
 }
