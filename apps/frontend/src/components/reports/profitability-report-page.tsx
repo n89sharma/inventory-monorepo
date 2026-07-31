@@ -12,19 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/shadcn/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/shadcn/table'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
+import { DataTable } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
+import {
+  createProfitabilityColumns,
+  formatMarginPct,
+  NEGATIVE_CLASS,
+} from './profitability-table-columns'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useProfitabilityReport } from '@/hooks/use-profitability-report'
@@ -42,70 +38,19 @@ import {
   type MonthRow,
   type ProfitabilityFilters,
   type ProfitabilityMetrics,
-  type ProfitabilityTable,
 } from '@/lib/profitability-aggregate'
 import { cn } from '@/lib/utils'
 import { departedDrilldownHref } from '@/lib/filters/serializers'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { endOfMonth, endOfYear } from 'date-fns'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { MAX_DEPARTED_WINDOW_MONTHS, type ProfitabilityCubeRow } from 'shared-types'
+import type { ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
 
-const NO_VALUE = '—'
-const TOTAL_LABEL = 'Total'
-const OUT_OF_WINDOW_MESSAGE = `Asset details are only kept for the last ${MAX_DEPARTED_WINDOW_MONTHS} months`
-const MARGIN_PCT_HEADER = 'Margin %'
-const MARGIN_PCT_FRACTION_DIGITS = 1
-const NEGATIVE_CLASS = 'text-destructive'
-
-const STICKY_HEADER_CLASS =
-  'sticky top-[calc(var(--app-header-height,0px)+var(--details-header-height,0px))] bg-background z-10'
-const STICKY_FOOTER_CLASS = 'sticky bottom-0 bg-muted z-10'
-
-const MONTH_LABELS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const
-
-const METRIC_COLUMNS = [
-  { key: 'asset_count', header: 'Assets', format: 'count', highlightNegative: false },
-  { key: 'gross_revenue', header: 'Gross Revenue', format: 'money', highlightNegative: false },
-  { key: 'cogs', header: 'COGS', format: 'money', highlightNegative: false },
-  { key: 'gross_margin', header: 'Gross Margin', format: 'money', highlightNegative: true },
-] as const satisfies readonly {
-  key: keyof ProfitabilityMetrics
-  header: string
-  format: 'money' | 'count'
-  highlightNegative: boolean
-}[]
-
 const EMPTY_CUBE: ProfitabilityCubeRow[] = []
-
-function formatMetric(value: number, format: 'money' | 'count'): string {
-  if (format === 'count') return String(value)
-  return formatUSDWithSymbol(value)
-}
-
-function formatMarginPct(grossRevenue: number, grossMargin: number): string {
-  if (grossRevenue === 0) return NO_VALUE
-  const pct = (grossMargin / grossRevenue) * 100
-  return `${pct.toFixed(MARGIN_PCT_FRACTION_DIGITS)}%`
-}
 
 function monthHasActivity(row: MonthRow): boolean {
   return row.asset_count > 0 || row.gross_revenue !== 0 || row.gross_margin !== 0
@@ -190,129 +135,18 @@ function ProfitabilitySummaryCards({
   )
 }
 
-function UnreachableRange({ label }: { label: string }): React.JSX.Element {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="text-muted-foreground">{label}</span>
-      </TooltipTrigger>
-      <TooltipContent>{OUT_OF_WINDOW_MESSAGE}</TooltipContent>
-    </Tooltip>
-  )
-}
-
-function RangeLink({ href, label }: { href: string | null; label: string }): React.JSX.Element {
-  if (href === null) return <UnreachableRange label={label} />
-  return (
-    <Link to={href} className="hover:underline">
-      {label}
-    </Link>
-  )
-}
-
-function ProfitabilityTable({
-  table,
-  year,
-  getRangeHref,
-}: {
-  table: ProfitabilityTable
-  year: number
-  getRangeHref: (from: Date, to: Date) => string | null
-}): React.JSX.Element {
-  const months = table.months.filter(monthHasActivity)
-  const yearStart = new Date(year, 0, 1)
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className={STICKY_HEADER_CLASS}>Month</TableHead>
-          {METRIC_COLUMNS.map((column) => (
-            <TableHead key={column.key} className={cn('text-right', STICKY_HEADER_CLASS)}>
-              {column.header}
-            </TableHead>
-          ))}
-          <TableHead className={cn('text-right', STICKY_HEADER_CLASS)}>
-            {MARGIN_PCT_HEADER}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {months.map((row) => {
-          const monthStart = new Date(year, row.month - 1, 1)
-          return (
-            <TableRow key={row.month}>
-              <TableCell className="font-medium">
-                <RangeLink
-                  href={getRangeHref(monthStart, endOfMonth(monthStart))}
-                  label={MONTH_LABELS[row.month - 1]}
-                />
-              </TableCell>
-              {METRIC_COLUMNS.map((column) => (
-                <TableCell
-                  key={column.key}
-                  className={cn(
-                    'text-right tabular-nums',
-                    column.highlightNegative && row[column.key] < 0 && NEGATIVE_CLASS,
-                  )}
-                >
-                  {formatMetric(row[column.key], column.format)}
-                </TableCell>
-              ))}
-              <TableCell
-                className={cn('text-right tabular-nums', row.gross_margin < 0 && NEGATIVE_CLASS)}
-              >
-                {formatMarginPct(row.gross_revenue, row.gross_margin)}
-              </TableCell>
-            </TableRow>
-          )
-        })}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell className={cn('font-semibold', STICKY_FOOTER_CLASS)}>
-            <RangeLink href={getRangeHref(yearStart, endOfYear(yearStart))} label={TOTAL_LABEL} />
-          </TableCell>
-          {METRIC_COLUMNS.map((column) => (
-            <TableCell
-              key={column.key}
-              className={cn(
-                'text-right font-semibold tabular-nums',
-                STICKY_FOOTER_CLASS,
-                column.highlightNegative && table.totals[column.key] < 0 && NEGATIVE_CLASS,
-              )}
-            >
-              {formatMetric(table.totals[column.key], column.format)}
-            </TableCell>
-          ))}
-          <TableCell
-            className={cn(
-              'text-right font-semibold tabular-nums',
-              STICKY_FOOTER_CLASS,
-              table.totals.gross_margin < 0 && NEGATIVE_CLASS,
-            )}
-          >
-            {formatMarginPct(table.totals.gross_revenue, table.totals.gross_margin)}
-          </TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
-  )
-}
-
 function ProfitabilityReportBody({
-  table,
-  year,
-  getRangeHref,
+  months,
+  columns,
   hasActiveFilters,
   onClearFilters,
 }: {
-  table: ProfitabilityTable
-  year: number
-  getRangeHref: (from: Date, to: Date) => string | null
+  months: MonthRow[]
+  columns: ColumnDef<MonthRow>[]
   hasActiveFilters: boolean
   onClearFilters: () => void
 }): React.JSX.Element {
-  if (!table.months.some(monthHasActivity)) {
+  if (months.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <p className="text-sm text-muted-foreground">No activity for these filters.</p>
@@ -324,7 +158,7 @@ function ProfitabilityReportBody({
       </div>
     )
   }
-  return <ProfitabilityTable table={table} year={year} getRangeHref={getRangeHref} />
+  return <DataTable columns={columns} data={months} />
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
@@ -357,6 +191,11 @@ export function ProfitabilityReportPage(): React.JSX.Element {
 
   const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(year)
   const table = useMemo(() => aggregateCube(cube, filters), [cube, filters])
+  const months = useMemo(() => table.months.filter(monthHasActivity), [table.months])
+  const columns = useMemo(
+    () => createProfitabilityColumns({ year, totals: table.totals, getRangeHref }),
+    [year, table.totals, getRangeHref],
+  )
 
   const activeFilterCount = countActiveFilters(filters)
 
@@ -395,9 +234,8 @@ export function ProfitabilityReportPage(): React.JSX.Element {
         <div className={cn('flex flex-col gap-4 transition-opacity', isLoading && 'opacity-50')}>
           <ProfitabilitySummaryCards totals={table.totals} />
           <ProfitabilityReportBody
-            table={table}
-            year={year}
-            getRangeHref={getRangeHref}
+            months={months}
+            columns={columns}
             hasActiveFilters={activeFilterCount > 0}
             onClearFilters={clearFilters}
           />
