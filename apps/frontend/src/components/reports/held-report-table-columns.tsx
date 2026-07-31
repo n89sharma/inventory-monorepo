@@ -1,4 +1,4 @@
-import type { SalespersonHoldsGroup } from '@/lib/holds-by-user-aggregate'
+import type { SalespersonHoldsGroup } from '@/lib/held-report-aggregate'
 import { formatTitleCase } from '@/lib/formatters'
 import { buildSearchOnHandUrl } from '@/lib/filters/serializers'
 import { cn } from '@/lib/utils'
@@ -9,17 +9,17 @@ import { Link } from 'react-router-dom'
 const DAYS_SUFFIX = 'd'
 const INDENT_PER_DEPTH_REM = 2.5
 
-export type HoldsReportRow = {
+export type HeldReportTableRow = {
   rowId: string
   label: string
   assetCount: number
   holdCount: number
   medianHeldDays: number
   href: string
-  subRows?: HoldsReportRow[]
+  subRows?: HeldReportTableRow[]
 }
 
-export function toHoldsReportRows(salespeople: SalespersonHoldsGroup[]): HoldsReportRow[] {
+export function toHeldReportTableRows(salespeople: SalespersonHoldsGroup[]): HeldReportTableRow[] {
   return salespeople.map((rep) => ({
     rowId: `rep-${rep.salesRepId}`,
     label: rep.salesRepName,
@@ -45,7 +45,7 @@ function formatDays(value: number): string {
   return `${Math.round(value)}${DAYS_SUFFIX}`
 }
 
-function LabelCell({ row }: { row: Row<HoldsReportRow> }): React.JSX.Element {
+function LabelCell({ row }: { row: Row<HeldReportTableRow> }): React.JSX.Element {
   return (
     <div
       className="flex min-w-0 items-center gap-1"
@@ -75,7 +75,7 @@ function LabelCell({ row }: { row: Row<HoldsReportRow> }): React.JSX.Element {
   )
 }
 
-export const HOLDS_BY_USER_COLUMNS: ColumnDef<HoldsReportRow>[] = [
+export const HELD_REPORT_COLUMNS: ColumnDef<HeldReportTableRow>[] = [
   {
     id: 'label',
     header: 'Salesperson / Customer',

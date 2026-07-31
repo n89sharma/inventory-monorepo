@@ -128,9 +128,9 @@ const ProfitabilityReportPage = lazy(() =>
     default: m.ProfitabilityReportPage,
   })),
 )
-const HoldsByUserReportPage = lazy(() =>
-  import('./components/reports/holds-by-user-report-page').then((m) => ({
-    default: m.HoldsByUserReportPage,
+const HeldReportPage = lazy(() =>
+  import('./components/reports/held-report-page').then((m) => ({
+    default: m.HeldReportPage,
   })),
 )
 const InStockSummaryReportPage = lazy(() =>
@@ -357,10 +357,10 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/reports/holds-by-user"
+                      path="/reports/held"
                       element={
                         <PermissionRoute permission="view_reports">
-                          <HoldsByUserReportPage />
+                          <HeldReportPage />
                         </PermissionRoute>
                       }
                     />

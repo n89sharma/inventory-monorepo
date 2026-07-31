@@ -1,7 +1,7 @@
 import { successResponse } from 'shared-types'
 import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { getHoldsByUserReport as getHoldsByUserReportSer } from '../services/holdsReportService.js'
+import { getHeldReport as getHeldReportSer } from '../services/heldReportService.js'
 import { getInStockSummaryReport as getInStockSummaryReportSer } from '../services/inStockSummaryService.js'
 import { getModelSales as getModelSalesSer } from '../services/modelSalesService.js'
 import { getProfitabilityCube as getProfitabilityCubeSer } from '../services/profitabilityService.js'
@@ -29,8 +29,8 @@ export const getProfitabilityReport = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const getHoldsByUserReport = asyncHandler(async (req, res) => {
-  const data = await getHoldsByUserReportSer()
+export const getHeldReport = asyncHandler(async (req, res) => {
+  const data = await getHeldReportSer()
   res.json(successResponse(data))
 })
 

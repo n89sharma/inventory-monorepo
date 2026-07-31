@@ -1,9 +1,9 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import {
-  HOLDS_BY_USER_COLUMNS,
-  toHoldsReportRows,
-  type HoldsReportRow,
-} from './holds-by-user-table-columns'
+  HELD_REPORT_COLUMNS,
+  toHeldReportTableRows,
+  type HeldReportTableRow,
+} from './held-report-table-columns'
 import {
   Table,
   TableBody,
@@ -15,8 +15,8 @@ import {
 import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { MetricCard } from './metric-card'
 import { ShareButton } from '@/components/shared/share-button'
-import { useHoldsByUserReport } from '@/hooks/use-holds-by-user-report'
-import { aggregateHolds, type HoldsByUserTable } from '@/lib/holds-by-user-aggregate'
+import { useHeldReport } from '@/hooks/use-held-report'
+import { aggregateHeldReport, type HeldReportSummary } from '@/lib/held-report-aggregate'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import {
@@ -28,7 +28,7 @@ import {
 } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import type { ActiveHoldRow } from 'shared-types'
+import type { HeldReportRow } from 'shared-types'
 
 const DAYS_SUFFIX = 'd'
 const SEARCH_ONHAND_URL = '/search/onhand'
@@ -39,13 +39,17 @@ const ROW_WARNING_CLASS = 'bg-[var(--row-warning)] hover:bg-[var(--row-warning-h
 const STICKY_HEADER_CLASS =
   'sticky top-[calc(var(--app-header-height,0px)+var(--details-header-height,0px))] bg-background z-10'
 
-const EMPTY_ROWS: ActiveHoldRow[] = []
+const EMPTY_ROWS: HeldReportRow[] = []
 
 function formatDays(value: number): string {
   return `${Math.round(value)}${DAYS_SUFFIX}`
 }
 
-function HoldsSummaryCards({ totals }: { totals: HoldsByUserTable['totals'] }): React.JSX.Element {
+function HeldReportSummaryCards({
+  totals,
+}: {
+  totals: HeldReportSummary['totals']
+}): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-3">
       <MetricCard label="Assets Held" value={String(totals.assetCount)} />
@@ -56,12 +60,12 @@ function HoldsSummaryCards({ totals }: { totals: HoldsByUserTable['totals'] }): 
   )
 }
 
-function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Element {
+function HeldReportTable({ rows }: { rows: HeldReportTableRow[] }): React.JSX.Element {
   const [expanded, setExpanded] = useState<ExpandedState>({})
 
   const table = useReactTable({
     data: rows,
-    columns: HOLDS_BY_USER_COLUMNS,
+    columns: HELD_REPORT_COLUMNS,
     state: { expanded },
     onExpandedChange: setExpanded,
     getRowId: (row) => row.rowId,
@@ -116,8 +120,8 @@ function HoldsReportTable({ rows }: { rows: HoldsReportRow[] }): React.JSX.Eleme
   )
 }
 
-function HoldsReportBody({ table }: { table: HoldsByUserTable }): React.JSX.Element {
-  const rows = useMemo(() => toHoldsReportRows(table.salespeople), [table.salespeople])
+function HeldReportBody({ table }: { table: HeldReportSummary }): React.JSX.Element {
+  const rows = useMemo(() => toHeldReportTableRows(table.salespeople), [table.salespeople])
 
   if (rows.length === 0) {
     return (
@@ -130,12 +134,12 @@ function HoldsReportBody({ table }: { table: HoldsByUserTable }): React.JSX.Elem
     )
   }
 
-  return <HoldsReportTable rows={rows} />
+  return <HeldReportTable rows={rows} />
 }
 
-export function HoldsByUserReportPage(): React.JSX.Element {
-  const { data: rows = EMPTY_ROWS, isLoading } = useHoldsByUserReport()
-  const table = useMemo(() => aggregateHolds(rows), [rows])
+export function HeldReportPage(): React.JSX.Element {
+  const { data: rows = EMPTY_ROWS, isLoading } = useHeldReport()
+  const table = useMemo(() => aggregateHeldReport(rows), [rows])
 
   return (
     <>
@@ -156,8 +160,8 @@ export function HoldsByUserReportPage(): React.JSX.Element {
       </StickyPageHeader>
       <PageContent>
         <div className={cn('flex flex-col gap-4 transition-opacity', isLoading && 'opacity-50')}>
-          <HoldsSummaryCards totals={table.totals} />
-          <HoldsReportBody table={table} />
+          <HeldReportSummaryCards totals={table.totals} />
+          <HeldReportBody table={table} />
         </div>
       </PageContent>
     </>

@@ -3,7 +3,7 @@ import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
   ProfitabilityReportQuerySchema,
   SoldReportQuerySchema,
-  getHoldsByUserReport,
+  getHeldReport,
   getInStockSummaryReport,
   getProfitabilityReport,
   getSoldReport,
@@ -25,7 +25,7 @@ router.get(
   getProfitabilityReport,
 )
 
-router.get('/holds-by-user', requirePermission('view_reports'), getHoldsByUserReport)
+router.get('/held', requirePermission('view_reports'), getHeldReport)
 
 router.get('/in-stock-summary', requirePermission('view_reports'), getInStockSummaryReport)
 

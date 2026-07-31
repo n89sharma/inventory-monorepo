@@ -43,9 +43,9 @@ export * from "./sql/getDepartedAssets.js"
 
 export * from "./sql/getDepartures.js"
 
-export * from "./sql/getHolds.js"
+export * from "./sql/getHeldReport.js"
 
-export * from "./sql/getHoldsByUser.js"
+export * from "./sql/getHolds.js"
 
 export * from "./sql/getInStockSummary.js"
 

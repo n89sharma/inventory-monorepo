@@ -1,9 +1,9 @@
 import { api } from '@/data/api/axios-client'
 import {
-  HoldsByUserReportSchema,
+  HeldReportSchema,
   InStockSummaryReportSchema,
   ProfitabilityReportSchema,
-  type HoldsByUserReport,
+  type HeldReport,
   type InStockSummaryReport,
   type ProfitabilityCubeRow,
 } from 'shared-types'
@@ -13,9 +13,9 @@ export async function getProfitabilityReport(year: number): Promise<Profitabilit
   return ProfitabilityReportSchema.parse(data)
 }
 
-export async function getHoldsByUserReport(): Promise<HoldsByUserReport> {
-  const { data } = await api.get(`/reports/holds-by-user`)
-  return HoldsByUserReportSchema.parse(data)
+export async function getHeldReport(): Promise<HeldReport> {
+  const { data } = await api.get('/reports/held')
+  return HeldReportSchema.parse(data)
 }
 
 export async function getInStockSummaryReport(): Promise<InStockSummaryReport> {

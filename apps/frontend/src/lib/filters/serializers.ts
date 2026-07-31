@@ -4,7 +4,7 @@ import { METER_BANDS } from '@/lib/model-sales-summary'
 import { createSerializer } from 'nuqs'
 import type { AssetType, Brand, InStockSummaryRow, MeterBand, Warehouse } from 'shared-types'
 
-const HELD_REPORT_COLUMN_IDS = [
+const HELD_DRILLDOWN_COLUMN_IDS = [
   'serial_number',
   'status',
   'held_by',
@@ -14,7 +14,7 @@ const HELD_REPORT_COLUMN_IDS = [
   'days_held',
 ] as const satisfies readonly AssetColumnId[]
 
-const HELD_REPORT_SORT = { id: 'days_held', desc: true } as const
+const HELD_DRILLDOWN_SORT = { id: 'days_held', desc: true } as const
 
 const STORE_LIST_PATH = '/store'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
@@ -129,8 +129,8 @@ export function buildSearchOnHandUrl(selection: {
   return serializeHeld(ONHAND_PATH, {
     heldfor: selection.heldForId ?? null,
     holdcustomer: selection.holdCustomerId ?? null,
-    cols: [...HELD_REPORT_COLUMN_IDS],
-    sort: HELD_REPORT_SORT,
+    cols: [...HELD_DRILLDOWN_COLUMN_IDS],
+    sort: HELD_DRILLDOWN_SORT,
   })
 }
 

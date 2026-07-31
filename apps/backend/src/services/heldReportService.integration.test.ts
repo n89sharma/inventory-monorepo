@@ -7,9 +7,9 @@ import {
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { archiveHold, createHold } from './holdService.js'
-import { getHoldsByUserReport } from './holdsReportService.js'
+import { getHeldReport } from './heldReportService.js'
 
-describe('holdsReportService', () => {
+describe('heldReportService', () => {
   let refs: ArrivalTestData
 
   beforeAll(async () => {
@@ -28,7 +28,7 @@ describe('holdsReportService', () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
 
-    const report = await getHoldsByUserReport()
+    const report = await getHeldReport()
     expect(report).toHaveLength(1)
     expect(report[0].held_asset_count).toBe(1)
   })
@@ -38,7 +38,7 @@ describe('holdsReportService', () => {
     const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
     await archiveHold(holdNumber, refs.userId)
 
-    const report = await getHoldsByUserReport()
+    const report = await getHeldReport()
     expect(report).toHaveLength(0)
   })
 })

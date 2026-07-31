@@ -1,4 +1,4 @@
-import type { ActiveHoldRow } from 'shared-types'
+import type { HeldReportRow } from 'shared-types'
 
 type CustomerHoldsGroup = {
   customerId: number
@@ -17,15 +17,15 @@ export type SalespersonHoldsGroup = {
   customers: CustomerHoldsGroup[]
 }
 
-type HoldsTotals = {
+type HeldReportTotals = {
   assetCount: number
   holdCount: number
   salespersonCount: number
   medianHeldDays: number
 }
 
-export type HoldsByUserTable = {
-  totals: HoldsTotals
+export type HeldReportSummary = {
+  totals: HeldReportTotals
   salespeople: SalespersonHoldsGroup[]
 }
 
@@ -55,7 +55,7 @@ type RepAccumulator = {
   customers: Map<number, CustomerAccumulator>
 }
 
-export function aggregateHolds(rows: ActiveHoldRow[]): HoldsByUserTable {
+export function aggregateHeldReport(rows: HeldReportRow[]): HeldReportSummary {
   const reps = new Map<number, RepAccumulator>()
   let totalAssetCount = 0
 
