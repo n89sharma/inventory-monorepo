@@ -29,6 +29,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -75,6 +76,8 @@ const DEFAULT_PAGE_SIZE = 75
 
 export const TABLE_HEAD_CLASS =
   'whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
+
+const TABLE_FOOT_CELL_CLASS = 'whitespace-nowrap text-center font-semibold'
 
 const CELL_BG =
   'bg-[var(--row-bg,var(--color-background))] ' +
@@ -180,6 +183,9 @@ export function DataTable<TData, TValue>({
 
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
+  const hasFooter = table
+    .getVisibleLeafColumns()
+    .some((column) => column.columnDef.footer !== undefined)
 
   const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
@@ -253,6 +259,28 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               )}
             </TableBody>
+            {hasFooter && (
+              <TableFooter>
+                {table.getFooterGroups().map((footerGroup) => (
+                  <TableRow key={footerGroup.id}>
+                    {footerGroup.headers.map((footer) => (
+                      <TableCell
+                        key={footer.id}
+                        style={{
+                          width: footer.column.columnDef.size,
+                          ...pinnedLeftStyle(footer.column, PINNED_CELL_Z_INDEX),
+                        }}
+                        className={`${TABLE_FOOT_CELL_CLASS} ${pinEdgeClass(footer.column)} ${footer.column.columnDef.meta?.cellClassName ?? ''}`}
+                      >
+                        {footer.isPlaceholder
+                          ? null
+                          : flexRender(footer.column.columnDef.footer, footer.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableFooter>
+            )}
           </Table>
         </div>
       </div>
@@ -264,44 +292,46 @@ export function DataTable<TData, TValue>({
           </strong>{' '}
           of <strong>{totalRows}</strong>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-            aria-label="First page"
-          >
-            <CaretDoubleLeftIcon aria-hidden="true" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <CaretLeftIcon aria-hidden="true" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <CaretRightIcon aria-hidden="true" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-            aria-label="Last page"
-          >
-            <CaretDoubleRightIcon aria-hidden="true" />
-          </Button>
-        </div>
+        {table.getPageCount() > 1 && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.firstPage()}
+              disabled={!table.getCanPreviousPage()}
+              aria-label="First page"
+            >
+              <CaretDoubleLeftIcon aria-hidden="true" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <CaretLeftIcon aria-hidden="true" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+              <CaretRightIcon aria-hidden="true" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.lastPage()}
+              disabled={!table.getCanNextPage()}
+              aria-label="Last page"
+            >
+              <CaretDoubleRightIcon aria-hidden="true" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
