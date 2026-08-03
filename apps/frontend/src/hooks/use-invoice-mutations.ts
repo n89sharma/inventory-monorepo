@@ -1,11 +1,12 @@
 import {
   createInvoice,
+  deleteInvoice,
   getInvoiceDetail,
   patchInvoiceAssets,
   updateInvoiceMetadata,
 } from '@/data/api/invoice-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
-import { invoiceDetailKey, invalidateInvoiceLists } from '@/hooks/use-invoice'
+import { invoiceDetailKey, clearInvoiceDetail, invalidateInvoiceLists } from '@/hooks/use-invoice'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
@@ -120,8 +121,15 @@ function flushPending(invoiceNumber: string) {
   flushPendingPriceInvalidation(priceSaveSpec(invoiceNumber))
 }
 
+async function remove(invoiceNumber: string) {
+  await deleteInvoice(invoiceNumber)
+  clearInvoiceDetail(invoiceNumber)
+  invalidateInvoiceLists()
+}
+
 const mutations = {
   create,
+  remove,
   getAssets,
   addAssets,
   addAsset,

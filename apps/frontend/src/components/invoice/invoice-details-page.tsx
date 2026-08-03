@@ -8,6 +8,7 @@ import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { useCan } from '@/hooks/use-can'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
+import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
@@ -30,6 +31,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     [mutations, invoiceNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+  const handleDelete = useEntityDelete('Invoice', invoiceNumber, mutations.remove)
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
@@ -56,6 +58,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       historyFetcher={() => getInvoiceHistory(invoiceNumber)}
       onBulkRemove={(assets) => mutations.bulkRemoveAssets(invoiceNumber, assets)}
       onFlushPending={mutations.flushPending}
+      onDelete={handleDelete}
       buildColumns={buildColumns}
       tableMeta={tableMeta}
       renderTitle={(invoice) => ({

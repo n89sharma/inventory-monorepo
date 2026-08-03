@@ -14,6 +14,7 @@ import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createTransfer,
+  deleteTransfer,
   dispatchTransfer,
   getTransfer,
   patchTransferAssets,
@@ -264,5 +265,84 @@ describe('transferService', () => {
     await expect(dispatchTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
       ConflictError,
     )
+  })
+})
+
+describe('deleteTransfer', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('deletes a draft transfer that holds no assets', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await patchTransferAssets(
+      transferNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: [asset.id] },
+      refs.userId,
+    )
+
+    await deleteTransfer(transferNumber, refs.userId)
+
+    expect(
+      await prisma.transfer.findUnique({ where: { transfer_number: transferNumber } }),
+    ).toBeNull()
+  })
+
+  it('refuses to delete a draft transfer that still holds assets', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+
+    await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(
+      new ConflictError(
+        `Transfer ${transferNumber} cannot be deleted because it still has 1 asset`,
+      ),
+    )
+  })
+
+  it('refuses to delete a transfer that has been dispatched', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await dispatchTransfer(transferNumber, refs.userId)
+
+    await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(
+      new ConflictError(`Transfer ${transferNumber} cannot be deleted after dispatch`),
+    )
+  })
+
+  it('refuses to delete a completed transfer', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await dispatchTransfer(transferNumber, refs.userId)
+    await receiveTransfer(transferNumber, refs.userId)
+
+    await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(ConflictError)
+  })
+
+  it('throws when the transfer number does not exist', async () => {
+    await expect(deleteTransfer('T-YYZ-9999999', refs.userId)).rejects.toThrow(NotFoundError)
   })
 })

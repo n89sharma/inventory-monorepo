@@ -11,9 +11,15 @@ import {
   seedAssetCost,
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
-import { ConflictError } from '../lib/errors.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createInvoice, getInvoice, patchInvoiceMetadata } from './invoiceService.js'
+import {
+  addRemoveCollectionFromAssetsAndRecord as patchInvoiceAssets,
+  createInvoice,
+  deleteInvoice,
+  getInvoice,
+  patchInvoiceMetadata,
+} from './invoiceService.js'
 
 describe('invoiceService', () => {
   let refs: ArrivalTestData
@@ -202,5 +208,71 @@ describe('invoiceService', () => {
       refs.userId,
     )
     expect(invoiceNumber).toMatch(/^I-\d{7}$/)
+  })
+})
+
+describe('deleteInvoice', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('deletes an invoice that holds no assets', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    await patchInvoiceAssets(
+      invoiceNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: [asset.id] },
+      refs.userId,
+    )
+
+    await deleteInvoice(invoiceNumber, refs.userId)
+
+    expect(await prisma.invoice.findUnique({ where: { invoice_number: invoiceNumber } })).toBeNull()
+  })
+
+  it('refuses to delete an invoice that still holds assets', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+
+    await expect(deleteInvoice(invoiceNumber, refs.userId)).rejects.toThrow(
+      new ConflictError(`Invoice ${invoiceNumber} cannot be deleted because it still has 1 asset`),
+    )
+  })
+
+  it('deletes an emptied purchase invoice even when it is cleared', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypePurchaseId, true),
+      refs.userId,
+    )
+    await patchInvoiceAssets(
+      invoiceNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: [asset.id] },
+      refs.userId,
+    )
+
+    await deleteInvoice(invoiceNumber, refs.userId)
+
+    expect(await prisma.invoice.findUnique({ where: { invoice_number: invoiceNumber } })).toBeNull()
+  })
+
+  it('throws when the invoice number does not exist', async () => {
+    await expect(deleteInvoice('I-9999999', refs.userId)).rejects.toThrow(NotFoundError)
   })
 })

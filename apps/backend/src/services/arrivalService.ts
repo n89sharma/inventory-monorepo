@@ -25,6 +25,8 @@ import {
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { logger } from '../lib/logger.js'
+import { pluralize } from '../lib/pluralize.js'
 import { prisma } from '../prisma.js'
 import { upsertLatestComment } from './assetCommentService.js'
 import { reconcileAssetErrors } from './assetErrorService.js'
@@ -670,6 +672,27 @@ async function generateBarcodes(assets: CreateAsset[], warehouseCode: string) {
     barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode)
   }
   return barcodes
+}
+
+export async function deleteArrival(arrivalNumber: string, userId: number): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const arrival = await tx.arrival.findUnique({
+      where: { arrival_number: arrivalNumber },
+      select: { id: true, _count: { select: { assets: true } } },
+    })
+    if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
+
+    const assetCount = arrival._count.assets
+    if (assetCount > 0) {
+      throw new ConflictError(
+        `Arrival ${arrivalNumber} cannot be deleted because it still has ${pluralize(assetCount, 'asset')}`,
+      )
+    }
+
+    await tx.arrival.delete({ where: { id: arrival.id } })
+  })
+
+  logger.warn('Arrival deleted', { arrivalNumber, userId })
 }
 
 async function getNewArrivalNumber(warehouseCode: string): Promise<string> {

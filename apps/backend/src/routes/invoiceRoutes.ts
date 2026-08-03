@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   createInvoice,
+  deleteInvoice,
   getInvoiceDetail,
   getInvoiceHistory,
   getInvoices,
@@ -34,5 +35,6 @@ router.patch(
   patchInvoiceMetadata,
 )
 router.get('/:invoiceNumber', requirePermission('view_collections'), getInvoiceDetail)
+router.delete('/:invoiceNumber', requirePermission('delete_collection'), deleteInvoice)
 
 export default router

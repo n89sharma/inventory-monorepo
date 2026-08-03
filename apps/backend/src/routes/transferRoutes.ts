@@ -2,6 +2,7 @@ import express from 'express'
 import {
   TransferQuerySchema,
   createTransfer,
+  deleteTransfer,
   dispatchTransfer,
   getTransferDetail,
   getTransferHistory,
@@ -28,6 +29,7 @@ router.get(
 router.post('/', requirePermission('create_update_transfer'), createTransfer)
 router.get('/:transferNumber/history', requirePermission('view_collections'), getTransferHistory)
 router.get('/:transferNumber', requirePermission('view_collections'), getTransferDetail)
+router.delete('/:transferNumber', requirePermission('delete_collection'), deleteTransfer)
 router.patch(
   '/:transferNumber/assets',
   requirePermission('create_update_transfer'),

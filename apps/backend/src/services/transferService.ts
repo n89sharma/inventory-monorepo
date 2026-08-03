@@ -11,6 +11,8 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { logger } from '../lib/logger.js'
+import { pluralize } from '../lib/pluralize.js'
 import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
 import { redactAssetCost } from '../lib/cost-redaction.js'
 import {
@@ -319,6 +321,31 @@ async function applyTransferAssetDelta(
       data: assetIdsToAdd.map((assetId) => ({ transfer_id: transferId, asset_id: assetId })),
     })
   }
+}
+
+export async function deleteTransfer(transferNumber: string, userId: number): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, _count: { select: { asset_transfers: true } } },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+
+    if (transfer.status !== TRANSFER_STATUS.DRAFT) {
+      throw new ConflictError(`Transfer ${transferNumber} cannot be deleted after dispatch`)
+    }
+
+    const assetCount = transfer._count.asset_transfers
+    if (assetCount > 0) {
+      throw new ConflictError(
+        `Transfer ${transferNumber} cannot be deleted because it still has ${pluralize(assetCount, 'asset')}`,
+      )
+    }
+
+    await tx.transfer.delete({ where: { id: transfer.id } })
+  })
+
+  logger.warn('Transfer deleted', { transferNumber, userId })
 }
 
 async function getNewTransferNumber(originCode: string): Promise<string> {

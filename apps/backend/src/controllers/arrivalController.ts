@@ -19,6 +19,7 @@ import { prisma } from '../prisma.js'
 import {
   createArrival as createArrivalSer,
   createSingleArrivalAsset as createSingleArrivalAssetSer,
+  deleteArrival as deleteArrivalSer,
   getArrivalAssetForUpdate as getArrivalAssetForUpdateSer,
   getArrival as getArrivalSer,
   moveAssetsToArrival as moveAssetsToArrivalSer,
@@ -113,3 +114,8 @@ export const getArrivalHistory = asyncHandler(
     res.json(successResponse(history))
   },
 )
+
+export const deleteArrival = asyncHandler(async (req, res) => {
+  await deleteArrivalSer(req.params.arrivalNumber, res.locals.dbUserId)
+  res.status(204).send()
+})

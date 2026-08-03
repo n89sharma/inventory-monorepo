@@ -113,3 +113,7 @@ export async function dispatchTransfer(transferNumber: string): Promise<void> {
 export async function receiveTransfer(transferNumber: string): Promise<void> {
   await api.post(`/transfers/${transferNumber}/receive`)
 }
+
+export async function deleteTransfer(transferNumber: string): Promise<void> {
+  await api.delete(`/transfers/${transferNumber}`)
+}

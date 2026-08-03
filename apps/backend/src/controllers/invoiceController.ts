@@ -16,6 +16,7 @@ import { InvoiceListQuerySchema } from '../middleware/validation.js'
 import { prisma } from '../prisma.js'
 import {
   createInvoice as createInvoiceSer,
+  deleteInvoice as deleteInvoiceSer,
   getInvoice as getInvoiceSer,
   getInvoices as getInvoicesSer,
   addRemoveCollectionFromAssetsAndRecord as patchInvoiceAssetsSer,
@@ -71,3 +72,8 @@ export const getInvoiceHistory = asyncHandler(
     res.json(successResponse(history))
   },
 )
+
+export const deleteInvoice = asyncHandler(async (req, res) => {
+  await deleteInvoiceSer(req.params.invoiceNumber, res.locals.dbUserId)
+  res.status(204).send()
+})

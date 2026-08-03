@@ -19,6 +19,7 @@ import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   createTransfer as createTransferSer,
+  deleteTransfer as deleteTransferSer,
   dispatchTransfer as dispatchTransferSer,
   getTransfer as getTransferSer,
   patchTransferAssets as patchTransferAssetsSer,
@@ -111,3 +112,8 @@ export const getTransferHistory = asyncHandler(
     res.json(successResponse(history))
   },
 )
+
+export const deleteTransfer = asyncHandler(async (req, res) => {
+  await deleteTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})

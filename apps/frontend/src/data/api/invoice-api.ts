@@ -90,3 +90,7 @@ export async function patchInvoiceAssets(invoiceNumber: string, delta: AssetDelt
   const patchInvoiceAssetsBody = AssetDeltaSchema.parse(delta satisfies AssetDelta)
   await api.patch(`/invoices/${invoiceNumber}/assets`, patchInvoiceAssetsBody)
 }
+
+export async function deleteInvoice(invoiceNumber: string): Promise<void> {
+  await api.delete(`/invoices/${invoiceNumber}`)
+}

@@ -4,6 +4,7 @@ import { getArrivalHistory } from '@/data/api/arrival-api'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { useCan } from '@/hooks/use-can'
+import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { PlusIcon } from '@phosphor-icons/react'
@@ -32,6 +33,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
   const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
   const [moveOpen, setMoveOpen] = useState(false)
+
+  const handleDelete = useEntityDelete('Arrival', arrivalNumber, mutations.remove)
 
   const handleEditAsset = useCallback(
     async (assetId: number) => {
@@ -115,6 +118,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         )
       }}
       onFlushPending={mutations.flushPending}
+      onDelete={handleDelete}
       buildColumns={buildColumns}
       tableMeta={tableMeta}
       renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}

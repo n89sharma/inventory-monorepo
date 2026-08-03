@@ -14,6 +14,10 @@ export function preloadInvoiceDetail(invoiceNumber: string) {
   preload(invoiceDetailKey(invoiceNumber), () => getInvoiceDetail(invoiceNumber))
 }
 
+export function clearInvoiceDetail(invoiceNumber: string): void {
+  mutate(invoiceDetailKey(invoiceNumber), undefined, { revalidate: false })
+}
+
 const INVOICE_LIST_KEY_PREFIX = 'invoices:list'
 
 type InvoiceListKey = readonly [

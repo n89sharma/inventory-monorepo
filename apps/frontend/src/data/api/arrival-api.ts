@@ -226,3 +226,7 @@ export async function updateArrivalAsset(
   )
   return AssetSummarySchema.parse(data)
 }
+
+export async function deleteArrival(arrivalNumber: string): Promise<void> {
+  await api.delete(`/arrivals/${arrivalNumber}`)
+}

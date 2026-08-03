@@ -2,6 +2,7 @@ import express from 'express'
 import {
   createArrival,
   createSingleArrivalAsset,
+  deleteArrival,
   getArrival,
   getArrivalAssetForUpdate,
   getArrivalHistory,
@@ -28,6 +29,7 @@ router.get(
 router.post('/', requirePermission('create_update_arrival'), createArrival)
 router.get('/:arrivalNumber/history', requirePermission('view_collections'), getArrivalHistory)
 router.get('/:arrivalNumber', requirePermission('view_collections'), getArrival)
+router.delete('/:arrivalNumber', requirePermission('delete_collection'), deleteArrival)
 router.patch(
   '/:arrivalNumber/metadata',
   requirePermission('create_update_arrival'),

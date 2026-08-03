@@ -1,5 +1,6 @@
 import {
   createTransfer,
+  deleteTransfer,
   dispatchTransfer,
   getTransferDetail,
   patchTransferAssets,
@@ -8,7 +9,11 @@ import {
   updateTransferNotes,
 } from '@/data/api/transfer-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
-import { transferDetailKey, invalidateTransferLists } from '@/hooks/use-transfer'
+import {
+  transferDetailKey,
+  clearTransferDetail,
+  invalidateTransferLists,
+} from '@/hooks/use-transfer'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
@@ -165,8 +170,15 @@ function bulkRemoveAssets(transferNumber: string, assets: AssetSummary[]) {
   )
 }
 
+async function remove(transferNumber: string) {
+  await deleteTransfer(transferNumber)
+  clearTransferDetail(transferNumber)
+  invalidateTransferLists()
+}
+
 const mutations = {
   create,
+  remove,
   getAssets,
   addAssets,
   addAsset,

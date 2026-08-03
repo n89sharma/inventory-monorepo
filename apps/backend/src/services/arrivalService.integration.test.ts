@@ -9,9 +9,10 @@ import {
   seedAssetCost,
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
-import { ConflictError } from '../lib/errors.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createArrival, getArrival, moveAssetsToArrival } from './arrivalService.js'
+import { createArrival, deleteArrival, getArrival, moveAssetsToArrival } from './arrivalService.js'
+import { deleteAsset } from './assetDeleteService.js'
 
 async function getArrivalId(arrivalNumber: string): Promise<number> {
   const arrival = await prisma.arrival.findUniqueOrThrow({
@@ -178,5 +179,50 @@ describe('getArrival', () => {
 
     const arrival = await getArrival(arrivalNumber, 'admin')
     expect(arrival.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+  })
+})
+
+describe('deleteArrival', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('deletes an arrival that holds no assets', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
+    const [assetId] = await getArrivalAssetIds(arrivalNumber)
+    const asset = await prisma.asset.findUniqueOrThrow({
+      where: { id: assetId },
+      select: { barcode: true },
+    })
+    await deleteAsset(asset.barcode, refs.userId)
+
+    await deleteArrival(arrivalNumber, refs.userId)
+
+    expect(await prisma.arrival.findUnique({ where: { arrival_number: arrivalNumber } })).toBeNull()
+  })
+
+  it('refuses to delete an arrival that still holds assets', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+
+    await expect(deleteArrival(arrivalNumber, refs.userId)).rejects.toThrow(
+      new ConflictError(`Arrival ${arrivalNumber} cannot be deleted because it still has 2 assets`),
+    )
+    expect(
+      await prisma.arrival.findUnique({ where: { arrival_number: arrivalNumber } }),
+    ).not.toBeNull()
+  })
+
+  it('throws when the arrival number does not exist', async () => {
+    await expect(deleteArrival('A-YYZ-9999999', refs.userId)).rejects.toThrow(NotFoundError)
   })
 })

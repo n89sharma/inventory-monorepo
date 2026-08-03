@@ -14,6 +14,10 @@ export function preloadArrivalDetail(arrivalNumber: string) {
   preload(arrivalDetailKey(arrivalNumber), () => getArrivalDetail(arrivalNumber))
 }
 
+export function clearArrivalDetail(arrivalNumber: string): void {
+  mutate(arrivalDetailKey(arrivalNumber), undefined, { revalidate: false })
+}
+
 const ARRIVAL_LIST_KEY_PREFIX = 'arrivals:list'
 
 type ArrivalListKey = readonly [

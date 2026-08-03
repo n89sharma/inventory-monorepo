@@ -10,6 +10,7 @@ import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { useCan } from '@/hooks/use-can'
+import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { useCallback } from 'react'
@@ -40,6 +41,7 @@ export function TransferDetailsPage(): React.JSX.Element {
     [mutations, transferNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+  const handleDelete = useEntityDelete('Transfer', transferNumber, mutations.remove)
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSummary) => string) =>
@@ -77,6 +79,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         canEditAssets ? (assets) => mutations.bulkRemoveAssets(transferNumber, assets) : undefined
       }
       onFlushPending={mutations.flushPending}
+      onDelete={handleDelete}
       buildColumns={buildColumns}
       tableMeta={tableMeta}
       renderHeaderActions={(transfer) => (

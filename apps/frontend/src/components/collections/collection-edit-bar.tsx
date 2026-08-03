@@ -44,6 +44,7 @@ type CollectionEditBarProps = {
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
   onRelease?: () => void
+  onDelete?: () => void
 }
 
 export function CollectionEditBar({
@@ -56,6 +57,7 @@ export function CollectionEditBar({
   historyFetcher,
   onEdit,
   onRelease,
+  onDelete,
 }: CollectionEditBarProps): React.JSX.Element {
   const canDelete = useCan('delete_collection')
   const canViewPurchasePrice = useCan('view_purchase_price')
@@ -123,7 +125,7 @@ export function CollectionEditBar({
   const printDisabled = !printableBarcodes || printableBarcodes.length === 0 || printLoading
 
   const showRelease = canCreateEditEntity && Boolean(onRelease)
-  const showDelete = !onRelease && canDelete
+  const showDelete = canDelete && Boolean(onDelete)
 
   return (
     <div className="flex gap-2 print:hidden">
@@ -192,9 +194,10 @@ export function CollectionEditBar({
         onOpenChange={setDeleteOpen}
         entity={section}
         entityId={collectionId}
+        onConfirm={onDelete}
       >
         <AlertDialogDescription>
-          This does not delete the underlying assets present in the collection.
+          This permanently removes the record. It cannot be undone.
         </AlertDialogDescription>
       </DeleteEntityDialog>
     </div>

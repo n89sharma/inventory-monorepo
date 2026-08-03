@@ -9,8 +9,8 @@ import {
   PrinterIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { assetDetailsToSummary, type Permission } from 'shared-types'
 import { toast } from 'sonner'
 import { AddToCollectionModal } from '../collections/add-to-collection-modal'
@@ -44,7 +44,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const deleteAsset = useAssetStore((state) => state.deleteAsset)
   const [printLoading, setPrintLoading] = useState(false)
-  const navigate = useNavigate()
+  const handleDelete = useEntityDelete('Asset', barcode, deleteAsset)
 
   const assetSummaries = assetDetails
     ? assetDetailsToSummary(
@@ -63,16 +63,6 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     } finally {
       setPrintLoading(false)
     }
-  }
-
-  async function handleDelete() {
-    try {
-      await deleteAsset(barcode)
-    } catch {
-      return
-    }
-    toast.success(`Asset ${barcode} deleted`, { position: 'top-center' })
-    navigate('..', { relative: 'path' })
   }
 
   const canEditLocation = can('update_location')

@@ -24,6 +24,8 @@ import {
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
+import { logger } from '../lib/logger.js'
+import { pluralize } from '../lib/pluralize.js'
 import { prisma } from '../prisma.js'
 import {
   recordAssetUpdateOnCollection,
@@ -209,6 +211,30 @@ export async function addRemoveCollectionFromAssetsAndRecord(
     delta.assetIdsToRemove,
     userId,
   )
+}
+
+export async function deleteInvoice(invoiceNumber: string, userId: number): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const invoice = await tx.invoice.findUnique({
+      where: { invoice_number: invoiceNumber },
+      select: {
+        id: true,
+        _count: { select: { purchase_assets: true, sales_assets: true } },
+      },
+    })
+    if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
+
+    const assetCount = invoice._count.purchase_assets + invoice._count.sales_assets
+    if (assetCount > 0) {
+      throw new ConflictError(
+        `Invoice ${invoiceNumber} cannot be deleted because it still has ${pluralize(assetCount, 'asset')}`,
+      )
+    }
+
+    await tx.invoice.delete({ where: { id: invoice.id } })
+  })
+
+  logger.warn('Invoice deleted', { invoiceNumber, userId })
 }
 
 export async function getInvoices(

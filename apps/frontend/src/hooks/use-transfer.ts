@@ -14,6 +14,10 @@ export function preloadTransferDetail(transferNumber: string) {
   preload(transferDetailKey(transferNumber), () => getTransferDetail(transferNumber))
 }
 
+export function clearTransferDetail(transferNumber: string): void {
+  mutate(transferDetailKey(transferNumber), undefined, { revalidate: false })
+}
+
 const TRANSFER_LIST_KEY_PREFIX = 'transfers:list'
 
 type TransferListKey = readonly [

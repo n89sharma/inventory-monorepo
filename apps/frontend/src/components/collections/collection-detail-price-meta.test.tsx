@@ -32,12 +32,14 @@ const mocks = vi.hoisted(() => {
     bulkRemoveAssets: vi.fn(),
     moveAssets: vi.fn(),
     flushPending: vi.fn(),
+    remove: vi.fn().mockResolvedValue(undefined),
   })
   return {
     arrival: makeMutations(),
     transfer: makeMutations(),
     departure: makeMutations(),
     invoice: makeMutations(),
+    navigate: vi.fn(),
     captured: { current: null as CapturedProps | null },
   }
 })
@@ -54,6 +56,7 @@ vi.mock('@/components/collections/collection-detail-page', () => ({
 vi.mock('react-router-dom', async (importOriginal) => ({
   ...(await importOriginal<typeof import('react-router-dom')>()),
   useParams: () => ({ collectionId: COLLECTION_ID }),
+  useNavigate: () => mocks.navigate,
 }))
 
 vi.mock('@/hooks/use-can', () => ({ useCan: () => true }))

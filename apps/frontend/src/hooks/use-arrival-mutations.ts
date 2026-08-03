@@ -1,6 +1,7 @@
 import {
   createArrival,
   createSingleArrivalAsset,
+  deleteArrival,
   getArrivalAssetForUpdate,
   moveArrivalAssets,
   patchArrivalAssets,
@@ -8,7 +9,7 @@ import {
   updateArrivalMetadata,
 } from '@/data/api/arrival-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
-import { arrivalDetailKey, invalidateArrivalLists } from '@/hooks/use-arrival'
+import { arrivalDetailKey, clearArrivalDetail, invalidateArrivalLists } from '@/hooks/use-arrival'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
@@ -129,8 +130,15 @@ async function moveAssets(
   invalidateArrivalLists()
 }
 
+async function remove(arrivalNumber: string) {
+  await deleteArrival(arrivalNumber)
+  clearArrivalDetail(arrivalNumber)
+  invalidateArrivalLists()
+}
+
 const mutations = {
   create,
+  remove,
   updateMetadata,
   createAsset,
   getAssetForEdit,

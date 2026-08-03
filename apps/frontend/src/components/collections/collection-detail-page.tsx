@@ -59,6 +59,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
     clearSelection: () => void
   }) => React.ReactNode
   onRelease?: () => void
+  onDelete?: () => void
 }
 
 export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>({
@@ -83,6 +84,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   renderHeaderActions,
   renderBulkExtraActions,
   onRelease,
+  onDelete,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   const { state, search } = useLocation()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
@@ -153,6 +155,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
               historyFetcher={historyFetcher}
               onEdit={() => setIsMetadataModalOpen(true)}
               onRelease={onRelease}
+              onDelete={onDelete}
             />
           </div>
         }

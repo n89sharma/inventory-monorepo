@@ -1,5 +1,6 @@
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
+import { pluralize } from '../lib/pluralize.js'
 import { prisma } from '../prisma.js'
 
 const DELETE_BLOCKER_SELECT = {
@@ -20,10 +21,6 @@ type DeletableAsset = {
   purchase_invoice: { invoice_number: string } | null
   asset_transfers: Array<{ transfer: { transfer_number: string } }>
   _count: { asset_store_parts: number; donated_parts: number; received_parts: number }
-}
-
-function pluralize(count: number, noun: string): string {
-  return `${count} ${noun}${count === 1 ? '' : 's'}`
 }
 
 function collectDeleteBlockers(asset: DeletableAsset): string[] {
