@@ -118,7 +118,7 @@ function AssetSummaryStrip({
   if (location) tokens.push({ key: 'location', node: <span>{location}</span> })
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-4">
       {tokens.map((t) => (
         <Fragment key={t.key}>{t.node}</Fragment>
       ))}
