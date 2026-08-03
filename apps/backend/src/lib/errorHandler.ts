@@ -36,6 +36,10 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     res.status(400).json(response400('A record with these details already exists'))
     return
   }
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+    res.status(409).json(response409('This record is still referenced by other records'))
+    return
+  }
   logger.error('Unhandled error', {
     requestId: req.id ?? 'unknown',
     error: err instanceof Error ? err.message : String(err),

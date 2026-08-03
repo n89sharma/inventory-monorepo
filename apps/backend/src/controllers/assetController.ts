@@ -52,6 +52,7 @@ import {
 } from '../services/assetLocationService.js'
 import { updateAssetSpecs as updateAssetSpecsSer } from '../services/assetSpecsService.js'
 import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../services/assetPartService.js'
+import { deleteAsset as deleteAssetSer } from '../services/assetDeleteService.js'
 
 export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number),
@@ -314,6 +315,12 @@ export const getAssetHistory = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const data = await getAssetHistorySer(barcode, res.locals.dbUserRole)
   res.json(successResponse(data))
+})
+
+export const deleteAsset = asyncHandler(async (req, res) => {
+  const { barcode } = req.params
+  await deleteAssetSer(barcode, res.locals.dbUserId)
+  res.status(204).send()
 })
 
 export const getAssetSummaryByBarcode = asyncHandler(

@@ -123,6 +123,10 @@ export async function updateAssetSpecs(barcode: string, data: UpdateAssetSpecs):
   await api.put(`/assets/${barcode}/specs`, updateAssetSpecsBody)
 }
 
+export async function deleteAsset(barcode: string): Promise<void> {
+  await api.delete(`/assets/${barcode}`)
+}
+
 export async function getLocationsByWarehouse(warehouseId: number): Promise<AssetLocation[]> {
   const { data } = await api.get<AssetLocation[]>('/assets/locations', { params: { warehouseId } })
   return z.array(AssetLocationSchema).parse(data)

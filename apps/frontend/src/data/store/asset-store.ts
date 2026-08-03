@@ -1,6 +1,7 @@
 import {
   bulkUpdateAssetPricing as bulkUpdateAssetPricingApi,
   createAssetHarvestedPart as createAssetHarvestedPartApi,
+  deleteAsset as deleteAssetApi,
   printBarcodes as printBarcodesApi,
   getAssetDetail as getAssetDetailApi,
   postComment as postCommentApi,
@@ -11,7 +12,7 @@ import {
 } from '@/data/api/asset-api'
 import { addStorePartToAsset as addStorePartToAssetApi } from '@/data/api/store-part-api'
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
-import { assetDetailKey, invalidateAssetDetails } from '@/hooks/use-asset-detail'
+import { assetDetailKey, clearAssetDetail, invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
@@ -38,6 +39,7 @@ interface AssetStore {
     form: AddStorePartForm,
   ) => Promise<StoreTransactionResponse>
   createComment: (barcode: string, data: CreateComment) => Promise<void>
+  deleteAsset: (barcode: string) => Promise<void>
   updateAssetLocation: (
     barcode: string,
     data: UpdateAssetLocation,
@@ -74,6 +76,11 @@ export const useAssetStore = create<AssetStore>(() => ({
   createComment: async (barcode, data) => {
     await postCommentApi(barcode, data)
     mutate(assetDetailKey(barcode))
+  },
+
+  deleteAsset: async (barcode) => {
+    await deleteAssetApi(barcode)
+    clearAssetDetail(barcode)
   },
 
   updateAssetLocation: async (barcode, data, skipErrorToast) => {

@@ -16,3 +16,7 @@ export function invalidateAssetDetails(barcodes: string[]): void {
     mutate(assetDetailKey(barcode))
   }
 }
+
+export function clearAssetDetail(barcode: string): void {
+  mutate(assetDetailKey(barcode), undefined, { revalidate: false })
+}

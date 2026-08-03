@@ -6,6 +6,7 @@ import {
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
+  deleteAsset,
   getAssetAccessories,
   getAssetComments,
   getAssetDetail,
@@ -49,6 +50,7 @@ router.get(
 router.get('/:barcode/history', requirePermission('view_asset'), getAssetHistory)
 router.get('/:barcode/summary', requirePermission('view_asset'), getAssetSummaryByBarcode)
 router.get('/:barcode', requirePermission('view_asset'), getAssetDetail)
+router.delete('/:barcode', requirePermission('delete_asset'), deleteAsset)
 router.get('/:barcode/accessories', requirePermission('view_asset'), getAssetAccessories)
 router.get('/:barcode/errors', requirePermission('view_asset'), getAssetErrors)
 router.put('/:barcode/errors', requirePermission('update_tech_specs'), updateAssetErrors)
