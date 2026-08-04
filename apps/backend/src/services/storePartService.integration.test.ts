@@ -47,6 +47,24 @@ describe('storePartService', () => {
     return part.id
   }
 
+  // A second (or later) purchase of the same part — a new FIFO layer behind the first.
+  async function purchaseMore(storePartId: number, quantity: number, unitCost: number) {
+    const purchase: RecordStoreTransaction = {
+      kind: 'PURCHASE',
+      part: { mode: 'existing', store_part_id: storePartId },
+      warehouse_id: refs.warehouse.id,
+      quantity,
+      unit_cost: unitCost,
+      notes: null,
+    }
+    await recordStoreTransaction(purchase, refs.userId)
+  }
+
+  async function summaryRow(storePartId: number, canViewCost = true) {
+    const rows = await getStoreParts(canViewCost)
+    return rows.find((r) => r.id === storePartId && r.warehouse_id === refs.warehouse.id)
+  }
+
   it('decrements on-hand and bumps asset parts_cost/total_cost when a part is consumed', async () => {
     const storePartId = await purchaseNewPart(10, 5)
     const [asset] = await createArrivedAssets(refs, 1)
@@ -55,7 +73,6 @@ describe('storePartService', () => {
       store_part_id: storePartId,
       warehouse_id: refs.warehouse.id,
       quantity: 3,
-      unit_cost: 5,
     }
     await addStorePartToAsset(asset.barcode, consume, refs.userId)
 
@@ -63,10 +80,7 @@ describe('storePartService', () => {
     expect(cost?.parts_cost).toBe(15)
     expect(cost?.total_cost).toBe(15)
 
-    const onHandRow = (await getStoreParts()).find(
-      (r) => r.id === storePartId && r.warehouse_id === refs.warehouse.id,
-    )
-    expect(onHandRow?.on_hand).toBe(7)
+    expect((await summaryRow(storePartId))?.on_hand).toBe(7)
   })
 
   it('rejects consuming more of a part than is on hand', async () => {
@@ -77,11 +91,75 @@ describe('storePartService', () => {
       store_part_id: storePartId,
       warehouse_id: refs.warehouse.id,
       quantity: 5,
-      unit_cost: 5,
     }
     await expect(addStorePartToAsset(asset.barcode, consume, refs.userId)).rejects.toThrow(
       ConflictError,
     )
+  })
+
+  it('values stock on hand against the newest purchase', async () => {
+    // 10 @ $10, then 10 @ $20, then 15 consumed — the 5 left are all from the $20 layer.
+    const storePartId = await purchaseNewPart(10, 10)
+    await purchaseMore(storePartId, 10, 20)
+    const [asset] = await createArrivedAssets(refs, 1)
+    await addStorePartToAsset(
+      asset.barcode,
+      { store_part_id: storePartId, warehouse_id: refs.warehouse.id, quantity: 15 },
+      refs.userId,
+    )
+
+    const row = await summaryRow(storePartId)
+    expect(row?.on_hand).toBe(5)
+    expect(row?.stock_value).toBe(100)
+  })
+
+  it('costs a consumption that spans two purchases and records a blended unit cost', async () => {
+    // 10 @ $10 then 10 @ $20, consume 15 → 10 x $10 + 5 x $20 = $200, blended $13.33.
+    const storePartId = await purchaseNewPart(10, 10)
+    await purchaseMore(storePartId, 10, 20)
+    const [asset] = await createArrivedAssets(refs, 1)
+    await addStorePartToAsset(
+      asset.barcode,
+      { store_part_id: storePartId, warehouse_id: refs.warehouse.id, quantity: 15 },
+      refs.userId,
+    )
+
+    const cost = await getAssetCost(asset.id)
+    expect(cost?.parts_cost).toBe(200)
+    expect(cost?.total_cost).toBe(200)
+
+    const used = await prisma.storeTransaction.findFirstOrThrow({
+      where: { store_part_id: storePartId, transaction_type: { is_inbound: false } },
+      select: { unit_cost: true },
+    })
+    expect(used.unit_cost?.toString()).toBe('13.33')
+  })
+
+  it('resumes the FIFO queue where the previous consumption stopped', async () => {
+    const storePartId = await purchaseNewPart(10, 10)
+    await purchaseMore(storePartId, 10, 20)
+    const [first, second] = await createArrivedAssets(refs, 2)
+
+    await addStorePartToAsset(
+      first.barcode,
+      { store_part_id: storePartId, warehouse_id: refs.warehouse.id, quantity: 15 },
+      refs.userId,
+    )
+    await addStorePartToAsset(
+      second.barcode,
+      { store_part_id: storePartId, warehouse_id: refs.warehouse.id, quantity: 3 },
+      refs.userId,
+    )
+
+    expect((await getAssetCost(second.id))?.parts_cost).toBe(60)
+    expect((await summaryRow(storePartId))?.stock_value).toBe(40)
+  })
+
+  it('withholds stock value from callers who cannot view purchase prices', async () => {
+    const storePartId = await purchaseNewPart(10, 10)
+
+    expect((await summaryRow(storePartId, true))?.stock_value).toBe(100)
+    expect((await summaryRow(storePartId, false))?.stock_value).toBeNull()
   })
 
   it('rejects creating a part whose part_number already exists', async () => {
@@ -125,10 +203,7 @@ describe('storePartService', () => {
     }
     await recordStoreTransaction(sale, refs.userId)
 
-    const onHandRow = (await getStoreParts()).find(
-      (r) => r.id === storePartId && r.warehouse_id === refs.warehouse.id,
-    )
-    expect(onHandRow?.on_hand).toBe(6)
+    expect((await summaryRow(storePartId))?.on_hand).toBe(6)
   })
 
   it('rejects a SALE that exceeds on-hand', async () => {

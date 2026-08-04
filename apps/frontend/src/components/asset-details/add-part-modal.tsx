@@ -256,7 +256,6 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
   const warehouse = useWatch({ control, name: 'warehouse' })
   const part = useWatch({ control, name: 'part' })
   const quantity = useWatch({ control, name: 'quantity' })
-  const unitCost = useWatch({ control, name: 'unitCost' })
 
   const partOptions = useMemo(
     () => (warehouse ? allRows.filter((row) => row.warehouse_id === warehouse.id) : []),
@@ -266,7 +265,6 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
   function selectWarehouse(next: Warehouse | null) {
     setValue('warehouse', next, { shouldValidate: true })
     setValue('part', null)
-    setValue('unitCost', '')
     setPartQuery('')
   }
 
@@ -274,13 +272,7 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
   const quantityIsInt = /^\d+$/.test(quantity)
   const exceedsStock = part !== null && quantityIsInt && Number(quantity) > onHand
   const canSubmit =
-    warehouse !== null &&
-    part !== null &&
-    quantityIsInt &&
-    Number(quantity) > 0 &&
-    !exceedsStock &&
-    unitCost.trim() !== '' &&
-    Number(unitCost) > 0
+    warehouse !== null && part !== null && quantityIsInt && Number(quantity) > 0 && !exceedsStock
 
   async function onValid(values: AddStorePartForm) {
     setSaving(true)
@@ -299,7 +291,6 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
       formErrors.warehouse?.message ??
       formErrors.part?.message ??
       formErrors.quantity?.message ??
-      formErrors.unitCost?.message ??
       'Please fix the highlighted fields'
     toast.error(message, { position: 'top-center' })
   }
@@ -327,13 +318,6 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
                   onQueryChange={setPartQuery}
                   onSelectionChange={(value) => {
                     field.onChange(value)
-                    setValue(
-                      'unitCost',
-                      value.last_purchase_unit_cost === null
-                        ? '0'
-                        : String(value.last_purchase_unit_cost),
-                      { shouldValidate: true },
-                    )
                     setPartQuery('')
                   }}
                   onClear={() => {
@@ -382,29 +366,6 @@ function StoreTab({ recipientBarcode, onClose }: TabProps) {
               <span className="text-xs text-destructive">Only {onHand} in stock</span>
             )}
           </div>
-        </HorizontalField>
-
-        <HorizontalField label="Unit cost" required>
-          <Controller
-            control={control}
-            name="unitCost"
-            render={({ field }) => (
-              <div className="relative max-w-[160px]">
-                <span className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
-                  $
-                </span>
-                <Input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="0.00"
-                  className="pl-7 tabular-nums"
-                />
-              </div>
-            )}
-          />
         </HorizontalField>
       </form>
 

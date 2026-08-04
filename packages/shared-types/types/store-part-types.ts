@@ -17,7 +17,8 @@ export const CreateStorePartSchema = z.object({
 })
 export type CreateStorePart = z.infer<typeof CreateStorePartSchema>
 
-// GET /store — one row per (part, warehouse)
+// GET /store — one row per (part, warehouse). stock_value is the FIFO value of the
+// on-hand quantity, withheld (null) from users without view_purchase_price.
 export const StorePartSummarySchema = z.object({
   id: z.number(),
   part_number: z.string(),
@@ -25,7 +26,7 @@ export const StorePartSummarySchema = z.object({
   warehouse_id: z.number(),
   warehouse_code: z.string(),
   on_hand: z.number().int(),
-  last_purchase_unit_cost: z.number().nullable(),
+  stock_value: z.number().nullable(),
   last_updated: z.coerce.date(),
 })
 export type StorePartSummary = z.infer<typeof StorePartSummarySchema>
@@ -101,11 +102,11 @@ export const AssetStorePartRowSchema = z.object({
 })
 export type AssetStorePartRow = z.infer<typeof AssetStorePartRowSchema>
 
-// POST /assets/:barcode/store-parts — consume a store part onto an asset (USED, outbound)
+// POST /assets/:barcode/store-parts — consume a store part onto an asset (USED, outbound).
+// The cost is derived from the FIFO ledger on the backend, never supplied by the client.
 export const AddStorePartToAssetSchema = z.object({
   store_part_id: z.number().int(),
   warehouse_id: z.number().int(),
   quantity: z.number().int().positive(),
-  unit_cost: z.number().positive(),
 })
 export type AddStorePartToAsset = z.infer<typeof AddStorePartToAssetSchema>

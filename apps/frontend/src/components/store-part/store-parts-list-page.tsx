@@ -3,7 +3,9 @@ import { Button } from '@/components/shadcn/button'
 import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { StoreTransactionModal } from '@/components/store-part/store-transaction-modal'
-import { storePartTableColumns } from '@/components/store-part/store-part-table-columns'
+import { StorePartSummaryStrip } from '@/components/store-part/store-part-summary-strip'
+import { buildStorePartTableColumns } from '@/components/store-part/store-part-table-columns'
+import { useCan } from '@/hooks/use-can'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'
 import { useStoreSearchParam, useStoreWarehousesParam } from '@/lib/filters/hooks'
 import { rankMatches } from '@/lib/rank-matches'
@@ -27,15 +29,25 @@ export function StorePartsListPage(): React.JSX.Element {
   const { data: rows = [] } = useStorePartsList()
   const [addOpen, setAddOpen] = useState(false)
 
+  const canViewStockValue = useCan('view_purchase_price')
+  const columns = useMemo(() => buildStorePartTableColumns(canViewStockValue), [canViewStockValue])
+
   const selectedWarehouseIds = useMemo(() => new Set(warehouses.map((w) => w.id)), [warehouses])
 
-  const filteredRows = useMemo(() => {
-    const inWarehouse =
+  // The stock value total answers "what is sitting in this warehouse", so it
+  // follows the warehouse filter but deliberately ignores the search box.
+  const warehouseRows = useMemo(
+    () =>
       selectedWarehouseIds.size > 0
         ? rows.filter((row) => selectedWarehouseIds.has(row.warehouse_id))
-        : rows
-    return rankMatches(inWarehouse, search, storePartSearchText)
-  }, [rows, selectedWarehouseIds, search])
+        : rows,
+    [rows, selectedWarehouseIds],
+  )
+
+  const filteredRows = useMemo(
+    () => rankMatches(warehouseRows, search, storePartSearchText),
+    [warehouseRows, search],
+  )
 
   const allParts = useMemo<StorePart[]>(() => {
     const byId = new Map<number, StorePart>()
@@ -62,8 +74,9 @@ export function StorePartsListPage(): React.JSX.Element {
     <>
       <CollectionPage<StorePartSummary, unknown>
         title="Store"
-        columns={storePartTableColumns}
+        columns={columns}
         data={filteredRows}
+        summaryStrip={<StorePartSummaryStrip rows={warehouseRows} />}
         defaultSort={{ id: 'on_hand', desc: true }}
         onRowMouseEnter={(row) => preloadStorePartDetail(row.id)}
         getRowHref={storePartHref}

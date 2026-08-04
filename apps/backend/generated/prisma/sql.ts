@@ -71,6 +71,10 @@ export * from "./sql/getStorePartOnHand.js"
 
 export * from "./sql/getStoreParts.js"
 
+export * from "./sql/getStorePartStockLayers.js"
+
+export * from "./sql/getStoreStockLayers.js"
+
 export * from "./sql/getTransfers.js"
 
 export * from "./sql/getUsers.js"

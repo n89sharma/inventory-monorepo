@@ -169,7 +169,6 @@ describe('assetDeleteService', () => {
       store_part_id: storePartId,
       warehouse_id: refs.warehouse.id,
       quantity: 2,
-      unit_cost: 5,
     }
     await addStorePartToAsset(asset.barcode, consume, refs.userId)
 

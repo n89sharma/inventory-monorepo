@@ -64,7 +64,6 @@ export async function addStorePartToAsset(
     store_part_id: form.part.id,
     warehouse_id: form.warehouse.id,
     quantity: Number(form.quantity),
-    unit_cost: Number(form.unitCost),
   } satisfies AddStorePartToAsset)
   const { data } = await api.post<StoreTransactionResponse>(
     `/store/asset/${barcode}/parts`,

@@ -9,6 +9,7 @@ interface CollectionPageProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   searchBar: React.ReactNode
+  summaryStrip?: React.ReactNode
   actions?: React.ReactNode
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
@@ -22,6 +23,7 @@ export function CollectionPage<TData, TValue>({
   columns,
   data,
   searchBar,
+  summaryStrip,
   actions,
   onRowMouseEnter,
   getRowHref,
@@ -40,6 +42,7 @@ export function CollectionPage<TData, TValue>({
         {searchBar}
       </StickyPageHeader>
       <PageContent className="flex flex-col gap-2">
+        {summaryStrip}
         <DataTable
           columns={columns}
           data={data}

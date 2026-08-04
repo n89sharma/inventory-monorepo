@@ -42,16 +42,15 @@ export const EMPTY_STORE_TRANSACTION_FORM: StoreTransactionForm = {
 }
 
 // Consume a part from store inventory onto an asset. part is a per-warehouse
-// summary row so its on_hand (stock guard) and last_purchase_unit_cost (default)
-// are available without a second lookup.
+// summary row so its on_hand (stock guard) is available without a second lookup.
+// The cost is derived from the FIFO ledger on the backend, so no cost is collected here.
 // last_updated (z.coerce.date) is dropped: it isn't needed in the form and its
 // `unknown` zod input type otherwise breaks the react-hook-form resolver typing.
 export const AddStorePartFormSchema = z
   .object({
     warehouse: WarehouseSchema.nullable(),
-    part: StorePartSummarySchema.omit({ last_updated: true }).nullable(),
+    part: StorePartSummarySchema.omit({ last_updated: true, stock_value: true }).nullable(),
     quantity: z.string(),
-    unitCost: z.string(),
   })
   .refine((form) => form.warehouse !== null, {
     message: 'Select a warehouse',
@@ -72,10 +71,6 @@ export const AddStorePartFormSchema = z
       Number(form.quantity) <= form.part.on_hand,
     { message: 'Quantity exceeds stock on hand', path: ['quantity'] },
   )
-  .refine((form) => form.unitCost.trim() !== '' && Number(form.unitCost) > 0, {
-    message: 'Enter a unit cost greater than 0',
-    path: ['unitCost'],
-  })
 
 export type AddStorePartForm = z.infer<typeof AddStorePartFormSchema>
 
@@ -83,5 +78,4 @@ export const EMPTY_ADD_STORE_PART_FORM: AddStorePartForm = {
   warehouse: null,
   part: null,
   quantity: '1',
-  unitCost: '',
 }
