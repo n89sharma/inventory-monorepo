@@ -20,8 +20,28 @@ export function createModelPriceHistoryColumns(
       value: (row) => row.barcode,
     }),
     {
+      accessorKey: 'meter',
+      header: sortableHeader<ModelPriceHistoryRow>('Meter'),
+      cell: ({ row }) => formatThousandsK(row.original.meter),
+    },
+    {
+      accessorKey: 'vendor',
+      header: sortableHeader<ModelPriceHistoryRow>('Vendor'),
+      cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
+    },
+    {
+      accessorKey: 'arrived_at',
+      header: sortableHeader<ModelPriceHistoryRow>('Arrived At'),
+      cell: ({ row }) => (row.original.arrived_at ? formatDate(row.original.arrived_at) : ''),
+    },
+    {
+      accessorKey: 'customer',
+      header: sortableHeader<ModelPriceHistoryRow>('Customer'),
+      cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
+    },
+    {
       accessorKey: 'departed_at',
-      header: sortableHeader<ModelPriceHistoryRow>('Date Sold'),
+      header: sortableHeader<ModelPriceHistoryRow>('Departed At'),
       cell: ({ row }) => formatDate(row.original.departed_at),
     },
     {
@@ -33,16 +53,6 @@ export function createModelPriceHistoryColumns(
       accessorKey: 'sale_price',
       header: sortableHeader<ModelPriceHistoryRow>('Sale Price'),
       cell: ({ row }) => formatUSDWithSymbol(row.original.sale_price),
-    },
-    {
-      accessorKey: 'meter',
-      header: sortableHeader<ModelPriceHistoryRow>('Meter'),
-      cell: ({ row }) => formatThousandsK(row.original.meter),
-    },
-    {
-      accessorKey: 'customer',
-      header: sortableHeader<ModelPriceHistoryRow>('Customer'),
-      cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
     },
     {
       accessorKey: 'salesperson',

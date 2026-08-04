@@ -7,6 +7,8 @@ select
   c.purchase_cost::float8 as purchase_cost,
   c.sale_price::float8 as sale_price,
   ts.meter_total as meter,
+  r.created_at as arrived_at,
+  vo."name" as vendor,
   o."name" as customer,
   u."name" as salesperson,
   ts.cassettes as cassettes,
@@ -16,6 +18,8 @@ from "Asset" a
   join "Departure" d on d.id = a.departure_id
   join "Cost" c on c.asset_id = a.id
   join "Organization" o on o.id = d.destination_id
+  left join "Arrival" r on r.id = a.arrival_id
+  left join "Organization" vo on vo.id = r.origin_id
   left join "User" u on u.id = d.sales_representative_id
   left join "TechnicalSpecification" ts on ts.asset_id = a.id
   left join "Component" cmp on cmp.id = ts.component_id

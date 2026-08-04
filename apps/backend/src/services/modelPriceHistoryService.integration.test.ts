@@ -47,6 +47,8 @@ describe('modelPriceHistoryService', () => {
     const result = await getModelPriceHistory(refs.model.id)
     expect(result.sales).toHaveLength(1)
     expect(result.sales[0].sale_price).toBe(500)
+    expect(result.sales[0].vendor).toBe(refs.vendor.name)
+    expect(result.sales[0].arrived_at).not.toBeNull()
     expect(result.last_sale).not.toBeNull()
     expect(result.in_stock_count).toBe(0)
   })

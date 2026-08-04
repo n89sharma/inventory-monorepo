@@ -2,10 +2,12 @@ import { z } from 'zod'
 
 export const ModelPriceHistoryRowSchema = z.object({
   barcode: z.string(),
+  arrived_at: z.coerce.date().nullable(),
   departed_at: z.coerce.date(),
   purchase_price: z.number().nullable(),
   sale_price: z.number(),
   meter: z.number().nullable(),
+  vendor: z.string().nullable(),
   customer: z.string().nullable(),
   salesperson: z.string().nullable(),
   cassettes: z.number().nullable(),

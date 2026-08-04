@@ -12,10 +12,12 @@ const SALES_WINDOW_MONTHS = 12
 function mapModelPriceHistoryRow(row: getModelPriceHistoryQuery.Result): ModelPriceHistoryRow {
   return {
     barcode: row.barcode,
+    arrived_at: row.arrived_at,
     departed_at: row.departed_at,
     purchase_price: row.purchase_cost ?? null,
     sale_price: row.sale_price ?? 0,
     meter: row.meter,
+    vendor: row.vendor,
     customer: row.customer,
     salesperson: row.salesperson ?? null,
     cassettes: row.cassettes,
