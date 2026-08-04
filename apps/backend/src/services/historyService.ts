@@ -26,6 +26,7 @@ type DepartureCreateState = {
   departure_number: string
   origin_id: number
   destination_id: number
+  sales_representative_id: number
   created_at: Date
 }
 
@@ -108,6 +109,7 @@ type DepartureUpdateFields = Partial<{
   origin_id: number
   destination_id: number
   transporter_id: number
+  sales_representative_id: number | null
 }>
 
 type HoldUpdateFields = Partial<{
@@ -505,6 +507,7 @@ const DEPARTURE_UPDATE_SPEC: FieldSpec[] = [
   { field: 'origin_id', out: 'origin_city_code', resolve: 'warehouse', bothRequired: true },
   { field: 'destination_id', out: 'destination_name', resolve: 'organization', bothRequired: true },
   { field: 'transporter_id', out: 'transporter_name', resolve: 'organization', bothRequired: true },
+  { field: 'sales_representative_id', out: 'salesperson_name', resolve: 'user' },
 ]
 
 const HOLD_UPDATE_SPEC: FieldSpec[] = [
@@ -549,6 +552,7 @@ const DEPARTURE_CREATE_SPEC: CreateFieldSpec<DepartureCreateState>[] = [
   { out: 'origin_city_code', resolve: 'warehouse', id: (s) => s.origin_id },
   { out: 'destination_name', resolve: 'organization', id: (s) => s.destination_id },
   { out: 'created_by_name', resolve: 'user', id: (_, userId) => userId },
+  { out: 'salesperson_name', resolve: 'user', id: (s) => s.sales_representative_id },
   { out: 'created_at', value: (s) => s.created_at },
 ]
 

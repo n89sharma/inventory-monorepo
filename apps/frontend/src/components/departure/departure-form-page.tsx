@@ -14,10 +14,12 @@ import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-
 import { AddFromHoldButton } from '@/components/collections/add-from-hold-button'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
+import { ControlledSelectOptionSearchSelect } from '@/components/shared/search-select/controlled-select-option-search-select'
 import { DepartureOutgoingStatusBar } from '@/components/departure/departure-outgoing-status-bar'
 import { SelectOptions } from '@/components/shared/search-select/select-options'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useOrgStore } from '@/data/store/org-store'
+import { useActiveUsers } from '@/hooks/use-active-users'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -62,6 +64,7 @@ export function DepartureFormPage({
     defaultValues: defaultValues ?? getDefaultDeparture(),
   })
   const activeWarehouses = useActiveWarehouses()
+  const activeUsers = useActiveUsers()
   const orgs = useOrgStore((state) => state.organizations)
   const {
     fields: assets,
@@ -101,6 +104,7 @@ export function DepartureFormPage({
       origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
       customer: null,
       transporter: null,
+      salesperson: UNSELECTED,
       comment: '',
       assets: [],
     }
@@ -173,6 +177,16 @@ export function DepartureFormPage({
                   options={orgs}
                   getLabel={(o) => o.name}
                   fieldLabel="Transporter"
+                  fieldRequired={true}
+                  className="max-w-60"
+                />
+
+                <ControlledSelectOptionSearchSelect
+                  control={form.control}
+                  name="salesperson"
+                  options={activeUsers}
+                  getLabel={(u) => u.name}
+                  fieldLabel="Salesperson"
                   fieldRequired={true}
                   className="max-w-60"
                 />

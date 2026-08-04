@@ -31,6 +31,7 @@ export function CreateDeparturePage(): React.JSX.Element {
         origin: defaultWarehouse ? getSelectOption(defaultWarehouse) : UNSELECTED,
         customer: null,
         transporter: null,
+        salesperson: UNSELECTED,
         comment: '',
         assets: preloadedAssets.map((a) => ({ ...a, outgoing_status: DEFAULT_OUTGOING_STATUS })),
       }

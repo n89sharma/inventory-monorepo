@@ -7,6 +7,7 @@ select
 	t."name" as transporter,
 	d.created_at as created_at,
 	u."name"  as created_by,
+	sp."name" as salesperson,
   ac.asset_count as asset_count,
   ac.copier_count as copier_count,
   ac.finisher_count as finisher_count,
@@ -14,6 +15,7 @@ select
   ac.other_count as other_count
 from "Departure" d
 join "User" u on u.id = d.created_by_id
+left join "User" sp on sp.id = d.sales_representative_id
 join "Warehouse" wo on wo.id = d.origin_id
 join "Organization" od on od.id = d.destination_id
 join "Organization" t on t.id = d.transporter_id

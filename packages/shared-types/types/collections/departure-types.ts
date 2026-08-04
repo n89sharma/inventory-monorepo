@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { AssetSummarySchema } from '../asset-types.js'
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { OutgoingStatusSchema, WarehouseSchema } from '../reference-data-types.js'
+import { UserSchema } from '../user-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
 
 export const DepartureSummarySchema = CollectionSummarySchema.extend({
@@ -10,6 +11,7 @@ export const DepartureSummarySchema = CollectionSummarySchema.extend({
   origin_street: z.string(),
   destination: z.string(),
   transporter: z.string(),
+  salesperson: z.string().nullable(),
 })
 export type DepartureSummary = z.infer<typeof DepartureSummarySchema>
 
@@ -22,6 +24,7 @@ export const DepartureDetailSchema = z.object({
   notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
+  salesperson: UserSchema.nullable(),
   assets: z.array(AssetSummarySchema),
 })
 export type DepartureDetail = z.infer<typeof DepartureDetailSchema>
@@ -44,6 +47,7 @@ export const CreateDepartureSchema = z.object({
   origin: WarehouseSchema,
   customer: OrgSummarySchema,
   transporter: OrgSummarySchema,
+  salesperson_id: z.number().int(),
   comment: z.string().nullable(),
   assets: z.array(DepartureAssetInputSchema).nonempty('No assets in the departure').max(2000),
 })
@@ -54,6 +58,7 @@ export const UpdateDepartureMetadataSchema = z.object({
   origin: WarehouseSchema,
   customer: OrgSummarySchema,
   transporter: OrgSummarySchema,
+  salesperson: UserSchema,
   comment: z.string().nullable(),
 })
 export type UpdateDepartureMetadata = z.infer<typeof UpdateDepartureMetadataSchema>

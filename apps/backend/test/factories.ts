@@ -301,6 +301,7 @@ export function buildCreateDepartureInput(
     origin: refs.warehouse,
     customer: refs.customer,
     transporter: refs.transporter,
+    salesperson_id: refs.userId,
     comment: null,
     assets: nonEmpty(assets),
   }

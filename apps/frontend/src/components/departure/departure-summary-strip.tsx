@@ -10,6 +10,9 @@ export function DepartureSummaryStrip({ departure }: { departure: DepartureDetai
       <SummaryField label="Origin" value={departure.origin.city_code} />
       <SummaryField label="Transporter" value={departure.transporter.name} />
       {departure.created_by && <SummaryField label="By" value={departure.created_by} />}
+      {departure.salesperson && (
+        <SummaryField label="Salesperson" value={departure.salesperson.name} />
+      )}
       {departure.notes && <SummaryField label="Note" value={departure.notes} />}
       <AssetCompositionField assets={departure.assets} />
       <AssetTotalsField assets={departure.assets} />

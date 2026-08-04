@@ -1,4 +1,5 @@
 import { useOrgStore } from '@/data/store/org-store'
+import { useActiveUsers } from '@/hooks/use-active-users'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -6,7 +7,7 @@ import {
   DepartureMetadataFormSchema,
   type DepartureMetadataForm,
 } from '@/ui-types/departure-form-types'
-import { getSelectOption } from '@/ui-types/select-option-types'
+import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
@@ -17,6 +18,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
+import { ControlledSelectOptionSearchSelect } from '../shared/search-select/controlled-select-option-search-select'
 import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
@@ -34,6 +36,7 @@ export function EditDepartureMetadataModal({
   onSave,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
+  const activeUsers = useActiveUsers()
   const orgs = useOrgStore((state) => state.organizations)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -106,6 +109,14 @@ export function EditDepartureMetadataModal({
               fieldLabel="Transporter"
               fieldRequired={true}
             />
+            <ControlledSelectOptionSearchSelect
+              control={form.control}
+              name="salesperson"
+              options={activeUsers}
+              getLabel={(u) => u.name}
+              fieldLabel="Salesperson"
+              fieldRequired={true}
+            />
             <Controller
               control={form.control}
               name="comment"
@@ -154,6 +165,7 @@ function toFormValues(d: DepartureDetail): DepartureMetadataForm {
       account_number: d.transporter.account_number,
       name: d.transporter.name,
     },
+    salesperson: d.salesperson ? getSelectOption(d.salesperson) : UNSELECTED,
     comment: d.notes ?? '',
   }
 }

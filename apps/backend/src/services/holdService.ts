@@ -1,16 +1,10 @@
-import {
-  AppRole,
-  AssetDelta,
-  ASSET_STATUS,
-  CreateHold,
-  HoldDetail,
-  UpdateHoldMetadata,
-} from 'shared-types'
+import { AssetDelta, ASSET_STATUS, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapUser } from '../lib/user-mappers.js'
 import {
   recordAssetStatusChange,
   recordAssetUpdateOnCollection,
@@ -329,24 +323,8 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
   if (!hold) throw new NotFoundError(`Hold ${holdNumber} not found`)
   return {
     hold_number: hold.hold_number,
-    created_by: {
-      id: hold.created_by.id,
-      name: hold.created_by.name,
-      email: hold.created_by.email,
-      is_active: hold.created_by.is_active,
-      role: hold.created_by.role as AppRole | null,
-      clerk_id: hold.created_by.clerk_id,
-      default_warehouse_id: hold.created_by.default_warehouse_id,
-    },
-    created_for: {
-      id: hold.created_for.id,
-      name: hold.created_for.name,
-      email: hold.created_for.email,
-      is_active: hold.created_for.is_active,
-      role: hold.created_for.role as AppRole | null,
-      clerk_id: hold.created_for.clerk_id,
-      default_warehouse_id: hold.created_for.default_warehouse_id,
-    },
+    created_by: mapUser(hold.created_by),
+    created_for: mapUser(hold.created_for),
     customer: hold.customer,
     notes: hold.notes,
     created_at: hold.created_at,

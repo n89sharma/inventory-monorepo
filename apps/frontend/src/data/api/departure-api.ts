@@ -62,6 +62,7 @@ export async function createDeparture(d: DepartureForm): Promise<CreateDeparture
     origin: getSelectedOrNull(d.origin)!,
     customer: d.customer!,
     transporter: d.transporter!,
+    salesperson_id: getIdOrNullFromSelection(d.salesperson)!,
     comment: d.comment,
     assets: d.assets.map((a) => ({
       id: a.id,
@@ -103,6 +104,7 @@ export async function updateDepartureMetadata(
     origin: getSelectedOrNull(metadata.origin)!,
     customer: metadata.customer!,
     transporter: metadata.transporter!,
+    salesperson: getSelectedOrNull(metadata.salesperson)!,
     comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateDepartureMetadata)
   await api.patch(`/departures/${departureNumber}/metadata`, updateDepartureMetadataBody)

@@ -19,6 +19,7 @@ import {
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { mapUser } from '../lib/user-mappers.js'
 import {
   recordAssetStatusChange,
   recordDepartureCreate,
@@ -33,7 +34,13 @@ export async function getDeparture(
   const [departure, assets] = await Promise.all([
     prisma.departure.findUnique({
       where: { departure_number: departureNumber },
-      include: { origin: true, destination: true, transporter: true, created_by: true },
+      include: {
+        origin: true,
+        destination: true,
+        transporter: true,
+        created_by: true,
+        sales_representative: true,
+      },
     }),
     prisma.$queryRawTyped(getAssetsForDepartures(departureNumber)),
   ])
@@ -46,6 +53,7 @@ export async function getDeparture(
     notes: departure.notes,
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
+    salesperson: departure.sales_representative && mapUser(departure.sales_representative),
     assets: assets.map((r) => ({
       ...mapAssetSummary(r),
       cost: redactAssetCost(mapAssetCost(r), role),
@@ -87,6 +95,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
           destination: { connect: { id: departure.customer.id } },
           transporter: { connect: { id: departure.transporter.id } },
           created_by: { connect: { id: userId } },
+          sales_representative: { connect: { id: departure.salesperson_id } },
           notes: departure.comment,
           created_at: currentDateTime,
         },
@@ -123,6 +132,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
       departure_number: departureNumber,
       origin_id: departure.origin.id,
       destination_id: departure.customer.id,
+      sales_representative_id: departure.salesperson_id,
       created_at: currentDateTime,
     },
     userId,
@@ -158,7 +168,14 @@ export async function patchDepartureMetadata(
 ): Promise<void> {
   const current = await prisma.departure.findUnique({
     where: { departure_number: departureNumber },
-    select: { id: true, origin_id: true, destination_id: true, transporter_id: true, notes: true },
+    select: {
+      id: true,
+      origin_id: true,
+      destination_id: true,
+      transporter_id: true,
+      sales_representative_id: true,
+      notes: true,
+    },
   })
   if (!current) throw new NotFoundError(`Departure ${departureNumber} not found`)
 
@@ -168,6 +185,7 @@ export async function patchDepartureMetadata(
       origin_id: metadata.origin.id,
       destination_id: metadata.customer.id,
       transporter_id: metadata.transporter.id,
+      sales_representative_id: metadata.salesperson.id,
       notes: metadata.comment,
     },
   })
@@ -178,11 +196,13 @@ export async function patchDepartureMetadata(
       origin_id: current.origin_id,
       destination_id: current.destination_id,
       transporter_id: current.transporter_id,
+      sales_representative_id: current.sales_representative_id,
     },
     {
       origin_id: metadata.origin.id,
       destination_id: metadata.customer.id,
       transporter_id: metadata.transporter.id,
+      sales_representative_id: metadata.salesperson.id,
     },
     userId,
   )
