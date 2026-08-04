@@ -1,43 +1,55 @@
-import { createIdColumn, sortableHeader } from '@/components/table-columns/column-primitives'
+import { ID_COLUMN_SIZE, IdLink } from '@/components/table-columns/column-primitives'
+import type { SummaryColumn } from '@/components/table-columns/summary-column'
 import { formatDate, formatUSDWithSymbol } from '@/lib/formatters'
-import type { ColumnDef } from '@tanstack/react-table'
 import type { StorePartSummary } from 'shared-types'
 
-const STOCK_VALUE_COLUMN: ColumnDef<StorePartSummary> = {
-  accessorKey: 'stock_value',
-  header: sortableHeader<StorePartSummary>('Value'),
-  cell: ({ row }) => (
-    <div className="text-right tabular-nums">{formatUSDWithSymbol(row.original.stock_value)}</div>
-  ),
+type StorePartCellContext = {
+  getHref: (row: StorePartSummary) => string
 }
 
-export function buildStorePartTableColumns(
-  canViewStockValue: boolean,
-): ColumnDef<StorePartSummary>[] {
-  const columns: ColumnDef<StorePartSummary>[] = [
-    createIdColumn<StorePartSummary>({
-      accessorKey: 'part_number',
-      header: 'Part #',
-      href: (row) => `/store/${row.id}?warehouse=${row.warehouse_id}`,
-      value: (row) => row.part_number,
-    }),
-    { accessorKey: 'description', header: 'Description' },
-    { accessorKey: 'warehouse_code', header: 'Warehouse' },
-    {
-      accessorKey: 'on_hand',
-      header: sortableHeader<StorePartSummary>('On hand'),
-      cell: ({ row }) => <div className="text-center tabular-nums">{row.original.on_hand}</div>,
-    },
-    {
-      accessorKey: 'last_updated',
-      header: sortableHeader<StorePartSummary>('Last updated'),
-      cell: ({ getValue }) => {
-        const date = getValue<Date>()
-        return date ? formatDate(date) : '-'
-      },
-    },
-  ]
+type StorePartColumn = SummaryColumn<StorePartSummary, StorePartCellContext>
 
-  if (canViewStockValue) columns.push(STOCK_VALUE_COLUMN)
-  return columns
-}
+// Where a column defines both, the cell must render exactly what text returns —
+// wrapped only for alignment — so the CSV matches the table.
+export const STORE_PART_COLUMNS: readonly StorePartColumn[] = [
+  {
+    id: 'part_number',
+    label: 'Part #',
+    text: (row) => row.part_number,
+    cell: (row, { getHref }) => <IdLink to={getHref(row)}>{row.part_number}</IdLink>,
+    size: ID_COLUMN_SIZE,
+  },
+  {
+    id: 'description',
+    label: 'Description',
+    text: (row) => row.description,
+  },
+  {
+    id: 'warehouse_code',
+    label: 'Warehouse',
+    text: (row) => row.warehouse_code,
+  },
+  {
+    id: 'on_hand',
+    label: 'On hand',
+    text: (row) => String(row.on_hand),
+    cell: (row) => <div className="text-center tabular-nums">{row.on_hand}</div>,
+    sortable: true,
+  },
+  {
+    id: 'last_updated',
+    label: 'Last updated',
+    text: (row) => (row.last_updated ? formatDate(row.last_updated) : '-'),
+    sortable: true,
+  },
+  {
+    id: 'stock_value',
+    label: 'Value',
+    text: (row) => formatUSDWithSymbol(row.stock_value),
+    cell: (row) => (
+      <div className="text-right tabular-nums">{formatUSDWithSymbol(row.stock_value)}</div>
+    ),
+    sortable: true,
+    permission: 'view_purchase_price',
+  },
+]
