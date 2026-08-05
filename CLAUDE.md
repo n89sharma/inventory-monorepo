@@ -140,6 +140,11 @@ A stale or unverified recommendation is worse than none.
   ternaries only for simple binary expressions. (JSX conditional rules: see `apps/frontend/CLAUDE.md`.)
 - **Boolean flags name the positive state** — `enabled`, not `disabled`; `included`, not
   `excluded`. Avoid negated names so call sites read `if (x.enabled)` not `if (!x.disabled)`.
+- **Comparing a value across time: name the two sides `prevX` / `currX`, and assign both before
+  the comparison.** Never compare a bare `ref.current` or an inline expression against an unnamed
+  value. A ref holding the earlier value is `prevXRef`. e.g.
+  `const prevBrandId = prevBrandIdRef.current` → `prevBrandIdRef.current = currBrandId` →
+  `if (prevBrandId !== currBrandId)`.
 - **Name identifiers after the domain entity, not a UI consumer or render behavior.** The thing's
   durable noun outlives how any one screen uses it. `ASSET_TABLE_COLUMNS` not `PICKABLE_COLUMNS`
   (the picker is one consumer of three); `defaultColumn` not `defaultVisible` (anchor to the noun,
