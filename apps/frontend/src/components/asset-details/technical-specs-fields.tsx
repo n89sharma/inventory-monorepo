@@ -276,6 +276,8 @@ interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   visibility: SpecificationFieldVisibility
   readinessDisabledStatuses?: string[]
   renderAfterReadiness?: React.ReactNode
+  // Runs after the pick is committed, for form state that follows the readiness.
+  onReadinessChange?: (newReadiness: Status | null) => void
 }
 
 /**
@@ -295,6 +297,7 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   visibility,
   readinessDisabledStatuses,
   renderAfterReadiness,
+  onReadinessChange,
 }: TechnicalSpecsFieldsProps<T>) {
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
@@ -319,7 +322,10 @@ export function TechnicalSpecsFields<T extends FieldValues>({
               return (
                 <ReadinessPicker
                   selection={isSelected(readiness) ? readiness.selected : null}
-                  onChange={(s) => onChange(s ? getSelectOption(s) : UNSELECTED)}
+                  onChange={(newReadiness) => {
+                    onChange(newReadiness ? getSelectOption(newReadiness) : UNSELECTED)
+                    onReadinessChange?.(newReadiness)
+                  }}
                   options={readinesses}
                   disabledStatuses={readinessDisabledStatuses}
                   error={fieldState.invalid}

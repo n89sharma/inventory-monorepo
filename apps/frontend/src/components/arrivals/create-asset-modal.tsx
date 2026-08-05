@@ -8,7 +8,7 @@ import { modelLabel } from '@/lib/reference-labels'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Controller,
   useForm,
@@ -109,9 +109,7 @@ export function CreateAssetModal({
     newAssetForm.reset(undefined, DISCARD_USER_EDITS),
   )
 
-  // Watch readiness + model to drive the errors editor's enabled/brand state, and to
-  // clear the errors when readiness leaves HAS_ERRORS. The ref tracks the previously
-  // observed readiness so the post-reset run doesn't fire a spurious clear.
+  // Watch readiness + model to drive the errors editor's enabled/brand state.
   const readinessSelection = useWatch({ control: newAssetForm.control, name: 'readiness' })
   const modelSelection = useWatch({ control: newAssetForm.control, name: 'model' })
   const currReadinessStatus = isSelected(readinessSelection)
@@ -122,18 +120,13 @@ export function CreateAssetModal({
   const visibility = getSpecificationFieldVisibility(modelSelection?.asset_type ?? null)
   const isHasErrors = currReadinessStatus === HAS_ERRORS_READINESS
 
-  const prevReadinessStatusRef = useRef<string | null | undefined>(undefined)
-
-  useEffect(() => {
-    const prevReadinessStatus = prevReadinessStatusRef.current
-    prevReadinessStatusRef.current = currReadinessStatus
-    if (
-      prevReadinessStatus === HAS_ERRORS_READINESS &&
-      currReadinessStatus !== HAS_ERRORS_READINESS
-    ) {
-      newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
-    }
-  }, [currReadinessStatus, newAssetForm])
+  // Errors only belong to an asset that is HAS_ERRORS, so any other readiness empties them.
+  // An invariant, not a transition: the previous readiness never has to be known.
+  function handleReadinessSelected(newReadiness: Status | null) {
+    if (newReadiness?.status === HAS_ERRORS_READINESS) return
+    if (newAssetForm.getValues('errors').length === 0) return
+    newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
+  }
 
   // Errors are brand-scoped, so an error only survives a model pick when it belongs to
   // that model's brand. The errors editor allows any brand while no model is picked,
@@ -255,6 +248,7 @@ export function CreateAssetModal({
             isColour={isColourModel}
             brandId={currBrandId}
             visibility={visibility}
+            onReadinessChange={handleReadinessSelected}
             renderAfterReadiness={
               <HorizontalField label="Errors" required={isHasErrors}>
                 <Controller

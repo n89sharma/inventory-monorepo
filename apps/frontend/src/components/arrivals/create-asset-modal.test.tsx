@@ -37,6 +37,9 @@ const CANON_ERROR: ReferenceError = {
   description: null,
   category: 'TEST',
 }
+// The readiness picker labels its pills with the display text from readiness-config.
+const UNTESTED_DISPLAY = 'Untested'
+const HAS_ERRORS_DISPLAY = 'Has errors'
 const CREATED_ASSET = { id: 10, barcode: 'BC-10' } as AssetSummary
 const SERIAL = 'SN-FIRST'
 
@@ -99,8 +102,12 @@ function pickModel(label = MODEL_LABEL) {
   fireEvent.click(screen.getByRole('option', { name: label }))
 }
 
+function pickReadiness(display: string) {
+  fireEvent.click(screen.getByText(display))
+}
+
 function addOpenError() {
-  fireEvent.click(screen.getByText('Has errors'))
+  pickReadiness(HAS_ERRORS_DISPLAY)
   fireEvent.change(fieldControl('Errors', 'input[role="combobox"]'), {
     target: { value: CANON_ERROR.code },
   })
@@ -154,6 +161,22 @@ describe('CreateAssetModal', () => {
     expect(screen.getByRole('button', { name: `Remove error ${CANON_ERROR.code}` })).toBeVisible()
 
     pickModel(RICOH_MODEL_LABEL)
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: `Remove error ${CANON_ERROR.code}` }),
+      ).not.toBeInTheDocument(),
+    )
+  })
+
+  it('clears the errors when the readiness leaves Has errors', async () => {
+    renderModal(vi.fn().mockResolvedValue(CREATED_ASSET))
+
+    pickModel()
+    addOpenError()
+    expect(screen.getByRole('button', { name: `Remove error ${CANON_ERROR.code}` })).toBeVisible()
+
+    pickReadiness(UNTESTED_DISPLAY)
 
     await waitFor(() =>
       expect(
