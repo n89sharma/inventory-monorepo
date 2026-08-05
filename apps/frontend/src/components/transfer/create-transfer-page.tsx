@@ -1,6 +1,7 @@
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
+import { showEntityCreatedToast } from '@/lib/success-toast'
 import type { TransferForm } from '@/ui-types/transfer-form-types'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
@@ -40,7 +41,8 @@ export function CreateTransferPage(): React.JSX.Element {
     try {
       const { transferNumber } = await mutations.create(data)
       const destination = returnTo ?? `/transfers/${transferNumber}`
-      navigate(destination, { state: { successToast: { entity: 'transfer', id: transferNumber } } })
+      showEntityCreatedToast({ entity: 'transfer', id: transferNumber })
+      navigate(destination)
     } catch {
       // interceptor already showed the error toast
     }

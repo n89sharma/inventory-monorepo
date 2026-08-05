@@ -1,5 +1,6 @@
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
+import { showEntityCreatedToast } from '@/lib/success-toast'
 import type { DepartureForm } from '@/ui-types/departure-form-types'
 import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -41,9 +42,8 @@ export function CreateDeparturePage(): React.JSX.Element {
     try {
       const { departureNumber } = await mutations.create(data)
       const destination = returnTo ?? `/departures/${departureNumber}`
-      navigate(destination, {
-        state: { successToast: { entity: 'departure', id: departureNumber } },
-      })
+      showEntityCreatedToast({ entity: 'departure', id: departureNumber })
+      navigate(destination)
     } catch {
       // interceptor already showed the error toast
     }

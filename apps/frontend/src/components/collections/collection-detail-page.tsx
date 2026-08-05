@@ -3,7 +3,6 @@ import { StickyDetailsPageHeader } from '@/components/collections/sticky-details
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { showEntityCreatedToast, type SuccessToastPayload } from '@/lib/success-toast'
 import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -86,7 +85,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   onRelease,
   onDelete,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
-  const { state, search } = useLocation()
+  const { search } = useLocation()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [filteredRowIds, setFilteredRowIds] = useState<string[]>(EMPTY_ROW_IDS)
@@ -106,11 +105,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
     if (!copiersOnly) return assets
     return assets.filter((asset) => asset.asset_type === COPIER_ASSET_TYPE)
   }, [assets, copiersOnly])
-
-  useEffect(() => {
-    const payload = (state as { successToast?: SuccessToastPayload } | null)?.successToast
-    if (payload) showEntityCreatedToast(payload)
-  }, [state])
 
   useEffect(() => {
     return () => onFlushPending?.(collectionId)

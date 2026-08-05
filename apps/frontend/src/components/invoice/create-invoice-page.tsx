@@ -1,4 +1,5 @@
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
+import { showEntityCreatedToast } from '@/lib/success-toast'
 import type { InvoiceForm } from '@/ui-types/invoice-form-types'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
@@ -27,7 +28,8 @@ export function CreateInvoicePage(): React.JSX.Element {
     try {
       const { invoiceNumber } = await mutations.create(data)
       const destination = returnTo ?? `/invoices/${invoiceNumber}`
-      navigate(destination, { state: { successToast: { entity: 'invoice', id: invoiceNumber } } })
+      showEntityCreatedToast({ entity: 'invoice', id: invoiceNumber })
+      navigate(destination)
     } catch {
       // interceptor already showed the error toast
     }

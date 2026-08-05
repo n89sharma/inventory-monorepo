@@ -1,4 +1,5 @@
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
+import { showEntityCreatedToast } from '@/lib/success-toast'
 import type { ArrivalForm } from '@/ui-types/arrival-form-types'
 import { useNavigate } from 'react-router-dom'
 import { ArrivalFormPage } from './arrival-form-page'
@@ -19,9 +20,8 @@ export function CreateArrivalPage(): React.JSX.Element {
   async function onValidArrivalCreateSubmit(data: ArrivalForm) {
     try {
       const { arrivalNumber } = await mutations.create(data)
-      navigate(`/arrivals/${arrivalNumber}`, {
-        state: { successToast: { entity: 'arrival', id: arrivalNumber } },
-      })
+      showEntityCreatedToast({ entity: 'arrival', id: arrivalNumber })
+      navigate(`/arrivals/${arrivalNumber}`)
     } catch {
       // interceptor already showed the error toast
     }

@@ -1,4 +1,5 @@
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
+import { showEntityCreatedToast } from '@/lib/success-toast'
 import type { HoldForm } from '@/ui-types/hold-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -32,7 +33,8 @@ export function CreateHoldPage(): React.JSX.Element {
     try {
       const { holdNumber } = await mutations.create(data)
       const destination = returnTo ?? `/holds/${holdNumber}`
-      navigate(destination, { state: { successToast: { entity: 'hold', id: holdNumber } } })
+      showEntityCreatedToast({ entity: 'hold', id: holdNumber })
+      navigate(destination)
     } catch {
       // interceptor already showed the error toast
     }

@@ -2,7 +2,7 @@ import { EntityLink } from '@/components/shared/entity-link'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 import { toast } from 'sonner'
 
-export type SuccessToastPayload = {
+type SuccessToastPayload = {
   entity: LinkableEntity
   id: string
 }
