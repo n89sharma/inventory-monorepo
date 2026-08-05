@@ -427,8 +427,8 @@ export async function seedBrand(name: string): Promise<number> {
 }
 
 // A second model for the same or another brand, reusing the asset type the seeded
-// model already carries so only the brand differs between the two.
-export async function seedModel(brandId: number, name: string): Promise<number> {
+// model already carries so only the brand and the colour flag differ between the two.
+export async function seedModel(brandId: number, name: string, isColour: boolean): Promise<number> {
   const assetType = await prisma.assetType.findFirstOrThrow({ where: { asset_type: 'Copier' } })
   const model = await prisma.model.upsert({
     where: { brand_id_name: { brand_id: brandId, name } },
@@ -436,7 +436,7 @@ export async function seedModel(brandId: number, name: string): Promise<number> 
       name,
       weight: 1,
       size: 1,
-      is_colour: false,
+      is_colour: isColour,
       brand_id: brandId,
       asset_type_id: assetType.id,
     },

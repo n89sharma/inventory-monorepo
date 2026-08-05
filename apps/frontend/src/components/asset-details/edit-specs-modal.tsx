@@ -12,7 +12,6 @@ import {
   DialogTitle,
 } from '@/components/shadcn/dialog'
 import { HorizontalField } from '@/components/shared/horizontal-field'
-import { InlineWarning } from '@/components/shared/inline-warning'
 import { ControlledSearchSelectField } from '@/components/shared/search-select/controlled-search-select-field'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
@@ -45,8 +44,10 @@ interface EditSpecsModalProps {
 
 // Readiness follows the asset's errors (see assetErrorService): HAS_ERRORS is never
 // chosen by hand, so the specs picker always disables it. While any error is open the
-// whole picker is locked — readiness stays on the enforced HAS_ERRORS.
+// whole picker is locked — readiness stays on the enforced HAS_ERRORS — unless the
+// model moves to another brand, which clears the errors and releases the readiness.
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
+const UNTESTED_READINESS = 'UNTESTED'
 
 const EMPTY_SPECS_FORM: SpecsForm = {
   model: null,
@@ -69,29 +70,48 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   tonerLifeK: null,
 }
 
-// Fields the new model's asset type hides are dropped rather than carried over from
-// the previous model, so a save cannot persist a value the form no longer shows.
+const CLEARED_MANUFACTURING_ORIGIN = { countryOfOrigin: null, manufacturedYear: null } as const
+const CLEARED_METER = { meterBlack: null, meterColour: null } as const
+const CLEARED_CASSETTES = { cassettes: null } as const
+const CLEARED_INTERNAL_FINISHER = { component: null } as const
+const CLEARED_CORE_FUNCTIONS = { coreFunctions: [] as CoreFunction[] }
+const CLEARED_CONSUMABLES = {
+  drumLifeC: null,
+  drumLifeM: null,
+  drumLifeY: null,
+  drumLifeK: null,
+  tonerLifeC: null,
+  tonerLifeM: null,
+  tonerLifeY: null,
+  tonerLifeK: null,
+} as const
+const CLEARED_COLOUR_CHANNELS = {
+  meterColour: null,
+  drumLifeC: null,
+  drumLifeM: null,
+  drumLifeY: null,
+  tonerLifeC: null,
+  tonerLifeM: null,
+  tonerLifeY: null,
+} as const
+
+// Fields the new model hides — by its asset type, or by being mono, which hides the
+// C/M/Y channels — are dropped rather than carried over from the previous model, so a
+// save cannot persist a value the form no longer shows.
 function clearHiddenSpecFields(
   formValues: SpecsForm,
   visibility: SpecificationFieldVisibility,
+  isColour: boolean,
 ): SpecsForm {
   return {
     ...formValues,
-    countryOfOrigin: visibility.manufacturingOrigin ? formValues.countryOfOrigin : null,
-    manufacturedYear: visibility.manufacturingOrigin ? formValues.manufacturedYear : null,
-    meterBlack: visibility.meter ? formValues.meterBlack : null,
-    meterColour: visibility.meter ? formValues.meterColour : null,
-    cassettes: visibility.cassettes ? formValues.cassettes : null,
-    component: visibility.internalFinisher ? formValues.component : null,
-    coreFunctions: visibility.coreFunctions ? formValues.coreFunctions : [],
-    drumLifeC: visibility.consumables ? formValues.drumLifeC : null,
-    drumLifeM: visibility.consumables ? formValues.drumLifeM : null,
-    drumLifeY: visibility.consumables ? formValues.drumLifeY : null,
-    drumLifeK: visibility.consumables ? formValues.drumLifeK : null,
-    tonerLifeC: visibility.consumables ? formValues.tonerLifeC : null,
-    tonerLifeM: visibility.consumables ? formValues.tonerLifeM : null,
-    tonerLifeY: visibility.consumables ? formValues.tonerLifeY : null,
-    tonerLifeK: visibility.consumables ? formValues.tonerLifeK : null,
+    ...(visibility.manufacturingOrigin ? {} : CLEARED_MANUFACTURING_ORIGIN),
+    ...(visibility.meter ? {} : CLEARED_METER),
+    ...(visibility.cassettes ? {} : CLEARED_CASSETTES),
+    ...(visibility.internalFinisher ? {} : CLEARED_INTERNAL_FINISHER),
+    ...(visibility.coreFunctions ? {} : CLEARED_CORE_FUNCTIONS),
+    ...(visibility.consumables ? {} : CLEARED_CONSUMABLES),
+    ...(isColour ? {} : CLEARED_COLOUR_CHANNELS),
   }
 }
 
@@ -157,21 +177,28 @@ export function EditSpecsModal({
     [hasOpenError, brandChanged, readinesses],
   )
 
-  // Components and errors are both brand-scoped, so a move between two distinct
-  // brands drops the internal finisher and releases the enforced HAS_ERRORS
-  // readiness — the backend clears the errors that were holding it.
+  // Components and errors are both brand-scoped, so a move between two distinct brands
+  // drops the internal finisher and releases the enforced HAS_ERRORS readiness — the
+  // backend clears the errors that were holding it. The release lands on UNTESTED
+  // rather than the PP_OK that fixing the last error yields, since the asset has not
+  // been checked against the new brand's error list. Mirrors assetSpecsService so the
+  // picker shows the readiness that will be saved.
   const prevBrandRef = useRef<number | null | undefined>(undefined)
   useEffect(() => {
     const prev = prevBrandRef.current
     if (prev && brandId && prev !== brandId) {
       form.setValue('component', null, { shouldDirty: true, shouldValidate: true })
       const readiness = form.getValues('readiness')
-      if (isSelected(readiness) && readiness.selected.status === HAS_ERRORS_READINESS) {
-        form.setValue('readiness', UNSELECTED, { shouldDirty: true, shouldValidate: true })
+      const untested = readinesses.find((r) => r.status === UNTESTED_READINESS)
+      if (untested && isSelected(readiness) && readiness.selected.status === HAS_ERRORS_READINESS) {
+        form.setValue('readiness', getSelectOption(untested), {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
       }
     }
     prevBrandRef.current = brandId
-  }, [brandId, form])
+  }, [brandId, form, readinesses])
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
     form.reset(undefined, DISCARD_USER_EDITS),
@@ -185,6 +212,7 @@ export function EditSpecsModal({
     const formValues = clearHiddenSpecFields(
       rawValues,
       getSpecificationFieldVisibility(model.asset_type),
+      model.is_colour,
     )
     try {
       await updateAssetSpecs(assetDetails!.barcode, {
@@ -253,13 +281,6 @@ export function EditSpecsModal({
               />
             </HorizontalField>
           </div>
-
-          {brandChanged && errors.length > 0 && (
-            <InlineWarning>
-              Changing to a different brand will remove the {errors.length} recorded error
-              {errors.length === 1 ? '' : 's'} from this asset.
-            </InlineWarning>
-          )}
 
           <TechnicalSpecsFields
             control={form.control}

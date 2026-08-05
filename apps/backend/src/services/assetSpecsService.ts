@@ -9,6 +9,26 @@ import {
 } from './assetErrorService.js'
 import { recordAssetUpdate } from './historyService.js'
 
+const UNTESTED_READINESS = 'UNTESTED'
+
+const CLEARED_COLOUR_CHANNELS = {
+  meter_colour: null,
+  drum_life_c: null,
+  drum_life_m: null,
+  drum_life_y: null,
+  toner_life_c: null,
+  toner_life_m: null,
+  toner_life_y: null,
+} as const
+
+// A mono model has no colour channels, so the C/M/Y values the previous model carried
+// are dropped rather than persisted against it. Everything downstream — the meter
+// total, the write and the recorded diff — reads the cleared values, never the request.
+function clearColourChannels(data: UpdateAssetSpecs, isColour: boolean): UpdateAssetSpecs {
+  if (isColour) return data
+  return { ...data, ...CLEARED_COLOUR_CHANNELS }
+}
+
 export async function updateAssetSpecs(
   barcode: string,
   data: UpdateAssetSpecs,
@@ -47,38 +67,50 @@ export async function updateAssetSpecs(
 
   const newModel = await prisma.model.findUnique({
     where: { id: data.model_id },
-    select: { brand_id: true },
+    select: { brand_id: true, is_colour: true },
   })
   if (!newModel) throw new NotFoundError(`Model ${data.model_id} not found`)
 
   // Errors are brand-scoped, so moving the asset to another brand's model clears them.
   const brandChanged = newModel.brand_id !== asset.model.brand_id
 
+  // With the errors gone the asset cannot stay on HAS_ERRORS, so the readiness is
+  // released to UNTESTED — not the PP_OK that clearing the last open error yields
+  // (assetErrorService), because the asset has not been checked against the new
+  // brand's error list.
+  let releasedReadinessId: number | null = null
+  if (brandChanged) {
+    const readinessIdByStatus = await resolveReadinessIds([
+      HAS_ERRORS_READINESS,
+      UNTESTED_READINESS,
+    ])
+    if (data.readiness_id === readinessIdByStatus.get(HAS_ERRORS_READINESS)) {
+      releasedReadinessId = readinessIdByStatus.get(UNTESTED_READINESS)!
+    }
+  }
+
+  const specs: UpdateAssetSpecs = {
+    ...clearColourChannels(data, newModel.is_colour),
+    ...(releasedReadinessId !== null ? { readiness_id: releasedReadinessId } : {}),
+  }
+
   // Readiness is owned by the error state while any error is open — it stays locked
   // on HAS_ERRORS and can only change once the errors are fixed or removed. A brand
   // change removes the errors outright, so the lock no longer applies.
   const hasOpenError = asset.asset_errors.length > 0
-  if (!brandChanged && hasOpenError && data.readiness_id !== asset.readiness_id) {
+  if (!brandChanged && hasOpenError && specs.readiness_id !== asset.readiness_id) {
     throw new ValidationError('Readiness cannot be changed while the asset has open errors')
   }
-  if (brandChanged) {
-    const readinessIdByStatus = await resolveReadinessIds([HAS_ERRORS_READINESS])
-    if (data.readiness_id === readinessIdByStatus.get(HAS_ERRORS_READINESS)) {
-      throw new ValidationError(
-        'Readiness cannot be Has Errors — changing the model brand clears the asset errors',
-      )
-    }
-  }
 
-  if (data.component_id !== null) {
+  if (specs.component_id !== null) {
     await validateComponentBrands(prisma, [
-      { componentId: data.component_id, expectedBrandId: newModel.brand_id },
+      { componentId: specs.component_id, expectedBrandId: newModel.brand_id },
     ])
   }
 
-  const meter_total = (data.meter_black ?? 0) + (data.meter_colour ?? 0)
+  const meter_total = (specs.meter_black ?? 0) + (specs.meter_colour ?? 0)
 
-  const accessoryIds = [...new Set(data.accessory_ids)]
+  const accessoryIds = [...new Set(specs.accessory_ids)]
   if (accessoryIds.length > 0) {
     const existing = await prisma.accessory.findMany({
       where: { id: { in: accessoryIds } },
@@ -93,45 +125,45 @@ export async function updateAssetSpecs(
     await tx.asset.update({
       where: { id: asset.id },
       data: {
-        model_id: data.model_id,
-        serial_number: data.serial_number,
-        readiness_id: data.readiness_id,
-        country_of_origin_id: data.country_of_origin_id,
-        manufactured_year: data.manufactured_year,
+        model_id: specs.model_id,
+        serial_number: specs.serial_number,
+        readiness_id: specs.readiness_id,
+        country_of_origin_id: specs.country_of_origin_id,
+        manufactured_year: specs.manufactured_year,
       },
     })
     await tx.technicalSpecification.upsert({
       where: { asset_id: asset.id },
       update: {
-        cassettes: data.cassettes,
-        component_id: data.component_id,
-        meter_black: data.meter_black,
-        meter_colour: data.meter_colour,
+        cassettes: specs.cassettes,
+        component_id: specs.component_id,
+        meter_black: specs.meter_black,
+        meter_colour: specs.meter_colour,
         meter_total,
-        drum_life_c: data.drum_life_c,
-        drum_life_m: data.drum_life_m,
-        drum_life_y: data.drum_life_y,
-        drum_life_k: data.drum_life_k,
-        toner_life_c: data.toner_life_c,
-        toner_life_m: data.toner_life_m,
-        toner_life_y: data.toner_life_y,
-        toner_life_k: data.toner_life_k,
+        drum_life_c: specs.drum_life_c,
+        drum_life_m: specs.drum_life_m,
+        drum_life_y: specs.drum_life_y,
+        drum_life_k: specs.drum_life_k,
+        toner_life_c: specs.toner_life_c,
+        toner_life_m: specs.toner_life_m,
+        toner_life_y: specs.toner_life_y,
+        toner_life_k: specs.toner_life_k,
       },
       create: {
         asset_id: asset.id,
-        cassettes: data.cassettes,
-        component_id: data.component_id,
-        meter_black: data.meter_black,
-        meter_colour: data.meter_colour,
+        cassettes: specs.cassettes,
+        component_id: specs.component_id,
+        meter_black: specs.meter_black,
+        meter_colour: specs.meter_colour,
         meter_total,
-        drum_life_c: data.drum_life_c,
-        drum_life_m: data.drum_life_m,
-        drum_life_y: data.drum_life_y,
-        drum_life_k: data.drum_life_k,
-        toner_life_c: data.toner_life_c,
-        toner_life_m: data.toner_life_m,
-        toner_life_y: data.toner_life_y,
-        toner_life_k: data.toner_life_k,
+        drum_life_c: specs.drum_life_c,
+        drum_life_m: specs.drum_life_m,
+        drum_life_y: specs.drum_life_y,
+        drum_life_k: specs.drum_life_k,
+        toner_life_c: specs.toner_life_c,
+        toner_life_m: specs.toner_life_m,
+        toner_life_y: specs.toner_life_y,
+        toner_life_k: specs.toner_life_k,
       },
     })
     await tx.assetAccessory.deleteMany({ where: { asset_id: asset.id } })
@@ -171,25 +203,25 @@ export async function updateAssetSpecs(
       toner_life_k: asset.technical_specification?.toner_life_k,
     },
     {
-      model_id: data.model_id,
-      serial_number: data.serial_number,
+      model_id: specs.model_id,
+      serial_number: specs.serial_number,
       ...(brandChanged ? { error_ids: [] } : {}),
-      readiness_id: data.readiness_id,
-      country_of_origin_id: data.country_of_origin_id,
-      manufactured_year: data.manufactured_year,
-      cassettes: data.cassettes,
-      component_id: data.component_id,
-      meter_black: data.meter_black,
-      meter_colour: data.meter_colour,
+      readiness_id: specs.readiness_id,
+      country_of_origin_id: specs.country_of_origin_id,
+      manufactured_year: specs.manufactured_year,
+      cassettes: specs.cassettes,
+      component_id: specs.component_id,
+      meter_black: specs.meter_black,
+      meter_colour: specs.meter_colour,
       meter_total,
-      drum_life_c: data.drum_life_c,
-      drum_life_m: data.drum_life_m,
-      drum_life_y: data.drum_life_y,
-      drum_life_k: data.drum_life_k,
-      toner_life_c: data.toner_life_c,
-      toner_life_m: data.toner_life_m,
-      toner_life_y: data.toner_life_y,
-      toner_life_k: data.toner_life_k,
+      drum_life_c: specs.drum_life_c,
+      drum_life_m: specs.drum_life_m,
+      drum_life_y: specs.drum_life_y,
+      drum_life_k: specs.drum_life_k,
+      toner_life_c: specs.toner_life_c,
+      toner_life_m: specs.toner_life_m,
+      toner_life_y: specs.toner_life_y,
+      toner_life_k: specs.toner_life_k,
     },
     userId,
   )

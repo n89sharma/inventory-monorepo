@@ -3,12 +3,40 @@ import { formatUSD } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { CurrencyDollarIcon } from '@phosphor-icons/react'
 
+// Ink channels, with the colour each is drawn in. A mono asset carries the K channel
+// only — see KRow — so the C/M/Y values it has no ink for are never rendered.
+const CHANNEL_TEXT_COLOURS = {
+  C: 'text-cyan-500',
+  M: 'text-fuchsia-500',
+  Y: 'text-yellow-500',
+  K: 'text-foreground',
+} as const
+
+type Channel = keyof typeof CHANNEL_TEXT_COLOURS
+
+type ChannelValue = {
+  channel: Channel
+  value: number | undefined | null
+}
+
 type CMYKDataProps = {
   label: string
   c_value: number | undefined | null
   m_value: number | undefined | null
   y_value: number | undefined | null
   k_value: number | undefined | null
+  rowClassName?: string
+}
+
+type KDataProps = {
+  label: string
+  k_value: number | undefined | null
+  rowClassName?: string
+}
+
+type ChannelRowProps = {
+  label: string
+  channels: ChannelValue[]
   rowClassName?: string
 }
 
@@ -108,6 +136,21 @@ export function DataCurrencyRow({
   )
 }
 
+function ChannelRow({ label, channels, rowClassName }: ChannelRowProps): React.JSX.Element {
+  return (
+    <DataRow label={label} rowClassName={rowClassName}>
+      <dd className="flex min-w-0 items-center gap-2">
+        {channels.map(({ channel, value }) => (
+          <span key={channel} className="flex items-baseline">
+            <span className={cn('text-xs', CHANNEL_TEXT_COLOURS[channel])}>{channel}</span>
+            <span className="tabular-nums">{value ?? 0}</span>
+          </span>
+        ))}
+      </dd>
+    </DataRow>
+  )
+}
+
 export function CMYKRow({
   label,
   c_value,
@@ -117,26 +160,26 @@ export function CMYKRow({
   rowClassName,
 }: CMYKDataProps): React.JSX.Element {
   return (
-    <DataRow label={label} rowClassName={rowClassName}>
-      <dd className="flex min-w-0 items-center gap-2">
-        <span className="flex items-baseline">
-          <span className="text-cyan-500 text-xs">C</span>
-          <span className="tabular-nums">{c_value ?? 0}</span>
-        </span>
-        <span className="flex items-baseline">
-          <span className="text-fuchsia-500 text-xs">M</span>
-          <span className="tabular-nums">{m_value ?? 0}</span>
-        </span>
-        <span className="flex items-baseline">
-          <span className="text-yellow-500 text-xs">Y</span>
-          <span className="tabular-nums">{y_value ?? 0}</span>
-        </span>
-        <span className="flex items-baseline">
-          <span className="text-foreground text-xs">K</span>
-          <span className="tabular-nums">{k_value ?? 0}</span>
-        </span>
-      </dd>
-    </DataRow>
+    <ChannelRow
+      label={label}
+      rowClassName={rowClassName}
+      channels={[
+        { channel: 'C', value: c_value },
+        { channel: 'M', value: m_value },
+        { channel: 'Y', value: y_value },
+        { channel: 'K', value: k_value },
+      ]}
+    />
+  )
+}
+
+export function KRow({ label, k_value, rowClassName }: KDataProps): React.JSX.Element {
+  return (
+    <ChannelRow
+      label={label}
+      rowClassName={rowClassName}
+      channels={[{ channel: 'K', value: k_value }]}
+    />
   )
 }
 

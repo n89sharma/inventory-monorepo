@@ -15,6 +15,7 @@ import {
   DataCurrencyRow,
   DataRow,
   DataValueRow,
+  KRow,
 } from '@/components/asset-details/detail-row'
 import { EditErrorsModal } from '@/components/asset-details/edit-errors-modal'
 import { EditPricingModal } from '@/components/asset-details/edit-pricing-modal'
@@ -61,6 +62,35 @@ const EMPTY_TAGS: { display: string; id: string }[] = []
 const RAIL_STICKY_TOP = 'calc(var(--app-header-height) + var(--details-header-height, 0px) + 1rem)'
 
 const ROW_GAP = 'gap-8'
+
+// A mono asset has no C/M/Y ink, so only its K channel is shown.
+function ConsumableRow({
+  label,
+  isColour,
+  c_value,
+  m_value,
+  y_value,
+  k_value,
+}: {
+  label: string
+  isColour: boolean
+  c_value: number | null
+  m_value: number | null
+  y_value: number | null
+  k_value: number | null
+}) {
+  if (!isColour) return <KRow label={label} k_value={k_value} rowClassName={ROW_GAP} />
+  return (
+    <CMYKRow
+      label={label}
+      c_value={c_value}
+      m_value={m_value}
+      y_value={y_value}
+      k_value={k_value}
+      rowClassName={ROW_GAP}
+    />
+  )
+}
 
 function RailCard({ children }: { children: React.ReactNode }) {
   return <div className="bg-card border rounded-md shadow-sm p-3">{children}</div>
@@ -381,21 +411,21 @@ export const AssetDetailsPage = () => {
                     value={specs.internal_finisher}
                     rowClassName={ROW_GAP}
                   />
-                  <CMYKRow
+                  <ConsumableRow
                     label="Drum Life"
+                    isColour={assetDetails.is_colour}
                     c_value={specs.drum_life_c}
                     m_value={specs.drum_life_m}
                     y_value={specs.drum_life_y}
                     k_value={specs.drum_life_k}
-                    rowClassName={ROW_GAP}
                   />
-                  <CMYKRow
+                  <ConsumableRow
                     label="Toner Remaining"
+                    isColour={assetDetails.is_colour}
                     c_value={specs.toner_life_c}
                     m_value={specs.toner_life_m}
                     y_value={specs.toner_life_y}
                     k_value={specs.toner_life_k}
-                    rowClassName={ROW_GAP}
                   />
                   <AccessoryRow
                     label="Core Functions"

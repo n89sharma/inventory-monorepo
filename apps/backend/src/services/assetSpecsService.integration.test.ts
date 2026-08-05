@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+﻿import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   buildUpdateAssetSpecs,
@@ -55,10 +55,11 @@ describe('assetSpecsService', () => {
 
   it('derives meter_total as meter_black + meter_colour', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
+    const colourModelId = await seedModel(refs.brandId, 'IRADXC3835i', true)
 
     await updateAssetSpecs(
       asset.barcode,
-      buildUpdateAssetSpecs(refs, { meter_black: 100, meter_colour: 50 }),
+      buildUpdateAssetSpecs(refs, { model_id: colourModelId, meter_black: 100, meter_colour: 50 }),
       refs.userId,
     )
 
@@ -67,6 +68,57 @@ describe('assetSpecsService', () => {
       select: { meter_total: true },
     })
     expect(spec.meter_total).toBe(150)
+  })
+
+  it('drops the colour channels when the asset moves to a mono model', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const colourModelId = await seedModel(refs.brandId, 'IRADXC3835i', true)
+    const monoModelId = await seedModel(refs.brandId, 'IRADX4751i', false)
+    const colourSpecs = {
+      meter_black: 100,
+      meter_colour: 50,
+      drum_life_c: 40,
+      drum_life_m: 41,
+      drum_life_y: 42,
+      drum_life_k: 43,
+      toner_life_c: 30,
+      toner_life_m: 31,
+      toner_life_y: 32,
+      toner_life_k: 33,
+    }
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { model_id: colourModelId, ...colourSpecs }),
+      refs.userId,
+    )
+    const sinceId = await getMaxHistoryId()
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { model_id: monoModelId, ...colourSpecs }),
+      refs.userId,
+    )
+
+    const spec = await prisma.technicalSpecification.findUniqueOrThrow({
+      where: { asset_id: asset.id },
+    })
+    expect(spec).toMatchObject({
+      meter_colour: null,
+      drum_life_c: null,
+      drum_life_m: null,
+      drum_life_y: null,
+      toner_life_c: null,
+      toner_life_m: null,
+      toner_life_y: null,
+      meter_black: 100,
+      meter_total: 100,
+      drum_life_k: 43,
+      toner_life_k: 33,
+    })
+
+    const changes = await assetUpdateChangesSince(sinceId, asset.id)
+    expect(changes.some((c) => c.after?.drum_life_c === null)).toBe(true)
+    expect(changes.some((c) => c.after?.drum_life_c === 40)).toBe(false)
   })
 
   it('accepts a component belonging to the asset model brand', async () => {
@@ -147,7 +199,7 @@ describe('assetSpecsService', () => {
 
   it('persists a same-brand model change and a new serial number, and records both', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    const sameBrandModelId = await seedModel(refs.brandId, 'IRADX4751i')
+    const sameBrandModelId = await seedModel(refs.brandId, 'IRADX4751i', false)
     const sinceId = await getMaxHistoryId()
 
     await updateAssetSpecs(
@@ -177,7 +229,7 @@ describe('assetSpecsService', () => {
       refs.userId,
     )
     const otherBrandId = await seedBrand('Ricoh')
-    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004', false)
     const sinceId = await getMaxHistoryId()
 
     await updateAssetSpecs(
@@ -198,21 +250,38 @@ describe('assetSpecsService', () => {
     expect(errorChange?.after?.error_codes).toEqual([])
   })
 
-  it('rejects Has Errors readiness when the model moves to another brand', async () => {
+  it('releases Has Errors to Untested when the model moves to another brand', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
+    const errorId = await seedError(refs.brandId, 'E100')
+    await updateAssetErrors(
+      asset.barcode,
+      { errors: [{ error_id: errorId, is_fixed: false }] },
+      refs.userId,
+    )
     const otherBrandId = await seedBrand('Ricoh')
-    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004', false)
+    const sinceId = await getMaxHistoryId()
 
-    await expect(
-      updateAssetSpecs(
-        asset.barcode,
-        buildUpdateAssetSpecs(refs, {
-          model_id: otherBrandModelId,
-          readiness_id: await readinessId('HAS_ERRORS'),
-        }),
-        refs.userId,
-      ),
-    ).rejects.toThrow(ValidationError)
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, {
+        model_id: otherBrandModelId,
+        readiness_id: await readinessId('HAS_ERRORS'),
+      }),
+      refs.userId,
+    )
+
+    const saved = await prisma.asset.findUniqueOrThrow({
+      where: { id: asset.id },
+      select: { readiness: { select: { status: true } } },
+    })
+    expect(saved.readiness.status).toBe('UNTESTED')
+
+    const remaining = await prisma.assetError.findMany({ where: { asset_id: asset.id } })
+    expect(remaining).toHaveLength(0)
+
+    const changes = await assetUpdateChangesSince(sinceId, asset.id)
+    expect(changes.some((c) => c.after?.readiness === 'UNTESTED')).toBe(true)
   })
 
   it('keeps readiness locked on a same-brand change while an error is open', async () => {
@@ -237,7 +306,7 @@ describe('assetSpecsService', () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const componentId = await seedComponent(refs.brandId, 'OldBrandComponent')
     const otherBrandId = await seedBrand('Ricoh')
-    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004', false)
 
     await expect(
       updateAssetSpecs(
