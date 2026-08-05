@@ -2,6 +2,11 @@ import { useModelStore } from '@/data/store/model-store'
 import { useOrgStore } from '@/data/store/org-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
+import {
+  DEFAULT_COLLECTION_RANGE_DAYS,
+  DEFAULT_DEPARTED_RANGE_DAYS,
+  getDefaultFromDate,
+} from '@/lib/filters/defaults'
 import { FILTER_PARSERS, parseAsIdList } from '@/lib/filters/parsers'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import {
@@ -10,7 +15,7 @@ import {
   getSelectedOrNull,
   type SelectOption,
 } from '@/ui-types/select-option-types'
-import { isAfter, isBefore, startOfDay, subDays, subMonths } from 'date-fns'
+import { isAfter, isBefore, startOfDay, subMonths } from 'date-fns'
 import { parseAsInteger, useQueryState, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -29,7 +34,6 @@ import {
 
 export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
-const DEFAULT_FROM_DAYS = 30
 
 export type PriceHistoryRange = 6 | 12
 const DEFAULT_PRICE_HISTORY_RANGE: PriceHistoryRange = 6
@@ -394,9 +398,6 @@ export function useYearParam(defaultYear: number): [number, (next: number) => vo
   const [raw, setRaw] = useQueryState('year', FILTER_PARSERS.year)
   const year = raw ?? defaultYear
   const setYear = useCallback((next: number) => void setRaw(next), [setRaw])
-  useEffect(() => {
-    if (raw === null) void setRaw(defaultYear)
-  }, [raw, defaultYear, setRaw])
   return [year, setYear]
 }
 
@@ -407,10 +408,7 @@ export function useDepartedRangeParam(): {
 } {
   const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
   const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
-  const from = useMemo(
-    () => fromRaw ?? startOfDay(subDays(new Date(), DEFAULT_FROM_DAYS)),
-    [fromRaw],
-  )
+  const from = useMemo(() => fromRaw ?? getDefaultFromDate(DEFAULT_DEPARTED_RANGE_DAYS), [fromRaw])
   const to = useMemo(() => toRaw ?? new Date(), [toRaw])
   const setRange = useCallback(
     (nextFrom: Date, nextTo: Date) => {
@@ -419,14 +417,8 @@ export function useDepartedRangeParam(): {
     },
     [setFrom, setTo],
   )
-  useEffect(() => {
-    if (fromRaw === null) void setFrom(from)
-    if (toRaw === null) void setTo(to)
-  }, [fromRaw, toRaw, from, to, setFrom, setTo])
   return { from, to, setRange }
 }
-
-const DEFAULT_COLLECTION_RANGE_DAYS = 60
 
 export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_RANGE_DAYS): {
   fromDate: SelectOption<Date>
@@ -436,10 +428,7 @@ export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_
 } {
   const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
   const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
-  const from = useMemo(
-    () => fromRaw ?? startOfDay(subDays(new Date(), defaultDays)),
-    [fromRaw, defaultDays],
-  )
+  const from = useMemo(() => fromRaw ?? getDefaultFromDate(defaultDays), [fromRaw, defaultDays])
   const to = useMemo(() => toRaw ?? new Date(), [toRaw])
   const setFromDate = useCallback(
     (next: SelectOption<Date>) => void setFrom(getSelectedOrNull(next)),
@@ -449,10 +438,6 @@ export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_
     (next: SelectOption<Date>) => void setTo(getSelectedOrNull(next)),
     [setTo],
   )
-  useEffect(() => {
-    if (fromRaw === null) void setFrom(from)
-    if (toRaw === null) void setTo(to)
-  }, [fromRaw, toRaw, from, to, setFrom, setTo])
   return {
     fromDate: getSelectOption(from),
     toDate: getSelectOption(to),

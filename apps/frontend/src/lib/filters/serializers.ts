@@ -1,4 +1,10 @@
 import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
+import {
+  DEFAULT_COLLECTION_RANGE_DAYS,
+  DEFAULT_DEPARTED_RANGE_DAYS,
+  getDefaultFromDate,
+  getDefaultYear,
+} from '@/lib/filters/defaults'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
@@ -33,7 +39,6 @@ const BAND_BOUNDS = {
 >
 
 const serializeWarehouse = createSerializer({ warehouse: FILTER_PARSERS.warehouse })
-const serializeWh = createSerializer({ wh: FILTER_PARSERS.wh })
 const serializeAssetSearch = createSerializer({ wh: FILTER_PARSERS.wh, type: FILTER_PARSERS.type })
 const serializeInStockSummary = createSerializer({
   wh: FILTER_PARSERS.wh,
@@ -53,6 +58,17 @@ const serializeDeparted = createSerializer({
   from: FILTER_PARSERS.from,
   to: FILTER_PARSERS.to,
   brand: FILTER_PARSERS.brand,
+})
+const serializeDepartedSearch = createSerializer({
+  wh: FILTER_PARSERS.wh,
+  type: FILTER_PARSERS.type,
+  from: FILTER_PARSERS.from,
+  to: FILTER_PARSERS.to,
+})
+const serializeDateRange = createSerializer({ from: FILTER_PARSERS.from, to: FILTER_PARSERS.to })
+const serializeProfitability = createSerializer({
+  wh: FILTER_PARSERS.wh,
+  year: FILTER_PARSERS.year,
 })
 const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
 const serializeHeld = createSerializer({
@@ -135,7 +151,32 @@ export function buildSearchOnHandUrl(selection: {
 }
 
 export function buildProfitabilityReportPath(warehouse: Warehouse | null): string {
-  return serializeWh(PROFITABILITY_REPORT_PATH, { wh: warehouse ? [warehouse.id] : null })
+  return serializeProfitability(PROFITABILITY_REPORT_PATH, {
+    wh: warehouse ? [warehouse.id] : null,
+    year: getDefaultYear(),
+  })
+}
+
+// The date filters default to a window ending today, so a link that omits them
+// means "the last N days" to whoever opens it rather than the range the sender
+// saw. Stamping the dates at build time keeps a copied link exact.
+export function buildCollectionSummaryPath(path: string): string {
+  return serializeDateRange(path, {
+    from: getDefaultFromDate(DEFAULT_COLLECTION_RANGE_DAYS),
+    to: new Date(),
+  })
+}
+
+export function buildDepartedSearchPath(
+  warehouse: Warehouse | null,
+  assetType: AssetType | null,
+): string {
+  return serializeDepartedSearch(DEPARTED_PATH, {
+    wh: warehouse ? [warehouse.id] : null,
+    type: assetType ? [assetType.id] : null,
+    from: getDefaultFromDate(DEFAULT_DEPARTED_RANGE_DAYS),
+    to: new Date(),
+  })
 }
 
 export function buildAssetSearchPath(

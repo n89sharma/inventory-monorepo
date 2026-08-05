@@ -32,6 +32,7 @@ import {
   useWarehousesParam,
   useYearParam,
 } from '@/lib/filters/hooks'
+import { getDefaultYear } from '@/lib/filters/defaults'
 import { formatUSDWithSymbol } from '@/lib/formatters'
 import {
   aggregateCube,
@@ -47,7 +48,7 @@ import { useCallback, useMemo } from 'react'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
 const YEARS_IN_DROPDOWN = 5
-const CURRENT_YEAR = new Date().getFullYear()
+const CURRENT_YEAR = getDefaultYear()
 const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
 
 const EMPTY_CUBE: ProfitabilityCubeRow[] = []

@@ -26,6 +26,8 @@ import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehous
 import {
   MODEL_PRICE_HISTORY_PATH,
   buildAssetSearchPath,
+  buildCollectionSummaryPath,
+  buildDepartedSearchPath,
   buildInStockSummaryPath,
   buildProfitabilityReportPath,
   buildStoreListPath,
@@ -98,11 +100,17 @@ const sidebarItems = [
   permission: SidebarPermission
 }[]
 
+const DEPARTED_PATH = '/search/departed'
+
 const SEARCH_ASSETS_SUB_ITEMS = [
   { title: 'On-Hand', url: '/search/onhand' },
-  { title: 'Departed', url: '/search/departed' },
+  { title: 'Departed', url: DEPARTED_PATH },
   { title: 'Harvested', url: '/search/harvested' },
 ]
+
+// The five collection summaries filter on a date range that defaults to a window
+// ending today, so their links carry the dates rather than leaving them implicit.
+const DATE_RANGE_ITEM_URLS = ['/arrivals', '/holds', '/transfers', '/departures', '/invoices']
 
 const SETTINGS_SUB_ITEMS = [
   { title: 'Catalog', url: '/settings/catalog' },
@@ -148,6 +156,17 @@ export function AppSidebar(): React.JSX.Element {
     [brands],
   )
   const defaultAssetType = useDefaultAssetType()
+
+  function sidebarItemPath(url: string): string {
+    if (url === STORE_PATH) return buildStoreListPath(defaultWarehouse)
+    if (DATE_RANGE_ITEM_URLS.includes(url)) return buildCollectionSummaryPath(url)
+    return url
+  }
+
+  function searchItemPath(url: string): string {
+    if (url === DEPARTED_PATH) return buildDepartedSearchPath(defaultWarehouse, defaultAssetType)
+    return buildAssetSearchPath(url, defaultWarehouse, defaultAssetType)
+  }
 
   function reportItemPath(url: string): string {
     if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath(defaultWarehouse)
@@ -232,15 +251,7 @@ export function AppSidebar(): React.JSX.Element {
                             asChild
                             isActive={location.pathname.startsWith(item.url) ? true : undefined}
                           >
-                            <Link
-                              to={buildAssetSearchPath(
-                                item.url,
-                                defaultWarehouse,
-                                defaultAssetType,
-                              )}
-                            >
-                              {item.title}
-                            </Link>
+                            <Link to={searchItemPath(item.url)}>{item.title}</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -252,8 +263,7 @@ export function AppSidebar(): React.JSX.Element {
                 .filter((item) => sidebarItemVisible[item.permission])
                 .map((item) => {
                   const isActive = location.pathname.startsWith(item.url)
-                  const to =
-                    item.url === STORE_PATH ? buildStoreListPath(defaultWarehouse) : item.url
+                  const to = sidebarItemPath(item.url)
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild isActive={isActive ? true : undefined}>
