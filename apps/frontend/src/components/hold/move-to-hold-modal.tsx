@@ -1,15 +1,12 @@
-import { getGlobalSearchResults } from '@/data/api/search-api'
+import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
-import { useEffect, useState } from 'react'
-import type { AssetSummary, HoldSuggestion, SearchEntityType } from 'shared-types'
+import { useState } from 'react'
+import type { AssetSummary, HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
 import { DetailGrid, SearchView } from '../collections/collection-search'
 import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-
-const HOLD_SEARCH_TYPES: SearchEntityType[] = ['holds']
-const SEARCH_DEBOUNCE_MS = 150
 
 interface DestinationStepProps {
   selected: HoldSuggestion | null
@@ -70,8 +67,6 @@ export function MoveToHoldModal({
   onConfirmSuccess,
 }: MoveToHoldModalProps) {
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [holds, setHolds] = useState<HoldSuggestion[]>([])
   const [selected, setSelected] = useState<HoldSuggestion | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
 
@@ -79,25 +74,9 @@ export function MoveToHoldModal({
   const assetCount = selectedAssets.length
   const assetNoun = `asset${assetCount !== 1 ? 's' : ''}`
 
-  useEffect(() => {
-    if (!query) return
-    const timer = setTimeout(async () => {
-      const res = await getGlobalSearchResults(query, HOLD_SEARCH_TYPES)
-      setHolds(res.holds.filter((h) => h.hold_number !== sourceHoldNumber))
-      setIsLoading(false)
-    }, SEARCH_DEBOUNCE_MS)
-    return () => clearTimeout(timer)
-  }, [query, sourceHoldNumber])
-
-  function handleQueryChange(value: string) {
-    setQuery(value)
-    if (!value) {
-      setHolds([])
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
-  }
+  const { results, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
+  // An asset cannot be moved to the hold it is already on.
+  const holds = results.holds.filter((h) => h.hold_number !== sourceHoldNumber)
 
   function handleSelect(collection: SelectedCollection) {
     if (collection.kind !== 'hold') return
@@ -125,9 +104,7 @@ export function MoveToHoldModal({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setQuery('')
-      setHolds([])
       setSelected(null)
-      setIsLoading(false)
       setIsConfirming(false)
     }
     onOpenChange(nextOpen)
@@ -136,7 +113,6 @@ export function MoveToHoldModal({
   function handleClearSelection() {
     setSelected(null)
     setQuery('')
-    setHolds([])
   }
 
   return (
@@ -157,7 +133,7 @@ export function MoveToHoldModal({
           query={query}
           isLoading={isLoading}
           holds={holds}
-          onQueryChange={handleQueryChange}
+          onQueryChange={setQuery}
           onSelect={handleSelect}
           onClearSelection={handleClearSelection}
         />

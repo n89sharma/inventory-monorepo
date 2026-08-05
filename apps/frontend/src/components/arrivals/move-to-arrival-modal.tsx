@@ -1,15 +1,12 @@
-import { getGlobalSearchResults } from '@/data/api/search-api'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
-import { useEffect, useState } from 'react'
-import type { ArrivalSuggestion, AssetSummary, SearchEntityType } from 'shared-types'
+import { ARRIVAL_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
+import { useState } from 'react'
+import type { ArrivalSuggestion, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { DetailGrid, SearchView } from '../collections/collection-search'
 import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-
-const ARRIVAL_SEARCH_TYPES: SearchEntityType[] = ['arrivals']
-const SEARCH_DEBOUNCE_MS = 150
 
 interface DestinationStepProps {
   selected: ArrivalSuggestion | null
@@ -70,8 +67,6 @@ export function MoveToArrivalModal({
   onConfirmSuccess,
 }: MoveToArrivalModalProps) {
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [arrivals, setArrivals] = useState<ArrivalSuggestion[]>([])
   const [selected, setSelected] = useState<ArrivalSuggestion | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
 
@@ -79,25 +74,9 @@ export function MoveToArrivalModal({
   const assetCount = selectedAssets.length
   const assetNoun = `asset${assetCount !== 1 ? 's' : ''}`
 
-  useEffect(() => {
-    if (!query) return
-    const timer = setTimeout(async () => {
-      const res = await getGlobalSearchResults(query, ARRIVAL_SEARCH_TYPES)
-      setArrivals(res.arrivals.filter((a) => a.arrival_number !== sourceArrivalNumber))
-      setIsLoading(false)
-    }, SEARCH_DEBOUNCE_MS)
-    return () => clearTimeout(timer)
-  }, [query, sourceArrivalNumber])
-
-  function handleQueryChange(value: string) {
-    setQuery(value)
-    if (!value) {
-      setArrivals([])
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
-  }
+  const { results, isLoading } = useGlobalSearch(query, ARRIVAL_SEARCH_TYPES)
+  // An asset cannot be moved to the arrival it is already on.
+  const arrivals = results.arrivals.filter((a) => a.arrival_number !== sourceArrivalNumber)
 
   function handleSelect(collection: SelectedCollection) {
     if (collection.kind !== 'arrival') return
@@ -129,9 +108,7 @@ export function MoveToArrivalModal({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setQuery('')
-      setArrivals([])
       setSelected(null)
-      setIsLoading(false)
       setIsConfirming(false)
     }
     onOpenChange(nextOpen)
@@ -140,7 +117,6 @@ export function MoveToArrivalModal({
   function handleClearSelection() {
     setSelected(null)
     setQuery('')
-    setArrivals([])
   }
 
   return (
@@ -161,7 +137,7 @@ export function MoveToArrivalModal({
           query={query}
           isLoading={isLoading}
           arrivals={arrivals}
-          onQueryChange={handleQueryChange}
+          onQueryChange={setQuery}
           onSelect={handleSelect}
           onClearSelection={handleClearSelection}
         />

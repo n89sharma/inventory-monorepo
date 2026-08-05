@@ -1,22 +1,18 @@
 import { EntityLink } from '@/components/shared/entity-link'
-import { getGlobalSearchResults } from '@/data/api/search-api'
 import { useCan } from '@/hooks/use-can'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
+import { useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 import { formatDate } from '@/lib/formatters'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { DetailGrid, SearchView } from './collection-search'
-import {
-  emptyResults,
-  type CollectionResults,
-  type SelectedCollection,
-} from './collection-search-types'
+import type { CollectionResults, SelectedCollection } from './collection-search-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 
@@ -196,8 +192,6 @@ export function AddToCollectionModal({
   refreshKey,
 }: AddToCollectionModalProps) {
   const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<CollectionResults>(emptyResults)
   const [selected, setSelected] = useState<SelectedCollection | null>(null)
   const [duplicateCount, setDuplicateCount] = useState(0)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
@@ -215,30 +209,15 @@ export function AddToCollectionModal({
 
   const assetCount = selectedAssets.length
 
-  useEffect(() => {
-    if (!query) return
-    const t = setTimeout(async () => {
-      const res = await getGlobalSearchResults(query)
-      setResults({
-        arrivals: [],
-        departures: canCreateDeparture ? res.departures : [],
-        transfers: canCreateTransfer ? res.transfers : [],
-        holds: canCreateHold ? res.holds : [],
-        invoices: canCreateInvoice ? res.invoices : [],
-      })
-      setIsLoading(false)
-    }, 150)
-    return () => clearTimeout(t)
-  }, [query, canCreateDeparture, canCreateTransfer, canCreateHold, canCreateInvoice])
-
-  function handleQueryChange(value: string) {
-    setQuery(value)
-    if (!value) {
-      setResults(emptyResults)
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
+  const { results: searchResults, isLoading } = useGlobalSearch(query)
+  // Arrivals never take assets this way, and a collection the user cannot edit
+  // is not offered as a target.
+  const results: CollectionResults = {
+    arrivals: [],
+    departures: canCreateDeparture ? searchResults.departures : [],
+    transfers: canCreateTransfer ? searchResults.transfers : [],
+    holds: canCreateHold ? searchResults.holds : [],
+    invoices: canCreateInvoice ? searchResults.invoices : [],
   }
 
   async function handleSelect(collection: SelectedCollection) {
@@ -335,9 +314,7 @@ export function AddToCollectionModal({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setQuery('')
-      setResults(emptyResults)
       setSelected(null)
-      setIsLoading(false)
       setDuplicateCount(0)
       setIsLoadingDetail(false)
       setIsConfirming(false)
@@ -350,7 +327,6 @@ export function AddToCollectionModal({
     setDuplicateCount(0)
     setIsLoadingDetail(false)
     setQuery('')
-    setResults(emptyResults)
   }
 
   return (
@@ -371,7 +347,7 @@ export function AddToCollectionModal({
           selected={selected}
           onClear={handleClearSelection}
           query={query}
-          onQueryChange={handleQueryChange}
+          onQueryChange={setQuery}
           isLoading={isLoading}
           results={results}
           onSelect={handleSelect}

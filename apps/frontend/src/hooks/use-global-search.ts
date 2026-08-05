@@ -7,6 +7,7 @@ const GLOBAL_SEARCH_KEY = 'global-search'
 const SEARCH_DEBOUNCE_MS = 150
 
 export const ASSET_SEARCH_TYPES: SearchEntityType[] = ['assets']
+export const ARRIVAL_SEARCH_TYPES: SearchEntityType[] = ['arrivals']
 export const HOLD_SEARCH_TYPES: SearchEntityType[] = ['holds']
 
 const EMPTY_RESULT: GlobalSearchResult = {
