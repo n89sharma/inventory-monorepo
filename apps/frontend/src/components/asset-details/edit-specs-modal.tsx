@@ -29,9 +29,9 @@ import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
-import type { AssetDetails, AssetError, CoreFunction } from 'shared-types'
+import type { AssetDetails, AssetError, CoreFunction, ModelSummary } from 'shared-types'
 import { toast } from 'sonner'
 
 interface EditSpecsModalProps {
@@ -166,10 +166,10 @@ export function EditSpecsModal({
   // Everything the fields render from follows the picked model, not the stored asset,
   // so switching model re-derives the applicable fields before the save.
   const modelSelection = useWatch({ control: form.control, name: 'model' })
-  const brandId = modelSelection?.brand_id ?? null
+  const currBrandId = modelSelection?.brand_id ?? null
   const isColourModel = modelSelection?.is_colour ?? false
   const visibility = getSpecificationFieldVisibility(modelSelection?.asset_type ?? null)
-  const brandChanged = brandId !== null && brandId !== (assetDetails?.brand_id ?? null)
+  const brandChanged = currBrandId !== null && currBrandId !== (assetDetails?.brand_id ?? null)
 
   const readinessDisabledStatuses = useMemo(
     () =>
@@ -177,34 +177,31 @@ export function EditSpecsModal({
     [hasOpenError, brandChanged, readinesses],
   )
 
-  // Components and errors are both brand-scoped, so a move between two distinct brands
-  // drops the internal finisher and releases the enforced HAS_ERRORS readiness — the
-  // backend clears the errors that were holding it. The release lands on UNTESTED
-  // rather than the PP_OK that fixing the last error yields, since the asset has not
-  // been checked against the new brand's error list. Mirrors assetSpecsService so the
-  // picker shows the readiness that will be saved.
-  const prevBrandRef = useRef<number | null | undefined>(undefined)
-  useEffect(() => {
-    const prev = prevBrandRef.current
-    if (prev && brandId && prev !== brandId) {
-      form.setValue('component', null, { shouldDirty: true, shouldValidate: true })
-      const readiness = form.getValues('readiness')
-      const untested = readinesses.find((r) => r.status === UNTESTED_READINESS)
-      if (untested && isSelected(readiness) && readiness.selected.status === HAS_ERRORS_READINESS) {
-        form.setValue('readiness', getSelectOption(untested), {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-      }
-    }
-    prevBrandRef.current = brandId
-  }, [brandId, form, readinesses])
-
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
     form.reset(undefined, DISCARD_USER_EDITS),
   )
 
   if (!assetDetails) return null
+
+  // Components and errors are both brand-scoped, so picking a model from a brand other
+  // than the asset's drops the internal finisher and releases the enforced HAS_ERRORS
+  // readiness — the backend clears the errors that were holding it. The release lands
+  // on UNTESTED rather than the PP_OK that fixing the last error yields, since the
+  // asset has not been checked against the new brand's error list. Mirrors
+  // assetSpecsService so the picker shows the readiness that will be saved.
+  function handleModelSelected(currModel: ModelSummary) {
+    if (currModel.brand_id === assetDetails!.brand_id) return
+
+    form.setValue('component', null, { shouldDirty: true, shouldValidate: true })
+    const readiness = form.getValues('readiness')
+    const untested = readinesses.find((r) => r.status === UNTESTED_READINESS)
+    if (untested && isSelected(readiness) && readiness.selected.status === HAS_ERRORS_READINESS) {
+      form.setValue('readiness', getSelectOption(untested), {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+  }
 
   async function onValid(rawValues: SpecsForm) {
     if (!isSelected(rawValues.readiness) || !rawValues.model) return
@@ -271,6 +268,7 @@ export function EditSpecsModal({
                 getLabel={modelLabel}
                 clearLabel="Clear model"
                 className={INPUT_WIDTH}
+                onSelectionChange={handleModelSelected}
               />
             </HorizontalField>
             <HorizontalField label="Serial Number" required>
@@ -285,7 +283,7 @@ export function EditSpecsModal({
           <TechnicalSpecsFields
             control={form.control}
             isColour={isColourModel}
-            brandId={brandId}
+            brandId={currBrandId}
             visibility={visibility}
             readinessDisabledStatuses={readinessDisabledStatuses}
           />

@@ -16,7 +16,7 @@ import {
   type UseFieldArrayAppend,
   type UseFieldArrayUpdate,
 } from 'react-hook-form'
-import type { AssetSummary, Status } from 'shared-types'
+import type { AssetSummary, ModelSummary, Status } from 'shared-types'
 import { toast } from 'sonner'
 import { AssetErrorsEditor } from '../asset-details/asset-errors-editor'
 import { Button } from '../shadcn/button'
@@ -91,6 +91,7 @@ export function CreateAssetModal({
   }
 
   const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const allErrors = useReferenceDataStore((state) => state.errors)
   const models = useModelStore((state) => state.models)
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
 
@@ -108,41 +109,44 @@ export function CreateAssetModal({
     newAssetForm.reset(undefined, DISCARD_USER_EDITS),
   )
 
-  // Watch readiness + model to (a) drive the errors editor's enabled/brand state
-  // and (b) clear errors on transitions: leaving HAS_ERRORS, or switching to a
-  // model whose brand differs from the previous brand. Refs track the previous
-  // observed value so the post-reset run doesn't fire a spurious clear.
+  // Watch readiness + model to drive the errors editor's enabled/brand state, and to
+  // clear the errors when readiness leaves HAS_ERRORS. The ref tracks the previously
+  // observed readiness so the post-reset run doesn't fire a spurious clear.
   const readinessSelection = useWatch({ control: newAssetForm.control, name: 'readiness' })
   const modelSelection = useWatch({ control: newAssetForm.control, name: 'model' })
-  const currentReadinessStatus = isSelected(readinessSelection)
+  const currReadinessStatus = isSelected(readinessSelection)
     ? readinessSelection.selected.status
     : null
-  const brandId = modelSelection?.brand_id ?? null
+  const currBrandId = modelSelection?.brand_id ?? null
   const isColourModel = modelSelection?.is_colour ?? false
   const visibility = getSpecificationFieldVisibility(modelSelection?.asset_type ?? null)
-  const isHasErrors = currentReadinessStatus === HAS_ERRORS_READINESS
+  const isHasErrors = currReadinessStatus === HAS_ERRORS_READINESS
 
-  const prevReadinessRef = useRef<string | null | undefined>(undefined)
-  const prevBrandRef = useRef<number | null | undefined>(undefined)
-
-  useEffect(() => {
-    const prev = prevReadinessRef.current
-    if (prev === HAS_ERRORS_READINESS && currentReadinessStatus !== HAS_ERRORS_READINESS) {
-      newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
-    }
-    prevReadinessRef.current = currentReadinessStatus
-  }, [currentReadinessStatus, newAssetForm])
+  const prevReadinessStatusRef = useRef<string | null | undefined>(undefined)
 
   useEffect(() => {
-    // Clear only when transitioning between two distinct non-null brands.
-    // Going from "no model" → "a model" keeps any errors the user added before
-    // picking the model; the backend will reject a brand mismatch on submit.
-    const prev = prevBrandRef.current
-    if (prev && brandId && prev !== brandId) {
+    const prevReadinessStatus = prevReadinessStatusRef.current
+    prevReadinessStatusRef.current = currReadinessStatus
+    if (
+      prevReadinessStatus === HAS_ERRORS_READINESS &&
+      currReadinessStatus !== HAS_ERRORS_READINESS
+    ) {
       newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
     }
-    prevBrandRef.current = brandId
-  }, [brandId, newAssetForm])
+  }, [currReadinessStatus, newAssetForm])
+
+  // Errors are brand-scoped, so an error only survives a model pick when it belongs to
+  // that model's brand. The errors editor allows any brand while no model is picked,
+  // which is where the mismatches come from.
+  function handleModelSelected(currModel: ModelSummary) {
+    const brandIdByErrorId = new Map(allErrors.map((e) => [e.id, e.brand_id]))
+    const currErrors = newAssetForm.getValues('errors')
+    const keptErrors = currErrors.filter(
+      (e) => brandIdByErrorId.get(e.error_id) === currModel.brand_id,
+    )
+    if (keptErrors.length === currErrors.length) return
+    newAssetForm.setValue('errors', keptErrors, { shouldDirty: true, shouldValidate: true })
+  }
 
   async function printCreatedAssetBarcode(barcode: string) {
     try {
@@ -234,6 +238,7 @@ export function CreateAssetModal({
                 getLabel={modelLabel}
                 clearLabel="Clear model"
                 className={INPUT_WIDTH}
+                onSelectionChange={handleModelSelected}
               />
             </HorizontalField>
             <HorizontalField label="Serial Number" required>
@@ -248,7 +253,7 @@ export function CreateAssetModal({
           <TechnicalSpecsFields
             control={newAssetForm.control}
             isColour={isColourModel}
-            brandId={brandId}
+            brandId={currBrandId}
             visibility={visibility}
             renderAfterReadiness={
               <HorizontalField label="Errors" required={isHasErrors}>
@@ -259,7 +264,7 @@ export function CreateAssetModal({
                     <AssetErrorsEditor
                       value={field.value}
                       onChange={field.onChange}
-                      brandId={brandId}
+                      brandId={currBrandId}
                       disabled={!isHasErrors}
                       invalid={fieldState.invalid}
                       statusToggleable={false}

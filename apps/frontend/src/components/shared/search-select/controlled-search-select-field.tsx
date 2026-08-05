@@ -16,6 +16,9 @@ type ControlledSearchSelectFieldProps<T, TForm extends FieldValues> = {
   placeholder?: string
   clearLabel?: string
   className?: string
+  // Runs after the pick is committed, for form state that follows the selection.
+  // Clearing the field doesn't call it — only an actual selection does.
+  onSelectionChange?: (selected: T) => void
 }
 
 export function ControlledSearchSelectField<T, TForm extends FieldValues>({
@@ -26,6 +29,7 @@ export function ControlledSearchSelectField<T, TForm extends FieldValues>({
   placeholder = '',
   clearLabel,
   className,
+  onSelectionChange,
 }: ControlledSearchSelectFieldProps<T, TForm>): React.JSX.Element {
   const [query, setQuery] = useState('')
   return (
@@ -39,6 +43,7 @@ export function ControlledSearchSelectField<T, TForm extends FieldValues>({
           onSelectionChange={(val) => {
             field.onChange(val)
             setQuery('')
+            onSelectionChange?.(val)
           }}
           onQueryChange={setQuery}
           onClear={() => {
