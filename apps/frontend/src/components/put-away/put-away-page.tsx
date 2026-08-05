@@ -135,6 +135,7 @@ function LocationField({
         <Input
           id="put-away-location"
           ref={inputRef}
+          autoFocus
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
@@ -237,10 +238,6 @@ export function PutAwayPage(): React.JSX.Element {
     !!scannedAsset?.location &&
     !!selectedWarehouse &&
     scannedAsset.location.warehouse_code !== selectedWarehouse.city_code
-
-  useEffect(() => {
-    form.setFocus('location')
-  }, [form])
 
   useEffect(() => {
     if (!locationValue) {
