@@ -2,6 +2,11 @@ import { UpdateAssetSpecs } from 'shared-types'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import {
+  HAS_ERRORS_READINESS,
+  reconcileAssetErrors,
+  resolveReadinessIds,
+} from './assetErrorService.js'
 import { recordAssetUpdate } from './historyService.js'
 
 export async function updateAssetSpecs(
@@ -14,9 +19,10 @@ export async function updateAssetSpecs(
     select: {
       id: true,
       readiness_id: true,
+      serial_number: true,
       country_of_origin_id: true,
       manufactured_year: true,
-      model: { select: { brand_id: true } },
+      model: { select: { id: true, brand_id: true } },
       asset_errors: { where: { is_fixed: false }, select: { error_id: true }, take: 1 },
       technical_specification: {
         select: {
@@ -39,16 +45,34 @@ export async function updateAssetSpecs(
   })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
+  const newModel = await prisma.model.findUnique({
+    where: { id: data.model_id },
+    select: { brand_id: true },
+  })
+  if (!newModel) throw new NotFoundError(`Model ${data.model_id} not found`)
+
+  // Errors are brand-scoped, so moving the asset to another brand's model clears them.
+  const brandChanged = newModel.brand_id !== asset.model.brand_id
+
   // Readiness is owned by the error state while any error is open — it stays locked
-  // on HAS_ERRORS and can only change once the errors are fixed or removed.
+  // on HAS_ERRORS and can only change once the errors are fixed or removed. A brand
+  // change removes the errors outright, so the lock no longer applies.
   const hasOpenError = asset.asset_errors.length > 0
-  if (hasOpenError && data.readiness_id !== asset.readiness_id) {
+  if (!brandChanged && hasOpenError && data.readiness_id !== asset.readiness_id) {
     throw new ValidationError('Readiness cannot be changed while the asset has open errors')
+  }
+  if (brandChanged) {
+    const readinessIdByStatus = await resolveReadinessIds([HAS_ERRORS_READINESS])
+    if (data.readiness_id === readinessIdByStatus.get(HAS_ERRORS_READINESS)) {
+      throw new ValidationError(
+        'Readiness cannot be Has Errors — changing the model brand clears the asset errors',
+      )
+    }
   }
 
   if (data.component_id !== null) {
     await validateComponentBrands(prisma, [
-      { componentId: data.component_id, expectedBrandId: asset.model.brand_id },
+      { componentId: data.component_id, expectedBrandId: newModel.brand_id },
     ])
   }
 
@@ -65,16 +89,18 @@ export async function updateAssetSpecs(
     }
   }
 
-  await prisma.$transaction([
-    prisma.asset.update({
+  const prevErrorIds = await prisma.$transaction(async (tx) => {
+    await tx.asset.update({
       where: { id: asset.id },
       data: {
+        model_id: data.model_id,
+        serial_number: data.serial_number,
         readiness_id: data.readiness_id,
         country_of_origin_id: data.country_of_origin_id,
         manufactured_year: data.manufactured_year,
       },
-    }),
-    prisma.technicalSpecification.upsert({
+    })
+    await tx.technicalSpecification.upsert({
       where: { asset_id: asset.id },
       update: {
         cassettes: data.cassettes,
@@ -107,16 +133,26 @@ export async function updateAssetSpecs(
         toner_life_y: data.toner_life_y,
         toner_life_k: data.toner_life_k,
       },
-    }),
-    prisma.assetAccessory.deleteMany({ where: { asset_id: asset.id } }),
-    ...accessoryIds.map((accessoryId) =>
-      prisma.assetAccessory.create({ data: { asset_id: asset.id, accessory_id: accessoryId } }),
-    ),
-  ])
+    })
+    await tx.assetAccessory.deleteMany({ where: { asset_id: asset.id } })
+    await tx.assetAccessory.createMany({
+      data: accessoryIds.map((accessoryId) => ({
+        asset_id: asset.id,
+        accessory_id: accessoryId,
+      })),
+    })
+
+    if (!brandChanged) return []
+    const { prevErrorIds } = await reconcileAssetErrors(tx, asset.id, [], userId)
+    return prevErrorIds
+  })
 
   await recordAssetUpdate(
     asset.id,
     {
+      model_id: asset.model.id,
+      serial_number: asset.serial_number,
+      ...(brandChanged ? { error_ids: prevErrorIds } : {}),
       readiness_id: asset.readiness_id,
       country_of_origin_id: asset.country_of_origin_id,
       manufactured_year: asset.manufactured_year,
@@ -135,6 +171,9 @@ export async function updateAssetSpecs(
       toner_life_k: asset.technical_specification?.toner_life_k,
     },
     {
+      model_id: data.model_id,
+      serial_number: data.serial_number,
+      ...(brandChanged ? { error_ids: [] } : {}),
       readiness_id: data.readiness_id,
       country_of_origin_id: data.country_of_origin_id,
       manufactured_year: data.manufactured_year,

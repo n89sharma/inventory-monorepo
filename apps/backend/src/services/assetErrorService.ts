@@ -9,7 +9,7 @@ import { recordAssetUpdate } from './historyService.js'
 // which is locked and never set by hand. Clearing the last open error releases the
 // asset from HAS_ERRORS to PP_OK; a readiness the user set manually (UNTESTED / PP_OK
 // / CUSTOMER_READY) is left untouched when no open error is involved.
-const HAS_ERRORS_READINESS = 'HAS_ERRORS'
+export const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const PP_OK_READINESS = 'PP_OK'
 
 /**
@@ -139,7 +139,7 @@ export async function updateAssetErrors(
  * Resolve a set of readiness status codes to their ids. Readiness rows are
  * immutable reference data, so this runs outside the caller's transaction.
  */
-async function resolveReadinessIds(statuses: string[]): Promise<Map<string, number>> {
+export async function resolveReadinessIds(statuses: string[]): Promise<Map<string, number>> {
   const rows = await prisma.readiness.findMany({
     where: { status: { in: statuses } },
     select: { id: true, status: true },

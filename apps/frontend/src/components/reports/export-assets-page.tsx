@@ -7,11 +7,12 @@ import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
+import { InlineWarning } from '@/components/shared/inline-warning'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { assetDetailHref } from '@/ui-types/navigation-context'
-import { CopyIcon, SpinnerGapIcon, WarningIcon } from '@phosphor-icons/react'
+import { CopyIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
@@ -70,27 +71,22 @@ function NotFoundSerialNumbersBanner({
 
   if (serialNumbers.length === 0) return null
   return (
-    <div
-      className="flex items-start justify-between gap-2 rounded-lg border
-        border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+    <InlineWarning
+      action={
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleCopy}
+          className="h-7 shrink-0 gap-1.5 text-destructive hover:text-destructive"
+        >
+          <CopyIcon />
+          Copy
+        </Button>
+      }
     >
-      <div className="flex items-start gap-2">
-        <WarningIcon className="mt-0.5 shrink-0" />
-        <span>
-          <span className="font-medium tabular-nums">{serialNumbers.length} not found: </span>
-          <span className="break-all">{serialNumbers.join(', ')}</span>
-        </span>
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleCopy}
-        className="h-7 shrink-0 gap-1.5 text-destructive hover:text-destructive"
-      >
-        <CopyIcon />
-        Copy
-      </Button>
-    </div>
+      <span className="font-medium tabular-nums">{serialNumbers.length} not found: </span>
+      <span className="break-all">{serialNumbers.join(', ')}</span>
+    </InlineWarning>
   )
 }
 

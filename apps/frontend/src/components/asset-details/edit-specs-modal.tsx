@@ -1,4 +1,8 @@
-import { TechnicalSpecsFields } from '@/components/asset-details/technical-specs-fields'
+import {
+  ControlledTextInput,
+  INPUT_WIDTH,
+  TechnicalSpecsFields,
+} from '@/components/asset-details/technical-specs-fields'
 import { Button } from '@/components/shadcn/button'
 import {
   Dialog,
@@ -7,19 +11,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/shadcn/dialog'
+import { HorizontalField } from '@/components/shared/horizontal-field'
+import { InlineWarning } from '@/components/shared/inline-warning'
+import { ControlledSearchSelectField } from '@/components/shared/search-select/controlled-search-select-field'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
+import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
-import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
+import {
+  getSpecificationFieldVisibility,
+  type SpecificationFieldVisibility,
+} from '@/lib/asset-spec-applicability'
 import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { modelLabel } from '@/lib/reference-labels'
 import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
-import { useForm, type FieldErrors } from 'react-hook-form'
+import { useEffect, useMemo, useRef } from 'react'
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import type { AssetDetails, AssetError, CoreFunction } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -37,6 +49,8 @@ interface EditSpecsModalProps {
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 
 const EMPTY_SPECS_FORM: SpecsForm = {
+  model: null,
+  serialNumber: '',
   readiness: UNSELECTED,
   countryOfOrigin: null,
   manufacturedYear: null,
@@ -53,8 +67,32 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   tonerLifeM: null,
   tonerLifeY: null,
   tonerLifeK: null,
-  isColour: false,
-  assetType: null,
+}
+
+// Fields the new model's asset type hides are dropped rather than carried over from
+// the previous model, so a save cannot persist a value the form no longer shows.
+function clearHiddenSpecFields(
+  formValues: SpecsForm,
+  visibility: SpecificationFieldVisibility,
+): SpecsForm {
+  return {
+    ...formValues,
+    countryOfOrigin: visibility.manufacturingOrigin ? formValues.countryOfOrigin : null,
+    manufacturedYear: visibility.manufacturingOrigin ? formValues.manufacturedYear : null,
+    meterBlack: visibility.meter ? formValues.meterBlack : null,
+    meterColour: visibility.meter ? formValues.meterColour : null,
+    cassettes: visibility.cassettes ? formValues.cassettes : null,
+    component: visibility.internalFinisher ? formValues.component : null,
+    coreFunctions: visibility.coreFunctions ? formValues.coreFunctions : [],
+    drumLifeC: visibility.consumables ? formValues.drumLifeC : null,
+    drumLifeM: visibility.consumables ? formValues.drumLifeM : null,
+    drumLifeY: visibility.consumables ? formValues.drumLifeY : null,
+    drumLifeK: visibility.consumables ? formValues.drumLifeK : null,
+    tonerLifeC: visibility.consumables ? formValues.tonerLifeC : null,
+    tonerLifeM: visibility.consumables ? formValues.tonerLifeM : null,
+    tonerLifeY: visibility.consumables ? formValues.tonerLifeY : null,
+    tonerLifeK: visibility.consumables ? formValues.tonerLifeK : null,
+  }
 }
 
 export function EditSpecsModal({
@@ -65,21 +103,20 @@ export function EditSpecsModal({
   errors,
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
+  const models = useModelStore((state) => state.models)
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
   const components = useReferenceDataStore((state) => state.components)
 
   const hasOpenError = errors.some((e) => !e.is_fixed)
-  const readinessDisabledStatuses = useMemo(
-    () => (hasOpenError ? readinesses.map((r) => r.status) : [HAS_ERRORS_READINESS]),
-    [hasOpenError, readinesses],
-  )
 
   const values = useMemo<SpecsForm>(() => {
     if (!assetDetails) return EMPTY_SPECS_FORM
     const { specs } = assetDetails
     const readiness = readinesses.find((r) => r.status === assetDetails.readiness)
     return {
+      model: models.find((m) => m.id === assetDetails.model_id) ?? null,
+      serialNumber: assetDetails.serial_number,
       readiness: readiness ? getSelectOption(readiness) : UNSELECTED,
       countryOfOrigin: countries.find((c) => c.id === assetDetails.country_of_origin_id) ?? null,
       manufacturedYear: assetDetails.manufactured_year,
@@ -96,10 +133,8 @@ export function EditSpecsModal({
       tonerLifeM: specs.toner_life_m,
       tonerLifeY: specs.toner_life_y,
       tonerLifeK: specs.toner_life_k,
-      isColour: assetDetails.is_colour,
-      assetType: assetDetails.asset_type,
     }
-  }, [assetDetails, readinesses, countries, components, accessories])
+  }, [assetDetails, models, readinesses, countries, components, accessories])
 
   const form = useForm<SpecsForm>({
     resolver: zodResolver(SpecsFormSchema),
@@ -108,17 +143,52 @@ export function EditSpecsModal({
   })
   const isSubmitting = form.formState.isSubmitting
 
+  // Everything the fields render from follows the picked model, not the stored asset,
+  // so switching model re-derives the applicable fields before the save.
+  const modelSelection = useWatch({ control: form.control, name: 'model' })
+  const brandId = modelSelection?.brand_id ?? null
+  const isColourModel = modelSelection?.is_colour ?? false
+  const visibility = getSpecificationFieldVisibility(modelSelection?.asset_type ?? null)
+  const brandChanged = brandId !== null && brandId !== (assetDetails?.brand_id ?? null)
+
+  const readinessDisabledStatuses = useMemo(
+    () =>
+      hasOpenError && !brandChanged ? readinesses.map((r) => r.status) : [HAS_ERRORS_READINESS],
+    [hasOpenError, brandChanged, readinesses],
+  )
+
+  // Components and errors are both brand-scoped, so a move between two distinct
+  // brands drops the internal finisher and releases the enforced HAS_ERRORS
+  // readiness — the backend clears the errors that were holding it.
+  const prevBrandRef = useRef<number | null | undefined>(undefined)
+  useEffect(() => {
+    const prev = prevBrandRef.current
+    if (prev && brandId && prev !== brandId) {
+      form.setValue('component', null, { shouldDirty: true, shouldValidate: true })
+      const readiness = form.getValues('readiness')
+      if (isSelected(readiness) && readiness.selected.status === HAS_ERRORS_READINESS) {
+        form.setValue('readiness', UNSELECTED, { shouldDirty: true, shouldValidate: true })
+      }
+    }
+    prevBrandRef.current = brandId
+  }, [brandId, form])
+
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
 
   if (!assetDetails) return null
 
-  const visibility = getSpecificationFieldVisibility(assetDetails.asset_type)
-
-  async function onValid(formValues: SpecsForm) {
-    if (!isSelected(formValues.readiness)) return
+  async function onValid(rawValues: SpecsForm) {
+    if (!isSelected(rawValues.readiness) || !rawValues.model) return
+    const model = rawValues.model
+    const formValues = clearHiddenSpecFields(
+      rawValues,
+      getSpecificationFieldVisibility(model.asset_type),
+    )
     try {
       await updateAssetSpecs(assetDetails!.barcode, {
-        readiness_id: formValues.readiness.selected.id,
+        model_id: model.id,
+        serial_number: formValues.serialNumber,
+        readiness_id: rawValues.readiness.selected.id,
         country_of_origin_id: formValues.countryOfOrigin?.id ?? null,
         manufactured_year: formValues.manufacturedYear,
         cassettes: formValues.cassettes,
@@ -162,10 +232,37 @@ export function EditSpecsModal({
           onSubmit={(e) => e.preventDefault()}
           className="flex flex-col gap-6 flex-1 overflow-y-auto overflow-x-hidden min-h-0 px-1 pt-2 pb-1"
         >
+          <div className="flex flex-col gap-2">
+            <HorizontalField label="Model" required>
+              <ControlledSearchSelectField
+                control={form.control}
+                name="model"
+                options={models}
+                getLabel={modelLabel}
+                clearLabel="Clear model"
+                className={INPUT_WIDTH}
+              />
+            </HorizontalField>
+            <HorizontalField label="Serial Number" required>
+              <ControlledTextInput
+                control={form.control}
+                name="serialNumber"
+                className={INPUT_WIDTH}
+              />
+            </HorizontalField>
+          </div>
+
+          {brandChanged && errors.length > 0 && (
+            <InlineWarning>
+              Changing to a different brand will remove the {errors.length} recorded error
+              {errors.length === 1 ? '' : 's'} from this asset.
+            </InlineWarning>
+          )}
+
           <TechnicalSpecsFields
             control={form.control}
-            isColour={assetDetails.is_colour}
-            brandId={assetDetails.brand_id}
+            isColour={isColourModel}
+            brandId={brandId}
             visibility={visibility}
             readinessDisabledStatuses={readinessDisabledStatuses}
           />

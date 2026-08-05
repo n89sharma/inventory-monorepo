@@ -426,6 +426,25 @@ export async function seedBrand(name: string): Promise<number> {
   return brand.id
 }
 
+// A second model for the same or another brand, reusing the asset type the seeded
+// model already carries so only the brand differs between the two.
+export async function seedModel(brandId: number, name: string): Promise<number> {
+  const assetType = await prisma.assetType.findFirstOrThrow({ where: { asset_type: 'Copier' } })
+  const model = await prisma.model.upsert({
+    where: { brand_id_name: { brand_id: brandId, name } },
+    create: {
+      name,
+      weight: 1,
+      size: 1,
+      is_colour: false,
+      brand_id: brandId,
+      asset_type_id: assetType.id,
+    },
+    update: {},
+  })
+  return model.id
+}
+
 export async function seedError(brandId: number, code: string): Promise<number> {
   const error = await prisma.error.upsert({
     where: { brand_id_code: { brand_id: brandId, code } },
@@ -453,12 +472,17 @@ export async function seedAccessory(name: string): Promise<number> {
   return accessory.id
 }
 
-// A valid UpdateAssetSpecs payload; override individual fields per test.
+// A valid UpdateAssetSpecs payload; override individual fields per test. The model
+// defaults to the seeded one, so a payload built without overrides leaves the asset's
+// identity on the same brand and only the serial number is rewritten.
 export function buildUpdateAssetSpecs(
   refs: ArrivalTestData,
   overrides: Partial<UpdateAssetSpecs> = {},
 ): UpdateAssetSpecs {
+  serialCounter += 1
   return {
+    model_id: refs.model.id,
+    serial_number: `TEST-SN-${serialCounter}`,
     readiness_id: refs.readiness.id,
     country_of_origin_id: refs.country.id,
     manufactured_year: null,

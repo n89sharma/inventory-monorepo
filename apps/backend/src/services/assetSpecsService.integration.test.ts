@@ -8,11 +8,35 @@ import {
   seedArrivalTestData,
   seedBrand,
   seedComponent,
+  seedError,
+  seedModel,
 } from '../../test/factories.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { updateAssetErrors } from './assetErrorService.js'
 import { getAccessories } from './assetReadService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
+
+const MISSING_MODEL_ID = 999999
+
+type HistoryChange = { before?: Record<string, unknown>; after?: Record<string, unknown> }
+
+async function getMaxHistoryId(): Promise<number> {
+  const { _max } = await prisma.history.aggregate({ _max: { id: true } })
+  return _max.id ?? 0
+}
+
+async function assetUpdateChangesSince(sinceId: number, assetId: number): Promise<HistoryChange[]> {
+  const rows = await prisma.history.findMany({
+    where: { id: { gt: sinceId }, entity_type: 'Asset', entity_id: assetId, action_type: 'UPDATE' },
+  })
+  return rows.map((r) => r.changes as HistoryChange)
+}
+
+async function readinessId(status: string): Promise<number> {
+  const readiness = await prisma.readiness.findUniqueOrThrow({ where: { status } })
+  return readiness.id
+}
 
 describe('assetSpecsService', () => {
   let refs: ArrivalTestData
@@ -107,5 +131,124 @@ describe('assetSpecsService', () => {
     await expect(
       updateAssetSpecs('DOES-NOT-EXIST', buildUpdateAssetSpecs(refs), refs.userId),
     ).rejects.toThrow(NotFoundError)
+  })
+
+  it('rejects a model id that does not exist', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+
+    await expect(
+      updateAssetSpecs(
+        asset.barcode,
+        buildUpdateAssetSpecs(refs, { model_id: MISSING_MODEL_ID }),
+        refs.userId,
+      ),
+    ).rejects.toThrow(NotFoundError)
+  })
+
+  it('persists a same-brand model change and a new serial number, and records both', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const sameBrandModelId = await seedModel(refs.brandId, 'IRADX4751i')
+    const sinceId = await getMaxHistoryId()
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { model_id: sameBrandModelId, serial_number: 'SN-CORRECTED' }),
+      refs.userId,
+    )
+
+    const saved = await prisma.asset.findUniqueOrThrow({
+      where: { id: asset.id },
+      select: { model_id: true, serial_number: true },
+    })
+    expect(saved.model_id).toBe(sameBrandModelId)
+    expect(saved.serial_number).toBe('SN-CORRECTED')
+
+    const changes = await assetUpdateChangesSince(sinceId, asset.id)
+    expect(changes.some((c) => c.after?.model_name === 'IRADX4751i')).toBe(true)
+    expect(changes.some((c) => c.after?.serial_number === 'SN-CORRECTED')).toBe(true)
+  })
+
+  it('clears every asset error when the model moves to another brand', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const errorId = await seedError(refs.brandId, 'E100')
+    await updateAssetErrors(
+      asset.barcode,
+      { errors: [{ error_id: errorId, is_fixed: false }] },
+      refs.userId,
+    )
+    const otherBrandId = await seedBrand('Ricoh')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+    const sinceId = await getMaxHistoryId()
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, {
+        model_id: otherBrandModelId,
+        readiness_id: await readinessId('PP_OK'),
+      }),
+      refs.userId,
+    )
+
+    const remaining = await prisma.assetError.findMany({ where: { asset_id: asset.id } })
+    expect(remaining).toHaveLength(0)
+
+    const changes = await assetUpdateChangesSince(sinceId, asset.id)
+    const errorChange = changes.find((c) => c.after?.error_codes !== undefined)
+    expect(errorChange?.before?.error_codes).toEqual(['E100'])
+    expect(errorChange?.after?.error_codes).toEqual([])
+  })
+
+  it('rejects Has Errors readiness when the model moves to another brand', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const otherBrandId = await seedBrand('Ricoh')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+
+    await expect(
+      updateAssetSpecs(
+        asset.barcode,
+        buildUpdateAssetSpecs(refs, {
+          model_id: otherBrandModelId,
+          readiness_id: await readinessId('HAS_ERRORS'),
+        }),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ValidationError)
+  })
+
+  it('keeps readiness locked on a same-brand change while an error is open', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const errorId = await seedError(refs.brandId, 'E100')
+    await updateAssetErrors(
+      asset.barcode,
+      { errors: [{ error_id: errorId, is_fixed: false }] },
+      refs.userId,
+    )
+
+    await expect(
+      updateAssetSpecs(
+        asset.barcode,
+        buildUpdateAssetSpecs(refs, { readiness_id: await readinessId('PP_OK') }),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ValidationError)
+  })
+
+  it('validates the component against the new model brand, not the old one', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const componentId = await seedComponent(refs.brandId, 'OldBrandComponent')
+    const otherBrandId = await seedBrand('Ricoh')
+    const otherBrandModelId = await seedModel(otherBrandId, 'MP-C3004')
+
+    await expect(
+      updateAssetSpecs(
+        asset.barcode,
+        buildUpdateAssetSpecs(refs, {
+          model_id: otherBrandModelId,
+          component_id: componentId,
+          readiness_id: await readinessId('PP_OK'),
+        }),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ValidationError)
   })
 })

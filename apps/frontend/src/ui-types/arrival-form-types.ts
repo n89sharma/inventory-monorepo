@@ -139,19 +139,18 @@ export const AssetFormSchema = z
     refineSpecFields(val, visibility, val.model?.is_colour ?? false, ctx)
   })
 
-// Edit Technical Specifications modal — the spec-field subset of an existing
-// asset. `isColour` and `assetType` are carried (not user-editable) so the
-// colour-channel and applicability rules match the asset modal, which derives the
-// same values from the selected model.
+// Edit Technical Specifications modal — an existing asset's model, serial number
+// and spec fields. The model drives the colour-channel and applicability rules the
+// same way it does in the asset modal.
 export const SpecsFormSchema = z
   .object({
+    model: ModelSummarySchema.nullable().refine((val) => !!val, 'Model is required'),
+    serialNumber: z.string().refine((val) => val.length > 0, 'Serial number is required'),
     ...specFieldsShape,
-    isColour: z.boolean(),
-    assetType: z.string().nullable(),
   })
   .superRefine((val, ctx) => {
-    const visibility = getSpecificationFieldVisibility(val.assetType)
-    refineSpecFields(val, visibility, val.isColour, ctx)
+    const visibility = getSpecificationFieldVisibility(val.model?.asset_type ?? null)
+    refineSpecFields(val, visibility, val.model?.is_colour ?? false, ctx)
   })
 
 // Arrival Form Page within Edit or Create Arrival
@@ -189,6 +188,8 @@ export type AssetForm = {
 }
 
 export type SpecsForm = {
+  model: ModelSummary | null
+  serialNumber: string
   readiness: SelectOption<Status>
   countryOfOrigin: Country | null
   manufacturedYear: number | null
@@ -205,8 +206,6 @@ export type SpecsForm = {
   tonerLifeM: number | null
   tonerLifeY: number | null
   tonerLifeK: number | null
-  isColour: boolean
-  assetType: string | null
 }
 
 export type ArrivalForm = {

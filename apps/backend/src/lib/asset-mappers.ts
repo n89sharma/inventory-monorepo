@@ -194,6 +194,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     barcode: r.barcode!,
     serial_number: r.serial_number!,
     model: r.model!,
+    model_id: r.model_id!,
     is_colour: r.is_colour!,
     brand: r.brand!,
     brand_id: r.brand_id!,

@@ -125,6 +125,7 @@ export const AssetDetailsSchema = z.object({
   id: z.number(),
   barcode: z.string(),
   model: z.string(),
+  model_id: z.number(),
   is_colour: z.boolean(),
   brand: z.string(),
   brand_id: z.number(),
@@ -356,6 +357,8 @@ export const BulkUpdateAssetPricingSchema = z.object({
 export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
 
 export const UpdateAssetSpecsSchema = z.object({
+  model_id: z.number().int().positive(),
+  serial_number: z.string().refine((val) => val.length > 0, 'Serial number is required'),
   readiness_id: z.number().int().positive(),
   country_of_origin_id: z.number().int().positive().nullable(),
   manufactured_year: z.number().int().nullable(),
