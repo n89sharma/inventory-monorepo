@@ -141,11 +141,11 @@ describe('asset-search report columns', () => {
     expect(header).toBe(
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
         'Country of Origin,Total Meter,Weight,Size,Days Held,Cassettes,Internal Finisher,' +
-        'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,Purchase Cost,' +
-        'Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,Margin %,' +
-        'Hold #,Held By,Held For,' +
-        'Hold Customer,Hold Created,Vendor,Created,Arrived At,Stock Days,Customer,' +
-        'Departed At,Invoice #,Last Comment',
+        'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
+        'Vendor,Arrived At,Customer,Departed At,' +
+        'Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,' +
+        'Margin %,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
+        'Created,Stock Days,Invoice #,Last Comment',
     )
   })
 
@@ -154,11 +154,11 @@ describe('asset-search report columns', () => {
     expect(data).toBe(
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
         'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
-        '"Toner, Drum",80,70,60,50,"$1,234.00",' +
-        '$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",48.9%,' +
-        'H-1,Alice,Bob,' +
-        'Acme Corp,"July 01, 2026",Big Vendor,"July 15, 2026","July 05, 2026",12,Retail Co,' +
-        '"July 10, 2026",PI-100,Looks good',
+        '"Toner, Drum",80,70,60,50,' +
+        'Big Vendor,"July 05, 2026",Retail Co,"July 10, 2026",' +
+        '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
+        '48.9%,H-1,Alice,Bob,Acme Corp,"July 01, 2026",' +
+        '"July 15, 2026",12,PI-100,Looks good',
     )
   })
 
@@ -195,10 +195,11 @@ describe('asset-search report columns', () => {
     expect(data).toBe(
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
         ',,"1,234 lbs",5,,,,' +
-        ',,,,,,' +
-        ',,,,,,,,,' +
-        ',,,"July 15, 2026",,12,,' +
-        ',,',
+        ',,,,,' +
+        ',,,,' +
+        ',,,,,,,' +
+        ',,,,,' +
+        '"July 15, 2026",12,,',
     )
   })
 
@@ -445,6 +446,8 @@ describe('asset search columns', () => {
           'specs_toner_life_k',
         ],
       },
+      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
+      { section: 'departure', ids: ['customer', 'departed_at'] },
       {
         section: 'cost',
         ids: [
@@ -457,8 +460,6 @@ describe('asset search columns', () => {
           'margin_percent',
         ],
       },
-      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
-      { section: 'departure', ids: ['customer', 'departed_at'] },
       {
         section: 'hold',
         ids: [
