@@ -13,7 +13,7 @@ import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatUSD } from '@/lib/formatters'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
@@ -113,7 +113,9 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
   })
   const isSubmitting = form.formState.isSubmitting
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
+    form.reset(undefined, DISCARD_USER_EDITS),
+  )
 
   const watched = useWatch({ control: form.control })
   const totalCost =
@@ -135,7 +137,7 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
         parts_cost: toNum(fields.parts_cost),
         sale_price: toNum(fields.sale_price),
       })
-      form.reset(fields)
+      form.reset(fields, DISCARD_USER_EDITS)
       toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
     } catch {

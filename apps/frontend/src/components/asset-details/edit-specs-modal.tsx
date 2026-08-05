@@ -23,7 +23,7 @@ import {
   getSpecificationFieldVisibility,
   type SpecificationFieldVisibility,
 } from '@/lib/asset-spec-applicability'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { modelLabel } from '@/lib/reference-labels'
 import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
@@ -173,7 +173,9 @@ export function EditSpecsModal({
     prevBrandRef.current = brandId
   }, [brandId, form])
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
+    form.reset(undefined, DISCARD_USER_EDITS),
+  )
 
   if (!assetDetails) return null
 
@@ -205,7 +207,7 @@ export function EditSpecsModal({
         toner_life_k: formValues.tonerLifeK,
         accessory_ids: formValues.coreFunctions.map((cf) => cf.id),
       })
-      form.reset(formValues)
+      form.reset(formValues, DISCARD_USER_EDITS)
       toast.success('Specifications updated.', { position: 'top-center' })
       onOpenChange(false)
     } catch {

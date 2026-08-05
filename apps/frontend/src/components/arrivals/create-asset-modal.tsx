@@ -3,7 +3,7 @@ import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { modelLabel } from '@/lib/reference-labels'
 import { AssetFormSchema, type ArrivalForm, type AssetForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
@@ -105,7 +105,7 @@ export function CreateAssetModal({
   })
 
   const guard = useUnsavedChangesGuard(newAssetForm.formState.isDirty, onOpenChange, () =>
-    newAssetForm.reset(),
+    newAssetForm.reset(undefined, DISCARD_USER_EDITS),
   )
 
   // Watch readiness + model to (a) drive the errors editor's enabled/brand state
@@ -177,7 +177,7 @@ export function CreateAssetModal({
       setIsSubmitting(true)
       try {
         await onUpdateAsset(asset)
-        newAssetForm.reset(asset)
+        newAssetForm.reset(asset, DISCARD_USER_EDITS)
         onOpenChange(false)
       } catch {
         // interceptor already showed the error toast — keep modal open
@@ -188,7 +188,7 @@ export function CreateAssetModal({
     }
     if (isEditMode) {
       updateAsset!(editingIndex!, asset)
-      newAssetForm.reset(asset)
+      newAssetForm.reset(asset, DISCARD_USER_EDITS)
       onOpenChange(false)
       return
     }
@@ -196,7 +196,7 @@ export function CreateAssetModal({
       setIsSubmitting(true)
       try {
         const created = await onCreateAsset(asset)
-        newAssetForm.reset(getDefaultNewAsset(readinesses))
+        newAssetForm.reset(getDefaultNewAsset(readinesses), DISCARD_USER_EDITS)
         onOpenChange(false)
         void printCreatedAssetBarcode(created.barcode)
       } catch {
@@ -207,7 +207,7 @@ export function CreateAssetModal({
       return
     }
     addNewAsset!(asset)
-    newAssetForm.reset(getDefaultNewAsset(readinesses))
+    newAssetForm.reset(getDefaultNewAsset(readinesses), DISCARD_USER_EDITS)
     onOpenChange(false)
   }
 

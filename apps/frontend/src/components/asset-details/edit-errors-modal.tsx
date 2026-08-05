@@ -9,7 +9,7 @@ import {
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useMemo, useState } from 'react'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { useForm, useWatch } from 'react-hook-form'
 import type { AssetDetails, AssetError, UpdateError } from 'shared-types'
 import { toast } from 'sonner'
@@ -49,7 +49,9 @@ export function EditErrorsModal({
   })
   const localErrors = useWatch({ control: form.control, name: 'errors' })
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
+    form.reset(undefined, DISCARD_USER_EDITS),
+  )
 
   if (!assetDetails) return null
 
@@ -65,7 +67,7 @@ export function EditErrorsModal({
     try {
       const next = form.getValues().errors
       await updateAssetErrors(assetDetails.barcode, next)
-      form.reset({ errors: next })
+      form.reset({ errors: next }, DISCARD_USER_EDITS)
       toast.success('Errors updated.')
       onOpenChange(false)
     } catch {

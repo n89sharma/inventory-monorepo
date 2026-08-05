@@ -1,7 +1,7 @@
 import { useOrgStore } from '@/data/store/org-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ArrivalMetadataFormSchema, type ArrivalMetadataForm } from '@/ui-types/arrival-form-types'
 import { UNSELECTED, getSelectOption } from '@/ui-types/select-option-types'
@@ -42,13 +42,15 @@ export function EditArrivalMetadataModal({
     resetOptions: KEEP_USER_EDITS_ON_SERVER_REFRESH,
   })
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
+    form.reset(undefined, DISCARD_USER_EDITS),
+  )
 
   async function onValid(values: ArrivalMetadataForm) {
     setIsSubmitting(true)
     try {
       await onSave(values)
-      form.reset(values)
+      form.reset(values, DISCARD_USER_EDITS)
       onOpenChange(false)
     } catch {
       // interceptor surfaced the error toast — keep modal open

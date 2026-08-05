@@ -22,7 +22,7 @@ import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useWarehouseLocations } from '@/hooks/use-locations'
 import { formatTitleCase } from '@/lib/formatters'
-import { KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
+import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -75,7 +75,9 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
   const [binQuery, setBinQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
+    form.reset(undefined, DISCARD_USER_EDITS),
+  )
 
   const { data: warehouseLocations, isLoading: fetchingLocations } = useWarehouseLocations(
     selectedWarehouse?.id ?? null,
@@ -118,7 +120,7 @@ export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLoca
         zone_id: selectedZone.id,
         bin: isBinZone ? selectedBin!.bin : '',
       })
-      form.reset(form.getValues())
+      form.reset(form.getValues(), DISCARD_USER_EDITS)
       toast.success('Location updated.', { position: 'top-center' })
       onOpenChange(false)
     } catch {
