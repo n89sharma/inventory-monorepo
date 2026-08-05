@@ -121,6 +121,63 @@ describe('assetSpecsService', () => {
     expect(changes.some((c) => c.after?.drum_life_c === 40)).toBe(false)
   })
 
+  it('keeps the colour values on a same-brand colour-to-colour model change', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const colourModelId = await seedModel(refs.brandId, 'IRADXC3835i', true)
+    const secondColourModelId = await seedModel(refs.brandId, 'IRADXC3830i', true)
+    const componentId = await seedComponent(refs.brandId, 'MatchingComponent')
+    const ppOkReadinessId = await readinessId('PP_OK')
+    const colourSpecs = {
+      component_id: componentId,
+      readiness_id: ppOkReadinessId,
+      meter_black: 100,
+      meter_colour: 50,
+      drum_life_c: 40,
+      drum_life_m: 41,
+      drum_life_y: 42,
+      drum_life_k: 43,
+      toner_life_c: 30,
+      toner_life_m: 31,
+      toner_life_y: 32,
+      toner_life_k: 33,
+    }
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { model_id: colourModelId, ...colourSpecs }),
+      refs.userId,
+    )
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { model_id: secondColourModelId, ...colourSpecs }),
+      refs.userId,
+    )
+
+    const saved = await prisma.asset.findUniqueOrThrow({
+      where: { id: asset.id },
+      select: { model_id: true, readiness_id: true },
+    })
+    expect(saved.model_id).toBe(secondColourModelId)
+    expect(saved.readiness_id).toBe(ppOkReadinessId)
+
+    const spec = await prisma.technicalSpecification.findUniqueOrThrow({
+      where: { asset_id: asset.id },
+    })
+    expect(spec).toMatchObject({
+      component_id: componentId,
+      meter_colour: 50,
+      meter_total: 150,
+      drum_life_c: 40,
+      drum_life_m: 41,
+      drum_life_y: 42,
+      drum_life_k: 43,
+      toner_life_c: 30,
+      toner_life_m: 31,
+      toner_life_y: 32,
+      toner_life_k: 33,
+    })
+  })
+
   it('accepts a component belonging to the asset model brand', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const componentId = await seedComponent(refs.brandId, 'MatchingComponent')
