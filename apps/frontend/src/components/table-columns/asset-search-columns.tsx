@@ -430,11 +430,11 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'purchase_invoice_invoice_reference',
     label: 'Purchase Invoice',
     section: 'invoice',
-    text: (a) => a.purchase_invoice_invoice_number ?? '',
+    text: (a) => a.purchase_invoice_invoice_reference ?? '',
     cell: (a) => (
       <InvoiceCell
         invoiceNumber={a.purchase_invoice_invoice_number}
-        label={a.purchase_invoice_invoice_number}
+        label={a.purchase_invoice_invoice_reference}
       />
     ),
   },

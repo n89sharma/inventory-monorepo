@@ -135,6 +135,7 @@ type AssetSearchRowDb = LocationRow & {
   departed_at: Date | null
   arrival_created_at: Date | null
   purchase_invoice_invoice_number: string | null
+  purchase_invoice_invoice_reference: string | null
   sales_invoice_invoice_number: string | null
   sales_invoice_invoice_reference: string | null
   latest_comment: string | null
@@ -182,6 +183,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     departed_at: r.departed_at,
     arrival_created_at: r.arrival_created_at,
     purchase_invoice_invoice_number: r.purchase_invoice_invoice_number,
+    purchase_invoice_invoice_reference: r.purchase_invoice_invoice_reference,
     sales_invoice_invoice_number: r.sales_invoice_invoice_number,
     sales_invoice_invoice_reference: r.sales_invoice_invoice_reference,
     latest_comment: r.latest_comment,

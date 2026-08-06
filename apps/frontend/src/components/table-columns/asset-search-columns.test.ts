@@ -115,6 +115,7 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     departed_at: new Date(2026, 6, 10),
     arrival_created_at: new Date(2026, 6, 5),
     purchase_invoice_invoice_number: 'PI-100',
+    purchase_invoice_invoice_reference: 'VENDOR-REF-4',
     sales_invoice_invoice_number: 'SI-200',
     sales_invoice_invoice_reference: 'CUST-REF-9',
     latest_comment: 'Looks good',
@@ -167,7 +168,7 @@ describe('asset-search report columns', () => {
         'Big Vendor,"July 05, 2026",Retail Co,"July 10, 2026",' +
         '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
         '48.9%,H-1,Alice,Bob,Acme Corp,"July 01, 2026",' +
-        '"July 15, 2026",12,PI-100,CUST-REF-9,Looks good',
+        '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,Looks good',
     )
   })
 
@@ -198,6 +199,7 @@ describe('asset-search report columns', () => {
       departed_at: null,
       arrival_created_at: null,
       purchase_invoice_invoice_number: null,
+      purchase_invoice_invoice_reference: null,
       sales_invoice_invoice_number: null,
       sales_invoice_invoice_reference: null,
       latest_comment: null,
