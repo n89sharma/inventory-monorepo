@@ -427,7 +427,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => String(stockDays(a.created_at)),
   },
   {
-    id: 'purchase_invoice_invoice_number',
+    id: 'purchase_invoice_invoice_reference',
     label: 'Purchase Invoice',
     section: 'invoice',
     text: (a) => a.purchase_invoice_invoice_number ?? '',

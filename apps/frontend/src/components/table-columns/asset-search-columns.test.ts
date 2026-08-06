@@ -496,7 +496,7 @@ describe('asset search columns', () => {
       },
       {
         section: 'invoice',
-        ids: ['purchase_invoice_invoice_number', 'sales_invoice_invoice_reference'],
+        ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
       },
       { section: 'last_comment', ids: ['latest_comment'] },
     ])
