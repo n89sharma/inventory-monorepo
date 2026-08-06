@@ -1,5 +1,5 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useModelStore } from '@/data/store/model-store'
+import { useModels } from '@/hooks/use-model'
 import { modelLabel } from '@/lib/reference-labels'
 import type { ModelSummary } from 'shared-types'
 
@@ -18,7 +18,7 @@ export function ModelFilter({
   onClear: () => void
   placeholder?: string
 }): React.JSX.Element {
-  const models = useModelStore((state) => state.models)
+  const models = useModels()
   return (
     <SearchSelectInput
       selection={selection}

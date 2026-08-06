@@ -6,7 +6,7 @@ import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shared/data-table'
 import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
-import { useModelStore } from '@/data/store/model-store'
+import { useModels } from '@/hooks/use-model'
 import { PlusIcon } from '@phosphor-icons/react'
 import { getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
@@ -22,7 +22,7 @@ export function CatalogSettingsPage(): React.JSX.Element {
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
 
-  const models = useModelStore((state) => state.models)
+  const models = useModels()
   const sortedModels = useMemo(
     () =>
       [...models].sort(

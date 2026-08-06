@@ -1,4 +1,4 @@
-import { useModelStore } from '@/data/store/model-store'
+import { useModels } from '@/hooks/use-model'
 import { useOrgs } from '@/hooks/use-org'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
@@ -336,7 +336,7 @@ export function useModelParam(): {
   setModelQuery: (text: string) => void
   clear: () => void
 } {
-  const models = useModelStore((state) => state.models)
+  const models = useModels()
   const [{ model: modelId, q }, setModelState] = useQueryStates(MODEL_PARSERS)
   const model = useMemo(() => resolveOne(modelId, models), [modelId, models])
   const committedQuery = model ? '' : (q ?? '')

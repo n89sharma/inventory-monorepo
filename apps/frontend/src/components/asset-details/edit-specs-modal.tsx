@@ -15,7 +15,7 @@ import { HorizontalField } from '@/components/shared/horizontal-field'
 import { ControlledSearchSelectField } from '@/components/shared/search-select/controlled-search-select-field'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useModelStore } from '@/data/store/model-store'
+import { useModels } from '@/hooks/use-model'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import {
@@ -123,7 +123,7 @@ export function EditSpecsModal({
   errors,
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
-  const models = useModelStore((state) => state.models)
+  const models = useModels()
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const countries = useReferenceDataStore((state) => state.countries)
   const components = useReferenceDataStore((state) => state.components)

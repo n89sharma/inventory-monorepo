@@ -1,6 +1,5 @@
 import { modelLabel } from '@/lib/reference-labels'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type {
@@ -16,6 +15,13 @@ import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { EditSpecsModal } from './edit-specs-modal'
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+
+const catalog = vi.hoisted(() => ({ models: [] as ModelSummary[] }))
+
+vi.mock('@/hooks/use-model', () => ({
+  useModels: () => catalog.models,
+  invalidateModels: vi.fn(),
+}))
 
 // Four models over two brands: everything the modal derives — applicable fields,
 // colour channels, the brand-scoped finisher and errors — follows the picked one.
@@ -117,7 +123,7 @@ function buildAssetDetails(model: ModelSummary, overrides: Partial<AssetDetails>
 type UpdateAssetSpecsFn = (barcode: string, data: UpdateAssetSpecs) => Promise<void>
 
 function seedStores(updateAssetSpecs: UpdateAssetSpecsFn) {
-  useModelStore.setState({ models: MODELS })
+  catalog.models = MODELS
   useReferenceDataStore.setState({
     readinesses: [UNTESTED, HAS_ERRORS, PP_OK],
     countries: [],

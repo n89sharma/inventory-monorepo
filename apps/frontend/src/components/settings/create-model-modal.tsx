@@ -1,5 +1,5 @@
-import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useModelMutations } from '@/hooks/use-model-mutations'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ModelFormSchema, type ModelForm } from '@/ui-types/model-form-types'
 import { UNSELECTED } from '@/ui-types/select-option-types'
@@ -50,7 +50,7 @@ function CreateModelFormBody({
 }: Pick<CreateModelModalProps, 'onOpenChange'>): React.JSX.Element {
   const brands = useReferenceDataStore((state) => state.brands)
   const assetTypes = useReferenceDataStore((state) => state.assetTypes)
-  const createModel = useModelStore((state) => state.createModel)
+  const { createModel } = useModelMutations()
 
   const form = useForm<ModelForm>({
     resolver: zodResolver(ModelFormSchema),

@@ -1,5 +1,5 @@
 import { useAssetStore } from '@/data/store/asset-store'
-import { useModelStore } from '@/data/store/model-store'
+import { useModels } from '@/hooks/use-model'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
@@ -92,7 +92,7 @@ export function CreateAssetModal({
 
   const readinesses = useReferenceDataStore((state) => state.readinesses)
   const allErrors = useReferenceDataStore((state) => state.errors)
-  const models = useModelStore((state) => state.models)
+  const models = useModels()
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
 
   const values = useMemo(

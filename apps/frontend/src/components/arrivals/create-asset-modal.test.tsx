@@ -1,10 +1,16 @@
 import { useAssetStore } from '@/data/store/asset-store'
-import { useModelStore } from '@/data/store/model-store'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { AssetSummary, Error as ReferenceError, ModelSummary, Status } from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CreateAssetModal } from './create-asset-modal'
+
+const catalog = vi.hoisted(() => ({ models: [] as ModelSummary[] }))
+
+vi.mock('@/hooks/use-model', () => ({
+  useModels: () => catalog.models,
+  invalidateModels: vi.fn(),
+}))
 
 // A supplies model carries no meter, cassette or consumable fields, so the form
 // is valid with nothing but a model and a serial number.
@@ -44,7 +50,7 @@ const CREATED_ASSET = { id: 10, barcode: 'BC-10' } as AssetSummary
 const SERIAL = 'SN-FIRST'
 
 function seedStores() {
-  useModelStore.setState({ models: [MODEL, RICOH_MODEL] })
+  catalog.models = [MODEL, RICOH_MODEL]
   useReferenceDataStore.setState({
     readinesses: [UNTESTED, HAS_ERRORS],
     countries: [],
