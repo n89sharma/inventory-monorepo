@@ -1,3 +1,4 @@
+import { toDateParam } from '@/lib/date-param'
 import { getHoldDetail, getHolds } from '@/data/api/hold-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
@@ -37,8 +38,8 @@ function holdListKey(
   const to = getSelectedOrNull(toDate)
   return [
     HOLD_LIST_KEY_PREFIX,
-    from.toISOString(),
-    to?.toISOString() ?? null,
+    toDateParam(from),
+    toDateParam(to),
     getIdOrNullFromSelection(holdBy),
     getIdOrNullFromSelection(holdFor),
     getIdOrNullFromSelection(customer),

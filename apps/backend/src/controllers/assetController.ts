@@ -19,6 +19,7 @@ import {
 import { z } from 'zod'
 import { getAssetByBarcode } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
+import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { mapAssetSummary } from '../lib/asset-mappers.js'
@@ -80,18 +81,19 @@ export const AssetQuerySchema = z.object({
   cassettes: z.string().optional().transform(Number),
   componentId: z.string().optional().transform(Number),
   customerId: z.string().optional().transform(Number),
-  fromDate: z.coerce.date().optional(),
-  toDate: z.coerce.date().optional(),
+  fromDate: z.iso.date().optional(),
+  toDate: z.iso.date().optional(),
 })
 
 function resolveDepartedRange(
-  fromDate: Date | undefined,
-  toDate: Date | undefined,
+  fromDate: string | undefined,
+  toDate: string | undefined,
 ): { departedFrom: Date | null; departedTo: Date | null } {
   if (!fromDate) return { departedFrom: null, departedTo: null }
   const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
-  const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
-  const departedTo = toDate ?? new Date()
+  const requestedFrom = normalizeFromDate(fromDate)
+  const departedFrom = isAfter(floor, requestedFrom) ? floor : requestedFrom
+  const departedTo = normalizeToDate(toDate)
   if (isAfter(departedFrom, departedTo)) {
     throw new ValidationError('fromDate must be before toDate')
   }
@@ -160,20 +162,22 @@ export const DepartedAssetQuerySchema = z.object({
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]*$/)
     .optional(),
-  fromDate: z.coerce.date(),
-  toDate: z.coerce.date(),
+  fromDate: z.iso.date(),
+  toDate: z.iso.date(),
 })
 
 function resolveDepartedSearchRange(
-  fromDate: Date,
-  toDate: Date,
+  fromDate: string,
+  toDate: string,
 ): { departedFrom: Date; departedTo: Date } {
   const floor = subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS)
-  const departedFrom = isAfter(floor, fromDate) ? floor : fromDate
-  if (isAfter(departedFrom, toDate)) {
+  const requestedFrom = normalizeFromDate(fromDate)
+  const departedFrom = isAfter(floor, requestedFrom) ? floor : requestedFrom
+  const departedTo = normalizeToDate(toDate)
+  if (isAfter(departedFrom, departedTo)) {
     throw new ValidationError('fromDate must be before toDate')
   }
-  return { departedFrom, departedTo: toDate }
+  return { departedFrom, departedTo }
 }
 
 export const getDepartedAssets = asyncHandler(async (req, res) => {

@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { toDateParam } from '@/lib/date-param'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import {
@@ -46,8 +47,8 @@ export async function getArrivals(
 ): Promise<ArrivalSummary[]> {
   const { data } = await api.get<ArrivalSummary[]>(`/arrivals`, {
     params: {
-      fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate),
+      fromDate: toDateParam(getSelectedOrNull(fromDate)),
+      toDate: toDateParam(getSelectedOrNull(toDate)),
       warehouse: getIdOrNullFromSelection(destination),
       vendor: getIdOrNullFromSelection(vendor),
     },

@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { toDateParam } from '@/lib/date-param'
 import { getAssetStoreParts } from '@/data/api/store-part-api'
 import { printPdfBlob } from '@/lib/print-pdf'
 import type {
@@ -258,8 +259,8 @@ export async function getAssetsForDeparted(
       componentId: component?.id ?? undefined,
       customerId: customer?.id ?? undefined,
       invoiceRef: invoiceReference || undefined,
-      fromDate: fromDate.toISOString(),
-      toDate: toDate.toISOString(),
+      fromDate: toDateParam(fromDate),
+      toDate: toDateParam(toDate),
     },
   })
   return z.array(AssetSearchRowSchema).parse(data)

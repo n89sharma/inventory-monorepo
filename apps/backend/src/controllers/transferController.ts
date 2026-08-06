@@ -31,8 +31,8 @@ import { getCollectionHistory as getCollectionHistorySer } from '../services/his
 
 export const TransferQuerySchema = z
   .object({
-    fromDate: z.string(),
-    toDate: z.string().optional(),
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
     origin: z.coerce.number().int().optional(),
     destination: z.coerce.number().int().optional(),
   })

@@ -6,6 +6,7 @@ import {
   DEFAULT_COLLECTION_RANGE_DAYS,
   DEFAULT_DEPARTED_RANGE_DAYS,
   getDefaultFromDate,
+  getToday,
 } from '@/lib/filters/defaults'
 import { FILTER_PARSERS, parseAsIdList } from '@/lib/filters/parsers'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
@@ -409,7 +410,7 @@ export function useDepartedRangeParam(): {
   const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
   const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
   const from = useMemo(() => fromRaw ?? getDefaultFromDate(DEFAULT_DEPARTED_RANGE_DAYS), [fromRaw])
-  const to = useMemo(() => toRaw ?? new Date(), [toRaw])
+  const to = useMemo(() => toRaw ?? getToday(), [toRaw])
   const setRange = useCallback(
     (nextFrom: Date, nextTo: Date) => {
       void setFrom(nextFrom)
@@ -429,7 +430,7 @@ export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_
   const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
   const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
   const from = useMemo(() => fromRaw ?? getDefaultFromDate(defaultDays), [fromRaw, defaultDays])
-  const to = useMemo(() => toRaw ?? new Date(), [toRaw])
+  const to = useMemo(() => toRaw ?? getToday(), [toRaw])
   const setFromDate = useCallback(
     (next: SelectOption<Date>) => void setFrom(getSelectedOrNull(next)),
     [setFrom],

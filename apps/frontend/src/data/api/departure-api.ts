@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { toDateParam } from '@/lib/date-param'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
 import {
   type SelectOption,
@@ -38,8 +39,8 @@ export async function getDepartures(
 ): Promise<DepartureSummary[]> {
   const { data } = await api.get<DepartureSummary[]>(`/departures`, {
     params: {
-      fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate),
+      fromDate: toDateParam(getSelectedOrNull(fromDate)),
+      toDate: toDateParam(getSelectedOrNull(toDate)),
       warehouse: getIdOrNullFromSelection(origin),
       customer: getIdOrNullFromSelection(customer),
     },

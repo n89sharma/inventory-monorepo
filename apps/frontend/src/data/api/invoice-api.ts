@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { DATE_PARAM_FORMAT, toDateParam } from '@/lib/date-param'
 import type {
   InvoiceForm,
   InvoiceMetadataForm,
@@ -28,15 +29,13 @@ import {
 import { format } from 'date-fns'
 import { z } from 'zod'
 
-const INVOICE_DATE_FORMAT = 'yyyy-MM-dd'
-
 const CreateInvoiceResponseSchema = z.object({ invoiceNumber: z.string() })
 type CreateInvoiceResponse = z.infer<typeof CreateInvoiceResponseSchema>
 
 export async function createInvoice(d: InvoiceForm): Promise<CreateInvoiceResponse> {
   const createInvoiceBody = CreateInvoiceSchema.parse({
     invoice_reference: d.invoice_reference,
-    invoice_date: format(d.invoice_date, INVOICE_DATE_FORMAT),
+    invoice_date: format(d.invoice_date, DATE_PARAM_FORMAT),
     organization_id: d.organization!.id,
     invoice_type_id: getIdOrNullFromSelection(d.invoice_type)!,
     is_cleared: d.is_cleared,
@@ -54,8 +53,8 @@ export async function getInvoices(
 ): Promise<InvoiceSummary[]> {
   const { data } = await api.get<InvoiceSummary[]>(`/invoices`, {
     params: {
-      fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate),
+      fromDate: toDateParam(getSelectedOrNull(fromDate)),
+      toDate: toDateParam(getSelectedOrNull(toDate)),
       invoiceType,
     },
   })
@@ -79,7 +78,7 @@ export async function updateInvoiceMetadata(
   const updateInvoiceMetadataBody = UpdateInvoiceMetadataSchema.parse({
     organization: metadata.organization!,
     invoice_reference: metadata.invoice_reference,
-    invoice_date: format(metadata.invoice_date, INVOICE_DATE_FORMAT),
+    invoice_date: format(metadata.invoice_date, DATE_PARAM_FORMAT),
     is_cleared: metadata.is_cleared,
     comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateInvoiceMetadata)

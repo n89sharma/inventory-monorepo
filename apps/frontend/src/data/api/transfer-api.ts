@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { toDateParam } from '@/lib/date-param'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import {
   type SelectOption,
@@ -39,8 +40,8 @@ export async function getTransfers(
 ): Promise<TransferSummary[]> {
   const { data } = await api.get<TransferSummary[]>(`/transfers`, {
     params: {
-      fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate),
+      fromDate: toDateParam(getSelectedOrNull(fromDate)),
+      toDate: toDateParam(getSelectedOrNull(toDate)),
       origin: getIdOrNullFromSelection(origin),
       destination: getIdOrNullFromSelection(destination),
     },

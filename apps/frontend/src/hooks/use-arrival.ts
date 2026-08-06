@@ -1,3 +1,4 @@
+import { toDateParam } from '@/lib/date-param'
 import { getArrivalDetail, getArrivals } from '@/data/api/arrival-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
@@ -39,8 +40,8 @@ function arrivalListKey(
   const to = getSelectedOrNull(toDate)
   return [
     ARRIVAL_LIST_KEY_PREFIX,
-    from.toISOString(),
-    to?.toISOString() ?? null,
+    toDateParam(from),
+    toDateParam(to),
     getIdOrNullFromSelection(destination),
     getIdOrNullFromSelection(vendor),
   ]

@@ -1,4 +1,5 @@
 import { DatePickerFieldInline } from '@/components/shared/date-picker'
+import { getToday } from '@/lib/filters/defaults'
 import { getDepartedFloor, isValidDepartedDateRange } from '@/lib/filters/hooks'
 import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 import { MAX_DEPARTED_WINDOW_MONTHS } from 'shared-types'
@@ -15,7 +16,7 @@ export function DepartedDateRangeFilter({
   onChange: (from: Date, to: Date) => void
 }): React.JSX.Element {
   const floor = getDepartedFloor()
-  const today = new Date()
+  const today = getToday()
   const valid = isValidDepartedDateRange(from, to)
 
   return (

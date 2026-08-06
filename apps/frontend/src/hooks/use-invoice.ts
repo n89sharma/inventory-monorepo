@@ -1,3 +1,4 @@
+import { toDateParam } from '@/lib/date-param'
 import { getInvoiceDetail, getInvoices } from '@/data/api/invoice-api'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import type { SelectOption } from '@/ui-types/select-option-types'
@@ -35,7 +36,7 @@ function invoiceListKey(
   const from = getSelectedOrNull(fromDate)
   if (from === null) return null
   const to = getSelectedOrNull(toDate)
-  return [INVOICE_LIST_KEY_PREFIX, from.toISOString(), to?.toISOString() ?? null, invoiceType]
+  return [INVOICE_LIST_KEY_PREFIX, toDateParam(from), toDateParam(to), invoiceType]
 }
 
 export function useInvoicesList(

@@ -1,4 +1,5 @@
 import { api } from '@/data/api/axios-client'
+import { toDateParam } from '@/lib/date-param'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import {
   getIdOrNullFromSelection,
@@ -39,8 +40,8 @@ export async function getHolds(
 ): Promise<HoldSummary[]> {
   const { data } = await api.get<HoldSummary[]>(`/holds`, {
     params: {
-      fromDate: getSelectedOrNull(fromDate),
-      toDate: getSelectedOrNull(toDate),
+      fromDate: toDateParam(getSelectedOrNull(fromDate)),
+      toDate: toDateParam(getSelectedOrNull(toDate)),
       holdBy: getIdOrNullFromSelection(holdBy),
       holdFor: getIdOrNullFromSelection(holdFor),
       customer: getIdOrNullFromSelection(customer),

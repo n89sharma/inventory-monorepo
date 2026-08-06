@@ -1,4 +1,3 @@
-import { endOfDay, startOfDay } from 'date-fns'
 import {
   AssetDetails,
   AssetError,
@@ -134,8 +133,8 @@ export async function getDepartedAssets(
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
     getDepartedAssetsQuery(
-      startOfDay(departedFrom),
-      endOfDay(departedTo),
+      departedFrom,
+      departedTo,
       model,
       statusIds,
       readinessIds,

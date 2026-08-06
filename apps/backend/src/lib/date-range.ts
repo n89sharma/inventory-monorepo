@@ -1,9 +1,9 @@
-import { endOfDay, startOfDay } from 'date-fns'
+import { endOfDay, parseISO, startOfDay } from 'date-fns'
 
 export function normalizeFromDate(value: string): Date {
-  return startOfDay(new Date(value))
+  return startOfDay(parseISO(value))
 }
 
 export function normalizeToDate(value?: string): Date {
-  return endOfDay(value ? new Date(value) : new Date())
+  return endOfDay(value ? parseISO(value) : new Date())
 }

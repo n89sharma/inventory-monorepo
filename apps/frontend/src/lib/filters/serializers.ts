@@ -3,6 +3,7 @@ import {
   DEFAULT_COLLECTION_RANGE_DAYS,
   DEFAULT_DEPARTED_RANGE_DAYS,
   getDefaultFromDate,
+  getToday,
   getDefaultYear,
 } from '@/lib/filters/defaults'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
@@ -163,7 +164,7 @@ export function buildProfitabilityReportPath(warehouse: Warehouse | null): strin
 export function buildCollectionSummaryPath(path: string): string {
   return serializeDateRange(path, {
     from: getDefaultFromDate(DEFAULT_COLLECTION_RANGE_DAYS),
-    to: new Date(),
+    to: getToday(),
   })
 }
 
@@ -175,7 +176,7 @@ export function buildDepartedSearchPath(
     wh: warehouse ? [warehouse.id] : null,
     type: assetType ? [assetType.id] : null,
     from: getDefaultFromDate(DEFAULT_DEPARTED_RANGE_DAYS),
-    to: new Date(),
+    to: getToday(),
   })
 }
 

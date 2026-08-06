@@ -29,8 +29,8 @@ import { getCollectionHistory as getCollectionHistorySer } from '../services/his
 
 export const HoldQuerySchema = z
   .object({
-    fromDate: z.string(),
-    toDate: z.string().optional(),
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
     holdBy: z.coerce.number().int().optional(),
     holdFor: z.coerce.number().int().optional(),
     customer: z.coerce.number().int().optional(),

@@ -6,8 +6,8 @@ import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 
 export const ArrivalListQuerySchema = z
   .object({
-    fromDate: z.string(),
-    toDate: z.string().optional(),
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
     warehouse: z.coerce.number().int().optional(),
     vendor: z.coerce.number().int().optional(),
   })
@@ -23,8 +23,8 @@ export const ArrivalListQuerySchema = z
 
 export const DepartureListQuerySchema = z
   .object({
-    fromDate: z.string(),
-    toDate: z.string().optional(),
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
     warehouse: z.coerce.number().int().optional(),
     customer: z.coerce.number().int().optional(),
   })
@@ -40,8 +40,8 @@ export const DepartureListQuerySchema = z
 
 export const InvoiceListQuerySchema = z
   .object({
-    fromDate: z.string(),
-    toDate: z.string().optional(),
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
     invoiceType: z.enum([INVOICE_TYPE.purchase, INVOICE_TYPE.sales]),
   })
   .transform((data) => ({

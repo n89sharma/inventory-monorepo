@@ -1,3 +1,4 @@
+import { DATE_PARAM_FORMAT } from '@/lib/date-param'
 import { format, isValid, parseISO } from 'date-fns'
 import {
   createParser,
@@ -8,7 +9,6 @@ import {
 } from 'nuqs'
 import { INVOICE_TYPE } from 'shared-types'
 
-const DATE_ONLY_FORMAT = 'yyyy-MM-dd'
 const FLAG_ON = '1'
 
 // CSV of integer ids, matching the legacy `encodeIds`/`decodeIds` format.
@@ -33,7 +33,7 @@ const parseAsDateOnly = createParser<Date>({
     const parsed = parseISO(value)
     return isValid(parsed) ? parsed : null
   },
-  serialize: (value) => format(value, DATE_ONLY_FORMAT),
+  serialize: (value) => format(value, DATE_PARAM_FORMAT),
   eq: (a, b) => a.getTime() === b.getTime(),
 })
 

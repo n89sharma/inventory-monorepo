@@ -1,6 +1,7 @@
 import { getAssetsForDeparted } from '@/data/api/asset-api'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { toDateParam } from '@/lib/date-param'
 import {
   isValidDepartedDateRange,
   resolveDepartedStatuses,
@@ -31,24 +32,33 @@ export function useSearchDeparted(filters: SearchDepartedFilters) {
     statuses.length > 0 &&
     isValidDepartedDateRange(filters.fromDate, filters.toDate)
 
+  // The key carries the calendar day rather than the Date, so two visits to the same
+  // range agree; the request itself still takes the Dates.
+  const key = {
+    ...filters,
+    warehouses,
+    fromDate: toDateParam(filters.fromDate),
+    toDate: toDateParam(filters.toDate),
+  }
+
   return useSWR<AssetSearchRow[]>(
-    ready ? [SEARCH_DEPARTED_KEY, { ...filters, warehouses }] : null,
-    ([, f]: [string, SearchDepartedFilters]) =>
+    ready ? [SEARCH_DEPARTED_KEY, key] : null,
+    () =>
       getAssetsForDeparted(
-        f.warehouses,
-        f.brand,
-        f.assetTypes,
-        f.readinesses,
-        f.model?.model_name ?? f.modelQuery,
-        f.meterMin,
-        f.meterMax,
-        f.cassettes,
-        f.internalFinisher,
-        f.customer,
-        f.invoiceReference,
+        warehouses,
+        filters.brand,
+        filters.assetTypes,
+        filters.readinesses,
+        filters.model?.model_name ?? filters.modelQuery,
+        filters.meterMin,
+        filters.meterMax,
+        filters.cassettes,
+        filters.internalFinisher,
+        filters.customer,
+        filters.invoiceReference,
         statuses,
-        f.fromDate,
-        f.toDate,
+        filters.fromDate,
+        filters.toDate,
       ),
     {
       revalidateOnFocus: false,

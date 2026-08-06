@@ -1,3 +1,4 @@
+import { toDateParam } from '@/lib/date-param'
 import { getTransferDetail, getTransfers } from '@/data/api/transfer-api'
 import type { SelectOption } from '@/ui-types/select-option-types'
 import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-option-types'
@@ -39,8 +40,8 @@ function transferListKey(
   const to = getSelectedOrNull(toDate)
   return [
     TRANSFER_LIST_KEY_PREFIX,
-    from.toISOString(),
-    to?.toISOString() ?? null,
+    toDateParam(from),
+    toDateParam(to),
     getIdOrNullFromSelection(origin),
     getIdOrNullFromSelection(destination),
   ]

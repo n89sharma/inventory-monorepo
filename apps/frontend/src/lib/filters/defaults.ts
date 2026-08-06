@@ -10,6 +10,12 @@ export function getDefaultFromDate(days: number): Date {
   return startOfDay(subDays(new Date(), days))
 }
 
+// Every filter date is a whole calendar day: the time of day would otherwise reach
+// the SWR key and the request, and no two visits would ever agree.
+export function getToday(): Date {
+  return startOfDay(new Date())
+}
+
 export function getDefaultYear(): number {
   return new Date().getFullYear()
 }

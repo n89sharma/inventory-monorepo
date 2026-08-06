@@ -1,6 +1,6 @@
+import { getDefaultFromDate, getToday } from '@/lib/filters/defaults'
 import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-types'
 import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
-import { subDays } from 'date-fns'
 import React from 'react'
 import { DatePickerFieldInline } from './date-picker'
 import { QuickSearchButtons } from './quick-search-buttons'
@@ -31,8 +31,8 @@ export function SearchBar({
   } = setSearchOptions
 
   async function handleQuickSearch(days: number) {
-    const from = getSelectOption(subDays(new Date(), days))
-    const to = getSelectOption(new Date())
+    const from = getSelectOption(getDefaultFromDate(days))
+    const to = getSelectOption(getToday())
     setFromDate(from)
     setToDate(to)
 
