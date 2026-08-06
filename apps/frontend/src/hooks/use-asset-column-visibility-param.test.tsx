@@ -55,6 +55,16 @@ describe('useAssetColumnVisibilityParam', () => {
     expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('')
   })
 
+  it('writes the ids in catalog order, whichever order they were chosen in', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('?cols=brand', onUrlUpdate)
+
+    act(() => result.current.setVisibleColumns(new Set(['status', 'brand'])))
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('brand,status')
+  })
+
   it('clears the param when the selection matches the defaults', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
     const { result } = renderWithParams('?cols=serial_number', onUrlUpdate)
@@ -70,7 +80,6 @@ describe('useAssetColumnVisibilityParam', () => {
     expect(result.current.visibleColumns.has(PURCHASE_COST_ID)).toBe(true)
   })
 
-  // The column is not built for this viewer, so a key for it would name nothing.
   it('keeps a forced column hidden when the viewer lacks its permission', () => {
     mocks.role = 'member'
     const { result } = renderWithParams('?cols=', undefined, [PURCHASE_COST_ID])
@@ -93,7 +102,6 @@ describe('useAssetColumnVisibilityParam', () => {
     expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('serial_number')
   })
 
-  // toggleAllColumnsVisible writes every leaf column, always-visible and select included.
   it('keeps ids it does not track out of the param the change handler writes', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
     const { result } = renderWithParams('?cols=status', onUrlUpdate)

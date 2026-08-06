@@ -492,9 +492,6 @@ export function canViewColumn(
   return column.permissions?.every((permission) => can(permission)) ?? true
 }
 
-// The columns whose visibility the viewer decides: the ones they may see, minus the ones
-// shown unconditionally. Answers both "what does the picker list" and "what does the
-// visibility map hold".
 export function userCanToggleColumn(
   column: AssetSearchColumn,
   can: (permission: Permission) => boolean,
@@ -504,8 +501,6 @@ export function userCanToggleColumn(
   return !isAlwaysVisible && userCanViewColumn
 }
 
-// The columns on screen, in declaration order: the ones drawn unconditionally plus the
-// ones the viewer chose. What the CSV export writes, so the file matches the table.
 export function orderedVisibleColumns(visibleColumns: Set<string>): readonly AssetSearchColumn[] {
   return ASSET_SEARCH_COLUMNS.filter((column) => {
     const isAlwaysVisible = column.alwaysVisible ?? false

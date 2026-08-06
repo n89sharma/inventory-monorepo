@@ -47,14 +47,14 @@ export function useAssetColumnVisibilityParam(
 
   const setVisibleColumns = useCallback(
     (next: Set<string>) => {
-      const ids = [...next].filter((id) => !forcedColumns.has(id))
+      const ids = ASSET_SEARCH_COLUMNS.filter(
+        (column) => next.has(column.id) && !forcedColumns.has(column.id),
+      ).map((column) => column.id)
       void setCols(isDefaultSet(ids, defaultIds) ? null : ids)
     },
     [setCols, defaultIds, forcedColumns],
   )
 
-  // Only the columns the viewer decides on: an always-visible one has nothing to store,
-  // and a column they may not see is not built, so a key for it would name nothing.
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
     for (const column of ASSET_SEARCH_COLUMNS) {
@@ -65,10 +65,6 @@ export function useAssetColumnVisibilityParam(
     return out
   }, [visibleColumns, can])
 
-  // The table writes through the same param the picker does, so column.toggleVisibility()
-  // and the picker cannot disagree. Only ids this hook already tracks are kept, so a
-  // table-wide write like toggleAllColumnsVisible cannot push the select column or an
-  // always-visible one into the param.
   const onColumnVisibilityChange = useCallback<OnChangeFn<VisibilityState>>(
     (updater) => {
       const newVisibility = typeof updater === 'function' ? updater(columnVisibility) : updater

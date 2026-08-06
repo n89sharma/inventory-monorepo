@@ -24,8 +24,6 @@ function toColumnDef(
   }
 }
 
-// A column the viewer may not see is never built, so it cannot be sorted on, exported, or
-// turned back on from the URL — visibility state is left to express what the viewer chose.
 export function createSearchPageColumns(
   detailHref: (row: AssetSearchRow) => string,
   can: (permission: Permission) => boolean,

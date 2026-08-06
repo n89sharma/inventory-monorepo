@@ -411,8 +411,6 @@ describe('asset search columns', () => {
     expect(liveColumnIds()).toEqual(ASSET_SEARCH_COLUMNS.map((c) => c.id))
   })
 
-  // Not built at all rather than built and hidden: a forced or shared column id cannot
-  // resolve to a column the viewer may not see if the column is not there.
   it('leaves the columns the viewer may not see out of the table entirely', () => {
     const gatedIds = ASSET_SEARCH_COLUMNS.filter((c) => c.permissions).map((c) => c.id)
     expect(gatedIds.length).toBeGreaterThan(0)
