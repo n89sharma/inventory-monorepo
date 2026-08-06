@@ -13,6 +13,8 @@ import {
 } from '@/components/shadcn/select'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
+import { useAssetByBarcode } from '@/hooks/use-asset-lookup'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useWarehouseLocations } from '@/hooks/use-locations'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
 import { cn } from '@/lib/utils'
@@ -24,7 +26,7 @@ import {
   WarningIcon,
   XIcon,
 } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { AssetLocation, AssetSummary, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
@@ -34,6 +36,8 @@ const BIN_ZONE = 'BIN'
 const SCAN_SANITIZER = /[^a-zA-Z0-9._-]/g
 const LOCATION_ERROR_DELAY_MS = 500
 const ASSET_LOOKUP_DELAY_MS = 500
+const LOCATION_NOT_FOUND_MESSAGE = 'Location not available'
+const ASSET_NOT_FOUND_MESSAGE = 'Asset not found'
 const EMPTY_LOCATIONS: AssetLocation[] = []
 
 function findScannedLocation(locations: AssetLocation[], scanned: string): AssetLocation | null {
@@ -201,7 +205,6 @@ function AssetField({
 }
 
 export function PutAwayPage(): React.JSX.Element {
-  const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
   const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
 
   const activeWarehouses = useActiveWarehouses()
@@ -218,76 +221,48 @@ export function PutAwayPage(): React.JSX.Element {
   const { data: locations = EMPTY_LOCATIONS, isLoading: fetchingLocations } = useWarehouseLocations(
     warehouseId ?? null,
   )
-  const [fetchedAsset, setFetchedAsset] = useState<AssetSummary | null>(null)
-  const [lookingUp, setLookingUp] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const form = useForm<PutAwayForm>({ defaultValues: { location: '', asset: '' } })
   const locationValue = useWatch({ control: form.control, name: 'location' })
   const assetValue = useWatch({ control: form.control, name: 'asset' })
 
+  const settledLocation = useDebouncedValue(locationValue, LOCATION_ERROR_DELAY_MS)
+  const settledAsset = useDebouncedValue(assetValue, ASSET_LOOKUP_DELAY_MS)
+
+  const {
+    data: fetchedAsset,
+    error: lookupError,
+    isLoading: lookingUp,
+  } = useAssetByBarcode(settledAsset)
+
   const selectedLocation = useMemo(
     () => findScannedLocation(locations, locationValue),
     [locations, locationValue],
   )
-  const scannedAsset = assetValue ? fetchedAsset : null
+  const scannedAsset = assetValue ? (fetchedAsset ?? null) : null
 
-  const locationSuccess = !!selectedLocation && !form.formState.errors.location
-  const assetSuccess = !!scannedAsset && !form.formState.errors.asset
+  const locationError =
+    locationValue && !selectedLocation && settledLocation === locationValue
+      ? LOCATION_NOT_FOUND_MESSAGE
+      : undefined
+  const assetError = assetValue && lookupError ? ASSET_NOT_FOUND_MESSAGE : undefined
+
+  const locationSuccess = !!selectedLocation
+  const assetSuccess = !!scannedAsset
   const crossWarehouse =
     !!scannedAsset?.location &&
     !!selectedWarehouse &&
     scannedAsset.location.warehouse_code !== selectedWarehouse.city_code
 
-  useEffect(() => {
-    if (!locationValue) {
-      form.clearErrors('location')
-      return
-    }
-    if (selectedLocation) {
-      form.clearErrors('location')
-      form.setFocus('asset')
-      return
-    }
-    const timer = setTimeout(
-      () => form.setError('location', { type: 'manual', message: 'Location not available' }),
-      LOCATION_ERROR_DELAY_MS,
-    )
-    return () => clearTimeout(timer)
-  }, [locationValue, selectedLocation, form])
-
-  useEffect(() => {
-    if (!assetValue) {
-      form.clearErrors('asset')
-      return
-    }
-    let cancelled = false
-    const timer = setTimeout(() => {
-      setLookingUp(true)
-      getAssetByBarcode(assetValue, true)
-        .then((asset) => {
-          if (cancelled) return
-          setFetchedAsset(asset)
-          form.clearErrors('asset')
-        })
-        .catch(() => {
-          if (cancelled) return
-          setFetchedAsset(null)
-          form.setError('asset', { type: 'manual', message: 'Asset not found' })
-        })
-        .finally(() => {
-          if (!cancelled) setLookingUp(false)
-        })
-    }, ASSET_LOOKUP_DELAY_MS)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-    }
-  }, [assetValue, getAssetByBarcode, form])
+  function scanLocation(raw: string, onChange: (value: string) => void) {
+    const scanned = sanitizeScan(raw)
+    onChange(scanned)
+    if (findScannedLocation(locations, scanned)) form.setFocus('asset')
+  }
 
   function resetAsset() {
     form.setValue('asset', '')
-    form.clearErrors('asset')
     form.setFocus('asset')
   }
 
@@ -298,7 +273,6 @@ export function PutAwayPage(): React.JSX.Element {
 
   function clearLocation() {
     form.setValue('location', '')
-    form.clearErrors('location')
     form.setFocus('location')
   }
 
@@ -350,14 +324,14 @@ export function PutAwayPage(): React.JSX.Element {
         <Controller
           name="location"
           control={form.control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <LocationField
               inputRef={field.ref}
               value={field.value}
-              onChange={(value) => field.onChange(sanitizeScan(value))}
+              onChange={(value) => scanLocation(value, field.onChange)}
               onBlur={field.onBlur}
               onClear={clearLocation}
-              error={fieldState.error?.message}
+              error={locationError}
               success={locationSuccess}
               disabled={fetchingLocations || saving}
             />
@@ -367,14 +341,14 @@ export function PutAwayPage(): React.JSX.Element {
         <Controller
           name="asset"
           control={form.control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <AssetField
               inputRef={field.ref}
               value={field.value}
               onChange={(value) => field.onChange(sanitizeScan(value))}
               onBlur={field.onBlur}
               onClear={resetAsset}
-              error={fieldState.error?.message}
+              error={assetError}
               success={assetSuccess}
               disabled={fetchingLocations || saving}
               lookingUp={lookingUp}
