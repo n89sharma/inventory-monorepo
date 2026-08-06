@@ -57,7 +57,7 @@ interface PriceButtonProps {
   label: string
   invalid: boolean
   tabIndex: typeof ENTRY_TAB_INDEX | typeof ROVING_TAB_INDEX
-  ref: React.RefObject<HTMLButtonElement | null>
+  ref: React.RefCallback<HTMLButtonElement>
   onClick: () => void
   onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void
 }
@@ -108,28 +108,27 @@ export function AssetPriceCell({
   const [value, setValue] = useState(String(currSavedValue))
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [isEditing, setIsEditing] = useState(false)
+  const [focusReadButtonOnAttach, setFocusReadButtonOnAttach] = useState(false)
   const sentValueRef = useRef<number | null>(null)
-  const readButtonRef = useRef<HTMLButtonElement | null>(null)
-  const shouldRestoreFocusRef = useRef(false)
 
   useEffect(
     () => editorRegistry.register({ rowId: row.id, field }, () => setIsEditing(true)),
     [editorRegistry, row.id, field],
   )
 
-  useEffect(() => {
-    if (isEditing || !shouldRestoreFocusRef.current) return
-    shouldRestoreFocusRef.current = false
-    readButtonRef.current?.focus()
-  }, [isEditing])
-
   if (!isEditing && prevSavedValue !== currSavedValue) {
     setPrevSavedValue(currSavedValue)
     setValue(String(currSavedValue))
   }
 
+  function focusReadButtonWhenAttached(node: HTMLButtonElement | null) {
+    if (!node || !focusReadButtonOnAttach) return
+    setFocusReadButtonOnAttach(false)
+    node.focus()
+  }
+
   function stopEditing(restoreFocus: boolean) {
-    shouldRestoreFocusRef.current = restoreFocus
+    setFocusReadButtonOnAttach(restoreFocus)
     setIsEditing(false)
   }
 
@@ -203,7 +202,7 @@ export function AssetPriceCell({
         label={`${label} for ${asset.barcode}`}
         invalid={status === 'error'}
         tabIndex={isKeyboardEntryCell(table, row.id, field) ? ENTRY_TAB_INDEX : ROVING_TAB_INDEX}
-        ref={readButtonRef}
+        ref={focusReadButtonWhenAttached}
         onClick={() => setIsEditing(true)}
         onKeyDown={handleButtonKeyDown}
       />
