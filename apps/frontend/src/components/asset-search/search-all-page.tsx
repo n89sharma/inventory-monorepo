@@ -82,6 +82,7 @@ export function SearchAllPage(): React.JSX.Element {
     visibleColumns,
     setVisibleColumns,
     columnVisibility,
+    onColumnVisibilityChange,
     reset: resetColumns,
   } = useColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
 
@@ -158,6 +159,7 @@ export function SearchAllPage(): React.JSX.Element {
             onRowSelectionChange={selection.setRowSelection}
             onBulkPriceSave={handleBulkPriceSave}
             columnVisibility={columnVisibility}
+            onColumnVisibilityChange={onColumnVisibilityChange}
             getRowHref={getRowHref}
             defaultSort={CREATED_AT_DESC_SORT}
           />

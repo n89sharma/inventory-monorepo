@@ -60,6 +60,7 @@ interface DataTableProps<TData, TValue> {
   getRowClassName?: (row: TData) => string | undefined
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: OnChangeFn<VisibilityState>
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
   renderAboveTable?: (table: ReactTableInstance<TData>) => React.ReactNode
   // Faceting walks the filtered rows once per column to collect distinct values, so it
@@ -114,6 +115,7 @@ export function DataTable<TData, TValue>({
   getRowClassName,
   getSubRows,
   columnVisibility,
+  onColumnVisibilityChange,
   renderTableFilter,
   renderAboveTable,
   facetedRowModels,
@@ -147,6 +149,7 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange,
     getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     ...facetedRowModels,

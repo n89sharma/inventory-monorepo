@@ -76,6 +76,34 @@ describe('useColumnVisibilityParam', () => {
     expect(result.current.columnVisibility[PURCHASE_COST_ID]).toBe(false)
   })
 
+  it('writes the param when the table hides a column through the change handler', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('?cols=serial_number,status', onUrlUpdate)
+
+    act(() => result.current.onColumnVisibilityChange((prev) => ({ ...prev, status: false })))
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('serial_number')
+  })
+
+  // toggleAllColumnsVisible writes every leaf column, always-visible and select included.
+  it('keeps ids it does not track out of the param the change handler writes', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('?cols=status', onUrlUpdate)
+
+    act(() =>
+      result.current.onColumnVisibilityChange((prev) => ({
+        ...prev,
+        barcode: true,
+        select: true,
+        brand: true,
+      })),
+    )
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('brand,status')
+  })
+
   it('keeps a forced column out of the param it writes', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
     const { result } = renderWithParams('?cols=serial_number', onUrlUpdate, [PURCHASE_COST_ID])

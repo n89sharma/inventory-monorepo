@@ -4,7 +4,7 @@ import {
 } from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
-import type { VisibilityState } from '@tanstack/react-table'
+import type { OnChangeFn, VisibilityState } from '@tanstack/react-table'
 import { useQueryState } from 'nuqs'
 import { useCallback, useMemo } from 'react'
 
@@ -27,6 +27,7 @@ export function useColumnVisibilityParam(
   visibleColumns: Set<string>
   setVisibleColumns: (columns: Set<string>) => void
   columnVisibility: VisibilityState
+  onColumnVisibilityChange: OnChangeFn<VisibilityState>
   reset: () => void
 } {
   const can = useCan()
@@ -59,7 +60,20 @@ export function useColumnVisibilityParam(
     return out
   }, [visibleColumns])
 
+  // The table writes through the same param the picker does, so column.toggleVisibility()
+  // and the picker cannot disagree. Only ids this hook already tracks are kept, so a
+  // table-wide write like toggleAllColumnsVisible cannot push the select column or an
+  // always-visible one into the param.
+  const onColumnVisibilityChange = useCallback<OnChangeFn<VisibilityState>>(
+    (updater) => {
+      const newVisibility = typeof updater === 'function' ? updater(columnVisibility) : updater
+      const ids = Object.keys(columnVisibility).filter((id) => newVisibility[id])
+      setVisibleColumns(new Set(ids))
+    },
+    [columnVisibility, setVisibleColumns],
+  )
+
   const reset = useCallback(() => void setCols(null), [setCols])
 
-  return { visibleColumns, setVisibleColumns, columnVisibility, reset }
+  return { visibleColumns, setVisibleColumns, columnVisibility, onColumnVisibilityChange, reset }
 }
