@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { rankMatches } from '@/lib/rank-matches'
 import { XIcon } from '@phosphor-icons/react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Badge } from '@/components/shadcn/badge'
 import { Field } from '@/components/shadcn/field'
 import {
@@ -64,14 +64,14 @@ export function SearchSelectInput<T>({
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [pendingFocus, setPendingFocus] = useState(false)
+  const [focusInputOnAttach, setFocusInputOnAttach] = useState(false)
 
-  useEffect(() => {
-    if (pendingFocus && !selection && inputRef.current) {
-      inputRef.current.focus()
-      setPendingFocus(false)
-    }
-  }, [pendingFocus, selection])
+  function attachInput(node: HTMLInputElement | null) {
+    inputRef.current = node
+    if (!node || !focusInputOnAttach) return
+    setFocusInputOnAttach(false)
+    node.focus()
+  }
 
   function updateSearch(rawInput: string) {
     const clean = sanitize(rawInput)
@@ -87,11 +87,15 @@ export function SearchSelectInput<T>({
     setPopoverOpen(true)
   }
 
-  function handleSelect(item: T) {
-    onSelectionChange(item)
+  function resetSuggestions() {
     setPopoverOpen(false)
     setMatches([])
     setHighlightedIndex(-1)
+  }
+
+  function handleSelect(item: T) {
+    onSelectionChange(item)
+    resetSuggestions()
   }
 
   function handleCreate() {
@@ -99,17 +103,19 @@ export function SearchSelectInput<T>({
     const clean = query.trim()
     if (!clean) return
     onCreateOption(clean)
-    setPopoverOpen(false)
-    setMatches([])
-    setHighlightedIndex(-1)
+    resetSuggestions()
   }
 
-  function handleClear() {
+  function clearSelection() {
     onClear()
-    setPopoverOpen(false)
-    setMatches([])
-    setHighlightedIndex(-1)
-    setPendingFocus(true)
+    resetSuggestions()
+    setFocusInputOnAttach(true)
+  }
+
+  function clearQuery() {
+    onClear()
+    resetSuggestions()
+    inputRef.current?.focus()
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -148,7 +154,7 @@ export function SearchSelectInput<T>({
               <span className="truncate">{getLabel(selection)}</span>
               <button
                 type="button"
-                onClick={handleClear}
+                onClick={clearSelection}
                 aria-label={clearLabel}
                 className={cn(
                   'ml-0.5 inline-flex size-4 shrink-0 items-center justify-center',
@@ -177,7 +183,7 @@ export function SearchSelectInput<T>({
                 value={query}
                 onChange={(e) => updateSearch(e.target.value)}
                 onKeyDown={handleKeyDown}
-                ref={inputRef}
+                ref={attachInput}
                 placeholder={placeholder}
                 autoComplete="off"
                 role="combobox"
@@ -187,7 +193,7 @@ export function SearchSelectInput<T>({
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
                   size="icon-sm"
-                  onClick={handleClear}
+                  onClick={clearQuery}
                   hidden={!query.length}
                   type="button"
                   aria-label="Clear"
