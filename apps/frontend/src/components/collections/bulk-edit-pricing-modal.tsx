@@ -8,24 +8,29 @@ import {
 } from '@/components/shadcn/dialog'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
 import { PriceInput } from '@/components/shared/price-input'
-import type { EditablePriceField } from '@/lib/price-cell-navigation'
+import { EDITABLE_PRICE_FIELDS, type EditablePriceField } from '@/lib/price-cell-navigation'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
+import { useAssetPricing, type AssetPricing } from '@/hooks/use-asset-detail'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatThousandsK } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import type { CellContext, ColumnDef, Table } from '@tanstack/react-table'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { useEffect, useRef, useState } from 'react'
-import type { AssetSummary } from 'shared-types'
+import { useMemo, useState } from 'react'
+import type { AssetCost, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 
+const EMPTY_PRICING: AssetPricing = Object.freeze({})
+
 interface BulkEditPricingModalProps {
-  open: boolean
   onOpenChange: (open: boolean) => void
   selectedAssets: AssetSummary[]
   onSaveSuccess: () => void
 }
+
+type PriceDraft = Partial<Record<EditablePriceField, string>>
+type PriceDrafts = Record<string, PriceDraft>
 
 type PricingRow = {
   barcode: string
@@ -37,7 +42,6 @@ type PricingRow = {
   transport_cost: string
   processing_cost: string
   other_cost: string
-  parts_cost: string
   sale_price: string
 }
 
@@ -100,20 +104,52 @@ const columns: ColumnDef<PricingRow>[] = [
   makeEditableColumn('sale_price', 'Sale Price'),
 ]
 
-const PRICE_FIELDS: EditablePriceField[] = [
-  'purchase_cost',
-  'transport_cost',
-  'processing_cost',
-  'other_cost',
-  'sale_price',
-]
+function toAmount(text: string): number {
+  return parseFloat(text) || 0
+}
 
-function checkDirty(rows: PricingRow[], initial: PricingRow[]): boolean {
-  return rows.some((row, i) => {
-    const init = initial[i]
-    if (!init) return false
-    return [...PRICE_FIELDS, 'parts_cost' as const].some((f) => row[f] !== init[f])
+function serverText(cost: AssetCost | undefined, field: EditablePriceField): string {
+  return cost?.[field]?.toString() ?? ''
+}
+
+function cellText(
+  cost: AssetCost | undefined,
+  draft: PriceDraft | undefined,
+  field: EditablePriceField,
+): string {
+  return draft?.[field] ?? serverText(cost, field)
+}
+
+function buildRows(
+  assets: AssetSummary[],
+  pricing: AssetPricing,
+  drafts: PriceDrafts,
+): PricingRow[] {
+  return assets.map((asset) => {
+    const cost = pricing[asset.barcode]
+    const draft = drafts[asset.barcode]
+    return {
+      barcode: asset.barcode,
+      serial_number: asset.serial_number,
+      brand: asset.brand,
+      model: asset.model,
+      meter_total: asset.meter_total,
+      purchase_cost: cellText(cost, draft, 'purchase_cost'),
+      transport_cost: cellText(cost, draft, 'transport_cost'),
+      processing_cost: cellText(cost, draft, 'processing_cost'),
+      other_cost: cellText(cost, draft, 'other_cost'),
+      sale_price: cellText(cost, draft, 'sale_price'),
+    }
   })
+}
+
+function hasEdits(pricing: AssetPricing, drafts: PriceDrafts): boolean {
+  return Object.entries(drafts).some(([barcode, draft]) =>
+    EDITABLE_PRICE_FIELDS.some((field) => {
+      const edited = draft[field]
+      return edited !== undefined && edited !== serverText(pricing[barcode], field)
+    }),
+  )
 }
 
 function PricingEditBody({ loading, table }: { loading: boolean; table: Table<PricingRow> }) {
@@ -164,68 +200,27 @@ function PricingEditBody({ loading, table }: { loading: boolean; table: Table<Pr
 }
 
 export function BulkEditPricingModal({
-  open,
   onOpenChange,
   selectedAssets,
   onSaveSuccess,
 }: BulkEditPricingModalProps) {
-  const getAssetDetail = useAssetStore((state) => state.getAssetDetail)
   const bulkUpdatePricing = useAssetStore((state) => state.bulkUpdatePricing)
-  const [rows, setRows] = useState<PricingRow[]>([])
-  const [initialRows, setInitialRows] = useState<PricingRow[]>([])
-  const [loading, setLoading] = useState(false)
+  const [drafts, setDrafts] = useState<PriceDrafts>({})
   const [saving, setSaving] = useState(false)
 
-  const selectedAssetsRef = useRef(selectedAssets)
-  selectedAssetsRef.current = selectedAssets
+  const { data: pricing = EMPTY_PRICING, isLoading } = useAssetPricing(
+    selectedAssets.map((asset) => asset.barcode),
+  )
 
-  const guard = useUnsavedChangesGuard(checkDirty(rows, initialRows), onOpenChange)
+  const guard = useUnsavedChangesGuard(hasEdits(pricing, drafts), onOpenChange)
 
-  useEffect(() => {
-    if (!open) return
-    const assets = selectedAssetsRef.current
-    setLoading(true)
-    Promise.allSettled(assets.map((a) => getAssetDetail(a.barcode))).then((results) => {
-      const loaded: PricingRow[] = results.map((r, i) => {
-        const asset = assets[i]
-        if (r.status === 'fulfilled') {
-          const { cost } = r.value
-          return {
-            barcode: asset.barcode,
-            serial_number: asset.serial_number,
-            brand: asset.brand,
-            model: asset.model,
-            meter_total: asset.meter_total,
-            purchase_cost: cost.purchase_cost?.toString() ?? '',
-            transport_cost: cost.transport_cost?.toString() ?? '',
-            processing_cost: cost.processing_cost?.toString() ?? '',
-            other_cost: cost.other_cost?.toString() ?? '',
-            parts_cost: cost.parts_cost?.toString() ?? '',
-            sale_price: cost.sale_price?.toString() ?? '',
-          }
-        }
-        return {
-          barcode: asset.barcode,
-          serial_number: asset.serial_number,
-          brand: asset.brand,
-          model: asset.model,
-          meter_total: asset.meter_total,
-          purchase_cost: '',
-          transport_cost: '',
-          processing_cost: '',
-          other_cost: '',
-          parts_cost: '',
-          sale_price: '',
-        }
-      })
-      setRows(loaded)
-      setInitialRows(loaded)
-      setLoading(false)
-    })
-  }, [open, getAssetDetail])
+  const rows = useMemo(
+    () => buildRows(selectedAssets, pricing, drafts),
+    [selectedAssets, pricing, drafts],
+  )
 
   function updatePriceDraft(barcode: string, field: EditablePriceField, value: string) {
-    setRows((prev) => prev.map((r) => (r.barcode === barcode ? { ...r, [field]: value } : r)))
+    setDrafts((prev) => ({ ...prev, [barcode]: { ...prev[barcode], [field]: value } }))
   }
 
   const table = useReactTable({
@@ -239,14 +234,14 @@ export function BulkEditPricingModal({
     setSaving(true)
     try {
       await bulkUpdatePricing(
-        rows.map((r) => ({
-          barcode: r.barcode,
-          purchase_cost: parseFloat(r.purchase_cost) || 0,
-          transport_cost: parseFloat(r.transport_cost) || 0,
-          processing_cost: parseFloat(r.processing_cost) || 0,
-          other_cost: parseFloat(r.other_cost) || 0,
-          parts_cost: parseFloat(r.parts_cost) || 0,
-          sale_price: parseFloat(r.sale_price) || 0,
+        rows.map((row) => ({
+          barcode: row.barcode,
+          purchase_cost: toAmount(row.purchase_cost),
+          transport_cost: toAmount(row.transport_cost),
+          processing_cost: toAmount(row.processing_cost),
+          other_cost: toAmount(row.other_cost),
+          parts_cost: pricing[row.barcode]?.parts_cost ?? 0,
+          sale_price: toAmount(row.sale_price),
         })),
       )
       toast.success('Pricing updated.', { position: 'top-center' })
@@ -260,13 +255,13 @@ export function BulkEditPricingModal({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={guard.onOpenChange}>
+      <Dialog open onOpenChange={guard.onOpenChange}>
         <DialogContent className="sm:max-w-[min(90vw,1300px)] max-h-[min(80vh,800px)] flex flex-col">
           <DialogHeader>
             <DialogTitle>Bulk Edit Pricing</DialogTitle>
           </DialogHeader>
 
-          <PricingEditBody loading={loading} table={table} />
+          <PricingEditBody loading={isLoading} table={table} />
 
           <DialogFooter>
             <Button
@@ -277,7 +272,7 @@ export function BulkEditPricingModal({
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} type="button" disabled={saving || loading}>
+            <Button onClick={handleSave} type="button" disabled={saving || isLoading}>
               {saving ? (
                 <>
                   <CircleNotchIcon className="animate-spin" />

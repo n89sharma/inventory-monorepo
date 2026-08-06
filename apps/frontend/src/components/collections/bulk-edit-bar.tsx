@@ -167,15 +167,16 @@ export function BulkEditBar({
         onConfirmSuccess={onClear}
         refreshKey={refreshKey}
       />
-      <BulkEditPricingModal
-        open={bulkPricingOpen}
-        onOpenChange={setBulkPricingOpen}
-        selectedAssets={assets}
-        onSaveSuccess={() => {
-          onClear()
-          onPriceSaveSuccess?.()
-        }}
-      />
+      {bulkPricingOpen && (
+        <BulkEditPricingModal
+          onOpenChange={setBulkPricingOpen}
+          selectedAssets={assets}
+          onSaveSuccess={() => {
+            onClear()
+            onPriceSaveSuccess?.()
+          }}
+        />
+      )}
     </>
   )
 }

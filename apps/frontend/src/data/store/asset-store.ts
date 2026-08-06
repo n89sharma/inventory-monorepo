@@ -3,7 +3,6 @@ import {
   createAssetHarvestedPart as createAssetHarvestedPartApi,
   deleteAsset as deleteAssetApi,
   printBarcodes as printBarcodesApi,
-  getAssetDetail as getAssetDetailApi,
   postComment as postCommentApi,
   updateAssetErrors as updateAssetErrorsApi,
   updateAssetLocation as updateAssetLocationApi,
@@ -12,11 +11,15 @@ import {
 } from '@/data/api/asset-api'
 import { addStorePartToAsset as addStorePartToAssetApi } from '@/data/api/store-part-api'
 import { getAssetByBarcode as getAssetByBarcodeApi } from '@/data/api/transfer-api'
-import { assetDetailKey, clearAssetDetail, invalidateAssetDetails } from '@/hooks/use-asset-detail'
+import {
+  assetDetailKey,
+  clearAssetDetail,
+  invalidateAssetDetails,
+  invalidateAssetPricing,
+} from '@/hooks/use-asset-detail'
 import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
-  AssetDetails,
   AssetSummary,
   BulkUpdateAssetPricing,
   CreateComment,
@@ -48,7 +51,6 @@ interface AssetStore {
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
   updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<void>
   getAssetByBarcode: (barcode: string, skipErrorToast?: boolean) => Promise<AssetSummary>
-  getAssetDetail: (barcode: string) => Promise<AssetDetails>
   printBarcodes: (barcodes: string[]) => Promise<void>
   bulkUpdatePricing: (items: BulkUpdateAssetPricing['items']) => Promise<void>
 }
@@ -103,14 +105,13 @@ export const useAssetStore = create<AssetStore>(() => ({
 
   getAssetByBarcode: (barcode, skipErrorToast) => getAssetByBarcodeApi(barcode, skipErrorToast),
 
-  getAssetDetail: (barcode) => getAssetDetailApi({ barcode }),
-
   printBarcodes: (barcodes) => printBarcodesApi(barcodes),
 
   bulkUpdatePricing: async (items) => {
     await bulkUpdateAssetPricingApi(items)
     const barcodes = items.map((item) => item.barcode)
     invalidateAssetDetails(barcodes)
+    invalidateAssetPricing()
     invalidateAssetHistory(barcodes)
   },
 }))

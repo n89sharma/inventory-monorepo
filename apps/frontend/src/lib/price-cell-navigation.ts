@@ -1,4 +1,4 @@
-const EDITABLE_PRICE_FIELDS = [
+export const EDITABLE_PRICE_FIELDS = [
   'purchase_cost',
   'transport_cost',
   'processing_cost',
