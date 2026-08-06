@@ -17,7 +17,10 @@ function isDefaultSet(ids: string[], defaultIds: readonly string[]): boolean {
   return ids.every((id) => defaults.has(id))
 }
 
-export function useColumnVisibilityParam(defaultIds: readonly string[]): {
+export function useColumnVisibilityParam(
+  defaultIds: readonly string[],
+  forcedIds: readonly string[] = EMPTY_COLS,
+): {
   visibleColumns: Set<string>
   setVisibleColumns: (columns: Set<string>) => void
   columnVisibility: VisibilityState
@@ -26,17 +29,22 @@ export function useColumnVisibilityParam(defaultIds: readonly string[]): {
   const can = useCan()
   const [cols, setCols] = useQueryState(COLS_PARAM_KEY, COLS_PARSER)
 
-  const visibleColumns = useMemo(
-    () => resolveVisibleColumns(cols.length > 0 ? cols : defaultIds, can),
-    [cols, can, defaultIds],
-  )
+  // A forced id is resolved the same way a stored one is, so a column the viewer may not
+  // see stays hidden however it was turned on.
+  const forcedColumns = useMemo(() => resolveVisibleColumns(forcedIds, can), [forcedIds, can])
+
+  const visibleColumns = useMemo(() => {
+    const stored = resolveVisibleColumns(cols.length > 0 ? cols : defaultIds, can)
+    for (const id of forcedColumns) stored.add(id)
+    return stored
+  }, [cols, can, defaultIds, forcedColumns])
 
   const setVisibleColumns = useCallback(
     (next: Set<string>) => {
-      const ids = [...next]
+      const ids = [...next].filter((id) => !forcedColumns.has(id))
       void setCols(isDefaultSet(ids, defaultIds) ? null : ids)
     },
-    [setCols, defaultIds],
+    [setCols, defaultIds, forcedColumns],
   )
 
   const columnVisibility = useMemo<VisibilityState>(() => {

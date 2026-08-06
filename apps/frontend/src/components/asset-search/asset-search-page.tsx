@@ -11,9 +11,8 @@ import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
-import type { VisibilityState } from '@tanstack/react-table'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import type { AssetSearchRow, SavedViewPageKey } from 'shared-types'
 
 const DEFAULT_ASSET_SORT = { id: 'stock_days', desc: false } as const
@@ -49,15 +48,12 @@ export function AssetSearchPage({
     setVisibleColumns,
     columnVisibility,
     reset: resetColumns,
-  } = useColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext])
+  } = useColumnVisibilityParam(
+    DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext],
+    forceVisibleColumnIds,
+  )
   const [sorting, onSortingChange] = useTableSortParam(defaultSort ?? DEFAULT_ASSET_SORT)
   const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
-  const effectiveColumnVisibility = useMemo<VisibilityState>(() => {
-    if (!forceVisibleColumnIds?.length) return columnVisibility
-    const out = { ...columnVisibility }
-    for (const id of forceVisibleColumnIds) out[id] = true
-    return out
-  }, [columnVisibility, forceVisibleColumnIds])
   const getRowHref = useCallback(
     (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
     [navContext, searchParams],
@@ -104,7 +100,7 @@ export function AssetSearchPage({
             rowSelection={selection.rowSelection}
             onRowSelectionChange={selection.setRowSelection}
             onBulkPriceSave={onBulkPriceSave}
-            columnVisibility={effectiveColumnVisibility}
+            columnVisibility={columnVisibility}
             getRowHref={getRowHref}
             getRowClassName={getRowClassName}
             defaultSort={defaultSort}
