@@ -115,6 +115,8 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     departed_at: new Date(2026, 6, 10),
     arrival_created_at: new Date(2026, 6, 5),
     purchase_invoice_invoice_number: 'PI-100',
+    sales_invoice_invoice_number: 'SI-200',
+    sales_invoice_invoice_reference: 'CUST-REF-9',
     latest_comment: 'Looks good',
     latest_comment_by: 'Carol',
     latest_comment_at: new Date(2026, 6, 12),
@@ -152,7 +154,7 @@ describe('asset-search report columns', () => {
         'Vendor,Arrived At,Customer,Departed At,' +
         'Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,' +
         'Margin %,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
-        'Created,Stock Days,Invoice #,Last Comment',
+        'Created,Stock Days,Purchase Invoice,Sales Invoice,Last Comment',
     )
   })
 
@@ -165,7 +167,7 @@ describe('asset-search report columns', () => {
         'Big Vendor,"July 05, 2026",Retail Co,"July 10, 2026",' +
         '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
         '48.9%,H-1,Alice,Bob,Acme Corp,"July 01, 2026",' +
-        '"July 15, 2026",12,PI-100,Looks good',
+        '"July 15, 2026",12,PI-100,CUST-REF-9,Looks good',
     )
   })
 
@@ -196,6 +198,8 @@ describe('asset-search report columns', () => {
       departed_at: null,
       arrival_created_at: null,
       purchase_invoice_invoice_number: null,
+      sales_invoice_invoice_number: null,
+      sales_invoice_invoice_reference: null,
       latest_comment: null,
     })
     const { data } = csvFor(nulled, liveColumnIds())
@@ -206,7 +210,7 @@ describe('asset-search report columns', () => {
         ',,,,' +
         ',,,,,,,' +
         ',,,,,' +
-        '"July 15, 2026",12,,',
+        '"July 15, 2026",12,,,',
     )
   })
 
@@ -490,7 +494,10 @@ describe('asset search columns', () => {
           'hold_created_at',
         ],
       },
-      { section: 'invoice', ids: ['purchase_invoice_invoice_number'] },
+      {
+        section: 'invoice',
+        ids: ['purchase_invoice_invoice_number', 'sales_invoice_invoice_reference'],
+      },
       { section: 'last_comment', ids: ['latest_comment'] },
     ])
   })

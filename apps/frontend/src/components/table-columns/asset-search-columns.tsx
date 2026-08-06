@@ -24,6 +24,8 @@ import {
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
+const invoiceDetailHref = (invoiceNumber: string): string => `/invoices/${invoiceNumber}`
+
 const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date(), createdAt)
 
 export const daysHeld = (heldOn: Date | null): number | undefined =>
@@ -113,6 +115,17 @@ function StatusCell({ asset }: { asset: AssetSearchRow }): ReactNode {
 function HoldNumberCell({ holdNumber }: { holdNumber: string | null }): ReactNode {
   if (!holdNumber) return ''
   return <IdLink to={holdDetailHref(holdNumber)}>{holdNumber}</IdLink>
+}
+
+function InvoiceCell({
+  invoiceNumber,
+  label,
+}: {
+  invoiceNumber: string | null
+  label: string | null
+}): ReactNode {
+  if (!invoiceNumber || !label) return ''
+  return <IdLink to={invoiceDetailHref(invoiceNumber)}>{label}</IdLink>
 }
 
 function LastCommentCell({ comment }: { comment: string | null }): ReactNode {
@@ -415,9 +428,27 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   },
   {
     id: 'purchase_invoice_invoice_number',
-    label: 'Invoice #',
+    label: 'Purchase Invoice',
     section: 'invoice',
     text: (a) => a.purchase_invoice_invoice_number ?? '',
+    cell: (a) => (
+      <InvoiceCell
+        invoiceNumber={a.purchase_invoice_invoice_number}
+        label={a.purchase_invoice_invoice_number}
+      />
+    ),
+  },
+  {
+    id: 'sales_invoice_invoice_reference',
+    label: 'Sales Invoice',
+    section: 'invoice',
+    text: (a) => a.sales_invoice_invoice_reference ?? '',
+    cell: (a) => (
+      <InvoiceCell
+        invoiceNumber={a.sales_invoice_invoice_number}
+        label={a.sales_invoice_invoice_reference}
+      />
+    ),
   },
   {
     id: 'latest_comment',

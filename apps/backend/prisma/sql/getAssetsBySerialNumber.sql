@@ -41,6 +41,8 @@ select
   d.created_at as departed_at,
   r.created_at as arrival_created_at,
   pi.invoice_number as purchase_invoice_invoice_number,
+  si.invoice_number as sales_invoice_invoice_number,
+  si.invoice_reference as sales_invoice_invoice_reference,
   lc.comment as latest_comment,
   lc.created_at as latest_comment_at,
   lcu."name" as latest_comment_by
@@ -64,6 +66,7 @@ from "Asset" a
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
+  left join "Invoice" si on si.id = a.sales_invoice_id
   left join "Hold" h on h.id = a.hold_id
   left join "User" hu on hu.id = h.created_by_id
   left join "User" hu2 on hu2.id = h.created_for_id

@@ -60,6 +60,8 @@ select
   d.created_at as departed_at,
   r.created_at as arrival_created_at,
   pi.invoice_number as purchase_invoice_invoice_number,
+  si.invoice_number as sales_invoice_invoice_number,
+  si.invoice_reference as sales_invoice_invoice_reference,
   lc.comment as latest_comment,
   lc.created_at as latest_comment_at,
   lcu."name" as latest_comment_by
