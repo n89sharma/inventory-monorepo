@@ -1,17 +1,19 @@
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
+import { useUsersLoaded } from '@/hooks/use-user'
 import { buildAssetSearchPath } from '@/lib/filters/serializers'
 import { Navigate } from 'react-router-dom'
 
 const ONHAND_PATH = '/search/onhand'
 
 export function PostLoginLanding(): React.JSX.Element | null {
-  const loaded = useReferenceDataStore((state) => state.loaded)
+  const referenceDataLoaded = useReferenceDataStore((state) => state.loaded)
+  const usersLoaded = useUsersLoaded()
   const defaultWarehouse = useProfileDefaultWarehouse()
   const defaultAssetType = useDefaultAssetType()
 
-  if (!loaded) return null
+  if (!referenceDataLoaded || !usersLoaded) return null
 
   return (
     <Navigate to={buildAssetSearchPath(ONHAND_PATH, defaultWarehouse, defaultAssetType)} replace />

@@ -1,8 +1,8 @@
-import { useUserStore } from '@/data/store/user-store'
+import { useUsers } from '@/hooks/use-user'
 import { useMemo } from 'react'
 import type { User } from 'shared-types'
 
 export function useActiveUsers(): User[] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useMemo(() => users.filter((u) => u.is_active), [users])
 }

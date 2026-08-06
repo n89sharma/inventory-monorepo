@@ -28,8 +28,9 @@ import {
   SelectValue,
 } from '@/components/shadcn/select'
 import { Toggle } from '@/components/shadcn/toggle'
-import { useUserStore } from '@/data/store/user-store'
 import { useCurrentUser } from '@/hooks/use-current-user'
+import { useUsers } from '@/hooks/use-user'
+import { useUserMutations } from '@/hooks/use-user-mutations'
 import { formatTitleCase } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo, useState } from 'react'
@@ -42,9 +43,8 @@ const ASSIGNABLE_ROLES = AppRoles.filter((r) => r !== 'admin')
 export function UserManagementPage() {
   const currentUserId = useCurrentUser()?.id
 
-  const users = useUserStore((state) => state.users)
-  const setUserRole = useUserStore((state) => state.setUserRole)
-  const toggleUserActive = useUserStore((state) => state.toggleUserActive)
+  const users = useUsers()
+  const { setUserRole, toggleUserActive } = useUserMutations()
 
   const [showActiveOnly, setShowActiveOnly] = useState(true)
   const [showClerkOnly, setShowClerkOnly] = useState(true)

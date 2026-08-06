@@ -1,7 +1,7 @@
 import { useModels } from '@/hooks/use-model'
 import { useOrgs } from '@/hooks/use-org'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
-import { useUserStore } from '@/data/store/user-store'
+import { useUsers } from '@/hooks/use-user'
 import {
   DEFAULT_COLLECTION_RANGE_DAYS,
   DEFAULT_DEPARTED_RANGE_DAYS,
@@ -258,17 +258,17 @@ export function useVendorParam(): [OrgSummary | null, (next: OrgSummary | null) 
 }
 
 export function useHeldByParam(): [User | null, (next: User | null) => void] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useIdParam('heldby', users)
 }
 
 export function useHeldForParam(): [User | null, (next: User | null) => void] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useIdParam('heldfor', users)
 }
 
 export function useSalespersonParam(): [User | null, (next: User | null) => void] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useIdParam('sp', users)
 }
 
@@ -305,12 +305,12 @@ export function useCustomerOptionParam(): [
 }
 
 export function useHeldByOptionParam(): [SelectOption<User>, (next: SelectOption<User>) => void] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useSelectOptionIdParam('heldby', users)
 }
 
 export function useHeldForOptionParam(): [SelectOption<User>, (next: SelectOption<User>) => void] {
-  const users = useUserStore((state) => state.users)
+  const users = useUsers()
   return useSelectOptionIdParam('heldfor', users)
 }
 

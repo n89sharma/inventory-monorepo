@@ -1,5 +1,5 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useUserStore } from '@/data/store/user-store'
+import { useUsers } from '@/hooks/use-user'
 import { useState } from 'react'
 import type { User } from 'shared-types'
 
@@ -16,7 +16,7 @@ export function UserFilter({
   placeholder: string
   clearLabel: string
 }): React.JSX.Element {
-  const allUsers = useUserStore((state) => state.users)
+  const allUsers = useUsers()
   const [query, setQuery] = useState('')
 
   return (
