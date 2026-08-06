@@ -9,7 +9,10 @@ import { useQueryState } from 'nuqs'
 import { useCallback, useMemo } from 'react'
 
 const EMPTY_COLS: string[] = []
-const COLS_PARSER = FILTER_PARSERS.cols.withDefault(EMPTY_COLS)
+// Left without a default so an absent param reads as null and an empty one as []: nuqs
+// clears a param whose value equals the parser default, which would erase the difference
+// between never having chosen and having hidden every column.
+const COLS_PARSER = FILTER_PARSERS.cols
 
 function isDefaultSet(ids: string[], defaultIds: readonly string[]): boolean {
   if (ids.length !== defaultIds.length) return false
@@ -34,7 +37,7 @@ export function useColumnVisibilityParam(
   const forcedColumns = useMemo(() => resolveVisibleColumns(forcedIds, can), [forcedIds, can])
 
   const visibleColumns = useMemo(() => {
-    const stored = resolveVisibleColumns(cols.length > 0 ? cols : defaultIds, can)
+    const stored = resolveVisibleColumns(cols ?? defaultIds, can)
     for (const id of forcedColumns) stored.add(id)
     return stored
   }, [cols, can, defaultIds, forcedColumns])
