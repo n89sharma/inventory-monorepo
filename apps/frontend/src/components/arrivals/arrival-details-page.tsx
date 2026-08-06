@@ -6,6 +6,7 @@ import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
+import { useAssetComponents } from '@/hooks/use-reference-data'
 import { formatDate } from '@/lib/formatters'
 import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
@@ -28,6 +29,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewSalePrice = useCan('view_sale_price')
   const detail = useArrivalDetail(arrivalNumber)
+  const components = useAssetComponents()
 
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
@@ -40,14 +42,14 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     async (assetId: number) => {
       setEditingAssetId(assetId)
       try {
-        const form = await mutations.getAssetForEdit(arrivalNumber, assetId)
+        const form = await mutations.getAssetForEdit(arrivalNumber, assetId, components)
         setEditingAssetForm(form)
         setIsAssetModalOpen(true)
       } catch {
         setEditingAssetId(null)
       }
     },
-    [mutations, arrivalNumber],
+    [mutations, arrivalNumber, components],
   )
 
   function handleModalOpenChange(open: boolean) {

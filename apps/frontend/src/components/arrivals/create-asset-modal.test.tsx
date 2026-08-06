@@ -1,15 +1,33 @@
 import { useAssetStore } from '@/data/store/asset-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import type { AssetSummary, Error as ReferenceError, ModelSummary, Status } from 'shared-types'
+import type {
+  AssetSummary,
+  Component,
+  Error as ReferenceError,
+  ModelSummary,
+  Status,
+} from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CreateAssetModal } from './create-asset-modal'
 
-const catalog = vi.hoisted(() => ({ models: [] as ModelSummary[] }))
+const catalog = vi.hoisted(() => ({
+  models: [] as ModelSummary[],
+  readinesses: [] as Status[],
+  errorCodes: [] as ReferenceError[],
+  assetComponents: [] as Component[],
+}))
 
 vi.mock('@/hooks/use-model', () => ({
   useModels: () => catalog.models,
   invalidateModels: vi.fn(),
+}))
+
+vi.mock('@/hooks/use-reference-data', () => ({
+  useReadinesses: () => catalog.readinesses,
+  useErrorCodes: () => catalog.errorCodes,
+  useAssetComponents: () => catalog.assetComponents,
+  useCountries: () => [],
+  useCoreFunctions: () => [],
 }))
 
 // A supplies model carries no meter, cassette or consumable fields, so the form
@@ -51,13 +69,9 @@ const SERIAL = 'SN-FIRST'
 
 function seedStores() {
   catalog.models = [MODEL, RICOH_MODEL]
-  useReferenceDataStore.setState({
-    readinesses: [UNTESTED, HAS_ERRORS],
-    countries: [],
-    components: [],
-    coreFunctions: [],
-    errors: [CANON_ERROR],
-  })
+  catalog.readinesses = [UNTESTED, HAS_ERRORS]
+  catalog.errorCodes = [CANON_ERROR]
+  catalog.assetComponents = []
   useAssetStore.setState({ printBarcodes: vi.fn().mockResolvedValue(undefined) })
 }
 

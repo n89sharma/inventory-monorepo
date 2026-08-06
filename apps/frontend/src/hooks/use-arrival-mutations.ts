@@ -21,7 +21,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
-import type { ArrivalDetail, AssetSummary, PatchAssetPricing } from 'shared-types'
+import type { ArrivalDetail, AssetSummary, Component, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: ArrivalForm) {
@@ -50,8 +50,12 @@ async function createAsset(arrivalNumber: string, asset: AssetForm) {
   return created
 }
 
-async function getAssetForEdit(arrivalNumber: string, assetId: number): Promise<AssetForm> {
-  return getArrivalAssetForUpdate(arrivalNumber, assetId)
+async function getAssetForEdit(
+  arrivalNumber: string,
+  assetId: number,
+  components: Component[],
+): Promise<AssetForm> {
+  return getArrivalAssetForUpdate(arrivalNumber, assetId, components)
 }
 
 async function updateAsset(arrivalNumber: string, assetId: number, asset: AssetForm) {

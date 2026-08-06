@@ -1,5 +1,5 @@
 import { getAssetsForDeparted } from '@/data/api/asset-api'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useStatuses } from '@/hooks/use-reference-data'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { toDateParam } from '@/lib/date-param'
 import {
@@ -23,7 +23,7 @@ export type SearchDepartedFilters = AssetFilters & {
 const SEARCH_DEPARTED_KEY = 'search-departed-assets'
 
 export function useSearchDeparted(filters: SearchDepartedFilters) {
-  const allStatuses = useReferenceDataStore((state) => state.statuses)
+  const allStatuses = useStatuses()
   const statuses = resolveDepartedStatuses(filters.showOther, allStatuses)
   const activeWarehouses = useActiveWarehouses()
   const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)

@@ -16,7 +16,7 @@ import { ControlledSearchSelectField } from '@/components/shared/search-select/c
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModels } from '@/hooks/use-model'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useReadinesses, useAssetComponents, useCountries } from '@/hooks/use-reference-data'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import {
   getSpecificationFieldVisibility,
@@ -124,9 +124,9 @@ export function EditSpecsModal({
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
   const models = useModels()
-  const readinesses = useReferenceDataStore((state) => state.readinesses)
-  const countries = useReferenceDataStore((state) => state.countries)
-  const components = useReferenceDataStore((state) => state.components)
+  const readinesses = useReadinesses()
+  const countries = useCountries()
+  const components = useAssetComponents()
 
   const hasOpenError = errors.some((e) => !e.is_fixed)
 

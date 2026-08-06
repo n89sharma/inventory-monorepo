@@ -1,6 +1,6 @@
 import { MultiSelectOptionsInline } from '@/components/shared/search-select/multi-select-options'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useReadinesses } from '@/hooks/use-reference-data'
 import type { Status } from 'shared-types'
 
 export function ReadinessFilter({
@@ -10,7 +10,7 @@ export function ReadinessFilter({
   selection: Status[]
   onSelectionChange: (readinesses: Status[]) => void
 }): React.JSX.Element {
-  const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const readinesses = useReadinesses()
   return (
     <MultiSelectOptionsInline
       selection={selection}

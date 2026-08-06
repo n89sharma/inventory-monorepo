@@ -19,7 +19,7 @@ import { ControlledDatePickerField } from '@/components/shared/date-picker'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useOrgs } from '@/hooks/use-org'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useInvoiceTypes } from '@/hooks/use-reference-data'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -70,7 +70,7 @@ export function InvoiceFormPage({
   onValidSubmit,
 }: InvoiceFormPageProps): React.JSX.Element {
   const orgs = useOrgs()
-  const invoiceTypes = useReferenceDataStore((state) => state.invoiceTypes)
+  const invoiceTypes = useInvoiceTypes()
   const purchaseType = invoiceTypes.find((t) => t.type === INVOICE_TYPE.purchase)
   const today = startOfDay(new Date())
 

@@ -9,7 +9,7 @@ import { MultiSelectOptionsInline } from '@/components/shared/search-select/mult
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useStatuses } from '@/hooks/use-reference-data'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
 import { useSearchAll } from '@/hooks/use-search-all'
@@ -33,7 +33,7 @@ const STATUS_DIVIDER_AFTER = new Set<string>([ASSET_STATUS.HELD, ASSET_STATUS.ON
 const SCOPE_FILTER_GROUPS = [['wh'], ['status']] as const satisfies FilterParamGroups
 
 function useOrderedStatuses(): { options: Status[]; dividerAfterIds: number[] } {
-  const rawStatuses = useReferenceDataStore((state) => state.statuses)
+  const rawStatuses = useStatuses()
   const options = useMemo(() => {
     const filtered = rawStatuses.filter(
       (s) => s.status != ASSET_STATUS.UNKNOWN && s.status != ASSET_STATUS.LEASED,

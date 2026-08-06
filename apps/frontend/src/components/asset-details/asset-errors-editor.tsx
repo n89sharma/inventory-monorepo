@@ -1,6 +1,6 @@
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useErrorCodes } from '@/hooks/use-reference-data'
 import { cn } from '@/lib/utils'
 import { TrashIcon } from '@phosphor-icons/react'
 import { useState, type ReactNode } from 'react'
@@ -73,7 +73,7 @@ export function AssetErrorsEditor({
   statusToggleable = true,
   renderSearch,
 }: AssetErrorsEditorProps) {
-  const allErrors = useReferenceDataStore((state) => state.errors)
+  const allErrors = useErrorCodes()
   const [query, setQuery] = useState('')
 
   const selectedIds = new Set(value.map((e) => e.error_id))

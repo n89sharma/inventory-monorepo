@@ -1,5 +1,5 @@
 import { MultiSelectOptionsInline } from '@/components/shared/search-select/multi-select-options'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useAssetTypes } from '@/hooks/use-reference-data'
 import type { AssetType } from 'shared-types'
 
 export function AssetTypeFilter({
@@ -9,7 +9,7 @@ export function AssetTypeFilter({
   selection: AssetType[]
   onSelectionChange: (assetTypes: AssetType[]) => void
 }): React.JSX.Element {
-  const allAssetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const allAssetTypes = useAssetTypes()
 
   return (
     <MultiSelectOptionsInline

@@ -19,7 +19,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/shadcn/sidebar'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useBrands } from '@/hooks/use-reference-data'
 import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -150,7 +150,7 @@ export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const defaultWarehouse = useProfileDefaultWarehouse()
 
-  const brands = useReferenceDataStore((state) => state.brands)
+  const brands = useBrands()
   const defaultBrand = useMemo(
     () => brands.find((b) => b.name === DEFAULT_BRAND_NAME) ?? null,
     [brands],

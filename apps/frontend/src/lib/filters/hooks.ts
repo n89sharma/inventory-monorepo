@@ -1,6 +1,13 @@
 import { useModels } from '@/hooks/use-model'
 import { useOrgs } from '@/hooks/use-org'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import {
+  useAssetTypes,
+  useBrands,
+  useStatuses,
+  useReadinesses,
+  useWarehouses,
+  useAssetComponents,
+} from '@/hooks/use-reference-data'
 import { useUsers } from '@/hooks/use-user'
 import {
   DEFAULT_COLLECTION_RANGE_DAYS,
@@ -174,7 +181,7 @@ function useDebouncedNumberParam(key: string): [number | null, (next: number | n
 }
 
 export function useWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void] {
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const warehouses = useWarehouses()
   return useIdListParam('wh', warehouses)
 }
 
@@ -218,27 +225,27 @@ export function useAssetFilters(): AssetFilters {
 }
 
 export function useReadinessesParam(): [Status[], (next: Status[]) => void] {
-  const readinesses = useReferenceDataStore((state) => state.readinesses)
+  const readinesses = useReadinesses()
   return useDebouncedIdListParam('readiness', readinesses)
 }
 
 export function useAssetTypesParam(): [AssetType[], (next: AssetType[]) => void] {
-  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const assetTypes = useAssetTypes()
   return useDebouncedIdListParam('type', assetTypes)
 }
 
 export function useStatusesParam(): [Status[], (next: Status[]) => void] {
-  const statuses = useReferenceDataStore((state) => state.statuses)
+  const statuses = useStatuses()
   return useDebouncedIdListParam('status', statuses)
 }
 
 export function useBrandParam(): [Brand | null, (next: Brand | null) => void] {
-  const brands = useReferenceDataStore((state) => state.brands)
+  const brands = useBrands()
   return useIdParam('brand', brands)
 }
 
 export function useInternalFinisherParam(): [Component | null, (next: Component | null) => void] {
-  const components = useReferenceDataStore((state) => state.components)
+  const components = useAssetComponents()
   return useIdParam('fin', components)
 }
 
@@ -276,7 +283,7 @@ export function useOriginOptionParam(): [
   SelectOption<Warehouse>,
   (next: SelectOption<Warehouse>) => void,
 ] {
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const warehouses = useWarehouses()
   return useSelectOptionIdParam('origin', warehouses)
 }
 
@@ -284,7 +291,7 @@ export function useDestinationOptionParam(): [
   SelectOption<Warehouse>,
   (next: SelectOption<Warehouse>) => void,
 ] {
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const warehouses = useWarehouses()
   return useSelectOptionIdParam('dest', warehouses)
 }
 
@@ -459,7 +466,7 @@ export function useInvoiceTypeParam(): [InvoiceTypeFilter, (next: InvoiceTypeFil
 }
 
 export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void] {
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
+  const warehouses = useWarehouses()
   return useIdListParam('warehouse', warehouses)
 }
 

@@ -6,7 +6,7 @@ import { ExclusiveOptionsFilter } from '@/components/shared/filters/exclusive-op
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { daysHeld } from '@/components/table-columns/asset-search-columns'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useStatuses } from '@/hooks/use-reference-data'
 import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useSearchOnHand } from '@/hooks/use-search-onhand'
@@ -49,7 +49,7 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
 
 // Ordered by ON_HAND_STATUS_VALUES rather than by the reference-data store.
 function useOnHandStatuses(): Status[] {
-  const statuses = useReferenceDataStore((state) => state.statuses)
+  const statuses = useStatuses()
   return useMemo(
     () =>
       ON_HAND_STATUS_VALUES.map((value) => statuses.find((s) => s.status === value)).filter(

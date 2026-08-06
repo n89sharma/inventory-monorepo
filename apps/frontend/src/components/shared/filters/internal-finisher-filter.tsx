@@ -1,5 +1,5 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useAssetComponents } from '@/hooks/use-reference-data'
 import { componentLabel } from '@/lib/reference-labels'
 import { useState } from 'react'
 import type { Component } from 'shared-types'
@@ -14,7 +14,7 @@ export function InternalFinisherFilter({
   onClear: () => void
 }): React.JSX.Element {
   const [query, setQuery] = useState('')
-  const allComponents = useReferenceDataStore((state) => state.components)
+  const allComponents = useAssetComponents()
   return (
     <SearchSelectInput
       selection={selection}

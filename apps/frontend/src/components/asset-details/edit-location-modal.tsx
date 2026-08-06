@@ -17,7 +17,7 @@ import {
 } from '@/components/shadcn/select'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useWarehouses, useZones } from '@/hooks/use-reference-data'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { useWarehouseLocations } from '@/hooks/use-locations'
@@ -51,8 +51,8 @@ function filterBinInput(val: string): string {
 
 export function EditLocationModal({ open, onOpenChange, assetDetails }: EditLocationModalProps) {
   const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
-  const warehouses = useReferenceDataStore((state) => state.warehouses)
-  const zones = useReferenceDataStore((state) => state.zones)
+  const warehouses = useWarehouses()
+  const zones = useZones()
   const activeWarehouses = useActiveWarehouses()
 
   const values = useMemo<LocationForm>(

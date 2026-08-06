@@ -4,13 +4,11 @@ import { PostLoginLanding } from '@/components/app-layout/post-login-landing'
 import { ProtectedRoute } from '@/components/app-layout/protected-route'
 import { ErrorFallback } from '@/components/shared/error-fallback'
 import { PermissionRoute } from '@/components/shared/permission-route'
-import { useAuth } from '@clerk/react'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { lazy, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAxiosAuth } from './hooks/use-axios-auth'
-import { useGlobalData } from './hooks/use-global-data'
 
 const LoginPage = lazy(() =>
   import('./components/app-layout/login-page').then((m) => ({ default: m.LoginPage })),
@@ -517,8 +515,6 @@ function AppRoutes() {
 
 function App() {
   useAxiosAuth()
-  const { isSignedIn, isLoaded } = useAuth()
-  useGlobalData(isLoaded && !!isSignedIn)
 
   return (
     <BrowserRouter>

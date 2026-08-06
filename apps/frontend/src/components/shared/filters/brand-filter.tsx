@@ -1,5 +1,5 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useBrands } from '@/hooks/use-reference-data'
 import { useState } from 'react'
 import type { Brand } from 'shared-types'
 
@@ -12,7 +12,7 @@ export function BrandFilter({
   onSelectionChange: (brand: Brand) => void
   onClear: () => void
 }): React.JSX.Element {
-  const allBrands = useReferenceDataStore((state) => state.brands)
+  const allBrands = useBrands()
   const [query, setQuery] = useState('')
 
   return (

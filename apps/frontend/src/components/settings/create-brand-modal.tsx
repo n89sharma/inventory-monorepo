@@ -1,4 +1,4 @@
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useBrandMutations } from '@/hooks/use-brand-mutations'
 import { flattenFieldErrors } from '@/lib/utils'
 import { BrandFormSchema, type BrandForm } from '@/ui-types/brand-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,7 +30,7 @@ export function CreateBrandModal({ open, onOpenChange }: CreateBrandModalProps):
 function CreateBrandFormBody({
   onOpenChange,
 }: Pick<CreateBrandModalProps, 'onOpenChange'>): React.JSX.Element {
-  const createBrand = useReferenceDataStore((state) => state.createBrand)
+  const { createBrand } = useBrandMutations()
 
   const form = useForm<BrandForm>({
     resolver: zodResolver(BrandFormSchema),

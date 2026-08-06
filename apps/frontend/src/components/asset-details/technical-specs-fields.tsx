@@ -10,7 +10,12 @@ import { HorizontalField } from '@/components/shared/horizontal-field'
 import { InputWithClearInline } from '@/components/shared/input-with-clear'
 import { ReadinessPicker } from '@/components/shared/readiness/readiness-picker'
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import {
+  useCoreFunctions,
+  useReadinesses,
+  useAssetComponents,
+  useCountries,
+} from '@/hooks/use-reference-data'
 import type { SpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
 import { formatTitleCase } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
@@ -234,7 +239,7 @@ function ControlledComponentSearch<T extends FieldValues>({
   brandId: number | null
   className?: string
 }) {
-  const components = useReferenceDataStore((state) => state.components)
+  const components = useAssetComponents()
   const [query, setQuery] = useState('')
   const options = useMemo(
     () => (brandId ? components.filter((c) => c.brand_id === brandId) : components),
@@ -299,9 +304,9 @@ export function TechnicalSpecsFields<T extends FieldValues>({
   renderAfterReadiness,
   onReadinessChange,
 }: TechnicalSpecsFieldsProps<T>) {
-  const readinesses = useReferenceDataStore((state) => state.readinesses)
-  const countries = useReferenceDataStore((state) => state.countries)
-  const coreFunctions = useReferenceDataStore((state) => state.coreFunctions)
+  const readinesses = useReadinesses()
+  const countries = useCountries()
+  const coreFunctions = useCoreFunctions()
   const selectableCoreFunctions = useMemo(
     () => coreFunctions.filter((c) => !EXCLUDED_CORE_FUNCTIONS.includes(c.accessory)),
     [coreFunctions],

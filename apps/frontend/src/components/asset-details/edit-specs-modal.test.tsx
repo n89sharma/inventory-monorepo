@@ -1,6 +1,5 @@
 import { modelLabel } from '@/lib/reference-labels'
 import { useAssetStore } from '@/data/store/asset-store'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type {
   AssetDetails,
@@ -16,11 +15,23 @@ import { EditSpecsModal } from './edit-specs-modal'
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
-const catalog = vi.hoisted(() => ({ models: [] as ModelSummary[] }))
+const catalog = vi.hoisted(() => ({
+  models: [] as ModelSummary[],
+  readinesses: [] as Status[],
+  assetComponents: [] as Component[],
+}))
 
 vi.mock('@/hooks/use-model', () => ({
   useModels: () => catalog.models,
   invalidateModels: vi.fn(),
+}))
+
+vi.mock('@/hooks/use-reference-data', () => ({
+  useReadinesses: () => catalog.readinesses,
+  useAssetComponents: () => catalog.assetComponents,
+  useCountries: () => [],
+  useCoreFunctions: () => [],
+  useErrorCodes: () => [],
 }))
 
 // Four models over two brands: everything the modal derives — applicable fields,
@@ -124,13 +135,8 @@ type UpdateAssetSpecsFn = (barcode: string, data: UpdateAssetSpecs) => Promise<v
 
 function seedStores(updateAssetSpecs: UpdateAssetSpecsFn) {
   catalog.models = MODELS
-  useReferenceDataStore.setState({
-    readinesses: [UNTESTED, HAS_ERRORS, PP_OK],
-    countries: [],
-    components: [CANON_FINISHER],
-    coreFunctions: [],
-    errors: [],
-  })
+  catalog.readinesses = [UNTESTED, HAS_ERRORS, PP_OK]
+  catalog.assetComponents = [CANON_FINISHER]
   useAssetStore.setState({ updateAssetSpecs })
 }
 

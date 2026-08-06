@@ -1,4 +1,4 @@
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useAssetTypes, useBrands } from '@/hooks/use-reference-data'
 import { useModelMutations } from '@/hooks/use-model-mutations'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ModelFormSchema, type ModelForm } from '@/ui-types/model-form-types'
@@ -48,8 +48,8 @@ export function CreateModelModal({ open, onOpenChange }: CreateModelModalProps):
 function CreateModelFormBody({
   onOpenChange,
 }: Pick<CreateModelModalProps, 'onOpenChange'>): React.JSX.Element {
-  const brands = useReferenceDataStore((state) => state.brands)
-  const assetTypes = useReferenceDataStore((state) => state.assetTypes)
+  const brands = useBrands()
+  const assetTypes = useAssetTypes()
   const { createModel } = useModelMutations()
 
   const form = useForm<ModelForm>({

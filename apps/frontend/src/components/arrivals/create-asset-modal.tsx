@@ -1,6 +1,6 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModels } from '@/hooks/use-model'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useReadinesses, useErrorCodes } from '@/hooks/use-reference-data'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { getSpecificationFieldVisibility } from '@/lib/asset-spec-applicability'
 import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
@@ -90,8 +90,8 @@ export function CreateAssetModal({
     submitLabel: isEditMode ? 'Update Asset' : 'Save Asset',
   }
 
-  const readinesses = useReferenceDataStore((state) => state.readinesses)
-  const allErrors = useReferenceDataStore((state) => state.errors)
+  const readinesses = useReadinesses()
+  const allErrors = useErrorCodes()
   const models = useModels()
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
 

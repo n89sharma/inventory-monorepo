@@ -1,6 +1,5 @@
 import { api } from '@/data/api/axios-client'
 import { toDateParam } from '@/lib/date-param'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import {
   type SelectOption,
@@ -14,6 +13,7 @@ import type {
   AssetDelta,
   AssetSummary,
   CollectionHistory,
+  Component,
   CreateArrival,
   CreateAsset,
   MoveArrivalAssets,
@@ -161,12 +161,13 @@ export async function createSingleArrivalAsset(
 export async function getArrivalAssetForUpdate(
   arrivalNumber: string,
   assetId: number,
+  components: Component[],
 ): Promise<AssetForm> {
   const { data } = await api.get<UpdateAsset>(`/arrivals/${arrivalNumber}/assets/${assetId}/edit`)
-  return mapUpdateAssetToAssetForm(UpdateAssetSchema.parse(data))
+  return mapUpdateAssetToAssetForm(UpdateAssetSchema.parse(data), components)
 }
 
-function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
+function mapUpdateAssetToAssetForm(asset: UpdateAsset, components: Component[]): AssetForm {
   return {
     id: asset.id,
     model: asset.model,
@@ -177,8 +178,7 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset): AssetForm {
     readiness: getSelectOption(asset.readiness),
     countryOfOrigin: asset.countryOfOrigin,
     manufacturedYear: asset.manufacturedYear,
-    component:
-      useReferenceDataStore.getState().components.find((c) => c.id === asset.componentId) ?? null,
+    component: components.find((c) => c.id === asset.componentId) ?? null,
     coreFunctions: asset.coreFunctions,
     drumLifeC: asset.drumLifeC,
     drumLifeM: asset.drumLifeM,

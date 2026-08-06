@@ -5,7 +5,7 @@ import {
   resolveWarehouseScope,
   type AssetFilters,
 } from '@/lib/filters/hooks'
-import { useReferenceDataStore } from '@/data/store/reference-data-store'
+import { useStatuses } from '@/hooks/use-reference-data'
 import type { AssetSearchRow, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
@@ -17,7 +17,7 @@ const SEARCH_HARVESTED_KEY = 'search-harvested-assets'
 
 export function useSearchHarvested(filters: SearchHarvestedFilters) {
   const activeWarehouses = useActiveWarehouses()
-  const allStatuses = useReferenceDataStore((state) => state.statuses)
+  const allStatuses = useStatuses()
   const warehouses = resolveWarehouseScope(filters.warehouses, activeWarehouses)
   const statuses = resolveHarvestedStatuses(allStatuses)
 
