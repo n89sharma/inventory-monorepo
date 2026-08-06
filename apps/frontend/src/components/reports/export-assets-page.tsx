@@ -11,10 +11,11 @@ import { InlineWarning } from '@/components/shared/inline-warning'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
 import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { CopyIcon, SpinnerGapIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 
@@ -92,12 +93,7 @@ function NotFoundSerialNumbersBanner({
 
 export function ExportAssetsPage(): React.JSX.Element {
   const [text, setText] = useState('')
-  const [debouncedText, setDebouncedText] = useState('')
-
-  useEffect(() => {
-    const id = setTimeout(() => setDebouncedText(text), DEBOUNCE_MS)
-    return () => clearTimeout(id)
-  }, [text])
+  const debouncedText = useDebouncedValue(text, DEBOUNCE_MS)
 
   const { serialNumbers, enteredCount, duplicateCount } = useMemo(
     () => parseSerialNumbers(debouncedText),

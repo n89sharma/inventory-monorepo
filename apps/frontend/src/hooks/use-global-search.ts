@@ -1,5 +1,5 @@
 import { getGlobalSearchResults } from '@/data/api/search-api'
-import { useEffect, useState } from 'react'
+import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import type { GlobalSearchResult, SearchEntityType } from 'shared-types'
 import useSWR from 'swr'
 
@@ -23,12 +23,7 @@ export function useGlobalSearch(
   query: string,
   types?: SearchEntityType[],
 ): { results: GlobalSearchResult; isLoading: boolean } {
-  const [debouncedQuery, setDebouncedQuery] = useState(query)
-
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedQuery(query), SEARCH_DEBOUNCE_MS)
-    return () => clearTimeout(t)
-  }, [query])
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS)
 
   const { data, isValidating } = useSWR<GlobalSearchResult>(
     debouncedQuery ? [GLOBAL_SEARCH_KEY, debouncedQuery, types] : null,
