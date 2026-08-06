@@ -138,6 +138,11 @@ describe('asset-search report columns', () => {
     expect(header.split(',')).toEqual(liveColumns.map(headerLabel))
   })
 
+  it('exports the always-visible columns even when the viewer chose none', () => {
+    const { header } = csvFor(makeRow(), [])
+    expect(header.split(',')).toEqual(['Barcode', 'Model'])
+  })
+
   it('writes the full header row', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(

@@ -541,6 +541,16 @@ export function userCanToggleColumn(
   return !isAlwaysVisible && userCanViewColumn
 }
 
+// The columns on screen, in declaration order: the ones drawn unconditionally plus the
+// ones the viewer chose. What the CSV export writes, so the file matches the table.
+export function orderedVisibleColumns(visibleColumns: Set<string>): readonly AssetSearchColumn[] {
+  return ASSET_SEARCH_COLUMNS.filter((column) => {
+    const isAlwaysVisible = column.alwaysVisible ?? false
+    const userChoseColumn = visibleColumns.has(column.id)
+    return isAlwaysVisible || userChoseColumn
+  })
+}
+
 // Filters a stored/shared set of column ids down to what the current viewer may see:
 // drops unknown ids (columns removed since the view was saved) and permission-gated
 // columns the viewer lacks. Applied when restoring a saved view.
