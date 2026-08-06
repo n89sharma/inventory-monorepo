@@ -23,7 +23,6 @@ const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 // column picker, so hide it explicitly.
 const ASSET_COLUMN_VISIBILITY = { created_at: false }
 const getAssetRowId = (asset: AssetSummary) => asset.barcode
-const EMPTY_ROW_IDS: string[] = []
 const EMPTY_ASSETS: AssetSummary[] = []
 
 interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
@@ -88,7 +87,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const { search } = useLocation()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [filteredRowIds, setFilteredRowIds] = useState<string[]>(EMPTY_ROW_IDS)
   const [copiersOnly, setCopiersOnly] = useState(false)
 
   const assetHref = useMemo(
@@ -97,8 +95,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   )
   const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
 
-  // Memoised because DataTable reports its filtered row ids from an effect keyed on `data`;
-  // a fresh array each render would loop that effect against the state it sets.
   const assets = detail.data?.assets
   const visibleAssets = useMemo(() => {
     if (!assets) return EMPTY_ASSETS
@@ -123,8 +119,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
 
   const selectedAssets = entity.assets.filter((asset) => rowSelection[asset.barcode])
   const clearSelection = () => setRowSelection({})
-  const selectAllFiltered = () =>
-    setRowSelection(Object.fromEntries(filteredRowIds.map((id) => [id, true])))
+  const selectAll = (rowIds: string[]) =>
+    setRowSelection(Object.fromEntries(rowIds.map((id) => [id, true])))
 
   const header = renderTitle
     ? renderTitle(entity)
@@ -166,21 +162,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           onOpenChange: setIsMetadataModalOpen,
         })}
         {renderAddAssetBar?.(entity)}
-        <BulkEditBar
-          selectedAssets={selectedAssets}
-          onClear={clearSelection}
-          refreshKey={refreshKey}
-          currentCollectionType={section}
-          returnTo={`/${section}/${collectionId}`}
-          onBulkRemove={onBulkRemove}
-          totalCount={filteredRowIds.length}
-          hiddenCount={entity.assets.length - filteredRowIds.length}
-          onSelectAll={selectAllFiltered}
-          extraActions={renderBulkExtraActions?.({
-            selectedAssets,
-            clearSelection,
-          })}
-        />
         <DataTable
           columns={columns}
           data={visibleAssets}
@@ -212,7 +193,26 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           )}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onFilteredRowIdsChange={setFilteredRowIds}
+          renderAboveTable={(table) => {
+            const filteredRowIds = table.getFilteredRowModel().rows.map((row) => row.id)
+            return (
+              <BulkEditBar
+                selectedAssets={selectedAssets}
+                onClear={clearSelection}
+                refreshKey={refreshKey}
+                currentCollectionType={section}
+                returnTo={`/${section}/${collectionId}`}
+                onBulkRemove={onBulkRemove}
+                totalCount={filteredRowIds.length}
+                hiddenCount={entity.assets.length - filteredRowIds.length}
+                onSelectAll={() => selectAll(filteredRowIds)}
+                extraActions={renderBulkExtraActions?.({
+                  selectedAssets,
+                  clearSelection,
+                })}
+              />
+            )
+          }}
           onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
           getRowHref={assetHref}
           getRowId={getAssetRowId}

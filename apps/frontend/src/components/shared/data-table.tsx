@@ -61,9 +61,7 @@ interface DataTableProps<TData, TValue> {
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
-  // Row ids surviving the column filters, in filtered order. Reported because the
-  // filter state lives in here; the caller owns rowSelection and derives the rest.
-  onFilteredRowIdsChange?: (rowIds: string[]) => void
+  renderAboveTable?: (table: ReactTableInstance<TData>) => React.ReactNode
   // Faceting walks the filtered rows once per column to collect distinct values, so it
   // is only wired up by tables that render a facet-driven filter.
   facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
@@ -117,7 +115,7 @@ export function DataTable<TData, TValue>({
   getSubRows,
   columnVisibility,
   renderTableFilter,
-  onFilteredRowIdsChange,
+  renderAboveTable,
   facetedRowModels,
   meta,
 }: DataTableProps<TData, TValue>) {
@@ -176,11 +174,6 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  useEffect(() => {
-    if (!onFilteredRowIdsChange) return
-    onFilteredRowIdsChange(table.getFilteredRowModel().rows.map((row) => row.id))
-  }, [onFilteredRowIdsChange, table, columnFilters, data])
-
   const { pageIndex, pageSize } = table.getState().pagination
   const totalRows = table.getFilteredRowModel().rows.length
   const hasFooter = table
@@ -192,6 +185,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      {renderAboveTable?.(table)}
       <div className="overflow-hidden rounded-md border">
         {renderTableFilter && (
           <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
