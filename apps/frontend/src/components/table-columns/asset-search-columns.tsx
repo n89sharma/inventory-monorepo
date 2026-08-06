@@ -529,6 +529,18 @@ export function canViewColumn(
   return column.permissions?.every((permission) => can(permission)) ?? true
 }
 
+// The columns whose visibility the viewer decides: the ones they may see, minus the ones
+// shown unconditionally. Answers both "what does the picker list" and "what does the
+// visibility map hold".
+export function userCanToggleColumn(
+  column: AssetSearchColumn,
+  can: (permission: Permission) => boolean,
+): boolean {
+  const isAlwaysVisible = column.alwaysVisible ?? false
+  const userCanViewColumn = canViewColumn(column, can)
+  return !isAlwaysVisible && userCanViewColumn
+}
+
 // Filters a stored/shared set of column ids down to what the current viewer may see:
 // drops unknown ids (columns removed since the view was saved) and permission-gated
 // columns the viewer lacks. Applied when restoring a saved view.

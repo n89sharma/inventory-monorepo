@@ -3,7 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/pop
 import { useCan } from '@/hooks/use-can'
 import {
   ASSET_SEARCH_COLUMNS,
-  canViewColumn,
+  userCanToggleColumn,
   type AssetSearchColumn,
 } from '@/components/table-columns/asset-search-columns'
 import { ColumnsIcon } from '@phosphor-icons/react'
@@ -23,7 +23,7 @@ export function ColumnPickerButton({
 }: ColumnPickerButtonProps): React.JSX.Element {
   const can = useCan()
   const permittedColumns = useMemo<readonly AssetSearchColumn[]>(
-    () => ASSET_SEARCH_COLUMNS.filter((c) => !c.alwaysVisible && canViewColumn(c, can)),
+    () => ASSET_SEARCH_COLUMNS.filter((column) => userCanToggleColumn(column, can)),
     [can],
   )
   const visibleCount = permittedColumns.filter((c) => visible.has(c.id)).length

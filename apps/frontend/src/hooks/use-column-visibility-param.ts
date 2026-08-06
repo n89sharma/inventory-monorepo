@@ -1,6 +1,7 @@
 import {
   ASSET_SEARCH_COLUMNS,
   resolveVisibleColumns,
+  userCanToggleColumn,
 } from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
@@ -51,14 +52,17 @@ export function useColumnVisibilityParam(
     [setCols, defaultIds, forcedColumns],
   )
 
+  // Only the columns the viewer decides on: an always-visible one has nothing to store,
+  // and a column they may not see is not built, so a key for it would name nothing.
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
     for (const column of ASSET_SEARCH_COLUMNS) {
-      if (column.alwaysVisible) continue
-      out[column.id] = visibleColumns.has(column.id)
+      if (userCanToggleColumn(column, can)) {
+        out[column.id] = visibleColumns.has(column.id)
+      }
     }
     return out
-  }, [visibleColumns])
+  }, [visibleColumns, can])
 
   // The table writes through the same param the picker does, so column.toggleVisibility()
   // and the picker cannot disagree. Only ids this hook already tracks are kept, so a

@@ -69,11 +69,17 @@ describe('useColumnVisibilityParam', () => {
     expect(result.current.visibleColumns.has(PURCHASE_COST_ID)).toBe(true)
   })
 
+  // The column is not built for this viewer, so a key for it would name nothing.
   it('keeps a forced column hidden when the viewer lacks its permission', () => {
     mocks.role = 'member'
     const { result } = renderWithParams('?cols=', undefined, [PURCHASE_COST_ID])
     expect(result.current.visibleColumns.has(PURCHASE_COST_ID)).toBe(false)
-    expect(result.current.columnVisibility[PURCHASE_COST_ID]).toBe(false)
+    expect(result.current.columnVisibility).not.toHaveProperty(PURCHASE_COST_ID)
+  })
+
+  it('keeps a column the viewer may see in the visibility map', () => {
+    const { result } = renderWithParams('?cols=', undefined, [PURCHASE_COST_ID])
+    expect(result.current.columnVisibility[PURCHASE_COST_ID]).toBe(true)
   })
 
   it('writes the param when the table hides a column through the change handler', async () => {
