@@ -20,6 +20,8 @@ const allows =
   (granted: readonly Permission[]) =>
   (permission: Permission): boolean =>
     granted.includes(permission)
+const allowsEverything = (): boolean => true
+const COST_PERMISSIONS = ['view_purchase_price', 'view_sale_price'] as const satisfies Permission[]
 // Frozen so the stock_days and days_held columns, which count from today, are deterministic.
 const NOW = new Date(2026, 6, 27)
 
@@ -44,7 +46,7 @@ function headerLabel(column: ColumnDef<AssetSearchRow>): string {
 }
 
 function liveColumnIds(): string[] {
-  return createSearchPageColumns(noHref).map(columnId)
+  return createSearchPageColumns(noHref, allowsEverything).map(columnId)
 }
 
 function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: string } {
@@ -57,7 +59,7 @@ function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: str
 function sortedBarcodes(rows: AssetSearchRow[], columnId: string, desc = false): string[] {
   const table = createTable<AssetSearchRow>({
     data: rows,
-    columns: createSearchPageColumns(noHref),
+    columns: createSearchPageColumns(noHref, allowsEverything),
     state: { sorting: [{ id: columnId, desc }] },
     onStateChange: () => {},
     renderFallbackValue: null,
@@ -131,7 +133,7 @@ afterEach(() => {
 
 describe('asset-search report columns', () => {
   it('exports one CSV column per live table column, in table order', () => {
-    const liveColumns = createSearchPageColumns(noHref)
+    const liveColumns = createSearchPageColumns(noHref, allowsEverything)
     const { header } = csvFor(makeRow(), liveColumns.map(columnId))
     expect(header.split(',')).toEqual(liveColumns.map(headerLabel))
   })
@@ -402,6 +404,20 @@ describe('margin columns', () => {
 describe('asset search columns', () => {
   it('renders the table in the order the columns are declared', () => {
     expect(liveColumnIds()).toEqual(ASSET_SEARCH_COLUMNS.map((c) => c.id))
+  })
+
+  // Not built at all rather than built and hidden: a forced or shared column id cannot
+  // resolve to a column the viewer may not see if the column is not there.
+  it('leaves the columns the viewer may not see out of the table entirely', () => {
+    const gatedIds = ASSET_SEARCH_COLUMNS.filter((c) => c.permissions).map((c) => c.id)
+    expect(gatedIds.length).toBeGreaterThan(0)
+
+    expect(createSearchPageColumns(noHref, allows([])).map(columnId)).toEqual(
+      ASSET_SEARCH_COLUMNS.filter((c) => !c.permissions).map((c) => c.id),
+    )
+    expect(createSearchPageColumns(noHref, allows(COST_PERMISSIONS)).map(columnId)).toEqual(
+      ASSET_SEARCH_COLUMNS.map((c) => c.id),
+    )
   })
 
   it('marks exactly barcode and model always visible', () => {

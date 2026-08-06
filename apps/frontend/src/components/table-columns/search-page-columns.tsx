@@ -1,7 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import type { AssetSearchRow } from 'shared-types'
+import type { AssetSearchRow, Permission } from 'shared-types'
 import {
   ASSET_SEARCH_COLUMNS,
+  canViewColumn,
   type AssetCellContext,
   type AssetSearchColumn,
 } from './asset-search-columns'
@@ -23,9 +24,14 @@ function toColumnDef(
   }
 }
 
+// A column the viewer may not see is never built, so it cannot be sorted on, exported, or
+// turned back on from the URL — visibility state is left to express what the viewer chose.
 export function createSearchPageColumns(
   detailHref: (row: AssetSearchRow) => string,
+  can: (permission: Permission) => boolean,
 ): ColumnDef<AssetSearchRow>[] {
   const context = { detailHref }
-  return ASSET_SEARCH_COLUMNS.map((column) => toColumnDef(column, context))
+  return ASSET_SEARCH_COLUMNS.filter((column) => canViewColumn(column, can)).map((column) =>
+    toColumnDef(column, context),
+  )
 }

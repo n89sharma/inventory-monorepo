@@ -5,6 +5,7 @@ import {
 } from '@/components/table-columns/column-primitives'
 import { DataTable } from '@/components/shared/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
+import { useCan } from '@/hooks/use-can'
 import type {
   OnChangeFn,
   RowSelectionState,
@@ -65,9 +66,10 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   sorting?: SortingState
   onSortingChange?: OnChangeFn<SortingState>
 }) {
+  const can = useCan()
   const columns = useMemo(
-    () => [createSelectColumn<AssetSearchRow>(), ...createSearchPageColumns(getRowHref)],
-    [getRowHref],
+    () => [createSelectColumn<AssetSearchRow>(), ...createSearchPageColumns(getRowHref, can)],
+    [getRowHref, can],
   )
 
   const selectedAssets: AssetSummary[] = assets
