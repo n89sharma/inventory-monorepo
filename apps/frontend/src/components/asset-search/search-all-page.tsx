@@ -11,7 +11,7 @@ import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useStatuses } from '@/hooks/use-reference-data'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
-import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
+import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import { useSearchAll } from '@/hooks/use-search-all'
 import {
   useAssetFilters,
@@ -84,7 +84,7 @@ export function SearchAllPage(): React.JSX.Element {
     columnVisibility,
     onColumnVisibilityChange,
     reset: resetColumns,
-  } = useColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
+  } = useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST.all)
 
   const { options: statusOptions, dividerAfterIds: statusDividerAfterIds } = useOrderedStatuses()
 

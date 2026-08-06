@@ -2,6 +2,7 @@ import {
   ASSET_SEARCH_COLUMNS,
   resolveVisibleColumns,
   userCanToggleColumn,
+  type AssetColumnId,
 } from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
@@ -9,21 +10,21 @@ import type { OnChangeFn, VisibilityState } from '@tanstack/react-table'
 import { useQueryState } from 'nuqs'
 import { useCallback, useMemo } from 'react'
 
-const EMPTY_COLS: string[] = []
+const EMPTY_COLS: AssetColumnId[] = []
 // Left without a default so an absent param reads as null and an empty one as []: nuqs
 // clears a param whose value equals the parser default, which would erase the difference
 // between never having chosen and having hidden every column.
 const COLS_PARSER = FILTER_PARSERS.cols
 
-function isDefaultSet(ids: string[], defaultIds: readonly string[]): boolean {
+function isDefaultSet(ids: string[], defaultIds: readonly AssetColumnId[]): boolean {
   if (ids.length !== defaultIds.length) return false
-  const defaults = new Set(defaultIds)
+  const defaults = new Set<string>(defaultIds)
   return ids.every((id) => defaults.has(id))
 }
 
-export function useColumnVisibilityParam(
-  defaultIds: readonly string[],
-  forcedIds: readonly string[] = EMPTY_COLS,
+export function useAssetColumnVisibilityParam(
+  defaultIds: readonly AssetColumnId[],
+  forcedIds: readonly AssetColumnId[] = EMPTY_COLS,
 ): {
   visibleColumns: Set<string>
   setVisibleColumns: (columns: Set<string>) => void

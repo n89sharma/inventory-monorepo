@@ -6,8 +6,11 @@ import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
-import { DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST } from '@/components/table-columns/asset-search-columns'
-import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
+import {
+  DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
+  type AssetColumnId,
+} from '@/components/table-columns/asset-search-columns'
+import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
@@ -38,7 +41,7 @@ export function AssetSearchPage({
   onBulkPriceSave: () => void
   defaultSort?: { id: string; desc: boolean }
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
-  forceVisibleColumnIds?: readonly string[]
+  forceVisibleColumnIds?: readonly AssetColumnId[]
   summaryStrip?: React.ReactNode
   children: React.ReactNode
 }): React.JSX.Element {
@@ -49,7 +52,7 @@ export function AssetSearchPage({
     columnVisibility,
     onColumnVisibilityChange,
     reset: resetColumns,
-  } = useColumnVisibilityParam(
+  } = useAssetColumnVisibilityParam(
     DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext],
     forceVisibleColumnIds,
   )

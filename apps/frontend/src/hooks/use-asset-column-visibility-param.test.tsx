@@ -1,11 +1,12 @@
-import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
+import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AppRole } from 'shared-types'
+import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 
-const DEFAULT_IDS = ['serial_number', 'status']
-const PURCHASE_COST_ID = 'cost_purchase_cost'
+const DEFAULT_IDS = ['serial_number', 'status'] as const satisfies readonly AssetColumnId[]
+const PURCHASE_COST_ID = 'cost_purchase_cost' satisfies AssetColumnId
 
 const mocks = vi.hoisted(() => ({ role: 'admin' as AppRole }))
 
@@ -14,9 +15,9 @@ vi.mock('@/hooks/use-role', () => ({ useRole: () => mocks.role }))
 function renderWithParams(
   searchParams: string,
   onUrlUpdate?: (event: UrlUpdateEvent) => void,
-  forcedIds?: readonly string[],
+  forcedIds?: readonly AssetColumnId[],
 ) {
-  return renderHook(() => useColumnVisibilityParam(DEFAULT_IDS, forcedIds), {
+  return renderHook(() => useAssetColumnVisibilityParam(DEFAULT_IDS, forcedIds), {
     wrapper: ({ children }) => (
       <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
         {children}
@@ -29,7 +30,7 @@ beforeEach(() => {
   mocks.role = 'admin'
 })
 
-describe('useColumnVisibilityParam', () => {
+describe('useAssetColumnVisibilityParam', () => {
   it('falls back to the defaults when the param is absent', () => {
     const { result } = renderWithParams('')
     expect([...result.current.visibleColumns].sort()).toEqual([...DEFAULT_IDS].sort())

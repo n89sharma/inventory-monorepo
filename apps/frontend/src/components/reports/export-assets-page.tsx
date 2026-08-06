@@ -10,7 +10,7 @@ import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { InlineWarning } from '@/components/shared/inline-warning'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
 import { useAssetsBySerialNumber } from '@/hooks/use-assets-by-serial-number'
-import { useColumnVisibilityParam } from '@/hooks/use-column-visibility-param'
+import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { CopyIcon, SpinnerGapIcon } from '@phosphor-icons/react'
@@ -105,7 +105,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   const notFound = data?.notFound ?? EMPTY_NOT_FOUND
 
   const { visibleColumns, setVisibleColumns, columnVisibility, onColumnVisibilityChange, reset } =
-    useColumnVisibilityParam(ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS)
+    useAssetColumnVisibilityParam(ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS)
   const selection = useAssetSelection(assets, visibleColumns, 'export-assets.csv')
 
   const searchParams = useOptimisticSearchParams()
