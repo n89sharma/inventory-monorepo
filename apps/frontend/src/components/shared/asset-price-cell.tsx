@@ -103,21 +103,14 @@ export function AssetPriceCell({
   editorRegistry,
 }: AssetPriceCellProps): React.JSX.Element {
   const asset = row.original
-  const savedValue = asset.cost?.[field] ?? 0
-  const [value, setValue] = useState(String(savedValue))
+  const currSavedValue = asset.cost?.[field] ?? 0
+  const [prevSavedValue, setPrevSavedValue] = useState(currSavedValue)
+  const [value, setValue] = useState(String(currSavedValue))
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [isEditing, setIsEditing] = useState(false)
-  const focusedRef = useRef(false)
   const sentValueRef = useRef<number | null>(null)
   const readButtonRef = useRef<HTMLButtonElement | null>(null)
   const shouldRestoreFocusRef = useRef(false)
-
-  // A background revalidation can replace the row while the field is being typed in;
-  // only adopt the incoming value when the caret is not in this cell.
-  useEffect(() => {
-    if (focusedRef.current) return
-    setValue(String(savedValue))
-  }, [savedValue])
 
   useEffect(
     () => editorRegistry.register({ rowId: row.id, field }, () => setIsEditing(true)),
@@ -130,15 +123,19 @@ export function AssetPriceCell({
     readButtonRef.current?.focus()
   }, [isEditing])
 
+  if (!isEditing && prevSavedValue !== currSavedValue) {
+    setPrevSavedValue(currSavedValue)
+    setValue(String(currSavedValue))
+  }
+
   function stopEditing(restoreFocus: boolean) {
     shouldRestoreFocusRef.current = restoreFocus
     setIsEditing(false)
   }
 
   async function commit() {
-    focusedRef.current = false
     const parsed = toNumber(value)
-    if (parsed === savedValue || parsed === sentValueRef.current) return
+    if (parsed === currSavedValue || parsed === sentValueRef.current) return
     // A revalidation can land while the request is in flight and overwrite the box, so the
     // typed text is held here and put back if the save fails.
     const typed = value
@@ -181,8 +178,7 @@ export function AssetPriceCell({
 
   function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === REVERT_KEY) {
-      focusedRef.current = false
-      setValue(String(savedValue))
+      setValue(String(currSavedValue))
       setStatus('idle')
       stopEditing(true)
       return
@@ -224,10 +220,7 @@ export function AssetPriceCell({
         stopEditing(false)
       }}
       onKeyDown={handleInputKeyDown}
-      onFocus={(event) => {
-        focusedRef.current = true
-        event.currentTarget.select()
-      }}
+      onFocus={(event) => event.currentTarget.select()}
       saving={status === 'saving'}
       invalid={status === 'error'}
       label={`${label} for ${asset.barcode}`}
