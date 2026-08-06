@@ -66,16 +66,6 @@ function resolveMany<T extends { id: number }>(ids: number[], list: T[]): T[] {
   return ids.map((id) => byId.get(id)).filter((item): item is T => item !== undefined)
 }
 
-function useCallbackRef<A extends unknown[], R>(
-  fn: (...args: A) => R,
-): React.RefObject<(...args: A) => R> {
-  const ref = useRef(fn)
-  useEffect(() => {
-    ref.current = fn
-  })
-  return ref
-}
-
 // Local draft that updates immediately for a responsive UI while the committed
 // value (the URL, which keys SWR) is written on a trailing debounce. Re-syncs the
 // draft when the committed value changes externally (nav, saved view, back button).
@@ -86,7 +76,6 @@ function useDebouncedParam<T>(
 ): [T, (value: T) => void, () => void] {
   const [draft, setDraft] = useState(committed)
   const [prevCommitted, setPrevCommitted] = useState(committed)
-  const commitRef = useCallbackRef(commit)
   const timerRef = useRef<number | null>(null)
 
   if (committed !== prevCommitted) {
@@ -109,10 +98,10 @@ function useDebouncedParam<T>(
       if (timerRef.current !== null) clearTimeout(timerRef.current)
       timerRef.current = window.setTimeout(() => {
         timerRef.current = null
-        commitRef.current(value)
+        commit(value)
       }, delayMs)
     },
-    [commitRef, delayMs],
+    [commit, delayMs],
   )
 
   return [draft, setValue, cancel]
