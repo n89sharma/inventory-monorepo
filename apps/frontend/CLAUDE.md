@@ -112,9 +112,13 @@ name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
   `scheduleAssetRemoval`, `scheduleBulkAssetRemoval`, `flushPendingRemovals`. Owns a module-level
   `Map` so the 5s timer survives re-renders. Detail pages call `mutations.flushPending(id)` in
   their unmount effect.
-- **Global data:** `useGlobalData` fetches users, orgs, models, reference data once in `App.tsx`
-  → available via `useUserStore` / `useOrgStore` / `useModelStore` / `useReferenceDataStore`.
-  Never re-fetch these in a form or page. `useAutoSearch` pre-populates list pages on first visit.
+- **Catalog data:** users, orgs, models and the `/reference` payload are plain SWR reads
+  (`use-user.ts`, `use-org.ts`, `use-model.ts`, `use-reference-data.ts`), fetched by whichever
+  screen needs them and cached for the session via `CATALOG_DATA_OPTIONS` (`lib/swr-options.ts`) —
+  no app-level preload. Each hook returns the domain array directly, backed by a frozen empty
+  fallback. Reference data is one key with entity-named accessors (`useBrands`, `useWarehouses`,
+  `useErrorCodes`, `useAssetComponents`, …). Writes go through `use-*-mutations.ts` and invalidate
+  the key. `useAutoSearch` pre-populates list pages on first visit.
 - **Page state lives in the URL** (`lib/search-*-params.ts` pattern: `filtersToParams` /
   `paramsToFilters`) so views are shareable and survive back-navigation. Local `useState` only
   for transient state (typeahead text) — state the deviation explicitly.
