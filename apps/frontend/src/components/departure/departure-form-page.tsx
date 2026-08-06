@@ -18,7 +18,7 @@ import { ControlledSelectOptionSearchSelect } from '@/components/shared/search-s
 import { DepartureOutgoingStatusBar } from '@/components/departure/departure-outgoing-status-bar'
 import { SelectOptions } from '@/components/shared/search-select/select-options'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveUsers } from '@/hooks/use-active-users'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
@@ -65,7 +65,7 @@ export function DepartureFormPage({
   })
   const activeWarehouses = useActiveWarehouses()
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const {
     fields: assets,
     append: addAsset,

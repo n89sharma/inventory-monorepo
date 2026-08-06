@@ -1,5 +1,5 @@
 import { arrivalTableColumns } from '@/components/arrivals/arrival-columns'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { preloadArrivalDetail, useArrivalsList } from '@/hooks/use-arrival'
 import { useCan } from '@/hooks/use-can'
@@ -25,7 +25,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
   const [destination, setDestination] = useDestinationOptionParam()
   const [vendor, setVendor] = useVendorOptionParam()
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const searchParams = useOptimisticSearchParams()
 
   const { data: arrivals = [] } = useArrivalsList(fromDate, toDate, destination, vendor)

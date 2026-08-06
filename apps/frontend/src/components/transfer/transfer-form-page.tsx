@@ -16,7 +16,7 @@ import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { SelectOptions } from '@/components/shared/search-select/select-options'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -53,7 +53,7 @@ export function TransferFormPage({
     defaultValues: defaultValues ?? getDefaultTransfer(),
   })
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const {
     fields: assets,
     append: addAsset,

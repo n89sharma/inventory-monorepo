@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -32,7 +32,7 @@ export function EditInvoiceMetadataModal({
   invoice,
   onSave,
 }: EditInvoiceMetadataModalProps): React.JSX.Element {
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const today = startOfDay(new Date())
 

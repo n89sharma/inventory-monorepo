@@ -1,5 +1,5 @@
 import { useModelStore } from '@/data/store/model-store'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useUserStore } from '@/data/store/user-store'
 import {
@@ -243,17 +243,17 @@ export function useInternalFinisherParam(): [Component | null, (next: Component 
 }
 
 export function useCustomerParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
-  const organizations = useOrgStore((state) => state.organizations)
+  const organizations = useOrgs()
   return useIdParam('customer', organizations)
 }
 
 export function useHoldCustomerParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
-  const organizations = useOrgStore((state) => state.organizations)
+  const organizations = useOrgs()
   return useIdParam('holdcustomer', organizations)
 }
 
 export function useVendorParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
-  const organizations = useOrgStore((state) => state.organizations)
+  const organizations = useOrgs()
   return useIdParam('vendor', organizations)
 }
 
@@ -292,7 +292,7 @@ export function useVendorOptionParam(): [
   SelectOption<OrgSummary>,
   (next: SelectOption<OrgSummary>) => void,
 ] {
-  const organizations = useOrgStore((state) => state.organizations)
+  const organizations = useOrgs()
   return useSelectOptionIdParam('vendor', organizations)
 }
 
@@ -300,7 +300,7 @@ export function useCustomerOptionParam(): [
   SelectOption<OrgSummary>,
   (next: SelectOption<OrgSummary>) => void,
 ] {
-  const organizations = useOrgStore((state) => state.organizations)
+  const organizations = useOrgs()
   return useSelectOptionIdParam('customer', organizations)
 }
 

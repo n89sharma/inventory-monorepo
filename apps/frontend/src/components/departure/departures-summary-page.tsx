@@ -4,7 +4,7 @@ import { CollectionPage } from '@/components/collections/collection-page'
 import { SearchBar } from '@/components/shared/search-bar'
 import { SearchSelectOptionFilter } from '@/components/shared/search-select/search-select-option-filter'
 import { SelectOptionsInline } from '@/components/shared/search-select/select-options'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useCan } from '@/hooks/use-can'
 import {
@@ -25,7 +25,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
   const [origin, setOrigin] = useOriginOptionParam()
   const [customer, setCustomer] = useCustomerOptionParam()
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const searchParams = useOptimisticSearchParams()
 
   const { data: departures = [] } = useDeparturesList(fromDate, toDate, origin, customer)

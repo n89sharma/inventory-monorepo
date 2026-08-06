@@ -14,7 +14,7 @@ import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { ControlledSelectOptionSearchSelect } from '@/components/shared/search-select/controlled-select-option-search-select'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveUsers } from '@/hooks/use-active-users'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -61,7 +61,7 @@ export function HoldFormPage({
     },
   })
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const {
     fields: assets,
     append: addAsset,

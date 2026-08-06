@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
@@ -32,7 +32,7 @@ export function EditArrivalMetadataModal({
   onSave,
 }: EditArrivalMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(arrival), [arrival])

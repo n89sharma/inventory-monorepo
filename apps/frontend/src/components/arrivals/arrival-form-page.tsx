@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-header'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -46,7 +46,7 @@ export function ArrivalFormPage({
     defaultValues: defaultValues ?? getDefaultArrival(),
   })
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const {
     fields: assets,
     append: addAsset,

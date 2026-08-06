@@ -7,7 +7,7 @@ import {
   useHeldByOptionParam,
   useHeldForOptionParam,
 } from '@/lib/filters/hooks'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { preloadHoldDetail, useHoldsList } from '@/hooks/use-hold'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
@@ -26,7 +26,7 @@ export function HoldSummaryPage(): React.JSX.Element {
   const [holdFor, setHoldFor] = useHeldForOptionParam()
   const [customer, setCustomer] = useCustomerOptionParam()
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const searchParams = useOptimisticSearchParams()
 
   const { data: holds = [] } = useHoldsList(fromDate, toDate, holdBy, holdFor, customer)

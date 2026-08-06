@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveUsers } from '@/hooks/use-active-users'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -31,7 +31,7 @@ export function EditHoldMetadataModal({
   onSave,
 }: EditHoldMetadataModalProps): React.JSX.Element {
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(hold), [hold])

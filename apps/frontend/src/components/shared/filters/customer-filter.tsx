@@ -1,5 +1,5 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useState } from 'react'
 import type { OrgSummary } from 'shared-types'
 
@@ -19,7 +19,7 @@ export function CustomerFilter({
   placeholder?: string
   clearLabel?: string
 }): React.JSX.Element {
-  const allCustomers = useOrgStore((state) => state.organizations)
+  const allCustomers = useOrgs()
   const [query, setQuery] = useState('')
 
   return (

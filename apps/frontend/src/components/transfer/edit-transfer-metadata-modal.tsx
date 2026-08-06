@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -34,7 +34,7 @@ export function EditTransferMetadataModal({
   onSave,
 }: EditTransferMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(transfer), [transfer])

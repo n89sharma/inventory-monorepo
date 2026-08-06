@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgMutations } from '@/hooks/use-org-mutations'
 import { flattenFieldErrors } from '@/lib/utils'
 import { OrgFormSchema, type OrgForm } from '@/ui-types/org-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -45,7 +45,7 @@ export function CreateOrgModal({ open, onOpenChange }: CreateOrgModalProps): Rea
 function CreateOrgFormBody({
   onOpenChange,
 }: Pick<CreateOrgModalProps, 'onOpenChange'>): React.JSX.Element {
-  const createOrg = useOrgStore((state) => state.createOrg)
+  const { createOrg } = useOrgMutations()
 
   const form = useForm<OrgForm>({
     resolver: zodResolver(OrgFormSchema),

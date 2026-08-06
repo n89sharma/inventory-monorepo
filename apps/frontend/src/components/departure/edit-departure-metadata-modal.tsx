@@ -1,4 +1,4 @@
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useActiveUsers } from '@/hooks/use-active-users'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
@@ -37,7 +37,7 @@ export function EditDepartureMetadataModal({
 }: EditDepartureMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
   const activeUsers = useActiveUsers()
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const values = useMemo(() => toFormValues(departure), [departure])

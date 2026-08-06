@@ -18,7 +18,7 @@ import { StickyEditPageHeader } from '@/components/collections/sticky-edit-page-
 import { ControlledDatePickerField } from '@/components/shared/date-picker'
 import { ControlledSearchSelectInput } from '@/components/shared/search-select/controlled-search-select-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
-import { useOrgStore } from '@/data/store/org-store'
+import { useOrgs } from '@/hooks/use-org'
 import { useReferenceDataStore } from '@/data/store/reference-data-store'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { formatTitleCase } from '@/lib/formatters'
@@ -69,7 +69,7 @@ export function InvoiceFormPage({
   breadcrumbs,
   onValidSubmit,
 }: InvoiceFormPageProps): React.JSX.Element {
-  const orgs = useOrgStore((state) => state.organizations)
+  const orgs = useOrgs()
   const invoiceTypes = useReferenceDataStore((state) => state.invoiceTypes)
   const purchaseType = invoiceTypes.find((t) => t.type === INVOICE_TYPE.purchase)
   const today = startOfDay(new Date())
