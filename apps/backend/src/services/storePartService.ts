@@ -18,7 +18,12 @@ import {
 import { getNextSequence } from '../lib/db-utils.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { consumptionCost, stockValue, type StockLayer } from '../lib/store-part-fifo.js'
+import {
+  consumptionCost,
+  stockByWarehouse,
+  stockValue,
+  type StockLayer,
+} from '../lib/store-part-fifo.js'
 import { prisma } from '../prisma.js'
 
 const USED_TYPE = 'USED'
@@ -69,6 +74,11 @@ export async function getStorePart(partId: number, canViewCost: boolean): Promis
     id: part.id,
     part_number: part.part_number,
     description: part.description,
+    stock: stockByWarehouse(rows).map((entry) => ({
+      warehouse_id: entry.warehouse_id,
+      on_hand: entry.on_hand,
+      stock_value: canViewCost ? entry.stock_value.toNumber() : null,
+    })),
     transactions: rows.map((row) => ({
       ...row,
       unit_cost: canViewCost ? decimalToNumber(row.unit_cost) : null,

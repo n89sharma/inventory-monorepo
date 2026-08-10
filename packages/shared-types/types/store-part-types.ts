@@ -51,11 +51,21 @@ export const StoreTransactionRowSchema = z.object({
 })
 export type StoreTransactionRow = z.infer<typeof StoreTransactionRowSchema>
 
-// GET /store/:partId — on_hand is derived on the frontend per selected warehouse
+// One warehouse holding a part. stock_value is the FIFO value of on_hand, withheld
+// (null) from users without view_purchase_price; on_hand is never withheld.
+export const StorePartWarehouseStockSchema = z.object({
+  warehouse_id: z.number(),
+  on_hand: z.number().int(),
+  stock_value: z.number().nullable(),
+})
+export type StorePartWarehouseStock = z.infer<typeof StorePartWarehouseStockSchema>
+
+// GET /store/:partId — stock carries one entry per warehouse the part has moved through
 export const StorePartDetailSchema = z.object({
   id: z.number(),
   part_number: z.string(),
   description: z.string(),
+  stock: z.array(StorePartWarehouseStockSchema),
   transactions: z.array(StoreTransactionRowSchema),
 })
 export type StorePartDetail = z.infer<typeof StorePartDetailSchema>

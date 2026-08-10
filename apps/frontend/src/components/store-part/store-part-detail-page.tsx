@@ -11,6 +11,13 @@ import { buildStorePartsPathByWarehouseId } from '@/lib/filters/serializers'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import type { StorePartWarehouseStock } from 'shared-types'
+
+// No warehouse selected means every warehouse, matching the ledger the page shows.
+function onHandIn(stock: StorePartWarehouseStock[], warehouseId: number | null): number {
+  if (warehouseId === null) return stock.reduce((sum, entry) => sum + entry.on_hand, 0)
+  return stock.find((entry) => entry.warehouse_id === warehouseId)?.on_hand ?? 0
+}
 
 export function StorePartDetailPage(): React.JSX.Element {
   const { partId = '' } = useParams()
@@ -29,11 +36,6 @@ export function StorePartDetailPage(): React.JSX.Element {
       : transactions.filter((t) => t.warehouse_id === warehouseId)
   }, [data, warehouseId])
 
-  const onHand = useMemo(
-    () => ledgerRows.reduce((sum, t) => sum + (t.is_inbound ? t.quantity : -t.quantity), 0),
-    [ledgerRows],
-  )
-
   if (isLoading) {
     return (
       <PageContent>
@@ -50,6 +52,7 @@ export function StorePartDetailPage(): React.JSX.Element {
     )
   }
 
+  const onHand = onHandIn(data.stock, warehouseId)
   const onHandLabel = warehouse ? `On hand (${warehouse.city_code})` : 'On hand'
   const backHref = buildStorePartsPathByWarehouseId(warehouseId)
 
