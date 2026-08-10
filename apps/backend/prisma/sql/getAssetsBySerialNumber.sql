@@ -29,6 +29,8 @@ select
   c.purchase_cost as cost_purchase_cost,
   c.transport_cost as cost_transport_cost,
   c.processing_cost as cost_processing_cost,
+  c.other_cost as cost_other_cost,
+  c.parts_cost as cost_parts_cost,
   c.total_cost as cost_total_cost,
   c.sale_price as cost_sale_price,
   h.hold_number as hold_hold_number,

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { AssetSummarySchema, CreateAssetSchema } from '../asset-types.js'
+import { AssetSearchRowSchema, CreateAssetSchema } from '../asset-types.js'
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { CountrySchema, WarehouseSchema } from '../reference-data-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
@@ -24,7 +24,7 @@ export const ArrivalDetailSchema = z.object({
   comment: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string(),
-  assets: z.array(AssetSummarySchema),
+  assets: z.array(AssetSearchRowSchema),
 })
 export type ArrivalDetail = z.infer<typeof ArrivalDetailSchema>
 

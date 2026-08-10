@@ -12,7 +12,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { MAX_BULK_ASSET_COUNT, type AssetSummary, type CollectionHistory } from 'shared-types'
+import { MAX_BULK_ASSET_COUNT, type AssetSearchRow, type CollectionHistory } from 'shared-types'
 import { toast } from 'sonner'
 import { PendingIcon } from '@/components/shared/pending-icon'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
@@ -25,10 +25,8 @@ import {
 } from '../shadcn/dropdown-menu'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
 import { ShareButton } from '../shared/share-button'
-import {
-  collectionDetailToCsv,
-  type CollectionSection,
-} from '../table-columns/collection-detail-report-columns'
+import { type CollectionSection } from '../table-columns/collection-detail-columns'
+import { searchPageRowsToCsv } from '../table-columns/search-page-report-columns'
 import { CollectionHistorySheet } from './collection-history-sheet'
 
 const BARCODE_PRINT_SECTION = 'arrivals'
@@ -38,8 +36,9 @@ type CollectionEditBarProps = {
   section: CollectionSection
   collectionId: string
   canCreateEditEntity: boolean
-  assets?: AssetSummary[]
-  selectedAssets?: AssetSummary[]
+  assets?: AssetSearchRow[]
+  selectedAssets?: AssetSearchRow[]
+  visibleColumns: Set<string>
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
@@ -53,6 +52,7 @@ export function CollectionEditBar({
   canCreateEditEntity,
   assets,
   selectedAssets,
+  visibleColumns,
   historyCacheKey,
   historyFetcher,
   onEdit,
@@ -60,8 +60,6 @@ export function CollectionEditBar({
   onDelete,
 }: CollectionEditBarProps): React.JSX.Element {
   const canDelete = useCan('delete_collection')
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
 
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -87,10 +85,7 @@ export function CollectionEditBar({
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = collectionDetailToCsv(section, exportableAssets, {
-        canViewPurchasePrice,
-        canViewSalePrice,
-      })
+      const csv = searchPageRowsToCsv(exportableAssets, visibleColumns)
       downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })

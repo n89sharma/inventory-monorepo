@@ -86,6 +86,8 @@ export const AssetSearchRowSchema = z.object({
   cost_purchase_cost: z.number().nullable(),
   cost_transport_cost: z.number().nullable(),
   cost_processing_cost: z.number().nullable(),
+  cost_other_cost: z.number().nullable(),
+  cost_parts_cost: z.number().nullable(),
   cost_total_cost: z.number().nullable(),
   cost_sale_price: z.number().nullable(),
   hold_hold_number: z.string().nullable(),

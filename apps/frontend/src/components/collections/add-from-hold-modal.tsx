@@ -3,7 +3,7 @@ import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
-import type { AssetSummary, HoldSuggestion } from 'shared-types'
+import { searchRowToAssetSummary, type AssetSummary, type HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
 import { DetailGrid, SearchView } from './collection-search'
 import { emptyResults, type CollectionResults } from './collection-search-types'
@@ -84,7 +84,7 @@ function HoldSelectionStep({
 interface AddFromHoldModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  getAssets: () => AssetSummary[]
+  getAssets: () => { id: number; barcode: string }[]
   onAddAsset: (asset: AssetSummary) => void
   onCommitBatch?: (assets: AssetSummary[]) => Promise<void>
 }
@@ -114,7 +114,7 @@ export function AddFromHoldModal({
     try {
       const holdAssets = await holdMutations.getAssets(selected.hold_number)
       const currentIds = new Set(getAssets().map((a) => a.id))
-      const toAdd = holdAssets.filter((a) => !currentIds.has(a.id))
+      const toAdd = holdAssets.filter((a) => !currentIds.has(a.id)).map(searchRowToAssetSummary)
       if (onCommitBatch) {
         if (toAdd.length > 0) await onCommitBatch(toAdd)
       } else {

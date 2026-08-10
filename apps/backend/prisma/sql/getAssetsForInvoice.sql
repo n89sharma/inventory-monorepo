@@ -1,14 +1,16 @@
 select
-  a.id as id,
+  a.id,
   b."name" as brand,
   m."name" as model,
-  at.asset_type as asset_type,
-  a.barcode as barcode,
-  a.serial_number as serial_number,
-  t.meter_total as meter_total,
-  t.cassettes as cassettes,
-  cmp."name" as internal_finisher,
-  acc.accessories as accessories,
+  at.asset_type,
+  a.barcode,
+  a.serial_number,
+  s.status as status,
+  rd.status as readiness,
+  a.is_in_transit as is_in_transit,
+  a.created_at as created_at,
+  co."name" as country_of_origin,
+  a.manufactured_year as manufactured_year,
   m.weight as weight,
   m.size as size,
   l.warehouse_id as warehouse_id,
@@ -16,19 +18,37 @@ select
   w.street as warehouse_street,
   z.zone as zone,
   l.bin as bin,
-  s.status as status,
-  rd.status as readiness,
-  a.is_in_transit as is_in_transit,
-  pi.invoice_number as purchase_invoice_number,
-  si.invoice_number as sales_invoice_number,
-  a.created_at as created_at,
+  t.meter_total as specs_meter_total,
+  t.cassettes as specs_cassettes,
+  cmp."name" as specs_internal_finisher,
+  acc.accessories as accessories,
+  t.toner_life_c as specs_toner_life_c,
+  t.toner_life_m as specs_toner_life_m,
+  t.toner_life_y as specs_toner_life_y,
+  t.toner_life_k as specs_toner_life_k,
   c.purchase_cost as cost_purchase_cost,
   c.transport_cost as cost_transport_cost,
   c.processing_cost as cost_processing_cost,
   c.other_cost as cost_other_cost,
   c.parts_cost as cost_parts_cost,
   c.total_cost as cost_total_cost,
-  c.sale_price as cost_sale_price
+  c.sale_price as cost_sale_price,
+  h.hold_number as hold_hold_number,
+  hu."name" as held_by,
+  hu2."name" as hold_created_for,
+  hc."name" as hold_customer,
+  h.created_at as hold_created_at,
+  ro."name" as vendor,
+  do_."name" as customer,
+  d.created_at as departed_at,
+  r.created_at as arrival_created_at,
+  pi.invoice_number as purchase_invoice_invoice_number,
+  pi.invoice_reference as purchase_invoice_invoice_reference,
+  si.invoice_number as sales_invoice_invoice_number,
+  si.invoice_reference as sales_invoice_invoice_reference,
+  lc.comment as latest_comment,
+  lc.created_at as latest_comment_at,
+  lcu."name" as latest_comment_by
 from "Invoice" i
   join "Asset" a on (i.id = a.purchase_invoice_id or i.id = a.sales_invoice_id)
   join "TechnicalSpecification" t on t.asset_id = a.id
@@ -44,10 +64,27 @@ from "Invoice" i
   join "AssetType" at on at.id = m.asset_type_id
   join "Status" s on s.id = a.status_id
   join "Readiness" rd on rd.id = a.readiness_id
+  left join "Cost" c on c.asset_id = a.id
+  left join "Country" co on co.id = a.country_of_origin_id
   left join "Location" l on l.id = a.location_id
   left join "Warehouse" w on w.id = l.warehouse_id
   left join "Zone" z on z.id = l.zone_id
   left join "Invoice" pi on pi.id = a.purchase_invoice_id
   left join "Invoice" si on si.id = a.sales_invoice_id
-  left join "Cost" c on c.asset_id = a.id
-where i.invoice_number  = $1
+  left join "Hold" h on h.id = a.hold_id
+  left join "User" hu on hu.id = h.created_by_id
+  left join "User" hu2 on hu2.id = h.created_for_id
+  left join "Organization" hc on hc.id = h.customer_id
+  left join "Arrival" r on r.id = a.arrival_id
+  left join "Organization" ro on ro.id = r.origin_id
+  left join "Departure" d on d.id = a.departure_id
+  left join "Organization" do_ on do_.id = d.destination_id
+  left join lateral (
+    select cm.comment, cm.created_at, cm.created_by_id
+    from "Comment" cm
+    where cm.asset_id = a.id
+    order by cm.created_at desc
+    limit 1
+  ) lc on true
+  left join "User" lcu on lcu.id = lc.created_by_id
+where i.invoice_number = $1

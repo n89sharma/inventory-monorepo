@@ -13,7 +13,7 @@ import {
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import type { AssetSummary, DepartureDetail, OutgoingStatus, PatchAssetPricing } from 'shared-types'
+import type { AssetSearchRow, AssetSummary, OutgoingStatus, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: DepartureForm) {
@@ -23,7 +23,7 @@ async function create(data: DepartureForm) {
   return result
 }
 
-async function getAssets(departureNumber: string): Promise<AssetSummary[]> {
+async function getAssets(departureNumber: string): Promise<AssetSearchRow[]> {
   return (await getDepartureDetail(departureNumber)).assets
 }
 
@@ -47,11 +47,6 @@ async function addAssets(departureNumber: string, assets: AssetSummary[]) {
 
 async function addAsset(departureNumber: string, asset: AssetSummary) {
   const cacheKey = departureDetailKey(departureNumber)
-  mutate<DepartureDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, asset] } : current),
-    { revalidate: false },
-  )
   try {
     await patchDepartureAssets(departureNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
     invalidateAssetDetails([asset.barcode])
@@ -69,11 +64,6 @@ async function addAssetBatch(departureNumber: string, assets: AssetSummary[]) {
   const cacheKey = departureDetailKey(departureNumber)
   const ids = assets.map((a) => a.id)
   const barcodes = assets.map((a) => a.barcode)
-  mutate<DepartureDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, ...assets] } : current),
-    { revalidate: false },
-  )
   try {
     await patchDepartureAssets(departureNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
     invalidateAssetDetails(barcodes)

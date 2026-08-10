@@ -1,9 +1,8 @@
 import { formatWeight } from '@/lib/formatters'
-import type { AssetSummary } from 'shared-types'
 
 const sizeFormatter = new Intl.NumberFormat('en-US')
 
-export function AssetTotalsField({ assets }: { assets: AssetSummary[] }) {
+export function AssetTotalsField({ assets }: { assets: { weight: number; size: number }[] }) {
   let totalWeight = 0
   let totalSize = 0
   for (const asset of assets) {

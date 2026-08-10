@@ -18,7 +18,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
-import type { AssetSummary, InvoiceDetail, PatchAssetPricing } from 'shared-types'
+import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: InvoiceForm) {
@@ -28,7 +28,7 @@ async function create(data: InvoiceForm) {
   return result
 }
 
-async function getAssets(invoiceNumber: string): Promise<AssetSummary[]> {
+async function getAssets(invoiceNumber: string): Promise<AssetSearchRow[]> {
   return (await getInvoiceDetail(invoiceNumber)).assets
 }
 
@@ -52,11 +52,6 @@ async function addAssets(invoiceNumber: string, assets: AssetSummary[]) {
 
 async function addAsset(invoiceNumber: string, asset: AssetSummary) {
   const cacheKey = invoiceDetailKey(invoiceNumber)
-  mutate<InvoiceDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, asset] } : current),
-    { revalidate: false },
-  )
   try {
     await patchInvoiceAssets(invoiceNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
     invalidateAssetDetails([asset.barcode])
@@ -90,7 +85,7 @@ async function updateMetadata(invoiceNumber: string, metadata: InvoiceMetadataFo
   invalidateInvoiceLists()
 }
 
-function removeAsset(invoiceNumber: string, asset: AssetSummary) {
+function removeAsset(invoiceNumber: string, asset: AssetIdentity) {
   scheduleAssetRemoval(
     {
       collectionId: invoiceNumber,
@@ -102,7 +97,7 @@ function removeAsset(invoiceNumber: string, asset: AssetSummary) {
   )
 }
 
-function bulkRemoveAssets(invoiceNumber: string, assets: AssetSummary[]) {
+function bulkRemoveAssets(invoiceNumber: string, assets: AssetIdentity[]) {
   scheduleBulkAssetRemoval(
     {
       collectionId: invoiceNumber,

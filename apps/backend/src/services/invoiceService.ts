@@ -14,8 +14,8 @@ import {
   getAssetsForInvoice,
   getInvoices as getInvoicesDb,
 } from '../../generated/prisma/sql.js'
-import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
-import { redactAssetCost } from '../lib/cost-redaction.js'
+import { mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import {
   addRemoveCollectionFromAssets,
@@ -295,10 +295,7 @@ export async function getInvoice(
       default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
     customer: invoice.organization,
-    assets: assets.map((r) => ({
-      ...mapAssetSummary(r),
-      cost: redactAssetCost(mapAssetCost(r), role),
-    })),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
     arrivals,
   }
 }

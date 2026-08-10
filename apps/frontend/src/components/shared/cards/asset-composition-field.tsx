@@ -1,5 +1,3 @@
-import type { AssetSummary } from 'shared-types'
-
 const ASSET_TYPE_LABELS = [
   { type: 'COPIER', label: 'Copiers' },
   { type: 'FINISHER', label: 'Finishers' },
@@ -8,7 +6,7 @@ const ASSET_TYPE_LABELS = [
 
 const OTHER_LABEL = 'Other'
 
-export function AssetCompositionField({ assets }: { assets: AssetSummary[] }) {
+export function AssetCompositionField({ assets }: { assets: { asset_type: string }[] }) {
   const total = assets.length
   const counts = new Map<string, number>()
   for (const asset of assets) {

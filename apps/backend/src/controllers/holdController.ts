@@ -90,7 +90,7 @@ export const archiveHold = asyncHandler(async (req, res) => {
 export const getHoldDetail = asyncHandler(
   async (req: Request, res: Response<ApiResponse<HoldDetail>>) => {
     const { holdNumber } = req.params
-    const data = await getHoldSer(holdNumber)
+    const data = await getHoldSer(holdNumber, res.locals.dbUserRole)
     res.json(successResponse(data))
   },
 )

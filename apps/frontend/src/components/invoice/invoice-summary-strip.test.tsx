@@ -1,48 +1,21 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import type { AssetCost, AssetSummary, InvoiceDetail } from 'shared-types'
+import type { AssetSearchRow, InvoiceDetail } from 'shared-types'
+import { makeAssetSearchRow } from '@/test/asset-factories'
 import { InvoiceSummaryStrip } from './invoice-summary-strip'
 
-function makeCost(overrides: Partial<AssetCost> = {}): AssetCost {
-  return {
-    purchase_cost: 100,
-    transport_cost: 20,
-    processing_cost: 5,
-    other_cost: 0,
-    parts_cost: 0,
-    total_cost: 125,
-    sale_price: 200,
-    ...overrides,
-  }
-}
+const NO_COST = {
+  cost_purchase_cost: null,
+  cost_transport_cost: null,
+  cost_processing_cost: null,
+  cost_other_cost: null,
+  cost_parts_cost: null,
+  cost_total_cost: null,
+  cost_sale_price: null,
+} as const satisfies Partial<AssetSearchRow>
 
-function makeAsset(cost: AssetCost | null | undefined): AssetSummary {
-  return {
-    id: 1,
-    barcode: 'BC-1',
-    brand: 'CANON',
-    model: 'IR-2020',
-    asset_type: 'COPIER',
-    serial_number: 'SN-1',
-    meter_total: 0,
-    cassettes: null,
-    internal_finisher: null,
-    accessories: [],
-    weight: 0,
-    size: 0,
-    status: 'IN_STOCK',
-    readiness: 'PP_OK',
-    location: null,
-    purchase_invoice_number: null,
-    sales_invoice_number: null,
-    is_in_transit: false,
-    created_at: new Date('2026-01-01T00:00:00Z'),
-    cost,
-  }
-}
-
-function makeInvoice(assets: AssetSummary[]): InvoiceDetail {
+function makeInvoice(assets: AssetSearchRow[]): InvoiceDetail {
   return {
     invoice_number: 'INV-1',
     invoice_reference: 'REF-1',
@@ -94,12 +67,18 @@ const ALL_PERMISSIONS = { canViewPurchasePrice: true, canViewSalePrice: true }
 describe('InvoiceSummaryStrip cost totals', () => {
   it('sums each cost field across the invoice assets', () => {
     const invoice = makeInvoice([
-      makeAsset(
-        makeCost({ purchase_cost: 100, transport_cost: 20, total_cost: 125, sale_price: 200 }),
-      ),
-      makeAsset(
-        makeCost({ purchase_cost: 250, transport_cost: 30, total_cost: 300, sale_price: 500 }),
-      ),
+      makeAssetSearchRow({
+        cost_purchase_cost: 100,
+        cost_transport_cost: 20,
+        cost_total_cost: 125,
+        cost_sale_price: 200,
+      }),
+      makeAssetSearchRow({
+        cost_purchase_cost: 250,
+        cost_transport_cost: 30,
+        cost_total_cost: 300,
+        cost_sale_price: 500,
+      }),
     ])
     renderStrip(invoice, ALL_PERMISSIONS)
 
@@ -109,11 +88,11 @@ describe('InvoiceSummaryStrip cost totals', () => {
     expect(screen.getByText('Sale Price').nextElementSibling).toHaveTextContent('$700.00')
   })
 
-  it('treats missing cost objects and null fields as zero', () => {
+  it('treats null cost fields as zero', () => {
     const invoice = makeInvoice([
-      makeAsset(makeCost({ purchase_cost: 100, sale_price: null })),
-      makeAsset(null),
-      makeAsset(undefined),
+      makeAssetSearchRow({ ...NO_COST, cost_purchase_cost: 100 }),
+      makeAssetSearchRow(NO_COST),
+      makeAssetSearchRow(NO_COST),
     ])
     renderStrip(invoice, ALL_PERMISSIONS)
 
@@ -122,7 +101,7 @@ describe('InvoiceSummaryStrip cost totals', () => {
   })
 
   it('hides purchase totals without view_purchase_price', () => {
-    const invoice = makeInvoice([makeAsset(makeCost())])
+    const invoice = makeInvoice([makeAssetSearchRow()])
     renderStrip(invoice, { canViewPurchasePrice: false, canViewSalePrice: true })
 
     expect(screen.queryByText('Purchase Cost')).not.toBeInTheDocument()
@@ -132,7 +111,7 @@ describe('InvoiceSummaryStrip cost totals', () => {
   })
 
   it('hides the sale-price total without view_sale_price', () => {
-    const invoice = makeInvoice([makeAsset(makeCost())])
+    const invoice = makeInvoice([makeAssetSearchRow()])
     renderStrip(invoice, { canViewPurchasePrice: true, canViewSalePrice: false })
 
     expect(screen.getByText('Purchase Cost')).toBeInTheDocument()

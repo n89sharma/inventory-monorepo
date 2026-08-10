@@ -15,7 +15,7 @@ export function ArrivalSummaryStrip({ arrival }: { arrival: ArrivalDetail }) {
       <AssetTotalsField assets={arrival.assets} />
       <InvoiceSummaryField
         assets={arrival.assets}
-        getInvoiceNumber={(a) => a.purchase_invoice_number}
+        getInvoiceNumber={(a) => a.purchase_invoice_invoice_number}
       />
     </div>
   )

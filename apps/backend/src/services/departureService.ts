@@ -9,8 +9,8 @@ import {
   UpdateDepartureMetadata,
 } from 'shared-types'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
-import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
-import { redactAssetCost } from '../lib/cost-redaction.js'
+import { mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
@@ -54,10 +54,7 @@ export async function getDeparture(
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
     salesperson: departure.sales_representative && mapUser(departure.sales_representative),
-    assets: assets.map((r) => ({
-      ...mapAssetSummary(r),
-      cost: redactAssetCost(mapAssetCost(r), role),
-    })),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
   }
 }
 

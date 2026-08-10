@@ -1,16 +1,12 @@
 import { TooltipProvider } from '@/components/shadcn/tooltip'
 import { DataTable } from '@/components/shared/data-table'
-import {
-  createArrivalDetailColumns,
-  createDepartureDetailColumns,
-  createInvoiceDetailColumns,
-  createTransferDetailColumns,
-} from '@/components/table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
+import { makeAssetSearchRow } from '@/test/asset-factories'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { TableMeta } from '@tanstack/react-table'
 import { MemoryRouter } from 'react-router-dom'
-import type { AssetCost, AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 import { describe, expect, it, vi } from 'vitest'
 
 // Data order, deliberately not barcode order so sorting by barcode changes the first row.
@@ -19,87 +15,35 @@ const SORTED_BARCODES = ['BC-1', 'BC-2', 'BC-3'] as const
 const FIRST_FIELD_LABEL = 'Purchase Cost'
 const LAST_FIELD_LABEL = 'Sale Price'
 
-function makeCost(): AssetCost {
-  return {
-    purchase_cost: 100,
-    transport_cost: 20,
-    processing_cost: 5,
-    other_cost: 0,
-    parts_cost: 0,
-    total_cost: 125,
-    sale_price: 200,
-  }
-}
-
-function makeAsset(barcode: string, id: number): AssetSummary {
-  return {
-    id,
-    barcode,
-    brand: 'CANON',
-    model: 'IR-2020',
-    asset_type: 'COPIER',
-    serial_number: `SN-${id}`,
-    meter_total: 0,
-    cassettes: null,
-    internal_finisher: null,
-    accessories: [],
-    weight: 0,
-    size: 0,
-    status: 'IN_STOCK',
-    readiness: 'PP_OK',
-    location: null,
-    purchase_invoice_number: null,
-    sales_invoice_number: null,
-    is_in_transit: false,
-    created_at: new Date('2026-01-01T00:00:00Z'),
-    cost: makeCost(),
-  }
-}
-
-const ASSETS = BARCODES.map((barcode, index) => makeAsset(barcode, index + 1))
-const ASSET_COLUMN_VISIBILITY = { created_at: false }
-const getAssetRowId = (asset: AssetSummary) => asset.barcode
-const getAssetHref = (asset: AssetSummary) => `/invoices/INV-1/${asset.barcode}`
+const ASSETS = BARCODES.map((barcode, index) =>
+  makeAssetSearchRow({ barcode, id: index + 1, serial_number: `SN-${index + 1}` }),
+)
+const getAssetRowId = (asset: AssetSearchRow) => asset.barcode
+const getAssetHref = (asset: AssetSearchRow) => `/invoices/INV-1/${asset.barcode}`
+const allowEverything = () => true
 
 function fieldOf(label: string, barcode: string): HTMLElement {
   return screen.getByLabelText(`${label} for ${barcode}`)
 }
 
-// Every priced detail table builds its cost columns from the same helper, so the grid behaviour
-// is asserted against all four rather than trusting invoices to stand in for the rest.
-const PRICED_COLUMN_BUILDERS = {
-  arrivals: createArrivalDetailColumns,
-  transfers: createTransferDetailColumns,
-  departures: createDepartureDetailColumns,
-  invoices: createInvoiceDetailColumns,
-} as const
-
-type PricedSection = keyof typeof PRICED_COLUMN_BUILDERS
-
-const PRICED_SECTIONS = Object.keys(PRICED_COLUMN_BUILDERS) as PricedSection[]
-
-function makeRenderGrid(section: PricedSection) {
-  return (savePriceField: TableMeta<AssetSummary>['savePriceField'] = vi.fn()) => {
-    const columns = PRICED_COLUMN_BUILDERS[section]({
-      getHref: getAssetHref,
-      canViewPurchasePrice: true,
-      canViewSalePrice: true,
-      priceEditorRegistry: createPriceCellEditorRegistry(),
-    })
-    render(
-      <MemoryRouter>
-        <TooltipProvider>
-          <DataTable
-            columns={columns}
-            data={ASSETS}
-            getRowId={getAssetRowId}
-            columnVisibility={ASSET_COLUMN_VISIBILITY}
-            meta={{ savePriceField }}
-          />
-        </TooltipProvider>
-      </MemoryRouter>,
-    )
-  }
+function renderGrid(savePriceField: TableMeta<AssetSearchRow>['savePriceField'] = vi.fn()) {
+  const columns = createCollectionDetailColumns({
+    getHref: getAssetHref,
+    can: allowEverything,
+    priceEditorRegistry: createPriceCellEditorRegistry(),
+  })
+  render(
+    <MemoryRouter>
+      <TooltipProvider>
+        <DataTable
+          columns={columns}
+          data={ASSETS}
+          getRowId={getAssetRowId}
+          meta={{ savePriceField }}
+        />
+      </TooltipProvider>
+    </MemoryRouter>,
+  )
 }
 
 // Opens the editor the way a user does, and waits for autoFocus to land the caret.
@@ -119,9 +63,7 @@ async function expectEditing(label: string, barcode: string) {
   })
 }
 
-describe.each(PRICED_SECTIONS)('the asset price grid on %s', (section) => {
-  const renderGrid = makeRenderGrid(section)
-
+describe('the asset price grid', () => {
   it('opens only the clicked cell', async () => {
     renderGrid()
 

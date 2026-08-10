@@ -12,8 +12,8 @@ import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary, PatchAssetPricing } from 'shared-types'
-import { createArrivalDetailColumns } from '../table-columns/collection-detail-columns'
+import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
+import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
@@ -26,8 +26,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const mutations = useArrivalMutations()
   const canEditArrival = useCan('create_update_arrival')
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
+  const can = useCan()
   const detail = useArrivalDetail(arrivalNumber)
   const components = useAssetComponents()
 
@@ -68,24 +67,22 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
-      createArrivalDetailColumns({
+    (assetHref: (asset: AssetSearchRow) => string) =>
+      createCollectionDetailColumns({
         getHref: assetHref,
+        can,
         onDelete: (asset) => mutations.removeAsset(arrivalNumber, asset),
         onEdit: canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
         disabledRowId: editingAssetId,
-        canViewPurchasePrice,
-        canViewSalePrice,
         priceEditorRegistry,
       }),
     [
       mutations,
       arrivalNumber,
+      can,
       canEditArrival,
       editingAssetId,
       handleEditAsset,
-      canViewPurchasePrice,
-      canViewSalePrice,
       priceEditorRegistry,
     ],
   )

@@ -25,7 +25,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
-import type { AssetSummary, PatchAssetPricing, TransferDetail } from 'shared-types'
+import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: TransferForm) {
@@ -35,7 +35,7 @@ async function create(data: TransferForm) {
   return result
 }
 
-async function getAssets(transferNumber: string): Promise<AssetSummary[]> {
+async function getAssets(transferNumber: string): Promise<AssetSearchRow[]> {
   return (await getTransferDetail(transferNumber)).assets
 }
 
@@ -59,11 +59,6 @@ async function addAssets(transferNumber: string, assets: AssetSummary[]) {
 
 async function addAsset(transferNumber: string, asset: AssetSummary) {
   const cacheKey = transferDetailKey(transferNumber)
-  mutate<TransferDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, asset] } : current),
-    { revalidate: false },
-  )
   try {
     await patchTransferAssets(transferNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
     invalidateAssetDetails([asset.barcode])
@@ -81,11 +76,6 @@ async function addAssetBatch(transferNumber: string, assets: AssetSummary[]) {
   const cacheKey = transferDetailKey(transferNumber)
   const ids = assets.map((a) => a.id)
   const barcodes = assets.map((a) => a.barcode)
-  mutate<TransferDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, ...assets] } : current),
-    { revalidate: false },
-  )
   try {
     await patchTransferAssets(transferNumber, { assetIdsToAdd: ids, assetIdsToRemove: [] })
     invalidateAssetDetails(barcodes)
@@ -146,7 +136,7 @@ function flushPending(transferNumber: string) {
   flushPendingPriceInvalidation(priceSaveSpec(transferNumber))
 }
 
-function removeAsset(transferNumber: string, asset: AssetSummary) {
+function removeAsset(transferNumber: string, asset: AssetIdentity) {
   scheduleAssetRemoval(
     {
       collectionId: transferNumber,
@@ -158,7 +148,7 @@ function removeAsset(transferNumber: string, asset: AssetSummary) {
   )
 }
 
-function bulkRemoveAssets(transferNumber: string, assets: AssetSummary[]) {
+function bulkRemoveAssets(transferNumber: string, assets: AssetIdentity[]) {
   scheduleBulkAssetRemoval(
     {
       collectionId: transferNumber,

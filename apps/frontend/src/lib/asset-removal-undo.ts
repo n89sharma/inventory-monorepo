@@ -1,5 +1,5 @@
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
-import type { AssetDelta, AssetSummary } from 'shared-types'
+import type { AssetDelta, AssetIdentity } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 
@@ -16,7 +16,7 @@ interface RemovalSpec {
 }
 
 interface HasAssets {
-  assets: AssetSummary[]
+  assets: { id: number }[]
 }
 
 function makeKey(collectionId: string, suffix: string): string {
@@ -33,7 +33,7 @@ function buildUndo(key: string, detailCacheKey: string) {
   }
 }
 
-export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetSummary): void {
+export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetIdentity): void {
   const key = makeKey(spec.collectionId, String(asset.id))
 
   mutate<HasAssets>(
@@ -66,7 +66,7 @@ export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetSummary): vo
   })
 }
 
-export function scheduleBulkAssetRemoval(spec: RemovalSpec, assets: AssetSummary[]): void {
+export function scheduleBulkAssetRemoval(spec: RemovalSpec, assets: AssetIdentity[]): void {
   if (assets.length === 0) return
   const ids = assets.map((a) => a.id)
   const idSet = new Set(ids)

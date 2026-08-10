@@ -1,5 +1,6 @@
 import {
   ASSET_STATUS,
+  AssetSearchRow,
   AssetSummary,
   Country,
   CreateArrival,
@@ -13,6 +14,7 @@ import {
   INVOICE_TYPE,
   ModelSummary,
   OrgSummary,
+  searchRowToAssetSummary,
   Status,
   UpdateAssetSpecs,
   Warehouse,
@@ -281,7 +283,11 @@ export async function createArrivedAssets(
 ): Promise<AssetSummary[]> {
   const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, count), refs.userId)
   const { assets } = await getArrival(arrivalNumber, 'admin')
-  return assets
+  return assets.map(searchRowToAssetSummary)
+}
+
+export function assetCostOf(row: AssetSearchRow): AssetCost | null {
+  return searchRowToAssetSummary(row).cost ?? null
 }
 
 export function buildCreateHoldInput(refs: ArrivalTestData, assets: AssetSummary[]): CreateHold {

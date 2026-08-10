@@ -4,29 +4,35 @@ import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-seg
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
+import { ColumnPickerButton } from '@/components/shared/column-picker-button'
+import {
+  DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION,
+  type CollectionSection,
+} from '@/components/table-columns/collection-detail-columns'
+import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import type { AssetSummary, CollectionHistory } from 'shared-types'
+import {
+  searchRowToAssetSummary,
+  type AssetSearchRow,
+  type AssetSummary,
+  type CollectionHistory,
+} from 'shared-types'
 import { DataTable } from '@/components/shared/data-table'
 import { Toggle } from '@/components/shadcn/toggle'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
-type DetailSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
-
 // Raw database casing; the title-cased reference-data value ('Copier') would never match.
 const COPIER_ASSET_TYPE = 'COPIER'
 
 const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
-// created_at drives the default sort but is not shown; the detail tables have no
-// column picker, so hide it explicitly.
-const ASSET_COLUMN_VISIBILITY = { created_at: false }
-const getAssetRowId = (asset: AssetSummary) => asset.barcode
-const EMPTY_ASSETS: AssetSummary[] = []
+const getAssetRowId = (asset: AssetSearchRow) => asset.barcode
+const EMPTY_ASSETS: AssetSearchRow[] = []
 
-interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> {
-  section: DetailSection
+interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }> {
+  section: CollectionSection
   titleLabel: string
   collectionId: string
   canCreateEditEntity: boolean
@@ -41,8 +47,8 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   historyFetcher: () => Promise<CollectionHistory>
   onBulkRemove?: (assets: AssetSummary[]) => void
   onFlushPending?: (collectionId: string) => void
-  buildColumns: (assetHref: (asset: AssetSummary) => string) => ColumnDef<AssetSummary>[]
-  tableMeta?: TableMeta<AssetSummary>
+  buildColumns: (assetHref: (asset: AssetSearchRow) => string) => ColumnDef<AssetSearchRow>[]
+  tableMeta?: TableMeta<AssetSearchRow>
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
@@ -53,14 +59,14 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSummary[] }> 
   renderAddAssetBar?: (entity: TEntity) => React.ReactNode
   renderHeaderActions?: (entity: TEntity) => React.ReactNode
   renderBulkExtraActions?: (args: {
-    selectedAssets: AssetSummary[]
+    selectedAssets: AssetSearchRow[]
     clearSelection: () => void
   }) => React.ReactNode
   onRelease?: () => void
   onDelete?: () => void
 }
 
-export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>({
+export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] }>({
   section,
   titleLabel,
   collectionId,
@@ -88,9 +94,11 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [copiersOnly, setCopiersOnly] = useState(false)
+  const { visibleColumns, setVisibleColumns, columnVisibility, onColumnVisibilityChange, reset } =
+    useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
 
   const assetHref = useMemo(
-    () => (asset: AssetSummary) => `/${section}/${collectionId}/${asset.barcode}`,
+    () => (asset: AssetSearchRow) => `/${section}/${collectionId}/${asset.barcode}`,
     [section, collectionId],
   )
   const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
@@ -118,6 +126,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
   const entity = detail.data
 
   const selectedAssets = entity.assets.filter((asset) => rowSelection[asset.barcode])
+  const selectedSummaries = selectedAssets.map(searchRowToAssetSummary)
   const clearSelection = () => setRowSelection({})
   const selectAll = (rowIds: string[]) =>
     setRowSelection(Object.fromEntries(rowIds.map((id) => [id, true])))
@@ -135,12 +144,18 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
         actions={
           <div className="flex items-center gap-2">
             {renderHeaderActions?.(entity)}
+            <ColumnPickerButton
+              visible={visibleColumns}
+              onVisibleChange={setVisibleColumns}
+              onReset={reset}
+            />
             <CollectionEditBar
               section={section}
               collectionId={collectionId}
               canCreateEditEntity={canCreateEditEntity}
               assets={entity.assets}
               selectedAssets={selectedAssets}
+              visibleColumns={visibleColumns}
               historyCacheKey={historyCacheKey}
               historyFetcher={historyFetcher}
               onEdit={() => setIsMetadataModalOpen(true)}
@@ -197,7 +212,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
             const filteredRowIds = table.getFilteredRowModel().rows.map((row) => row.id)
             return (
               <BulkEditBar
-                selectedAssets={selectedAssets}
+                selectedAssets={selectedSummaries}
                 onClear={clearSelection}
                 refreshKey={refreshKey}
                 currentCollectionType={section}
@@ -218,7 +233,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSummary[] }>
           getRowId={getAssetRowId}
           defaultSort={DEFAULT_ASSET_SORT}
           pinLeft={PINNED_ASSET_COLUMN_IDS}
-          columnVisibility={ASSET_COLUMN_VISIBILITY}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={onColumnVisibilityChange}
           meta={tableMeta}
         />
       </PageContent>

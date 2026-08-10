@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 
-export type AssetInvoiceSelector = (asset: AssetSummary) => string | null
+export type AssetInvoiceSelector = (asset: AssetSearchRow) => string | null
 
 type InvoiceBucket = { invoice_number: string | null; count: number }
 
 function groupAssetsByInvoice(
-  assets: AssetSummary[],
+  assets: AssetSearchRow[],
   getInvoiceNumber: AssetInvoiceSelector,
 ): InvoiceBucket[] {
   const counts = new Map<string | null, number>()
@@ -42,7 +42,7 @@ export function InvoiceSummaryField({
   assets,
   getInvoiceNumber,
 }: {
-  assets: AssetSummary[]
+  assets: AssetSearchRow[]
   getInvoiceNumber: AssetInvoiceSelector
 }) {
   const invoiceBuckets = useMemo(

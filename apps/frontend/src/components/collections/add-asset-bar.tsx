@@ -3,7 +3,7 @@ import { AddAssetsByBarcodeOrSerial } from './add-assets-by-barcode-or-serial'
 import { AddFromHoldButton } from './add-from-hold-button'
 
 interface AddAssetBarProps {
-  existingAssets: AssetSummary[]
+  existingAssets: { id: number; barcode: string }[]
   entityName: string
   onAddSingle: (asset: AssetSummary) => Promise<void>
   onAddBatchFromHold?: (assets: AssetSummary[]) => Promise<void>

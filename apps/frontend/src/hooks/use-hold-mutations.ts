@@ -14,7 +14,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
-import type { AssetSummary, HoldDetail } from 'shared-types'
+import type { AssetIdentity, AssetSearchRow, AssetSummary } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: HoldForm) {
@@ -24,7 +24,7 @@ async function create(data: HoldForm) {
   return result
 }
 
-async function getAssets(holdNumber: string): Promise<AssetSummary[]> {
+async function getAssets(holdNumber: string): Promise<AssetSearchRow[]> {
   return (await getHoldDetail(holdNumber)).assets
 }
 
@@ -48,11 +48,6 @@ async function addAssets(holdNumber: string, assets: AssetSummary[]) {
 
 async function addAsset(holdNumber: string, asset: AssetSummary) {
   const cacheKey = holdDetailKey(holdNumber)
-  mutate<HoldDetail>(
-    cacheKey,
-    (current) => (current ? { ...current, assets: [...current.assets, asset] } : current),
-    { revalidate: false },
-  )
   try {
     await patchHoldAssets(holdNumber, { assetIdsToAdd: [asset.id], assetIdsToRemove: [] })
     invalidateAssetDetails([asset.barcode])
@@ -79,7 +74,7 @@ async function archive(holdNumber: string) {
   invalidateHoldLists()
 }
 
-function removeAsset(holdNumber: string, asset: AssetSummary) {
+function removeAsset(holdNumber: string, asset: AssetIdentity) {
   scheduleAssetRemoval(
     {
       collectionId: holdNumber,
@@ -94,7 +89,7 @@ function removeAsset(holdNumber: string, asset: AssetSummary) {
 async function moveAssets(
   sourceHoldNumber: string,
   destinationHoldNumber: string,
-  assets: AssetSummary[],
+  assets: AssetIdentity[],
 ) {
   await moveHoldAssets(destinationHoldNumber, {
     sourceHoldNumber,
@@ -106,7 +101,7 @@ async function moveAssets(
   invalidateHoldLists()
 }
 
-function bulkRemoveAssets(holdNumber: string, assets: AssetSummary[]) {
+function bulkRemoveAssets(holdNumber: string, assets: AssetIdentity[]) {
   scheduleBulkAssetRemoval(
     {
       collectionId: holdNumber,

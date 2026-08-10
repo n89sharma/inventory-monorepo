@@ -3,7 +3,7 @@ import { CollectionDetailPage } from '@/components/collections/collection-detail
 import { EditInvoiceMetadataModal } from '@/components/invoice/edit-invoice-metadata-modal'
 import { InvoiceSummaryStrip } from '@/components/invoice/invoice-summary-strip'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { createInvoiceDetailColumns } from '@/components/table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { useCan } from '@/hooks/use-can'
 import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
@@ -14,7 +14,7 @@ import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { INVOICE_TYPE, type AssetSummary, type PatchAssetPricing } from 'shared-types'
+import { INVOICE_TYPE, type AssetSearchRow, type PatchAssetPricing } from 'shared-types'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
@@ -23,6 +23,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const mutations = useInvoiceMutations()
   const detail = useInvoiceDetail(invoiceNumber)
   const canCreateEditInvoice = useCan('create_update_invoice')
+  const can = useCan()
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewSalePrice = useCan('view_sale_price')
   const savePrice = useCallback(
@@ -34,15 +35,14 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const handleDelete = useEntityDelete('Invoice', invoiceNumber, mutations.remove)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
-      createInvoiceDetailColumns({
+    (assetHref: (asset: AssetSearchRow) => string) =>
+      createCollectionDetailColumns({
         getHref: assetHref,
+        can,
         onDelete: (asset) => mutations.removeAsset(invoiceNumber, asset),
-        canViewPurchasePrice,
-        canViewSalePrice,
         priceEditorRegistry,
       }),
-    [mutations, invoiceNumber, canViewPurchasePrice, canViewSalePrice, priceEditorRegistry],
+    [mutations, invoiceNumber, can, priceEditorRegistry],
   )
 
   return (

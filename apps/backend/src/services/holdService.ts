@@ -1,9 +1,17 @@
-import { AssetDelta, ASSET_STATUS, CreateHold, HoldDetail, UpdateHoldMetadata } from 'shared-types'
+import {
+  AssetDelta,
+  ASSET_STATUS,
+  type AppRole,
+  CreateHold,
+  HoldDetail,
+  UpdateHoldMetadata,
+} from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForHold } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
-import { mapAssetSummary } from '../lib/asset-mappers.js'
+import { mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import { mapUser } from '../lib/user-mappers.js'
 import {
   recordAssetStatusChange,
@@ -308,7 +316,7 @@ export async function moveAssetsToHold(
   if (archived) await recordHoldArchive(source.id, now, userId)
 }
 
-export async function getHold(holdNumber: string): Promise<HoldDetail> {
+export async function getHold(holdNumber: string, role: AppRole | null): Promise<HoldDetail> {
   const [hold, assets] = await Promise.all([
     prisma.hold.findUnique({
       where: { hold_number: holdNumber },
@@ -331,7 +339,7 @@ export async function getHold(holdNumber: string): Promise<HoldDetail> {
     from_dt: hold.from_dt,
     to_dt: hold.to_dt,
     archived_at: hold.archived_at,
-    assets: assets.map(mapAssetSummary),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
   }
 }
 

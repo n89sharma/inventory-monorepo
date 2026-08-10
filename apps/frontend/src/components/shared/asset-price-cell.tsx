@@ -1,8 +1,10 @@
 import { PriceInput } from '@/components/shared/price-input'
 import { formatUSDWithSymbol } from '@/lib/formatters'
 import {
-  isEditablePriceField,
+  editablePriceFieldForColumn,
+  EDITABLE_PRICE_COLUMNS,
   resolveAdjacentPriceCell,
+  type EditablePriceColumnId,
   type EditablePriceField,
   type PriceCellDirection,
   type PriceCellEditorRegistry,
@@ -10,7 +12,7 @@ import {
 } from '@/lib/price-cell-navigation'
 import type { Row, Table } from '@tanstack/react-table'
 import { useEffect, useRef, useState } from 'react'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 
 const MOVE_DOWN_KEY = 'Enter'
 const REVERT_KEY = 'Escape'
@@ -31,25 +33,27 @@ function toNumber(value: string): number {
   return parseFloat(value) || 0
 }
 
-function readPriceGridLayout(table: Table<AssetSummary>): PriceGridLayout {
+function visibleEditableFields(table: Table<AssetSearchRow>): EditablePriceField[] {
+  return table
+    .getVisibleLeafColumns()
+    .map((column) => editablePriceFieldForColumn(column.id))
+    .filter((field) => field !== undefined)
+}
+
+function readPriceGridLayout(table: Table<AssetSearchRow>): PriceGridLayout {
   return {
     rowIds: table.getRowModel().rows.map((row) => row.id),
-    fields: table
-      .getVisibleLeafColumns()
-      .map((column) => column.id)
-      .filter(isEditablePriceField),
+    fields: visibleEditableFields(table),
   }
 }
 
 function isKeyboardEntryCell(
-  table: Table<AssetSummary>,
+  table: Table<AssetSearchRow>,
   rowId: string,
   field: EditablePriceField,
 ): boolean {
   if (table.getRowModel().rows[0]?.id !== rowId) return false
-  return (
-    table.getVisibleLeafColumns().find((column) => isEditablePriceField(column.id))?.id === field
-  )
+  return visibleEditableFields(table)[0] === field
 }
 
 interface PriceButtonProps {
@@ -88,22 +92,23 @@ function PriceButton({
 }
 
 interface AssetPriceCellProps {
-  row: Row<AssetSummary>
-  field: EditablePriceField
+  row: Row<AssetSearchRow>
+  columnId: EditablePriceColumnId
   label: string
-  table: Table<AssetSummary>
+  table: Table<AssetSearchRow>
   editorRegistry: PriceCellEditorRegistry
 }
 
 export function AssetPriceCell({
   row,
-  field,
+  columnId,
   label,
   table,
   editorRegistry,
 }: AssetPriceCellProps): React.JSX.Element {
   const asset = row.original
-  const currSavedValue = asset.cost?.[field] ?? 0
+  const field = EDITABLE_PRICE_COLUMNS[columnId]
+  const currSavedValue = asset[columnId] ?? 0
   const [prevSavedValue, setPrevSavedValue] = useState(currSavedValue)
   const [value, setValue] = useState(String(currSavedValue))
   const [status, setStatus] = useState<SaveStatus>('idle')

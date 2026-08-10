@@ -12,7 +12,7 @@ import { useAuth } from '@clerk/react'
 import { LockSimpleOpenIcon } from '@phosphor-icons/react'
 import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
 import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
@@ -32,6 +32,7 @@ export function HoldDetailsPage(): React.JSX.Element {
   const { userId: clerkUserId } = useAuth()
   const canEditAny = useCan('edit_any_hold')
   const canCreateHold = useCan('create_update_hold')
+  const can = useCan()
   const [releaseOpen, setReleaseOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
 
@@ -57,12 +58,13 @@ export function HoldDetailsPage(): React.JSX.Element {
   const assetCount = detail.data?.assets.length ?? 0
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
+    (assetHref: (asset: AssetSearchRow) => string) =>
       createCollectionDetailColumns({
         getHref: assetHref,
+        can,
         onDelete: canEditHold ? (asset) => mutations.removeAsset(holdNumber, asset) : undefined,
       }),
-    [mutations, holdNumber, canEditHold],
+    [mutations, holdNumber, can, canEditHold],
   )
 
   return (

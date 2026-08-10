@@ -1,117 +1,56 @@
-import { AssetPriceCell } from '@/components/shared/asset-price-cell'
-import type { AssetInvoiceSelector } from '@/components/invoice/invoice-summary-field'
 import { Button } from '@/components/shadcn/button'
-import { isEditablePriceField, type PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
-import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
-import { StatusBadge } from '@/components/shared/status-badge'
-import {
-  formatDate,
-  formatLocation,
-  formatThousandsK,
-  formatTitleCase,
-  formatUSDWithSymbol,
-} from '@/lib/formatters'
+import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Link } from 'react-router-dom'
-import type { AssetCost, AssetSummary } from 'shared-types'
-import {
-  createIdColumn,
-  createSelectColumn,
-  MODEL_COLUMN_SIZE,
-  SERIAL_NUMBER_COLUMN_SIZE,
-  sortableHeader,
-} from './column-primitives'
+import type { AssetSearchRow, Permission } from 'shared-types'
+import type { AssetColumnId } from './asset-search-columns'
+import { createSelectColumn } from './column-primitives'
+import { createSearchPageColumns } from './search-page-columns'
 
-// The columns every detail table opens with, and the anchor the invoice column sits after.
-function identityColumns(getHref: (asset: AssetSummary) => string): ColumnDef<AssetSummary>[] {
-  return [
-    createSelectColumn<AssetSummary>(),
-    createIdColumn<AssetSummary>({
-      accessorKey: 'barcode',
-      header: sortableHeader<AssetSummary>('Barcode'),
-      href: getHref,
-      value: (row) => row.barcode,
-      filterFn: 'includesString',
-    }),
-    {
-      accessorKey: 'serial_number',
-      header: sortableHeader<AssetSummary>('Serial Number'),
-      filterFn: 'includesString',
-      size: SERIAL_NUMBER_COLUMN_SIZE,
-    },
-    {
-      accessorKey: 'model',
-      header: sortableHeader<AssetSummary>('Model'),
-      filterFn: 'includesString',
-      size: MODEL_COLUMN_SIZE,
-    },
-  ]
-}
+export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
-// Ends on location, the anchor the cost columns sit after.
-function specColumns(): ColumnDef<AssetSummary>[] {
-  return [
-    {
-      accessorKey: 'brand',
-      header: 'Brand',
-      cell: ({ row }) => formatTitleCase(row.original.brand),
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    },
-    {
-      accessorKey: 'readiness',
-      header: 'Readiness',
-      cell: ({ row }) => <ReadinessIcon status={row.original.readiness} />,
-    },
-    {
-      accessorKey: 'meter_total',
-      cell: ({ row }) => {
-        return formatThousandsK(row.getValue('meter_total'))
-      },
-      header: 'Total Meter',
-    },
-    {
-      accessorKey: 'cassettes',
-      header: 'Cassettes',
-      cell: ({ row }) => row.original.cassettes ?? '',
-    },
-    {
-      accessorKey: 'internal_finisher',
-      header: 'Internal Finisher',
-      cell: ({ row }) => row.original.internal_finisher ?? '',
-    },
-    {
-      accessorKey: 'accessories',
-      header: 'Accessories',
-      cell: ({ row }) => row.original.accessories.join(', '),
-    },
-    {
-      id: 'location',
-      accessorFn: (row) => formatLocation(row.location, row.is_in_transit),
-      header: sortableHeader<AssetSummary>('Location'),
-      cell: ({ getValue }) => getValue<string>(),
-    },
-  ]
-}
+const COMMON_DEFAULT_COLUMN_IDS = [
+  'serial_number',
+  'brand',
+  'status',
+  'readiness',
+  'specs_meter_total',
+  'specs_cassettes',
+  'specs_internal_finisher',
+  'accessories',
+  'location',
+] as const satisfies readonly AssetColumnId[]
 
-// Hidden by default (see collection-detail-page columnVisibility); defined so
-// the detail tables can default-sort by asset creation date.
-const CREATED_AT_COLUMN: ColumnDef<AssetSummary> = {
-  accessorKey: 'created_at',
-  header: 'Created',
-  cell: ({ row }) => formatDate(row.original.created_at),
-}
+const COST_DEFAULT_COLUMN_IDS = [
+  'cost_purchase_cost',
+  'cost_transport_cost',
+  'cost_processing_cost',
+  'cost_total_cost',
+  'cost_sale_price',
+] as const satisfies readonly AssetColumnId[]
+
+export const DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION = {
+  arrivals: [
+    'purchase_invoice_invoice_reference',
+    ...COMMON_DEFAULT_COLUMN_IDS,
+    ...COST_DEFAULT_COLUMN_IDS,
+  ],
+  departures: [
+    'sales_invoice_invoice_reference',
+    ...COMMON_DEFAULT_COLUMN_IDS,
+    ...COST_DEFAULT_COLUMN_IDS,
+  ],
+  transfers: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS],
+  invoices: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS, 'latest_comment'],
+  holds: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS],
+} as const satisfies Record<CollectionSection, readonly AssetColumnId[]>
 
 function actionColumns(
-  onEdit?: (asset: AssetSummary) => void,
-  onDelete?: (asset: AssetSummary) => void,
+  onEdit?: (asset: AssetSearchRow) => void,
+  onDelete?: (asset: AssetSearchRow) => void,
   disabledRowId?: number | null,
-): ColumnDef<AssetSummary>[] {
-  const columns: ColumnDef<AssetSummary>[] = []
+): ColumnDef<AssetSearchRow>[] {
+  const columns: ColumnDef<AssetSearchRow>[] = []
   if (onEdit) {
     columns.push({
       id: 'edit',
@@ -152,171 +91,26 @@ function actionColumns(
   return columns
 }
 
-interface CollectionDetailColumnOptions {
-  getHref: (asset: AssetSummary) => string
-  onDelete?: (asset: AssetSummary) => void
-  onEdit?: (asset: AssetSummary) => void
+export interface CollectionDetailColumnOptions {
+  getHref: (asset: AssetSearchRow) => string
+  can: (permission: Permission) => boolean
+  onDelete?: (asset: AssetSearchRow) => void
+  onEdit?: (asset: AssetSearchRow) => void
   disabledRowId?: number | null
+  priceEditorRegistry?: PriceCellEditorRegistry
 }
 
 export function createCollectionDetailColumns({
   getHref,
+  can,
   onDelete,
   onEdit,
   disabledRowId,
-}: CollectionDetailColumnOptions): ColumnDef<AssetSummary>[] {
-  return [
-    ...identityColumns(getHref),
-    ...specColumns(),
-    CREATED_AT_COLUMN,
-    ...actionColumns(onEdit, onDelete, disabledRowId),
-  ]
-}
-
-function createInvoiceColumn(
-  accessorKey: string,
-  getInvoiceNumber: AssetInvoiceSelector,
-): ColumnDef<AssetSummary> {
-  return {
-    accessorKey,
-    header: 'Invoice',
-    cell: ({ row }) => {
-      const invoiceNumber = getInvoiceNumber(row.original) ?? null
-      if (invoiceNumber === null) return null
-      return (
-        <Link to={`/invoices/${invoiceNumber}`} className="text-primary hover:underline">
-          {invoiceNumber}
-        </Link>
-      )
-    },
-  }
-}
-
-interface PricedCollectionDetailColumnOptions
-  extends CollectionDetailColumnOptions, CostColumnOptions {}
-
-export function createArrivalDetailColumns(
-  options: PricedCollectionDetailColumnOptions,
-): ColumnDef<AssetSummary>[] {
-  return [
-    ...identityColumns(options.getHref),
-    createInvoiceColumn('purchase_invoice_number', (a) => a.purchase_invoice_number),
-    ...specColumns(),
-    ...costColumns(options),
-    CREATED_AT_COLUMN,
-    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
-  ]
-}
-
-export function createDepartureDetailColumns(
-  options: PricedCollectionDetailColumnOptions,
-): ColumnDef<AssetSummary>[] {
-  return [
-    ...identityColumns(options.getHref),
-    createInvoiceColumn('sales_invoice_number', (a) => a.sales_invoice_number),
-    ...specColumns(),
-    ...costColumns(options),
-    CREATED_AT_COLUMN,
-    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
-  ]
-}
-
-export function createTransferDetailColumns(
-  options: PricedCollectionDetailColumnOptions,
-): ColumnDef<AssetSummary>[] {
-  return [
-    ...identityColumns(options.getHref),
-    ...specColumns(),
-    ...costColumns(options),
-    CREATED_AT_COLUMN,
-    ...actionColumns(options.onEdit, options.onDelete, options.disabledRowId),
-  ]
-}
-
-export const PURCHASE_COST_COLUMNS = [
-  ['purchase_cost', 'Purchase Cost'],
-  ['transport_cost', 'Transport Cost'],
-  ['processing_cost', 'Processing Cost'],
-  ['total_cost', 'Total Cost'],
-] as const satisfies ReadonlyArray<readonly [keyof AssetCost, string]>
-
-export const SALE_PRICE_COLUMN = ['sale_price', 'Sale Price'] as const satisfies readonly [
-  keyof AssetCost,
-  string,
-]
-
-const EDITABLE_COST_COLUMN_SIZE = 110
-
-function createCostColumn(
-  field: keyof AssetCost,
-  header: string,
-  priceEditorRegistry: PriceCellEditorRegistry | undefined,
-): ColumnDef<AssetSummary> {
-  if (priceEditorRegistry && isEditablePriceField(field)) {
-    return {
-      id: field,
-      header,
-      size: EDITABLE_COST_COLUMN_SIZE,
-      cell: ({ row, table }) => (
-        <AssetPriceCell
-          row={row}
-          field={field}
-          label={header}
-          table={table}
-          editorRegistry={priceEditorRegistry}
-        />
-      ),
-    }
-  }
-  return {
-    id: field,
-    header,
-    cell: ({ row }) => formatUSDWithSymbol(row.original.cost?.[field] ?? null),
-  }
-}
-
-export interface PricePermissions {
-  canViewPurchasePrice: boolean
-  canViewSalePrice: boolean
-}
-
-interface CostColumnOptions extends PricePermissions {
-  // Supplied only when the user holds edit_prices; absent renders read-only cost text.
-  priceEditorRegistry?: PriceCellEditorRegistry
-}
-
-function costColumns({
-  canViewPurchasePrice,
-  canViewSalePrice,
   priceEditorRegistry,
-}: CostColumnOptions): ColumnDef<AssetSummary>[] {
-  const columns: ColumnDef<AssetSummary>[] = []
-  if (canViewPurchasePrice) {
-    columns.push(
-      ...PURCHASE_COST_COLUMNS.map(([field, header]) =>
-        createCostColumn(field, header, priceEditorRegistry),
-      ),
-    )
-  }
-  if (canViewSalePrice) {
-    columns.push(createCostColumn(SALE_PRICE_COLUMN[0], SALE_PRICE_COLUMN[1], priceEditorRegistry))
-  }
-  return columns
-}
-
-interface InvoiceDetailColumnOptions extends CostColumnOptions {
-  getHref: (asset: AssetSummary) => string
-  onDelete?: (asset: AssetSummary) => void
-}
-
-export function createInvoiceDetailColumns(
-  options: InvoiceDetailColumnOptions,
-): ColumnDef<AssetSummary>[] {
+}: CollectionDetailColumnOptions): ColumnDef<AssetSearchRow>[] {
   return [
-    ...identityColumns(options.getHref),
-    ...specColumns(),
-    ...costColumns(options),
-    CREATED_AT_COLUMN,
-    ...actionColumns(undefined, options.onDelete),
+    createSelectColumn<AssetSearchRow>(),
+    ...createSearchPageColumns(getHref, can, priceEditorRegistry),
+    ...actionColumns(onEdit, onDelete, disabledRowId),
   ]
 }

@@ -1,6 +1,6 @@
 import { DepartureSummaryStrip } from '@/components/departure/departure-summary-strip'
 import { EditDepartureMetadataModal } from '@/components/departure/edit-departure-metadata-modal'
-import { createDepartureDetailColumns } from '@/components/table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -13,7 +13,7 @@ import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSummary, PatchAssetPricing } from 'shared-types'
+import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
@@ -22,8 +22,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const mutations = useDepartureMutations()
   const detail = useDepartureDetail(departureNumber)
   const canCreateEditDeparture = useCan('create_update_departure')
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
+  const can = useCan()
 
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
@@ -33,14 +32,13 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
-      createDepartureDetailColumns({
+    (assetHref: (asset: AssetSearchRow) => string) =>
+      createCollectionDetailColumns({
         getHref: assetHref,
-        canViewPurchasePrice,
-        canViewSalePrice,
+        can,
         priceEditorRegistry,
       }),
-    [canViewPurchasePrice, canViewSalePrice, priceEditorRegistry],
+    [can, priceEditorRegistry],
   )
 
   return (

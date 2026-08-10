@@ -1,7 +1,7 @@
 import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { useState } from 'react'
-import type { AssetSummary, HoldSuggestion } from 'shared-types'
+import type { AssetIdentity, HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
 import { DetailGrid, SearchView } from '../collections/collection-search'
 import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
@@ -55,7 +55,7 @@ interface MoveToHoldModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   sourceHoldNumber: string
-  selectedAssets: AssetSummary[]
+  selectedAssets: AssetIdentity[]
   onConfirmSuccess: () => void
 }
 

@@ -5,12 +5,12 @@ import {
 } from '@/lib/price-cell-navigation'
 import type { TableMeta } from '@tanstack/react-table'
 import { useMemo } from 'react'
-import type { AssetSummary, PatchAssetPricing } from 'shared-types'
+import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
 
 interface PriceCellEditing {
   // Absent when the user lacks edit_prices; the cost columns then render read-only text.
   priceEditorRegistry: PriceCellEditorRegistry | undefined
-  tableMeta: TableMeta<AssetSummary>
+  tableMeta: TableMeta<AssetSearchRow>
 }
 
 // `updatePrice` must be stable — pass the entity's mutation wrapped in a useCallback keyed on the
@@ -21,7 +21,7 @@ export function usePriceCellEditing(
   const canEditPrice = useCan('edit_prices')
   const registry = useMemo(() => createPriceCellEditorRegistry(), [])
 
-  const tableMeta = useMemo<TableMeta<AssetSummary>>(
+  const tableMeta = useMemo<TableMeta<AssetSearchRow>>(
     () => ({
       savePriceField: (barcode, field, value) => updatePrice(barcode, { [field]: value }),
     }),

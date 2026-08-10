@@ -27,25 +27,11 @@ import {
   getDepartedAssets as getDepartedAssetsQuery,
 } from '../../generated/prisma/sql.js'
 import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
-import { redactAssetCost } from '../lib/cost-redaction.js'
+import { redactAssetCost, redactSearchRowCost } from '../lib/cost-redaction.js'
 import { NotFoundError } from '../lib/errors.js'
 import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import { type BarcodeContent } from './barcodePrintService.js'
-
-function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSearchRow {
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
-  const canViewPurchase = permissions.includes('view_purchase_price')
-  const canViewSale = permissions.includes('view_sale_price')
-  return {
-    ...row,
-    cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
-    cost_transport_cost: canViewPurchase ? row.cost_transport_cost : null,
-    cost_processing_cost: canViewPurchase ? row.cost_processing_cost : null,
-    cost_total_cost: canViewPurchase ? row.cost_total_cost : null,
-    cost_sale_price: canViewSale ? row.cost_sale_price : null,
-  }
-}
 
 const NO_DATE_LOWER_BOUND = new Date('0001-01-01T00:00:00.000Z')
 const NO_DATE_UPPER_BOUND = new Date('9999-12-31T00:00:00.000Z')

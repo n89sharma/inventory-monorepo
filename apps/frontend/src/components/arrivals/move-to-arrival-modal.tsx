@@ -1,7 +1,7 @@
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { ARRIVAL_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useState } from 'react'
-import type { ArrivalSuggestion, AssetSummary } from 'shared-types'
+import type { ArrivalSuggestion, AssetIdentity } from 'shared-types'
 import { toast } from 'sonner'
 import { DetailGrid, SearchView } from '../collections/collection-search'
 import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
@@ -55,7 +55,7 @@ interface MoveToArrivalModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   sourceArrivalNumber: string
-  selectedAssets: AssetSummary[]
+  selectedAssets: AssetIdentity[]
   onConfirmSuccess: () => void
 }
 

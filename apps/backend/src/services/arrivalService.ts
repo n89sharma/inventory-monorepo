@@ -17,8 +17,8 @@ import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/s
 import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
-import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
-import { redactAssetCost } from '../lib/cost-redaction.js'
+import { mapAssetSearchRow, mapAssetSummary } from '../lib/asset-mappers.js'
+import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
   addRemoveCollectionFromAssets,
   recordCollectionAssetDelta,
@@ -104,10 +104,7 @@ export async function getArrival(
     comment: arrival.notes,
     created_at: arrival.created_at,
     created_by: arrival.created_by.name,
-    assets: assets.map((r) => ({
-      ...mapAssetSummary(r),
-      cost: redactAssetCost(mapAssetCost(r), role),
-    })),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
   }
 }
 

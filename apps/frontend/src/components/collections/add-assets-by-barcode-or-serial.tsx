@@ -14,7 +14,7 @@ const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
 const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 interface AddAssetsByBarcodeOrSerialProps {
-  getAssets: () => AssetSummary[]
+  getAssets: () => { barcode: string }[]
   onAddAsset: (asset: AssetSummary) => void
   entityName: string
   validateAsset?: (asset: AssetSummary) => string | null

@@ -1,10 +1,4 @@
-import {
-  AssetCost,
-  AssetDetails,
-  AssetLocationDetails,
-  AssetSearchRow,
-  AssetSummary,
-} from 'shared-types'
+import { AssetDetails, AssetLocationDetails, AssetSearchRow, AssetSummary } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generated/prisma/sql.js'
 import { decimalToNumber } from './decimal.js'
@@ -75,28 +69,6 @@ export function mapAssetSummary(r: AssetSummaryRow): AssetSummary {
   }
 }
 
-type AssetCostRow = {
-  cost_purchase_cost: Prisma.Decimal | null
-  cost_transport_cost: Prisma.Decimal | null
-  cost_processing_cost: Prisma.Decimal | null
-  cost_other_cost: Prisma.Decimal | null
-  cost_parts_cost: Prisma.Decimal | null
-  cost_total_cost: Prisma.Decimal | null
-  cost_sale_price: Prisma.Decimal | null
-}
-
-export function mapAssetCost(r: AssetCostRow): AssetCost {
-  return {
-    purchase_cost: decimalToNumber(r.cost_purchase_cost),
-    transport_cost: decimalToNumber(r.cost_transport_cost),
-    processing_cost: decimalToNumber(r.cost_processing_cost),
-    other_cost: decimalToNumber(r.cost_other_cost),
-    parts_cost: decimalToNumber(r.cost_parts_cost),
-    total_cost: decimalToNumber(r.cost_total_cost),
-    sale_price: decimalToNumber(r.cost_sale_price),
-  }
-}
-
 type AssetSearchRowDb = LocationRow & {
   id: number
   barcode: string
@@ -123,6 +95,8 @@ type AssetSearchRowDb = LocationRow & {
   cost_purchase_cost: Prisma.Decimal | null
   cost_transport_cost: Prisma.Decimal | null
   cost_processing_cost: Prisma.Decimal | null
+  cost_other_cost: Prisma.Decimal | null
+  cost_parts_cost: Prisma.Decimal | null
   cost_total_cost: Prisma.Decimal | null
   cost_sale_price: Prisma.Decimal | null
   hold_hold_number: string | null
@@ -171,6 +145,8 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     cost_purchase_cost: decimalToNumber(r.cost_purchase_cost),
     cost_transport_cost: decimalToNumber(r.cost_transport_cost),
     cost_processing_cost: decimalToNumber(r.cost_processing_cost),
+    cost_other_cost: decimalToNumber(r.cost_other_cost),
+    cost_parts_cost: decimalToNumber(r.cost_parts_cost),
     cost_total_cost: decimalToNumber(r.cost_total_cost),
     cost_sale_price: decimalToNumber(r.cost_sale_price),
     hold_hold_number: r.hold_hold_number,

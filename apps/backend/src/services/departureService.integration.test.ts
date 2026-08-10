@@ -9,6 +9,7 @@ import {
   getAssetHoldId,
   getAssetStatus,
   getHoldArchivedAt,
+  assetCostOf,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
@@ -47,18 +48,18 @@ describe('departureService', () => {
     await seedAssetCost(asset.id)
 
     const asAdmin = await getDeparture(departureNumber, 'admin')
-    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
+    expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
     // 'sales' has view_sale_price but not view_purchase_price
     const asSales = await getDeparture(departureNumber, 'sales')
-    expect(asSales.assets[0].cost).toEqual({
+    expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
     // 'member' has neither price permission
     const asMember = await getDeparture(departureNumber, 'member')
-    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+    expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('returns a null cost for an asset that has no Cost row', async () => {
@@ -69,7 +70,7 @@ describe('departureService', () => {
     )
 
     const departure = await getDeparture(departureNumber, 'admin')
-    expect(departure.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+    expect(assetCostOf(departure.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('applies each asset its own outgoing status on creation', async () => {

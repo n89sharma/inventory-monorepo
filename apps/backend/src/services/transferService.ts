@@ -13,8 +13,8 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { pluralize } from '../lib/pluralize.js'
-import { mapAssetCost, mapAssetSummary } from '../lib/asset-mappers.js'
-import { redactAssetCost } from '../lib/cost-redaction.js'
+import { mapAssetSearchRow } from '../lib/asset-mappers.js'
+import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
   recordAssetUpdateOnCollection,
   recordTransferCreate,
@@ -45,10 +45,7 @@ export async function getTransfer(
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets: assets.map((r) => ({
-      ...mapAssetSummary(r),
-      cost: redactAssetCost(mapAssetCost(r), role),
-    })),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
   }
 }
 

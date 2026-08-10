@@ -1,82 +1,52 @@
 import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { Row, Table, TableMeta } from '@tanstack/react-table'
-import type { AssetCost, AssetSummary } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 import { describe, expect, it, vi } from 'vitest'
+import { makeAssetSearchRow } from '@/test/asset-factories'
 import { AssetPriceCell } from './asset-price-cell'
 
 const LABEL = 'Purchase Cost'
 const BARCODE = 'BC-1'
 const FIELD_LABEL = `${LABEL} for ${BARCODE}`
-
-function makeCost(overrides: Partial<AssetCost> = {}): AssetCost {
-  return {
-    purchase_cost: 100,
-    transport_cost: 20,
-    processing_cost: 5,
-    other_cost: 0,
-    parts_cost: 0,
-    total_cost: 125,
-    sale_price: 200,
-    ...overrides,
-  }
-}
-
-function makeAsset(cost: AssetCost | null): AssetSummary {
-  return {
-    id: 1,
-    barcode: BARCODE,
-    brand: 'CANON',
-    model: 'IR-2020',
-    asset_type: 'COPIER',
-    serial_number: 'SN-1',
-    meter_total: 0,
-    cassettes: null,
-    internal_finisher: null,
-    accessories: [],
-    weight: 0,
-    size: 0,
-    status: 'IN_STOCK',
-    readiness: 'PP_OK',
-    location: null,
-    purchase_invoice_number: null,
-    sales_invoice_number: null,
-    is_in_transit: false,
-    created_at: new Date('2026-01-01T00:00:00Z'),
-    cost,
-  }
-}
+const COLUMN_ID = 'cost_purchase_cost'
+const SAVED_PURCHASE_COST = 100
 
 interface RenderedCell {
   // The read button, which is what the cell shows until an edit begins.
   readButton: HTMLButtonElement
   openEditor: () => HTMLInputElement
   // Re-renders with a different saved cost, standing in for a background revalidation.
-  revalidate: (cost: AssetCost | null) => void
+  revalidate: (purchaseCost: number | null) => void
 }
 
 function renderCell(
-  savePriceField: TableMeta<AssetSummary>['savePriceField'],
-  cost: AssetCost | null = makeCost(),
+  savePriceField: TableMeta<AssetSearchRow>['savePriceField'],
+  purchaseCost: number | null = SAVED_PURCHASE_COST,
 ): RenderedCell {
   // A single-cell grid: every direction resolves to null, so movement is covered by
   // price-cell-navigation.test.ts and asset-price-grid.test.tsx instead.
   const table = {
     options: { meta: { savePriceField } },
     getRowModel: () => ({ rows: [{ id: BARCODE }] }),
-    getVisibleLeafColumns: () => [{ id: 'purchase_cost' }],
-  } as unknown as Table<AssetSummary>
+    getVisibleLeafColumns: () => [{ id: COLUMN_ID }],
+  } as unknown as Table<AssetSearchRow>
   const registry = createPriceCellEditorRegistry()
-  const cell = (next: AssetCost | null) => (
+  const cell = (next: number | null) => (
     <AssetPriceCell
-      row={{ id: BARCODE, original: makeAsset(next) } as Row<AssetSummary>}
-      field="purchase_cost"
+      row={
+        {
+          id: BARCODE,
+          original: makeAssetSearchRow({ barcode: BARCODE, cost_purchase_cost: next }),
+        } as Row<AssetSearchRow>
+      }
+      columnId={COLUMN_ID}
       label={LABEL}
       table={table}
       editorRegistry={registry}
     />
   )
-  const { rerender } = render(cell(cost))
+  const { rerender } = render(cell(purchaseCost))
   const readButton = screen.getByLabelText(FIELD_LABEL)
   if (!(readButton instanceof HTMLButtonElement)) throw new Error('Expected a price read button')
   return {
@@ -204,7 +174,7 @@ describe('AssetPriceCell', () => {
     input.blur()
     await waitFor(() => expect(savePriceField).toHaveBeenCalled())
 
-    revalidate(makeCost({ purchase_cost: 250 }))
+    revalidate(250)
     await waitFor(() => expect(currentField()).toHaveTextContent('$250.00'))
 
     rejectSave(new Error('nope'))
@@ -244,7 +214,7 @@ describe('AssetPriceCell', () => {
 
     type(input, '999')
     fireEvent.keyDown(input, { key: 'Escape' })
-    revalidate(makeCost({ purchase_cost: 300 }))
+    revalidate(300)
 
     await waitFor(() => expect(currentField()).toHaveTextContent('$300.00'))
   })

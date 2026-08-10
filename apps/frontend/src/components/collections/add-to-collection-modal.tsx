@@ -8,7 +8,7 @@ import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow, AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 import { DetailGrid, SearchView } from './collection-search'
@@ -225,7 +225,7 @@ export function AddToCollectionModal({
     setDuplicateCount(0)
     setIsLoadingDetail(true)
     try {
-      let existing: AssetSummary[]
+      let existing: AssetSearchRow[]
       switch (collection.kind) {
         case 'arrival':
           throw new Error('Arrivals are not a valid target for adding assets')

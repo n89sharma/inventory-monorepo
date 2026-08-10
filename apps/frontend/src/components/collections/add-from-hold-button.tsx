@@ -4,7 +4,7 @@ import type { AssetSummary } from 'shared-types'
 import { Button } from '../shadcn/button'
 
 interface AddFromHoldButtonProps {
-  getAssets: () => AssetSummary[]
+  getAssets: () => { id: number; barcode: string }[]
   onAddAsset: (asset: AssetSummary) => void
   disabled?: boolean
   onCommitBatch?: (assets: AssetSummary[]) => Promise<void>

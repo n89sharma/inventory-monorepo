@@ -6,6 +6,7 @@ import {
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
+  assetCostOf,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
@@ -166,18 +167,18 @@ describe('invoiceService', () => {
     await seedAssetCost(asset.id)
 
     const asAdmin = await getInvoice(invoiceNumber, 'admin')
-    expect(asAdmin.assets[0].cost).toEqual(SEEDED_ASSET_COST)
+    expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
     // 'sales' has view_sale_price but not view_purchase_price
     const asSales = await getInvoice(invoiceNumber, 'sales')
-    expect(asSales.assets[0].cost).toEqual({
+    expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
     // 'member' has neither price permission
     const asMember = await getInvoice(invoiceNumber, 'member')
-    expect(asMember.assets[0].cost).toEqual(REDACTED_ASSET_COST)
+    expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('returns the distinct arrivals of the invoiced assets', async () => {

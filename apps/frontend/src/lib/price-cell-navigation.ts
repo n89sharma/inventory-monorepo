@@ -8,12 +8,21 @@ export const EDITABLE_PRICE_FIELDS = [
 
 export type EditablePriceField = (typeof EDITABLE_PRICE_FIELDS)[number]
 
-const EDITABLE_PRICE_FIELD_SET: ReadonlySet<string> = new Set<EditablePriceField>(
-  EDITABLE_PRICE_FIELDS,
+export const EDITABLE_PRICE_COLUMNS = {
+  cost_purchase_cost: 'purchase_cost',
+  cost_transport_cost: 'transport_cost',
+  cost_processing_cost: 'processing_cost',
+  cost_sale_price: 'sale_price',
+} as const satisfies Record<string, EditablePriceField>
+
+export type EditablePriceColumnId = keyof typeof EDITABLE_PRICE_COLUMNS
+
+const FIELD_BY_COLUMN_ID: ReadonlyMap<string, EditablePriceField> = new Map(
+  Object.entries(EDITABLE_PRICE_COLUMNS),
 )
 
-export function isEditablePriceField(field: string): field is EditablePriceField {
-  return EDITABLE_PRICE_FIELD_SET.has(field)
+export function editablePriceFieldForColumn(columnId: string): EditablePriceField | undefined {
+  return FIELD_BY_COLUMN_ID.get(columnId)
 }
 
 export interface PriceCellPosition {

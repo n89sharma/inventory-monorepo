@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   createPriceCellEditorRegistry,
-  isEditablePriceField,
+  editablePriceFieldForColumn,
   resolveAdjacentPriceCell,
   type EditablePriceField,
   type PriceCellDirection,
@@ -26,20 +26,24 @@ const SINGLE_CELL_LAYOUT: PriceGridLayout = {
   fields: ['purchase_cost'],
 }
 
-describe('isEditablePriceField', () => {
-  it('accepts the fields a user types', () => {
-    expect(isEditablePriceField('purchase_cost')).toBe(true)
-    expect(isEditablePriceField('other_cost')).toBe(true)
-    expect(isEditablePriceField('sale_price')).toBe(true)
+describe('editablePriceFieldForColumn', () => {
+  it('maps an editable cost column to the field the API patches', () => {
+    expect(editablePriceFieldForColumn('cost_purchase_cost')).toBe('purchase_cost')
+    expect(editablePriceFieldForColumn('cost_transport_cost')).toBe('transport_cost')
+    expect(editablePriceFieldForColumn('cost_sale_price')).toBe('sale_price')
   })
 
-  it('rejects the server-derived fields', () => {
-    expect(isEditablePriceField('total_cost')).toBe(false)
-    expect(isEditablePriceField('parts_cost')).toBe(false)
+  it('rejects the server-derived columns', () => {
+    expect(editablePriceFieldForColumn('cost_total_cost')).toBeUndefined()
+    expect(editablePriceFieldForColumn('cost_parts_cost')).toBeUndefined()
   })
 
-  it('rejects a column id that is not a price field at all', () => {
-    expect(isEditablePriceField('barcode')).toBe(false)
+  it('rejects a column id that is not a cost column at all', () => {
+    expect(editablePriceFieldForColumn('barcode')).toBeUndefined()
+  })
+
+  it('rejects a bare API field name, which is not a column id', () => {
+    expect(editablePriceFieldForColumn('purchase_cost')).toBeUndefined()
   })
 })
 

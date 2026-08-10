@@ -1,4 +1,4 @@
-import { createTransferDetailColumns } from '@/components/table-columns/collection-detail-columns'
+import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -17,7 +17,7 @@ import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   TRANSFER_STATUS,
-  type AssetSummary,
+  type AssetSearchRow,
   type PatchAssetPricing,
   type TransferDetail,
 } from 'shared-types'
@@ -30,8 +30,7 @@ export function TransferDetailsPage(): React.JSX.Element {
   const mutations = useTransferMutations()
   const detail = useTransferDetail(transferNumber)
   const canCreateEditTransfer = useCan('create_update_transfer')
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
+  const can = useCan()
   const isDraft = detail.data?.status === TRANSFER_STATUS.DRAFT
   const canEditAssets = canCreateEditTransfer && isDraft
 
@@ -44,24 +43,16 @@ export function TransferDetailsPage(): React.JSX.Element {
   const handleDelete = useEntityDelete('Transfer', transferNumber, mutations.remove)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSummary) => string) =>
-      createTransferDetailColumns({
+    (assetHref: (asset: AssetSearchRow) => string) =>
+      createCollectionDetailColumns({
         getHref: assetHref,
+        can,
         onDelete: canEditAssets
           ? (asset) => mutations.removeAsset(transferNumber, asset)
           : undefined,
-        canViewPurchasePrice,
-        canViewSalePrice,
         priceEditorRegistry,
       }),
-    [
-      mutations,
-      transferNumber,
-      canEditAssets,
-      canViewPurchasePrice,
-      canViewSalePrice,
-      priceEditorRegistry,
-    ],
+    [mutations, transferNumber, can, canEditAssets, priceEditorRegistry],
   )
 
   return (

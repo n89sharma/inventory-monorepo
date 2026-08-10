@@ -11,6 +11,7 @@ import {
   formatUSDWithSymbol,
   formatWeight,
 } from '@/lib/formatters'
+import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import type { SearchList } from '@/ui-types/navigation-context'
 import { differenceInCalendarDays } from 'date-fns'
 import type { ReactNode } from 'react'
@@ -60,7 +61,11 @@ export type ColumnSectionId =
 
 // What the barcode cell needs from the page rendering it: every list links an asset
 // back to its own section, so the href cannot be static.
-export type AssetCellContext = { detailHref: (row: AssetSearchRow) => string }
+export type AssetCellContext = {
+  detailHref: (row: AssetSearchRow) => string
+  // Supplied only when the viewer holds edit_prices; absent renders read-only cost text.
+  priceEditorRegistry?: PriceCellEditorRegistry
+}
 
 export type AssetSearchColumn = {
   readonly id: string
@@ -149,6 +154,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Barcode',
     section: 'general',
     alwaysVisible: true,
+    sortable: true,
     size: ID_COLUMN_SIZE,
     text: (a) => a.barcode,
     cell: (a, { detailHref }) => <IdLink to={detailHref(a)}>{a.barcode}</IdLink>,
@@ -178,6 +184,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'serial_number',
     label: 'Serial Number',
     section: 'general',
+    sortable: true,
     size: SERIAL_NUMBER_COLUMN_SIZE,
     text: (a) => a.serial_number,
   },

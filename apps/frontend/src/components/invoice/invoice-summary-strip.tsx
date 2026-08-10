@@ -1,11 +1,17 @@
 import { AssetCompositionField } from '@/components/shared/cards/asset-composition-field'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { formatUSDWithSymbol } from '@/lib/formatters'
-import type { AssetCost, AssetSummary, InvoiceDetail } from 'shared-types'
+import type { AssetSearchRow, InvoiceDetail } from 'shared-types'
 import { InvoiceArrivalsField } from './invoice-arrivals-field'
 
-function sumCost(assets: AssetSummary[], field: keyof AssetCost): number {
-  return assets.reduce((total, asset) => total + (asset.cost?.[field] ?? 0), 0)
+type CostColumnId =
+  | 'cost_purchase_cost'
+  | 'cost_transport_cost'
+  | 'cost_total_cost'
+  | 'cost_sale_price'
+
+function sumCost(assets: AssetSearchRow[], field: CostColumnId): number {
+  return assets.reduce((total, asset) => total + (asset[field] ?? 0), 0)
 }
 
 export function InvoiceSummaryStrip({
@@ -32,22 +38,22 @@ export function InvoiceSummaryStrip({
         <>
           <SummaryField
             label="Purchase Cost"
-            value={formatUSDWithSymbol(sumCost(invoice.assets, 'purchase_cost'))}
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'cost_purchase_cost'))}
           />
           <SummaryField
             label="Transport Cost"
-            value={formatUSDWithSymbol(sumCost(invoice.assets, 'transport_cost'))}
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'cost_transport_cost'))}
           />
           <SummaryField
             label="Total Cost"
-            value={formatUSDWithSymbol(sumCost(invoice.assets, 'total_cost'))}
+            value={formatUSDWithSymbol(sumCost(invoice.assets, 'cost_total_cost'))}
           />
         </>
       )}
       {canViewSalePrice && (
         <SummaryField
           label="Sale Price"
-          value={formatUSDWithSymbol(sumCost(invoice.assets, 'sale_price'))}
+          value={formatUSDWithSymbol(sumCost(invoice.assets, 'cost_sale_price'))}
         />
       )}
     </div>

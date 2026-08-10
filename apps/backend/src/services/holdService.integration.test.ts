@@ -2,12 +2,16 @@ import { ASSET_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
+  assetCostOf,
   buildCreateHoldInput,
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
   getHoldArchivedAt,
+  REDACTED_ASSET_COST,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -15,6 +19,7 @@ import {
   addRemoveCollectionFromAssetsAndRecord,
   archiveHold,
   createHold,
+  getHold,
   moveAssetsToHold,
 } from './holdService.js'
 
@@ -44,6 +49,35 @@ describe('holdService', () => {
 
   afterAll(async () => {
     await cleanupTransactionalData()
+  })
+
+  it('returns asset cost, redacted by role permissions', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
+    await seedAssetCost(asset.id)
+
+    const asAdmin = await getHold(holdNumber, 'admin')
+    expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
+
+    // 'sales' has view_sale_price but not view_purchase_price
+    const asSales = await getHold(holdNumber, 'sales')
+    expect(assetCostOf(asSales.assets[0])).toEqual({
+      ...REDACTED_ASSET_COST,
+      sale_price: SEEDED_ASSET_COST.sale_price,
+    })
+
+    // 'member' has neither price permission
+    const asMember = await getHold(holdNumber, 'member')
+    expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('redacts cost for a viewer with no role at all', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
+    await seedAssetCost(asset.id)
+
+    const asNobody = await getHold(holdNumber, null)
+    expect(assetCostOf(asNobody.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('sets every held asset to HELD on creation', async () => {
