@@ -41,6 +41,27 @@ export const EMPTY_STORE_TRANSACTION_FORM: StoreTransactionForm = {
   notes: '',
 }
 
+// Money is stored as Decimal(12,2), so anything finer than a cent cannot be represented.
+const UNIT_PRICE_PATTERN = /^\d+(\.\d{1,2})?$/
+
+// Restate what stock on hand is worth. Only the new unit price is collected — the
+// quantity revalued is whatever the ledger says is on hand when the backend records it.
+export const RevalueStorePartFormSchema = z
+  .object({
+    unitPrice: z.string(),
+    notes: z.string(),
+  })
+  .refine((form) => UNIT_PRICE_PATTERN.test(form.unitPrice.trim()), {
+    message: 'Enter a unit price of 0 or more, to at most two decimals',
+    path: ['unitPrice'],
+  })
+export type RevalueStorePartForm = z.infer<typeof RevalueStorePartFormSchema>
+
+export const EMPTY_REVALUE_STORE_PART_FORM: RevalueStorePartForm = {
+  unitPrice: '',
+  notes: '',
+}
+
 // Consume a part from store inventory onto an asset. part is a per-warehouse
 // summary row so its on_hand (stock guard) is available without a second lookup.
 // The cost is derived from the FIFO ledger on the backend, so no cost is collected here.

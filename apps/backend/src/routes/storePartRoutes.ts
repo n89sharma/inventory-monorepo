@@ -5,6 +5,7 @@ import {
   getAssetStoreParts,
   getStorePart,
   getStoreParts,
+  revalueStorePart,
 } from '../controllers/storePartController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -18,5 +19,6 @@ router.get('/asset/:barcode/parts', requirePermission('view_asset'), getAssetSto
 router.post('/asset/:barcode/parts', requirePermission('update_tech_specs'), addStorePartToAsset)
 router.get('/:partId', requirePermission('view_store'), getStorePart)
 router.post('/', requirePermission('create_update_store'), recordStoreTransaction)
+router.post('/:partId/revaluation', requirePermission('edit_prices'), revalueStorePart)
 
 export default router

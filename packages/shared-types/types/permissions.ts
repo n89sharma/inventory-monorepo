@@ -151,6 +151,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'view_asset',
     'view_collections',
     'view_reports',
+    'view_store',
     'create_update_arrival',
     'create_update_hold',
     'create_update_transfer',
@@ -164,6 +165,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
   accountant: [
     'view_asset',
     'view_collections',
+    'view_store',
     'view_sale_price',
     'create_update_invoice',
     'view_purchase_price',

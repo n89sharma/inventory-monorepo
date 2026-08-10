@@ -1,6 +1,9 @@
-import { recordStoreTransaction as recordStoreTransactionApi } from '@/data/api/store-part-api'
+import {
+  recordStoreTransaction as recordStoreTransactionApi,
+  revalueStorePart as revalueStorePartApi,
+} from '@/data/api/store-part-api'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
-import type { StoreTransactionForm } from '@/ui-types/store-part-form-types'
+import type { StoreTransactionForm, RevalueStorePartForm } from '@/ui-types/store-part-form-types'
 import type { StoreTransactionResponse } from 'shared-types'
 import { mutate } from 'swr'
 
@@ -14,8 +17,20 @@ async function recordStoreTransaction(
   return result
 }
 
+async function revalueStorePart(
+  partId: number,
+  warehouseId: number,
+  form: RevalueStorePartForm,
+): Promise<StoreTransactionResponse> {
+  const result = await revalueStorePartApi(partId, warehouseId, form)
+  invalidateStorePartLists()
+  mutate(storePartDetailKey(result.store_part_id))
+  return result
+}
+
 const mutations = {
   recordStoreTransaction,
+  revalueStorePart,
 } as const
 
 export function useStorePartMutations() {

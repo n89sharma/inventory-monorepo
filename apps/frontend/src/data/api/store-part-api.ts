@@ -1,10 +1,15 @@
 import { api } from '@/data/api/axios-client'
-import type { StoreTransactionForm, AddStorePartForm } from '@/ui-types/store-part-form-types'
+import type {
+  StoreTransactionForm,
+  AddStorePartForm,
+  RevalueStorePartForm,
+} from '@/ui-types/store-part-form-types'
 import type {
   RecordStoreTransaction,
   StoreTransactionResponse,
   AddStorePartToAsset,
   AssetStorePartRow,
+  RevalueStorePart,
   StorePartDetail,
   StorePartSummary,
 } from 'shared-types'
@@ -13,6 +18,7 @@ import {
   RecordStoreTransactionSchema,
   AddStorePartToAssetSchema,
   AssetStorePartRowSchema,
+  RevalueStorePartSchema,
   StorePartDetailSchema,
   StorePartSummarySchema,
 } from 'shared-types'
@@ -48,6 +54,23 @@ function buildPartPayload(part: StoreTransactionForm['part']): RecordStoreTransa
   if (part === null) throw new Error('No part selected')
   if ('id' in part) return { mode: 'existing', store_part_id: part.id }
   return { mode: 'new', part_number: part.part_number, description: part.description }
+}
+
+export async function revalueStorePart(
+  partId: number,
+  warehouseId: number,
+  form: RevalueStorePartForm,
+): Promise<StoreTransactionResponse> {
+  const revalueStorePartBody = RevalueStorePartSchema.parse({
+    warehouse_id: warehouseId,
+    unit_cost: Number(form.unitPrice),
+    notes: form.notes.trim() === '' ? null : form.notes,
+  } satisfies RevalueStorePart)
+  const { data } = await api.post<StoreTransactionResponse>(
+    `/store/${partId}/revaluation`,
+    revalueStorePartBody,
+  )
+  return StoreTransactionResponseSchema.parse(data)
 }
 
 export async function getAssetStoreParts(barcode: string): Promise<AssetStorePartRow[]> {

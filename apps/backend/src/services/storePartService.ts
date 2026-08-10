@@ -4,6 +4,7 @@ import {
   StoreTransactionResponse,
   AddStorePartToAsset,
   AssetStorePartRow,
+  RevalueStorePart,
   StorePartDetail,
 } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
@@ -27,6 +28,8 @@ import {
 import { prisma } from '../prisma.js'
 
 const USED_TYPE = 'USED'
+const REVALUATION_OUT_TYPE = 'REVALUATION_OUT'
+const REVALUATION_IN_TYPE = 'REVALUATION_IN'
 const ZERO_COST = new Prisma.Decimal(0)
 const UNIT_COST_DECIMAL_PLACES = 2
 
@@ -163,6 +166,81 @@ async function resolveStorePart(
 async function getNewStoreTransactionNumber(): Promise<string> {
   const sequence = await getNextSequence('store_transaction')
   return `S-${String(sequence).padStart(7, '0')}`
+}
+
+// Restate what the stock on hand is worth without moving any of it: an outbound leg
+// clears the current FIFO value and an inbound leg re-lays the same quantity at the new
+// price. Quantity nets to zero, and because the inbound leg is the newest layer it alone
+// covers the on-hand units — so stock is valued at the new price and later purchases
+// still enter at whatever they actually cost.
+export async function revalueStorePart(
+  partId: number,
+  data: RevalueStorePart,
+  userId: number,
+): Promise<StoreTransactionResponse> {
+  const [outType, inType] = await Promise.all([
+    prisma.storeTransactionType.findFirstOrThrow({
+      where: { type: REVALUATION_OUT_TYPE, is_inbound: false },
+      select: { id: true },
+    }),
+    prisma.storeTransactionType.findFirstOrThrow({
+      where: { type: REVALUATION_IN_TYPE, is_inbound: true },
+      select: { id: true },
+    }),
+  ])
+  const clearingNumber = await getNewStoreTransactionNumber()
+  const restatingNumber = await getNewStoreTransactionNumber()
+  const now = new Date()
+
+  return prisma.$transaction(async (tx) => {
+    const part = await tx.storePart.findUnique({
+      where: { id: partId },
+      select: { part_number: true },
+    })
+    if (!part) throw new NotFoundError(`Store part ${partId} not found`)
+
+    const [onHandRow] = await tx.$queryRawTyped(getStorePartOnHandDb(partId, data.warehouse_id))
+    const onHand = onHandRow?.on_hand ?? 0
+    if (onHand <= 0) {
+      throw new ConflictError('No stock on hand in the selected warehouse to revalue')
+    }
+
+    const layers = await tx.$queryRawTyped(getStorePartStockLayersDb(partId, data.warehouse_id))
+    const currentValue = stockValue(layers, onHand)
+
+    const leg = {
+      store_part_id: partId,
+      quantity: onHand,
+      warehouse_id: data.warehouse_id,
+      created_by_id: userId,
+      created_at: now,
+      notes: data.notes,
+    }
+    // Written oldest-first so the restating leg takes the higher id, which is what
+    // breaks the created_at tie both legs share.
+    await tx.storeTransaction.createMany({
+      data: [
+        {
+          ...leg,
+          store_transaction_number: clearingNumber,
+          transaction_type_id: outType.id,
+          unit_cost: currentValue.div(onHand).toDecimalPlaces(UNIT_COST_DECIMAL_PLACES),
+        },
+        {
+          ...leg,
+          store_transaction_number: restatingNumber,
+          transaction_type_id: inType.id,
+          unit_cost: data.unit_cost,
+        },
+      ],
+    })
+
+    return {
+      store_transaction_number: restatingNumber,
+      store_part_id: partId,
+      part_number: part.part_number,
+    }
+  })
 }
 
 export async function getAssetStoreParts(barcode: string): Promise<AssetStorePartRow[]> {

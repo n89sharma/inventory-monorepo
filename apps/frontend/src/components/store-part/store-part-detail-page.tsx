@@ -3,12 +3,14 @@ import { Button } from '@/components/shadcn/button'
 import { DataTable } from '@/components/shared/data-table'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { SummaryField } from '@/components/shared/cards/summary-field'
+import { RevalueStorePartModal } from '@/components/store-part/revalue-store-part-modal'
 import { StoreTransactionModal } from '@/components/store-part/store-transaction-modal'
 import { storeTransactionLedgerColumns } from '@/components/store-part/store-transaction-ledger-columns'
+import { useCan } from '@/hooks/use-can'
 import { useStorePartDetail } from '@/hooks/use-store-part'
 import { useStoreWarehousesParam } from '@/lib/filters/hooks'
 import { buildStorePartsPathByWarehouseId } from '@/lib/filters/serializers'
-import { PlusIcon } from '@phosphor-icons/react'
+import { PlusIcon, ScalesIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { StorePartWarehouseStock } from 'shared-types'
@@ -19,10 +21,19 @@ function onHandIn(stock: StorePartWarehouseStock[], warehouseId: number | null):
   return stock.find((entry) => entry.warehouse_id === warehouseId)?.on_hand ?? 0
 }
 
+// Revaluing restates one warehouse's stock, so it needs a warehouse holding some.
+function revalueBlockedReason(stock: StorePartWarehouseStock | null): string | undefined {
+  if (stock === null) return 'Open from a warehouse to revalue stock'
+  if (stock.on_hand <= 0) return 'No stock on hand in this warehouse to revalue'
+  return undefined
+}
+
 export function StorePartDetailPage(): React.JSX.Element {
   const { partId = '' } = useParams()
   const [scopeWarehouses] = useStoreWarehousesParam()
   const [addOpen, setAddOpen] = useState(false)
+  const [revalueOpen, setRevalueOpen] = useState(false)
+  const canEditPrices = useCan('edit_prices')
 
   const warehouse = scopeWarehouses[0] ?? null
   const warehouseId = warehouse?.id ?? null
@@ -53,6 +64,11 @@ export function StorePartDetailPage(): React.JSX.Element {
   }
 
   const onHand = onHandIn(data.stock, warehouseId)
+  const warehouseStock =
+    warehouseId === null
+      ? null
+      : (data.stock.find((entry) => entry.warehouse_id === warehouseId) ?? null)
+  const revalueBlocked = revalueBlockedReason(warehouseStock)
   const onHandLabel = warehouse ? `On hand (${warehouse.city_code})` : 'On hand'
   const backHref = buildStorePartsPathByWarehouseId(warehouseId)
 
@@ -63,14 +79,27 @@ export function StorePartDetailPage(): React.JSX.Element {
         title={data.part_number}
         copyValue={data.part_number}
         actions={
-          <Button
-            onClick={() => setAddOpen(true)}
-            disabled={!warehouse}
-            title={warehouse ? undefined : 'Open from a warehouse to record a transaction'}
-          >
-            <PlusIcon aria-hidden="true" />
-            Transaction
-          </Button>
+          <div className="flex items-center gap-2">
+            {canEditPrices && (
+              <Button
+                variant="outline"
+                onClick={() => setRevalueOpen(true)}
+                disabled={revalueBlocked !== undefined}
+                title={revalueBlocked}
+              >
+                <ScalesIcon aria-hidden="true" />
+                Revalue
+              </Button>
+            )}
+            <Button
+              onClick={() => setAddOpen(true)}
+              disabled={!warehouse}
+              title={warehouse ? undefined : 'Open from a warehouse to record a transaction'}
+            >
+              <PlusIcon aria-hidden="true" />
+              Transaction
+            </Button>
+          </div>
         }
         subtitle={
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
@@ -95,6 +124,18 @@ export function StorePartDetailPage(): React.JSX.Element {
           allParts={[]}
           lockedPart={{ id: data.id, part_number: data.part_number, description: data.description }}
           onHandByPartId={{ [data.id]: onHand }}
+        />
+      )}
+      {warehouse && warehouseStock && (
+        <RevalueStorePartModal
+          open={revalueOpen}
+          onOpenChange={setRevalueOpen}
+          partId={data.id}
+          partNumber={data.part_number}
+          warehouseId={warehouse.id}
+          warehouseLabel={warehouse.city_code}
+          onHand={warehouseStock.on_hand}
+          stockValue={warehouseStock.stock_value}
         />
       )}
     </>

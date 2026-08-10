@@ -95,6 +95,16 @@ export const RecordStoreTransactionSchema = z
   })
 export type RecordStoreTransaction = z.infer<typeof RecordStoreTransactionSchema>
 
+// POST /store/:partId/revaluation — restate the carrying value of the stock on hand in
+// one warehouse. Quantity is never supplied: the ledger's on-hand is the only authority,
+// so a revaluation always covers exactly what is held at the moment it is recorded.
+export const RevalueStorePartSchema = z.object({
+  warehouse_id: z.number().int(),
+  unit_cost: z.number().nonnegative(),
+  notes: z.string().nullable(),
+})
+export type RevalueStorePart = z.infer<typeof RevalueStorePartSchema>
+
 export const StoreTransactionResponseSchema = z.object({
   store_transaction_number: z.string(),
   store_part_id: z.number(),

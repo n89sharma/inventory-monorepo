@@ -55,6 +55,8 @@ export interface ArrivalTestData {
 const STORE_TXN_PURCHASE = 'PURCHASE'
 const STORE_TXN_USED = 'USED'
 const STORE_TXN_SALE = 'SALE'
+const STORE_TXN_REVALUATION_OUT = 'REVALUATION_OUT'
+const STORE_TXN_REVALUATION_IN = 'REVALUATION_IN'
 
 // Readiness reference codes. HAS_ERRORS / PP_OK are resolved by assetErrorService;
 // UNTESTED is the benign default handed to freshly-built assets.
@@ -188,6 +190,16 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
   await prisma.storeTransactionType.upsert({
     where: { type: STORE_TXN_SALE },
     create: { type: STORE_TXN_SALE, is_inbound: false },
+    update: {},
+  })
+  await prisma.storeTransactionType.upsert({
+    where: { type: STORE_TXN_REVALUATION_OUT },
+    create: { type: STORE_TXN_REVALUATION_OUT, is_inbound: false },
+    update: {},
+  })
+  await prisma.storeTransactionType.upsert({
+    where: { type: STORE_TXN_REVALUATION_IN },
+    create: { type: STORE_TXN_REVALUATION_IN, is_inbound: true },
     update: {},
   })
 
