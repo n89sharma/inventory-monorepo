@@ -10,18 +10,15 @@ import { createSearchPageColumns } from './search-page-columns'
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
 const COMMON_DEFAULT_COLUMN_IDS = [
-  'serial_number',
-  'brand',
   'status',
   'readiness',
   'specs_meter_total',
   'specs_cassettes',
   'specs_internal_finisher',
   'accessories',
-  'location',
 ] as const satisfies readonly AssetColumnId[]
 
-const COST_DEFAULT_COLUMN_IDS = [
+const PRICE_COLUMN_IDS = [
   'cost_purchase_cost',
   'cost_transport_cost',
   'cost_processing_cost',
@@ -30,19 +27,15 @@ const COST_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION = {
-  arrivals: [
-    'purchase_invoice_invoice_reference',
-    ...COMMON_DEFAULT_COLUMN_IDS,
-    ...COST_DEFAULT_COLUMN_IDS,
-  ],
+  arrivals: ['purchase_invoice_invoice_reference', ...COMMON_DEFAULT_COLUMN_IDS],
   departures: [
     'sales_invoice_invoice_reference',
     ...COMMON_DEFAULT_COLUMN_IDS,
-    ...COST_DEFAULT_COLUMN_IDS,
+    ...PRICE_COLUMN_IDS,
   ],
-  transfers: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS],
-  invoices: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS, 'latest_comment'],
-  holds: [...COMMON_DEFAULT_COLUMN_IDS, ...COST_DEFAULT_COLUMN_IDS],
+  transfers: [...COMMON_DEFAULT_COLUMN_IDS],
+  invoices: [...COMMON_DEFAULT_COLUMN_IDS, ...PRICE_COLUMN_IDS, 'latest_comment'],
+  holds: [...COMMON_DEFAULT_COLUMN_IDS, ...PRICE_COLUMN_IDS],
 } as const satisfies Record<CollectionSection, readonly AssetColumnId[]>
 
 function actionColumns(

@@ -50,14 +50,17 @@ const marginPercent = (salePrice: number | null, totalCost: number | null): numb
 }
 
 export type ColumnSectionId =
-  | 'specs'
+  | 'identity'
+  | 'status'
+  | 'general_specs'
   | 'cost'
-  | 'arrival'
-  | 'departure'
-  | 'hold'
   | 'invoice'
-  | 'general'
-  | 'last_comment'
+  | 'arrival'
+  | 'hold'
+  | 'departure'
+  | 'detailed_specs'
+  | 'profitability'
+  | 'other'
 
 // What the barcode cell needs from the page rendering it: every list links an asset
 // back to its own section, so the href cannot be static.
@@ -73,7 +76,7 @@ export type AssetSearchColumn = {
   readonly section: ColumnSectionId
   // Every listed permission is required; a viewer missing any one loses the column.
   readonly permissions?: readonly Permission[]
-  // Shown unconditionally and never offered in the picker: barcode, model.
+  // Shown unconditionally and never offered in the picker: barcode, serial number, model.
   readonly alwaysVisible?: boolean
   readonly sortable?: boolean
   readonly size?: number
@@ -87,15 +90,20 @@ export type AssetSearchColumn = {
   readonly cell?: (row: AssetSearchRow, context: AssetCellContext) => ReactNode
 }
 
+// Order here is the order the picker lists its groups in. Table column order is
+// independent: it follows ASSET_SEARCH_COLUMNS. 'identity' is deliberately absent —
+// its columns are alwaysVisible, so listing it would render an empty group.
 export const COLUMN_SECTIONS = [
-  { id: 'general', label: 'General' },
-  { id: 'specs', label: 'Specs' },
-  { id: 'arrival', label: 'Arrival' },
-  { id: 'departure', label: 'Departure' },
+  { id: 'status', label: 'Status' },
+  { id: 'general_specs', label: 'General Specifications' },
   { id: 'cost', label: 'Cost' },
-  { id: 'hold', label: 'Hold' },
   { id: 'invoice', label: 'Invoice' },
-  { id: 'last_comment', label: 'Last Comment' },
+  { id: 'arrival', label: 'Arrival' },
+  { id: 'hold', label: 'Hold' },
+  { id: 'departure', label: 'Departure' },
+  { id: 'detailed_specs', label: 'Detailed Specifications' },
+  { id: 'profitability', label: 'Profitability' },
+  { id: 'other', label: 'Other' },
 ] as const satisfies readonly { id: ColumnSectionId; label: string }[]
 
 function StatusCell({ asset }: { asset: AssetSearchRow }): ReactNode {
@@ -152,7 +160,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'barcode',
     label: 'Barcode',
-    section: 'general',
+    section: 'identity',
     alwaysVisible: true,
     sortable: true,
     size: ID_COLUMN_SIZE,
@@ -162,13 +170,13 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'brand',
     label: 'Brand',
-    section: 'general',
+    section: 'detailed_specs',
     text: (a) => formatTitleCase(a.brand),
   },
   {
     id: 'model',
     label: 'Model',
-    section: 'general',
+    section: 'identity',
     alwaysVisible: true,
     sortable: true,
     size: MODEL_COLUMN_SIZE,
@@ -177,13 +185,14 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'asset_type',
     label: 'Asset Type',
-    section: 'general',
+    section: 'detailed_specs',
     text: (a) => formatTitleCase(a.asset_type),
   },
   {
     id: 'serial_number',
     label: 'Serial Number',
-    section: 'general',
+    section: 'identity',
+    alwaysVisible: true,
     sortable: true,
     size: SERIAL_NUMBER_COLUMN_SIZE,
     text: (a) => a.serial_number,
@@ -191,14 +200,14 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'status',
     label: 'Status',
-    section: 'general',
+    section: 'status',
     text: (a) => formatTitleCase(a.status),
     cell: (a) => <StatusCell asset={a} />,
   },
   {
     id: 'readiness',
     label: 'Readiness',
-    section: 'general',
+    section: 'status',
     sortable: true,
     text: (a) => getReadinessDisplay(a.readiness),
     cell: (a) => <ReadinessIcon status={a.readiness} />,
@@ -206,7 +215,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'location',
     label: 'Location',
-    section: 'general',
+    section: 'other',
     sortable: true,
     accessor: (a) => formatLocation(a.location, a.is_in_transit),
     text: (a) => formatLocation(a.location, a.is_in_transit),
@@ -214,27 +223,27 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'country_of_origin',
     label: 'Country of Origin',
-    section: 'specs',
+    section: 'detailed_specs',
     text: (a) => formatTitleCase(a.country_of_origin ?? ''),
   },
   {
     id: 'specs_meter_total',
     label: 'Total Meter',
-    section: 'specs',
+    section: 'general_specs',
     sortable: true,
     text: (a) => formatThousandsK(a.specs_meter_total),
   },
   {
     id: 'weight',
     label: 'Weight',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => formatWeight(a.weight),
   },
   {
     id: 'size',
     label: 'Size',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => String(a.size),
   },
@@ -250,48 +259,48 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'specs_cassettes',
     label: 'Cassettes',
-    section: 'specs',
+    section: 'general_specs',
     sortable: true,
     text: (a) => optionalNumber(a.specs_cassettes),
   },
   {
     id: 'specs_internal_finisher',
     label: 'Internal Finisher',
-    section: 'specs',
+    section: 'general_specs',
     sortable: true,
     text: (a) => a.specs_internal_finisher ?? '',
   },
   {
     id: 'accessories',
     label: 'Accessories',
-    section: 'specs',
+    section: 'general_specs',
     text: (a) => a.accessories.join(', '),
   },
   {
     id: 'specs_toner_life_c',
     label: 'Toner Life C',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_c),
   },
   {
     id: 'specs_toner_life_m',
     label: 'Toner Life M',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_m),
   },
   {
     id: 'specs_toner_life_y',
     label: 'Toner Life Y',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_y),
   },
   {
     id: 'specs_toner_life_k',
     label: 'Toner Life K',
-    section: 'specs',
+    section: 'detailed_specs',
     sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_k),
   },
@@ -366,7 +375,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'gross_margin',
     label: 'Gross Margin',
-    section: 'cost',
+    section: 'profitability',
     permissions: MARGIN_PERMISSIONS,
     sortable: true,
     sortUndefined: 'last',
@@ -376,7 +385,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'margin_percent',
     label: 'Margin %',
-    section: 'cost',
+    section: 'profitability',
     permissions: MARGIN_PERMISSIONS,
     sortable: true,
     sortUndefined: 'last',
@@ -421,14 +430,14 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'created_at',
     label: 'Created',
-    section: 'general',
+    section: 'other',
     sortable: true,
     text: (a) => formatDate(a.created_at),
   },
   {
     id: 'stock_days',
     label: 'Stock Days',
-    section: 'general',
+    section: 'other',
     sortable: true,
     accessor: (a) => stockDays(a.created_at),
     text: (a) => String(stockDays(a.created_at)),
@@ -460,7 +469,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'latest_comment',
     label: 'Last Comment',
-    section: 'last_comment',
+    section: 'other',
     text: (a) => a.latest_comment ?? '',
     cell: (a) => <LastCommentCell comment={a.latest_comment} />,
   },
@@ -471,7 +480,6 @@ export type AssetColumnId = (typeof ASSET_SEARCH_COLUMN_LITERALS)[number]['id']
 export const ASSET_SEARCH_COLUMNS: readonly AssetSearchColumn[] = ASSET_SEARCH_COLUMN_LITERALS
 
 const ALL_DEFAULT_COLUMN_IDS = [
-  'serial_number',
   'status',
   'readiness',
   'specs_meter_total',
@@ -479,7 +487,6 @@ const ALL_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 const ONHAND_DEFAULT_COLUMN_IDS = [
-  'serial_number',
   'status',
   'readiness',
   'specs_meter_total',
@@ -508,7 +515,6 @@ const HARVESTED_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
-  'serial_number',
   'status',
   'arrival_created_at',
 ] as const satisfies readonly AssetColumnId[]

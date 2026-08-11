@@ -13,7 +13,7 @@ import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibili
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
 import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import {
   searchRowToAssetSummary,
   type AssetSearchRow,
@@ -21,12 +21,15 @@ import {
   type CollectionHistory,
 } from 'shared-types'
 import { DataTable } from '@/components/shared/data-table'
-import { Toggle } from '@/components/shadcn/toggle'
+import { Switch } from '@/components/shadcn/switch'
+import { Label } from '@/components/shadcn/label'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
 // Raw database casing; the title-cased reference-data value ('Copier') would never match.
 const COPIER_ASSET_TYPE = 'COPIER'
+
+const COPIERS_ONLY_LABEL = 'View copier only'
 
 const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 const getAssetRowId = (asset: AssetSearchRow) => asset.barcode
@@ -95,7 +98,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   const searchParams = useOptimisticSearchParams()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [copiersOnly, setCopiersOnly] = useState(false)
+  const [copiersOnly, setCopiersOnly] = useState(true)
   const { visibleColumns, setVisibleColumns, columnVisibility, onColumnVisibilityChange, reset } =
     useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
 
@@ -147,11 +150,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         actions={
           <div className="flex items-center gap-2">
             {renderHeaderActions?.(entity)}
-            <ColumnPickerButton
-              visible={visibleColumns}
-              onVisibleChange={setVisibleColumns}
-              onReset={reset}
-            />
             <CollectionEditBar
               section={section}
               collectionId={collectionId}
@@ -206,7 +204,14 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
                 clearLabel="Clear model"
                 className="w-50"
               />
-              <CopierFilterToggle pressed={copiersOnly} onPressedChange={setCopiersOnly} />
+              <CopierFilterToggle copiersOnly={copiersOnly} onCopiersOnlyChange={setCopiersOnly} />
+              <div className="ml-auto">
+                <ColumnPickerButton
+                  visible={visibleColumns}
+                  onVisibleChange={setVisibleColumns}
+                  onReset={reset}
+                />
+              </div>
             </>
           )}
           rowSelection={rowSelection}
@@ -246,23 +251,21 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
 }
 
 interface CopierFilterToggleProps {
-  pressed: boolean
-  onPressedChange: (pressed: boolean) => void
+  copiersOnly: boolean
+  onCopiersOnlyChange: (copiersOnly: boolean) => void
 }
 
 function CopierFilterToggle({
-  pressed,
-  onPressedChange,
+  copiersOnly,
+  onCopiersOnlyChange,
 }: CopierFilterToggleProps): React.JSX.Element {
+  const switchId = useId()
   return (
-    <Toggle
-      variant="outline"
-      pressed={pressed}
-      onPressedChange={onPressedChange}
-      aria-label="Show only copiers"
-      className="bg-background"
-    >
-      {pressed ? 'Show All' : 'Show Copiers'}
-    </Toggle>
+    <div className="flex shrink-0 items-center gap-2">
+      <Switch id={switchId} checked={copiersOnly} onCheckedChange={onCopiersOnlyChange} />
+      <Label htmlFor={switchId} className="whitespace-nowrap">
+        {COPIERS_ONLY_LABEL}
+      </Label>
+    </div>
   )
 }

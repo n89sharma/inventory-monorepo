@@ -1,17 +1,22 @@
 import { Button } from '@/components/shadcn/button'
-import { Checkbox } from '@/components/shadcn/checkbox'
 import { Input } from '@/components/shadcn/input'
+import { Label } from '@/components/shadcn/label'
+import { Switch } from '@/components/shadcn/switch'
 import {
   COLUMN_SECTIONS,
   type AssetSearchColumn,
 } from '@/components/table-columns/asset-search-columns'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 
 const SEARCH_PLACEHOLDER = 'Search columns'
 const EMPTY_RESULT_TEXT = 'No columns match'
 const RESET_LABEL = 'Reset to defaults'
+// Grows with the viewport but never past it: the popover's own available height, less the
+// search bar and reset footer that sit outside this scroll area.
+const SCROLL_AREA_MAX_HEIGHT =
+  'max-h-[min(640px,calc(var(--radix-popover-content-available-height)-6rem))]'
 
 type ColumnPickerProps = {
   visibleColSet: Set<string>
@@ -64,13 +69,13 @@ function SectionHeader({
       type="button"
       onClick={onToggle}
       className={cn(
-        'flex w-full items-center justify-between rounded px-2 py-1.5',
-        'text-xs font-medium uppercase tracking-wide text-muted-foreground',
+        'flex w-full items-center justify-between gap-2 rounded px-2 py-2 text-left',
+        'text-sm font-medium text-foreground',
         'hover:bg-accent hover:text-accent-foreground',
       )}
     >
-      <span>{label}</span>
-      <span className="tabular-nums">
+      <span className="min-w-0">{label}</span>
+      <span className="shrink-0 tabular-nums">
         {visibleCount}/{columnCount}
       </span>
     </button>
@@ -86,16 +91,19 @@ function ColumnRow({
   isOn: boolean
   onToggle: (checked: boolean) => void
 }): React.JSX.Element {
+  const switchId = useId()
   return (
-    <label
+    <div
       className={cn(
-        'flex items-center gap-2 rounded px-2 py-1 text-sm',
-        'cursor-pointer hover:bg-accent hover:text-accent-foreground',
+        'flex items-center gap-2 rounded py-1 pl-6 pr-2 text-sm',
+        'hover:bg-accent hover:text-accent-foreground',
       )}
     >
-      <Checkbox checked={isOn} onCheckedChange={(checked) => onToggle(!!checked)} />
-      <span className="truncate">{column.label}</span>
-    </label>
+      <Switch id={switchId} checked={isOn} onCheckedChange={onToggle} />
+      <Label htmlFor={switchId} className="min-w-0 flex-1 cursor-pointer font-normal">
+        <span className="truncate">{column.label}</span>
+      </Label>
+    </div>
   )
 }
 
@@ -155,33 +163,37 @@ export function ColumnPicker({
     <div className="flex flex-col gap-2 -m-0.5">
       <SearchBar query={query} onQueryChange={setQuery} />
 
-      <div className="max-h-[440px] overflow-y-auto -mx-0.5 px-0.5">
-        {hasAnyMatch ? (
-          groupedSections.map(({ section, columns, visibleColumns }) => {
-            const allOn = visibleColumns.length === columns.length
-            const columnIds = columns.map((c) => c.id)
-            return (
-              <div key={section.id} className="mb-1 last:mb-0">
-                <SectionHeader
-                  label={section.label}
-                  visibleCount={visibleColumns.length}
-                  columnCount={columns.length}
-                  onToggle={() => toggleSection(columnIds, allOn)}
-                />
-                {columns.map((col) => (
-                  <ColumnRow
-                    key={col.id}
-                    column={col}
-                    isOn={visibleColSet.has(col.id)}
-                    onToggle={(checked) => toggleColumn(col.id, checked)}
+      <div className={cn(SCROLL_AREA_MAX_HEIGHT, 'overflow-y-auto -mx-0.5 px-0.5')}>
+        {/* The multi-column element must size to its content: capping its height instead
+            makes the browser lay the overflow out as further columns to the right. */}
+        <div className="columns-2 gap-4">
+          {hasAnyMatch ? (
+            groupedSections.map(({ section, columns, visibleColumns }) => {
+              const allOn = visibleColumns.length === columns.length
+              const columnIds = columns.map((c) => c.id)
+              return (
+                <div key={section.id} className="mb-4 break-inside-avoid last:mb-0">
+                  <SectionHeader
+                    label={section.label}
+                    visibleCount={visibleColumns.length}
+                    columnCount={columns.length}
+                    onToggle={() => toggleSection(columnIds, allOn)}
                   />
-                ))}
-              </div>
-            )
-          })
-        ) : (
-          <div className="px-2 py-4 text-sm text-muted-foreground">{EMPTY_RESULT_TEXT}</div>
-        )}
+                  {columns.map((col) => (
+                    <ColumnRow
+                      key={col.id}
+                      column={col}
+                      isOn={visibleColSet.has(col.id)}
+                      onToggle={(checked) => toggleColumn(col.id, checked)}
+                    />
+                  ))}
+                </div>
+              )
+            })
+          ) : (
+            <div className="px-2 py-4 text-sm text-muted-foreground">{EMPTY_RESULT_TEXT}</div>
+          )}
+        </div>
       </div>
 
       <ResetFooter onReset={onReset} />

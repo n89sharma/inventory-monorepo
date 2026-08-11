@@ -13,7 +13,7 @@ import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 
 const CSV_ROW_DELIMITER = '\r\n'
-const ALWAYS_VISIBLE_COLUMN_IDS = ['barcode', 'model']
+const ALWAYS_VISIBLE_COLUMN_IDS = ['barcode', 'model', 'serial_number']
 const MARGIN_COLUMN_IDS = ['gross_margin', 'margin_percent']
 
 const allows =
@@ -145,7 +145,7 @@ describe('asset-search report columns', () => {
 
   it('exports the always-visible columns even when the viewer chose none', () => {
     const { header } = csvFor(makeRow(), [])
-    expect(header.split(',')).toEqual(['Barcode', 'Model'])
+    expect(header.split(',')).toEqual(['Barcode', 'Model', 'Serial Number'])
   })
 
   it('writes the full header row', () => {
@@ -230,18 +230,18 @@ describe('asset-search report columns', () => {
         bin: 'A12',
       },
     })
-    expect(csvFor(binRow, ['location']).data).toBe('BC-1,IR-2020,NYC | A12')
+    expect(csvFor(binRow, ['location']).data).toBe('BC-1,IR-2020,SN-1,NYC | A12')
   })
 
   it('reports an in-transit asset regardless of its stored location', () => {
     expect(csvFor(makeRow({ is_in_transit: true }), ['location']).data).toBe(
-      'BC-1,IR-2020,In transit',
+      'BC-1,IR-2020,SN-1,In transit',
     )
   })
 
-  it('emits only visible columns, keeping barcode and model always on', () => {
+  it('emits only visible columns, keeping the always-on identity columns', () => {
     const { header } = csvFor(makeRow(), ['status'])
-    expect(header).toBe('Barcode,Model,Status')
+    expect(header).toBe('Barcode,Model,Serial Number,Status')
   })
 
   // The CSV preserves whatever order it is handed. It does not sort, so the row order
@@ -367,29 +367,31 @@ describe('margin columns', () => {
 
   it('reports the margin and its percentage of the sale price', () => {
     expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: 1000 })).toBe(
-      'BC-1,IR-2020,$400.00,28.6%',
+      'BC-1,IR-2020,SN-1,$400.00,28.6%',
     )
   })
 
   it('keeps the minus outside the dollar sign when an asset sold below cost', () => {
     expect(marginCsv({ cost_sale_price: 800, cost_total_cost: 1000 })).toBe(
-      'BC-1,IR-2020,-$200.00,-25.0%',
+      'BC-1,IR-2020,SN-1,-$200.00,-25.0%',
     )
   })
 
   it('writes off the whole cost when an asset left at a zero sale price', () => {
     expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 500 })).toBe(
-      'BC-1,IR-2020,-$500.00,-100.0%',
+      'BC-1,IR-2020,SN-1,-$500.00,-100.0%',
     )
   })
 
   it('reports flat rather than a total loss when both the sale price and cost are zero', () => {
-    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 0 })).toBe('BC-1,IR-2020,$0.00,0.0%')
+    expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 0 })).toBe(
+      'BC-1,IR-2020,SN-1,$0.00,0.0%',
+    )
   })
 
   it('leaves both columns empty when either input is missing', () => {
-    expect(marginCsv({ cost_sale_price: null, cost_total_cost: 500 })).toBe('BC-1,IR-2020,,')
-    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: null })).toBe('BC-1,IR-2020,,')
+    expect(marginCsv({ cost_sale_price: null, cost_total_cost: 500 })).toBe('BC-1,IR-2020,SN-1,,')
+    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: null })).toBe('BC-1,IR-2020,SN-1,,')
   })
 
   it('orders by the computed number, not its formatted text, keeping unpriced assets last', () => {
@@ -433,9 +435,18 @@ describe('asset search columns', () => {
     )
   })
 
-  it('marks exactly barcode and model always visible', () => {
+  it('marks exactly barcode, model and serial number always visible', () => {
     const alwaysVisible = ASSET_SEARCH_COLUMNS.filter((c) => c.alwaysVisible).map((c) => c.id)
     expect(alwaysVisible).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
+  })
+
+  it('keeps every pickable column in a section the picker renders', () => {
+    const renderedSections = new Set<string>(COLUMN_SECTIONS.map((section) => section.id))
+    const orphaned = ASSET_SEARCH_COLUMNS.filter(
+      (c) => !c.alwaysVisible && !renderedSections.has(c.section),
+    ).map((c) => c.id)
+
+    expect(orphaned).toEqual([])
   })
 
   it('groups the pickable columns by section, in picker order', () => {
@@ -446,37 +457,11 @@ describe('asset search columns', () => {
       ),
     }))
     expect(grouped).toEqual([
+      { section: 'status', ids: ['status', 'readiness'] },
       {
-        section: 'general',
-        ids: [
-          'brand',
-          'asset_type',
-          'serial_number',
-          'status',
-          'readiness',
-          'location',
-          'created_at',
-          'stock_days',
-        ],
+        section: 'general_specs',
+        ids: ['specs_meter_total', 'specs_cassettes', 'specs_internal_finisher', 'accessories'],
       },
-      {
-        section: 'specs',
-        ids: [
-          'country_of_origin',
-          'specs_meter_total',
-          'weight',
-          'size',
-          'specs_cassettes',
-          'specs_internal_finisher',
-          'accessories',
-          'specs_toner_life_c',
-          'specs_toner_life_m',
-          'specs_toner_life_y',
-          'specs_toner_life_k',
-        ],
-      },
-      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
-      { section: 'departure', ids: ['customer', 'departed_at'] },
       {
         section: 'cost',
         ids: [
@@ -485,10 +470,13 @@ describe('asset search columns', () => {
           'cost_processing_cost',
           'cost_total_cost',
           'cost_sale_price',
-          'gross_margin',
-          'margin_percent',
         ],
       },
+      {
+        section: 'invoice',
+        ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
+      },
+      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
       {
         section: 'hold',
         ids: [
@@ -500,11 +488,23 @@ describe('asset search columns', () => {
           'hold_created_at',
         ],
       },
+      { section: 'departure', ids: ['customer', 'departed_at'] },
       {
-        section: 'invoice',
-        ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
+        section: 'detailed_specs',
+        ids: [
+          'brand',
+          'asset_type',
+          'country_of_origin',
+          'weight',
+          'size',
+          'specs_toner_life_c',
+          'specs_toner_life_m',
+          'specs_toner_life_y',
+          'specs_toner_life_k',
+        ],
       },
-      { section: 'last_comment', ids: ['latest_comment'] },
+      { section: 'profitability', ids: ['gross_margin', 'margin_percent'] },
+      { section: 'other', ids: ['location', 'created_at', 'stock_days', 'latest_comment'] },
     ])
   })
 })

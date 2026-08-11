@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AppRole } from 'shared-types'
 import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 
-const DEFAULT_IDS = ['serial_number', 'status'] as const satisfies readonly AssetColumnId[]
+const DEFAULT_IDS = ['location', 'status'] as const satisfies readonly AssetColumnId[]
 const PURCHASE_COST_ID = 'cost_purchase_cost' satisfies AssetColumnId
 
 const mocks = vi.hoisted(() => ({ role: 'admin' as AppRole }))
@@ -47,7 +47,7 @@ describe('useAssetColumnVisibilityParam', () => {
 
   it('writes an empty param rather than clearing it when the last column is unchecked', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
-    const { result } = renderWithParams('?cols=serial_number', onUrlUpdate)
+    const { result } = renderWithParams('?cols=location', onUrlUpdate)
 
     act(() => result.current.setVisibleColumns(new Set()))
 
@@ -67,7 +67,7 @@ describe('useAssetColumnVisibilityParam', () => {
 
   it('clears the param when the selection matches the defaults', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
-    const { result } = renderWithParams('?cols=serial_number', onUrlUpdate)
+    const { result } = renderWithParams('?cols=location', onUrlUpdate)
 
     act(() => result.current.setVisibleColumns(new Set(DEFAULT_IDS)))
 
@@ -94,12 +94,12 @@ describe('useAssetColumnVisibilityParam', () => {
 
   it('writes the param when the table hides a column through the change handler', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
-    const { result } = renderWithParams('?cols=serial_number,status', onUrlUpdate)
+    const { result } = renderWithParams('?cols=location,status', onUrlUpdate)
 
     act(() => result.current.onColumnVisibilityChange((prev) => ({ ...prev, status: false })))
 
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
-    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('serial_number')
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('location')
   })
 
   it('keeps ids it does not track out of the param the change handler writes', async () => {
@@ -121,11 +121,11 @@ describe('useAssetColumnVisibilityParam', () => {
 
   it('keeps a forced column out of the param it writes', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
-    const { result } = renderWithParams('?cols=serial_number', onUrlUpdate, [PURCHASE_COST_ID])
+    const { result } = renderWithParams('?cols=location', onUrlUpdate, [PURCHASE_COST_ID])
 
     act(() => result.current.setVisibleColumns(result.current.visibleColumns))
 
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
-    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('serial_number')
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('location')
   })
 })

@@ -37,7 +37,7 @@ export function ColumnPickerButton({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-72 p-2">
+      <PopoverContent align="end" className="w-144 p-2">
         <ColumnPicker
           visibleColSet={visible}
           onVisibleChange={onVisibleChange}
