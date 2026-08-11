@@ -47,14 +47,17 @@ export function isFromGlobalSearch(state: unknown): boolean {
   )
 }
 
+export function queryStringFrom(filters: URLSearchParams): string {
+  const query = filters.toString()
+  return query ? `?${query}` : ''
+}
+
 export function assetDetailHref(
   list: SearchList,
   barcode: string,
   filters: URLSearchParams,
 ): string {
-  const query = filters.toString()
-  const queryString = query ? `?${query}` : ''
-  return `${listBasePath(list)}/${list}/${barcode}${queryString}`
+  return `${listBasePath(list)}/${list}/${barcode}${queryStringFrom(filters)}`
 }
 
 export function collectionDetailHref(
@@ -62,7 +65,14 @@ export function collectionDetailHref(
   collectionId: string,
   filters: URLSearchParams,
 ): string {
-  const query = filters.toString()
-  const queryString = query ? `?${query}` : ''
-  return `/${section}/${collectionId}${queryString}`
+  return `/${section}/${collectionId}${queryStringFrom(filters)}`
+}
+
+export function collectionAssetHref(
+  section: NavigationSection,
+  collectionId: string,
+  barcode: string,
+  filters: URLSearchParams,
+): string {
+  return `/${section}/${collectionId}/${barcode}${queryStringFrom(filters)}`
 }

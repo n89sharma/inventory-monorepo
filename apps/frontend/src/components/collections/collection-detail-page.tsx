@@ -11,8 +11,9 @@ import {
 } from '@/components/table-columns/collection-detail-columns'
 import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
+import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
+import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import {
   searchRowToAssetSummary,
   type AssetSearchRow,
@@ -90,7 +91,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   onRelease,
   onDelete,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
-  const { search } = useLocation()
+  // nuqs writes the cols param shallowly, so useLocation would not see it.
+  const searchParams = useOptimisticSearchParams()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [copiersOnly, setCopiersOnly] = useState(false)
@@ -98,8 +100,9 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
 
   const assetHref = useMemo(
-    () => (asset: AssetSearchRow) => `/${section}/${collectionId}/${asset.barcode}${search}`,
-    [section, collectionId, search],
+    () => (asset: AssetSearchRow) =>
+      collectionAssetHref(section, collectionId, asset.barcode, searchParams),
+    [section, collectionId, searchParams],
   )
   const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
 
@@ -138,7 +141,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   return (
     <>
       <StickyDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary(section, search)}
+        breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
         title={header.title}
         copyValue={header.copyValue}
         actions={
