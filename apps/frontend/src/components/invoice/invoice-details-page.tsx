@@ -24,8 +24,6 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   const detail = useInvoiceDetail(invoiceNumber)
   const canCreateEditInvoice = useCan('create_update_invoice')
   const can = useCan()
-  const canViewPurchasePrice = useCan('view_purchase_price')
-  const canViewSalePrice = useCan('view_sale_price')
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
       mutations.updatePrice(invoiceNumber, barcode, patch),
@@ -65,13 +63,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         title: `Invoice ${invoice.invoice_reference}`,
         copyValue: invoice.invoice_reference,
       })}
-      renderSummaryStrip={(invoice) => (
-        <InvoiceSummaryStrip
-          invoice={invoice}
-          canViewPurchasePrice={canViewPurchasePrice}
-          canViewSalePrice={canViewSalePrice}
-        />
-      )}
+      renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
       renderSubtitle={(invoice) => (
         <>
           <SummaryField
