@@ -1,7 +1,7 @@
 import { patchAssetPricing } from '@/data/api/asset-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { invalidateAssetHistory } from '@/hooks/use-asset-history'
-import type { AssetSummary, PatchAssetPricing } from 'shared-types'
+import type { AssetCost, AssetSearchRow, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
 
 export interface PriceSaveSpec {
@@ -10,7 +10,22 @@ export interface PriceSaveSpec {
 }
 
 interface HasAssets {
-  assets: AssetSummary[]
+  assets: AssetSearchRow[]
+}
+
+// The server recomputes every field, including the derived total, so the whole cost is
+// spread back over the row rather than only the field that was patched.
+function withCost(asset: AssetSearchRow, cost: AssetCost): AssetSearchRow {
+  return {
+    ...asset,
+    cost_purchase_cost: cost.purchase_cost,
+    cost_transport_cost: cost.transport_cost,
+    cost_processing_cost: cost.processing_cost,
+    cost_other_cost: cost.other_cost,
+    cost_parts_cost: cost.parts_cost,
+    cost_total_cost: cost.total_cost,
+    cost_sale_price: cost.sale_price,
+  }
 }
 
 // One patch per price field returns the recomputed cost for the whole asset, so two in-flight
@@ -49,7 +64,7 @@ async function writePrice(spec: PriceSaveSpec, barcode: string, patch: PatchAsse
       current && {
         ...current,
         assets: current.assets.map((asset) =>
-          asset.barcode === barcode ? { ...asset, cost } : asset,
+          asset.barcode === barcode ? withCost(asset, cost) : asset,
         ),
       },
     { revalidate: false },
