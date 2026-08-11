@@ -98,8 +98,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
 
   const assetHref = useMemo(
-    () => (asset: AssetSearchRow) => `/${section}/${collectionId}/${asset.barcode}`,
-    [section, collectionId],
+    () => (asset: AssetSearchRow) => `/${section}/${collectionId}/${asset.barcode}${search}`,
+    [section, collectionId, search],
   )
   const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
 

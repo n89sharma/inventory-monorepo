@@ -23,7 +23,7 @@ export function getBreadcrumForAssetDetails(
   if (isCollection(section)) {
     return [
       { label: formatTitleCase(section), href: `/${section}` },
-      { label: collectionId ?? '', href: `/${section}/${collectionId}` },
+      { label: collectionId ?? '', href: `/${section}/${collectionId}${listSearch}` },
     ]
   }
 
