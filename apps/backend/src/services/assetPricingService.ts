@@ -94,64 +94,25 @@ export async function bulkUpdateAssetPricing(
   })
   const costMap = new Map(currentCosts.map((c) => [c.asset_id, toAssetCost(c)]))
 
+  const changes = items.map((item) => {
+    const assetId = assetMap.get(item.barcode)!
+    const currentCost = costMap.get(assetId) ?? toAssetCost(null)
+    return { assetId, currentCost, newCost: mergePricing(currentCost, item) }
+  })
+
   await prisma.$transaction(async (tx) => {
-    for (const item of items) {
-      const assetId = assetMap.get(item.barcode)!
-      const total_cost =
-        item.purchase_cost +
-        item.transport_cost +
-        item.processing_cost +
-        item.other_cost +
-        item.parts_cost
+    for (const { assetId, newCost } of changes) {
       await tx.cost.upsert({
         where: { asset_id: assetId },
-        update: {
-          purchase_cost: item.purchase_cost,
-          transport_cost: item.transport_cost,
-          processing_cost: item.processing_cost,
-          other_cost: item.other_cost,
-          parts_cost: item.parts_cost,
-          total_cost,
-          sale_price: item.sale_price,
-        },
-        create: {
-          asset_id: assetId,
-          purchase_cost: item.purchase_cost,
-          transport_cost: item.transport_cost,
-          processing_cost: item.processing_cost,
-          other_cost: item.other_cost,
-          parts_cost: item.parts_cost,
-          total_cost,
-          sale_price: item.sale_price,
-        },
+        update: newCost,
+        create: { asset_id: assetId, ...newCost },
       })
     }
   })
 
   await Promise.all(
-    items.map((item) => {
-      const assetId = assetMap.get(item.barcode)!
-      const currentCost = costMap.get(assetId) ?? toAssetCost(null)
-      const total_cost =
-        item.purchase_cost +
-        item.transport_cost +
-        item.processing_cost +
-        item.other_cost +
-        item.parts_cost
-      return recordAssetUpdate(
-        assetId,
-        currentCost,
-        {
-          purchase_cost: item.purchase_cost,
-          transport_cost: item.transport_cost,
-          processing_cost: item.processing_cost,
-          other_cost: item.other_cost,
-          parts_cost: item.parts_cost,
-          total_cost,
-          sale_price: item.sale_price,
-        },
-        userId,
-      )
-    }),
+    changes.map(({ assetId, currentCost, newCost }) =>
+      recordAssetUpdate(assetId, currentCost, newCost, userId),
+    ),
   )
 }

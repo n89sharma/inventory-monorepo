@@ -119,17 +119,18 @@ describe('BulkEditPricingModal', () => {
     expect(priceInput('Transport Cost', 'BC-1')).toHaveValue('')
   })
 
-  it('leaves an asset blank when its price failed to load', async () => {
+  it('never sends an asset whose price failed to load and was not edited', async () => {
     pricingState.data = { 'BC-1': makeCost({ purchase_cost: 150 }) }
     renderModal([ASSET_ONE, ASSET_TWO])
 
     expect(priceInput('Purchase Cost', 'BC-2')).toHaveValue('')
 
+    type(priceInput('Purchase Cost', 'BC-1'), '175')
     save()
 
     await waitFor(() => expect(bulkUpdatePricing).toHaveBeenCalled())
     const [items] = vi.mocked(bulkUpdatePricing).mock.calls[0]
-    expect(items[1]).toMatchObject({ barcode: 'BC-2', purchase_cost: 0, sale_price: 0 })
+    expect(items).toEqual([{ barcode: 'BC-1', purchase_cost: 175 }])
   })
 
   it('edits only the cell that was typed in', () => {
@@ -146,7 +147,7 @@ describe('BulkEditPricingModal', () => {
     expect(priceInput('Sale Price', 'BC-1')).toHaveValue('')
   })
 
-  it('sends the typed values, the untouched server values and the untouched parts cost', async () => {
+  it('sends only the fields that were typed, leaving the rest to the server', async () => {
     pricingState.data = {
       'BC-1': makeCost({ purchase_cost: 150, transport_cost: 20, parts_cost: 35 }),
     }
@@ -157,18 +158,18 @@ describe('BulkEditPricingModal', () => {
 
     await waitFor(() => expect(bulkUpdatePricing).toHaveBeenCalledTimes(1))
     const [items] = vi.mocked(bulkUpdatePricing).mock.calls[0]
-    expect(items).toEqual([
-      {
-        barcode: 'BC-1',
-        purchase_cost: 175,
-        transport_cost: 20,
-        processing_cost: 0,
-        other_cost: 0,
-        parts_cost: 35,
-        sale_price: 0,
-      },
-    ])
+    expect(items).toEqual([{ barcode: 'BC-1', purchase_cost: 175 }])
     await waitFor(() => expect(onSaveSuccess).toHaveBeenCalled())
+  })
+
+  it('sends nothing when no cell was edited', async () => {
+    pricingState.data = { 'BC-1': makeCost({ purchase_cost: 150 }) }
+    const { onOpenChange } = renderModal()
+
+    save()
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(bulkUpdatePricing).not.toHaveBeenCalled()
   })
 
   it('keeps a typed value when fresh server prices arrive underneath it', () => {

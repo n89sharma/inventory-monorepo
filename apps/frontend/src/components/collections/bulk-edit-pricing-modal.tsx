@@ -18,7 +18,7 @@ import { CircleNotchIcon } from '@phosphor-icons/react'
 import type { CellContext, ColumnDef, Table } from '@tanstack/react-table'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
-import type { AssetCost, AssetSummary } from 'shared-types'
+import type { AssetCost, AssetSummary, BulkUpdateAssetPricing } from 'shared-types'
 import { toast } from 'sonner'
 
 const EMPTY_PRICING: AssetPricing = Object.freeze({})
@@ -28,6 +28,8 @@ interface BulkEditPricingModalProps {
   selectedAssets: AssetSummary[]
   onSaveSuccess: () => void
 }
+
+type BulkPricingItem = BulkUpdateAssetPricing['items'][number]
 
 type PriceDraft = Partial<Record<EditablePriceField, string>>
 type PriceDrafts = Record<string, PriceDraft>
@@ -106,6 +108,23 @@ const columns: ColumnDef<PricingRow>[] = [
 
 function toAmount(text: string): number {
   return parseFloat(text) || 0
+}
+
+// Only the fields the user actually typed are sent, so an untouched field keeps whatever
+// the server already holds and a failed pricing read cannot overwrite anything.
+function toBulkPricingItem(barcode: string, draft: PriceDraft): BulkPricingItem {
+  const item: BulkPricingItem = { barcode }
+  for (const field of EDITABLE_PRICE_FIELDS) {
+    const typed = draft[field]
+    if (typed !== undefined) item[field] = toAmount(typed)
+  }
+  return item
+}
+
+function toBulkPricingItems(drafts: PriceDrafts): BulkPricingItem[] {
+  return Object.entries(drafts)
+    .map(([barcode, draft]) => toBulkPricingItem(barcode, draft))
+    .filter((item) => EDITABLE_PRICE_FIELDS.some((field) => item[field] !== undefined))
 }
 
 function serverText(cost: AssetCost | undefined, field: EditablePriceField): string {
@@ -230,20 +249,16 @@ export function BulkEditPricingModal({
     meta: { updatePriceDraft },
   })
 
+  const items = toBulkPricingItems(drafts)
+
   async function handleSave() {
+    if (items.length === 0) {
+      onOpenChange(false)
+      return
+    }
     setSaving(true)
     try {
-      await bulkUpdatePricing(
-        rows.map((row) => ({
-          barcode: row.barcode,
-          purchase_cost: toAmount(row.purchase_cost),
-          transport_cost: toAmount(row.transport_cost),
-          processing_cost: toAmount(row.processing_cost),
-          other_cost: toAmount(row.other_cost),
-          parts_cost: pricing[row.barcode]?.parts_cost ?? 0,
-          sale_price: toAmount(row.sale_price),
-        })),
-      )
+      await bulkUpdatePricing(items)
       toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
       onSaveSuccess()

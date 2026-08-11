@@ -86,6 +86,32 @@ describe('assetPricingService', () => {
     ).rejects.toThrow(NotFoundError)
   })
 
+  it('keeps the fields a bulk item omits and recomputes the total', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await patchAssetPricing(asset.barcode, FULL_PRICING, refs.userId)
+
+    await bulkUpdateAssetPricing([{ barcode: asset.barcode, purchase_cost: 200 }], refs.userId)
+
+    const cost = await getAssetCost(asset.id)
+    // parts_cost and other_cost were never sent, so they survive and still count in the total.
+    expect(cost?.parts_cost).toBe(FULL_PRICING.parts_cost)
+    expect(cost?.other_cost).toBe(FULL_PRICING.other_cost)
+    expect(cost?.sale_price).toBe(FULL_PRICING.sale_price)
+    expect(cost?.purchase_cost).toBe(200)
+    expect(cost?.total_cost).toBe(200 + 10 + 5 + 2 + 3)
+  })
+
+  it('applies a bulk update per asset, leaving the others alone', async () => {
+    const [first, second] = await createArrivedAssets(refs, 2)
+    await patchAssetPricing(first.barcode, FULL_PRICING, refs.userId)
+    await patchAssetPricing(second.barcode, FULL_PRICING, refs.userId)
+
+    await bulkUpdateAssetPricing([{ barcode: first.barcode, sale_price: 999 }], refs.userId)
+
+    expect((await getAssetCost(first.id))?.sale_price).toBe(999)
+    expect((await getAssetCost(second.id))?.sale_price).toBe(FULL_PRICING.sale_price)
+  })
+
   it('rejects a bulk update when any barcode does not exist', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const items: BulkUpdateAssetPricing['items'] = [
