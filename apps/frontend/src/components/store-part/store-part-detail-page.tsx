@@ -10,6 +10,8 @@ import { useCan } from '@/hooks/use-can'
 import { useStorePartDetail } from '@/hooks/use-store-part'
 import { useStoreWarehousesParam } from '@/lib/filters/hooks'
 import { buildStorePartsPathByWarehouseId } from '@/lib/filters/serializers'
+import { formatUSDWithSymbol } from '@/lib/formatters'
+import { effectiveUnitCost } from '@/lib/store-part-value'
 import { PlusIcon, ScalesIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -19,6 +21,18 @@ import type { StorePartWarehouseStock } from 'shared-types'
 function onHandIn(stock: StorePartWarehouseStock[], warehouseId: number | null): number {
   if (warehouseId === null) return stock.reduce((sum, entry) => sum + entry.on_hand, 0)
   return stock.find((entry) => entry.warehouse_id === warehouseId)?.on_hand ?? 0
+}
+
+// Cost redaction is all-or-nothing, so one withheld entry withholds the whole total.
+function stockValueIn(stock: StorePartWarehouseStock[], warehouseId: number | null): number | null {
+  const scoped =
+    warehouseId === null ? stock : stock.filter((entry) => entry.warehouse_id === warehouseId)
+  let total = 0
+  for (const entry of scoped) {
+    if (entry.stock_value === null) return null
+    total += entry.stock_value
+  }
+  return total
 }
 
 // Revaluing restates one warehouse's stock, so it needs a warehouse holding some.
@@ -69,6 +83,7 @@ export function StorePartDetailPage(): React.JSX.Element {
       ? null
       : (data.stock.find((entry) => entry.warehouse_id === warehouseId) ?? null)
   const revalueBlocked = revalueBlockedReason(warehouseStock)
+  const unitCost = effectiveUnitCost(stockValueIn(data.stock, warehouseId), onHand)
   const onHandLabel = warehouse ? `On hand (${warehouse.city_code})` : 'On hand'
   const backHref = buildStorePartsPathByWarehouseId(warehouseId)
 
@@ -105,6 +120,7 @@ export function StorePartDetailPage(): React.JSX.Element {
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
             <SummaryField label="Description" value={data.description} />
             <SummaryField label={onHandLabel} value={String(onHand)} />
+            <SummaryField label="Effective unit cost" value={formatUSDWithSymbol(unitCost)} />
           </div>
         }
       />
@@ -135,7 +151,7 @@ export function StorePartDetailPage(): React.JSX.Element {
           warehouseId={warehouse.id}
           warehouseLabel={warehouse.city_code}
           onHand={warehouseStock.on_hand}
-          stockValue={warehouseStock.stock_value}
+          currentUnitPrice={unitCost}
         />
       )}
     </>

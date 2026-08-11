@@ -35,8 +35,8 @@ interface RevalueStorePartModalProps {
   warehouseId: number
   warehouseLabel: string
   onHand: number
-  // FIFO value of the stock on hand; null for callers who cannot see purchase prices.
-  stockValue: number | null
+  // What the stock on hand is carried at per unit; null for callers who cannot see costs.
+  currentUnitPrice: number | null
 }
 
 type RevalueStorePartFormBodyProps = Omit<RevalueStorePartModalProps, 'open'>
@@ -62,7 +62,7 @@ function RevalueStorePartFormBody({
   warehouseId,
   warehouseLabel,
   onHand,
-  stockValue,
+  currentUnitPrice,
 }: RevalueStorePartFormBodyProps) {
   const { revalueStorePart } = useStorePartMutations()
   const [saving, setSaving] = useState(false)
@@ -71,10 +71,6 @@ function RevalueStorePartFormBody({
     resolver: zodResolver(RevalueStorePartFormSchema),
     defaultValues: EMPTY_REVALUE_STORE_PART_FORM,
   })
-
-  // A weighted average across the FIFO layers still on the shelf — the part has no
-  // single unit price, so this is what its stock is currently carried at per unit.
-  const currentUnitPrice = stockValue === null ? null : stockValue / onHand
 
   async function onValid(values: RevalueStorePartForm) {
     setSaving(true)
