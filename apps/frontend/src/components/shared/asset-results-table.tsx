@@ -13,35 +13,10 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table'
 import { memo, useMemo } from 'react'
-import type { AssetSearchRow, AssetSummary } from 'shared-types'
+import { searchRowToAssetSummary, type AssetSearchRow, type AssetSummary } from 'shared-types'
 
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const STOCK_DAYS_ASC_SORT = { id: 'stock_days', desc: false } as const
-
-function toAssetSummary(r: AssetSearchRow): AssetSummary {
-  return {
-    id: r.id,
-    barcode: r.barcode,
-    brand: r.brand,
-    model: r.model,
-    asset_type: r.asset_type,
-    serial_number: r.serial_number,
-    meter_total: r.specs_meter_total,
-    cassettes: r.specs_cassettes,
-    internal_finisher: r.specs_internal_finisher,
-    accessories: r.accessories,
-    weight: r.weight,
-    size: r.size,
-    status: r.status,
-    readiness: r.readiness,
-    location: r.location,
-    hold_number: r.hold_hold_number,
-    purchase_invoice_number: r.purchase_invoice_invoice_number,
-    sales_invoice_number: r.sales_invoice_invoice_number,
-    is_in_transit: r.is_in_transit,
-    created_at: r.created_at,
-  }
-}
 
 export const AssetResultsTable = memo(function AssetResultsTable({
   assets,
@@ -76,7 +51,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
 
   const selectedAssets: AssetSummary[] = assets
     .filter((a) => rowSelection[a.barcode])
-    .map(toAssetSummary)
+    .map(searchRowToAssetSummary)
 
   function selectAllAssets() {
     const all: RowSelectionState = {}
