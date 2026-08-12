@@ -1,6 +1,6 @@
 import type { OutgoingStatus } from 'shared-types'
 import { BulkActionBar } from '../collections/bulk-action-bar'
-import { DepartureOutgoingStatusToggle } from './departure-outgoing-status-toggle'
+import { DepartureOutgoingStatusMenu } from './departure-outgoing-status-menu'
 
 type DepartureOutgoingStatusBarProps = {
   selectedCount: number
@@ -24,7 +24,7 @@ export function DepartureOutgoingStatusBar({
       onSelectAll={onSelectAll}
       onClear={onClear}
     >
-      <DepartureOutgoingStatusToggle onApply={onApply} />
+      <DepartureOutgoingStatusMenu onApply={onApply} />
     </BulkActionBar>
   )
 }

@@ -4,13 +4,13 @@ import { ToggleGroup, ToggleGroupItem } from '../shadcn/toggle-group'
 
 const OUTGOING_STATUS_OPTIONS = OutgoingStatusSchema.options
 
-type DepartureOutgoingStatusToggleProps = {
+type DepartureOutgoingStatusMenuProps = {
   onApply: (status: OutgoingStatus) => void
 }
 
-export function DepartureOutgoingStatusToggle({
+export function DepartureOutgoingStatusMenu({
   onApply,
-}: DepartureOutgoingStatusToggleProps): React.ReactNode {
+}: DepartureOutgoingStatusMenuProps): React.ReactNode {
   const canEdit = useCan('create_update_departure')
   if (!canEdit) return null
 

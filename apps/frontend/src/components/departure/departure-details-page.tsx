@@ -4,7 +4,7 @@ import { createCollectionDetailColumns } from '@/components/table-columns/collec
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { DepartureOutgoingStatusToggle } from '@/components/departure/departure-outgoing-status-toggle'
+import { DepartureOutgoingStatusMenu } from '@/components/departure/departure-outgoing-status-menu'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
@@ -81,7 +81,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         )
       }
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
-        <DepartureOutgoingStatusToggle
+        <DepartureOutgoingStatusMenu
           onApply={(status) => {
             mutations.setOutgoingStatus(
               departureNumber,
