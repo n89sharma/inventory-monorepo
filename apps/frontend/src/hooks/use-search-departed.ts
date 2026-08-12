@@ -8,7 +8,7 @@ import {
   resolveWarehouseScope,
   type AssetFilters,
 } from '@/lib/filters/hooks'
-import type { AssetSearchRow, OrgSummary, Warehouse } from 'shared-types'
+import type { AssetSearchRow, OrgSummary, User, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
 export type SearchDepartedFilters = AssetFilters & {
@@ -17,6 +17,7 @@ export type SearchDepartedFilters = AssetFilters & {
   fromDate: Date
   toDate: Date
   customer: OrgSummary | null
+  salesperson: User | null
   invoiceReference: string
 }
 
@@ -55,6 +56,7 @@ export function useSearchDeparted(filters: SearchDepartedFilters) {
         filters.cassettes,
         filters.internalFinisher,
         filters.customer,
+        filters.salesperson,
         filters.invoiceReference,
         statuses,
         filters.fromDate,

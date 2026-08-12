@@ -326,6 +326,13 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => formatTitleCase(a.customer ?? ''),
   },
   {
+    id: 'salesperson',
+    label: 'Salesperson',
+    section: 'departure',
+    sortable: true,
+    text: (a) => formatTitleCase(a.salesperson ?? ''),
+  },
+  {
     id: 'departed_at',
     label: 'Departed At',
     section: 'departure',

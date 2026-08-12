@@ -40,6 +40,7 @@ select
   h.created_at as hold_created_at,
   ro."name" as vendor,
   do_."name" as customer,
+  sp."name" as salesperson,
   d.created_at as departed_at,
   r.created_at as arrival_created_at,
   pi.invoice_number as purchase_invoice_invoice_number,
@@ -79,6 +80,7 @@ from "Invoice" i
   left join "Organization" ro on ro.id = r.origin_id
   left join "Departure" d on d.id = a.departure_id
   left join "Organization" do_ on do_.id = d.destination_id
+  left join "User" sp on sp.id = d.sales_representative_id
   left join lateral (
     select cm.comment, cm.created_at, cm.created_by_id
     from "Comment" cm

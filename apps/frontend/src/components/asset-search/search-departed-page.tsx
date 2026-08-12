@@ -3,6 +3,7 @@ import { DepartedSummaryStrip } from '@/components/asset-search/departed-summary
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
 import { InvoiceReferenceFilter } from '@/components/shared/filters/invoice-reference-filter'
+import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Toggle } from '@/components/shadcn/toggle'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
@@ -12,6 +13,7 @@ import {
   useCustomerParam,
   useDepartedRangeParam,
   useInvoiceRefParam,
+  useSalespersonParam,
   useShowOtherParam,
   useWarehousesParam,
   type FilterParamGroups,
@@ -27,6 +29,7 @@ const SCOPE_FILTER_GROUPS = [
   ['wh'],
   ['other'],
   ['customer'],
+  ['sp'],
   ['invoiceref'],
 ] as const satisfies FilterParamGroups
 
@@ -36,6 +39,7 @@ export function SearchDepartedPage(): React.JSX.Element {
   const [showOther, setShowOther] = useShowOtherParam()
   const { from, to, setRange } = useDepartedRangeParam()
   const [customer, setCustomer] = useCustomerParam()
+  const [salesperson, setSalesperson] = useSalespersonParam()
   const [invoiceReference, setInvoiceReference] = useInvoiceRefParam()
 
   const filters = useMemo(
@@ -46,9 +50,10 @@ export function SearchDepartedPage(): React.JSX.Element {
       fromDate: from,
       toDate: to,
       customer,
+      salesperson,
       invoiceReference,
     }),
-    [assetFilters, warehouses, showOther, from, to, customer, invoiceReference],
+    [assetFilters, warehouses, showOther, from, to, customer, salesperson, invoiceReference],
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchDeparted(filters)
@@ -85,6 +90,13 @@ export function SearchDepartedPage(): React.JSX.Element {
               selection={customer}
               onSelectionChange={setCustomer}
               onClear={() => setCustomer(null)}
+            />
+            <UserFilter
+              selection={salesperson}
+              onSelectionChange={setSalesperson}
+              onClear={() => setSalesperson(null)}
+              placeholder="Salesperson"
+              clearLabel="Clear salesperson"
             />
             <InvoiceReferenceFilter
               value={invoiceReference}

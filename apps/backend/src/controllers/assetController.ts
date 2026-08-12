@@ -157,6 +157,7 @@ export const DepartedAssetQuerySchema = z.object({
   cassettes: z.string().optional().transform(Number),
   componentId: z.string().optional().transform(Number),
   customerId: z.string().optional().transform(Number),
+  salespersonId: z.string().optional().transform(Number),
   invoiceRef: z
     .string()
     .max(100)
@@ -193,6 +194,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
     cassettes,
     componentId,
     customerId,
+    salespersonId,
     invoiceRef,
     fromDate,
     toDate,
@@ -212,6 +214,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
     departedFrom,
     departedTo,
     isNaN(customerId) ? -1 : customerId,
+    isNaN(salespersonId) ? -1 : salespersonId,
     invoiceRef ?? '',
     res.locals.dbUserRole,
   )

@@ -39,6 +39,7 @@ export function makeAssetSearchRow(overrides: Partial<AssetSearchRow> = {}): Ass
     hold_created_at: null,
     vendor: null,
     customer: null,
+    salesperson: null,
     departed_at: null,
     arrival_created_at: null,
     purchase_invoice_invoice_number: null,

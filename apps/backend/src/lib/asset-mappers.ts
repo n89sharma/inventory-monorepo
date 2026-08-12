@@ -106,6 +106,7 @@ type AssetSearchRowDb = LocationRow & {
   hold_created_at: Date | null
   vendor: string | null
   customer: string | null
+  salesperson: string | null
   departed_at: Date | null
   arrival_created_at: Date | null
   purchase_invoice_invoice_number: string | null
@@ -156,6 +157,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     hold_created_at: r.hold_created_at,
     vendor: r.vendor,
     customer: r.customer,
+    salesperson: r.salesperson,
     departed_at: r.departed_at,
     arrival_created_at: r.arrival_created_at,
     purchase_invoice_invoice_number: r.purchase_invoice_invoice_number,

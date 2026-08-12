@@ -97,6 +97,7 @@ export const AssetSearchRowSchema = z.object({
   hold_created_at: z.coerce.date().nullable(),
   vendor: z.string().nullable(),
   customer: z.string().nullable(),
+  salesperson: z.string().nullable(),
   departed_at: z.coerce.date().nullable(),
   arrival_created_at: z.coerce.date().nullable(),
   purchase_invoice_invoice_number: z.string().nullable(),

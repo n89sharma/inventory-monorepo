@@ -114,6 +114,7 @@ export async function getDepartedAssets(
   departedFrom: Date,
   departedTo: Date,
   customerIdParam: number,
+  salespersonIdParam: number,
   invoiceReference: string,
   role: AppRole | null,
 ): Promise<AssetSearchRow[]> {
@@ -133,6 +134,7 @@ export async function getDepartedAssets(
       assetTypeIds,
       customerIdParam,
       normalizeForSearch(invoiceReference),
+      salespersonIdParam,
     ),
   )
   return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
