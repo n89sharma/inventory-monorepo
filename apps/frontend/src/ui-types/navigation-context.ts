@@ -20,13 +20,12 @@ export function isCollection(navigationSection: NavigationSection) {
   return COLLECTION_SECTIONS.has(navigationSection)
 }
 
-const SEARCH_LISTS = ['onhand', 'all', 'model-price-history', 'departed', 'harvested'] as const
+const SEARCH_LISTS = ['onhand', 'model-price-history', 'departed', 'harvested'] as const
 
 export type SearchList = (typeof SEARCH_LISTS)[number]
 
 export const SEARCH_LIST_LABELS = {
   onhand: 'On Hand',
-  all: 'All Assets',
   'model-price-history': 'Model Price History',
   departed: 'Departed',
   harvested: 'Harvested',

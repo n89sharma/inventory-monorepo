@@ -40,7 +40,7 @@ import {
   type Warehouse,
 } from 'shared-types'
 
-export const MIN_MODEL_INPUT_QUERY_LENGTH = 3
+const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
 
 export type PriceHistoryRange = 6 | 12

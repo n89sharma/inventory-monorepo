@@ -146,9 +146,6 @@ const PutAwayPage = lazy(() =>
     default: m.PutAwayPage,
   })),
 )
-const SearchAllPage = lazy(() =>
-  import('./components/asset-search/search-all-page').then((m) => ({ default: m.SearchAllPage })),
-)
 const ModelPriceHistoryPage = lazy(() =>
   import('./components/reports/model-price-history-page').then((m) => ({
     default: m.ModelPriceHistoryPage,
@@ -405,22 +402,6 @@ function AppRoutes() {
                       }
                     />
 
-                    <Route
-                      path="/search/all"
-                      element={
-                        <PermissionRoute permission="view_asset">
-                          <SearchAllPage />
-                        </PermissionRoute>
-                      }
-                    />
-                    <Route
-                      path="/search/all/:assetId"
-                      element={
-                        <PermissionRoute permission="view_asset">
-                          <AssetDetailsPage />
-                        </PermissionRoute>
-                      }
-                    />
                     <Route
                       path="/search/onhand"
                       element={

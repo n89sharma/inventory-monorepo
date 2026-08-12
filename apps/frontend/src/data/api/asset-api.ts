@@ -204,31 +204,6 @@ export async function getAssetHistory(barcode: string): Promise<AssetHistory> {
   return AssetHistorySchema.parse(data)
 }
 
-export async function getAssetsForSearchAll(
-  modelName: string,
-  meterMin: number | null,
-  meterMax: number | null,
-  cassettes: number | null,
-  component: Component | null,
-  statuses: Status[],
-  readinesses: Status[],
-  warehouses: Warehouse[],
-): Promise<AssetSearchRow[]> {
-  const { data } = await api.get<AssetSearchRow[]>(`/assets`, {
-    params: {
-      model: modelName,
-      meterMin: meterMin ?? undefined,
-      meterMax: meterMax ?? undefined,
-      cassettes: cassettes ?? undefined,
-      componentId: component?.id ?? undefined,
-      statusIds: statuses.map((s) => s.id),
-      readinessIds: readinesses.map((s) => s.id),
-      warehouseIds: warehouses.map((w) => w.id),
-    },
-  })
-  return z.array(AssetSearchRowSchema).parse(data)
-}
-
 export async function getAssetsForDeparted(
   warehouses: Warehouse[],
   brand: Brand | null,

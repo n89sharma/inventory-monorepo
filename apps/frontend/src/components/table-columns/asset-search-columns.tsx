@@ -479,7 +479,7 @@ export type AssetColumnId = (typeof ASSET_SEARCH_COLUMN_LITERALS)[number]['id']
 
 export const ASSET_SEARCH_COLUMNS: readonly AssetSearchColumn[] = ASSET_SEARCH_COLUMN_LITERALS
 
-const ALL_DEFAULT_COLUMN_IDS = [
+const MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS = [
   'status',
   'readiness',
   'specs_meter_total',
@@ -520,11 +520,10 @@ export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
-  all: ALL_DEFAULT_COLUMN_IDS,
   onhand: ONHAND_DEFAULT_COLUMN_IDS,
   departed: DEPARTED_DEFAULT_COLUMN_IDS,
   harvested: HARVESTED_DEFAULT_COLUMN_IDS,
-  'model-price-history': ALL_DEFAULT_COLUMN_IDS,
+  'model-price-history': MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly AssetColumnId[]>
 
 const COLUMN_BY_ID = new Map<string, AssetSearchColumn>(ASSET_SEARCH_COLUMNS.map((c) => [c.id, c]))
