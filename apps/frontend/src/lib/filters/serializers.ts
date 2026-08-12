@@ -89,8 +89,10 @@ export function buildStorePartsPathByWarehouseId(warehouseId: number | null): st
   })
 }
 
-export function buildStorePartPath(partId: number, warehouseId: number): string {
-  return serializeWarehouse(`${STORE_LIST_PATH}/${partId}`, { warehouse: [warehouseId] })
+export function buildStorePartPath(partId: number, warehouseId: number | null): string {
+  const path = `${STORE_LIST_PATH}/${partId}`
+  if (warehouseId === null) return path
+  return serializeWarehouse(path, { warehouse: [warehouseId] })
 }
 
 export function buildInStockSummaryPath(

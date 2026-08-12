@@ -1,3 +1,4 @@
+import { buildStorePartPath } from '@/lib/filters/serializers'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { Link } from 'react-router-dom'
 import type { AssetDetails, AssetHarvestedPart, AssetStorePartRow } from 'shared-types'
@@ -79,7 +80,7 @@ function getStorePartBadge(storePart: AssetStorePartRow, rowClassName?: string) 
       <div className="flex items-center gap-2">
         <Badge variant="success">Added</Badge>
         <Link
-          to={`/store/${storePart.part_number}`}
+          to={buildStorePartPath(storePart.store_part_id, null)}
           className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
         >
           Store
