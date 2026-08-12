@@ -1,6 +1,13 @@
 import { OUTGOING_STATUS_LABELS, OutgoingStatusSchema, type OutgoingStatus } from 'shared-types'
+import { CaretDownIcon } from '@phosphor-icons/react'
 import { useCan } from '@/hooks/use-can'
-import { ToggleGroup, ToggleGroupItem } from '../shadcn/toggle-group'
+import { Button } from '../shadcn/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../shadcn/dropdown-menu'
 
 const OUTGOING_STATUS_OPTIONS = OutgoingStatusSchema.options
 
@@ -14,27 +21,21 @@ export function DepartureOutgoingStatusMenu({
   const canEdit = useCan('create_update_departure')
   if (!canEdit) return null
 
-  function handleValueChange(next: string) {
-    const picked = OUTGOING_STATUS_OPTIONS.find((o) => o === next)
-    if (picked) onApply(picked)
-  }
-
   return (
-    <>
-      <span className="ml-2 text-muted-foreground">Outgoing Status</span>
-      <ToggleGroup
-        type="single"
-        value=""
-        onValueChange={handleValueChange}
-        variant="outline"
-        size="sm"
-      >
-        {OUTGOING_STATUS_OPTIONS.map((opt) => (
-          <ToggleGroupItem key={opt} value={opt}>
-            {OUTGOING_STATUS_LABELS[opt]}
-          </ToggleGroupItem>
+    <DropdownMenu>
+      <Button asChild variant="secondary">
+        <DropdownMenuTrigger>
+          Outgoing Status
+          <CaretDownIcon />
+        </DropdownMenuTrigger>
+      </Button>
+      <DropdownMenuContent className="w-max" side="top" align="end">
+        {OUTGOING_STATUS_OPTIONS.map((option) => (
+          <DropdownMenuItem key={option} onSelect={() => onApply(option)}>
+            {OUTGOING_STATUS_LABELS[option]}
+          </DropdownMenuItem>
         ))}
-      </ToggleGroup>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
