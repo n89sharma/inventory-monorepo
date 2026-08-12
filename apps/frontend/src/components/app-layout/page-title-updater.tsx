@@ -1,7 +1,10 @@
+import { getSearchList, SEARCH_LIST_LABELS } from '@/ui-types/navigation-context'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const APP_NAME = 'Loon'
+const ASSET_SECTION = 'assets'
+const SEARCH_SECTION_LABEL = 'Search Assets'
 
 const SECTION_LABEL: Record<string, string> = {
   arrivals: 'Arrivals',
@@ -10,7 +13,6 @@ const SECTION_LABEL: Record<string, string> = {
   holds: 'Holds',
   invoices: 'Invoices',
   'put-away': 'Put Away',
-  search: 'Search',
   settings: 'Settings',
   reports: 'Reports',
 }
@@ -23,10 +25,11 @@ const ENTITY_LABEL: Record<string, string> = {
   invoices: 'Invoice',
 }
 
-function deriveSearchTitle(id: string | undefined, sub: string | undefined): string {
-  const view = id === 'onhand' ? 'On Hand' : 'All'
-  if (sub) return `Asset ${sub} | ${view} | Search Assets | ${APP_NAME}`
-  return `${view} | Search Assets | ${APP_NAME}`
+function deriveSearchTitle(pathname: string, assetId: string | undefined): string {
+  const list = getSearchList(pathname)
+  const view = list ? SEARCH_LIST_LABELS[list] : SEARCH_SECTION_LABEL
+  if (assetId) return `Asset ${assetId} | ${view} | ${APP_NAME}`
+  return `${view} | ${APP_NAME}`
 }
 
 function deriveTitle(pathname: string): string {
@@ -38,7 +41,8 @@ function deriveTitle(pathname: string): string {
   const sectionLabel = SECTION_LABEL[section]
   const entityLabel = ENTITY_LABEL[section]
 
-  if (section === 'search') return deriveSearchTitle(id, sub)
+  if (section === 'search') return deriveSearchTitle(pathname, sub)
+  if (section === ASSET_SECTION && id) return `Asset ${id} | ${APP_NAME}`
   if (sub === 'edit') return sectionLabel ? `Edit ${id} | ${sectionLabel} | ${APP_NAME}` : APP_NAME
   if (sub) return `Asset ${sub} | ${id} | ${APP_NAME}`
   if (id === 'new') return entityLabel ? `New ${entityLabel} | ${APP_NAME}` : APP_NAME
