@@ -27,6 +27,12 @@ describe('getBreadcrumForAssetDetails', () => {
 
     expect(segments[0].href).toBe(`/search/departed${COLS_SEARCH}`)
   })
+
+  it('offers no way back when the asset was not opened from a list', () => {
+    const segments = getBreadcrumForAssetDetails('assets', null, null, COLS_SEARCH)
+
+    expect(segments).toEqual([])
+  })
 })
 
 describe('getBreadcrumbForAssetSummary', () => {

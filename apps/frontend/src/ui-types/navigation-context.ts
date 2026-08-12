@@ -6,9 +6,18 @@ export type NavigationSection =
   | 'holds'
   | 'search'
   | 'home'
+  | 'assets'
+
+const COLLECTION_SECTIONS = new Set<NavigationSection>([
+  'arrivals',
+  'departures',
+  'transfers',
+  'invoices',
+  'holds',
+])
 
 export function isCollection(navigationSection: NavigationSection) {
-  return navigationSection !== 'search' && navigationSection !== 'home'
+  return COLLECTION_SECTIONS.has(navigationSection)
 }
 
 const SEARCH_LISTS = ['onhand', 'all', 'model-price-history', 'departed', 'harvested'] as const
@@ -36,23 +45,18 @@ export function getSearchList(pathname: string): SearchList | null {
   return SEARCH_LISTS.includes(candidate as SearchList) ? (candidate as SearchList) : null
 }
 
-export const FROM_GLOBAL_SEARCH_STATE = { fromGlobalSearch: true } as const
-
-export function isFromGlobalSearch(state: unknown): boolean {
-  return (
-    typeof state === 'object' &&
-    state !== null &&
-    'fromGlobalSearch' in state &&
-    (state as { fromGlobalSearch: unknown }).fromGlobalSearch === true
-  )
-}
-
 export function queryStringFrom(filters: URLSearchParams): string {
   const query = filters.toString()
   return query ? `?${query}` : ''
 }
 
-export function assetDetailHref(
+const ASSET_DETAIL_BASE_PATH = '/assets'
+
+export function assetDetailHref(barcode: string): string {
+  return `${ASSET_DETAIL_BASE_PATH}/${barcode}`
+}
+
+export function searchListAssetDetailHref(
   list: SearchList,
   barcode: string,
   filters: URLSearchParams,

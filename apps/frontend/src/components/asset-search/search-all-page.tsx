@@ -20,7 +20,7 @@ import {
   type FilterParamGroups,
 } from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
-import { assetDetailHref } from '@/ui-types/navigation-context'
+import { searchListAssetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo } from 'react'
@@ -102,7 +102,7 @@ export function SearchAllPage(): React.JSX.Element {
     mutate()
   }, [mutate])
   const getRowHref = useCallback(
-    (a: AssetSearchRow) => assetDetailHref('all', a.barcode, searchParams),
+    (a: AssetSearchRow) => searchListAssetDetailHref('all', a.barcode, searchParams),
     [searchParams],
   )
 

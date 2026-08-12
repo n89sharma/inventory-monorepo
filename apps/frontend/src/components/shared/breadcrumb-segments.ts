@@ -12,8 +12,6 @@ export interface BreadcrumbSegment {
   href?: string
 }
 
-const DEFAULT_SEARCH_LIST: SearchList = 'all'
-
 export function getBreadcrumForAssetDetails(
   section: NavigationSection,
   collectionId: string | null,
@@ -27,9 +25,15 @@ export function getBreadcrumForAssetDetails(
     ]
   }
 
-  if (section === 'search') {
-    const list = searchList ?? DEFAULT_SEARCH_LIST
-    return [{ label: SEARCH_LIST_LABELS[list], href: `${listBasePath(list)}/${list}${listSearch}` }]
+  if (section === 'assets') return []
+
+  if (section === 'search' && searchList) {
+    return [
+      {
+        label: SEARCH_LIST_LABELS[searchList],
+        href: `${listBasePath(searchList)}/${searchList}${listSearch}`,
+      },
+    ]
   }
   return [{ label: 'Home', href: '/' }]
 }

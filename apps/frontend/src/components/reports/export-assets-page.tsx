@@ -14,7 +14,6 @@ import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibili
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { CopyIcon, SpinnerGapIcon } from '@phosphor-icons/react'
-import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 import { toast } from 'sonner'
@@ -108,11 +107,7 @@ export function ExportAssetsPage(): React.JSX.Element {
     useAssetColumnVisibilityParam(ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS)
   const selection = useAssetSelection(assets, visibleColumns, 'export-assets.csv')
 
-  const searchParams = useOptimisticSearchParams()
-  const getRowHref = useCallback(
-    (asset: AssetSearchRow) => assetDetailHref('all', asset.barcode, searchParams),
-    [searchParams],
-  )
+  const getRowHref = useCallback((asset: AssetSearchRow) => assetDetailHref(asset.barcode), [])
   const handleBulkPriceSave = useCallback(() => {
     mutate()
   }, [mutate])

@@ -42,7 +42,6 @@ import {
   formatTitleCase,
   formatWeight,
 } from '@/lib/formatters'
-import { isFromGlobalSearch } from '@/ui-types/navigation-context'
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -300,9 +299,12 @@ export const AssetDetailsPage = () => {
   const { section, collectionId, assetId, searchList } = useAssetDetailsParams()
   const location = useLocation()
   const listSearch = location.search
-  const breadcrumbSegments = isFromGlobalSearch(location.state)
-    ? []
-    : getBreadcrumForAssetDetails(section, collectionId, searchList, listSearch)
+  const breadcrumbSegments = getBreadcrumForAssetDetails(
+    section,
+    collectionId,
+    searchList,
+    listSearch,
+  )
 
   const { data, error: detailError, isLoading: detailLoading } = useAssetDetail(assetId)
   const [editPricingOpen, setEditPricingOpen] = useState(false)

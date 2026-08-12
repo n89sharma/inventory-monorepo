@@ -28,10 +28,11 @@ export function useAssetDetailsParams(): AssetDetailsParams {
     return { section: section as NavigationSection, collectionId, assetId, searchList: null }
   }
 
+  const searchList = getSearchList(pathname)
   return {
-    section: 'search' as NavigationSection,
+    section: searchList === null ? 'assets' : 'search',
     collectionId: null,
     assetId,
-    searchList: getSearchList(pathname),
+    searchList,
   }
 }

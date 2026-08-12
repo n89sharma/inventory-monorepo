@@ -397,6 +397,15 @@ function AppRoutes() {
                     />
 
                     <Route
+                      path="/assets/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
+
+                    <Route
                       path="/search/all"
                       element={
                         <PermissionRoute permission="view_asset">

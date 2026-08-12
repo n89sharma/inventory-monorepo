@@ -12,7 +12,7 @@ import {
 } from '@/components/table-columns/asset-search-columns'
 import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
-import { assetDetailHref, type SearchList } from '@/ui-types/navigation-context'
+import { searchListAssetDetailHref, type SearchList } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback } from 'react'
@@ -59,7 +59,7 @@ export function AssetSearchPage({
   const [sorting, onSortingChange] = useTableSortParam(defaultSort ?? DEFAULT_ASSET_SORT)
   const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
   const getRowHref = useCallback(
-    (a: AssetSearchRow) => assetDetailHref(navContext, a.barcode, searchParams),
+    (a: AssetSearchRow) => searchListAssetDetailHref(navContext, a.barcode, searchParams),
     [navContext, searchParams],
   )
 

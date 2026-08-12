@@ -1,3 +1,4 @@
+import { assetDetailHref } from '@/ui-types/navigation-context'
 import { Link } from 'react-router-dom'
 import type { StoreTransactionRow } from 'shared-types'
 
@@ -15,7 +16,7 @@ export function DestinationCell({ row }: { row: StoreTransactionRow }) {
   if (row.asset_barcode) {
     return (
       <Link
-        to={`/search/all/${row.asset_barcode}`}
+        to={assetDetailHref(row.asset_barcode)}
         className="font-mono text-foreground hover:underline"
       >
         Asset {row.asset_barcode}

@@ -26,7 +26,7 @@ import {
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
 import { formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-price-history-summary'
-import { assetDetailHref } from '@/ui-types/navigation-context'
+import { searchListAssetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { format, subMonths } from 'date-fns'
@@ -218,7 +218,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
 
   const getRowHref = useCallback(
     (row: ModelPriceHistoryRow) =>
-      assetDetailHref('model-price-history', row.barcode, searchParams),
+      searchListAssetDetailHref('model-price-history', row.barcode, searchParams),
     [searchParams],
   )
 

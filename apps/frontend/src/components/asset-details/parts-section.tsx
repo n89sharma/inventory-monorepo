@@ -1,3 +1,4 @@
+import { assetDetailHref } from '@/ui-types/navigation-context'
 import { Link } from 'react-router-dom'
 import type { AssetDetails, AssetHarvestedPart, AssetStorePartRow } from 'shared-types'
 import { Section, SectionHeader } from '../asset-details/detail-layout'
@@ -58,7 +59,7 @@ function getHarvestedPartBadge(
       <div className="flex items-center gap-2">
         <HarvestedPartBadge isDonor={isDonor} isExchange={transfer.is_exchange} />
         <Link
-          to={`/search/all/${counterpartBarcode}`}
+          to={assetDetailHref(counterpartBarcode)}
           className="font-mono text-xs text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
         >
           {counterpartBarcode}
