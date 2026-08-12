@@ -125,9 +125,15 @@ function StatusCell({ asset }: { asset: AssetSearchRow }): ReactNode {
   )
 }
 
-function HoldNumberCell({ holdNumber }: { holdNumber: string | null }): ReactNode {
-  if (!holdNumber) return ''
-  return <IdLink to={holdDetailHref(holdNumber)}>{holdNumber}</IdLink>
+function CollectionNumberCell({
+  collectionNumber,
+  detailHref,
+}: {
+  collectionNumber: string | null
+  detailHref: (collectionNumber: string) => string
+}): ReactNode {
+  if (!collectionNumber) return ''
+  return <IdLink to={detailHref(collectionNumber)}>{collectionNumber}</IdLink>
 }
 
 function InvoiceCell({
@@ -404,7 +410,9 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Hold #',
     section: 'hold',
     text: (a) => a.hold_hold_number ?? '',
-    cell: (a) => <HoldNumberCell holdNumber={a.hold_hold_number} />,
+    cell: (a) => (
+      <CollectionNumberCell collectionNumber={a.hold_hold_number} detailHref={holdDetailHref} />
+    ),
   },
   {
     id: 'held_by',
