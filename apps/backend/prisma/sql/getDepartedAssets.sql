@@ -8,9 +8,10 @@
 -- planner to range-scan Departure_created_at_idx first, rather than reordering this ~22-table
 -- join into a plan that builds the full status/asset_type asset set and probes Departure by PK.
 with d as materialized (
-  select 
-    id, 
-    created_at, 
+  select
+    id,
+    departure_number,
+    created_at,
     origin_id,
     destination_id,
     sales_representative_id
@@ -43,6 +44,7 @@ select
   t.cassettes as specs_cassettes,
   cmp."name" as specs_internal_finisher,
   acc.accessories as accessories,
+  err.errors as errors,
   t.toner_life_c as specs_toner_life_c,
   t.toner_life_m as specs_toner_life_m,
   t.toner_life_y as specs_toner_life_y,
@@ -62,7 +64,10 @@ select
   ro."name" as vendor,
   do_."name" as customer,
   sp."name" as salesperson,
+  d.departure_number as departure_number,
   d.created_at as departed_at,
+  r.arrival_number as arrival_number,
+  aw.city_code as arrival_warehouse_code,
   r.created_at as arrival_created_at,
   pi.invoice_number as purchase_invoice_invoice_number,
   pi.invoice_reference as purchase_invoice_invoice_reference,
@@ -82,6 +87,13 @@ from d
       join "Accessory" ac on ac.id = aa.accessory_id
     where aa.asset_id = a.id
   ) acc on true
+  left join lateral (
+    select coalesce(array_agg(e.code order by e.code), '{}') as errors
+    from "AssetError" ae
+      join "Error" e on e.id = ae.error_id
+    where ae.asset_id = a.id
+      and not ae.is_fixed
+  ) err on true
   join "Model" m on m.id = a.model_id
   join "Brand" b on b.id = m.brand_id
   join "AssetType" at on at.id = m.asset_type_id
@@ -98,6 +110,7 @@ from d
   left join "User" hu2 on hu2.id = h.created_for_id
   left join "Organization" hc on hc.id = h.customer_id
   left join "Arrival" r on r.id = a.arrival_id
+  left join "Warehouse" aw on aw.id = r.destination_id
   left join "Organization" ro on ro.id = r.origin_id
   left join "Organization" do_ on do_.id = d.destination_id
   left join "User" sp on sp.id = d.sales_representative_id

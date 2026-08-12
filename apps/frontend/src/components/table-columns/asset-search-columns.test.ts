@@ -96,6 +96,7 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     specs_cassettes: 2,
     specs_internal_finisher: 'FIN-1',
     accessories: ['Toner', 'Drum'],
+    errors: ['E001', 'E045'],
     specs_toner_life_c: 80,
     specs_toner_life_m: 70,
     specs_toner_life_y: 60,
@@ -115,6 +116,9 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     vendor: 'BIG_VENDOR',
     customer: 'RETAIL_CO',
     salesperson: 'JANE_SMITH',
+    departure_number: 'D-260710-001',
+    arrival_number: 'A-260705-001',
+    arrival_warehouse_code: 'TOR',
     departed_at: new Date(2026, 6, 10),
     arrival_created_at: new Date(2026, 6, 5),
     purchase_invoice_invoice_number: 'PI-100',
@@ -155,10 +159,10 @@ describe('asset-search report columns', () => {
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
         'Country of Origin,Total Meter,Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
-        'Vendor,Arrived At,Customer,Salesperson,Departed At,' +
+        'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
         'Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,' +
         'Margin %,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
-        'Created,Stock Days,Purchase Invoice,Sales Invoice,Last Comment',
+        'Created,Stock Days,Purchase Invoice,Sales Invoice,Errors,Last Comment',
     )
   })
 
@@ -168,10 +172,10 @@ describe('asset-search report columns', () => {
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
         'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
-        'Big Vendor,"July 05, 2026",Retail Co,Jane Smith,"July 10, 2026",' +
+        'Big Vendor,A-260705-001,TOR,"July 05, 2026",Retail Co,Jane Smith,D-260710-001,"July 10, 2026",' +
         '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
         '48.9%,H-1,Alice,Bob,Acme Corp,"July 01, 2026",' +
-        '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,Looks good',
+        '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
     )
   })
 
@@ -183,6 +187,7 @@ describe('asset-search report columns', () => {
       specs_cassettes: null,
       specs_internal_finisher: null,
       accessories: [],
+      errors: [],
       specs_toner_life_c: null,
       specs_toner_life_m: null,
       specs_toner_life_y: null,
@@ -202,7 +207,10 @@ describe('asset-search report columns', () => {
       vendor: null,
       customer: null,
       salesperson: null,
+      departure_number: null,
       departed_at: null,
+      arrival_number: null,
+      arrival_warehouse_code: null,
       arrival_created_at: null,
       purchase_invoice_invoice_number: null,
       purchase_invoice_invoice_reference: null,
@@ -215,10 +223,10 @@ describe('asset-search report columns', () => {
       'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
         ',,"1,234 lbs",5,,,,' +
         ',,,,,' +
-        ',,,,,' +
+        ',,,,,,,,' +
         ',,,,,,,' +
         ',,,,,' +
-        '"July 15, 2026",12,,,',
+        '"July 15, 2026",12,,,,',
     )
   })
 
@@ -478,7 +486,10 @@ describe('asset search columns', () => {
         section: 'invoice',
         ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
       },
-      { section: 'arrival', ids: ['vendor', 'arrival_created_at'] },
+      {
+        section: 'arrival',
+        ids: ['vendor', 'arrival_number', 'arrival_warehouse_code', 'arrival_created_at'],
+      },
       {
         section: 'hold',
         ids: [
@@ -490,7 +501,10 @@ describe('asset search columns', () => {
           'hold_created_at',
         ],
       },
-      { section: 'departure', ids: ['customer', 'salesperson', 'departed_at'] },
+      {
+        section: 'departure',
+        ids: ['customer', 'salesperson', 'departure_number', 'departed_at'],
+      },
       {
         section: 'detailed_specs',
         ids: [
@@ -506,7 +520,10 @@ describe('asset search columns', () => {
         ],
       },
       { section: 'profitability', ids: ['gross_margin', 'margin_percent'] },
-      { section: 'other', ids: ['location', 'created_at', 'stock_days', 'latest_comment'] },
+      {
+        section: 'other',
+        ids: ['location', 'created_at', 'stock_days', 'errors', 'latest_comment'],
+      },
     ])
   })
 })

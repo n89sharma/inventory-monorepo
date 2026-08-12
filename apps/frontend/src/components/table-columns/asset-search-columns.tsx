@@ -25,6 +25,10 @@ import {
 
 const holdDetailHref = (holdNumber: string): string => `/holds/${holdNumber}`
 
+const arrivalDetailHref = (arrivalNumber: string): string => `/arrivals/${arrivalNumber}`
+
+const departureDetailHref = (departureNumber: string): string => `/departures/${departureNumber}`
+
 const invoiceDetailHref = (invoiceNumber: string): string => `/invoices/${invoiceNumber}`
 
 const stockDays = (createdAt: Date): number => differenceInCalendarDays(new Date(), createdAt)
@@ -318,6 +322,23 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => formatTitleCase(a.vendor ?? ''),
   },
   {
+    id: 'arrival_number',
+    label: 'Arrival #',
+    section: 'arrival',
+    sortable: true,
+    text: (a) => a.arrival_number ?? '',
+    cell: (a) => (
+      <CollectionNumberCell collectionNumber={a.arrival_number} detailHref={arrivalDetailHref} />
+    ),
+  },
+  {
+    id: 'arrival_warehouse_code',
+    label: 'Arrival Warehouse',
+    section: 'arrival',
+    sortable: true,
+    text: (a) => a.arrival_warehouse_code ?? '',
+  },
+  {
     id: 'arrival_created_at',
     label: 'Arrived At',
     section: 'arrival',
@@ -337,6 +358,19 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     section: 'departure',
     sortable: true,
     text: (a) => formatTitleCase(a.salesperson ?? ''),
+  },
+  {
+    id: 'departure_number',
+    label: 'Departure #',
+    section: 'departure',
+    sortable: true,
+    text: (a) => a.departure_number ?? '',
+    cell: (a) => (
+      <CollectionNumberCell
+        collectionNumber={a.departure_number}
+        detailHref={departureDetailHref}
+      />
+    ),
   },
   {
     id: 'departed_at',
@@ -480,6 +514,12 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
         label={a.sales_invoice_invoice_reference}
       />
     ),
+  },
+  {
+    id: 'errors',
+    label: 'Errors',
+    section: 'other',
+    text: (a) => a.errors.join(', '),
   },
   {
     id: 'latest_comment',

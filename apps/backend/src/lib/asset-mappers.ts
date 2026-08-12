@@ -88,6 +88,7 @@ type AssetSearchRowDb = LocationRow & {
   specs_cassettes: number | null
   specs_internal_finisher: string | null
   accessories: string[] | null
+  errors: string[] | null
   specs_toner_life_c: number | null
   specs_toner_life_m: number | null
   specs_toner_life_y: number | null
@@ -107,7 +108,10 @@ type AssetSearchRowDb = LocationRow & {
   vendor: string | null
   customer: string | null
   salesperson: string | null
+  departure_number: string | null
   departed_at: Date | null
+  arrival_number: string | null
+  arrival_warehouse_code: string | null
   arrival_created_at: Date | null
   purchase_invoice_invoice_number: string | null
   purchase_invoice_invoice_reference: string | null
@@ -139,6 +143,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     specs_cassettes: r.specs_cassettes,
     specs_internal_finisher: r.specs_internal_finisher,
     accessories: r.accessories ?? [],
+    errors: r.errors ?? [],
     specs_toner_life_c: r.specs_toner_life_c,
     specs_toner_life_m: r.specs_toner_life_m,
     specs_toner_life_y: r.specs_toner_life_y,
@@ -158,7 +163,10 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     vendor: r.vendor,
     customer: r.customer,
     salesperson: r.salesperson,
+    departure_number: r.departure_number,
     departed_at: r.departed_at,
+    arrival_number: r.arrival_number,
+    arrival_warehouse_code: r.arrival_warehouse_code,
     arrival_created_at: r.arrival_created_at,
     purchase_invoice_invoice_number: r.purchase_invoice_invoice_number,
     purchase_invoice_invoice_reference: r.purchase_invoice_invoice_reference,
