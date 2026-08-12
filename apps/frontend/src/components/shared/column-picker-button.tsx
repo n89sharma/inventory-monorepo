@@ -6,7 +6,7 @@ import {
   userCanToggleColumn,
   type AssetSearchColumn,
 } from '@/components/table-columns/asset-search-columns'
-import { ColumnsIcon } from '@phosphor-icons/react'
+import { SlidersIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ColumnPicker } from './column-picker'
 
@@ -31,7 +31,7 @@ export function ColumnPickerButton({
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="default" className="gap-1.5">
-          <ColumnsIcon />
+          <SlidersIcon />
           <span>
             Columns ({visibleCount} / {permittedColumns.length})
           </span>

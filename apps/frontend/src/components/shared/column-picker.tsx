@@ -13,6 +13,7 @@ import { useId, useMemo, useState } from 'react'
 const SEARCH_PLACEHOLDER = 'Search columns'
 const EMPTY_RESULT_TEXT = 'No columns match'
 const RESET_LABEL = 'Reset to defaults'
+const ALL_TOGGLE_LABEL = 'All'
 // Grows with the viewport but never past it: the popover's own available height, less the
 // search bar and reset footer that sit outside this scroll area.
 const SCROLL_AREA_MAX_HEIGHT =
@@ -55,30 +56,24 @@ function SearchBar({
 
 function SectionHeader({
   label,
-  visibleCount,
-  columnCount,
+  allVisible,
   onToggle,
 }: {
   label: string
-  visibleCount: number
-  columnCount: number
+  allVisible: boolean
   onToggle: () => void
 }): React.JSX.Element {
+  const switchId = useId()
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className={cn(
-        'flex w-full items-center justify-between gap-2 rounded px-2 py-2 text-left',
-        'text-sm font-medium text-foreground',
-        'hover:bg-accent hover:text-accent-foreground',
-      )}
-    >
-      <span className="min-w-0">{label}</span>
-      <span className="shrink-0 tabular-nums">
-        {visibleCount}/{columnCount}
-      </span>
-    </button>
+    <div className="flex w-full items-center justify-between gap-2 px-2 py-2 text-sm font-medium text-foreground">
+      <span className="min-w-0 truncate">{label}</span>
+      <div className="flex shrink-0 items-center gap-1.5">
+        <Label htmlFor={switchId} className="cursor-pointer text-xs text-muted-foreground">
+          {ALL_TOGGLE_LABEL}
+        </Label>
+        <Switch id={switchId} checked={allVisible} onCheckedChange={onToggle} />
+      </div>
+    </div>
   )
 }
 
@@ -175,8 +170,7 @@ export function ColumnPicker({
                 <div key={section.id} className="mb-4 break-inside-avoid last:mb-0">
                   <SectionHeader
                     label={section.label}
-                    visibleCount={visibleColumns.length}
-                    columnCount={columns.length}
+                    allVisible={allOn}
                     onToggle={() => toggleSection(columnIds, allOn)}
                   />
                   {columns.map((col) => (
