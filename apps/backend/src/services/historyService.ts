@@ -199,9 +199,9 @@ const RESOLVERS = {
     (ids) =>
       prisma.invoice.findMany({
         where: { id: { in: ids } },
-        select: { id: true, invoice_number: true },
+        select: { id: true, invoice_reference: true },
       }),
-    (r) => r.invoice_number,
+    (r) => r.invoice_reference,
   ),
   organization: foreignKeyResolver(
     (ids) =>
@@ -478,8 +478,8 @@ const ASSET_UPDATE_SPEC: FieldSpec[] = [
   { field: 'arrival_id', out: 'arrival_number', resolve: 'arrival' },
   { field: 'departure_id', out: 'departure_number', resolve: 'departure' },
   { field: 'hold_id', out: 'hold_number', resolve: 'hold' },
-  { field: 'purchase_invoice_id', out: 'invoice_number', resolve: 'invoice' },
-  { field: 'sales_invoice_id', out: 'invoice_number', resolve: 'invoice' },
+  { field: 'purchase_invoice_id', out: 'purchase_invoice_reference', resolve: 'invoice' },
+  { field: 'sales_invoice_id', out: 'sales_invoice_reference', resolve: 'invoice' },
   { field: 'location_id', expand: 'location' },
   { field: 'model_id', out: 'model_name', resolve: 'model', bothRequired: true },
   { field: 'status_id', out: 'status', resolve: 'status' },
