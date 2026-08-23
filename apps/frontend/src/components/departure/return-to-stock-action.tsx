@@ -34,8 +34,9 @@ export function ReturnToStockAction({
         onConfirm={onConfirm}
       >
         <AlertDialogDescription>
-          The status changes to In Stock. The asset{assetCount !== 1 ? 's' : ''} leave this
-          departure and any sales invoice, and the sale price is cleared. This cannot be undone.
+          The status changes to In Stock.{' '}
+          {assetCount === 1 ? 'The asset leaves' : 'The assets leave'} this departure and any sales
+          invoice, and the sale price is cleared. This cannot be undone.
         </AlertDialogDescription>
       </ConfirmActionDialog>
     </>
