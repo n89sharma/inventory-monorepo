@@ -207,12 +207,14 @@ export const AssetDetailsSchema = z.object({
   purchase_invoice: z
     .object({
       invoice_number: z.string(),
+      invoice_reference: z.string(),
       is_cleared: z.boolean(),
     })
     .nullable(),
   sales_invoice: z
     .object({
       invoice_number: z.string(),
+      invoice_reference: z.string(),
       is_cleared: z.boolean(),
     })
     .nullable(),

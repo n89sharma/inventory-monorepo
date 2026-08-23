@@ -16,6 +16,7 @@ import {
   seedArrivalTestData,
   seedAssetCost,
   seedError,
+  TEST_INVOICE_REFERENCE,
 } from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -136,28 +137,25 @@ describe('assetDeleteService', () => {
 
   it('blocks an asset that is on a sales invoice', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    const { invoiceNumber } = await createInvoice(
-      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
-      refs.userId,
-    )
+    await createInvoice(buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId), refs.userId)
 
     await expect(deleteAsset(asset.barcode, refs.userId)).rejects.toThrow(
       new ConflictError(
-        `Asset ${asset.barcode} cannot be deleted because it is linked to sales invoice ${invoiceNumber}`,
+        `Asset ${asset.barcode} cannot be deleted because it is linked to sales invoice ${TEST_INVOICE_REFERENCE}`,
       ),
     )
   })
 
   it('blocks an asset that is on a purchase invoice', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    const { invoiceNumber } = await createInvoice(
+    await createInvoice(
       buildCreateInvoiceInput(refs, [asset], refs.invoiceTypePurchaseId),
       refs.userId,
     )
 
     await expect(deleteAsset(asset.barcode, refs.userId)).rejects.toThrow(
       new ConflictError(
-        `Asset ${asset.barcode} cannot be deleted because it is linked to purchase invoice ${invoiceNumber}`,
+        `Asset ${asset.barcode} cannot be deleted because it is linked to purchase invoice ${TEST_INVOICE_REFERENCE}`,
       ),
     )
   })
@@ -205,14 +203,11 @@ describe('assetDeleteService', () => {
       buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
       refs.userId,
     )
-    const { invoiceNumber } = await createInvoice(
-      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
-      refs.userId,
-    )
+    await createInvoice(buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId), refs.userId)
 
     await expect(deleteAsset(asset.barcode, refs.userId)).rejects.toThrow(
       new ConflictError(
-        `Asset ${asset.barcode} cannot be deleted because it is linked to departure ${departureNumber}, sales invoice ${invoiceNumber}`,
+        `Asset ${asset.barcode} cannot be deleted because it is linked to departure ${departureNumber}, sales invoice ${TEST_INVOICE_REFERENCE}`,
       ),
     )
   })

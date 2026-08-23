@@ -7,8 +7,8 @@ const DELETE_BLOCKER_SELECT = {
   id: true,
   serial_number: true,
   departure: { select: { departure_number: true } },
-  sales_invoice: { select: { invoice_number: true } },
-  purchase_invoice: { select: { invoice_number: true } },
+  sales_invoice: { select: { invoice_reference: true } },
+  purchase_invoice: { select: { invoice_reference: true } },
   asset_transfers: { select: { transfer: { select: { transfer_number: true } } } },
   _count: {
     select: { asset_store_parts: true, donated_parts: true, received_parts: true },
@@ -17,8 +17,8 @@ const DELETE_BLOCKER_SELECT = {
 
 type DeletableAsset = {
   departure: { departure_number: string } | null
-  sales_invoice: { invoice_number: string } | null
-  purchase_invoice: { invoice_number: string } | null
+  sales_invoice: { invoice_reference: string } | null
+  purchase_invoice: { invoice_reference: string } | null
   asset_transfers: Array<{ transfer: { transfer_number: string } }>
   _count: { asset_store_parts: number; donated_parts: number; received_parts: number }
 }
@@ -34,10 +34,10 @@ function collectDeleteBlockers(asset: DeletableAsset): string[] {
     blockers.push(`departure ${asset.departure.departure_number}`)
   }
   if (asset.sales_invoice) {
-    blockers.push(`sales invoice ${asset.sales_invoice.invoice_number}`)
+    blockers.push(`sales invoice ${asset.sales_invoice.invoice_reference}`)
   }
   if (asset.purchase_invoice) {
-    blockers.push(`purchase invoice ${asset.purchase_invoice.invoice_number}`)
+    blockers.push(`purchase invoice ${asset.purchase_invoice.invoice_reference}`)
   }
   if (asset._count.asset_store_parts > 0) {
     blockers.push(pluralize(asset._count.asset_store_parts, 'consumed store part'))

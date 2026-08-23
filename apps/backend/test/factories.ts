@@ -63,6 +63,8 @@ const STORE_TXN_REVALUATION_IN = 'REVALUATION_IN'
 const READINESS_CODES = ['UNTESTED', 'HAS_ERRORS', 'PP_OK', 'CUSTOMER_READY'] as const
 const DEFAULT_READINESS = 'UNTESTED'
 
+export const TEST_INVOICE_REFERENCE = 'TEST-REF'
+
 // Asset serial numbers aren't unique in the schema, but a per-call counter keeps
 // built assets distinguishable across multiple arrivals in one run.
 let serialCounter = 0
@@ -345,7 +347,7 @@ export function buildCreateInvoiceInput(
   isCleared = false,
 ): CreateInvoice {
   return {
-    invoice_reference: 'TEST-REF',
+    invoice_reference: TEST_INVOICE_REFERENCE,
     invoice_date: '2026-01-15',
     organization_id: refs.customer.id,
     invoice_type_id: invoiceTypeId,

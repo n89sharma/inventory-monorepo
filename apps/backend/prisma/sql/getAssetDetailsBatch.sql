@@ -78,8 +78,10 @@ select
   d.created_at as departure_created_at,
   -- invoice
   pi.invoice_number as purchase_invoice_number,
+  pi.invoice_reference as purchase_invoice_reference,
   pi.is_cleared as purchase_invoice_is_cleared,
   si.invoice_number as sales_invoice_number,
+  si.invoice_reference as sales_invoice_reference,
   si.is_cleared as sales_invoice_is_cleared,
   -- latest comment
   lc.comment as latest_comment

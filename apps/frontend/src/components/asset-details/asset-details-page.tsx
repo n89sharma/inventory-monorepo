@@ -220,7 +220,7 @@ function buildAssetLifecycle(
                   to={`/invoices/${purchase_invoice.invoice_number}`}
                   className="font-medium hover:underline"
                 >
-                  {purchase_invoice.invoice_number}
+                  {purchase_invoice.invoice_reference}
                 </Link>
               </RailField>
             )}
@@ -275,7 +275,7 @@ function buildAssetLifecycle(
                   to={`/invoices/${sales_invoice.invoice_number}`}
                   className="font-medium hover:underline"
                 >
-                  {sales_invoice.invoice_number}
+                  {sales_invoice.invoice_reference}
                 </Link>
               </RailField>
             )}

@@ -281,6 +281,7 @@ function mapInvoice(r: AssetDetailRow) {
   if (!r.purchase_invoice_number) return null
   return {
     invoice_number: r.purchase_invoice_number,
+    invoice_reference: r.purchase_invoice_reference!,
     is_cleared: r.purchase_invoice_is_cleared!,
   }
 }
@@ -289,6 +290,7 @@ function mapSalesInvoice(r: AssetDetailRow) {
   if (!r.sales_invoice_number) return null
   return {
     invoice_number: r.sales_invoice_number,
+    invoice_reference: r.sales_invoice_reference!,
     is_cleared: r.sales_invoice_is_cleared!,
   }
 }
