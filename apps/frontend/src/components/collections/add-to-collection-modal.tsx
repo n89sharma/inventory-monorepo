@@ -16,23 +16,25 @@ import type { CollectionResults, SelectedCollection } from './collection-search-
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 
+type CollectionRef = { entity: LinkableEntity; id: string; label: string }
+
 function collectionLabel(s: SelectedCollection): string {
-  const { entity, id } = collectionRef(s)
-  return `${ENTITY_CONFIG[entity].label} ${id}`
+  const { entity, label } = collectionRef(s)
+  return `${ENTITY_CONFIG[entity].label} ${label}`
 }
 
-function collectionRef(s: SelectedCollection): { entity: LinkableEntity; id: string } {
+function collectionRef(s: SelectedCollection): CollectionRef {
   switch (s.kind) {
     case 'arrival':
-      return { entity: 'arrival', id: s.data.arrival_number }
+      return { entity: 'arrival', id: s.data.arrival_number, label: s.data.arrival_number }
     case 'departure':
-      return { entity: 'departure', id: s.data.departure_number }
+      return { entity: 'departure', id: s.data.departure_number, label: s.data.departure_number }
     case 'transfer':
-      return { entity: 'transfer', id: s.data.transfer_number }
+      return { entity: 'transfer', id: s.data.transfer_number, label: s.data.transfer_number }
     case 'hold':
-      return { entity: 'hold', id: s.data.hold_number }
+      return { entity: 'hold', id: s.data.hold_number, label: s.data.hold_number }
     case 'invoice':
-      return { entity: 'invoice', id: s.data.invoice_number }
+      return { entity: 'invoice', id: s.data.invoice_number, label: s.data.invoice_reference }
   }
 }
 
@@ -67,6 +69,7 @@ function getDetailFields(s: SelectedCollection): { label: string; value: string 
       ]
     case 'invoice':
       return [
+        { label: 'Reference', value: s.data.invoice_reference },
         { label: 'Organization', value: s.data.organization },
         { label: 'Invoice type', value: s.data.invoice_type },
         { label: 'Cleared', value: null },
@@ -80,11 +83,10 @@ function CollectionAssetsAddedMessage({
   skipped,
   entity,
   id,
-}: {
+  label,
+}: CollectionRef & {
   added: number
   skipped: number
-  entity: LinkableEntity
-  id: string
 }) {
   const assetNoun = `asset${added !== 1 ? 's' : ''}`
   if (skipped > 0) {
@@ -97,7 +99,7 @@ function CollectionAssetsAddedMessage({
   return (
     <>
       {added} {assetNoun} added to {ENTITY_CONFIG[entity].label}{' '}
-      <EntityLink entity={entity} id={id} />.
+      <EntityLink entity={entity} id={id} label={label} />.
     </>
   )
 }
@@ -297,6 +299,7 @@ export function AddToCollectionModal({
           skipped={skipped}
           entity={ref.entity}
           id={ref.id}
+          label={ref.label}
         />,
         { position: 'top-center' },
       )

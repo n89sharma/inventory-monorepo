@@ -40,7 +40,7 @@ export function TransferDetailsPage(): React.JSX.Element {
     [mutations, transferNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
-  const handleDelete = useEntityDelete('Transfer', transferNumber, mutations.remove)
+  const handleDelete = useEntityDelete('Transfer', transferNumber, transferNumber, mutations.remove)
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSearchRow) => string) =>

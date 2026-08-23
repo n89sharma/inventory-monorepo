@@ -153,6 +153,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
             <CollectionEditBar
               section={section}
               collectionId={collectionId}
+              displayId={header.copyValue}
               canCreateEditEntity={canCreateEditEntity}
               assets={entity.assets}
               selectedAssets={selectedAssets}

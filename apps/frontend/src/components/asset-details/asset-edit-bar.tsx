@@ -44,7 +44,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const deleteAsset = useAssetStore((state) => state.deleteAsset)
   const [printLoading, setPrintLoading] = useState(false)
-  const handleDelete = useEntityDelete('Asset', barcode, deleteAsset)
+  const handleDelete = useEntityDelete('Asset', barcode, barcode, deleteAsset)
 
   const assetSummaries = assetDetails
     ? assetDetailsToSummary(

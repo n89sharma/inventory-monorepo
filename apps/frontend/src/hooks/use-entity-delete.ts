@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 export function useEntityDelete(
   label: string,
   entityId: string,
+  displayId: string,
   remove: (entityId: string) => Promise<void>,
 ): () => Promise<void> {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export function useEntityDelete(
     } catch {
       return
     }
-    toast.success(`${label} ${entityId} deleted`, { position: 'top-center' })
+    toast.success(`${label} ${displayId} deleted`, { position: 'top-center' })
     navigate('..', { relative: 'path' })
-  }, [label, entityId, remove, navigate])
+  }, [label, entityId, displayId, remove, navigate])
 }

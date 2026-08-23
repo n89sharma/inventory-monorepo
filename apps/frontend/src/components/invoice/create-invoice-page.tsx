@@ -28,7 +28,11 @@ export function CreateInvoicePage(): React.JSX.Element {
     try {
       const { invoiceNumber } = await mutations.create(data)
       const destination = returnTo ?? `/invoices/${invoiceNumber}`
-      showEntityCreatedToast({ entity: 'invoice', id: invoiceNumber })
+      showEntityCreatedToast({
+        entity: 'invoice',
+        id: invoiceNumber,
+        label: data.invoice_reference,
+      })
       navigate(destination)
     } catch {
       // interceptor already showed the error toast

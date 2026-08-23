@@ -1,39 +1,42 @@
+import type { AssetInvoice, AssetInvoiceSelector } from '@/lib/asset-invoice'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 
-export type AssetInvoiceSelector = (asset: AssetSearchRow) => string | null
-
-type InvoiceBucket = { invoice_number: string | null; count: number }
+type InvoiceBucket = { invoice: AssetInvoice | null; count: number }
 
 function groupAssetsByInvoice(
   assets: AssetSearchRow[],
   getInvoice: AssetInvoiceSelector,
 ): InvoiceBucket[] {
-  const counts = new Map<string | null, number>()
+  const buckets = new Map<string | null, InvoiceBucket>()
   for (const asset of assets) {
-    const key = getInvoice(asset) ?? null
-    counts.set(key, (counts.get(key) ?? 0) + 1)
+    const invoice = getInvoice(asset)
+    const key = invoice?.invoice_number ?? null
+    const bucket = buckets.get(key)
+    if (bucket) {
+      bucket.count += 1
+    } else {
+      buckets.set(key, { invoice, count: 1 })
+    }
   }
-  const buckets: InvoiceBucket[] = []
-  for (const [invoice_number, count] of counts) {
-    buckets.push({ invoice_number, count })
-  }
-  buckets.sort((a, b) => {
-    if (a.invoice_number === null) return 1
-    if (b.invoice_number === null) return -1
+  return [...buckets.values()].sort((a, b) => {
+    if (a.invoice === null) return 1
+    if (b.invoice === null) return -1
     return b.count - a.count
   })
-  return buckets
 }
 
 function InvoiceBucketLabel({ bucket }: { bucket: InvoiceBucket }) {
-  if (bucket.invoice_number === null) {
+  if (bucket.invoice === null) {
     return <span className="text-muted-foreground">No invoice ({bucket.count})</span>
   }
   return (
-    <Link to={`/invoices/${bucket.invoice_number}`} className="text-primary hover:underline">
-      {bucket.invoice_number} ({bucket.count})
+    <Link
+      to={`/invoices/${bucket.invoice.invoice_number}`}
+      className="text-primary hover:underline"
+    >
+      {bucket.invoice.invoice_reference} ({bucket.count})
     </Link>
   )
 }
@@ -55,7 +58,7 @@ export function InvoiceSummaryField({
       <span className="text-muted-foreground">Invoices</span>
       <span>
         {invoiceBuckets.map((bucket, i) => (
-          <span key={bucket.invoice_number ?? '__none__'}>
+          <span key={bucket.invoice?.invoice_number ?? '__none__'}>
             {i > 0 && ', '}
             <InvoiceBucketLabel bucket={bucket} />
           </span>

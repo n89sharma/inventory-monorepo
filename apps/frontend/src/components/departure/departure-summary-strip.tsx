@@ -1,4 +1,5 @@
 import { InvoiceSummaryField } from '@/components/invoice/invoice-summary-field'
+import { salesInvoiceOf } from '@/lib/asset-invoice'
 import { AssetCompositionField } from '@/components/shared/cards/asset-composition-field'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
 import { SummaryField } from '@/components/shared/cards/summary-field'
@@ -17,10 +18,7 @@ export function DepartureSummaryStrip({ departure }: { departure: DepartureDetai
       {departure.notes && <SummaryField label="Note" value={departure.notes} />}
       <AssetCompositionField assets={departure.assets} />
       <AssetTotalsField assets={departure.assets} />
-      <InvoiceSummaryField
-        assets={departure.assets}
-        getInvoice={(a) => a.sales_invoice_invoice_number}
-      />
+      <InvoiceSummaryField assets={departure.assets} getInvoice={salesInvoiceOf} />
     </SummaryStrip>
   )
 }

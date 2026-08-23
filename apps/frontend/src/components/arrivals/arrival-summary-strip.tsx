@@ -1,5 +1,6 @@
 import type { ArrivalDetail } from 'shared-types'
 import { InvoiceSummaryField } from '../invoice/invoice-summary-field'
+import { purchaseInvoiceOf } from '@/lib/asset-invoice'
 import { AssetCompositionField } from '../shared/cards/asset-composition-field'
 import { AssetTotalsField } from '../shared/cards/asset-totals-field'
 import { SummaryField } from '../shared/cards/summary-field'
@@ -14,10 +15,7 @@ export function ArrivalSummaryStrip({ arrival }: { arrival: ArrivalDetail }) {
       {arrival.comment && <SummaryField label="Note" value={arrival.comment} />}
       <AssetCompositionField assets={arrival.assets} />
       <AssetTotalsField assets={arrival.assets} />
-      <InvoiceSummaryField
-        assets={arrival.assets}
-        getInvoice={(a) => a.purchase_invoice_invoice_number}
-      />
+      <InvoiceSummaryField assets={arrival.assets} getInvoice={purchaseInvoiceOf} />
     </SummaryStrip>
   )
 }

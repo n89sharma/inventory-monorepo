@@ -1,6 +1,6 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useCan } from '@/hooks/use-can'
-import { downloadFile } from '@/lib/download-file'
+import { downloadFile, toFilenameStem } from '@/lib/download-file'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import {
   BarcodeIcon,
@@ -35,6 +35,7 @@ const CSV_MIME_TYPE = 'text/csv'
 type CollectionEditBarProps = {
   section: CollectionSection
   collectionId: string
+  displayId: string
   canCreateEditEntity: boolean
   assets?: AssetSearchRow[]
   selectedAssets?: AssetSearchRow[]
@@ -49,6 +50,7 @@ type CollectionEditBarProps = {
 export function CollectionEditBar({
   section,
   collectionId,
+  displayId,
   canCreateEditEntity,
   assets,
   selectedAssets,
@@ -86,7 +88,10 @@ export function CollectionEditBar({
     try {
       await waitForNextPaint()
       const csv = searchPageRowsToCsv(exportableAssets, visibleColumns)
-      downloadFile(`${section}-${collectionId}.csv`, new Blob([csv], { type: CSV_MIME_TYPE }))
+      downloadFile(
+        `${section}-${toFilenameStem(displayId, collectionId)}.csv`,
+        new Blob([csv], { type: CSV_MIME_TYPE }),
+      )
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })
     } finally {
@@ -188,7 +193,7 @@ export function CollectionEditBar({
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         entity={section}
-        entityId={collectionId}
+        entityId={displayId}
         onConfirm={onDelete}
       >
         <AlertDialogDescription>

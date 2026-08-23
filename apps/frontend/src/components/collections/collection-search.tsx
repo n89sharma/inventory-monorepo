@@ -77,8 +77,8 @@ function ResultsList({
       {results.invoices.map((i) => (
         <ResultButton
           key={i.id}
-          label={`Invoice ${i.invoice_number}`}
-          sub={i.organization}
+          label={`Invoice ${i.invoice_reference}`}
+          sub={`${i.organization} — ${i.invoice_number}`}
           onClick={() => onSelect({ kind: 'invoice', data: i })}
         />
       ))}

@@ -35,7 +35,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
   const [moveOpen, setMoveOpen] = useState(false)
 
-  const handleDelete = useEntityDelete('Arrival', arrivalNumber, mutations.remove)
+  const handleDelete = useEntityDelete('Arrival', arrivalNumber, arrivalNumber, mutations.remove)
 
   const handleEditAsset = useCallback(
     async (assetId: number) => {

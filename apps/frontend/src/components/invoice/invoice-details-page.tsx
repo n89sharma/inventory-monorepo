@@ -30,7 +30,12 @@ export function InvoiceDetailsPage(): React.JSX.Element {
     [mutations, invoiceNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
-  const handleDelete = useEntityDelete('Invoice', invoiceNumber, mutations.remove)
+  const handleDelete = useEntityDelete(
+    'Invoice',
+    invoiceNumber,
+    detail.data?.invoice_reference ?? invoiceNumber,
+    mutations.remove,
+  )
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSearchRow) => string) =>
