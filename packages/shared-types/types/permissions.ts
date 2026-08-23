@@ -14,6 +14,7 @@ export type Permission =
   | 'update_tech_specs'
   | 'update_location'
   | 'update_settings'
+  | 'return_to_stock'
   | 'view_sale_price'
   | 'view_purchase_price'
   | 'edit_any_hold'
@@ -39,6 +40,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'update_tech_specs',
     'update_location',
     'update_settings',
+    'return_to_stock',
     'view_sale_price',
     'view_purchase_price',
     'edit_any_hold',
@@ -62,6 +64,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_store',
     'update_tech_specs',
     'update_location',
+    'return_to_stock',
     'view_sale_price',
     'view_purchase_price',
     'edit_any_hold',
@@ -81,6 +84,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'create_update_store',
     'update_tech_specs',
     'update_location',
+    'return_to_stock',
     'view_sale_price',
     'view_purchase_price',
     'edit_any_hold',
@@ -100,6 +104,7 @@ export const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     'update_tech_specs',
     'update_location',
     'update_settings',
+    'return_to_stock',
     'view_sale_price',
     'view_purchase_price',
     'edit_any_hold',

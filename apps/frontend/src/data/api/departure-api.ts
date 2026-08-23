@@ -23,6 +23,7 @@ import {
   CreateDepartureSchema,
   DepartureDetailSchema,
   DepartureSummarySchema,
+  ReturnAssetsToStockSchema,
   SetDepartureOutgoingStatusSchema,
   UpdateDepartureMetadataSchema,
 } from 'shared-types'
@@ -94,6 +95,17 @@ export async function setDepartureOutgoingStatus(
   await api.patch(
     `/departures/${departureNumber}/assets/outgoing-status`,
     setDepartureOutgoingStatusBody,
+  )
+}
+
+export async function returnDepartureAssetsToStock(
+  departureNumber: string,
+  assetIds: number[],
+): Promise<void> {
+  const returnDepartureAssetsToStockBody = ReturnAssetsToStockSchema.parse({ assetIds })
+  await api.post(
+    `/departures/${departureNumber}/assets/return-to-stock`,
+    returnDepartureAssetsToStockBody,
   )
 }
 

@@ -6,6 +6,7 @@ import {
   getDepartures,
   patchDepartureAssets,
   patchDepartureMetadata,
+  returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
 } from '../controllers/departureController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -34,6 +35,11 @@ router.patch(
   '/:departureNumber/assets/outgoing-status',
   requirePermission('create_update_departure'),
   setDepartureOutgoingStatus,
+)
+router.post(
+  '/:departureNumber/assets/return-to-stock',
+  requirePermission('return_to_stock'),
+  returnDepartureAssetsToStock,
 )
 router.patch(
   '/:departureNumber/metadata',

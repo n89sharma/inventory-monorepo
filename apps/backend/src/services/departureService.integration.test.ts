@@ -1,11 +1,18 @@
-import { DEFAULT_OUTGOING_STATUS, OUTGOING_STATUS } from 'shared-types'
+import {
+  ASSET_STATUS,
+  DEFAULT_OUTGOING_STATUS,
+  OUTGOING_STATUS,
+  ROLE_PERMISSIONS,
+} from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   buildCreateDepartureInput,
   buildCreateHoldInput,
+  buildCreateInvoiceInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  getAssetCost,
   getAssetHoldId,
   getAssetStatus,
   getHoldArchivedAt,
@@ -16,13 +23,35 @@ import {
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
+import { prisma } from '../prisma.js'
 import {
   addAssetsToDepartureAndRecord,
   createDeparture,
   getDeparture,
+  returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
 } from './departureService.js'
 import { createHold } from './holdService.js'
+import { createInvoice } from './invoiceService.js'
+
+const ROLES_WITH_RETURN_TO_STOCK = [
+  'admin',
+  'leadership',
+  'general_manager',
+  'inventory_manager',
+] as const
+
+async function getAssetCollectionLinks(assetId: number) {
+  return prisma.asset.findUniqueOrThrow({
+    where: { id: assetId },
+    select: { departure_id: true, sales_invoice_id: true },
+  })
+}
+
+async function getMaxHistoryId(): Promise<number> {
+  const { _max } = await prisma.history.aggregate({ _max: { id: true } })
+  return _max.id ?? 0
+}
 
 describe('departureService', () => {
   let refs: ArrivalTestData
@@ -237,5 +266,128 @@ describe('departureService', () => {
       refs.userId,
     )
     expect(departureNumber).toMatch(/^D-YYZ-\d{7}$/)
+  })
+  it('returns assets to stock, clearing the departure, sales invoice and sale price', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await seedAssetCost(asset.id)
+    await createInvoice(buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId), refs.userId)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    await returnDepartureAssetsToStock(departureNumber, [asset.id], refs.userId)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
+    expect(await getAssetCollectionLinks(asset.id)).toEqual({
+      departure_id: null,
+      sales_invoice_id: null,
+    })
+    expect(await getAssetCost(asset.id)).toEqual({ ...SEEDED_ASSET_COST, sale_price: null })
+  })
+
+  it('leaves assets on other departures untouched when the ids do not match', async () => {
+    const [onDeparture] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: onDeparture.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    const [stranger] = await createArrivedAssets(refs, 1)
+    await seedAssetCost(stranger.id)
+    const strangerDeparture = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: stranger.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+      ]),
+      refs.userId,
+    )
+
+    await expect(
+      returnDepartureAssetsToStock(departureNumber, [stranger.id], refs.userId),
+    ).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(stranger.id)).toBe(OUTGOING_STATUS.HARVESTED)
+    expect(await getAssetCost(stranger.id)).toEqual(SEEDED_ASSET_COST)
+    expect(strangerDeparture).not.toBe(departureNumber)
+  })
+
+  it('leaves the departure in place when its last asset is returned', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    await returnDepartureAssetsToStock(departureNumber, [asset.id], refs.userId)
+
+    const departure = await getDeparture(departureNumber, 'admin')
+    expect(departure.assets).toHaveLength(0)
+  })
+
+  it('leaves the other assets on the same sales invoice untouched', async () => {
+    const [returned, staying] = await createArrivedAssets(refs, 2)
+    await seedAssetCost(returned.id)
+    await seedAssetCost(staying.id)
+    await createInvoice(
+      buildCreateInvoiceInput(refs, [returned, staying], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: returned.id, outgoing_status: OUTGOING_STATUS.SOLD },
+        { id: staying.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    await returnDepartureAssetsToStock(departureNumber, [returned.id], refs.userId)
+
+    const stayingLinks = await getAssetCollectionLinks(staying.id)
+    expect(stayingLinks.sales_invoice_id).not.toBeNull()
+    expect(stayingLinks.departure_id).not.toBeNull()
+    expect(await getAssetCost(staying.id)).toEqual(SEEDED_ASSET_COST)
+  })
+
+  it('records the return against the departure, the invoice and the asset', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await seedAssetCost(asset.id)
+    await createInvoice(buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId), refs.userId)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    const sinceId = await getMaxHistoryId()
+
+    await returnDepartureAssetsToStock(departureNumber, [asset.id], refs.userId)
+
+    const newRows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(
+      newRows.some((r) => r.entity_type === 'Departure' && r.action_type === 'ASSETS_REMOVED'),
+    ).toBe(true)
+    expect(
+      newRows.some((r) => r.entity_type === 'Invoice' && r.action_type === 'ASSETS_REMOVED'),
+    ).toBe(true)
+
+    // The sale price is a permission-gated channel and lands on its own entity type.
+    const changesFor = (entityType: string) =>
+      newRows
+        .filter((r) => r.entity_type === entityType && r.entity_id === asset.id)
+        .map(
+          (r) => r.changes as { before?: Record<string, unknown>; after?: Record<string, unknown> },
+        )
+
+    const priceChange = changesFor('AssetSalePrice').find((c) => c.after?.sale_price !== undefined)
+    expect(priceChange?.before?.sale_price).toBe(SEEDED_ASSET_COST.sale_price)
+    expect(priceChange?.after?.sale_price).toBeNull()
+    expect(changesFor('Asset').some((c) => c.after?.status === ASSET_STATUS.IN_STOCK)).toBe(true)
+  })
+
+  it('grants return_to_stock to exactly the four intended roles', () => {
+    const granted = Object.entries(ROLE_PERMISSIONS)
+      .filter(([, permissions]) => permissions.includes('return_to_stock'))
+      .map(([role]) => role)
+    expect(granted.sort()).toEqual([...ROLES_WITH_RETURN_TO_STOCK].sort())
   })
 })

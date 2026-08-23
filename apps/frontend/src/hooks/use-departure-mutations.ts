@@ -2,11 +2,13 @@ import {
   createDeparture,
   getDepartureDetail,
   patchDepartureAssets,
+  returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
   updateDepartureMetadata,
 } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
+import { invalidateInvoiceLists } from '@/hooks/use-invoice'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
@@ -93,6 +95,18 @@ async function setOutgoingStatus(
   invalidateDepartureLists()
 }
 
+async function returnToStock(departureNumber: string, assets: AssetSearchRow[]) {
+  if (assets.length === 0) return
+  await returnDepartureAssetsToStock(
+    departureNumber,
+    assets.map((a) => a.id),
+  )
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+  invalidateInvoiceLists()
+  invalidateAssetDetails(assets.map((a) => a.barcode))
+}
+
 function priceSaveSpec(departureNumber: string): PriceSaveSpec {
   return {
     detailCacheKey: departureDetailKey(departureNumber),
@@ -108,8 +122,8 @@ function updatePrice(
   return saveAssetPrice(priceSaveSpec(departureNumber), barcode, patch)
 }
 
-// Departures have no removal flow, so the only deferred work is the price list invalidation.
-// Module-level so the identity stays stable: CollectionDetailPage's unmount effect depends on
+// Returning assets to stock commits immediately, so the only deferred work is the price list
+// invalidation. Module-level so the identity stays stable: CollectionDetailPage's unmount effect depends on
 // this callback and would otherwise flush on every render.
 function flushPending(departureNumber: string) {
   flushPendingPriceInvalidation(priceSaveSpec(departureNumber))
@@ -124,6 +138,7 @@ const mutations = {
   updateMetadata,
   updatePrice,
   setOutgoingStatus,
+  returnToStock,
   flushPending,
 } as const
 

@@ -42,6 +42,12 @@ export const SetDepartureOutgoingStatusSchema = z.object({
 })
 export type SetDepartureOutgoingStatus = z.infer<typeof SetDepartureOutgoingStatusSchema>
 
+// POST /departures/:departureNumber/assets/return-to-stock
+export const ReturnAssetsToStockSchema = z.object({
+  assetIds: z.array(z.number().int()).nonempty().max(2000),
+})
+export type ReturnAssetsToStock = z.infer<typeof ReturnAssetsToStockSchema>
+
 // POST /departures
 export const CreateDepartureSchema = z.object({
   origin: WarehouseSchema,

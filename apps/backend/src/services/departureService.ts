@@ -1,5 +1,6 @@
 import {
   AppRole,
+  ASSET_STATUS,
   AssetDelta,
   CreateDeparture,
   DEFAULT_OUTGOING_STATUS,
@@ -8,6 +9,7 @@ import {
   OutgoingStatusSchema,
   UpdateDepartureMetadata,
 } from 'shared-types'
+import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
@@ -17,11 +19,13 @@ import {
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { mapUser } from '../lib/user-mappers.js'
 import {
   recordAssetStatusChange,
+  recordAssetUpdate,
   recordDepartureCreate,
   recordDepartureUpdate,
 } from './historyService.js'
@@ -293,6 +297,90 @@ export async function setDepartureOutgoingStatus(
   })
 
   await recordAssetStatusChange(priorAssets, status.id, userId)
+}
+
+type ReturnedAsset = {
+  id: number
+  status_id: number
+  sales_invoice_id: number | null
+  cost: { sale_price: Prisma.Decimal | null } | null
+}
+
+// Returned assets may sit on different sales invoices, so record one delta per invoice.
+async function recordSalesInvoiceRelease(assets: ReturnedAsset[], userId: number): Promise<void> {
+  const invoicedAssets = assets.filter((asset) => asset.sales_invoice_id !== null)
+  const assetsByInvoice = Object.groupBy(invoicedAssets, (asset) => asset.sales_invoice_id!)
+  for (const [invoiceId, group] of Object.entries(assetsByInvoice)) {
+    if (!group) continue
+    await recordCollectionAssetDelta(
+      'Invoice',
+      'sales_invoice_id',
+      Number(invoiceId),
+      [],
+      group.map((asset) => asset.id),
+      userId,
+    )
+  }
+}
+
+async function recordSalePriceClear(assets: ReturnedAsset[], userId: number): Promise<void> {
+  const pricedAssets = assets.filter((asset) => asset.cost?.sale_price != null)
+  await Promise.all(
+    pricedAssets.map((asset) =>
+      recordAssetUpdate(
+        asset.id,
+        { sale_price: decimalToNumber(asset.cost!.sale_price) },
+        { sale_price: null },
+        userId,
+      ),
+    ),
+  )
+}
+
+export async function returnDepartureAssetsToStock(
+  departureNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  const departure = await prisma.departure.findUnique({
+    where: { departure_number: departureNumber },
+    select: { id: true },
+  })
+  if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+
+  const inStockStatus = await prisma.status.findUniqueOrThrow({
+    where: { status: ASSET_STATUS.IN_STOCK },
+    select: { id: true },
+  })
+
+  const priorAssets = await prisma.$transaction(async (tx) => {
+    const assets = await tx.asset.findMany({
+      where: { id: { in: assetIds }, departure_id: departure.id },
+      select: {
+        id: true,
+        status_id: true,
+        sales_invoice_id: true,
+        cost: { select: { sale_price: true } },
+      },
+    })
+    if (assets.length !== assetIds.length)
+      throw new ConflictError('Some assets do not belong to this departure')
+
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds }, departure_id: departure.id },
+      data: { departure_id: null, status_id: inStockStatus.id, sales_invoice_id: null },
+    })
+    await tx.cost.updateMany({
+      where: { asset_id: { in: assetIds } },
+      data: { sale_price: null },
+    })
+    return assets
+  })
+
+  await recordCollectionAssetDelta('Departure', 'departure_id', departure.id, [], assetIds, userId)
+  await recordAssetStatusChange(priorAssets, inStockStatus.id, userId)
+  await recordSalesInvoiceRelease(priorAssets, userId)
+  await recordSalePriceClear(priorAssets, userId)
 }
 
 async function getNewDepartureNumber(originCode: string): Promise<string> {

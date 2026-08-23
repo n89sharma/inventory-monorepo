@@ -5,6 +5,7 @@ import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { DepartureOutgoingStatusMenu } from '@/components/departure/departure-outgoing-status-menu'
+import { ReturnToStockAction } from '@/components/departure/return-to-stock-action'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
@@ -13,7 +14,26 @@ import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
+import type { AssetSearchRow, OutgoingStatus, PatchAssetPricing } from 'shared-types'
+
+type DepartureBulkActionsProps = {
+  selectedAssets: AssetSearchRow[]
+  onApplyOutgoingStatus: (status: OutgoingStatus) => void
+  onReturnToStock: () => void
+}
+
+function DepartureBulkActions({
+  selectedAssets,
+  onApplyOutgoingStatus,
+  onReturnToStock,
+}: DepartureBulkActionsProps): React.JSX.Element {
+  return (
+    <>
+      <ReturnToStockAction assetCount={selectedAssets.length} onConfirm={onReturnToStock} />
+      <DepartureOutgoingStatusMenu onApply={onApplyOutgoingStatus} />
+    </>
+  )
+}
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
@@ -81,13 +101,18 @@ export function DepartureDetailsPage(): React.JSX.Element {
         )
       }
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
-        <DepartureOutgoingStatusMenu
-          onApply={(status) => {
+        <DepartureBulkActions
+          selectedAssets={selectedAssets}
+          onApplyOutgoingStatus={(status) => {
             mutations.setOutgoingStatus(
               departureNumber,
               selectedAssets.map((a) => a.id),
               status,
             )
+            clearSelection()
+          }}
+          onReturnToStock={() => {
+            mutations.returnToStock(departureNumber, selectedAssets)
             clearSelection()
           }}
         />

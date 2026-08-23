@@ -5,6 +5,7 @@ import {
   CollectionHistory,
   CreateDepartureSchema,
   DepartureDetail,
+  ReturnAssetsToStockSchema,
   SetDepartureOutgoingStatusSchema,
   UpdateDepartureMetadataSchema,
   successResponse,
@@ -20,6 +21,7 @@ import {
   getDeparture as getDepartureSer,
   addAssetsToDepartureAndRecord as patchDepartureAssetsSer,
   setDepartureOutgoingStatus as setDepartureOutgoingStatusSer,
+  returnDepartureAssetsToStock as returnDepartureAssetsToStockSer,
   patchDepartureMetadata as patchDepartureMetadataSer,
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -62,6 +64,12 @@ export const setDepartureOutgoingStatus = asyncHandler(async (req, res) => {
     outgoing_status,
     res.locals.dbUserId,
   )
+  res.status(204).send()
+})
+
+export const returnDepartureAssetsToStock = asyncHandler(async (req, res) => {
+  const { assetIds } = ReturnAssetsToStockSchema.parse(req.body)
+  await returnDepartureAssetsToStockSer(req.params.departureNumber, assetIds, res.locals.dbUserId)
   res.status(204).send()
 })
 
