@@ -123,9 +123,12 @@ const DRAGGING_HEAD_CLASS = 'opacity-40'
 // Only ever applied to unpinned headers, so it never collides with PIN_EDGE_SHADOW.
 const DROP_BEFORE_CLASS = 'shadow-[inset_2px_0_0_var(--color-primary)]'
 const DROP_AFTER_CLASS = 'shadow-[inset_-2px_0_0_var(--color-primary)]'
+// Cursors come from the --cursor-grab / --cursor-grabbing variables in global.css rather
+// than the bare grab/grabbing keywords, which Chrome draws from an unscaled bitmap.
 const GRIP_CLASS =
-  'absolute left-0.5 top-1/2 -translate-y-1/2 cursor-grab opacity-0 transition-opacity ' +
-  'group-hover/head:opacity-60 focus-visible:opacity-100 active:cursor-grabbing'
+  'absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity ' +
+  '[cursor:var(--cursor-grab)] active:[cursor:var(--cursor-grabbing)] ' +
+  'group-hover/head:opacity-60 focus-visible:opacity-100'
 const DRAG_CHIP_CLASS =
   'flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium shadow-md'
 
