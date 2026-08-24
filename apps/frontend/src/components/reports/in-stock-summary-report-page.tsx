@@ -27,6 +27,8 @@ import type { VisibilityState } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import type { AssetType, Brand, InStockSummaryReport, ModelSummary, Warehouse } from 'shared-types'
 
+const TABLE_LABEL = 'In-stock summary'
+
 const EMPTY_ROWS: InStockSummaryReport = []
 const DEFAULT_SORT = { id: 'asset_count', desc: true }
 
@@ -96,6 +98,7 @@ function InStockSummaryBody({
     <div className="flex flex-col gap-2">
       <MeterBandLegend />
       <DataTable
+        label={TABLE_LABEL}
         columns={IN_STOCK_SUMMARY_COLUMNS}
         data={rows}
         defaultSort={DEFAULT_SORT}

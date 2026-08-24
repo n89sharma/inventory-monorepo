@@ -18,6 +18,8 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { HeldReportRow } from 'shared-types'
 
+const TABLE_LABEL = 'Held assets'
+
 const DAYS_SUFFIX = 'd'
 const SEARCH_ONHAND_URL = '/search/onhand'
 
@@ -58,6 +60,7 @@ function HeldReportBody({ table }: { table: HeldReportSummary }): React.JSX.Elem
 
   return (
     <DataTable
+      label={TABLE_LABEL}
       columns={HELD_REPORT_COLUMNS}
       data={rows}
       getRowId={getHeldReportRowId}

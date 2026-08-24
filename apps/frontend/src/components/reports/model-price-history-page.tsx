@@ -35,6 +35,8 @@ import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { ModelPriceHistoryResult, ModelPriceHistoryRow, ModelSummary } from 'shared-types'
 
+const TABLE_LABEL = 'Model price history'
+
 const EMPTY_SALES: ModelPriceHistoryRow[] = []
 const RANGE_OPTIONS = [6, 12] as const satisfies readonly PriceHistoryRange[]
 const NO_MEDIAN = '—'
@@ -183,6 +185,7 @@ function ModelPriceHistoryResults({
         <RangeSentence count={visibleSales.length} range={range} />
       </div>
       <DataTable
+        label={TABLE_LABEL}
         columns={columns}
         data={visibleSales}
         defaultSort={DEPARTED_AT_DESC_SORT}

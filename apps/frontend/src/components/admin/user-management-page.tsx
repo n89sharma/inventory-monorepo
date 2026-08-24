@@ -38,6 +38,8 @@ import { AppRoles, type AppRole, type User } from 'shared-types'
 import { toast } from 'sonner'
 import { createUserPermissionTableColumns } from './user-permission-table-columns'
 
+const TABLE_LABEL = 'Users'
+
 const ASSIGNABLE_ROLES = AppRoles.filter((r) => r !== 'admin')
 
 export function UserManagementPage() {
@@ -139,6 +141,7 @@ export function UserManagementPage() {
       </div>
 
       <DataTable
+        label={TABLE_LABEL}
         columns={columns}
         data={displayedUsers}
         renderTableFilter={(table) => (

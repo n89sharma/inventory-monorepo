@@ -28,6 +28,8 @@ import { useMemo } from 'react'
 import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 
+const TABLE_LABEL = 'Transfer assets'
+
 interface TransferFormPageProps {
   defaultValues?: TransferForm
   pageConfig: {
@@ -197,7 +199,7 @@ export function TransferFormPage({
             disabled={isSubmitting}
             className="max-w-xl"
           />
-          <DataTable columns={assetTableColumns} data={assets} />
+          <DataTable label={TABLE_LABEL} columns={assetTableColumns} data={assets} />
         </div>
 
         <UnsavedChangesDialog

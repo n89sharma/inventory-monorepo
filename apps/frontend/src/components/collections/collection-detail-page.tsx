@@ -26,6 +26,8 @@ import { Label } from '@/components/shadcn/label'
 import { BulkEditBar } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
+const TABLE_LABEL = 'Collection assets'
+
 // Raw database casing; the title-cased reference-data value ('Copier') would never match.
 const COPIER_ASSET_TYPE = 'COPIER'
 
@@ -187,6 +189,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         })}
         {renderAddAssetBar?.(entity)}
         <DataTable
+          label={TABLE_LABEL}
           columns={columns}
           data={visibleAssets}
           renderTableFilter={(table) => (

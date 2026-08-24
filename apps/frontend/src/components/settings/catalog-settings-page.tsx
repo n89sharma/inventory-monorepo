@@ -12,6 +12,8 @@ import { getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-tabl
 import { useMemo, useState } from 'react'
 import type { ModelSummary } from 'shared-types'
 
+const TABLE_LABEL = 'Models'
+
 const MODEL_DEFAULT_SORT = { id: 'brand_name', desc: false }
 const MODEL_FACETED_ROW_MODELS = {
   getFacetedRowModel: getFacetedRowModel<ModelSummary>(),
@@ -47,6 +49,7 @@ export function CatalogSettingsPage(): React.JSX.Element {
 
       <h2 className="text-lg font-semibold">Models</h2>
       <DataTable
+        label={TABLE_LABEL}
         columns={modelTableColumns}
         data={sortedModels}
         defaultSort={MODEL_DEFAULT_SORT}

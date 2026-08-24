@@ -16,6 +16,8 @@ import type {
 import { memo, useMemo } from 'react'
 import { searchRowToAssetSummary, type AssetSearchRow, type AssetSummary } from 'shared-types'
 
+const TABLE_LABEL = 'Assets'
+
 const getAssetRowId = (row: AssetSearchRow) => row.barcode
 const STOCK_DAYS_ASC_SORT = { id: 'stock_days', desc: false } as const
 
@@ -74,6 +76,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         onSelectAll={selectAllAssets}
       />
       <DataTable
+        label={TABLE_LABEL}
         columns={columns}
         data={assets}
         rowSelection={rowSelection}

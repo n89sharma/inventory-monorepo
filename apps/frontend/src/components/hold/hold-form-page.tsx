@@ -27,6 +27,8 @@ import type { AssetSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { getCreateEditCollectionFormColumns } from '../table-columns/create-edit-collection-form-columns'
 
+const TABLE_LABEL = 'Hold assets'
+
 interface HoldFormPageProps {
   defaultValues?: HoldForm
   pageConfig: {
@@ -163,7 +165,7 @@ export function HoldFormPage({
             disabled={isSubmitting}
             className="max-w-xl"
           />
-          <DataTable columns={assetTableColumns} data={assets} />
+          <DataTable label={TABLE_LABEL} columns={assetTableColumns} data={assets} />
         </div>
 
         <UnsavedChangesDialog

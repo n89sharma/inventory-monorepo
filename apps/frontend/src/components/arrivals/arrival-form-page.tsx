@@ -21,6 +21,8 @@ import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 import { CreateAssetModal } from './create-asset-modal'
 
+const TABLE_LABEL = 'Arrival assets'
+
 interface ArrivalFormPageProps {
   defaultValues?: ArrivalForm
   pageConfig: {
@@ -200,7 +202,7 @@ export function ArrivalFormPage({
               Create New Asset
             </Button>
           </div>
-          <DataTable columns={assetTableColumns} data={assets} />
+          <DataTable label={TABLE_LABEL} columns={assetTableColumns} data={assets} />
         </div>
 
         <UnsavedChangesDialog

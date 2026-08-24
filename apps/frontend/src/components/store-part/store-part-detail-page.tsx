@@ -17,6 +17,8 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { StorePartWarehouseStock } from 'shared-types'
 
+const TABLE_LABEL = 'Store part transactions'
+
 // No warehouse selected means every warehouse, matching the ledger the page shows.
 function onHandIn(stock: StorePartWarehouseStock[], warehouseId: number | null): number {
   if (warehouseId === null) return stock.reduce((sum, entry) => sum + entry.on_hand, 0)
@@ -126,6 +128,7 @@ export function StorePartDetailPage(): React.JSX.Element {
       />
       <PageContent>
         <DataTable
+          label={TABLE_LABEL}
           columns={storeTransactionLedgerColumns}
           data={ledgerRows}
           defaultSort={{ id: 'created_at', desc: true }}

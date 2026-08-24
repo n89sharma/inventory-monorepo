@@ -37,6 +37,8 @@ import { Controller, useFieldArray, useForm, type FieldErrors } from 'react-hook
 import { DEFAULT_OUTGOING_STATUS, type AssetSummary, type OutgoingStatus } from 'shared-types'
 import { toast } from 'sonner'
 
+const TABLE_LABEL = 'Departure assets'
+
 const getAssetRowId = (asset: DepartureFormAsset) => asset.barcode
 
 interface DepartureFormPageProps {
@@ -233,6 +235,7 @@ export function DepartureFormPage({
             className="max-w-xl"
           />
           <DataTable
+            label={TABLE_LABEL}
             columns={assetTableColumns}
             data={assets}
             rowSelection={rowSelection}

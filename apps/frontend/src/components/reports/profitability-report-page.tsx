@@ -47,6 +47,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useMemo } from 'react'
 import type { ProfitabilityCubeRow } from 'shared-types'
 
+const TABLE_LABEL = 'Profitability by month'
+
 const YEARS_IN_DROPDOWN = 5
 const CURRENT_YEAR = getDefaultYear()
 const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
@@ -159,7 +161,7 @@ function ProfitabilityReportBody({
       </div>
     )
   }
-  return <DataTable columns={columns} data={months} />
+  return <DataTable label={TABLE_LABEL} columns={columns} data={months} />
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {

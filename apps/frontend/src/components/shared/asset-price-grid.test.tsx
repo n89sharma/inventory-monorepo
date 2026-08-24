@@ -9,6 +9,8 @@ import { MemoryRouter } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 import { describe, expect, it, vi } from 'vitest'
 
+const TABLE_LABEL = 'Assets'
+
 // Data order, deliberately not barcode order so sorting by barcode changes the first row.
 const BARCODES = ['BC-2', 'BC-3', 'BC-1'] as const
 const SORTED_BARCODES = ['BC-1', 'BC-2', 'BC-3'] as const
@@ -36,6 +38,7 @@ function renderGrid(savePriceField: TableMeta<AssetSearchRow>['savePriceField'] 
     <MemoryRouter>
       <TooltipProvider>
         <DataTable
+          label={TABLE_LABEL}
           columns={columns}
           data={ASSETS}
           getRowId={getAssetRowId}

@@ -68,6 +68,9 @@ import {
 } from '@phosphor-icons/react'
 
 interface DataTableProps<TData, TValue> {
+  // The entity the rows describe, as a plural noun ('Assets', 'Users'). Names the scroll
+  // region for screen readers, which append the word themselves, so it never says 'table'.
+  label: string
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onRowMouseEnter?: (row: TData) => void
@@ -103,6 +106,12 @@ export const TABLE_HEAD_CLASS =
   'whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
 
 const TABLE_FOOT_CELL_CLASS = 'whitespace-nowrap text-center font-semibold'
+
+const SCROLL_REGION_SLOT = 'table-scroll'
+// Drawn on the bordered wrapper rather than the scroll region itself, whose own outline the
+// wrapper's overflow-hidden would clip away.
+const SCROLL_REGION_FOCUS_CLASS =
+  'has-[>[data-slot=table-scroll]:focus-visible]:ring-3 has-[>[data-slot=table-scroll]:focus-visible]:ring-ring/50'
 
 const CELL_BG =
   'bg-[var(--row-bg,var(--color-background))] ' +
@@ -235,6 +244,7 @@ function ColumnDragChip({ label }: { label: string }): React.JSX.Element {
 }
 
 export function DataTable<TData, TValue>({
+  label,
   columns,
   data,
   onRowMouseEnter,
@@ -369,7 +379,7 @@ export function DataTable<TData, TValue>({
         onDragCancel={() => setDraggedColumnLabel('')}
       >
         <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
-          <div className="overflow-hidden rounded-md border">
+          <div className={`overflow-hidden rounded-md border ${SCROLL_REGION_FOCUS_CLASS}`}>
             {renderTableFilter && (
               <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
                 <div
@@ -381,7 +391,13 @@ export function DataTable<TData, TValue>({
                 {renderTableFilter(table)}
               </div>
             )}
-            <div className="overflow-x-auto">
+            <div
+              data-slot={SCROLL_REGION_SLOT}
+              role="region"
+              aria-label={label}
+              tabIndex={0}
+              className="overflow-x-auto outline-none"
+            >
               <Table className={`table-auto w-max min-w-full`}>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (

@@ -13,6 +13,8 @@ import { toast } from 'sonner'
 import type { RowSelectionState } from '@tanstack/react-table'
 import type { LocationSummary } from 'shared-types'
 
+const TABLE_LABEL = 'Locations'
+
 const LOCATION_DEFAULT_SORT = { id: 'warehouse_code', desc: false }
 const LOCATION_PIN_LEFT = ['select', 'warehouse_code']
 const EMPTY_LOCATIONS: LocationSummary[] = []
@@ -67,6 +69,7 @@ export function LocationsSettingsPage(): React.JSX.Element {
       </div>
 
       <DataTable
+        label={TABLE_LABEL}
         columns={columns}
         data={locations}
         getRowId={getLocationRowId}

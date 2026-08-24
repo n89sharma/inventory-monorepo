@@ -4,6 +4,8 @@ import { StickyPageHeader } from '@/components/collections/sticky-page-header'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import type { ColumnDef, Table } from '@tanstack/react-table'
 
+const TABLE_LABEL = 'Collections'
+
 interface CollectionPageProps<TData, TValue> {
   title: string
   columns: ColumnDef<TData, TValue>[]
@@ -44,6 +46,7 @@ export function CollectionPage<TData, TValue>({
       <PageContent className="flex flex-col gap-2">
         {summaryStrip}
         <DataTable
+          label={TABLE_LABEL}
           columns={columns}
           data={data}
           onRowMouseEnter={onRowMouseEnter}

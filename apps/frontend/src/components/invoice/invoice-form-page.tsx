@@ -39,6 +39,8 @@ import {
 import { INVOICE_TYPE, type AssetSummary, type InvoiceType } from 'shared-types'
 import { toast } from 'sonner'
 
+const TABLE_LABEL = 'Invoice assets'
+
 interface InvoiceFormPageProps {
   defaultAssets?: AssetSummary[]
   pageConfig: {
@@ -226,7 +228,7 @@ export function InvoiceFormPage({
             disabled={isSubmitting}
             className="max-w-xl"
           />
-          <DataTable columns={assetTableColumns} data={assets} />
+          <DataTable label={TABLE_LABEL} columns={assetTableColumns} data={assets} />
         </div>
 
         <UnsavedChangesDialog
