@@ -99,8 +99,15 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [copiersOnly, setCopiersOnly] = useState(true)
-  const { visibleColumns, setVisibleColumns, columnVisibility, onColumnVisibilityChange, reset } =
-    useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
+  const {
+    visibleColumns,
+    setVisibleColumns,
+    columnVisibility,
+    onColumnVisibilityChange,
+    columnOrder,
+    onColumnOrderChange,
+    reset,
+  } = useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
 
   const assetHref = useMemo(
     () => (asset: AssetSearchRow) =>
@@ -244,6 +251,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
           pinLeft={PINNED_ASSET_COLUMN_IDS}
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={onColumnVisibilityChange}
+          columnOrder={columnOrder}
+          onColumnOrderChange={onColumnOrderChange}
           meta={tableMeta}
         />
       </PageContent>

@@ -7,6 +7,7 @@ import { DataTable } from '@/components/shared/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import { useCan } from '@/hooks/use-can'
 import type {
+  ColumnOrderState,
   OnChangeFn,
   RowSelectionState,
   SortingState,
@@ -25,6 +26,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave,
   columnVisibility,
   onColumnVisibilityChange,
+  columnOrder,
+  onColumnOrderChange,
   getRowHref,
   getRowClassName,
   defaultSort = STOCK_DAYS_ASC_SORT,
@@ -37,6 +40,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   onBulkPriceSave: () => void
   columnVisibility: VisibilityState
   onColumnVisibilityChange: OnChangeFn<VisibilityState>
+  columnOrder: ColumnOrderState
+  onColumnOrderChange: OnChangeFn<ColumnOrderState>
   getRowHref: (asset: AssetSearchRow) => string
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
   defaultSort?: { id: string; desc: boolean }
@@ -82,6 +87,8 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         getRowClassName={getRowClassName}
         columnVisibility={columnVisibility}
         onColumnVisibilityChange={onColumnVisibilityChange}
+        columnOrder={columnOrder}
+        onColumnOrderChange={onColumnOrderChange}
       />
     </>
   )

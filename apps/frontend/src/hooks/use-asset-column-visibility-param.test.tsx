@@ -55,14 +55,49 @@ describe('useAssetColumnVisibilityParam', () => {
     expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('')
   })
 
-  it('writes the ids in catalog order, whichever order they were chosen in', async () => {
+  it('keeps the stored order and appends a newly enabled column at the end', async () => {
     const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
-    const { result } = renderWithParams('?cols=brand', onUrlUpdate)
+    const { result } = renderWithParams('?cols=status,location', onUrlUpdate)
 
-    act(() => result.current.setVisibleColumns(new Set(['status', 'brand'])))
+    act(() => result.current.setVisibleColumns(new Set(['status', 'location', 'brand'])))
 
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
-    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('brand,status')
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,location,brand')
+  })
+
+  it('leaves the surviving columns in order when one is disabled', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('?cols=status,brand,location', onUrlUpdate)
+
+    act(() => result.current.setVisibleColumns(new Set(['status', 'location'])))
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,location')
+  })
+
+  it('reads the column order back in the order the param stores it', () => {
+    const { result } = renderWithParams('?cols=status,location')
+    expect(result.current.columnOrder).toEqual(['status', 'location'])
+  })
+
+  it('writes a reordered default selection rather than clearing the param', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('', onUrlUpdate)
+
+    act(() => result.current.onColumnOrderChange(['status', 'location']))
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,location')
+  })
+
+  it('clears the param when a reorder lands back on the default order', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>()
+    const { result } = renderWithParams('?cols=status,location', onUrlUpdate)
+
+    act(() => result.current.onColumnOrderChange((prev) => [...prev].reverse()))
+
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBeNull()
   })
 
   it('clears the param when the selection matches the defaults', async () => {
@@ -116,7 +151,7 @@ describe('useAssetColumnVisibilityParam', () => {
     )
 
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
-    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('brand,status')
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,brand')
   })
 
   it('keeps a forced column out of the param it writes', async () => {

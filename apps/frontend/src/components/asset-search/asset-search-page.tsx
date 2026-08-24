@@ -51,6 +51,8 @@ export function AssetSearchPage({
     setVisibleColumns,
     columnVisibility,
     onColumnVisibilityChange,
+    columnOrder,
+    onColumnOrderChange,
     reset: resetColumns,
   } = useAssetColumnVisibilityParam(
     DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST[navContext],
@@ -106,6 +108,8 @@ export function AssetSearchPage({
             onBulkPriceSave={onBulkPriceSave}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={onColumnVisibilityChange}
+            columnOrder={columnOrder}
+            onColumnOrderChange={onColumnOrderChange}
             getRowHref={getRowHref}
             getRowClassName={getRowClassName}
             defaultSort={defaultSort}
