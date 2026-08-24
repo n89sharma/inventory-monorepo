@@ -51,7 +51,7 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
     size: SELECT_COLUMN_SIZE,
     enableSorting: false,
     enableHiding: false,
-    meta: { cellClassName: 'p-0' },
+    meta: { cellClassName: 'p-0', reorderable: false },
     header: ({ table }) => (
       <SelectHitArea
         onActivate={() => table.toggleAllPageRowsSelected(!table.getIsAllPageRowsSelected())}

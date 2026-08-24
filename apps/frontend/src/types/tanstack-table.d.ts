@@ -10,6 +10,9 @@ declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     cellClassName?: string
+    // Absent means reorderable. Set false for structural columns that must hold their
+    // position, such as an expander. Pinned columns are excluded regardless.
+    reorderable?: boolean
   }
 
   // One interface is shared by every table in the app, so each member is optional and

@@ -68,6 +68,7 @@ export function createUserPermissionTableColumns(
     {
       id: 'actions',
       header: 'Actions',
+      meta: { reorderable: false },
       cell: ({ row }) => {
         const user = row.original
         if (user.id === currentUserId || user.role === 'admin' || !user.clerk_id) return null

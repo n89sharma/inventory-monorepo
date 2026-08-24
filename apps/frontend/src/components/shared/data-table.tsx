@@ -3,7 +3,9 @@ import type {
   Column,
   ColumnDef,
   ColumnFiltersState,
+  ColumnOrderState,
   ExpandedState,
+  Header,
   OnChangeFn,
   Table as ReactTableInstance,
   TableMeta,
@@ -25,6 +27,25 @@ import {
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+
 import {
   Table,
   TableBody,
@@ -42,6 +63,7 @@ import {
   CaretDoubleRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  DotsSixVerticalIcon,
   FunnelSimpleIcon,
 } from '@phosphor-icons/react'
 
@@ -61,6 +83,10 @@ interface DataTableProps<TData, TValue> {
   getSubRows?: (row: TData) => TData[] | undefined
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>
+  // Left uncontrolled, the order lives for the life of the mount. Pages that own column
+  // state pass both so a drag persists wherever that state is stored.
+  columnOrder?: ColumnOrderState
+  onColumnOrderChange?: OnChangeFn<ColumnOrderState>
   renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
   renderAboveTable?: (table: ReactTableInstance<TData>) => React.ReactNode
   // Faceting walks the filtered rows once per column to collect distinct values, so it
@@ -88,6 +114,21 @@ const HEADER_Z_INDEX = 10
 const PINNED_HEADER_Z_INDEX = 11
 const PINNED_CELL_Z_INDEX = 1
 
+// Pointer travel before a press on the grip counts as a drag, so a plain click never
+// starts one.
+const DRAG_ACTIVATION_DISTANCE = 4
+const GRIP_ICON_SIZE = 14
+const GRIP_LABEL = 'Reorder column'
+const DRAGGING_HEAD_CLASS = 'opacity-40'
+// Only ever applied to unpinned headers, so it never collides with PIN_EDGE_SHADOW.
+const DROP_BEFORE_CLASS = 'shadow-[inset_2px_0_0_var(--color-primary)]'
+const DROP_AFTER_CLASS = 'shadow-[inset_-2px_0_0_var(--color-primary)]'
+const GRIP_CLASS =
+  'absolute left-0.5 top-1/2 -translate-y-1/2 cursor-grab opacity-0 transition-opacity ' +
+  'group-hover/head:opacity-60 focus-visible:opacity-100 active:cursor-grabbing'
+const DRAG_CHIP_CLASS =
+  'flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium shadow-md'
+
 // Spread over a base style: contributes nothing unless the column is pinned, so the
 // caller supplies the z-index that a pinned cell needs to win over its own layer.
 function pinnedLeftStyle<TData>(column: Column<TData>, zIndex: number): CSSProperties {
@@ -98,6 +139,96 @@ function pinnedLeftStyle<TData>(column: Column<TData>, zIndex: number): CSSPrope
 function pinEdgeClass<TData>(column: Column<TData>): string {
   const isPinnedEdge = column.getIsPinned() === 'left' && column.getIsLastColumn('left')
   return isPinnedEdge ? PIN_EDGE_SHADOW : ''
+}
+
+// A pinned column renders from the columnPinning array rather than from columnOrder, so
+// dragging one would move it in state without moving it on screen.
+function isReorderable<TData>(column: Column<TData>): boolean {
+  if (column.getIsPinned()) return false
+  return column.columnDef.meta?.reorderable ?? true
+}
+
+function headerCellStyle<TData>(header: Header<TData, unknown>): CSSProperties {
+  return {
+    width: header.column.columnDef.size,
+    position: 'sticky',
+    top: 0,
+    zIndex: HEADER_Z_INDEX,
+    ...pinnedLeftStyle(header.column, PINNED_HEADER_Z_INDEX),
+  }
+}
+
+function headerCellClassName<TData>(header: Header<TData, unknown>): string {
+  return `${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`
+}
+
+function headerContent<TData>(header: Header<TData, unknown>): React.ReactNode {
+  if (header.isPlaceholder) return null
+  return flexRender(header.column.columnDef.header, header.getContext())
+}
+
+function HeaderCell<TData>({ header }: { header: Header<TData, unknown> }): React.JSX.Element {
+  if (!isReorderable(header.column)) return <StaticHeaderCell header={header} />
+  return <SortableHeaderCell header={header} />
+}
+
+function StaticHeaderCell<TData>({
+  header,
+}: {
+  header: Header<TData, unknown>
+}): React.JSX.Element {
+  return (
+    <TableHead style={headerCellStyle(header)} className={headerCellClassName(header)}>
+      {headerContent(header)}
+    </TableHead>
+  )
+}
+
+function dropIndicatorClass(isOver: boolean, activeIndex: number, index: number): string {
+  if (!isOver || activeIndex === index) return ''
+  if (activeIndex > index) return DROP_BEFORE_CLASS
+  return DROP_AFTER_CLASS
+}
+
+function SortableHeaderCell<TData>({
+  header,
+}: {
+  header: Header<TData, unknown>
+}): React.JSX.Element {
+  // The transform this returns is deliberately unused: shifting a header without shifting
+  // the thousands of body cells below it would tear the column apart mid-drag.
+  const { activeIndex, attributes, index, isDragging, isOver, listeners, setNodeRef } = useSortable(
+    { id: header.column.id },
+  )
+  return (
+    <TableHead
+      ref={setNodeRef}
+      style={headerCellStyle(header)}
+      className={`group/head relative ${headerCellClassName(header)} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
+    >
+      {/* Labelled through aria-label rather than visually hidden text, which would land in
+          the innerText the drag chip reads back. */}
+      <button
+        type="button"
+        aria-label={GRIP_LABEL}
+        className={GRIP_CLASS}
+        {...attributes}
+        {...listeners}
+      >
+        <DotsSixVerticalIcon size={GRIP_ICON_SIZE} aria-hidden="true" />
+      </button>
+      {headerContent(header)}
+    </TableHead>
+  )
+}
+
+function ColumnDragChip({ label }: { label: string }): React.JSX.Element {
+  return (
+    <div className={DRAG_CHIP_CLASS}>
+      <DotsSixVerticalIcon size={GRIP_ICON_SIZE} aria-hidden="true" />
+      {label}
+    </div>
+  )
 }
 
 export function DataTable<TData, TValue>({
@@ -116,6 +247,8 @@ export function DataTable<TData, TValue>({
   getSubRows,
   columnVisibility,
   onColumnVisibilityChange,
+  columnOrder: controlledColumnOrder,
+  onColumnOrderChange: onControlledColumnOrderChange,
   renderTableFilter,
   renderAboveTable,
   facetedRowModels,
@@ -127,11 +260,15 @@ export function DataTable<TData, TValue>({
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
+  const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
+  const [draggedColumnLabel, setDraggedColumnLabel] = useState('')
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
   const sorting = controlledSorting ?? internalSorting
   const onSortingChange = onControlledSortingChange ?? setInternalSorting
+  const columnOrder = controlledColumnOrder ?? internalColumnOrder
+  const onColumnOrderChange = onControlledColumnOrderChange ?? setInternalColumnOrder
 
   // Hover only triggers a prefetch, so its identity never affects what a row renders.
   // Holding it in a ref lets callers pass an inline arrow without breaking DataRow's memo.
@@ -150,6 +287,7 @@ export function DataTable<TData, TValue>({
     onSortingChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange,
+    onColumnOrderChange,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     ...facetedRowModels,
@@ -166,6 +304,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
       columnFilters,
       columnVisibility,
+      columnOrder,
       expanded,
     },
     initialState: {
@@ -186,101 +325,128 @@ export function DataTable<TData, TValue>({
   const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  const reorderableColumnIds = table
+    .getVisibleLeafColumns()
+    .filter((column) => isReorderable(column))
+    .map((column) => column.id)
+
+  function handleDragStart({ activatorEvent }: DragStartEvent) {
+    const grip = activatorEvent.target as HTMLElement | null
+    setDraggedColumnLabel(grip?.closest('th')?.innerText.trim() ?? '')
+  }
+
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    setDraggedColumnLabel('')
+    if (!over || active.id === over.id) return
+    // An empty columnOrder means definition order, which indexOf cannot search: seed it
+    // with the current leaf ids before splicing.
+    const currOrder = columnOrder.length
+      ? columnOrder
+      : table.getAllLeafColumns().map((column) => column.id)
+    const from = currOrder.indexOf(String(active.id))
+    const to = currOrder.indexOf(String(over.id))
+    if (from === -1 || to === -1) return
+    onColumnOrderChange(arrayMove(currOrder, from, to))
+  }
+
   return (
     <div>
       {renderAboveTable?.(table)}
-      <div className="overflow-hidden rounded-md border">
-        {renderTableFilter && (
-          <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
-            <div
-              className="flex shrink-0 items-center justify-center pl-4"
-              style={{ width: SELECT_COLUMN_SIZE }}
-            >
-              <FunnelSimpleIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-            </div>
-            {renderTableFilter(table)}
-          </div>
-        )}
-        <div className="overflow-x-auto">
-          <Table className={`table-auto w-max min-w-full`}>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead
-                        key={header.id}
-                        style={{
-                          width: header.column.columnDef.size,
-                          position: 'sticky',
-                          top: 0,
-                          zIndex: HEADER_Z_INDEX,
-                          ...pinnedLeftStyle(header.column, PINNED_HEADER_Z_INDEX),
-                        }}
-                        className={`${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table
-                  .getRowModel()
-                  .rows.map((row, rowPosition) => (
-                    <DataRow
-                      key={row.id}
-                      row={row}
-                      rowPosition={rowPosition}
-                      isSelected={row.getIsSelected()}
-                      isExpanded={row.getIsExpanded()}
-                      onRowMouseEnter={handleRowMouseEnter}
-                      getRowHref={getRowHref}
-                      getRowClassName={getRowClassName}
-                      cells={row.getVisibleCells()}
-                    />
-                  ))
-              ) : (
-                <TableRow role="status" aria-live="polite">
-                  <TableCell
-                    colSpan={table.getVisibleLeafColumns().length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-            {hasFooter && (
-              <TableFooter>
-                {table.getFooterGroups().map((footerGroup) => (
-                  <TableRow key={footerGroup.id}>
-                    {footerGroup.headers.map((footer) => (
-                      <TableCell
-                        key={footer.id}
-                        style={{
-                          width: footer.column.columnDef.size,
-                          ...pinnedLeftStyle(footer.column, PINNED_CELL_Z_INDEX),
-                        }}
-                        className={`${TABLE_FOOT_CELL_CLASS} ${pinEdgeClass(footer.column)} ${footer.column.columnDef.meta?.cellClassName ?? ''}`}
-                      >
-                        {footer.isPlaceholder
-                          ? null
-                          : flexRender(footer.column.columnDef.footer, footer.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableFooter>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToHorizontalAxis]}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setDraggedColumnLabel('')}
+      >
+        <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
+          <div className="overflow-hidden rounded-md border">
+            {renderTableFilter && (
+              <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
+                <div
+                  className="flex shrink-0 items-center justify-center pl-4"
+                  style={{ width: SELECT_COLUMN_SIZE }}
+                >
+                  <FunnelSimpleIcon className="size-4 text-muted-foreground" aria-hidden="true" />
+                </div>
+                {renderTableFilter(table)}
+              </div>
             )}
-          </Table>
-        </div>
-      </div>
+            <div className="overflow-x-auto">
+              <Table className={`table-auto w-max min-w-full`}>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <HeaderCell key={header.id} header={header} />
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table
+                      .getRowModel()
+                      .rows.map((row, rowPosition) => (
+                        <DataRow
+                          key={row.id}
+                          row={row}
+                          rowPosition={rowPosition}
+                          isSelected={row.getIsSelected()}
+                          isExpanded={row.getIsExpanded()}
+                          onRowMouseEnter={handleRowMouseEnter}
+                          getRowHref={getRowHref}
+                          getRowClassName={getRowClassName}
+                          cells={row.getVisibleCells()}
+                        />
+                      ))
+                  ) : (
+                    <TableRow role="status" aria-live="polite">
+                      <TableCell
+                        colSpan={table.getVisibleLeafColumns().length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+                {hasFooter && (
+                  <TableFooter>
+                    {table.getFooterGroups().map((footerGroup) => (
+                      <TableRow key={footerGroup.id}>
+                        {footerGroup.headers.map((footer) => (
+                          <TableCell
+                            key={footer.id}
+                            style={{
+                              width: footer.column.columnDef.size,
+                              ...pinnedLeftStyle(footer.column, PINNED_CELL_Z_INDEX),
+                            }}
+                            className={`${TABLE_FOOT_CELL_CLASS} ${pinEdgeClass(footer.column)} ${footer.column.columnDef.meta?.cellClassName ?? ''}`}
+                          >
+                            {footer.isPlaceholder
+                              ? null
+                              : flexRender(footer.column.columnDef.footer, footer.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableFooter>
+                )}
+              </Table>
+            </div>
+          </div>
+        </SortableContext>
+        <DragOverlay>
+          {draggedColumnLabel.length > 0 && <ColumnDragChip label={draggedColumnLabel} />}
+        </DragOverlay>
+      </DndContext>
 
       <div className="flex flex-col items-center gap-2 p-2">
         <div className="text-sm text-semibold">

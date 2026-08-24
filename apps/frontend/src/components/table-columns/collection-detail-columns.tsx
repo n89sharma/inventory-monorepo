@@ -47,6 +47,7 @@ function actionColumns(
   if (onEdit) {
     columns.push({
       id: 'edit',
+      meta: { reorderable: false },
       cell: ({ row }) => (
         <Button
           variant="outline"
@@ -65,6 +66,7 @@ function actionColumns(
   if (onDelete) {
     columns.push({
       id: 'delete',
+      meta: { reorderable: false },
       cell: ({ row }) => (
         <Button
           variant="outline"

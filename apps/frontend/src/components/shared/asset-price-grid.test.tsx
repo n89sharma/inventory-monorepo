@@ -197,8 +197,11 @@ describe('the asset price grid', () => {
   it('gives the grid exactly one keyboard entry point, on the first visible row', () => {
     renderGrid()
 
+    // Scoped to body cells: the header's column-reorder grips are their own tab stops and
+    // are not part of the grid's roving tabindex.
     const entryCells = screen
       .getAllByRole('button')
+      .filter((button) => button.closest('td') !== null)
       .filter((button) => button.getAttribute('tabindex') === '0')
 
     expect(entryCells).toHaveLength(1)

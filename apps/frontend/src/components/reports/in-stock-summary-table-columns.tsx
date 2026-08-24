@@ -82,6 +82,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     id: 'expander',
     header: '',
     enableSorting: false,
+    meta: { reorderable: false },
     cell: ({ row }) => <ExpanderCell row={row} />,
   },
   {
