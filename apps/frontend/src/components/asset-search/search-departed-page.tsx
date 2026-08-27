@@ -56,6 +56,64 @@ export function SearchDepartedPage(): React.JSX.Element {
     [assetFilters, warehouses, showOther, from, to, customer, salesperson, invoiceReference],
   )
 
+  const clearCustomer = useCallback(() => setCustomer(null), [setCustomer])
+  const clearSalesperson = useCallback(() => setSalesperson(null), [setSalesperson])
+  const clearInvoiceReference = useCallback(() => setInvoiceReference(''), [setInvoiceReference])
+
+  // Held as one element so a URL write that touches none of these filters, such as sorting
+  // the grid, re-renders neither the controls nor the popovers they own.
+  const scopeFilters = useMemo(
+    () => (
+      <>
+        <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+        <Toggle
+          variant="outline"
+          pressed={showOther}
+          onPressedChange={setShowOther}
+          aria-label="Show scrapped assets"
+        >
+          {showOther ? 'Show Sold' : 'Show Scrapped'}
+        </Toggle>
+        <DepartedDateRangeFilter from={from} to={to} onChange={setRange} />
+        <CustomerFilter
+          selection={customer}
+          onSelectionChange={setCustomer}
+          onClear={clearCustomer}
+        />
+        <UserFilter
+          selection={salesperson}
+          onSelectionChange={setSalesperson}
+          onClear={clearSalesperson}
+          placeholder="Salesperson"
+          clearLabel="Clear salesperson"
+        />
+        <InvoiceReferenceFilter
+          value={invoiceReference}
+          onChange={setInvoiceReference}
+          onClear={clearInvoiceReference}
+        />
+      </>
+    ),
+    [
+      warehouses,
+      setWarehouses,
+      showOther,
+      setShowOther,
+      from,
+      to,
+      setRange,
+      customer,
+      setCustomer,
+      clearCustomer,
+      salesperson,
+      setSalesperson,
+      clearSalesperson,
+      invoiceReference,
+      setInvoiceReference,
+      clearInvoiceReference,
+    ],
+  )
+
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchDeparted(filters)
   const handleBulkPriceSave = useCallback(() => {
     mutate()
@@ -72,40 +130,7 @@ export function SearchDepartedPage(): React.JSX.Element {
       defaultSort={DEPARTED_AT_DESC_SORT}
       summaryStrip={<DepartedSummaryStrip assets={assets} />}
     >
-      <AssetFilterBar
-        scopeFilterGroups={SCOPE_FILTER_GROUPS}
-        scopeFilters={
-          <>
-            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
-            <Toggle
-              variant="outline"
-              pressed={showOther}
-              onPressedChange={setShowOther}
-              aria-label="Show scrapped assets"
-            >
-              {showOther ? 'Show Sold' : 'Show Scrapped'}
-            </Toggle>
-            <DepartedDateRangeFilter from={from} to={to} onChange={setRange} />
-            <CustomerFilter
-              selection={customer}
-              onSelectionChange={setCustomer}
-              onClear={() => setCustomer(null)}
-            />
-            <UserFilter
-              selection={salesperson}
-              onSelectionChange={setSalesperson}
-              onClear={() => setSalesperson(null)}
-              placeholder="Salesperson"
-              clearLabel="Clear salesperson"
-            />
-            <InvoiceReferenceFilter
-              value={invoiceReference}
-              onChange={setInvoiceReference}
-              onClear={() => setInvoiceReference('')}
-            />
-          </>
-        }
-      />
+      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }

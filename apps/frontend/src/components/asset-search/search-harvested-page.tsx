@@ -16,6 +16,13 @@ export function SearchHarvestedPage(): React.JSX.Element {
 
   const filters = useMemo(() => ({ ...assetFilters, warehouses }), [assetFilters, warehouses])
 
+  // Held as one element so a URL write that touches none of these filters, such as sorting
+  // the grid, re-renders neither the control nor the popover it owns.
+  const scopeFilters = useMemo(
+    () => <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />,
+    [warehouses, setWarehouses],
+  )
+
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchHarvested(filters)
   const handleBulkPriceSave = useCallback(() => {
     mutate()
@@ -31,10 +38,7 @@ export function SearchHarvestedPage(): React.JSX.Element {
       onBulkPriceSave={handleBulkPriceSave}
       defaultSort={DEPARTED_AT_DESC_SORT}
     >
-      <AssetFilterBar
-        scopeFilterGroups={SCOPE_FILTER_GROUPS}
-        scopeFilters={<WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />}
-      />
+      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }
