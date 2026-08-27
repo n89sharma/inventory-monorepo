@@ -3,7 +3,7 @@ import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/table-c
 import { Button } from '@/components/shadcn/button'
 import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'

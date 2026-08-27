@@ -1,6 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { DataTable } from '@/components/shared/data-table'
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import type { ColumnDef, Table } from '@tanstack/react-table'
 

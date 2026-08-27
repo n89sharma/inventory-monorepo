@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/shadcn/select'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataTable } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
 import {

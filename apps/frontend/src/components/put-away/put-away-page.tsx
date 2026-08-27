@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { Button } from '@/components/shadcn/button'
 import { Field, FieldError, FieldLabel } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'

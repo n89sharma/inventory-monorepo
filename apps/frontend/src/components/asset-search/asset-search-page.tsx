@@ -1,5 +1,5 @@
 import { PageContent } from '@/components/app-layout/page-content'
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'

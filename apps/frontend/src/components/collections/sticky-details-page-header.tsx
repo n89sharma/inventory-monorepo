@@ -1,4 +1,4 @@
-import { StickyPageHeader } from '@/components/collections/sticky-page-header'
+import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import type { BreadcrumbSegment } from '@/components/shared/breadcrumb-segments'
 import { CopyButton } from '@/components/shared/copy-button'
 import { PageBreadcrumbToTitle } from './page-breadcrumb'
