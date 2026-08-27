@@ -25,7 +25,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import {
@@ -58,6 +58,7 @@ import {
 } from '@/components/shadcn/table'
 
 import { Button } from '@/components/shadcn/button'
+import { useGridScrollRestoration } from '@/hooks/use-grid-scroll-restoration'
 import { SELECT_COLUMN_SIZE } from '@/components/table-columns/column-primitives'
 import {
   CaretDoubleLeftIcon,
@@ -329,6 +330,7 @@ function DataTableBase<TData, TValue>({
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
   const [draggedColumnLabel, setDraggedColumnLabel] = useState('')
   const scrollRegionRef = useRef<HTMLDivElement>(null)
+  const { pathname } = useLocation()
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
@@ -397,11 +399,17 @@ function DataTableBase<TData, TValue>({
   // column re-renders a screenful rather than every row the reader has scrolled past.
   const virtualRows = frame.virtualRows
   const rows = table.getRowModel().rows
+  // Names this region on this path, so returning to the list by any route puts the reader back
+  // where they were. Absent for a frame that grows with its rows, which has nothing to scroll
+  // back to.
+  const scrollKey = virtualRows ? `${pathname}|${label}` : null
+  const { initialOffset } = useGridScrollRestoration(scrollRegionRef, scrollKey, rows.length)
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRegionRef.current,
     estimateSize: () => virtualRows?.rowHeight ?? GRID_ROW_HEIGHT,
     overscan: virtualRows?.overscan ?? 0,
+    initialOffset,
     enabled: Boolean(virtualRows),
   })
 
@@ -415,12 +423,6 @@ function DataTableBase<TData, TValue>({
   const lastItem = virtualItems[virtualItems.length - 1]
   const paddingTop = firstItem ? firstItem.start : 0
   const paddingBottom = lastItem ? rowVirtualizer.getTotalSize() - lastItem.end : 0
-
-  // A new result set starts at the top; without this the reader keeps the offset from the
-  // previous search and lands in blank space when the new one is shorter.
-  useEffect(() => {
-    if (scrollRegionRef.current) scrollRegionRef.current.scrollTop = 0
-  }, [filteredRows])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
