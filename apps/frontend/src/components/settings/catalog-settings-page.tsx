@@ -1,9 +1,9 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { CreateBrandModal } from '@/components/settings/create-brand-modal'
 import { CreateModelModal } from '@/components/settings/create-model-modal'
 import { modelTableColumns } from '@/components/settings/model-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { useModels } from '@/hooks/use-model'
@@ -35,20 +35,23 @@ export function CatalogSettingsPage(): React.JSX.Element {
   )
 
   return (
-    <PageContent className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Catalog</h1>
+    <GridPageContent>
+      <PageSection className="flex flex-col gap-4">
+        <h1 className="text-2xl font-semibold">Catalog</h1>
 
-      <div className="flex gap-2">
-        <Button variant="secondary" onClick={() => setIsBrandModalOpen(true)} className="w-fit">
-          <PlusIcon /> Add Brand
-        </Button>
-        <Button variant="secondary" onClick={() => setIsModelModalOpen(true)} className="w-fit">
-          <PlusIcon /> Add Model
-        </Button>
-      </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => setIsBrandModalOpen(true)} className="w-fit">
+            <PlusIcon /> Add Brand
+          </Button>
+          <Button variant="secondary" onClick={() => setIsModelModalOpen(true)} className="w-fit">
+            <PlusIcon /> Add Model
+          </Button>
+        </div>
 
-      <h2 className="text-lg font-semibold">Models</h2>
-      <DataTable
+        <h2 className="text-lg font-semibold">Models</h2>
+      </PageSection>
+
+      <DataGrid
         label={TABLE_LABEL}
         columns={modelTableColumns}
         data={sortedModels}
@@ -83,6 +86,6 @@ export function CatalogSettingsPage(): React.JSX.Element {
 
       <CreateBrandModal open={isBrandModalOpen} onOpenChange={setIsBrandModalOpen} />
       <CreateModelModal open={isModelModalOpen} onOpenChange={setIsModelModalOpen} />
-    </PageContent>
+    </GridPageContent>
   )
 }

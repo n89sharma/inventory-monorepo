@@ -1,4 +1,4 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import {
   Dialog,
@@ -116,31 +116,33 @@ export function UserManagementPage() {
   )
 
   return (
-    <PageContent className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">User Management</h1>
+    <GridPageContent>
+      <PageSection className="flex flex-col gap-4">
+        <h1 className="text-2xl font-semibold">User Management</h1>
 
-      <div className="flex gap-2">
-        <Toggle
-          size="sm"
-          pressed={showActiveOnly}
-          onPressedChange={setShowActiveOnly}
-          className="w-fit"
-          variant="outline"
-        >
-          Active only
-        </Toggle>
-        <Toggle
-          size="sm"
-          pressed={showClerkOnly}
-          onPressedChange={setShowClerkOnly}
-          className="w-fit"
-          variant="outline"
-        >
-          Clerk users
-        </Toggle>
-      </div>
+        <div className="flex gap-2">
+          <Toggle
+            size="sm"
+            pressed={showActiveOnly}
+            onPressedChange={setShowActiveOnly}
+            className="w-fit"
+            variant="outline"
+          >
+            Active only
+          </Toggle>
+          <Toggle
+            size="sm"
+            pressed={showClerkOnly}
+            onPressedChange={setShowClerkOnly}
+            className="w-fit"
+            variant="outline"
+          >
+            Clerk users
+          </Toggle>
+        </div>
+      </PageSection>
 
-      <DataTable
+      <DataGrid
         label={TABLE_LABEL}
         columns={columns}
         data={displayedUsers}
@@ -229,6 +231,6 @@ export function UserManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </PageContent>
+    </GridPageContent>
   )
 }

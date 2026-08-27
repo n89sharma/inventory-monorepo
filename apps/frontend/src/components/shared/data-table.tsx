@@ -100,12 +100,37 @@ interface DataTableProps<TData, TValue> {
   meta?: TableMeta<TData>
 }
 
+type DataTableBaseProps<TData, TValue> = DataTableProps<TData, TValue> & { frame: TableFrame }
+
 const DEFAULT_PAGE_SIZE = 75
 
 export const TABLE_HEAD_CLASS =
   'whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
 
-const TABLE_FOOT_CELL_CLASS = 'whitespace-nowrap text-center font-semibold'
+const TABLE_FOOT_CELL_CLASS = 'whitespace-nowrap bg-muted text-center font-semibold'
+
+// The three boxes that differ between a grid and an in-flow table. Injected rather than
+// branched on, so DataTableBase never asks which one it is rendering.
+type TableFrame = {
+  root: string
+  border: string
+  scrollRegion: string
+}
+
+// Claims what its flex column has left and scrolls on both axes, so both scrollbars sit on
+// the viewport edges. No side border or radius: the grid runs edge to edge.
+const GRID_FRAME = {
+  root: 'flex min-h-0 flex-1 flex-col',
+  border: 'flex min-h-0 flex-1 flex-col border-y',
+  scrollRegion: 'flex-1 min-h-0 overflow-auto outline-none',
+} as const satisfies TableFrame
+
+// Grows with its rows and scrolls horizontally only, for a table that sits inside a form.
+const IN_FLOW_FRAME = {
+  root: '',
+  border: 'overflow-hidden rounded-md border',
+  scrollRegion: 'overflow-x-auto outline-none',
+} as const satisfies TableFrame
 
 const SCROLL_REGION_SLOT = 'table-scroll'
 // Drawn on the bordered wrapper rather than the scroll region itself, whose own outline the
@@ -243,7 +268,8 @@ function ColumnDragChip({ label }: { label: string }): React.JSX.Element {
   )
 }
 
-export function DataTable<TData, TValue>({
+function DataTableBase<TData, TValue>({
+  frame,
   label,
   columns,
   data,
@@ -266,7 +292,7 @@ export function DataTable<TData, TValue>({
   renderAboveTable,
   facetedRowModels,
   meta,
-}: DataTableProps<TData, TValue>) {
+}: DataTableBaseProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>(
     defaultSort ? [defaultSort] : [],
   )
@@ -368,8 +394,8 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div>
-      {renderAboveTable?.(table)}
+    <div className={frame.root}>
+      {renderAboveTable && <div className="shrink-0">{renderAboveTable(table)}</div>}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -379,9 +405,9 @@ export function DataTable<TData, TValue>({
         onDragCancel={() => setDraggedColumnLabel('')}
       >
         <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
-          <div className={`overflow-hidden rounded-md border ${SCROLL_REGION_FOCUS_CLASS}`}>
+          <div className={`${frame.border} ${SCROLL_REGION_FOCUS_CLASS}`}>
             {renderTableFilter && (
-              <div className="flex items-center gap-4 border-b bg-muted py-2 pr-2">
+              <div className="flex shrink-0 items-center gap-4 border-b bg-muted py-2 pr-2">
                 <div
                   className="flex shrink-0 items-center justify-center pl-4"
                   style={{ width: SELECT_COLUMN_SIZE }}
@@ -396,7 +422,7 @@ export function DataTable<TData, TValue>({
               role="region"
               aria-label={label}
               tabIndex={0}
-              className="overflow-x-auto outline-none"
+              className={frame.scrollRegion}
             >
               <Table className={`table-auto w-max min-w-full`}>
                 <TableHeader>
@@ -467,7 +493,7 @@ export function DataTable<TData, TValue>({
         </DragOverlay>
       </DndContext>
 
-      <div className="flex flex-col items-center gap-2 p-2">
+      <div className="flex shrink-0 flex-col items-center gap-2 p-2">
         <div className="text-sm text-semibold">
           <strong>
             {start}-{end}
@@ -517,6 +543,18 @@ export function DataTable<TData, TValue>({
       </div>
     </div>
   )
+}
+
+// Fills the space its parent gives it and owns both scrollbars, so the horizontal scrollbar
+// sits at the bottom of the viewport instead of below the last row. For list and report pages.
+export function DataGrid<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  return <DataTableBase {...props} frame={GRID_FRAME} />
+}
+
+// Lays out in flow and grows with its rows, for a table that sits inside a form under a
+// field set, where claiming the rest of the viewport would strand the fields above it.
+export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  return <DataTableBase {...props} frame={IN_FLOW_FRAME} />
 }
 
 function DataRowImpl<TData>({

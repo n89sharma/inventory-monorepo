@@ -1,4 +1,4 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
@@ -20,7 +20,7 @@ import {
   type AssetSummary,
   type CollectionHistory,
 } from 'shared-types'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { Switch } from '@/components/shadcn/switch'
 import { Label } from '@/components/shadcn/label'
 import { BulkEditBar } from './bulk-edit-bar'
@@ -151,7 +151,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     : { title: `${titleLabel} ${collectionId}`, copyValue: collectionId }
 
   return (
-    <>
+    <GridPageContent className={selectedAssets.length > 0 ? 'pb-24' : ''}>
       <StickyDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
         title={header.title}
@@ -181,85 +181,86 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
           </div>
         }
       />
-      <PageContent className={`flex flex-col gap-4 ${selectedAssets.length > 0 ? 'pb-24' : ''}`}>
+      <PageSection className="flex flex-col gap-4">
         {renderSummaryStrip(entity)}
         {renderMetadataModal(entity, {
           open: isMetadataModalOpen,
           onOpenChange: setIsMetadataModalOpen,
         })}
         {renderAddAssetBar?.(entity)}
-        <DataTable
-          label={TABLE_LABEL}
-          columns={columns}
-          data={visibleAssets}
-          renderTableFilter={(table) => (
-            <>
-              <ColumnTextFilter
-                table={table}
-                columnId="barcode"
-                placeholder="Barcode"
-                clearLabel="Clear barcode"
-                className="w-50"
+      </PageSection>
+
+      <DataGrid
+        label={TABLE_LABEL}
+        columns={columns}
+        data={visibleAssets}
+        renderTableFilter={(table) => (
+          <>
+            <ColumnTextFilter
+              table={table}
+              columnId="barcode"
+              placeholder="Barcode"
+              clearLabel="Clear barcode"
+              className="w-50"
+            />
+            <ColumnTextFilter
+              table={table}
+              columnId="serial_number"
+              placeholder="Serial number"
+              clearLabel="Clear serial number"
+              className="w-50"
+            />
+            <ColumnTextFilter
+              table={table}
+              columnId="model"
+              placeholder="Model"
+              clearLabel="Clear model"
+              className="w-50"
+            />
+            <CopierFilterToggle copiersOnly={copiersOnly} onCopiersOnlyChange={setCopiersOnly} />
+            <div className="ml-auto">
+              <ColumnPickerButton
+                visible={visibleColumns}
+                onVisibleChange={setVisibleColumns}
+                onReset={reset}
               />
-              <ColumnTextFilter
-                table={table}
-                columnId="serial_number"
-                placeholder="Serial number"
-                clearLabel="Clear serial number"
-                className="w-50"
-              />
-              <ColumnTextFilter
-                table={table}
-                columnId="model"
-                placeholder="Model"
-                clearLabel="Clear model"
-                className="w-50"
-              />
-              <CopierFilterToggle copiersOnly={copiersOnly} onCopiersOnlyChange={setCopiersOnly} />
-              <div className="ml-auto">
-                <ColumnPickerButton
-                  visible={visibleColumns}
-                  onVisibleChange={setVisibleColumns}
-                  onReset={reset}
-                />
-              </div>
-            </>
-          )}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-          renderAboveTable={(table) => {
-            const filteredRowIds = table.getFilteredRowModel().rows.map((row) => row.id)
-            return (
-              <BulkEditBar
-                selectedAssets={selectedSummaries}
-                onClear={clearSelection}
-                refreshKey={refreshKey}
-                currentCollectionType={section}
-                returnTo={`/${section}/${collectionId}`}
-                onBulkRemove={onBulkRemove}
-                totalCount={filteredRowIds.length}
-                hiddenCount={entity.assets.length - filteredRowIds.length}
-                onSelectAll={() => selectAll(filteredRowIds)}
-                extraActions={renderBulkExtraActions?.({
-                  selectedAssets,
-                  clearSelection,
-                })}
-              />
-            )
-          }}
-          onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
-          getRowHref={assetHref}
-          getRowId={getAssetRowId}
-          defaultSort={DEFAULT_ASSET_SORT}
-          pinLeft={PINNED_ASSET_COLUMN_IDS}
-          columnVisibility={columnVisibility}
-          onColumnVisibilityChange={onColumnVisibilityChange}
-          columnOrder={columnOrder}
-          onColumnOrderChange={onColumnOrderChange}
-          meta={tableMeta}
-        />
-      </PageContent>
-    </>
+            </div>
+          </>
+        )}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        renderAboveTable={(table) => {
+          const filteredRowIds = table.getFilteredRowModel().rows.map((row) => row.id)
+          return (
+            <BulkEditBar
+              selectedAssets={selectedSummaries}
+              onClear={clearSelection}
+              refreshKey={refreshKey}
+              currentCollectionType={section}
+              returnTo={`/${section}/${collectionId}`}
+              onBulkRemove={onBulkRemove}
+              totalCount={filteredRowIds.length}
+              hiddenCount={entity.assets.length - filteredRowIds.length}
+              onSelectAll={() => selectAll(filteredRowIds)}
+              extraActions={renderBulkExtraActions?.({
+                selectedAssets,
+                clearSelection,
+              })}
+            />
+          )
+        }}
+        onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
+        getRowHref={assetHref}
+        getRowId={getAssetRowId}
+        defaultSort={DEFAULT_ASSET_SORT}
+        pinLeft={PINNED_ASSET_COLUMN_IDS}
+        columnVisibility={columnVisibility}
+        onColumnVisibilityChange={onColumnVisibilityChange}
+        columnOrder={columnOrder}
+        onColumnOrderChange={onColumnOrderChange}
+        meta={tableMeta}
+      />
+    </GridPageContent>
   )
 }
 

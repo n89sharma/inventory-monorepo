@@ -1,7 +1,7 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { locationTableColumns } from '@/components/settings/location-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { printLocationBarcodes } from '@/data/api/location-api'
@@ -52,8 +52,8 @@ export function LocationsSettingsPage(): React.JSX.Element {
   }
 
   return (
-    <PageContent className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <GridPageContent>
+      <PageSection className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Locations</h1>
         <Button
           variant="outline"
@@ -66,9 +66,9 @@ export function LocationsSettingsPage(): React.JSX.Element {
             <BarcodeIcon />
           </PendingIcon>
         </Button>
-      </div>
+      </PageSection>
 
-      <DataTable
+      <DataGrid
         label={TABLE_LABEL}
         columns={columns}
         data={locations}
@@ -103,6 +103,6 @@ export function LocationsSettingsPage(): React.JSX.Element {
           </>
         )}
       />
-    </PageContent>
+    </GridPageContent>
   )
 }

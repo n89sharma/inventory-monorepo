@@ -1,8 +1,8 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { createModelPriceHistoryColumns } from './model-price-history-table-columns'
 import { Button } from '@/components/shadcn/button'
-import { DataTable, TABLE_HEAD_CLASS } from '@/components/shared/data-table'
+import { DataGrid, TABLE_HEAD_CLASS } from '@/components/shared/data-table'
 import {
   Table,
   TableBody,
@@ -175,16 +175,16 @@ function ModelPriceHistoryResults({
     )
   }
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-1">
+      <PageSection className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Last sold {formatSaleSummary(visibleSales[0])}</h2>
           <ViewStockButton count={data.in_stock_count} href={inStockHref} />
         </div>
         <MeterBandsTable bands={bands} />
         <RangeSentence count={visibleSales.length} range={range} />
-      </div>
-      <DataTable
+      </PageSection>
+      <DataGrid
         label={TABLE_LABEL}
         columns={columns}
         data={visibleSales}
@@ -226,7 +226,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
   )
 
   return (
-    <>
+    <GridPageContent>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -290,20 +290,20 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
           </Toggle>
         </form>
       </StickyPageHeader>
-      <PageContent className="flex flex-col gap-2">
-        <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <ModelPriceHistoryResults
-            data={data}
-            model={model}
-            range={range}
-            visibleSales={visibleSales}
-            bands={bands}
-            inStockHref={inStockHref}
-            columnVisibility={columnVisibility}
-            getRowHref={getRowHref}
-          />
-        </div>
-      </PageContent>
-    </>
+      <div
+        className={`flex min-h-0 flex-1 flex-col ${isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}`}
+      >
+        <ModelPriceHistoryResults
+          data={data}
+          model={model}
+          range={range}
+          visibleSales={visibleSales}
+          bands={bands}
+          inStockHref={inStockHref}
+          columnVisibility={columnVisibility}
+          getRowHref={getRowHref}
+        />
+      </div>
+    </GridPageContent>
   )
 }

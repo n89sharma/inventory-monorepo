@@ -1,4 +1,4 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import {
   HELD_REPORT_COLUMNS,
   getHeldReportRowClassName,
@@ -7,7 +7,7 @@ import {
   toHeldReportTableRows,
 } from './held-report-table-columns'
 import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
 import { ShareButton } from '@/components/shared/share-button'
 import { useHeldReport } from '@/hooks/use-held-report'
@@ -59,7 +59,7 @@ function HeldReportBody({ table }: { table: HeldReportSummary }): React.JSX.Elem
   }
 
   return (
-    <DataTable
+    <DataGrid
       label={TABLE_LABEL}
       columns={HELD_REPORT_COLUMNS}
       data={rows}
@@ -75,7 +75,7 @@ export function HeldReportPage(): React.JSX.Element {
   const table = useMemo(() => aggregateHeldReport(rows), [rows])
 
   return (
-    <>
+    <GridPageContent>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -91,12 +91,17 @@ export function HeldReportPage(): React.JSX.Element {
           <ShareButton />
         </div>
       </StickyPageHeader>
-      <PageContent>
-        <div className={cn('flex flex-col gap-4 transition-opacity', isLoading && 'opacity-50')}>
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',
+          isLoading && 'opacity-50',
+        )}
+      >
+        <PageSection>
           <HeldReportSummaryCards totals={table.totals} />
-          <HeldReportBody table={table} />
-        </div>
-      </PageContent>
-    </>
+        </PageSection>
+        <HeldReportBody table={table} />
+      </div>
+    </GridPageContent>
   )
 }

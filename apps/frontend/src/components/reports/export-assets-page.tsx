@@ -1,4 +1,4 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/table-columns/asset-search-columns'
 import { Button } from '@/components/shadcn/button'
 import { Label } from '@/components/shadcn/label'
@@ -120,7 +120,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   }, [mutate])
 
   return (
-    <>
+    <GridPageContent className={selection.hasSelection ? 'pb-24' : ''}>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -158,22 +158,24 @@ export function ExportAssetsPage(): React.JSX.Element {
           <SerialNumberCounts enteredCount={enteredCount} duplicateCount={duplicateCount} />
         </div>
       </StickyPageHeader>
-      <PageContent className={`flex flex-col gap-2 ${selection.hasSelection ? 'pb-24' : ''}`}>
+      <PageSection>
         <NotFoundSerialNumbersBanner serialNumbers={notFound} />
-        <div className={isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}>
-          <AssetResultsTable
-            assets={assets}
-            rowSelection={selection.rowSelection}
-            onRowSelectionChange={selection.setRowSelection}
-            onBulkPriceSave={handleBulkPriceSave}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={onColumnVisibilityChange}
-            columnOrder={columnOrder}
-            onColumnOrderChange={onColumnOrderChange}
-            getRowHref={getRowHref}
-          />
-        </div>
-      </PageContent>
-    </>
+      </PageSection>
+      <div
+        className={`flex min-h-0 flex-1 flex-col ${isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}`}
+      >
+        <AssetResultsTable
+          assets={assets}
+          rowSelection={selection.rowSelection}
+          onRowSelectionChange={selection.setRowSelection}
+          onBulkPriceSave={handleBulkPriceSave}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={onColumnVisibilityChange}
+          columnOrder={columnOrder}
+          onColumnOrderChange={onColumnOrderChange}
+          getRowHref={getRowHref}
+        />
+      </div>
+    </GridPageContent>
   )
 }

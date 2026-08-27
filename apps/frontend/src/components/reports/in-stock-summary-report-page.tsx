@@ -1,10 +1,10 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { IN_STOCK_SUMMARY_COLUMNS } from './in-stock-summary-table-columns'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
@@ -95,9 +95,11 @@ function InStockSummaryBody({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <MeterBandLegend />
-      <DataTable
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <PageSection>
+        <MeterBandLegend />
+      </PageSection>
+      <DataGrid
         label={TABLE_LABEL}
         columns={IN_STOCK_SUMMARY_COLUMNS}
         data={rows}
@@ -129,7 +131,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
   )
 
   return (
-    <>
+    <GridPageContent>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -164,15 +166,15 @@ export function InStockSummaryReportPage(): React.JSX.Element {
           />
         </form>
       </StickyPageHeader>
-      <PageContent>
-        <div className={cn('transition-opacity', isLoading && 'opacity-50')}>
-          <InStockSummaryBody
-            rows={visibleRows}
-            isLoading={isLoading}
-            columnVisibility={columnVisibility}
-          />
-        </div>
-      </PageContent>
-    </>
+      <div
+        className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
+      >
+        <InStockSummaryBody
+          rows={visibleRows}
+          isLoading={isLoading}
+          columnVisibility={columnVisibility}
+        />
+      </div>
+    </GridPageContent>
   )
 }

@@ -3,7 +3,7 @@ import {
   createSelectColumn,
   PINNED_ASSET_COLUMN_IDS,
 } from '@/components/table-columns/column-primitives'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import { useCan } from '@/hooks/use-can'
 import type {
@@ -75,7 +75,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         totalCount={assets.length}
         onSelectAll={selectAllAssets}
       />
-      <DataTable
+      <DataGrid
         label={TABLE_LABEL}
         columns={columns}
         data={assets}

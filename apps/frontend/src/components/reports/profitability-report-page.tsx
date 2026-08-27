@@ -1,4 +1,4 @@
-import { PageContent } from '@/components/app-layout/page-content'
+import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { CustomerFilter } from '@/components/shared/filters/customer-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
@@ -14,7 +14,7 @@ import {
 } from '@/components/shadcn/select'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
-import { DataTable } from '@/components/shared/data-table'
+import { DataGrid } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
 import {
   createProfitabilityColumns,
@@ -161,7 +161,7 @@ function ProfitabilityReportBody({
       </div>
     )
   }
-  return <DataTable label={TABLE_LABEL} columns={columns} data={months} />
+  return <DataGrid label={TABLE_LABEL} columns={columns} data={months} />
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
@@ -210,7 +210,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
   }
 
   return (
-    <>
+    <GridPageContent>
       <StickyPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -233,17 +233,22 @@ export function ProfitabilityReportPage(): React.JSX.Element {
           <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
         ) : null}
       </StickyPageHeader>
-      <PageContent>
-        <div className={cn('flex flex-col gap-4 transition-opacity', isLoading && 'opacity-50')}>
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',
+          isLoading && 'opacity-50',
+        )}
+      >
+        <PageSection>
           <ProfitabilitySummaryCards totals={table.totals} />
-          <ProfitabilityReportBody
-            months={months}
-            columns={columns}
-            hasActiveFilters={activeFilterCount > 0}
-            onClearFilters={clearFilters}
-          />
-        </div>
-      </PageContent>
-    </>
+        </PageSection>
+        <ProfitabilityReportBody
+          months={months}
+          columns={columns}
+          hasActiveFilters={activeFilterCount > 0}
+          onClearFilters={clearFilters}
+        />
+      </div>
+    </GridPageContent>
   )
 }
