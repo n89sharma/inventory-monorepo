@@ -151,14 +151,19 @@ function InvoiceCell({
   return <IdLink to={invoiceDetailHref(invoiceNumber)}>{label}</IdLink>
 }
 
+// One line, so every row in a grid is the same height and the virtualiser can place rows by
+// arithmetic instead of measuring them. Comments run to several lines; the full text is on
+// the title, and the asset's detail page shows it in full.
 function LastCommentCell({ comment }: { comment: string | null }): ReactNode {
   if (!comment) return ''
   return (
-    <div className="text-left text-xs">
-      <div className="whitespace-pre-wrap">{comment}</div>
+    <div className={LAST_COMMENT_CLASS} title={comment}>
+      {comment}
     </div>
   )
 }
+
+const LAST_COMMENT_CLASS = 'max-w-100 truncate text-left text-xs'
 
 function optionalNumber(value: number | null): string {
   return value == null ? '' : String(value)

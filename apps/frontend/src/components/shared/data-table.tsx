@@ -38,6 +38,7 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   arrayMove,
   horizontalListSortingStrategy,
@@ -115,13 +116,20 @@ type TableFrame = {
   root: string
   border: string
   scrollRegion: string
-  // Present when the frame grows its own row window as the user reaches the bottom, which
-  // is what replaces a pager. Absent means a fixed page with pager controls.
-  rowWindow?: { initial: number; batch: number }
+  // Present when the frame keeps only the rows near the viewport in the DOM, which is what
+  // replaces a pager. Absent means a fixed page with pager controls.
+  //
+  // rowHeight must match what a row actually measures: rows are placed by arithmetic, not
+  // by measurement, so a wrong value drifts further out of true the deeper you scroll.
+  // Every cell is whitespace-nowrap and single-line, which is what keeps that true.
+  virtualRows?: { rowHeight: number; overscan: number }
 }
 
-// How close to the bottom of the scroll region counts as reaching it.
-const ROW_WINDOW_GROW_THRESHOLD_PX = 600
+// Rows are 29px: p-1 either side of a 13px line-height, plus a 1px bottom border.
+const GRID_ROW_HEIGHT = 29
+const GRID_OVERSCAN = 12
+// A virtualised grid never paginates; the row model has to hand over every row.
+const ALL_ROWS_PAGE_SIZE = Number.MAX_SAFE_INTEGER
 
 const RESULT_COUNT_CLASS = 'shrink-0 border-b px-4 py-1 text-xs text-muted-foreground'
 
@@ -131,7 +139,7 @@ const GRID_FRAME = {
   root: 'flex min-h-0 flex-1 flex-col',
   border: 'flex min-h-0 flex-1 flex-col border-y',
   scrollRegion: 'flex-1 min-h-0 overflow-auto outline-none',
-  rowWindow: { initial: 100, batch: 100 },
+  virtualRows: { rowHeight: GRID_ROW_HEIGHT, overscan: GRID_OVERSCAN },
 } as const satisfies TableFrame
 
 // Grows with its rows and scrolls horizontally only, for a table that sits inside a form.
@@ -268,6 +276,16 @@ function SortableHeaderCell<TData>({
   )
 }
 
+// Stands in for the rows outside the window so the scrollbar spans the whole result set.
+// Borderless and padding-free, so it never reads as a row.
+function SpacerRow({ height }: { height: number }): React.JSX.Element {
+  return (
+    <tr aria-hidden="true">
+      <td style={{ height, padding: 0, border: 0 }} />
+    </tr>
+  )
+}
+
 function ColumnDragChip({ label }: { label: string }): React.JSX.Element {
   return (
     <div className={DRAG_CHIP_CLASS}>
@@ -310,6 +328,7 @@ function DataTableBase<TData, TValue>({
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
   const [draggedColumnLabel, setDraggedColumnLabel] = useState('')
+  const scrollRegionRef = useRef<HTMLDivElement>(null)
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
   const onRowSelectionChange = onControlledRowSelectionChange ?? setInternalRowSelection
@@ -357,7 +376,7 @@ function DataTableBase<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: frame.rowWindow?.initial ?? DEFAULT_PAGE_SIZE,
+        pageSize: frame.virtualRows ? ALL_ROWS_PAGE_SIZE : DEFAULT_PAGE_SIZE,
         pageIndex: 0,
       },
       columnPinning: { left: pinLeft ?? [], right: [] },
@@ -374,25 +393,34 @@ function DataTableBase<TData, TValue>({
   const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
 
-  // A grid has no pager: it starts with a window of rows and widens it as the reader
-  // reaches the bottom, so the DOM only ever holds what has actually been scrolled to.
-  const rowWindow = frame.rowWindow
-  const handleScrollRegionScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      if (!rowWindow) return
-      const region = event.currentTarget
-      const distanceToBottom = region.scrollHeight - region.scrollTop - region.clientHeight
-      if (distanceToBottom > ROW_WINDOW_GROW_THRESHOLD_PX) return
-      table.setPageSize((currentSize) => Math.min(currentSize + rowWindow.batch, totalRows))
-    },
-    [rowWindow, table, totalRows],
-  )
+  // A grid has no pager: it holds only the rows near the viewport, so sorting or toggling a
+  // column re-renders a screenful rather than every row the reader has scrolled past.
+  const virtualRows = frame.virtualRows
+  const rows = table.getRowModel().rows
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scrollRegionRef.current,
+    estimateSize: () => virtualRows?.rowHeight ?? GRID_ROW_HEIGHT,
+    overscan: virtualRows?.overscan ?? 0,
+    enabled: Boolean(virtualRows),
+  })
 
-  // A new result set starts from a fresh window; without this the reader keeps whatever
-  // width they scrolled to on the previous search.
+  const virtualItems = rowVirtualizer.getVirtualItems()
+  const windowedRows = virtualRows
+    ? virtualItems.map((item) => ({ row: rows[item.index], rowPosition: item.index }))
+    : rows.map((row, rowPosition) => ({ row, rowPosition }))
+  // Spacer rows stand in for everything outside the window, so the scrollbar spans the whole
+  // result set and the rendered rows stay in normal table flow.
+  const firstItem = virtualItems[0]
+  const lastItem = virtualItems[virtualItems.length - 1]
+  const paddingTop = firstItem ? firstItem.start : 0
+  const paddingBottom = lastItem ? rowVirtualizer.getTotalSize() - lastItem.end : 0
+
+  // A new result set starts at the top; without this the reader keeps the offset from the
+  // previous search and lands in blank space when the new one is shorter.
   useEffect(() => {
-    table.setPageSize(rowWindow?.initial ?? DEFAULT_PAGE_SIZE)
-  }, [filteredRows, rowWindow, table])
+    if (scrollRegionRef.current) scrollRegionRef.current.scrollTop = 0
+  }, [filteredRows])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
@@ -438,7 +466,7 @@ function DataTableBase<TData, TValue>({
           <div className={`${frame.border} ${SCROLL_REGION_FOCUS_CLASS}`}>
             {/* A grid has no pager to carry the total, and only the table knows it once a
                 column filter has run. */}
-            {rowWindow && (
+            {virtualRows && (
               <div className={RESULT_COUNT_CLASS}>
                 {totalRows.toLocaleString()} {totalRows === 1 ? 'result' : 'results'}
               </div>
@@ -458,9 +486,9 @@ function DataTableBase<TData, TValue>({
               data-slot={SCROLL_REGION_SLOT}
               role="region"
               aria-label={label}
+              ref={scrollRegionRef}
               tabIndex={0}
               className={frame.scrollRegion}
-              onScroll={handleScrollRegionScroll}
             >
               <Table aria-label={label} className="table-auto w-max min-w-full">
                 <TableHeader>
@@ -473,22 +501,21 @@ function DataTableBase<TData, TValue>({
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table
-                      .getRowModel()
-                      .rows.map((row, rowPosition) => (
-                        <DataRow
-                          key={row.id}
-                          row={row}
-                          rowPosition={rowPosition}
-                          isSelected={row.getIsSelected()}
-                          isExpanded={row.getIsExpanded()}
-                          onRowMouseEnter={handleRowMouseEnter}
-                          getRowHref={getRowHref}
-                          getRowClassName={getRowClassName}
-                          cells={row.getVisibleCells()}
-                        />
-                      ))
+                  {paddingTop > 0 && <SpacerRow height={paddingTop} />}
+                  {rows.length ? (
+                    windowedRows.map(({ row, rowPosition }) => (
+                      <DataRow
+                        key={row.id}
+                        row={row}
+                        rowPosition={rowPosition}
+                        isSelected={row.getIsSelected()}
+                        isExpanded={row.getIsExpanded()}
+                        onRowMouseEnter={handleRowMouseEnter}
+                        getRowHref={getRowHref}
+                        getRowClassName={getRowClassName}
+                        cells={row.getVisibleCells()}
+                      />
+                    ))
                   ) : (
                     <TableRow role="status" aria-live="polite">
                       <TableCell
@@ -499,6 +526,7 @@ function DataTableBase<TData, TValue>({
                       </TableCell>
                     </TableRow>
                   )}
+                  {paddingBottom > 0 && <SpacerRow height={paddingBottom} />}
                 </TableBody>
                 {hasFooter && (
                   <TableFooter>
@@ -531,7 +559,7 @@ function DataTableBase<TData, TValue>({
         </DragOverlay>
       </DndContext>
 
-      {!rowWindow && (
+      {!virtualRows && (
         <div className="flex shrink-0 flex-col items-center gap-2 p-2">
           <div className="text-sm text-semibold">
             <strong>
