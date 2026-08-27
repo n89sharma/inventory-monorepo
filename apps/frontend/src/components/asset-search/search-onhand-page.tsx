@@ -42,6 +42,8 @@ const ROW_WARNING_CLASS = 'data-row-warning'
 const ALL_STATUSES_LABEL = 'All'
 const STATUS_GROUP_LABEL = 'Filter by status'
 
+const statusLabel = (status: Status) => formatTitleCase(status.status)
+
 function heldRowClassName(asset: AssetSearchRow): string | undefined {
   const days = daysHeld(asset.hold_created_at)
   return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
@@ -91,6 +93,76 @@ export function SearchOnHandPage(): React.JSX.Element {
     mutate()
   }, [mutate])
 
+  const clearHeldBy = useCallback(() => setHeldBy(null), [setHeldBy])
+  const clearHeldFor = useCallback(() => setHeldFor(null), [setHeldFor])
+  const clearHoldCustomer = useCallback(() => setHoldCustomer(null), [setHoldCustomer])
+
+  // Held as one element so a URL write that touches none of these filters, such as sorting
+  // the grid, re-renders neither the controls nor the popovers they own.
+  const scopeFilters = useMemo(
+    () => (
+      <>
+        <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+        <ExclusiveOptionsFilter
+          options={onHandStatuses}
+          selection={statuses}
+          onSelectionChange={setStatuses}
+          getLabel={statusLabel}
+          allLabel={ALL_STATUSES_LABEL}
+          groupLabel={STATUS_GROUP_LABEL}
+        />
+        {canViewPurchasePrice ? (
+          <Toggle
+            variant="outline"
+            pressed={priceCheck}
+            onPressedChange={handlePriceCheckChange}
+            aria-label="Show only assets with a missing or zero purchase price"
+          >
+            $0 Price Check
+          </Toggle>
+        ) : undefined}
+        <UserFilter
+          selection={heldBy}
+          onSelectionChange={setHeldBy}
+          onClear={clearHeldBy}
+          placeholder="Held By"
+          clearLabel="Clear held by"
+        />
+        <UserFilter
+          selection={heldFor}
+          onSelectionChange={setHeldFor}
+          onClear={clearHeldFor}
+          placeholder="Held For"
+          clearLabel="Clear held for"
+        />
+        <CustomerFilter
+          selection={holdCustomer}
+          onSelectionChange={setHoldCustomer}
+          onClear={clearHoldCustomer}
+        />
+      </>
+    ),
+    [
+      warehouses,
+      setWarehouses,
+      onHandStatuses,
+      statuses,
+      setStatuses,
+      canViewPurchasePrice,
+      priceCheck,
+      handlePriceCheckChange,
+      heldBy,
+      setHeldBy,
+      clearHeldBy,
+      heldFor,
+      setHeldFor,
+      clearHeldFor,
+      holdCustomer,
+      setHoldCustomer,
+      clearHoldCustomer,
+    ],
+  )
+
   const visibleAssets = useMemo(
     () =>
       assets.filter(
@@ -113,51 +185,7 @@ export function SearchOnHandPage(): React.JSX.Element {
       getRowClassName={heldRowClassName}
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
     >
-      <AssetFilterBar
-        scopeFilterGroups={SCOPE_FILTER_GROUPS}
-        scopeFilters={
-          <>
-            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
-            <ExclusiveOptionsFilter
-              options={onHandStatuses}
-              selection={statuses}
-              onSelectionChange={setStatuses}
-              getLabel={(s) => formatTitleCase(s.status)}
-              allLabel={ALL_STATUSES_LABEL}
-              groupLabel={STATUS_GROUP_LABEL}
-            />
-            {canViewPurchasePrice ? (
-              <Toggle
-                variant="outline"
-                pressed={priceCheck}
-                onPressedChange={handlePriceCheckChange}
-                aria-label="Show only assets with a missing or zero purchase price"
-              >
-                $0 Price Check
-              </Toggle>
-            ) : undefined}
-            <UserFilter
-              selection={heldBy}
-              onSelectionChange={setHeldBy}
-              onClear={() => setHeldBy(null)}
-              placeholder="Held By"
-              clearLabel="Clear held by"
-            />
-            <UserFilter
-              selection={heldFor}
-              onSelectionChange={setHeldFor}
-              onClear={() => setHeldFor(null)}
-              placeholder="Held For"
-              clearLabel="Clear held for"
-            />
-            <CustomerFilter
-              selection={holdCustomer}
-              onSelectionChange={setHoldCustomer}
-              onClear={() => setHoldCustomer(null)}
-            />
-          </>
-        }
-      />
+      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }

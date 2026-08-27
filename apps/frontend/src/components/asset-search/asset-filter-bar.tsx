@@ -17,7 +17,7 @@ import {
   useReadinessesParam,
   type FilterParamGroups,
 } from '@/lib/filters/hooks'
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 
 const DEFAULT_MODEL_PLACEHOLDER = 'Model'
 
@@ -32,7 +32,9 @@ const ASSET_FILTER_GROUPS = [
   ['fin'],
 ] as const satisfies FilterParamGroups
 
-export function AssetFilterBar({
+// Memoised so a URL write for something the bar does not own, such as the grid's sort,
+// stops here instead of re-rendering every control and popover below it.
+export const AssetFilterBar = memo(function AssetFilterBar({
   scopeFilters,
   scopeFilterGroups,
   modelPlaceholder = DEFAULT_MODEL_PLACEHOLDER,
@@ -98,4 +100,4 @@ export function AssetFilterBar({
       {count > 0 ? <ActiveFilterBar count={count} onClear={clearAll} /> : null}
     </>
   )
-}
+})
