@@ -58,7 +58,7 @@ function AssetHistoryTabContent({ barcode, enabled }: { barcode: string; enabled
 
 const EMPTY_TAGS: { display: string; id: string }[] = []
 
-const RAIL_STICKY_TOP = 'calc(var(--app-header-height) + var(--details-header-height, 0px) + 1rem)'
+const RAIL_STICKY_TOP = 'calc(var(--details-header-height, 0px) + 1rem)'
 
 const ROW_GAP = 'gap-8'
 

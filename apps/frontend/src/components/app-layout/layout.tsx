@@ -14,9 +14,15 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </a>
       <AppSidebar />
       <Toaster />
-      <div className="flex flex-col w-full min-w-0">
-        <Header className="sticky top-0 z-30 bg-background" />
-        <main id="main-content" className="w-full min-w-0 text-sm">
+      <div className="flex h-svh flex-col w-full min-w-0">
+        <Header className="shrink-0 bg-background" />
+        {/* The app's only scrollport. Grid pages fill it exactly and scroll inside their own
+            grid instead; every other page scrolls here. */}
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 min-h-0 w-full min-w-0 overflow-auto text-sm focus:outline-none"
+        >
           {children}
         </main>
       </div>
