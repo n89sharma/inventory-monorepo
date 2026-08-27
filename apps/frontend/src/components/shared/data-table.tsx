@@ -115,7 +115,15 @@ type TableFrame = {
   root: string
   border: string
   scrollRegion: string
+  // Present when the frame grows its own row window as the user reaches the bottom, which
+  // is what replaces a pager. Absent means a fixed page with pager controls.
+  rowWindow?: { initial: number; batch: number }
 }
+
+// How close to the bottom of the scroll region counts as reaching it.
+const ROW_WINDOW_GROW_THRESHOLD_PX = 600
+
+const RESULT_COUNT_CLASS = 'shrink-0 border-b px-4 py-1 text-xs text-muted-foreground'
 
 // Claims what its flex column has left and scrolls on both axes, so both scrollbars sit on
 // the viewport edges. No side border or radius: the grid runs edge to edge.
@@ -123,6 +131,7 @@ const GRID_FRAME = {
   root: 'flex min-h-0 flex-1 flex-col',
   border: 'flex min-h-0 flex-1 flex-col border-y',
   scrollRegion: 'flex-1 min-h-0 overflow-auto outline-none',
+  rowWindow: { initial: 100, batch: 100 },
 } as const satisfies TableFrame
 
 // Grows with its rows and scrolls horizontally only, for a table that sits inside a form.
@@ -348,7 +357,7 @@ function DataTableBase<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: DEFAULT_PAGE_SIZE,
+        pageSize: frame.rowWindow?.initial ?? DEFAULT_PAGE_SIZE,
         pageIndex: 0,
       },
       columnPinning: { left: pinLeft ?? [], right: [] },
@@ -356,13 +365,34 @@ function DataTableBase<TData, TValue>({
   })
 
   const { pageIndex, pageSize } = table.getState().pagination
-  const totalRows = table.getFilteredRowModel().rows.length
+  const filteredRows = table.getFilteredRowModel().rows
+  const totalRows = filteredRows.length
   const hasFooter = table
     .getVisibleLeafColumns()
     .some((column) => column.columnDef.footer !== undefined)
 
   const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, totalRows)
+
+  // A grid has no pager: it starts with a window of rows and widens it as the reader
+  // reaches the bottom, so the DOM only ever holds what has actually been scrolled to.
+  const rowWindow = frame.rowWindow
+  const handleScrollRegionScroll = useCallback(
+    (event: React.UIEvent<HTMLDivElement>) => {
+      if (!rowWindow) return
+      const region = event.currentTarget
+      const distanceToBottom = region.scrollHeight - region.scrollTop - region.clientHeight
+      if (distanceToBottom > ROW_WINDOW_GROW_THRESHOLD_PX) return
+      table.setPageSize((currentSize) => Math.min(currentSize + rowWindow.batch, totalRows))
+    },
+    [rowWindow, table, totalRows],
+  )
+
+  // A new result set starts from a fresh window; without this the reader keeps whatever
+  // width they scrolled to on the previous search.
+  useEffect(() => {
+    table.setPageSize(rowWindow?.initial ?? DEFAULT_PAGE_SIZE)
+  }, [filteredRows, rowWindow, table])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
@@ -406,6 +436,13 @@ function DataTableBase<TData, TValue>({
       >
         <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
           <div className={`${frame.border} ${SCROLL_REGION_FOCUS_CLASS}`}>
+            {/* A grid has no pager to carry the total, and only the table knows it once a
+                column filter has run. */}
+            {rowWindow && (
+              <div className={RESULT_COUNT_CLASS}>
+                {totalRows.toLocaleString()} {totalRows === 1 ? 'result' : 'results'}
+              </div>
+            )}
             {renderTableFilter && (
               <div className="flex shrink-0 items-center gap-4 border-b bg-muted py-2 pr-2">
                 <div
@@ -423,8 +460,9 @@ function DataTableBase<TData, TValue>({
               aria-label={label}
               tabIndex={0}
               className={frame.scrollRegion}
+              onScroll={handleScrollRegionScroll}
             >
-              <Table className={`table-auto w-max min-w-full`}>
+              <Table aria-label={label} className="table-auto w-max min-w-full">
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
@@ -493,54 +531,56 @@ function DataTableBase<TData, TValue>({
         </DragOverlay>
       </DndContext>
 
-      <div className="flex shrink-0 flex-col items-center gap-2 p-2">
-        <div className="text-sm text-semibold">
-          <strong>
-            {start}-{end}
-          </strong>{' '}
-          of <strong>{totalRows}</strong>
-        </div>
-        {table.getPageCount() > 1 && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.firstPage()}
-              disabled={!table.getCanPreviousPage()}
-              aria-label="First page"
-            >
-              <CaretDoubleLeftIcon aria-hidden="true" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <CaretLeftIcon aria-hidden="true" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-              <CaretRightIcon aria-hidden="true" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.lastPage()}
-              disabled={!table.getCanNextPage()}
-              aria-label="Last page"
-            >
-              <CaretDoubleRightIcon aria-hidden="true" />
-            </Button>
+      {!rowWindow && (
+        <div className="flex shrink-0 flex-col items-center gap-2 p-2">
+          <div className="text-sm text-semibold">
+            <strong>
+              {start}-{end}
+            </strong>{' '}
+            of <strong>{totalRows}</strong>
           </div>
-        )}
-      </div>
+          {table.getPageCount() > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.firstPage()}
+                disabled={!table.getCanPreviousPage()}
+                aria-label="First page"
+              >
+                <CaretDoubleLeftIcon aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <CaretLeftIcon aria-hidden="true" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+                <CaretRightIcon aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.lastPage()}
+                disabled={!table.getCanNextPage()}
+                aria-label="Last page"
+              >
+                <CaretDoubleRightIcon aria-hidden="true" />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
