@@ -146,18 +146,19 @@ describe('assetDeleteService', () => {
     )
   })
 
-  it('blocks an asset that is on a purchase invoice', async () => {
+  it('deletes an asset that is on a purchase invoice and keeps the invoice', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    await createInvoice(
+    const { invoiceNumber } = await createInvoice(
       buildCreateInvoiceInput(refs, [asset], refs.invoiceTypePurchaseId),
       refs.userId,
     )
 
-    await expect(deleteAsset(asset.barcode, refs.userId)).rejects.toThrow(
-      new ConflictError(
-        `Asset ${asset.barcode} cannot be deleted because it is linked to purchase invoice ${TEST_INVOICE_REFERENCE}`,
-      ),
-    )
+    await deleteAsset(asset.barcode, refs.userId)
+
+    expect(await prisma.asset.findUnique({ where: { id: asset.id } })).toBeNull()
+    expect(
+      await prisma.invoice.findUnique({ where: { invoice_number: invoiceNumber } }),
+    ).not.toBeNull()
   })
 
   it('blocks an asset that has consumed a store part', async () => {
