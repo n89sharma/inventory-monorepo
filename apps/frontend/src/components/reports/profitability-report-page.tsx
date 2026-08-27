@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/shadcn/select'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataGrid } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
 import {
@@ -211,7 +211,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
 
   return (
     <GridPageContent>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">Profitability Report</h1>
@@ -232,7 +232,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
         {activeFilterCount > 0 ? (
           <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
         ) : null}
-      </StickyPageHeader>
+      </GridPageHeader>
       <div
         className={cn(
           'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',

@@ -1,6 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { DataGrid } from '@/components/shared/data-table'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
 import type { ColumnDef, Table } from '@tanstack/react-table'
 
@@ -36,13 +36,13 @@ export function CollectionPage<TData, TValue>({
   const [sorting, onSortingChange] = useTableSortParam(defaultSort)
   return (
     <GridPageContent>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold">{title}</h1>
           {actions}
         </div>
         {searchBar}
-      </StickyPageHeader>
+      </GridPageHeader>
       {summaryStrip && <PageSection>{summaryStrip}</PageSection>}
       <DataGrid
         label={TABLE_LABEL}

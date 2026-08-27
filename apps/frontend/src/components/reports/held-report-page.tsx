@@ -6,7 +6,7 @@ import {
   getHeldReportSubRows,
   toHeldReportTableRows,
 } from './held-report-table-columns'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataGrid } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
 import { ShareButton } from '@/components/shared/share-button'
@@ -76,7 +76,7 @@ export function HeldReportPage(): React.JSX.Element {
 
   return (
     <GridPageContent>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">Held Report</h1>
@@ -90,7 +90,7 @@ export function HeldReportPage(): React.JSX.Element {
           </div>
           <ShareButton />
         </div>
-      </StickyPageHeader>
+      </GridPageHeader>
       <div
         className={cn(
           'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',

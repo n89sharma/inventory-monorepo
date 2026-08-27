@@ -1,5 +1,5 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
-import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
+import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
@@ -152,7 +152,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
 
   return (
     <GridPageContent className={selectedAssets.length > 0 ? 'pb-24' : ''}>
-      <StickyDetailsPageHeader
+      <GridDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
         title={header.title}
         copyValue={header.copyValue}

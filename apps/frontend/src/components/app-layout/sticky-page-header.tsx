@@ -1,4 +1,10 @@
+import { cn } from '@/lib/utils'
+
 const DETAILS_HEADER_HEIGHT_PROPERTY = '--details-header-height'
+
+const HEADER_BAR = 'sticky top-0 z-20 bg-background border-b'
+const HEADER_INNER = 'w-full px-4 pt-4 pb-3 flex flex-col gap-2'
+const HEADER_GUTTER = 'max-w-7xl mx-auto'
 
 // Declared outside the component so its identity is stable: React re-runs a ref
 // callback whenever the function changes, which would rebuild the observer on
@@ -19,14 +25,28 @@ function trackDetailsHeaderHeight(el: HTMLDivElement) {
   }
 }
 
-type StickyPageHeaderProps = {
+type PageHeaderProps = {
   children: React.ReactNode
 }
 
-export function StickyPageHeader({ children }: StickyPageHeaderProps): React.JSX.Element {
+function PageHeaderBar({
+  children,
+  innerClassName,
+}: PageHeaderProps & { innerClassName?: string }): React.JSX.Element {
   return (
-    <div ref={trackDetailsHeaderHeight} className="sticky top-0 z-20 bg-background border-b">
-      <div className="max-w-7xl mx-auto w-full px-4 pt-4 pb-3 flex flex-col gap-2">{children}</div>
+    <div ref={trackDetailsHeaderHeight} className={HEADER_BAR}>
+      <div className={cn(HEADER_INNER, innerClassName)}>{children}</div>
     </div>
   )
+}
+
+// Centred on the same column as PageContent, for a page whose body is gutter'd.
+export function StickyPageHeader({ children }: PageHeaderProps): React.JSX.Element {
+  return <PageHeaderBar innerClassName={HEADER_GUTTER}>{children}</PageHeaderBar>
+}
+
+// Runs the full width, for a page whose body is a grid that does the same. A gutter'd
+// header over an edge-to-edge grid reads as two different pages.
+export function GridPageHeader({ children }: PageHeaderProps): React.JSX.Element {
+  return <PageHeaderBar>{children}</PageHeaderBar>
 }

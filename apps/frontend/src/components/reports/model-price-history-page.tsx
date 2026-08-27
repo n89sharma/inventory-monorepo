@@ -13,7 +13,7 @@ import {
 } from '@/components/shadcn/table'
 import { Toggle } from '@/components/shadcn/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useModelPriceHistory } from '@/hooks/use-model-price-history'
@@ -227,7 +227,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
 
   return (
     <GridPageContent>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">Model Price History</h1>
@@ -289,7 +289,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
             {specsVisible ? 'Hide Specs' : 'Show Specs'}
           </Toggle>
         </form>
-      </StickyPageHeader>
+      </GridPageHeader>
       <div
         className={`flex min-h-0 flex-1 flex-col ${isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}`}
       >

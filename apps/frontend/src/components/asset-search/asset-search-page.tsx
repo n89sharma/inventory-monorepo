@@ -1,5 +1,5 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
@@ -67,7 +67,7 @@ export function AssetSearchPage({
 
   return (
     <GridPageContent className={selection.hasSelection ? 'pb-24' : ''}>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{title}</h1>
@@ -97,7 +97,7 @@ export function AssetSearchPage({
         <form className="flex flex-col gap-2" onSubmit={(e) => e.preventDefault()}>
           {children}
         </form>
-      </StickyPageHeader>
+      </GridPageHeader>
       {summaryStrip && <PageSection>{summaryStrip}</PageSection>}
       <div
         className={`flex min-h-0 flex-1 flex-col ${isLoading ? 'opacity-50 transition-opacity' : 'transition-opacity'}`}

@@ -3,7 +3,7 @@ import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/table-c
 import { Button } from '@/components/shadcn/button'
 import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
@@ -121,7 +121,7 @@ export function ExportAssetsPage(): React.JSX.Element {
 
   return (
     <GridPageContent className={selection.hasSelection ? 'pb-24' : ''}>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">{PAGE_TITLE}</h1>
@@ -157,7 +157,7 @@ export function ExportAssetsPage(): React.JSX.Element {
           />
           <SerialNumberCounts enteredCount={enteredCount} duplicateCount={duplicateCount} />
         </div>
-      </StickyPageHeader>
+      </GridPageHeader>
       <PageSection>
         <NotFoundSerialNumbersBanner serialNumbers={notFound} />
       </PageSection>

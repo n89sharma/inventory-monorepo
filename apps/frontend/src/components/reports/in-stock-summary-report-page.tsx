@@ -5,7 +5,7 @@ import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { IN_STOCK_SUMMARY_COLUMNS } from './in-stock-summary-table-columns'
 import { DataGrid } from '@/components/shared/data-table'
-import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
 import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
@@ -132,7 +132,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
 
   return (
     <GridPageContent>
-      <StickyPageHeader>
+      <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold">In Stock Report</h1>
@@ -165,7 +165,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
             onClear={clearModel}
           />
         </form>
-      </StickyPageHeader>
+      </GridPageHeader>
       <div
         className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
