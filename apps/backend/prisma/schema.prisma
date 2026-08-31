@@ -99,6 +99,7 @@ model Asset {
 
   @@index([barcode_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([serial_normalized(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([serial_normalized], map: "Asset_serial_normalized_btree_idx")
   @@index([serial_number])
   @@index([model_id])
   @@index([location_id])
