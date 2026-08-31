@@ -24,6 +24,7 @@ import type {
   CreateSalvagedPart,
   OrgSummary,
   PatchAssetPricing,
+  SerialNumberCheckResult,
   Status,
   UpdateAssetErrors,
   UpdateAssetLocation,
@@ -52,6 +53,7 @@ import {
   CreateSalvagedPartSchema,
   PatchAssetPricingSchema,
   PrintBarcodesSchema,
+  SerialNumberCheckResultSchema,
   UpdateAssetErrorsSchema,
   UpdateAssetLocationSchema,
   UpdateAssetPricingSchema,
@@ -280,6 +282,16 @@ export async function getAssetsBySerialNumber(
   } satisfies AssetsBySerialNumberRequest)
   const { data } = await api.post('/reports/serial-number', getAssetsBySerialNumberBody)
   return AssetsBySerialNumberResultSchema.parse(data)
+}
+
+export async function getSerialNumberMatches(
+  serialNumber: string,
+  excludeBarcode: string | null,
+): Promise<SerialNumberCheckResult> {
+  const { data } = await api.get<SerialNumberCheckResult>('/assets/serial-check', {
+    params: { serialNumber, excludeBarcode: excludeBarcode ?? undefined },
+  })
+  return SerialNumberCheckResultSchema.parse(data)
 }
 
 export async function getAssetsForSearchOnHand(

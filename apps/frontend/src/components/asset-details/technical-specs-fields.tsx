@@ -70,6 +70,7 @@ export function ControlledTextInput<T extends FieldValues>({
         <Input
           value={(field.value as string) ?? ''}
           onChange={(e) => field.onChange(e.target.value)}
+          onBlur={field.onBlur}
           placeholder={placeholder ?? ''}
           aria-invalid={fieldState.invalid}
           className={className}

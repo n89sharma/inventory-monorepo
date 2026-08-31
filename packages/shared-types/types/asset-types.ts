@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { ModelSummarySchema } from './model-types.js'
-import { CoreFunctionsSchema, CountrySchema, StatusSchema } from './reference-data-types.js'
+import {
+  ASSET_STATUS,
+  CoreFunctionsSchema,
+  CountrySchema,
+  StatusSchema,
+  type AssetStatus,
+} from './reference-data-types.js'
 
 export const MIN_MANUFACTURED_YEAR = 1980
 export const MAX_MANUFACTURED_YEAR = 2100
@@ -259,6 +265,9 @@ export const CreateAssetSchema = z.object({
   tonerLifeK: z.number().min(0, 'Toner life K required'),
   errors: z.array(UpdateErrorSchema).default([]),
   comment: z.string().max(2000).nullable().default(null),
+  // Set by the client once the user has confirmed a serial number that already exists.
+  // The write path rejects an unacknowledged duplicate — see lib/serial-duplicates.ts.
+  duplicateSerialAcknowledged: z.boolean().default(false),
 })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 
@@ -319,6 +328,42 @@ export const BarcodeSuggestionSchema = z.object({
 })
 
 export type BarcodeSuggestion = z.infer<typeof BarcodeSuggestionSchema>
+
+// GET /assets/serial-check — identity only. Cost, hold, vendor and customer columns are
+// deliberately absent so the endpoint can be opened to every `view_asset` holder.
+export const SerialNumberMatchSchema = z.object({
+  barcode: z.string(),
+  serial_number: z.string(),
+  brand: z.string(),
+  model: z.string(),
+  status: z.string(),
+  warehouse_code: z.string().nullable(),
+  arrival_number: z.string().nullable(),
+  departure_number: z.string().nullable(),
+  departed_at: z.coerce.date().nullable(),
+})
+
+export type SerialNumberMatch = z.infer<typeof SerialNumberMatchSchema>
+
+export const SERIAL_NUMBER_MATCH_LIMIT = 3
+
+// A machine that was sold can be bought back, so its serial may legitimately appear again. Any
+// other status means the serial is still spoken for and a second machine carrying it is an error.
+export const DUPLICATE_ALLOWED_STATUS: AssetStatus = ASSET_STATUS.SOLD
+
+export function isBlockingSerialMatch(match: SerialNumberMatch): boolean {
+  return match.status !== DUPLICATE_ALLOWED_STATUS
+}
+
+export const SerialNumberCheckResultSchema = z.object({
+  matches: z.array(SerialNumberMatchSchema).max(SERIAL_NUMBER_MATCH_LIMIT),
+  totalMatchCount: z.number().int().nonnegative(),
+  // Counted over every match, not just the returned page, so the gate does not depend on
+  // which rows fit inside SERIAL_NUMBER_MATCH_LIMIT.
+  blockingMatchCount: z.number().int().nonnegative(),
+})
+
+export type SerialNumberCheckResult = z.infer<typeof SerialNumberCheckResultSchema>
 
 export const UpdateAssetErrorsSchema = z.object({
   errors: z.array(UpdateErrorSchema).max(100),
@@ -391,6 +436,7 @@ export const UpdateAssetSpecsSchema = z.object({
   toner_life_y: z.number().int().nonnegative().nullable(),
   toner_life_k: z.number().int().nonnegative().nullable(),
   accessory_ids: z.array(z.number().int().positive()),
+  duplicate_serial_acknowledged: z.boolean().default(false),
 })
 
 export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>

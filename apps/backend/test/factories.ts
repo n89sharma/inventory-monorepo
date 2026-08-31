@@ -274,6 +274,7 @@ function buildAsset(refs: ArrivalTestData): CreateAsset {
     tonerLifeK: 0,
     errors: [],
     comment: null,
+    duplicateSerialAcknowledged: false,
   }
 }
 
@@ -519,6 +520,7 @@ export function buildUpdateAssetSpecs(
     toner_life_y: 0,
     toner_life_k: 0,
     accessory_ids: [],
+    duplicate_serial_acknowledged: false,
     ...overrides,
   }
 }

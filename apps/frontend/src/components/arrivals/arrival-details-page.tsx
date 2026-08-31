@@ -7,6 +7,7 @@ import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { useAssetComponents } from '@/hooks/use-reference-data'
+import type { PersistedAsset } from '@/hooks/use-serial-number-check'
 import { formatDate } from '@/lib/formatters'
 import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
@@ -32,20 +33,23 @@ export function ArrivalDetailsPage(): React.JSX.Element {
 
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
+  const [editingPersistedAsset, setEditingPersistedAsset] = useState<PersistedAsset | null>(null)
   const [editingAssetForm, setEditingAssetForm] = useState<AssetForm | null>(null)
   const [moveOpen, setMoveOpen] = useState(false)
 
   const handleDelete = useEntityDelete('Arrival', arrivalNumber, arrivalNumber, mutations.remove)
 
   const handleEditAsset = useCallback(
-    async (assetId: number) => {
+    async (assetId: number, persistedAsset: PersistedAsset) => {
       setEditingAssetId(assetId)
+      setEditingPersistedAsset(persistedAsset)
       try {
         const form = await mutations.getAssetForEdit(arrivalNumber, assetId, components)
         setEditingAssetForm(form)
         setIsAssetModalOpen(true)
       } catch {
         setEditingAssetId(null)
+        setEditingPersistedAsset(null)
       }
     },
     [mutations, arrivalNumber, components],
@@ -55,6 +59,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
     setIsAssetModalOpen(open)
     if (!open) {
       setEditingAssetId(null)
+      setEditingPersistedAsset(null)
       setEditingAssetForm(null)
     }
   }
@@ -72,7 +77,13 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         getHref: assetHref,
         can,
         onDelete: (asset) => mutations.removeAsset(arrivalNumber, asset),
-        onEdit: canEditArrival ? (asset) => handleEditAsset(asset.id) : undefined,
+        onEdit: canEditArrival
+          ? (asset) =>
+              handleEditAsset(asset.id, {
+                barcode: asset.barcode,
+                serialNumber: asset.serial_number,
+              })
+          : undefined,
         disabledRowId: editingAssetId,
         priceEditorRegistry,
       }),
@@ -146,6 +157,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
               open={isAssetModalOpen}
               onOpenChange={handleModalOpenChange}
               editingAsset={editingAssetForm}
+              persistedAsset={editingPersistedAsset}
               onCreateAsset={(asset) => mutations.createAsset(arrivalNumber, asset)}
               onUpdateAsset={(asset) =>
                 mutations.updateAsset(arrivalNumber, editingAssetId!, asset)

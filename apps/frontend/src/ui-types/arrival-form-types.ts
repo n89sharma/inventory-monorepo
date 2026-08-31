@@ -117,6 +117,9 @@ export const AssetFormSchema = z
     ...specFieldsShape,
     errors: z.array(UpdateErrorSchema),
     comment: z.string().max(2000).nullable(),
+    // Travels with the row into the arrival's asset list so a duplicate confirmed while
+    // composing is still acknowledged when the whole arrival is submitted.
+    duplicateSerialAcknowledged: z.boolean(),
   })
   .superRefine((val, ctx) => {
     // Errors are required iff Readiness = Has Errors. The reverse direction is
@@ -185,6 +188,7 @@ export type AssetForm = {
   tonerLifeK: number | null
   errors: UpdateError[]
   comment: string | null
+  duplicateSerialAcknowledged: boolean
 }
 
 export type SpecsForm = {

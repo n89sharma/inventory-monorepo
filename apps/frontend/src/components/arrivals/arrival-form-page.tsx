@@ -72,6 +72,11 @@ export function ArrivalFormPage({
   )
   const editingAsset =
     editingAssetIndex !== null ? form.getValues('assets')[editingAssetIndex] : null
+  // The row being edited is not its own duplicate.
+  const draftSerialNumbers = useMemo(
+    () => assets.filter((_, i) => i !== editingAssetIndex).map((a) => a.serialNumber),
+    [assets, editingAssetIndex],
+  )
 
   function getDefaultArrival() {
     return {
@@ -185,6 +190,7 @@ export function ArrivalFormPage({
           updateAsset={updateAsset}
           editingAsset={editingAsset}
           editingIndex={editingAssetIndex}
+          draftSerialNumbers={draftSerialNumbers}
         />
 
         <div className="flex flex-col gap-2">

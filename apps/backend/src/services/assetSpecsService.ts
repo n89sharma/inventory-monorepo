@@ -1,6 +1,10 @@
 import { UpdateAssetSpecs } from 'shared-types'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
+import {
+  assertSerialDuplicatesAllowed,
+  buildUpdateSerialCandidates,
+} from '../lib/serial-duplicates.js'
 import { prisma } from '../prisma.js'
 import {
   HAS_ERRORS_READINESS,
@@ -121,7 +125,15 @@ export async function updateAssetSpecs(
     }
   }
 
+  const serialCandidates = buildUpdateSerialCandidates({
+    assetId: asset.id,
+    prevSerialNumber: asset.serial_number,
+    newSerialNumber: specs.serial_number,
+    acknowledged: specs.duplicate_serial_acknowledged,
+  })
+
   const prevErrorIds = await prisma.$transaction(async (tx) => {
+    await assertSerialDuplicatesAllowed(tx, serialCandidates)
     await tx.asset.update({
       where: { id: asset.id },
       data: {

@@ -13,10 +13,13 @@ import {
 } from '@/components/shadcn/dialog'
 import { HorizontalField } from '@/components/shared/horizontal-field'
 import { ControlledSearchSelectField } from '@/components/shared/search-select/controlled-search-select-field'
+import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog'
+import { DuplicateSerialWarning } from '@/components/shared/duplicate-serial-warning'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useModels } from '@/hooks/use-model'
 import { useReadinesses, useAssetComponents, useCountries } from '@/hooks/use-reference-data'
+import { useSerialNumberCheck } from '@/hooks/use-serial-number-check'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import {
   getSpecificationFieldVisibility,
@@ -28,10 +31,15 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { SpecsFormSchema, type SpecsForm } from '@/ui-types/arrival-form-types'
 import { getSelectOption, isSelected, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleNotchIcon } from '@phosphor-icons/react'
-import { useMemo } from 'react'
+import { CircleNotchIcon, WarningIcon } from '@phosphor-icons/react'
+import { useMemo, useState } from 'react'
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
-import type { AssetDetails, AssetError, CoreFunction, ModelSummary } from 'shared-types'
+import {
+  type AssetDetails,
+  type AssetError,
+  type CoreFunction,
+  type ModelSummary,
+} from 'shared-types'
 import { toast } from 'sonner'
 
 interface EditSpecsModalProps {
@@ -48,6 +56,9 @@ interface EditSpecsModalProps {
 // model moves to another brand, which clears the errors and releases the readiness.
 const HAS_ERRORS_READINESS = 'HAS_ERRORS'
 const UNTESTED_READINESS = 'UNTESTED'
+
+// An asset's specs are edited on their own; there is no unsaved sibling list to compare against.
+const NO_DRAFT_SERIAL_NUMBERS: string[] = []
 
 const EMPTY_SPECS_FORM: SpecsForm = {
   model: null,
@@ -123,6 +134,7 @@ export function EditSpecsModal({
   errors,
 }: EditSpecsModalProps) {
   const updateAssetSpecs = useAssetStore((state) => state.updateAssetSpecs)
+  const [duplicateConfirmOpen, setDuplicateConfirmOpen] = useState(false)
   const models = useModels()
   const readinesses = useReadinesses()
   const countries = useCountries()
@@ -177,9 +189,23 @@ export function EditSpecsModal({
     [hasOpenError, brandChanged, readinesses],
   )
 
-  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () =>
-    form.reset(undefined, DISCARD_USER_EDITS),
+  const currSerialNumber = useWatch({ control: form.control, name: 'serialNumber' })
+  // The stored serial, so editing any other field on an asset that already shares one is not gated.
+  const persistedAsset = useMemo(
+    () =>
+      assetDetails
+        ? { barcode: assetDetails.barcode, serialNumber: assetDetails.serial_number }
+        : null,
+    [assetDetails],
   )
+  const serialCheck = useSerialNumberCheck({
+    serialNumber: currSerialNumber ?? '',
+    persistedAsset,
+    draftSerialNumbers: NO_DRAFT_SERIAL_NUMBERS,
+  })
+  const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => {
+    form.reset(undefined, DISCARD_USER_EDITS)
+  })
 
   if (!assetDetails) return null
 
@@ -203,7 +229,9 @@ export function EditSpecsModal({
     }
   }
 
-  async function onValid(rawValues: SpecsForm) {
+  // Passed in rather than read from state: the confirm dialog sets it and submits in the same
+  // tick, when a state read would still see the previous value.
+  async function onValid(rawValues: SpecsForm, duplicateSerialAcknowledged: boolean) {
     if (!isSelected(rawValues.readiness) || !rawValues.model) return
     const model = rawValues.model
     const formValues = clearHiddenSpecFields(
@@ -231,6 +259,7 @@ export function EditSpecsModal({
         toner_life_y: formValues.tonerLifeY,
         toner_life_k: formValues.tonerLifeK,
         accessory_ids: formValues.coreFunctions.map((cf) => cf.id),
+        duplicate_serial_acknowledged: duplicateSerialAcknowledged,
       })
       form.reset(formValues, DISCARD_USER_EDITS)
       toast.success('Specifications updated.', { position: 'top-center' })
@@ -244,8 +273,22 @@ export function EditSpecsModal({
     toast.error(flattenFieldErrors(errors, []), { position: 'top-center' })
   }
 
+  // Validation runs first, so field errors surface before the duplicate prompt and the prompt
+  // only ever appears on a payload that is ready to save. Nothing is acknowledged in advance:
+  // every save attempt on a matching serial goes back through the confirmation.
   function submit() {
-    form.handleSubmit(onValid, onInvalid)()
+    form.handleSubmit((values) => {
+      if (serialCheck.hasMatch) {
+        setDuplicateConfirmOpen(true)
+        return
+      }
+      return onValid(values, false)
+    }, onInvalid)()
+  }
+
+  function confirmDuplicateSerial() {
+    setDuplicateConfirmOpen(false)
+    form.handleSubmit((values) => onValid(values, true), onInvalid)()
   }
 
   return (
@@ -272,11 +315,14 @@ export function EditSpecsModal({
               />
             </HorizontalField>
             <HorizontalField label="Serial Number" required>
-              <ControlledTextInput
-                control={form.control}
-                name="serialNumber"
-                className={INPUT_WIDTH}
-              />
+              <div className="flex flex-col gap-2">
+                <ControlledTextInput
+                  control={form.control}
+                  name="serialNumber"
+                  className={INPUT_WIDTH}
+                />
+                <DuplicateSerialWarning check={serialCheck} />
+              </div>
             </HorizontalField>
           </div>
 
@@ -298,7 +344,11 @@ export function EditSpecsModal({
           >
             Cancel
           </Button>
-          <Button onClick={submit} type="button" disabled={isSubmitting}>
+          <Button
+            onClick={submit}
+            type="button"
+            disabled={isSubmitting || serialCheck.isChecking || serialCheck.isBlocked}
+          >
             {isSubmitting ? (
               <>
                 <CircleNotchIcon className="animate-spin" />
@@ -315,6 +365,16 @@ export function EditSpecsModal({
         onOpenChange={guard.setConfirmOpen}
         onDiscard={guard.discard}
       />
+      <ConfirmActionDialog
+        open={duplicateConfirmOpen}
+        onOpenChange={setDuplicateConfirmOpen}
+        title="Duplicate serial number"
+        confirmLabel="Confirm Duplicate"
+        icon={<WarningIcon />}
+        onConfirm={confirmDuplicateSerial}
+      >
+        <DuplicateSerialWarning check={serialCheck} />
+      </ConfirmActionDialog>
     </Dialog>
   )
 }

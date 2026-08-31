@@ -9,9 +9,12 @@ import {
   AssetTransfer,
   Comment,
   CoreFunction,
+  DUPLICATE_ALLOWED_STATUS,
   getInitials,
+  normalizeForSearch,
   ON_HAND_STATUS_VALUES,
   ROLE_PERMISSIONS,
+  SerialNumberCheckResult,
   type AppRole,
 } from 'shared-types'
 import {
@@ -22,6 +25,7 @@ import {
   getAssetErrors as getAssetErrorsQuery,
   getAssetSalvagedParts as getAssetSalvagedPartsQuery,
   getAssetsBySerialNumber as getAssetsBySerialNumberQuery,
+  getAssetsMatchingSerial as getAssetsMatchingSerialQuery,
   getAssets as getAssetsQuery,
   getAssetTransfers as getAssetTransfersQuery,
   getDepartedAssets as getDepartedAssetsQuery,
@@ -29,7 +33,6 @@ import {
 import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactAssetCost, redactSearchRowCost } from '../lib/cost-redaction.js'
 import { NotFoundError } from '../lib/errors.js'
-import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 import { type BarcodeContent } from './barcodePrintService.js'
 
@@ -98,6 +101,49 @@ export async function getAssetsBySerialNumber(
     .map((s) => s.raw)
 
   return { assets, notFound }
+}
+
+// Prisma infers left-joined columns as non-nullable, so the row shape is restated here.
+type SerialMatchRow = {
+  barcode: string
+  serial_number: string
+  brand: string
+  model: string
+  status: string
+  warehouse_code: string | null
+  arrival_number: string | null
+  departure_number: string | null
+  departed_at: Date | null
+  total_match_count: bigint | null
+  blocking_match_count: bigint | null
+}
+
+export async function getSerialNumberMatches(
+  serialNumber: string,
+  excludeBarcode: string,
+): Promise<SerialNumberCheckResult> {
+  const normalized = normalizeForSearch(serialNumber)
+  if (normalized === '') return { matches: [], totalMatchCount: 0, blockingMatchCount: 0 }
+
+  const rows: SerialMatchRow[] = await prisma.$queryRawTyped(
+    getAssetsMatchingSerialQuery(normalized, excludeBarcode, DUPLICATE_ALLOWED_STATUS),
+  )
+
+  return {
+    matches: rows.map((r) => ({
+      barcode: r.barcode,
+      serial_number: r.serial_number,
+      brand: r.brand,
+      model: r.model,
+      status: r.status,
+      warehouse_code: r.warehouse_code,
+      arrival_number: r.arrival_number,
+      departure_number: r.departure_number,
+      departed_at: r.departed_at,
+    })),
+    totalMatchCount: Number(rows[0]?.total_match_count ?? 0),
+    blockingMatchCount: Number(rows[0]?.blocking_match_count ?? 0),
+  }
 }
 
 export async function getDepartedAssets(

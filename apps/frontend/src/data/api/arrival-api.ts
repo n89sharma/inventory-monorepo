@@ -88,6 +88,7 @@ export async function createArrival(a: ArrivalForm): Promise<CreateArrivalRespon
       tonerLifeK: s.tonerLifeK!,
       errors: s.errors,
       comment: s.comment,
+      duplicateSerialAcknowledged: s.duplicateSerialAcknowledged,
     })) as CreateArrival['assets'],
   } satisfies CreateArrival)
   const { data } = await api.post<CreateArrivalResponse>('/arrivals', createArrivalBody)
@@ -150,6 +151,7 @@ export async function createSingleArrivalAsset(
     tonerLifeK: asset.tonerLifeK!,
     errors: asset.errors,
     comment: asset.comment,
+    duplicateSerialAcknowledged: asset.duplicateSerialAcknowledged,
   } satisfies CreateAsset)
   const { data } = await api.post<AssetSummary>(
     `/arrivals/${arrivalNumber}/assets`,
@@ -190,6 +192,7 @@ function mapUpdateAssetToAssetForm(asset: UpdateAsset, components: Component[]):
     tonerLifeK: asset.tonerLifeK,
     errors: asset.errors,
     comment: asset.comment,
+    duplicateSerialAcknowledged: asset.duplicateSerialAcknowledged,
   }
 }
 
@@ -220,6 +223,7 @@ export async function updateArrivalAsset(
     tonerLifeK: asset.tonerLifeK!,
     errors: asset.errors,
     comment: asset.comment,
+    duplicateSerialAcknowledged: asset.duplicateSerialAcknowledged,
   } satisfies UpdateAsset)
   const { data } = await api.patch<AssetSummary>(
     `/arrivals/${arrivalNumber}/assets/${assetId}`,

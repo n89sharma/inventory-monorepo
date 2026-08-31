@@ -1,4 +1,4 @@
-import { SEARCH_ENTITY_TYPES, successResponse } from 'shared-types'
+import { normalizeForSearch, SEARCH_ENTITY_TYPES, successResponse } from 'shared-types'
 import { z } from 'zod'
 import {
   searchArrivals,
@@ -9,7 +9,6 @@ import {
   searchTransfers,
 } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { normalizeForSearch } from '../lib/search.js'
 import { prisma } from '../prisma.js'
 
 const toArray = (val: unknown) => {

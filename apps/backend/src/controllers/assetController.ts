@@ -36,6 +36,7 @@ import {
   getAssetsBySerialNumber as getAssetsBySerialNumberSer,
   getBarcodeContents as getBarcodeContentsSer,
   getDepartedAssets as getDepartedAssetsSer,
+  getSerialNumberMatches as getSerialNumberMatchesSer,
 } from '../services/assetReadService.js'
 import {
   ASSET_LABEL_LAYOUT,
@@ -57,6 +58,15 @@ import { deleteAsset as deleteAssetSer } from '../services/assetDeleteService.js
 
 export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number),
+})
+
+// serial_number is VarChar(50). The allowlist is the standard guard for text that reaches a
+// query predicate — parameterisation stops injection but not a pathological pattern.
+const SERIAL_NUMBER_PATTERN = /^[a-zA-Z0-9\s\-_.]*$/
+
+export const SerialCheckQuerySchema = z.object({
+  serialNumber: z.string().min(1).max(50).regex(SERIAL_NUMBER_PATTERN),
+  excludeBarcode: z.string().max(50).regex(SERIAL_NUMBER_PATTERN).optional(),
 })
 
 const toNumberArray = (val: unknown) => {
@@ -279,6 +289,14 @@ export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
 export const getAssetsBySerialNumber = asyncHandler(async (req, res) => {
   const { serialNumbers } = AssetsBySerialNumberRequestSchema.parse(req.body)
   const data = await getAssetsBySerialNumberSer(serialNumbers, res.locals.dbUserRole)
+  res.json(successResponse(data))
+})
+
+export const getSerialNumberMatches = asyncHandler(async (_req, res) => {
+  const { serialNumber, excludeBarcode } = res.locals.query as z.infer<
+    typeof SerialCheckQuerySchema
+  >
+  const data = await getSerialNumberMatchesSer(serialNumber, excludeBarcode ?? '')
   res.json(successResponse(data))
 })
 

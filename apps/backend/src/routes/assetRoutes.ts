@@ -3,6 +3,7 @@ import {
   AssetQuerySchema,
   LocationsByWarehouseQuerySchema,
   DepartedAssetQuerySchema,
+  SerialCheckQuerySchema,
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
@@ -18,6 +19,7 @@ import {
   getAssets,
   getLocationsByWarehouse,
   getDepartedAssets,
+  getSerialNumberMatches,
   patchAssetPricing,
   printAssetBarcodes,
   updateAssetErrors,
@@ -46,6 +48,12 @@ router.get(
   requirePermission('view_asset'),
   validateQuery(LocationsByWarehouseQuerySchema),
   getLocationsByWarehouse,
+)
+router.get(
+  '/serial-check',
+  requirePermission('view_asset'),
+  validateQuery(SerialCheckQuerySchema),
+  getSerialNumberMatches,
 )
 router.get('/:barcode/history', requirePermission('view_asset'), getAssetHistory)
 router.get('/:barcode/summary', requirePermission('view_asset'), getAssetSummaryByBarcode)

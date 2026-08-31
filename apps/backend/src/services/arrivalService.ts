@@ -27,6 +27,11 @@ import { getNextSequence } from '../lib/db-utils.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { pluralize } from '../lib/pluralize.js'
+import {
+  assertSerialDuplicatesAllowed,
+  buildUpdateSerialCandidates,
+  type SerialCandidate,
+} from '../lib/serial-duplicates.js'
 import { prisma } from '../prisma.js'
 import { upsertLatestComment } from './assetCommentService.js'
 import { reconcileAssetErrors } from './assetErrorService.js'
@@ -131,6 +136,8 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     tonerLifeK: dbAsset.technical_specification?.toner_life_k ?? 0,
     errors: dbAsset.asset_errors.map((r) => ({ error_id: r.error_id, is_fixed: r.is_fixed })),
     comment: dbAsset.comments[0]?.comment ?? null,
+    // A loaded asset has acknowledged nothing; the client re-acknowledges if it changes the serial.
+    duplicateSerialAcknowledged: false,
   }
 }
 
@@ -144,6 +151,7 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
   const arrival = await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs(newArrival.assets, brandIdByModelId))
     await validateComponentBrands(tx, buildComponentBrandPairs(newArrival.assets, brandIdByModelId))
+    await assertSerialDuplicatesAllowed(tx, newArrival.assets.map(toSerialCandidate))
     const locationId = await ensureArrivalLocationId(tx, newArrival.warehouse.id)
     return tx.arrival.create({
       data: {
@@ -155,10 +163,10 @@ export async function createArrival(newArrival: CreateArrival, userId: number) {
         created_at: currentDateTime,
         created_by: { connect: { id: userId } },
         assets: {
-          create: newArrival.assets.map((a) =>
+          create: newArrival.assets.map((a, index) =>
             mapInputAssetToPrismaCreateAsset(
               a,
-              barcodes[a.serialNumber],
+              barcodes[index],
               locationId,
               currentDateTime,
               userId,
@@ -333,6 +341,15 @@ function buildComponentBrandPairs(
     }
     return [{ componentId: a.componentId, expectedBrandId }]
   })
+}
+
+// New assets have nothing to exclude — they cannot yet collide with themselves.
+function toSerialCandidate(asset: CreateAsset): SerialCandidate {
+  return {
+    serialNumber: asset.serialNumber,
+    acknowledged: asset.duplicateSerialAcknowledged,
+    excludeAssetId: null,
+  }
 }
 
 export async function patchArrivalMetadata(
@@ -534,10 +551,17 @@ export async function updateArrivalAsset(
 
   const assetWithId: UpdateAsset = { ...asset, id: assetId }
   const brandIdByModelId = await resolveModelBrands([asset.model.id])
+  const serialCandidates = buildUpdateSerialCandidates({
+    assetId,
+    prevSerialNumber: existing.serial_number,
+    newSerialNumber: asset.serialNumber,
+    acknowledged: asset.duplicateSerialAcknowledged,
+  })
 
   await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
     await validateComponentBrands(tx, buildComponentBrandPairs([asset], brandIdByModelId))
+    await assertSerialDuplicatesAllowed(tx, serialCandidates)
     await tx.assetAccessory.deleteMany({ where: { asset_id: assetId } })
     await updateArrivalAssetCoreFields(tx, assetWithId)
     if (asset.coreFunctions.length > 0) {
@@ -640,6 +664,7 @@ export async function createSingleArrivalAsset(
   const created = await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
     await validateComponentBrands(tx, buildComponentBrandPairs([asset], brandIdByModelId))
+    await assertSerialDuplicatesAllowed(tx, [toSerialCandidate(asset)])
     const locationId = await ensureArrivalLocationId(tx, arrival.destination_id)
     return createArrivalAssetInTx(tx, arrival.id, asset, barcode, locationId, now, userId)
   })
@@ -663,10 +688,12 @@ export async function createSingleArrivalAsset(
   return mapAssetSummary(summary)
 }
 
-async function generateBarcodes(assets: CreateAsset[], warehouseCode: string) {
-  const barcodes: Record<string, string> = {}
-  for (const asset of assets) {
-    barcodes[asset.serialNumber] = await getNewAssetBarcode(warehouseCode)
+// One barcode per asset, positionally. Keying by serial number would collapse two assets that
+// deliberately share one onto a single barcode.
+async function generateBarcodes(assets: CreateAsset[], warehouseCode: string): Promise<string[]> {
+  const barcodes: string[] = []
+  for (let i = 0; i < assets.length; i += 1) {
+    barcodes.push(await getNewAssetBarcode(warehouseCode))
   }
   return barcodes
 }

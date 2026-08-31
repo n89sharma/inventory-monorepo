@@ -35,6 +35,8 @@ export * from "./sql/getAssetsForInvoice.js"
 
 export * from "./sql/getAssetsForTransfers.js"
 
+export * from "./sql/getAssetsMatchingSerial.js"
+
 export * from "./sql/getAssetStoreParts.js"
 
 export * from "./sql/getAssetTransfers.js"
