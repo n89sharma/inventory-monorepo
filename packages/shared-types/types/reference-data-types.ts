@@ -125,7 +125,13 @@ export const CreateBrandSchema = z.object({
   name: z.string().min(1),
 })
 
+// PATCH /brands/:brandId
+export const UpdateBrandSchema = z.object({
+  name: z.string().min(1),
+})
+
 export type CreateBrand = z.infer<typeof CreateBrandSchema>
+export type UpdateBrand = z.infer<typeof UpdateBrandSchema>
 export type ReferenceData = z.infer<typeof ReferenceDataSchema>
 export type CoreFunction = z.infer<typeof CoreFunctionsSchema>
 export type AssetType = z.infer<typeof AssetTypeSchema>

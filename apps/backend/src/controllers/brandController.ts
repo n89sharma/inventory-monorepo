@@ -1,5 +1,11 @@
 import { Request, Response } from 'express'
-import { ApiResponse, Brand, CreateBrandSchema, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  Brand,
+  CreateBrandSchema,
+  UpdateBrandSchema,
+  successResponse,
+} from 'shared-types'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import * as brandService from '../services/brandService.js'
 
@@ -13,3 +19,9 @@ export const createBrand = asyncHandler(
     res.status(201).json(successResponse(await brandService.createBrand(body)))
   },
 )
+
+export const updateBrand = asyncHandler(async (req: Request, res: Response) => {
+  const body = UpdateBrandSchema.parse(req.body)
+  await brandService.updateBrand(Number(req.params.brandId), body)
+  res.status(204).send()
+})

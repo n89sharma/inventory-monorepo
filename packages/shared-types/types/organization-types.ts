@@ -37,3 +37,19 @@ export const CreateOrgSchema = z.object({
 })
 
 export type CreateOrg = z.infer<typeof CreateOrgSchema>
+
+// PATCH /organizations/:orgId
+export const UpdateOrgSchema = z.object({
+  account_number: z.string().min(1),
+  name: z.string().min(1),
+  contact_name: z.string().nullable(),
+  phone: z.string().nullable(),
+  mobile: z.string().nullable(),
+  primary_email: z.string().nullable(),
+  address: z.string().nullable(),
+  city: z.string().nullable(),
+  province: z.string().nullable(),
+  country: z.string().nullable(),
+})
+
+export type UpdateOrg = z.infer<typeof UpdateOrgSchema>

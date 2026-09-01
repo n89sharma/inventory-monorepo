@@ -24,3 +24,15 @@ export const CreateModelSchema = z.object({
 })
 
 export type CreateModel = z.infer<typeof CreateModelSchema>
+
+// PATCH /models/:modelId
+export const UpdateModelSchema = z.object({
+  name: z.string().min(1),
+  weight: z.number().min(0),
+  size: z.number().min(0),
+  brand_id: z.number(),
+  asset_type_id: z.number(),
+  is_colour: z.boolean().default(false),
+})
+
+export type UpdateModel = z.infer<typeof UpdateModelSchema>

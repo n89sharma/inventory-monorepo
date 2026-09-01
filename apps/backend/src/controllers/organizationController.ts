@@ -1,5 +1,11 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CreateOrgSchema, OrgDetail, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  CreateOrgSchema,
+  OrgDetail,
+  UpdateOrgSchema,
+  successResponse,
+} from 'shared-types'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import * as organizationService from '../services/organizationService.js'
 
@@ -15,3 +21,9 @@ export const createOrganization = asyncHandler(
     res.status(201).json(successResponse(await organizationService.createOrganization(body)))
   },
 )
+
+export const updateOrganization = asyncHandler(async (req: Request, res: Response) => {
+  const body = UpdateOrgSchema.parse(req.body)
+  await organizationService.updateOrganization(Number(req.params.orgId), body)
+  res.status(204).send()
+})

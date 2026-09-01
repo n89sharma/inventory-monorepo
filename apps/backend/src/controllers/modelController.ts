@@ -1,5 +1,11 @@
 import { Request, Response } from 'express'
-import { ApiResponse, CreateModelSchema, ModelSummary, successResponse } from 'shared-types'
+import {
+  ApiResponse,
+  CreateModelSchema,
+  ModelSummary,
+  UpdateModelSchema,
+  successResponse,
+} from 'shared-types'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import * as modelService from '../services/modelService.js'
 
@@ -15,3 +21,9 @@ export const createModel = asyncHandler(
     res.status(201).json(successResponse(await modelService.createModel(body)))
   },
 )
+
+export const updateModel = asyncHandler(async (req: Request, res: Response) => {
+  const body = UpdateModelSchema.parse(req.body)
+  await modelService.updateModel(Number(req.params.modelId), body)
+  res.status(204).send()
+})
