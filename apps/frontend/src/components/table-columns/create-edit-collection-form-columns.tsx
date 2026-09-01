@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
-import { formatLocation, formatThousandsK, formatTitleCase } from '@/lib/formatters'
+import { formatLocation, formatThousandsK } from '@/lib/formatters'
 import type { DepartureFormAsset } from '@/ui-types/departure-form-types'
 import { TrashIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -17,7 +17,7 @@ function getCommonLeadingColumns<T extends AssetSummary>(): ColumnDef<T>[] {
     {
       accessorKey: 'brand',
       header: 'Brand',
-      cell: ({ row }) => formatTitleCase(row.original.brand),
+      cell: ({ row }) => row.original.brand,
     },
     {
       accessorKey: 'model',

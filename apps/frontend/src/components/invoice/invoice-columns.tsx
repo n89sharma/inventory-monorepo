@@ -6,7 +6,7 @@ import {
 } from '@/components/table-columns/collection-summary-columns'
 import { ID_COLUMN_SIZE, IdLink } from '@/components/table-columns/column-primitives'
 import type { SummaryColumn } from '@/components/table-columns/summary-column'
-import { formatDate, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
+import { formatDate, formatUSDWithSymbol } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
@@ -43,7 +43,7 @@ function organizationColumn(label: string): InvoiceSummaryColumn {
   return {
     id: 'organization',
     label,
-    text: (invoice) => formatTitleCase(invoice.organization ?? ''),
+    text: (invoice) => invoice.organization ?? '',
     sortable: true,
     filterFn: 'includesString',
   }

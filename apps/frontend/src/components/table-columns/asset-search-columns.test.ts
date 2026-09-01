@@ -169,12 +169,12 @@ describe('asset-search report columns', () => {
   it('runs every column value through its display formatter', () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
-      'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
+      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
         'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
-        'Big Vendor,A-260705-001,TOR,"July 05, 2026",Retail Co,Jane Smith,D-260710-001,"July 10, 2026",' +
+        'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
         '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
-        '48.9%,H-1,Alice,Bob,Acme Corp,"July 01, 2026",' +
+        '48.9%,H-1,Alice,Bob,ACME_CORP,"July 01, 2026",' +
         '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
     )
   })
@@ -220,7 +220,7 @@ describe('asset-search report columns', () => {
     })
     const { data } = csvFor(nulled, liveColumnIds())
     expect(data).toBe(
-      'BC-1,Canon,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
+      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
         ',,"1,234 lbs",5,,,,' +
         ',,,,,' +
         ',,,,,,,,' +

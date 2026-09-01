@@ -20,7 +20,7 @@ export function getNewAssetFormColumns({
     {
       accessorKey: 'model.brand_name',
       header: 'Brand',
-      cell: ({ row }) => formatTitleCase(row.original.model?.brand_name ?? ''),
+      cell: ({ row }) => row.original.model?.brand_name ?? '',
     },
     {
       accessorKey: 'model.model_name',

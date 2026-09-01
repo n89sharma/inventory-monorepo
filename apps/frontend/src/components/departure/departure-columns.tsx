@@ -4,7 +4,6 @@ import {
   createdAtColumnDef,
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
-import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { DepartureSummary } from 'shared-types'
 
@@ -25,12 +24,12 @@ export function departureTableColumns(
     {
       accessorKey: 'transporter',
       header: 'Transporter',
-      cell: ({ row }) => formatTitleCase(row.original.transporter ?? ''),
+      cell: ({ row }) => row.original.transporter ?? '',
     },
     {
       accessorKey: 'destination',
       header: 'Customer',
-      cell: ({ row }) => formatTitleCase(row.original.destination ?? ''),
+      cell: ({ row }) => row.original.destination ?? '',
     },
     assetCountColumnDef as ColumnDef<DepartureSummary>,
   ]

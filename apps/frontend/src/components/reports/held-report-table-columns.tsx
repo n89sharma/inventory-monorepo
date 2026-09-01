@@ -1,5 +1,4 @@
 import type { SalespersonHoldsGroup } from '@/lib/held-report-aggregate'
-import { formatTitleCase } from '@/lib/formatters'
 import { buildSearchOnHandUrl } from '@/lib/filters/serializers'
 import { cn } from '@/lib/utils'
 import { CaretRightIcon } from '@phosphor-icons/react'
@@ -31,7 +30,7 @@ export function toHeldReportTableRows(salespeople: SalespersonHoldsGroup[]): Hel
     href: buildSearchOnHandUrl({ heldForId: rep.salesRepId }),
     subRows: rep.customers.map((customer) => ({
       rowId: `rep-${rep.salesRepId}-customer-${customer.customerId}`,
-      label: formatTitleCase(customer.customerName),
+      label: customer.customerName,
       assetCount: customer.assetCount,
       holdCount: customer.holdCount,
       medianHeldDays: customer.medianHeldDays,

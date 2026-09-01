@@ -186,7 +186,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'brand',
     label: 'Brand',
     section: 'detailed_specs',
-    text: (a) => formatTitleCase(a.brand),
+    text: (a) => a.brand,
   },
   {
     id: 'model',
@@ -324,7 +324,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Vendor',
     section: 'arrival',
     sortable: true,
-    text: (a) => formatTitleCase(a.vendor ?? ''),
+    text: (a) => a.vendor ?? '',
   },
   {
     id: 'arrival_number',
@@ -355,7 +355,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Customer',
     section: 'departure',
     sortable: true,
-    text: (a) => formatTitleCase(a.customer ?? ''),
+    text: (a) => a.customer ?? '',
   },
   {
     id: 'salesperson',
@@ -472,7 +472,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Hold Customer',
     section: 'hold',
     sortable: true,
-    text: (a) => formatTitleCase(a.hold_customer ?? ''),
+    text: (a) => a.hold_customer ?? '',
   },
   {
     id: 'hold_created_at',

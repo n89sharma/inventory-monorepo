@@ -1,5 +1,4 @@
 import { api } from '@/data/api/axios-client'
-import { formatTitleCase } from '@/lib/formatters'
 import type { OrgForm } from '@/ui-types/org-form-types'
 import {
   type CreateOrg,
@@ -15,8 +14,7 @@ const CreateOrgResponseSchema = z.object({ id: z.number() })
 
 export async function getOrgs(): Promise<OrgDetail[]> {
   const { data } = await api.get<OrgDetail[]>('/organizations')
-  const organizations = z.array(OrgDetailSchema).parse(data)
-  return organizations.map((org) => ({ ...org, name: formatTitleCase(org.name) }))
+  return z.array(OrgDetailSchema).parse(data)
 }
 
 export async function createOrg(form: OrgForm): Promise<{ id: number }> {

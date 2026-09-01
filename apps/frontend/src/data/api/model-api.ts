@@ -1,5 +1,4 @@
 import { api } from '@/data/api/axios-client'
-import { formatTitleCase } from '@/lib/formatters'
 import type { ModelForm } from '@/ui-types/model-form-types'
 import {
   type CreateModel,
@@ -15,12 +14,7 @@ const CreateModelResponseSchema = z.object({ id: z.number() })
 
 export async function getModels(): Promise<ModelSummary[]> {
   const { data } = await api.get<ModelSummary[]>('/models')
-  const models = z.array(ModelSummarySchema).parse(data)
-  return models.map((model) => ({
-    ...model,
-    brand_name: formatTitleCase(model.brand_name),
-    model_name: formatTitleCase(model.model_name),
-  }))
+  return z.array(ModelSummarySchema).parse(data)
 }
 
 export async function createModel(form: ModelForm): Promise<{ id: number }> {

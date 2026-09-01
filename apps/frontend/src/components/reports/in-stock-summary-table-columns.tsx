@@ -93,7 +93,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   {
     accessorKey: 'brand_name',
     header: 'Brand',
-    cell: ({ row }) => scopeCell(row, (r) => formatTitleCase(r.brand_name)),
+    cell: ({ row }) => scopeCell(row, (r) => r.brand_name),
   },
   {
     accessorKey: 'asset_type',

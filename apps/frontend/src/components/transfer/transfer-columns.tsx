@@ -5,7 +5,6 @@ import {
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
-import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TransferSummary } from 'shared-types'
 
@@ -30,7 +29,7 @@ export function transferTableColumns(
     {
       accessorKey: 'transporter',
       header: 'Transporter',
-      cell: ({ row }) => formatTitleCase(row.original.transporter ?? ''),
+      cell: ({ row }) => row.original.transporter ?? '',
     },
     createdByColumnDef as ColumnDef<TransferSummary>,
     assetCountColumnDef as ColumnDef<TransferSummary>,

@@ -4,7 +4,6 @@ import {
   createdAtColumnDef,
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
-import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { HoldSummary } from 'shared-types'
 
@@ -21,7 +20,7 @@ export function holdTableColumns(getHref: (row: HoldSummary) => string): ColumnD
     {
       accessorKey: 'customer',
       header: 'Customer',
-      cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
+      cell: ({ row }) => row.original.customer ?? '',
     },
     createdAtColumnDef as ColumnDef<HoldSummary>,
     assetCountColumnDef as ColumnDef<HoldSummary>,
