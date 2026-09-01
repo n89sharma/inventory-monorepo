@@ -151,9 +151,14 @@ const ModelPriceHistoryPage = lazy(() =>
     default: m.ModelPriceHistoryPage,
   })),
 )
-const CatalogSettingsPage = lazy(() =>
-  import('./components/settings/catalog-settings-page').then((m) => ({
-    default: m.CatalogSettingsPage,
+const ModelsSettingsPage = lazy(() =>
+  import('./components/settings/models-settings-page').then((m) => ({
+    default: m.ModelsSettingsPage,
+  })),
+)
+const BrandsSettingsPage = lazy(() =>
+  import('./components/settings/brands-settings-page').then((m) => ({
+    default: m.BrandsSettingsPage,
   })),
 )
 const LocationsSettingsPage = lazy(() =>
@@ -451,12 +456,20 @@ function AppRoutes() {
                       }
                     />
 
-                    <Route path="/settings" element={<Navigate to="/settings/catalog" replace />} />
+                    <Route path="/settings" element={<Navigate to="/settings/models" replace />} />
                     <Route
-                      path="/settings/catalog"
+                      path="/settings/models"
                       element={
                         <PermissionRoute permission="update_settings">
-                          <CatalogSettingsPage />
+                          <ModelsSettingsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/brands"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <BrandsSettingsPage />
                         </PermissionRoute>
                       }
                     />

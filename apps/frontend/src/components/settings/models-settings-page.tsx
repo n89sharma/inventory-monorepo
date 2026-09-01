@@ -1,4 +1,3 @@
-import { CreateBrandModal } from '@/components/settings/create-brand-modal'
 import { CreateModelModal } from '@/components/settings/create-model-modal'
 import { modelTableColumns } from '@/components/settings/model-table-columns'
 import { SettingsListPage } from '@/components/settings/settings-list-page'
@@ -19,8 +18,7 @@ const MODEL_FACETED_ROW_MODELS = {
   getFacetedUniqueValues: getFacetedUniqueValues<ModelSummary>(),
 }
 
-export function CatalogSettingsPage(): React.JSX.Element {
-  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false)
+export function ModelsSettingsPage(): React.JSX.Element {
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
 
   const models = useModels()
@@ -36,21 +34,16 @@ export function CatalogSettingsPage(): React.JSX.Element {
   return (
     <>
       <SettingsListPage
-        title="Catalog"
+        title="Models"
         label={TABLE_LABEL}
         columns={modelTableColumns}
         data={sortedModels}
         defaultSort={MODEL_DEFAULT_SORT}
         facetedRowModels={MODEL_FACETED_ROW_MODELS}
         actions={
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={() => setIsBrandModalOpen(true)}>
-              <PlusIcon /> Add Brand
-            </Button>
-            <Button variant="secondary" onClick={() => setIsModelModalOpen(true)}>
-              <PlusIcon /> Add Model
-            </Button>
-          </div>
+          <Button onClick={() => setIsModelModalOpen(true)}>
+            <PlusIcon /> Add Model
+          </Button>
         }
         renderTableFilter={(table) => (
           <>
@@ -79,7 +72,6 @@ export function CatalogSettingsPage(): React.JSX.Element {
         )}
       />
 
-      <CreateBrandModal open={isBrandModalOpen} onOpenChange={setIsBrandModalOpen} />
       <CreateModelModal open={isModelModalOpen} onOpenChange={setIsModelModalOpen} />
     </>
   )
