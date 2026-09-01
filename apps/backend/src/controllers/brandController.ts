@@ -1,23 +1,15 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { ApiResponse, Brand, CreateBrandSchema, successResponse } from 'shared-types'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { prisma } from '../prisma.js'
+import * as brandService from '../services/brandService.js'
 
 export const getBrands = asyncHandler(async (req: Request, res: Response<ApiResponse<Brand[]>>) => {
-  const brands = await prisma.brand.findMany({ orderBy: { name: 'asc' } })
-  res.json(successResponse(brands))
+  res.json(successResponse(await brandService.listBrands()))
 })
 
-export async function createBrand(
-  req: Request,
-  res: Response<ApiResponse<{ id: number }>>,
-  next: NextFunction,
-) {
-  try {
+export const createBrand = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<{ id: number }>>) => {
     const body = CreateBrandSchema.parse(req.body)
-    const brand = await prisma.brand.create({ data: { name: body.name } })
-    res.status(201).json(successResponse({ id: brand.id }))
-  } catch (error) {
-    next(error)
-  }
-}
+    res.status(201).json(successResponse(await brandService.createBrand(body)))
+  },
+)

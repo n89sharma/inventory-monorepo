@@ -14,7 +14,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
-import { mapDbModelToSummaryModel } from '../controllers/modelController.js'
+import { getModelSummary } from './modelService.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { mapAssetSearchRow, mapAssetSummary } from '../lib/asset-mappers.js'
@@ -509,7 +509,7 @@ export async function getArrivalAssetForUpdate(
     ...assetIncludeArgs,
   })
   if (!dbAsset) throw new NotFoundError(`Asset ${assetId} not found on arrival ${arrivalNumber}`)
-  const model = await mapDbModelToSummaryModel(dbAsset.model_id)
+  const model = await getModelSummary(dbAsset.model_id)
   return mapDbAssetToUpdateAsset(dbAsset, model)
 }
 
