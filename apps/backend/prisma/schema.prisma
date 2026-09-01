@@ -460,6 +460,10 @@ model Brand {
   models     Model[]
   errors     Error[]
   components Component[]
+
+  name_normalized String? @default(dbgenerated()) @map("name_normalized")
+
+  @@unique([name_normalized])
 }
 
 model Model {
@@ -475,7 +479,10 @@ model Model {
   assets        Asset[]
   asset_type_id Int
 
+  name_normalized String? @default(dbgenerated()) @map("name_normalized")
+
   @@unique([brand_id, name])
+  @@unique([brand_id, name_normalized])
   @@index([name])
 }
 
@@ -591,6 +598,9 @@ model Organization {
   holds                  Hold[]
   transfers              Transfer[]
 
+  name_normalized String? @default(dbgenerated()) @map("name_normalized")
+
+  @@unique([name_normalized])
   @@index([name])
 }
 

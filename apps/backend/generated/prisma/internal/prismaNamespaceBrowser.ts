@@ -430,7 +430,8 @@ export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof t
 
 export const BrandScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  name_normalized: 'name_normalized'
 } as const
 
 export type BrandScalarFieldEnum = (typeof BrandScalarFieldEnum)[keyof typeof BrandScalarFieldEnum]
@@ -443,7 +444,8 @@ export const ModelScalarFieldEnum = {
   size: 'size',
   is_colour: 'is_colour',
   brand_id: 'brand_id',
-  asset_type_id: 'asset_type_id'
+  asset_type_id: 'asset_type_id',
+  name_normalized: 'name_normalized'
 } as const
 
 export type ModelScalarFieldEnum = (typeof ModelScalarFieldEnum)[keyof typeof ModelScalarFieldEnum]
@@ -525,7 +527,8 @@ export const OrganizationScalarFieldEnum = {
   city: 'city',
   province: 'province',
   country: 'country',
-  website: 'website'
+  website: 'website',
+  name_normalized: 'name_normalized'
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]

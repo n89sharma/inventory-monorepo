@@ -5,3 +5,10 @@
 export function normalizeForSearch(q: string): string {
   return q.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
+
+// Mirrors the `name_normalized` generated columns on Brand, Model and Organization, which back
+// their duplicate-name unique indexes. Unlike normalizeForSearch this keeps `+`, because a model
+// name carries it as meaning: IMAGEPRESS-C1 and IMAGEPRESS-C1+ are different models.
+export function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9+]/g, '')
+}

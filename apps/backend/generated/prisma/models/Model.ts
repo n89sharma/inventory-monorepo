@@ -50,6 +50,7 @@ export type ModelMinAggregateOutputType = {
   is_colour: boolean | null
   brand_id: number | null
   asset_type_id: number | null
+  name_normalized: string | null
 }
 
 export type ModelMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type ModelMaxAggregateOutputType = {
   is_colour: boolean | null
   brand_id: number | null
   asset_type_id: number | null
+  name_normalized: string | null
 }
 
 export type ModelCountAggregateOutputType = {
@@ -70,6 +72,7 @@ export type ModelCountAggregateOutputType = {
   is_colour: number
   brand_id: number
   asset_type_id: number
+  name_normalized: number
   _all: number
 }
 
@@ -98,6 +101,7 @@ export type ModelMinAggregateInputType = {
   is_colour?: true
   brand_id?: true
   asset_type_id?: true
+  name_normalized?: true
 }
 
 export type ModelMaxAggregateInputType = {
@@ -108,6 +112,7 @@ export type ModelMaxAggregateInputType = {
   is_colour?: true
   brand_id?: true
   asset_type_id?: true
+  name_normalized?: true
 }
 
 export type ModelCountAggregateInputType = {
@@ -118,6 +123,7 @@ export type ModelCountAggregateInputType = {
   is_colour?: true
   brand_id?: true
   asset_type_id?: true
+  name_normalized?: true
   _all?: true
 }
 
@@ -215,6 +221,7 @@ export type ModelGroupByOutputType = {
   is_colour: boolean
   brand_id: number
   asset_type_id: number
+  name_normalized: string | null
   _count: ModelCountAggregateOutputType | null
   _avg: ModelAvgAggregateOutputType | null
   _sum: ModelSumAggregateOutputType | null
@@ -248,6 +255,7 @@ export type ModelWhereInput = {
   is_colour?: Prisma.BoolFilter<"Model"> | boolean
   brand_id?: Prisma.IntFilter<"Model"> | number
   asset_type_id?: Prisma.IntFilter<"Model"> | number
+  name_normalized?: Prisma.StringNullableFilter<"Model"> | string | null
   asset_type?: Prisma.XOR<Prisma.AssetTypeScalarRelationFilter, Prisma.AssetTypeWhereInput>
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
   assets?: Prisma.AssetListRelationFilter
@@ -261,6 +269,7 @@ export type ModelOrderByWithRelationInput = {
   is_colour?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
   asset_type_id?: Prisma.SortOrder
+  name_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   asset_type?: Prisma.AssetTypeOrderByWithRelationInput
   brand?: Prisma.BrandOrderByWithRelationInput
   assets?: Prisma.AssetOrderByRelationAggregateInput
@@ -269,6 +278,7 @@ export type ModelOrderByWithRelationInput = {
 export type ModelWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   brand_id_name?: Prisma.ModelBrand_idNameCompoundUniqueInput
+  brand_id_name_normalized?: Prisma.ModelBrand_idName_normalizedCompoundUniqueInput
   AND?: Prisma.ModelWhereInput | Prisma.ModelWhereInput[]
   OR?: Prisma.ModelWhereInput[]
   NOT?: Prisma.ModelWhereInput | Prisma.ModelWhereInput[]
@@ -278,10 +288,11 @@ export type ModelWhereUniqueInput = Prisma.AtLeast<{
   is_colour?: Prisma.BoolFilter<"Model"> | boolean
   brand_id?: Prisma.IntFilter<"Model"> | number
   asset_type_id?: Prisma.IntFilter<"Model"> | number
+  name_normalized?: Prisma.StringNullableFilter<"Model"> | string | null
   asset_type?: Prisma.XOR<Prisma.AssetTypeScalarRelationFilter, Prisma.AssetTypeWhereInput>
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
   assets?: Prisma.AssetListRelationFilter
-}, "id" | "brand_id_name">
+}, "id" | "brand_id_name" | "brand_id_name_normalized">
 
 export type ModelOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -291,6 +302,7 @@ export type ModelOrderByWithAggregationInput = {
   is_colour?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
   asset_type_id?: Prisma.SortOrder
+  name_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ModelCountOrderByAggregateInput
   _avg?: Prisma.ModelAvgOrderByAggregateInput
   _max?: Prisma.ModelMaxOrderByAggregateInput
@@ -309,6 +321,7 @@ export type ModelScalarWhereWithAggregatesInput = {
   is_colour?: Prisma.BoolWithAggregatesFilter<"Model"> | boolean
   brand_id?: Prisma.IntWithAggregatesFilter<"Model"> | number
   asset_type_id?: Prisma.IntWithAggregatesFilter<"Model"> | number
+  name_normalized?: Prisma.StringNullableWithAggregatesFilter<"Model"> | string | null
 }
 
 export type ModelCreateInput = {
@@ -316,6 +329,7 @@ export type ModelCreateInput = {
   weight: number
   size: number
   is_colour?: boolean
+  name_normalized?: string | null
   asset_type: Prisma.AssetTypeCreateNestedOneWithoutModelsInput
   brand: Prisma.BrandCreateNestedOneWithoutModelsInput
   assets?: Prisma.AssetCreateNestedManyWithoutModelInput
@@ -329,6 +343,7 @@ export type ModelUncheckedCreateInput = {
   is_colour?: boolean
   brand_id: number
   asset_type_id: number
+  name_normalized?: string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutModelInput
 }
 
@@ -337,6 +352,7 @@ export type ModelUpdateInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_type?: Prisma.AssetTypeUpdateOneRequiredWithoutModelsNestedInput
   brand?: Prisma.BrandUpdateOneRequiredWithoutModelsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutModelNestedInput
@@ -350,6 +366,7 @@ export type ModelUncheckedUpdateInput = {
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutModelNestedInput
 }
 
@@ -361,6 +378,7 @@ export type ModelCreateManyInput = {
   is_colour?: boolean
   brand_id: number
   asset_type_id: number
+  name_normalized?: string | null
 }
 
 export type ModelUpdateManyMutationInput = {
@@ -368,6 +386,7 @@ export type ModelUpdateManyMutationInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModelUncheckedUpdateManyInput = {
@@ -378,6 +397,7 @@ export type ModelUncheckedUpdateManyInput = {
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModelListRelationFilter = {
@@ -400,6 +420,11 @@ export type ModelBrand_idNameCompoundUniqueInput = {
   name: string
 }
 
+export type ModelBrand_idName_normalizedCompoundUniqueInput = {
+  brand_id: number
+  name_normalized: string
+}
+
 export type ModelCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -408,6 +433,7 @@ export type ModelCountOrderByAggregateInput = {
   is_colour?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
   asset_type_id?: Prisma.SortOrder
+  name_normalized?: Prisma.SortOrder
 }
 
 export type ModelAvgOrderByAggregateInput = {
@@ -426,6 +452,7 @@ export type ModelMaxOrderByAggregateInput = {
   is_colour?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
   asset_type_id?: Prisma.SortOrder
+  name_normalized?: Prisma.SortOrder
 }
 
 export type ModelMinOrderByAggregateInput = {
@@ -436,6 +463,7 @@ export type ModelMinOrderByAggregateInput = {
   is_colour?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
   asset_type_id?: Prisma.SortOrder
+  name_normalized?: Prisma.SortOrder
 }
 
 export type ModelSumOrderByAggregateInput = {
@@ -557,6 +585,7 @@ export type ModelCreateWithoutAsset_typeInput = {
   weight: number
   size: number
   is_colour?: boolean
+  name_normalized?: string | null
   brand: Prisma.BrandCreateNestedOneWithoutModelsInput
   assets?: Prisma.AssetCreateNestedManyWithoutModelInput
 }
@@ -568,6 +597,7 @@ export type ModelUncheckedCreateWithoutAsset_typeInput = {
   size: number
   is_colour?: boolean
   brand_id: number
+  name_normalized?: string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutModelInput
 }
 
@@ -608,6 +638,7 @@ export type ModelScalarWhereInput = {
   is_colour?: Prisma.BoolFilter<"Model"> | boolean
   brand_id?: Prisma.IntFilter<"Model"> | number
   asset_type_id?: Prisma.IntFilter<"Model"> | number
+  name_normalized?: Prisma.StringNullableFilter<"Model"> | string | null
 }
 
 export type ModelCreateWithoutAssetsInput = {
@@ -615,6 +646,7 @@ export type ModelCreateWithoutAssetsInput = {
   weight: number
   size: number
   is_colour?: boolean
+  name_normalized?: string | null
   asset_type: Prisma.AssetTypeCreateNestedOneWithoutModelsInput
   brand: Prisma.BrandCreateNestedOneWithoutModelsInput
 }
@@ -627,6 +659,7 @@ export type ModelUncheckedCreateWithoutAssetsInput = {
   is_colour?: boolean
   brand_id: number
   asset_type_id: number
+  name_normalized?: string | null
 }
 
 export type ModelCreateOrConnectWithoutAssetsInput = {
@@ -650,6 +683,7 @@ export type ModelUpdateWithoutAssetsInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_type?: Prisma.AssetTypeUpdateOneRequiredWithoutModelsNestedInput
   brand?: Prisma.BrandUpdateOneRequiredWithoutModelsNestedInput
 }
@@ -662,6 +696,7 @@ export type ModelUncheckedUpdateWithoutAssetsInput = {
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
   asset_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModelCreateWithoutBrandInput = {
@@ -669,6 +704,7 @@ export type ModelCreateWithoutBrandInput = {
   weight: number
   size: number
   is_colour?: boolean
+  name_normalized?: string | null
   asset_type: Prisma.AssetTypeCreateNestedOneWithoutModelsInput
   assets?: Prisma.AssetCreateNestedManyWithoutModelInput
 }
@@ -680,6 +716,7 @@ export type ModelUncheckedCreateWithoutBrandInput = {
   size: number
   is_colour?: boolean
   asset_type_id: number
+  name_normalized?: string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutModelInput
 }
 
@@ -716,6 +753,7 @@ export type ModelCreateManyAsset_typeInput = {
   size: number
   is_colour?: boolean
   brand_id: number
+  name_normalized?: string | null
 }
 
 export type ModelUpdateWithoutAsset_typeInput = {
@@ -723,6 +761,7 @@ export type ModelUpdateWithoutAsset_typeInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brand?: Prisma.BrandUpdateOneRequiredWithoutModelsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutModelNestedInput
 }
@@ -734,6 +773,7 @@ export type ModelUncheckedUpdateWithoutAsset_typeInput = {
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutModelNestedInput
 }
 
@@ -744,6 +784,7 @@ export type ModelUncheckedUpdateManyWithoutAsset_typeInput = {
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModelCreateManyBrandInput = {
@@ -753,6 +794,7 @@ export type ModelCreateManyBrandInput = {
   size: number
   is_colour?: boolean
   asset_type_id: number
+  name_normalized?: string | null
 }
 
 export type ModelUpdateWithoutBrandInput = {
@@ -760,6 +802,7 @@ export type ModelUpdateWithoutBrandInput = {
   weight?: Prisma.FloatFieldUpdateOperationsInput | number
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_type?: Prisma.AssetTypeUpdateOneRequiredWithoutModelsNestedInput
   assets?: Prisma.AssetUpdateManyWithoutModelNestedInput
 }
@@ -771,6 +814,7 @@ export type ModelUncheckedUpdateWithoutBrandInput = {
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   asset_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutModelNestedInput
 }
 
@@ -781,6 +825,7 @@ export type ModelUncheckedUpdateManyWithoutBrandInput = {
   size?: Prisma.FloatFieldUpdateOperationsInput | number
   is_colour?: Prisma.BoolFieldUpdateOperationsInput | boolean
   asset_type_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -822,6 +867,7 @@ export type ModelSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   is_colour?: boolean
   brand_id?: boolean
   asset_type_id?: boolean
+  name_normalized?: boolean
   asset_type?: boolean | Prisma.AssetTypeDefaultArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   assets?: boolean | Prisma.Model$assetsArgs<ExtArgs>
@@ -836,6 +882,7 @@ export type ModelSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_colour?: boolean
   brand_id?: boolean
   asset_type_id?: boolean
+  name_normalized?: boolean
   asset_type?: boolean | Prisma.AssetTypeDefaultArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["model"]>
@@ -848,6 +895,7 @@ export type ModelSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_colour?: boolean
   brand_id?: boolean
   asset_type_id?: boolean
+  name_normalized?: boolean
   asset_type?: boolean | Prisma.AssetTypeDefaultArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["model"]>
@@ -860,9 +908,10 @@ export type ModelSelectScalar = {
   is_colour?: boolean
   brand_id?: boolean
   asset_type_id?: boolean
+  name_normalized?: boolean
 }
 
-export type ModelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "weight" | "size" | "is_colour" | "brand_id" | "asset_type_id", ExtArgs["result"]["model"]>
+export type ModelOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "weight" | "size" | "is_colour" | "brand_id" | "asset_type_id" | "name_normalized", ExtArgs["result"]["model"]>
 export type ModelInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset_type?: boolean | Prisma.AssetTypeDefaultArgs<ExtArgs>
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
@@ -893,6 +942,7 @@ export type $ModelPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     is_colour: boolean
     brand_id: number
     asset_type_id: number
+    name_normalized: string | null
   }, ExtArgs["result"]["model"]>
   composites: {}
 }
@@ -1326,6 +1376,7 @@ export interface ModelFieldRefs {
   readonly is_colour: Prisma.FieldRef<"Model", 'Boolean'>
   readonly brand_id: Prisma.FieldRef<"Model", 'Int'>
   readonly asset_type_id: Prisma.FieldRef<"Model", 'Int'>
+  readonly name_normalized: Prisma.FieldRef<"Model", 'String'>
 }
     
 
