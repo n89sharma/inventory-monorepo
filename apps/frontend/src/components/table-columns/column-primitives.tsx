@@ -1,6 +1,11 @@
 import { Button } from '@/components/shadcn/button'
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { ArrowDownIcon, ArrowsDownUpIcon, ArrowUpIcon } from '@phosphor-icons/react'
+import {
+  ArrowDownIcon,
+  ArrowsDownUpIcon,
+  ArrowUpIcon,
+  PencilSimpleIcon,
+} from '@phosphor-icons/react'
 import type { ColumnDef, HeaderContext, SortDirection } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
@@ -131,4 +136,29 @@ export function sortableHeader<TData>(label: string) {
       onToggle={() => column.toggleSorting(column.getIsSorted() === 'asc')}
     />
   )
+}
+
+export function createEditColumn<TData>(
+  onEdit: (row: TData) => void,
+  ariaLabel: string,
+): ColumnDef<TData> {
+  return {
+    id: 'edit',
+    header: 'Edit',
+    enableSorting: false,
+    meta: { reorderable: false },
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <Button
+          variant="outline"
+          size="icon"
+          type="button"
+          aria-label={ariaLabel}
+          onClick={() => onEdit(row.original)}
+        >
+          <PencilSimpleIcon />
+        </Button>
+      </div>
+    ),
+  }
 }

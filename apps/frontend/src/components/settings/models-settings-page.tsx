@@ -1,13 +1,15 @@
 import { CreateModelModal } from '@/components/settings/create-model-modal'
-import { modelTableColumns } from '@/components/settings/model-table-columns'
+import { EditModelModal } from '@/components/settings/edit-model-modal'
+import { createModelTableColumns } from '@/components/settings/model-table-columns'
 import { SettingsListPage } from '@/components/settings/settings-list-page'
 import { Button } from '@/components/shadcn/button'
 import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filter'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
+import { useCan } from '@/hooks/use-can'
 import { useModels } from '@/hooks/use-model'
 import { PlusIcon } from '@phosphor-icons/react'
 import { getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { ModelSummary } from 'shared-types'
 
 const TABLE_LABEL = 'Models'
@@ -20,6 +22,14 @@ const MODEL_FACETED_ROW_MODELS = {
 
 export function ModelsSettingsPage(): React.JSX.Element {
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<ModelSummary | null>(null)
+
+  const canEdit = useCan('update_settings')
+  const handleEdit = useCallback((model: ModelSummary) => setEditTarget(model), [])
+  const columns = useMemo(
+    () => createModelTableColumns(canEdit ? handleEdit : undefined),
+    [canEdit, handleEdit],
+  )
 
   const models = useModels()
   const sortedModels = useMemo(
@@ -36,7 +46,7 @@ export function ModelsSettingsPage(): React.JSX.Element {
       <SettingsListPage
         title="Models"
         label={TABLE_LABEL}
-        columns={modelTableColumns}
+        columns={columns}
         data={sortedModels}
         defaultSort={MODEL_DEFAULT_SORT}
         facetedRowModels={MODEL_FACETED_ROW_MODELS}
@@ -73,6 +83,15 @@ export function ModelsSettingsPage(): React.JSX.Element {
       />
 
       <CreateModelModal open={isModelModalOpen} onOpenChange={setIsModelModalOpen} />
+      {editTarget && (
+        <EditModelModal
+          open={!!editTarget}
+          onOpenChange={(open) => {
+            if (!open) setEditTarget(null)
+          }}
+          model={editTarget}
+        />
+      )}
     </>
   )
 }
