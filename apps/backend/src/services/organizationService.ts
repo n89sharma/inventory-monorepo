@@ -1,8 +1,8 @@
-import type { CreateOrg, OrgSummary } from 'shared-types'
+import type { CreateOrg, OrgDetail } from 'shared-types'
 import { getOrganizations as getOrganizationsDb } from '../../generated/prisma/sql.js'
 import { prisma } from '../prisma.js'
 
-export async function listOrganizations(): Promise<OrgSummary[]> {
+export async function listOrganizations(): Promise<OrgDetail[]> {
   return prisma.$queryRawTyped(getOrganizationsDb())
 }
 

@@ -1,7 +1,7 @@
 import { getAssetsForSearchOnHand } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { resolveWarehouseScope, type AssetFilters } from '@/lib/filters/hooks'
-import type { AssetSearchRow, OrgSummary, User, Warehouse } from 'shared-types'
+import type { AssetSearchRow, OrgDetail, User, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
 export type SearchOnHandFilters = AssetFilters & {
@@ -9,7 +9,7 @@ export type SearchOnHandFilters = AssetFilters & {
   priceCheck: boolean
   heldBy: User | null
   heldFor: User | null
-  holdCustomer: OrgSummary | null
+  holdCustomer: OrgDetail | null
 }
 
 const SEARCH_ONHAND_KEY = 'search-onhand-assets'

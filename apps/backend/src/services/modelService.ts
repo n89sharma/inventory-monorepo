@@ -37,6 +37,7 @@ export async function getModelSummary(modelId: number): Promise<ModelSummary> {
     brand_id: model.brand_id,
     brand_name: brand.name,
     model_name: model.name,
+    asset_type_id: model.asset_type_id,
     asset_type: assetType.asset_type,
     weight: model.weight,
     size: model.size,

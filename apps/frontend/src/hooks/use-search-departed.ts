@@ -8,7 +8,7 @@ import {
   resolveWarehouseScope,
   type AssetFilters,
 } from '@/lib/filters/hooks'
-import type { AssetSearchRow, OrgSummary, User, Warehouse } from 'shared-types'
+import type { AssetSearchRow, OrgDetail, User, Warehouse } from 'shared-types'
 import useSWR from 'swr'
 
 export type SearchDepartedFilters = AssetFilters & {
@@ -16,7 +16,7 @@ export type SearchDepartedFilters = AssetFilters & {
   showOther: boolean
   fromDate: Date
   toDate: Date
-  customer: OrgSummary | null
+  customer: OrgDetail | null
   salesperson: User | null
   invoiceReference: string
 }

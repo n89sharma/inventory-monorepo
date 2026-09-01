@@ -234,6 +234,7 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
       brand_id: canon.id,
       brand_name: canon.name,
       model_name: iradx4745i.name,
+      asset_type_id: copier.id,
       asset_type: copier.asset_type,
       weight: iradx4745i.weight,
       size: iradx4745i.size,

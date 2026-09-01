@@ -1,7 +1,7 @@
 import { SearchSelectInput } from '@/components/shared/search-select/search-select-input'
 import { useOrgs } from '@/hooks/use-org'
 import { useState } from 'react'
-import type { OrgSummary } from 'shared-types'
+import type { OrgDetail } from 'shared-types'
 
 const DEFAULT_PLACEHOLDER = 'Customer'
 const DEFAULT_CLEAR_LABEL = 'Clear customer'
@@ -13,8 +13,8 @@ export function CustomerFilter({
   placeholder = DEFAULT_PLACEHOLDER,
   clearLabel = DEFAULT_CLEAR_LABEL,
 }: {
-  selection: OrgSummary | null
-  onSelectionChange: (customer: OrgSummary) => void
+  selection: OrgDetail | null
+  onSelectionChange: (customer: OrgDetail) => void
   onClear: () => void
   placeholder?: string
   clearLabel?: string

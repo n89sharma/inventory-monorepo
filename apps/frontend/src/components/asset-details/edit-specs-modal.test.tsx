@@ -53,6 +53,7 @@ const COLOUR_CANON: ModelSummary = {
   brand_id: 1,
   brand_name: 'CANON',
   model_name: 'IRADXC3835I',
+  asset_type_id: 1,
   asset_type: 'COPIER',
   weight: 1,
   size: 1,

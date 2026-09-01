@@ -34,7 +34,7 @@ import {
   type Brand,
   type Component,
   type ModelSummary,
-  type OrgSummary,
+  type OrgDetail,
   type Status,
   type User,
   type Warehouse,
@@ -238,17 +238,17 @@ export function useInternalFinisherParam(): [Component | null, (next: Component 
   return useIdParam('fin', components)
 }
 
-export function useCustomerParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
+export function useCustomerParam(): [OrgDetail | null, (next: OrgDetail | null) => void] {
   const organizations = useOrgs()
   return useIdParam('customer', organizations)
 }
 
-export function useHoldCustomerParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
+export function useHoldCustomerParam(): [OrgDetail | null, (next: OrgDetail | null) => void] {
   const organizations = useOrgs()
   return useIdParam('holdcustomer', organizations)
 }
 
-export function useVendorParam(): [OrgSummary | null, (next: OrgSummary | null) => void] {
+export function useVendorParam(): [OrgDetail | null, (next: OrgDetail | null) => void] {
   const organizations = useOrgs()
   return useIdParam('vendor', organizations)
 }
@@ -285,16 +285,16 @@ export function useDestinationOptionParam(): [
 }
 
 export function useVendorOptionParam(): [
-  SelectOption<OrgSummary>,
-  (next: SelectOption<OrgSummary>) => void,
+  SelectOption<OrgDetail>,
+  (next: SelectOption<OrgDetail>) => void,
 ] {
   const organizations = useOrgs()
   return useSelectOptionIdParam('vendor', organizations)
 }
 
 export function useCustomerOptionParam(): [
-  SelectOption<OrgSummary>,
-  (next: SelectOption<OrgSummary>) => void,
+  SelectOption<OrgDetail>,
+  (next: SelectOption<OrgDetail>) => void,
 ] {
   const organizations = useOrgs()
   return useSelectOptionIdParam('customer', organizations)

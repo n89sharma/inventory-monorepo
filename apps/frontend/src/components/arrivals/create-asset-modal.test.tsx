@@ -49,6 +49,7 @@ const MODEL: ModelSummary = {
   brand_id: 1,
   brand_name: 'CANON',
   model_name: 'PALLET',
+  asset_type_id: 1,
   asset_type: 'WAREHOUSE_SUPPLIES',
   weight: 0,
   size: 0,
