@@ -1,12 +1,11 @@
-import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { locationTableColumns } from '@/components/settings/location-table-columns'
+import { SettingsListPage } from '@/components/settings/settings-list-page'
 import { Button } from '@/components/shadcn/button'
-import { DataGrid } from '@/components/shared/data-table'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
+import { PendingIcon } from '@/components/shared/pending-icon'
 import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { printLocationBarcodes } from '@/data/api/location-api'
 import { useLocations } from '@/hooks/use-locations'
-import { PendingIcon } from '@/components/shared/pending-icon'
 import { BarcodeIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -52,9 +51,17 @@ export function LocationsSettingsPage(): React.JSX.Element {
   }
 
   return (
-    <GridPageContent>
-      <PageSection className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Locations</h1>
+    <SettingsListPage
+      title="Locations"
+      label={TABLE_LABEL}
+      columns={columns}
+      data={locations}
+      getRowId={getLocationRowId}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      pinLeft={LOCATION_PIN_LEFT}
+      defaultSort={LOCATION_DEFAULT_SORT}
+      actions={
         <Button
           variant="outline"
           size="icon"
@@ -66,43 +73,32 @@ export function LocationsSettingsPage(): React.JSX.Element {
             <BarcodeIcon />
           </PendingIcon>
         </Button>
-      </PageSection>
-
-      <DataGrid
-        label={TABLE_LABEL}
-        columns={columns}
-        data={locations}
-        getRowId={getLocationRowId}
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        pinLeft={LOCATION_PIN_LEFT}
-        defaultSort={LOCATION_DEFAULT_SORT}
-        renderTableFilter={(table) => (
-          <>
-            <ColumnTextFilter
-              table={table}
-              columnId="warehouse_code"
-              placeholder="Warehouse"
-              clearLabel="Clear warehouse"
-              className="w-50"
-            />
-            <ColumnTextFilter
-              table={table}
-              columnId="zone"
-              placeholder="Zone"
-              clearLabel="Clear zone"
-              className="w-50"
-            />
-            <ColumnTextFilter
-              table={table}
-              columnId="bin"
-              placeholder="Bin"
-              clearLabel="Clear bin"
-              className="w-50"
-            />
-          </>
-        )}
-      />
-    </GridPageContent>
+      }
+      renderTableFilter={(table) => (
+        <>
+          <ColumnTextFilter
+            table={table}
+            columnId="warehouse_code"
+            placeholder="Warehouse"
+            clearLabel="Clear warehouse"
+            className="w-50"
+          />
+          <ColumnTextFilter
+            table={table}
+            columnId="zone"
+            placeholder="Zone"
+            clearLabel="Clear zone"
+            className="w-50"
+          />
+          <ColumnTextFilter
+            table={table}
+            columnId="bin"
+            placeholder="Bin"
+            clearLabel="Clear bin"
+            className="w-50"
+          />
+        </>
+      )}
+    />
   )
 }
