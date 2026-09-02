@@ -45,6 +45,11 @@ function headerLabel(column: ColumnDef<AssetSearchRow>): string {
   return ''
 }
 
+function csvHeaderLabel(column: ColumnDef<AssetSearchRow>): string {
+  const definition = ASSET_SEARCH_COLUMNS.find((c) => c.id === columnId(column))
+  return definition?.csvHeader ?? headerLabel(column)
+}
+
 function liveColumnIds(): string[] {
   return createSearchPageColumns(noHref, allowsEverything).map(columnId)
 }
@@ -145,7 +150,7 @@ describe('asset-search report columns', () => {
   it('exports one CSV column per live table column, in table order', () => {
     const liveColumns = createSearchPageColumns(noHref, allowsEverything)
     const { header } = csvFor(makeRow(), liveColumns.map(columnId))
-    expect(header.split(',')).toEqual(liveColumns.map(headerLabel))
+    expect(header.split(',')).toEqual(liveColumns.map(csvHeaderLabel))
   })
 
   it('exports the always-visible columns even when the viewer chose none', () => {
@@ -157,7 +162,7 @@ describe('asset-search report columns', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
-        'Country of Origin,Total Meter,Weight,Size,Days Held,Cassettes,Internal Finisher,' +
+        'Country of Origin,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
         'Purchase Cost,Transport Cost,Processing Cost,Total Cost,Sale Price,Gross Margin,' +
@@ -166,17 +171,34 @@ describe('asset-search report columns', () => {
     )
   })
 
-  it('runs every column value through its display formatter', () => {
+  it("writes each column's CSV text", () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
-        'Japan,12 K,"1,234 lbs",5,26,2,FIN-1,' +
+        'Japan,12,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
         'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
         '"$1,234.00",$200.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
         '48.9%,H-1,Alice,Bob,ACME_CORP,"July 01, 2026",' +
         '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
     )
+  })
+
+  it('exports the meter in thousands, with the unit moved to the CSV header', () => {
+    const meterColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'specs_meter_total')
+    const meterText = (meter: number | null) =>
+      meterColumn?.text(makeRow({ specs_meter_total: meter }))
+    expect(meterColumn?.label).toBe('Total Meter')
+    expect(meterColumn?.csvHeader).toBe('Total Meter (K)')
+    expect(meterColumn?.cell?.(makeRow({ specs_meter_total: 12000 }), { detailHref: noHref })).toBe(
+      '12 K',
+    )
+    expect(meterText(12000)).toBe('12')
+    expect(meterText(12500)).toBe('12.5')
+    expect(meterText(1234)).toBe('1.2')
+    expect(meterText(900)).toBe('0.9')
+    expect(meterText(0)).toBe('0')
+    expect(meterText(null)).toBe('')
   })
 
   it('emits an empty field for every nullable column left null', () => {

@@ -2,6 +2,8 @@ import { format } from 'date-fns'
 import type { AssetLocationDetails } from 'shared-types'
 
 const BIN_ZONE = 'BIN'
+const THOUSAND = 1000
+const THOUSANDS_FRACTION_DIGITS = 1
 const IN_TRANSIT_LOCATION_LABEL = 'In transit'
 
 export function formatLocation(location: AssetLocationDetails | null, isInTransit = false): string {
@@ -20,8 +22,13 @@ export function formatWeight(value: number): string {
 
 export function formatThousandsK(value: number | null): string {
   if (value === null || value === undefined || Number.isNaN(value)) return ''
-  if (value < 1000) return value.toString()
-  return (value / 1000).toFixed(0) + ' K'
+  if (value < THOUSAND) return value.toString()
+  return (value / THOUSAND).toFixed(0) + ' K'
+}
+
+export function formatThousands(value: number | null): string {
+  if (value === null) return ''
+  return Number((value / THOUSAND).toFixed(THOUSANDS_FRACTION_DIGITS)).toString()
 }
 
 export function formatUSD(value: number | null): string {

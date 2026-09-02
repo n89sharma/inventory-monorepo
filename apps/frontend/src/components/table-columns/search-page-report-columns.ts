@@ -4,7 +4,7 @@ import { orderedVisibleColumns } from './asset-search-columns'
 
 export function searchPageRowsToCsv(rows: AssetSearchRow[], visibleColumns: Set<string>): string {
   const columns = orderedVisibleColumns(visibleColumns).map((c) => ({
-    header: c.label,
+    header: c.csvHeader ?? c.label,
     value: c.text,
   }))
   return toCsv(columns, rows)

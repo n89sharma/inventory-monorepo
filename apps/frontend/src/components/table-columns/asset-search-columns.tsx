@@ -6,6 +6,7 @@ import {
   formatDate,
   formatLocation,
   formatMarginPercent,
+  formatThousands,
   formatThousandsK,
   formatTitleCase,
   formatUSDWithSymbol,
@@ -90,7 +91,9 @@ export type AssetSearchColumn = {
   readonly accessor?: (row: AssetSearchRow) => unknown
   // The column's string form: the CSV field, and the table cell when `cell` is absent.
   readonly text: (row: AssetSearchRow) => string
-  // Display override when the cell is not plain text.
+  // CSV header override, for a field whose exported form carries a unit the label omits.
+  readonly csvHeader?: string
+  // Display override when the cell differs from the CSV field.
   readonly cell?: (row: AssetSearchRow, context: AssetCellContext) => ReactNode
 }
 
@@ -246,7 +249,9 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Total Meter',
     section: 'general_specs',
     sortable: true,
-    text: (a) => formatThousandsK(a.specs_meter_total),
+    csvHeader: 'Total Meter (K)',
+    cell: (a) => formatThousandsK(a.specs_meter_total),
+    text: (a) => formatThousands(a.specs_meter_total),
   },
   {
     id: 'weight',
