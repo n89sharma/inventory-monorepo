@@ -41,6 +41,8 @@ import {
 } from 'shared-types'
 
 const MIN_MODEL_INPUT_QUERY_LENGTH = 3
+const toCommittedQuery = (text: string): string =>
+  text.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? text : ''
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
 
 export type PriceHistoryRange = 6 | 12
@@ -66,21 +68,31 @@ function resolveMany<T extends { id: number }>(ids: number[], list: T[]): T[] {
   return ids.map((id) => byId.get(id)).filter((item): item is T => item !== undefined)
 }
 
+function identity<T>(value: T): T {
+  return value
+}
+
 // Local draft that updates immediately for a responsive UI while the committed
 // value (the URL, which keys SWR) is written on a trailing debounce. Re-syncs the
 // draft when the committed value changes externally (nav, saved view, back button).
+// `toCommittedValue` describes what the draft commits to when the mapping is lossy
+// — a model query below the minimum length commits as empty — so the resulting URL
+// write is recognised as this hook's own echo and does not wipe what the user typed.
+// `resetDraft` drops any pending commit and sets the draft outright, for callers that
+// write the committed value themselves and cannot rely on it changing.
 function useDebouncedParam<T>(
   committed: T,
   commit: (value: T) => void,
+  toCommittedValue: (draft: T) => T = identity,
   delayMs: number = DEFAULT_FILTER_DEBOUNCE_MS,
-): [T, (value: T) => void, () => void] {
+): [T, (value: T) => void, (value: T) => void] {
   const [draft, setDraft] = useState(committed)
   const [prevCommitted, setPrevCommitted] = useState(committed)
   const timerRef = useRef<number | null>(null)
 
   if (committed !== prevCommitted) {
     setPrevCommitted(committed)
-    setDraft(committed)
+    if (committed !== toCommittedValue(draft)) setDraft(committed)
   }
 
   const cancel = useCallback(() => {
@@ -104,7 +116,15 @@ function useDebouncedParam<T>(
     [commit, delayMs],
   )
 
-  return [draft, setValue, cancel]
+  const resetDraft = useCallback(
+    (value: T) => {
+      cancel()
+      setDraft(value)
+    },
+    [cancel],
+  )
+
+  return [draft, setValue, resetDraft]
 }
 
 function useIdListParam<T extends { id: number }>(
@@ -202,7 +222,7 @@ export function useAssetFilters(): AssetFilters {
       brand,
       assetTypes,
       model,
-      modelQuery: modelQuery.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? modelQuery : null,
+      modelQuery: toCommittedQuery(modelQuery) || null,
       readinesses,
       meterMin: min,
       meterMax: max,
@@ -338,25 +358,26 @@ export function useModelParam(): {
   const committedQuery = model ? '' : (q ?? '')
   const commitQuery = useCallback(
     (text: string) => {
-      void setModelState({
-        model: null,
-        q: text.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? text : null,
-      })
+      void setModelState({ model: null, q: toCommittedQuery(text) || null })
     },
     [setModelState],
   )
-  const [modelQuery, setModelQuery, cancelQuery] = useDebouncedParam(committedQuery, commitQuery)
+  const [modelQuery, setModelQuery, resetQuery] = useDebouncedParam(
+    committedQuery,
+    commitQuery,
+    toCommittedQuery,
+  )
   const setModel = useCallback(
     (next: ModelSummary | null) => {
-      cancelQuery()
+      resetQuery('')
       void setModelState({ model: next?.id ?? null, q: null })
     },
-    [cancelQuery, setModelState],
+    [resetQuery, setModelState],
   )
   const clear = useCallback(() => {
-    cancelQuery()
+    resetQuery('')
     void setModelState({ model: null, q: null })
-  }, [cancelQuery, setModelState])
+  }, [resetQuery, setModelState])
   return { model, modelQuery, setModel, setModelQuery, clear }
 }
 
