@@ -113,9 +113,9 @@ const SEARCH_ASSETS_SUB_ITEMS = [
 const DATE_RANGE_ITEM_URLS = ['/arrivals', '/holds', '/transfers', '/departures', '/invoices']
 
 const SETTINGS_SUB_ITEMS = [
-  { title: 'Model', url: '/settings/models' },
-  { title: 'Brand', url: '/settings/brands' },
-  { title: 'Organization', url: '/settings/organizations' },
+  { title: 'Models', url: '/settings/models' },
+  { title: 'Brands', url: '/settings/brands' },
+  { title: 'Organizations', url: '/settings/organizations' },
   { title: 'Locations', url: '/settings/locations' },
   { title: 'Export Assets', url: '/settings/export-assets' },
 ]
