@@ -1,4 +1,5 @@
 import { OrgFormFields } from '@/components/settings/org-form-fields'
+import { toOrgFormValues } from '@/ui-types/org-form-types'
 import { useOrgMutations } from '@/hooks/use-org-mutations'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -18,26 +19,11 @@ interface EditOrgModalProps {
   org: OrgDetail
 }
 
-function toFormValues(org: OrgDetail): OrgForm {
-  return {
-    account_number: org.account_number,
-    name: org.name,
-    contact_name: org.contact_name,
-    phone: org.phone,
-    mobile: org.mobile,
-    primary_email: org.primary_email,
-    address: org.address,
-    city: org.city,
-    province: org.province,
-    country: org.country,
-  }
-}
-
 export function EditOrgModal({ open, onOpenChange, org }: EditOrgModalProps): React.JSX.Element {
   const { updateOrg } = useOrgMutations()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const values = useMemo(() => toFormValues(org), [org])
+  const values = useMemo(() => toOrgFormValues(org), [org])
   const form = useForm<OrgForm>({ resolver: zodResolver(OrgFormSchema), values })
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())

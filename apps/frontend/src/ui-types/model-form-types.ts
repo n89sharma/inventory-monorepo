@@ -1,7 +1,13 @@
-import type { AssetType, Brand } from 'shared-types'
+import type { AssetType, Brand, ModelSummary } from 'shared-types'
 import { BrandSchema } from 'shared-types'
 import z from 'zod'
-import { AssetTypeSelectOptionSchema, isSelected, type SelectOption } from './select-option-types'
+import {
+  AssetTypeSelectOptionSchema,
+  getSelectOption,
+  isSelected,
+  UNSELECTED,
+  type SelectOption,
+} from './select-option-types'
 
 export const ModelFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -19,4 +25,22 @@ export type ModelForm = {
   brand: Brand | null
   assetType: SelectOption<AssetType>
   is_colour: boolean
+}
+
+// asset_type_id is what makes this prefill possible: matching on the display string would break
+// as soon as either side stops normalising the casing.
+export function toModelFormValues(
+  model: ModelSummary,
+  brands: Brand[],
+  assetTypes: AssetType[],
+): ModelForm {
+  const assetType = assetTypes.find((type) => type.id === model.asset_type_id)
+  return {
+    name: model.model_name,
+    weight: model.weight,
+    size: model.size,
+    brand: brands.find((brand) => brand.id === model.brand_id) ?? null,
+    assetType: assetType ? getSelectOption(assetType) : UNSELECTED,
+    is_colour: model.is_colour,
+  }
 }

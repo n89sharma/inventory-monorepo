@@ -1,3 +1,4 @@
+import type { OrgDetail } from 'shared-types'
 import z from 'zod'
 
 export const OrgFormSchema = z.object({
@@ -14,3 +15,18 @@ export const OrgFormSchema = z.object({
 })
 
 export type OrgForm = z.infer<typeof OrgFormSchema>
+
+export function toOrgFormValues(org: OrgDetail): OrgForm {
+  return {
+    account_number: org.account_number,
+    name: org.name,
+    contact_name: org.contact_name,
+    phone: org.phone,
+    mobile: org.mobile,
+    primary_email: org.primary_email,
+    address: org.address,
+    city: org.city,
+    province: org.province,
+    country: org.country,
+  }
+}

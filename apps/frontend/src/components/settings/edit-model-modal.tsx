@@ -1,14 +1,14 @@
 import { ModelFormFields } from '@/components/settings/model-form-fields'
+import { toModelFormValues } from '@/ui-types/model-form-types'
 import { useModelMutations } from '@/hooks/use-model-mutations'
 import { useAssetTypes, useBrands } from '@/hooks/use-reference-data'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
 import { ModelFormSchema, type ModelForm } from '@/ui-types/model-form-types'
-import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo, useState } from 'react'
 import { useForm, type FieldErrors } from 'react-hook-form'
-import type { AssetType, Brand, ModelSummary } from 'shared-types'
+import type { ModelSummary } from 'shared-types'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -18,20 +18,6 @@ interface EditModelModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   model: ModelSummary
-}
-
-// asset_type_id is what makes this prefill possible: matching on the display string would break
-// as soon as either side stops normalising the casing.
-function toFormValues(model: ModelSummary, brands: Brand[], assetTypes: AssetType[]): ModelForm {
-  const assetType = assetTypes.find((type) => type.id === model.asset_type_id)
-  return {
-    name: model.model_name,
-    weight: model.weight,
-    size: model.size,
-    brand: brands.find((brand) => brand.id === model.brand_id) ?? null,
-    assetType: assetType ? getSelectOption(assetType) : UNSELECTED,
-    is_colour: model.is_colour,
-  }
 }
 
 export function EditModelModal({
@@ -44,7 +30,10 @@ export function EditModelModal({
   const assetTypes = useAssetTypes()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const values = useMemo(() => toFormValues(model, brands, assetTypes), [model, brands, assetTypes])
+  const values = useMemo(
+    () => toModelFormValues(model, brands, assetTypes),
+    [model, brands, assetTypes],
+  )
   const form = useForm<ModelForm>({ resolver: zodResolver(ModelFormSchema), values })
 
   const guard = useUnsavedChangesGuard(form.formState.isDirty, onOpenChange, () => form.reset())

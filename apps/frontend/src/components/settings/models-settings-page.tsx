@@ -1,4 +1,5 @@
 import { CreateModelModal } from '@/components/settings/create-model-modal'
+import { MergeModelModal } from '@/components/settings/merge-model-modal'
 import { EditModelModal } from '@/components/settings/edit-model-modal'
 import { createModelTableColumns } from '@/components/settings/model-table-columns'
 import { SettingsListPage } from '@/components/settings/settings-list-page'
@@ -7,14 +8,18 @@ import { ColumnFacetFilter } from '@/components/shared/filters/column-facet-filt
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
 import { useCan } from '@/hooks/use-can'
 import { useModels } from '@/hooks/use-model'
-import { PlusIcon } from '@phosphor-icons/react'
+import { ArrowsMergeIcon, PlusIcon } from '@phosphor-icons/react'
 import { getFacetedRowModel, getFacetedUniqueValues } from '@tanstack/react-table'
+import { createSelectColumn } from '@/components/table-columns/column-primitives'
 import { useCallback, useMemo, useState } from 'react'
+import type { RowSelectionState } from '@tanstack/react-table'
 import type { ModelSummary } from 'shared-types'
 
 const TABLE_LABEL = 'Models'
 
 const MODEL_DEFAULT_SORT = { id: 'brand_name', desc: false }
+const MODEL_PIN_LEFT = ['select']
+const getModelRowId = (model: ModelSummary) => String(model.id)
 const MODEL_FACETED_ROW_MODELS = {
   getFacetedRowModel: getFacetedRowModel<ModelSummary>(),
   getFacetedUniqueValues: getFacetedUniqueValues<ModelSummary>(),
@@ -23,11 +28,16 @@ const MODEL_FACETED_ROW_MODELS = {
 export function ModelsSettingsPage(): React.JSX.Element {
   const [isModelModalOpen, setIsModelModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<ModelSummary | null>(null)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState(false)
 
   const canEdit = useCan('update_settings')
   const handleEdit = useCallback((model: ModelSummary) => setEditTarget(model), [])
   const columns = useMemo(
-    () => createModelTableColumns(canEdit ? handleEdit : undefined),
+    () => [
+      createSelectColumn<ModelSummary>(),
+      ...createModelTableColumns(canEdit ? handleEdit : undefined),
+    ],
     [canEdit, handleEdit],
   )
 
@@ -41,6 +51,11 @@ export function ModelsSettingsPage(): React.JSX.Element {
     [models],
   )
 
+  const selectedModels = useMemo(
+    () => models.filter((model) => rowSelection[String(model.id)]),
+    [models, rowSelection],
+  )
+
   return (
     <>
       <SettingsListPage
@@ -50,10 +65,23 @@ export function ModelsSettingsPage(): React.JSX.Element {
         data={sortedModels}
         defaultSort={MODEL_DEFAULT_SORT}
         facetedRowModels={MODEL_FACETED_ROW_MODELS}
+        getRowId={getModelRowId}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        pinLeft={MODEL_PIN_LEFT}
         actions={
-          <Button onClick={() => setIsModelModalOpen(true)}>
-            <PlusIcon /> Add Model
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsMergeModalOpen(true)}
+              disabled={selectedModels.length < 2}
+            >
+              <ArrowsMergeIcon /> Merge
+            </Button>
+            <Button onClick={() => setIsModelModalOpen(true)}>
+              <PlusIcon /> Add Model
+            </Button>
+          </div>
         }
         renderTableFilter={(table) => (
           <>
@@ -83,6 +111,14 @@ export function ModelsSettingsPage(): React.JSX.Element {
       />
 
       <CreateModelModal open={isModelModalOpen} onOpenChange={setIsModelModalOpen} />
+      {isMergeModalOpen && (
+        <MergeModelModal
+          open={isMergeModalOpen}
+          onOpenChange={setIsMergeModalOpen}
+          models={selectedModels}
+          onMerged={() => setRowSelection({})}
+        />
+      )}
       {editTarget && (
         <EditModelModal
           open={!!editTarget}
