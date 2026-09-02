@@ -2,6 +2,7 @@ import { useAssetStore } from '@/data/store/asset-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
 import {
+  ArrowUUpLeftIcon,
   BarcodeIcon,
   DotsThreeVerticalIcon,
   MapPinIcon,
@@ -9,11 +10,13 @@ import {
   PrinterIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { useState } from 'react'
 import { assetDetailsToSummary, type Permission } from 'shared-types'
 import { toast } from 'sonner'
 import { AddToCollectionModal } from '../collections/add-to-collection-modal'
+import { ReturnToStockDialog } from '../departure/return-to-stock-dialog'
 import { Button } from '../shadcn/button'
 import {
   DropdownMenu,
@@ -40,7 +43,9 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
+  const [returnToStockOpen, setReturnToStockOpen] = useState(false)
 
+  const mutations = useDepartureMutations()
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
   const deleteAsset = useAssetStore((state) => state.deleteAsset)
   const [printLoading, setPrintLoading] = useState(false)
@@ -65,9 +70,19 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     }
   }
 
+  const departureNumber = assetDetails?.departure?.departure_number ?? null
+
+  function handleReturnToStock() {
+    if (!assetDetails || departureNumber === null) return
+    mutations.returnToStock(departureNumber, [
+      { id: assetDetails.id, barcode: assetDetails.barcode },
+    ])
+  }
+
   const canEditLocation = can('update_location')
   const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p))
   const canDelete = can('delete_asset')
+  const showReturnToStock = can('return_to_stock') && departureNumber !== null
 
   return (
     <div className="flex gap-2 print:hidden">
@@ -102,7 +117,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           Collection
         </Button>
       )}
-      {canDelete && (
+      {(showReturnToStock || canDelete) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -110,10 +125,18 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-              <TrashIcon />
-              Delete
-            </DropdownMenuItem>
+            {showReturnToStock && (
+              <DropdownMenuItem onSelect={() => setReturnToStockOpen(true)}>
+                <ArrowUUpLeftIcon />
+                Return to Stock
+              </DropdownMenuItem>
+            )}
+            {canDelete && (
+              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                <TrashIcon />
+                Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -129,6 +152,13 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         onOpenChange={setAddToCollectionOpen}
         selectedAssets={assetSummaries ? [assetSummaries] : []}
         onConfirmSuccess={() => {}}
+      />
+
+      <ReturnToStockDialog
+        assetCount={1}
+        open={returnToStockOpen}
+        onOpenChange={setReturnToStockOpen}
+        onConfirm={handleReturnToStock}
       />
 
       <DeleteEntityDialog

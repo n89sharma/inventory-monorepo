@@ -95,7 +95,7 @@ async function setOutgoingStatus(
   invalidateDepartureLists()
 }
 
-async function returnToStock(departureNumber: string, assets: AssetSearchRow[]) {
+async function returnToStock(departureNumber: string, assets: { id: number; barcode: string }[]) {
   if (assets.length === 0) return
   await returnDepartureAssetsToStock(
     departureNumber,

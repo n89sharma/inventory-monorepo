@@ -1,6 +1,5 @@
-import { AlertDialogDescription } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
-import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog'
+import { ReturnToStockDialog } from '@/components/departure/return-to-stock-dialog'
 import { useCan } from '@/hooks/use-can'
 import { ArrowUUpLeftIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -24,21 +23,12 @@ export function ReturnToStockAction({
         <ArrowUUpLeftIcon />
         Return to Stock
       </Button>
-      <ConfirmActionDialog
+      <ReturnToStockDialog
+        assetCount={assetCount}
         open={open}
         onOpenChange={setOpen}
-        title={`Return ${assetCount} asset${assetCount !== 1 ? 's' : ''} to stock?`}
-        confirmLabel="Return to Stock"
-        confirmVariant="destructive"
-        icon={<ArrowUUpLeftIcon />}
         onConfirm={onConfirm}
-      >
-        <AlertDialogDescription>
-          The status changes to In Stock.{' '}
-          {assetCount === 1 ? 'The asset leaves' : 'The assets leave'} this departure and any sales
-          invoice, and the sale price is cleared. This cannot be undone.
-        </AlertDialogDescription>
-      </ConfirmActionDialog>
+      />
     </>
   )
 }
