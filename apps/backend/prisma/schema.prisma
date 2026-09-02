@@ -576,7 +576,7 @@ model SavedView {
 
 model Organization {
   id              Int     @id @default(autoincrement())
-  account_number  String  @unique @db.VarChar(50)
+  account_number  String? @unique @db.VarChar(50)
   name            String  @db.Text
   contact_name    String? @db.Text
   phone           String? @db.Text

@@ -1,7 +1,7 @@
 import z from 'zod'
 
 export const OrgFormSchema = z.object({
-  account_number: z.string().min(1, 'Account number is required'),
+  account_number: z.string().nullable(),
   name: z.string().min(1, 'Name is required'),
   contact_name: z.string().nullable(),
   phone: z.string().nullable(),

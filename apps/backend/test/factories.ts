@@ -205,7 +205,11 @@ export async function seedArrivalTestData(): Promise<ArrivalTestData> {
     update: {},
   })
 
-  const toOrgSummary = (o: { id: number; account_number: string; name: string }): OrgSummary => ({
+  const toOrgSummary = (o: {
+    id: number
+    account_number: string | null
+    name: string
+  }): OrgSummary => ({
     id: o.id,
     account_number: o.account_number,
     name: o.name,

@@ -19,7 +19,7 @@ export async function getOrgs(): Promise<OrgDetail[]> {
 
 export async function createOrg(form: OrgForm): Promise<{ id: number }> {
   const createOrgBody = CreateOrgSchema.parse({
-    account_number: form.account_number,
+    account_number: form.account_number || null,
     name: form.name,
     contact_name: form.contact_name || null,
     phone: form.phone || null,
@@ -36,7 +36,7 @@ export async function createOrg(form: OrgForm): Promise<{ id: number }> {
 
 export async function updateOrg(id: number, form: OrgForm): Promise<void> {
   const updateOrgBody = UpdateOrgSchema.parse({
-    account_number: form.account_number,
+    account_number: form.account_number || null,
     name: form.name,
     contact_name: form.contact_name || null,
     phone: form.phone || null,

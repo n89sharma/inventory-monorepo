@@ -77,7 +77,6 @@ export function EditOrgModal({ open, onOpenChange, org }: EditOrgModalProps): Re
               control={form.control}
               name="account_number"
               fieldLabel="Account Number"
-              fieldRequired={true}
               inputType="string"
             />
 

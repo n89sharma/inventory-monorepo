@@ -10,6 +10,7 @@ export function createOrgTableColumns(
       accessorKey: 'account_number',
       filterFn: 'includesString',
       header: sortableHeader<OrgDetail>('Account Number'),
+      cell: ({ row }) => row.original.account_number ?? '',
     },
     {
       accessorKey: 'name',

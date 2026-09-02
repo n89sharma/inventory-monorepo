@@ -241,7 +241,7 @@ export type OrganizationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type OrganizationGroupByOutputType = {
   id: number
-  account_number: string
+  account_number: string | null
   name: string
   contact_name: string | null
   phone: string | null
@@ -282,7 +282,7 @@ export type OrganizationWhereInput = {
   OR?: Prisma.OrganizationWhereInput[]
   NOT?: Prisma.OrganizationWhereInput | Prisma.OrganizationWhereInput[]
   id?: Prisma.IntFilter<"Organization"> | number
-  account_number?: Prisma.StringFilter<"Organization"> | string
+  account_number?: Prisma.StringNullableFilter<"Organization"> | string | null
   name?: Prisma.StringFilter<"Organization"> | string
   contact_name?: Prisma.StringNullableFilter<"Organization"> | string | null
   phone?: Prisma.StringNullableFilter<"Organization"> | string | null
@@ -307,7 +307,7 @@ export type OrganizationWhereInput = {
 
 export type OrganizationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  account_number?: Prisma.SortOrder
+  account_number?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   contact_name?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -360,7 +360,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
 
 export type OrganizationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  account_number?: Prisma.SortOrder
+  account_number?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   contact_name?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -386,7 +386,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   OR?: Prisma.OrganizationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.OrganizationScalarWhereWithAggregatesInput | Prisma.OrganizationScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Organization"> | number
-  account_number?: Prisma.StringWithAggregatesFilter<"Organization"> | string
+  account_number?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   contact_name?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Organization"> | string | null
@@ -403,7 +403,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
 }
 
 export type OrganizationCreateInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -428,7 +428,7 @@ export type OrganizationCreateInput = {
 
 export type OrganizationUncheckedCreateInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -452,7 +452,7 @@ export type OrganizationUncheckedCreateInput = {
 }
 
 export type OrganizationUpdateInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -477,7 +477,7 @@ export type OrganizationUpdateInput = {
 
 export type OrganizationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -502,7 +502,7 @@ export type OrganizationUncheckedUpdateInput = {
 
 export type OrganizationCreateManyInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -519,7 +519,7 @@ export type OrganizationCreateManyInput = {
 }
 
 export type OrganizationUpdateManyMutationInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -537,7 +537,7 @@ export type OrganizationUpdateManyMutationInput = {
 
 export type OrganizationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -719,7 +719,7 @@ export type OrganizationUpdateOneRequiredWithoutInvoicesNestedInput = {
 }
 
 export type OrganizationCreateWithoutTransfersInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -743,7 +743,7 @@ export type OrganizationCreateWithoutTransfersInput = {
 
 export type OrganizationUncheckedCreateWithoutTransfersInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -782,7 +782,7 @@ export type OrganizationUpdateToOneWithWhereWithoutTransfersInput = {
 }
 
 export type OrganizationUpdateWithoutTransfersInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -806,7 +806,7 @@ export type OrganizationUpdateWithoutTransfersInput = {
 
 export type OrganizationUncheckedUpdateWithoutTransfersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -829,7 +829,7 @@ export type OrganizationUncheckedUpdateWithoutTransfersInput = {
 }
 
 export type OrganizationCreateWithoutArrivals_originInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -853,7 +853,7 @@ export type OrganizationCreateWithoutArrivals_originInput = {
 
 export type OrganizationUncheckedCreateWithoutArrivals_originInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -881,7 +881,7 @@ export type OrganizationCreateOrConnectWithoutArrivals_originInput = {
 }
 
 export type OrganizationCreateWithoutArrivals_transporterInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -905,7 +905,7 @@ export type OrganizationCreateWithoutArrivals_transporterInput = {
 
 export type OrganizationUncheckedCreateWithoutArrivals_transporterInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -944,7 +944,7 @@ export type OrganizationUpdateToOneWithWhereWithoutArrivals_originInput = {
 }
 
 export type OrganizationUpdateWithoutArrivals_originInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -968,7 +968,7 @@ export type OrganizationUpdateWithoutArrivals_originInput = {
 
 export type OrganizationUncheckedUpdateWithoutArrivals_originInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1002,7 +1002,7 @@ export type OrganizationUpdateToOneWithWhereWithoutArrivals_transporterInput = {
 }
 
 export type OrganizationUpdateWithoutArrivals_transporterInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1026,7 +1026,7 @@ export type OrganizationUpdateWithoutArrivals_transporterInput = {
 
 export type OrganizationUncheckedUpdateWithoutArrivals_transporterInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1049,7 +1049,7 @@ export type OrganizationUncheckedUpdateWithoutArrivals_transporterInput = {
 }
 
 export type OrganizationCreateWithoutDepartures_destinationInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1073,7 +1073,7 @@ export type OrganizationCreateWithoutDepartures_destinationInput = {
 
 export type OrganizationUncheckedCreateWithoutDepartures_destinationInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1101,7 +1101,7 @@ export type OrganizationCreateOrConnectWithoutDepartures_destinationInput = {
 }
 
 export type OrganizationCreateWithoutDepartures_transporterInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1125,7 +1125,7 @@ export type OrganizationCreateWithoutDepartures_transporterInput = {
 
 export type OrganizationUncheckedCreateWithoutDepartures_transporterInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1164,7 +1164,7 @@ export type OrganizationUpdateToOneWithWhereWithoutDepartures_destinationInput =
 }
 
 export type OrganizationUpdateWithoutDepartures_destinationInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1188,7 +1188,7 @@ export type OrganizationUpdateWithoutDepartures_destinationInput = {
 
 export type OrganizationUncheckedUpdateWithoutDepartures_destinationInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1222,7 +1222,7 @@ export type OrganizationUpdateToOneWithWhereWithoutDepartures_transporterInput =
 }
 
 export type OrganizationUpdateWithoutDepartures_transporterInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1246,7 +1246,7 @@ export type OrganizationUpdateWithoutDepartures_transporterInput = {
 
 export type OrganizationUncheckedUpdateWithoutDepartures_transporterInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1269,7 +1269,7 @@ export type OrganizationUncheckedUpdateWithoutDepartures_transporterInput = {
 }
 
 export type OrganizationCreateWithoutHoldsInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1293,7 +1293,7 @@ export type OrganizationCreateWithoutHoldsInput = {
 
 export type OrganizationUncheckedCreateWithoutHoldsInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1332,7 +1332,7 @@ export type OrganizationUpdateToOneWithWhereWithoutHoldsInput = {
 }
 
 export type OrganizationUpdateWithoutHoldsInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1356,7 +1356,7 @@ export type OrganizationUpdateWithoutHoldsInput = {
 
 export type OrganizationUncheckedUpdateWithoutHoldsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1379,7 +1379,7 @@ export type OrganizationUncheckedUpdateWithoutHoldsInput = {
 }
 
 export type OrganizationCreateWithoutInvoicesInput = {
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1403,7 +1403,7 @@ export type OrganizationCreateWithoutInvoicesInput = {
 
 export type OrganizationUncheckedCreateWithoutInvoicesInput = {
   id?: number
-  account_number: string
+  account_number?: string | null
   name: string
   contact_name?: string | null
   phone?: string | null
@@ -1442,7 +1442,7 @@ export type OrganizationUpdateToOneWithWhereWithoutInvoicesInput = {
 }
 
 export type OrganizationUpdateWithoutInvoicesInput = {
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1466,7 +1466,7 @@ export type OrganizationUpdateWithoutInvoicesInput = {
 
 export type OrganizationUncheckedUpdateWithoutInvoicesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  account_number?: Prisma.StringFieldUpdateOperationsInput | string
+  account_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   contact_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1680,7 +1680,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    account_number: string
+    account_number: string | null
     name: string
     contact_name: string | null
     phone: string | null

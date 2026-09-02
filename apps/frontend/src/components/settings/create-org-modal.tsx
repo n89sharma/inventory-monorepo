@@ -16,7 +16,7 @@ interface CreateOrgModalProps {
 
 function getDefaultValues(): OrgForm {
   return {
-    account_number: '',
+    account_number: null,
     name: '',
     contact_name: null,
     phone: null,
@@ -78,7 +78,6 @@ function CreateOrgFormBody({
             control={form.control}
             name="account_number"
             fieldLabel="Account Number"
-            fieldRequired={true}
             inputType="string"
           />
 

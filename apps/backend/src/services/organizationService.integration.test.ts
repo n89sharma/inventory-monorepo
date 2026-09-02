@@ -10,7 +10,7 @@ async function cleanupOrgs(): Promise<void> {
   await prisma.organization.deleteMany({ where: { name: { startsWith: NAME_PREFIX } } })
 }
 
-function orgBody(accountNumber: string, name: string) {
+function orgBody(accountNumber: string | null, name: string) {
   return {
     account_number: accountNumber,
     name,
@@ -59,6 +59,33 @@ describe('organizationService', () => {
     await expect(
       createOrganization(orgBody(`${ACCOUNT_PREFIX}dup`, `${NAME_PREFIX}second`)),
     ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('allows several organizations with no account number at all', async () => {
+    await createOrganization(orgBody(null, `${NAME_PREFIX}no-account-one`))
+
+    const { id } = await createOrganization(orgBody(null, `${NAME_PREFIX}no-account-two`))
+
+    const org = await prisma.organization.findUniqueOrThrow({ where: { id } })
+    expect(org.account_number).toBeNull()
+  })
+
+  it('stores a blank account number as null rather than an empty string', async () => {
+    const { id } = await createOrganization(orgBody('   ', `${NAME_PREFIX}blank-account`))
+
+    const org = await prisma.organization.findUniqueOrThrow({ where: { id } })
+    expect(org.account_number).toBeNull()
+  })
+
+  it('clears an account number on update', async () => {
+    const { id } = await createOrganization(
+      orgBody(`${ACCOUNT_PREFIX}CLEARABLE`, `${NAME_PREFIX}clearing`),
+    )
+
+    await updateOrganization(id, orgBody(null, `${NAME_PREFIX}clearing`))
+
+    const org = await prisma.organization.findUniqueOrThrow({ where: { id } })
+    expect(org.account_number).toBeNull()
   })
 
   it('rejects a case or punctuation variant of an existing name', async () => {

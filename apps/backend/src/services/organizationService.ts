@@ -6,27 +6,33 @@ import { prisma } from '../prisma.js'
 import type { Prisma } from '../../generated/prisma/client.js'
 
 // An account number is a code, not a name: it has no casing worth preserving, and storing one
-// canonical form is what keeps ab-1234 from being filed separately from AB-1234.
-function toAccountNumber(raw: string): string {
-  return raw.trim().toUpperCase()
+// canonical form is what keeps ab-1234 from being filed separately from AB-1234. It is optional,
+// and a blank one is stored as null so it does not occupy the unique index.
+function toAccountNumber(raw: string | null): string | null {
+  const trimmed = raw?.trim().toUpperCase()
+  return trimmed ? trimmed : null
 }
 
 async function assertOrgAvailable(
   tx: Prisma.TransactionClient,
-  accountNumber: string,
+  accountNumber: string | null,
   name: string,
   excludeId: number | null,
 ): Promise<void> {
   const exclude = excludeId === null ? {} : { id: { not: excludeId } }
 
-  const accountConflict = await tx.organization.findFirst({
-    where: { account_number: accountNumber, ...exclude },
-    select: { name: true },
-  })
-  if (accountConflict)
-    throw new ConflictError(
-      `Account number ${accountNumber} already belongs to "${accountConflict.name}"`,
-    )
+  // Only a real account number can collide. Matching on null would find every other organization
+  // that has none and reject the second one, which the unique index itself permits.
+  if (accountNumber !== null) {
+    const accountConflict = await tx.organization.findFirst({
+      where: { account_number: accountNumber, ...exclude },
+      select: { name: true },
+    })
+    if (accountConflict)
+      throw new ConflictError(
+        `Account number ${accountNumber} already belongs to "${accountConflict.name}"`,
+      )
+  }
 
   const nameConflict = await tx.organization.findFirst({
     where: { name_normalized: normalizeName(name), ...exclude },
