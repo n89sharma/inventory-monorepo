@@ -79,14 +79,6 @@ function CreateModelFormBody({
     <>
       <form onSubmit={(e) => e.preventDefault()}>
         <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-          <ControlledInputWithClear
-            control={form.control}
-            name="name"
-            fieldLabel="Name"
-            fieldRequired={true}
-            inputType="string"
-          />
-
           <ControlledSearchSelectInput
             control={form.control}
             name="brand"
@@ -94,6 +86,14 @@ function CreateModelFormBody({
             getLabel={(b: Brand) => b.name}
             fieldLabel="Brand"
             fieldRequired={true}
+          />
+
+          <ControlledInputWithClear
+            control={form.control}
+            name="name"
+            fieldLabel="Name"
+            fieldRequired={true}
+            inputType="string"
           />
 
           <Controller
