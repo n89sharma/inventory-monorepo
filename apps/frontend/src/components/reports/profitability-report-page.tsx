@@ -1,6 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
-import { CustomerFilter } from '@/components/shared/filters/customer-filter'
+import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Button } from '@/components/shadcn/button'
@@ -102,7 +102,7 @@ function ProfitabilityFilterBar(): React.JSX.Element {
         clearLabel="Clear salesperson"
       />
 
-      <CustomerFilter
+      <OrganizationFilter
         selection={vendor}
         onSelectionChange={setVendor}
         onClear={() => setVendor(null)}

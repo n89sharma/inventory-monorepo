@@ -1,6 +1,6 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { DepartedSummaryStrip } from '@/components/asset-search/departed-summary-strip'
-import { CustomerFilter } from '@/components/shared/filters/customer-filter'
+import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
 import { InvoiceReferenceFilter } from '@/components/shared/filters/invoice-reference-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
@@ -75,10 +75,12 @@ export function SearchDepartedPage(): React.JSX.Element {
           {showOther ? 'Show Sold' : 'Show Scrapped'}
         </Toggle>
         <DepartedDateRangeFilter from={from} to={to} onChange={setRange} />
-        <CustomerFilter
+        <OrganizationFilter
           selection={customer}
           onSelectionChange={setCustomer}
           onClear={clearCustomer}
+          placeholder="Customer"
+          clearLabel="Clear customer"
         />
         <UserFilter
           selection={salesperson}

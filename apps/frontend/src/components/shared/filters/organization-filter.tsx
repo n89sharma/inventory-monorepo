@@ -3,40 +3,37 @@ import { useOrgs } from '@/hooks/use-org'
 import { useState } from 'react'
 import type { OrgDetail } from 'shared-types'
 
-const DEFAULT_PLACEHOLDER = 'Customer'
-const DEFAULT_CLEAR_LABEL = 'Clear customer'
-
-export function CustomerFilter({
+export function OrganizationFilter({
   selection,
   onSelectionChange,
   onClear,
-  placeholder = DEFAULT_PLACEHOLDER,
-  clearLabel = DEFAULT_CLEAR_LABEL,
+  placeholder,
+  clearLabel,
 }: {
   selection: OrgDetail | null
-  onSelectionChange: (customer: OrgDetail) => void
+  onSelectionChange: (organization: OrgDetail) => void
   onClear: () => void
-  placeholder?: string
-  clearLabel?: string
+  placeholder: string
+  clearLabel: string
 }): React.JSX.Element {
-  const allCustomers = useOrgs()
+  const allOrganizations = useOrgs()
   const [query, setQuery] = useState('')
 
   return (
     <SearchSelectInput
       selection={selection}
       query={query}
-      onSelectionChange={(c) => {
+      onSelectionChange={(organization) => {
         setQuery('')
-        onSelectionChange(c)
+        onSelectionChange(organization)
       }}
       onQueryChange={setQuery}
       onClear={() => {
         setQuery('')
         onClear()
       }}
-      options={allCustomers}
-      getLabel={(c) => c.name}
+      options={allOrganizations}
+      getLabel={(organization) => organization.name}
       placeholder={placeholder}
       clearLabel={clearLabel}
       className="w-35"

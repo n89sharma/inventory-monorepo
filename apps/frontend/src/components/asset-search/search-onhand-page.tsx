@@ -1,7 +1,7 @@
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { Toggle } from '@/components/shadcn/toggle'
-import { CustomerFilter } from '@/components/shared/filters/customer-filter'
+import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { ExclusiveOptionsFilter } from '@/components/shared/filters/exclusive-options-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
@@ -135,10 +135,12 @@ export function SearchOnHandPage(): React.JSX.Element {
           placeholder="Held For"
           clearLabel="Clear held for"
         />
-        <CustomerFilter
+        <OrganizationFilter
           selection={holdCustomer}
           onSelectionChange={setHoldCustomer}
           onClear={clearHoldCustomer}
+          placeholder="Customer"
+          clearLabel="Clear customer"
         />
       </>
     ),
