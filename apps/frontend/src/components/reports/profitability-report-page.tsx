@@ -27,6 +27,7 @@ import { useProfitabilityReport } from '@/hooks/use-profitability-report'
 import {
   isValidDepartedDateRange,
   useBrandParam,
+  useCustomerParam,
   useSalespersonParam,
   useVendorParam,
   useWarehousesParam,
@@ -64,6 +65,7 @@ function countActiveFilters(filters: ProfitabilityFilters): number {
   if (filters.warehouseIds.length > 0) count += 1
   if (filters.salesRepId !== null) count += 1
   if (filters.vendorId !== null) count += 1
+  if (filters.customerId !== null) count += 1
   if (filters.brandId !== null) count += 1
   return count
 }
@@ -73,6 +75,7 @@ function ProfitabilityFilterBar(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [salesRep, setSalesRep] = useSalespersonParam()
   const [vendor, setVendor] = useVendorParam()
+  const [customer, setCustomer] = useCustomerParam()
   const [brand, setBrand] = useBrandParam()
 
   return (
@@ -108,6 +111,14 @@ function ProfitabilityFilterBar(): React.JSX.Element {
         onClear={() => setVendor(null)}
         placeholder="Vendor"
         clearLabel="Clear vendor"
+      />
+
+      <OrganizationFilter
+        selection={customer}
+        onSelectionChange={setCustomer}
+        onClear={() => setCustomer(null)}
+        placeholder="Customer"
+        clearLabel="Clear customer"
       />
 
       <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
@@ -169,6 +180,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [salesRep, setSalesRep] = useSalespersonParam()
   const [vendor, setVendor] = useVendorParam()
+  const [customer, setCustomer] = useCustomerParam()
   const [brand, setBrand] = useBrandParam()
 
   const filters = useMemo<ProfitabilityFilters>(
@@ -177,9 +189,10 @@ export function ProfitabilityReportPage(): React.JSX.Element {
       warehouseIds: warehouses.map((w) => w.id),
       salesRepId: salesRep?.id ?? null,
       vendorId: vendor?.id ?? null,
+      customerId: customer?.id ?? null,
       brandId: brand?.id ?? null,
     }),
-    [year, warehouses, salesRep, vendor, brand],
+    [year, warehouses, salesRep, vendor, customer, brand],
   )
 
   // Gated on the same predicate the departed page uses to decide whether to fetch, so a
@@ -187,9 +200,9 @@ export function ProfitabilityReportPage(): React.JSX.Element {
   const getRangeHref = useCallback(
     (from: Date, to: Date) =>
       isValidDepartedDateRange(from, to)
-        ? departedDrilldownHref(from, to, warehouses, brand)
+        ? departedDrilldownHref({ from, to, warehouses, brand, customer, salesperson: salesRep })
         : null,
-    [warehouses, brand],
+    [warehouses, brand, customer, salesRep],
   )
 
   const { data: cube = EMPTY_CUBE, isLoading } = useProfitabilityReport(year)
@@ -206,6 +219,7 @@ export function ProfitabilityReportPage(): React.JSX.Element {
     void setWarehouses([])
     void setSalesRep(null)
     void setVendor(null)
+    void setCustomer(null)
     void setBrand(null)
   }
 

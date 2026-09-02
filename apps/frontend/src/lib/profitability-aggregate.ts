@@ -7,6 +7,7 @@ export type ProfitabilityFilters = {
   warehouseIds: number[]
   salesRepId: number | null
   vendorId: number | null
+  customerId: number | null
   brandId: number | null
 }
 
@@ -64,6 +65,7 @@ export function aggregateCube(
     if (!matchesWarehouse(row.warehouse_id, filters.warehouseIds)) continue
     if (!matchesDimension(row.sales_rep_id, filters.salesRepId)) continue
     if (!matchesDimension(row.vendor_id, filters.vendorId)) continue
+    if (!matchesDimension(row.customer_id, filters.customerId)) continue
     if (!matchesDimension(row.brand_id, filters.brandId)) continue
     addMetrics(months[row.month - 1], row)
     addMetrics(totals, row)

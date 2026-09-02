@@ -8,25 +8,18 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param int4
  */
-export const getProfitabilityCube = $runtime.makeTypedQueryFactory("select\ndep.origin_id                                  as warehouse_id,\nw.city_code                                    as warehouse_code,\ndep.sales_representative_id                    as sales_rep_id,\nu.\"name\"                                       as sales_rep_name,\norg.id                                         as vendor_id,\norg.\"name\"                                     as vendor_name,\nb.id                                           as brand_id,\nb.\"name\"                                       as brand_name,\nextract(month from dep.created_at)::int        as month,\ncount(*)::int                                  as asset_count,\n\ncoalesce(sum(c.transport_cost), 0)::float8     as transport_cost,\ncoalesce(sum(c.processing_cost), 0)::float8    as processing_cost,\ncoalesce(sum(c.parts_cost), 0)::float8         as parts_cost,\ncoalesce(sum(c.other_cost), 0)::float8         as other_cost,\n\ncoalesce(sum(c.total_cost), 0)::float8                    as cogs,\ncoalesce(sum(c.sale_price), 0)::float8                    as gross_revenue,\ncoalesce(sum(c.sale_price - c.total_cost), 0)::float8     as gross_margin\n\nfrom \"Asset\" a\njoin \"Cost\" c on c.asset_id = a.id\njoin \"Departure\" dep on dep.id = a.departure_id\njoin \"Warehouse\" w on w.id = dep.origin_id\njoin \"Model\" m on m.id = a.model_id\njoin \"Brand\" b on b.id = m.brand_id\nleft join \"User\" u on u.id = dep.sales_representative_id\nleft join \"Arrival\" arr on arr.id = a.arrival_id\nleft join \"Organization\" org on org.id = arr.origin_id\nwhere extract(year from dep.created_at)::int = $1\nand c.purchase_cost is not null\nand c.transport_cost is not null\nand c.total_cost is not null and c.total_cost > 0\nand c.sale_price is not null and c.sale_price > 0\ngroup by\ndep.origin_id,\nw.city_code,\ndep.sales_representative_id,\nu.\"name\",\norg.id,\norg.\"name\",\nb.id,\nb.\"name\",\nextract(month from dep.created_at)\norder by month") as (int4: number) => $runtime.TypedSql<getProfitabilityCube.Parameters, getProfitabilityCube.Result>
+export const getProfitabilityCube = $runtime.makeTypedQueryFactory("select\ndep.origin_id                                             as warehouse_id,\ndep.sales_representative_id                               as sales_rep_id,\narr.origin_id                                             as vendor_id,\ndep.destination_id                                        as customer_id,\nm.brand_id                                                as brand_id,\nextract(month from dep.created_at)::int                   as month,\ncount(*)::int                                             as asset_count,\n\ncoalesce(sum(c.total_cost), 0)::float8                    as cogs,\ncoalesce(sum(c.sale_price), 0)::float8                    as gross_revenue,\ncoalesce(sum(c.sale_price - c.total_cost), 0)::float8     as gross_margin\n\nfrom \"Asset\" a\njoin \"Cost\" c on c.asset_id = a.id\njoin \"Departure\" dep on dep.id = a.departure_id\njoin \"Model\" m on m.id = a.model_id\nleft join \"Arrival\" arr on arr.id = a.arrival_id\nwhere extract(year from dep.created_at)::int = $1\nand c.purchase_cost is not null\nand c.transport_cost is not null\nand c.total_cost is not null and c.total_cost > 0\nand c.sale_price is not null and c.sale_price > 0\ngroup by\ndep.origin_id,\ndep.sales_representative_id,\narr.origin_id,\ndep.destination_id,\nm.brand_id,\nextract(month from dep.created_at)\norder by month") as (int4: number) => $runtime.TypedSql<getProfitabilityCube.Parameters, getProfitabilityCube.Result>
 
 export namespace getProfitabilityCube {
   export type Parameters = [int4: number]
   export type Result = {
     warehouse_id: number
-    warehouse_code: string
     sales_rep_id: number | null
-    sales_rep_name: string
     vendor_id: number
-    vendor_name: string
+    customer_id: number
     brand_id: number
-    brand_name: string
     month: number | null
     asset_count: number | null
-    transport_cost: number | null
-    processing_cost: number | null
-    parts_cost: number | null
-    other_cost: number | null
     cogs: number | null
     gross_revenue: number | null
     gross_margin: number | null

@@ -9,7 +9,15 @@ import {
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
-import type { AssetType, Brand, InStockSummaryRow, MeterBand, Warehouse } from 'shared-types'
+import type {
+  AssetType,
+  Brand,
+  InStockSummaryRow,
+  MeterBand,
+  OrgDetail,
+  User,
+  Warehouse,
+} from 'shared-types'
 
 const HELD_DRILLDOWN_COLUMN_IDS = [
   'serial_number',
@@ -59,6 +67,8 @@ const serializeDeparted = createSerializer({
   from: FILTER_PARSERS.from,
   to: FILTER_PARSERS.to,
   brand: FILTER_PARSERS.brand,
+  customer: FILTER_PARSERS.customer,
+  sp: FILTER_PARSERS.sp,
 })
 const serializeDepartedSearch = createSerializer({
   wh: FILTER_PARSERS.wh,
@@ -119,17 +129,24 @@ export function inStockDrilldownHref(row: InStockSummaryRow): string {
   })
 }
 
-export function departedDrilldownHref(
-  from: Date,
-  to: Date,
-  warehouses: Warehouse[],
-  brand: Brand | null,
-): string {
+// Vendor is deliberately absent: the departed search has no arrival-origin filter, so it
+// is the one profitability dimension the drilldown cannot carry.
+export function departedDrilldownHref(params: {
+  from: Date
+  to: Date
+  warehouses: Warehouse[]
+  brand: Brand | null
+  customer: OrgDetail | null
+  salesperson: User | null
+}): string {
+  const { from, to, warehouses, brand, customer, salesperson } = params
   return serializeDeparted(DEPARTED_PATH, {
     wh: warehouses.length > 0 ? warehouses.map((warehouse) => warehouse.id) : null,
     from,
     to,
     brand: brand?.id ?? null,
+    customer: customer?.id ?? null,
+    sp: salesperson?.id ?? null,
   })
 }
 
