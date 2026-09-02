@@ -39,7 +39,7 @@ export const getDepartures = asyncHandler(async (req, res) => {
 export const getDepartureDetail = asyncHandler(
   async (req: Request, res: Response<ApiResponse<DepartureDetail>>) => {
     const { departureNumber } = req.params
-    const data = await getDepartureSer(departureNumber, res.locals.dbUserRole)
+    const data = await getDepartureSer(departureNumber, res.locals.permissions)
     res.json(successResponse(data))
   },
 )

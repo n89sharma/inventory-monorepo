@@ -1,9 +1,11 @@
-import { type AssetCost, type AssetSearchRow, type AppRole, ROLE_PERMISSIONS } from 'shared-types'
+import { type AssetCost, type AssetSearchRow, type Permission } from 'shared-types'
 
-export function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): AssetSearchRow {
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
-  const canViewPurchase = permissions.includes('view_purchase_price')
-  const canViewSale = permissions.includes('view_sale_price')
+export function redactSearchRowCost(
+  row: AssetSearchRow,
+  permissions: ReadonlySet<Permission>,
+): AssetSearchRow {
+  const canViewPurchase = permissions.has('view_purchase_price')
+  const canViewSale = permissions.has('view_sale_price')
   return {
     ...row,
     cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
@@ -16,11 +18,13 @@ export function redactSearchRowCost(row: AssetSearchRow, role: AppRole | null): 
   }
 }
 
-export function redactAssetCost(cost: AssetCost | null, role: AppRole | null): AssetCost | null {
+export function redactAssetCost(
+  cost: AssetCost | null,
+  permissions: ReadonlySet<Permission>,
+): AssetCost | null {
   if (cost === null) return null
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
-  const canViewPurchase = permissions.includes('view_purchase_price')
-  const canViewSale = permissions.includes('view_sale_price')
+  const canViewPurchase = permissions.has('view_purchase_price')
+  const canViewSale = permissions.has('view_sale_price')
   return {
     purchase_cost: canViewPurchase ? cost.purchase_cost : null,
     transport_cost: canViewPurchase ? cost.transport_cost : null,

@@ -5,6 +5,9 @@ import {
   cleanupTransactionalData,
   createArrivedAssets,
   assetCostOf,
+  ALL_PRICE_PERMISSIONS,
+  NO_PERMISSIONS,
+  SALE_PRICE_ONLY,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
@@ -72,18 +75,16 @@ describe('transferService', () => {
     )
     await seedAssetCost(asset.id)
 
-    const asAdmin = await getTransfer(transferNumber, 'admin')
+    const asAdmin = await getTransfer(transferNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
-    // 'sales' has view_sale_price but not view_purchase_price
-    const asSales = await getTransfer(transferNumber, 'sales')
+    const asSales = await getTransfer(transferNumber, SALE_PRICE_ONLY)
     expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
-    // 'member' has neither price permission
-    const asMember = await getTransfer(transferNumber, 'member')
+    const asMember = await getTransfer(transferNumber, NO_PERMISSIONS)
     expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
@@ -94,7 +95,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    const transfer = await getTransfer(transferNumber, 'admin')
+    const transfer = await getTransfer(transferNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(transfer.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 

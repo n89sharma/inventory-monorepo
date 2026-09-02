@@ -7,6 +7,7 @@ import {
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
   seedArrivalTestData,
+  ALL_PRICE_PERMISSIONS,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -49,7 +50,7 @@ async function createArrivalWithSerial(
     arrivalWithSerials(refs, [{ serialNumber, duplicateSerialAcknowledged }]),
     refs.userId,
   )
-  const { assets } = await getArrival(arrivalNumber, 'admin')
+  const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
   const asset = assets[0]!
   return { arrivalNumber, assetId: asset.id, barcode: asset.barcode }
 }
@@ -160,7 +161,7 @@ describe('duplicate serial numbers', () => {
 
       const arrivalNumber = await createArrival(input, refs.userId)
 
-      const { assets } = await getArrival(arrivalNumber, 'admin')
+      const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
       expect(assets).toHaveLength(2)
     })
   })
@@ -208,7 +209,7 @@ describe('duplicate serial numbers', () => {
 
       await expect(createSingleArrivalAsset(arrivalNumber, asset, refs.userId)).rejects.toThrow(
         new ConflictError(
-          `Serial number ${EXISTING_SERIAL} is already on asset ${(await getArrival(arrivalNumber, 'admin')).assets[0]!.barcode}, which has not been sold`,
+          `Serial number ${EXISTING_SERIAL} is already on asset ${(await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)).assets[0]!.barcode}, which has not been sold`,
         ),
       )
     })

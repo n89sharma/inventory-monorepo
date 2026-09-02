@@ -1,5 +1,5 @@
 import {
-  AppRole,
+  Permission,
   ArrivalDetail,
   ASSET_STATUS,
   AssetDelta,
@@ -91,7 +91,7 @@ type UpdateArrivalAssetDb = AssetGetPayload<typeof assetIncludeArgs>
 
 export async function getArrival(
   arrivalNumber: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<ArrivalDetail> {
   const [arrival, assets] = await Promise.all([
     prisma.arrival.findUnique({
@@ -109,7 +109,7 @@ export async function getArrival(
     comment: arrival.notes,
     created_at: arrival.created_at,
     created_by: arrival.created_by.name,
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
   }
 }
 

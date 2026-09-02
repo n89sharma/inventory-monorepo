@@ -14,6 +14,7 @@ import {
   INVOICE_TYPE,
   ModelSummary,
   OrgSummary,
+  Permission,
   searchRowToAssetSummary,
   Status,
   UpdateAssetSpecs,
@@ -302,7 +303,7 @@ export async function createArrivedAssets(
   count = 1,
 ): Promise<AssetSummary[]> {
   const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, count), refs.userId)
-  const { assets } = await getArrival(arrivalNumber, 'admin')
+  const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
   return assets.map(searchRowToAssetSummary)
 }
 
@@ -372,6 +373,13 @@ export interface AssetCost {
   total_cost: number | null
   sale_price: number | null
 }
+
+export const ALL_PRICE_PERMISSIONS: ReadonlySet<Permission> = new Set([
+  'view_purchase_price',
+  'view_sale_price',
+])
+export const SALE_PRICE_ONLY: ReadonlySet<Permission> = new Set(['view_sale_price'])
+export const NO_PERMISSIONS: ReadonlySet<Permission> = new Set()
 
 export const SEEDED_ASSET_COST: AssetCost = {
   purchase_cost: 100,

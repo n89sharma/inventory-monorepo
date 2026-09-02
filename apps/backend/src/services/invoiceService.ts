@@ -5,7 +5,7 @@ import {
   INVOICE_TYPE,
   InvoiceDetail,
   InvoiceSummary,
-  ROLE_PERMISSIONS,
+  Permission,
   UpdateInvoiceMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
@@ -241,11 +241,10 @@ export async function getInvoices(
   fromDate: Date,
   toDate: Date,
   invoiceType: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<InvoiceSummary[]> {
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
-  const canViewPurchase = permissions.includes('view_purchase_price')
-  const canViewSale = permissions.includes('view_sale_price')
+  const canViewPurchase = permissions.has('view_purchase_price')
+  const canViewSale = permissions.has('view_sale_price')
   const rows = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
   return rows.map((row) => ({
     ...row,
@@ -262,7 +261,7 @@ export async function getInvoices(
 
 export async function getInvoice(
   invoiceNumber: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<InvoiceDetail> {
   const [invoice, assets, arrivals] = await Promise.all([
     prisma.invoice.findUnique({
@@ -295,7 +294,7 @@ export async function getInvoice(
       default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
     customer: invoice.organization,
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
     arrivals,
   }
 }

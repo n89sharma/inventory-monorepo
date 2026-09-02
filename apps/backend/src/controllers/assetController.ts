@@ -145,7 +145,7 @@ export const getAssets = asyncHandler(async (req, res) => {
     -1,
     -1,
     -1,
-    res.locals.dbUserRole,
+    res.locals.permissions,
   )
   res.json(successResponse(data))
 })
@@ -226,7 +226,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
     isNaN(customerId) ? -1 : customerId,
     isNaN(salespersonId) ? -1 : salespersonId,
     invoiceRef ?? '',
-    res.locals.dbUserRole,
+    res.locals.permissions,
   )
   res.json(successResponse(data))
 })
@@ -281,14 +281,14 @@ export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
     isNaN(heldById) ? -1 : heldById,
     isNaN(heldForId) ? -1 : heldForId,
     isNaN(holdCustomerId) ? -1 : holdCustomerId,
-    res.locals.dbUserRole,
+    res.locals.permissions,
   )
   res.json(successResponse(data))
 })
 
 export const getAssetsBySerialNumber = asyncHandler(async (req, res) => {
   const { serialNumbers } = AssetsBySerialNumberRequestSchema.parse(req.body)
-  const data = await getAssetsBySerialNumberSer(serialNumbers, res.locals.dbUserRole)
+  const data = await getAssetsBySerialNumberSer(serialNumbers, res.locals.permissions)
   res.json(successResponse(data))
 })
 
@@ -302,7 +302,7 @@ export const getSerialNumberMatches = asyncHandler(async (_req, res) => {
 
 export const getAssetDetail = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const data = await getAssetDetailSer(barcode, res.locals.dbUserRole)
+  const data = await getAssetDetailSer(barcode, res.locals.permissions)
   res.json(successResponse(data))
 })
 
@@ -338,7 +338,7 @@ export const getAssetTransfers = asyncHandler(async (req, res) => {
 
 export const getAssetHistory = asyncHandler(async (req, res) => {
   const { barcode } = req.params
-  const data = await getAssetHistorySer(barcode, res.locals.dbUserRole)
+  const data = await getAssetHistorySer(barcode, res.locals.permissions)
   res.json(successResponse(data))
 })
 

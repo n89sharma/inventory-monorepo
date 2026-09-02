@@ -1,7 +1,7 @@
 import {
   AssetDelta,
   ASSET_STATUS,
-  type AppRole,
+  type Permission,
   CreateHold,
   HoldDetail,
   UpdateHoldMetadata,
@@ -316,7 +316,10 @@ export async function moveAssetsToHold(
   if (archived) await recordHoldArchive(source.id, now, userId)
 }
 
-export async function getHold(holdNumber: string, role: AppRole | null): Promise<HoldDetail> {
+export async function getHold(
+  holdNumber: string,
+  permissions: ReadonlySet<Permission>,
+): Promise<HoldDetail> {
   const [hold, assets] = await Promise.all([
     prisma.hold.findUnique({
       where: { hold_number: holdNumber },
@@ -339,7 +342,7 @@ export async function getHold(holdNumber: string, role: AppRole | null): Promise
     from_dt: hold.from_dt,
     to_dt: hold.to_dt,
     archived_at: hold.archived_at,
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
   }
 }
 

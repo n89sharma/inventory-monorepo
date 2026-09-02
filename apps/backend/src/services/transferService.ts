@@ -1,5 +1,5 @@
 import {
-  AppRole,
+  Permission,
   AssetDelta,
   CreateTransfer,
   TRANSFER_STATUS,
@@ -26,7 +26,7 @@ const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
 
 export async function getTransfer(
   transferNumber: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<TransferDetail> {
   const [transfer, assets] = await Promise.all([
     prisma.transfer.findUnique({
@@ -45,7 +45,7 @@ export async function getTransfer(
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
   }
 }
 

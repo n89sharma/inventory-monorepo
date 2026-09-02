@@ -35,7 +35,7 @@ export const getInvoices = asyncHandler(
     const { fromDate, toDate, invoiceType } = res.locals.query as z.infer<
       typeof InvoiceListQuerySchema
     >
-    const invoices = await getInvoicesSer(fromDate, toDate, invoiceType, res.locals.dbUserRole)
+    const invoices = await getInvoicesSer(fromDate, toDate, invoiceType, res.locals.permissions)
     res.json(successResponse(invoices))
   },
 )
@@ -55,7 +55,7 @@ export const patchInvoiceAssets = asyncHandler(async (req, res) => {
 export const getInvoiceDetail = asyncHandler(
   async (req: Request, res: Response<ApiResponse<InvoiceDetail>>) => {
     const { invoiceNumber } = req.params
-    const data = await getInvoiceSer(invoiceNumber, res.locals.dbUserRole)
+    const data = await getInvoiceSer(invoiceNumber, res.locals.permissions)
     res.json(successResponse(data))
   },
 )

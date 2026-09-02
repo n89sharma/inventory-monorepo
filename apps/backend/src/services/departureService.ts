@@ -1,5 +1,5 @@
 import {
-  AppRole,
+  Permission,
   ASSET_STATUS,
   AssetDelta,
   CreateDeparture,
@@ -33,7 +33,7 @@ import { archiveHoldsEmptiedByReleasedAssets, recordHoldRelease } from './holdSe
 
 export async function getDeparture(
   departureNumber: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<DepartureDetail> {
   const [departure, assets] = await Promise.all([
     prisma.departure.findUnique({
@@ -58,7 +58,7 @@ export async function getDeparture(
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
     salesperson: departure.sales_representative && mapUser(departure.sales_representative),
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), role)),
+    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
   }
 }
 

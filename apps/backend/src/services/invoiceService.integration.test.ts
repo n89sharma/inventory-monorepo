@@ -7,6 +7,9 @@ import {
   createArrivedAssets,
   getAssetStatus,
   assetCostOf,
+  ALL_PRICE_PERMISSIONS,
+  NO_PERMISSIONS,
+  SALE_PRICE_ONLY,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
@@ -96,7 +99,7 @@ describe('invoiceService', () => {
       refs.userId,
     )
 
-    const created = await getInvoice(invoiceNumber, 'admin')
+    const created = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
     expect(created.notes).toBe('initial note')
 
     await patchInvoiceMetadata(
@@ -110,7 +113,7 @@ describe('invoiceService', () => {
       },
       refs.userId,
     )
-    expect((await getInvoice(invoiceNumber, 'admin')).notes).toBe('updated note')
+    expect((await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)).notes).toBe('updated note')
 
     await patchInvoiceMetadata(
       invoiceNumber,
@@ -123,7 +126,7 @@ describe('invoiceService', () => {
       },
       refs.userId,
     )
-    expect((await getInvoice(invoiceNumber, 'admin')).notes).toBeNull()
+    expect((await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)).notes).toBeNull()
   })
 
   it('persists invoice_date on create and edits date + reference via metadata patch', async () => {
@@ -137,7 +140,7 @@ describe('invoiceService', () => {
       refs.userId,
     )
 
-    const created = await getInvoice(invoiceNumber, 'admin')
+    const created = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
     expect(created.invoice_date).toBe('2026-01-15')
     expect(created.invoice_reference).toBe('REF-BEFORE')
 
@@ -153,7 +156,7 @@ describe('invoiceService', () => {
       refs.userId,
     )
 
-    const updated = await getInvoice(invoiceNumber, 'admin')
+    const updated = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
     expect(updated.invoice_date).toBe('2026-02-20')
     expect(updated.invoice_reference).toBe('REF-AFTER')
   })
@@ -166,18 +169,16 @@ describe('invoiceService', () => {
     )
     await seedAssetCost(asset.id)
 
-    const asAdmin = await getInvoice(invoiceNumber, 'admin')
+    const asAdmin = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
-    // 'sales' has view_sale_price but not view_purchase_price
-    const asSales = await getInvoice(invoiceNumber, 'sales')
+    const asSales = await getInvoice(invoiceNumber, SALE_PRICE_ONLY)
     expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
-    // 'member' has neither price permission
-    const asMember = await getInvoice(invoiceNumber, 'member')
+    const asMember = await getInvoice(invoiceNumber, NO_PERMISSIONS)
     expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
@@ -189,7 +190,7 @@ describe('invoiceService', () => {
       refs.userId,
     )
 
-    const invoice = await getInvoice(invoiceNumber, 'admin')
+    const invoice = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
 
     // two arrival batches -> two distinct arrivals, deduped despite 3 assets
     expect(invoice.arrivals).toHaveLength(2)

@@ -3,6 +3,9 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   assetCostOf,
+  ALL_PRICE_PERMISSIONS,
+  NO_PERMISSIONS,
+  SALE_PRICE_ONLY,
   buildCreateHoldInput,
   cleanupTransactionalData,
   createArrivedAssets,
@@ -56,27 +59,25 @@ describe('holdService', () => {
     const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
     await seedAssetCost(asset.id)
 
-    const asAdmin = await getHold(holdNumber, 'admin')
+    const asAdmin = await getHold(holdNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
-    // 'sales' has view_sale_price but not view_purchase_price
-    const asSales = await getHold(holdNumber, 'sales')
+    const asSales = await getHold(holdNumber, SALE_PRICE_ONLY)
     expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
-    // 'member' has neither price permission
-    const asMember = await getHold(holdNumber, 'member')
+    const asMember = await getHold(holdNumber, NO_PERMISSIONS)
     expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
-  it('redacts cost for a viewer with no role at all', async () => {
+  it('redacts cost for a viewer with no permissions at all', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
     await seedAssetCost(asset.id)
 
-    const asNobody = await getHold(holdNumber, null)
+    const asNobody = await getHold(holdNumber, NO_PERMISSIONS)
     expect(assetCostOf(asNobody.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 

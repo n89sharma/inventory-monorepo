@@ -1,7 +1,7 @@
 import { getAuth } from '@clerk/express'
 import { NextFunction, Request, Response } from 'express'
 import { LRUCache } from 'lru-cache'
-import { response401 } from 'shared-types'
+import { ROLE_PERMISSIONS, response401 } from 'shared-types'
 import { prisma } from '../prisma.js'
 
 // clerk_id → internal DB user id
@@ -19,7 +19,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return res.status(401).json(response401('Unauthorized'))
   }
 
-  res.locals.dbUserRole = sessionClaims?.metadata?.role ?? null
+  const role = sessionClaims?.metadata?.role ?? null
+  res.locals.permissions = new Set(role ? ROLE_PERMISSIONS[role] : [])
 
   const cached = userIdCache.get(userId)
   if (cached !== undefined) {

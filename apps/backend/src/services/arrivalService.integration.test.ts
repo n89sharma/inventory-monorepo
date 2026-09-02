@@ -5,6 +5,9 @@ import {
   buildCreateArrivalInput,
   cleanupTransactionalData,
   assetCostOf,
+  ALL_PRICE_PERMISSIONS,
+  NO_PERMISSIONS,
+  SALE_PRICE_ONLY,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
@@ -160,25 +163,23 @@ describe('getArrival', () => {
     const [assetId] = await getArrivalAssetIds(arrivalNumber)
     await seedAssetCost(assetId)
 
-    const asAdmin = await getArrival(arrivalNumber, 'admin')
+    const asAdmin = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(asAdmin.assets[0])).toEqual(SEEDED_ASSET_COST)
 
-    // 'sales' has view_sale_price but not view_purchase_price
-    const asSales = await getArrival(arrivalNumber, 'sales')
+    const asSales = await getArrival(arrivalNumber, SALE_PRICE_ONLY)
     expect(assetCostOf(asSales.assets[0])).toEqual({
       ...REDACTED_ASSET_COST,
       sale_price: SEEDED_ASSET_COST.sale_price,
     })
 
-    // 'member' has neither price permission
-    const asMember = await getArrival(arrivalNumber, 'member')
+    const asMember = await getArrival(arrivalNumber, NO_PERMISSIONS)
     expect(assetCostOf(asMember.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 
   it('returns a null-valued cost for an asset with no cost recorded', async () => {
     const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
 
-    const arrival = await getArrival(arrivalNumber, 'admin')
+    const arrival = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(arrival.assets[0])).toEqual(REDACTED_ASSET_COST)
   })
 })

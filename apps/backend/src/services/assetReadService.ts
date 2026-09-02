@@ -13,9 +13,8 @@ import {
   getInitials,
   normalizeForSearch,
   ON_HAND_STATUS_VALUES,
-  ROLE_PERMISSIONS,
   SerialNumberCheckResult,
-  type AppRole,
+  type Permission,
 } from 'shared-types'
 import {
   getAssetAccessories as getAssetAccessoriesQuery,
@@ -57,7 +56,7 @@ export async function getAssets(
   heldForIdParam: number,
   holdCustomerIdParam: number,
   daysHeldMinParam: number,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
     getAssetsQuery(
@@ -80,12 +79,12 @@ export async function getAssets(
       daysHeldMinParam,
     ),
   )
-  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
+  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, permissions))
 }
 
 export async function getAssetsBySerialNumber(
   serialNumbers: string[],
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<AssetsBySerialNumberResult> {
   const normalizedInput = serialNumbers.map((raw) => ({ raw, normalized: normalizeForSearch(raw) }))
   const uniqueNormalized = [
@@ -93,7 +92,7 @@ export async function getAssetsBySerialNumber(
   ]
 
   const rows = await prisma.$queryRawTyped(getAssetsBySerialNumberQuery(uniqueNormalized))
-  const assets = rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
+  const assets = rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, permissions))
 
   const foundNormalized = new Set(assets.map((a) => normalizeForSearch(a.serial_number)))
   const notFound = normalizedInput
@@ -162,7 +161,7 @@ export async function getDepartedAssets(
   customerIdParam: number,
   salespersonIdParam: number,
   invoiceReference: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<AssetSearchRow[]> {
   const rows = await prisma.$queryRawTyped(
     getDepartedAssetsQuery(
@@ -183,7 +182,7 @@ export async function getDepartedAssets(
       salespersonIdParam,
     ),
   )
-  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, role))
+  return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, permissions))
 }
 
 export async function getAssetsForSearchOnHand(
@@ -199,7 +198,7 @@ export async function getAssetsForSearchOnHand(
   heldByIdParam: number,
   heldForIdParam: number,
   holdCustomerIdParam: number,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<AssetSearchRow[]> {
   const statuses = await prisma.status.findMany({
     where: { status: { in: [...ON_HAND_STATUS_VALUES] } },
@@ -223,20 +222,23 @@ export async function getAssetsForSearchOnHand(
     heldForIdParam,
     holdCustomerIdParam,
     -1,
-    role,
+    permissions,
   )
 }
 
-export async function getAssetDetail(barcode: string, role: AppRole | null): Promise<AssetDetails> {
+export async function getAssetDetail(
+  barcode: string,
+  permissions: ReadonlySet<Permission>,
+): Promise<AssetDetails> {
   const assets = await prisma.$queryRawTyped(getAssetDetailsQuery(barcode))
   if (!assets || assets.length === 0) throw new NotFoundError(`Asset ${barcode} not found`)
-  return redactCost(mapAssetDetail(assets[0]), role)
+  return redactCost(mapAssetDetail(assets[0]), permissions)
 }
 
-function redactCost(detail: AssetDetails, role: AppRole | null): AssetDetails {
+function redactCost(detail: AssetDetails, permissions: ReadonlySet<Permission>): AssetDetails {
   return {
     ...detail,
-    cost: redactAssetCost(detail.cost, role)!,
+    cost: redactAssetCost(detail.cost, permissions)!,
   }
 }
 
@@ -293,15 +295,14 @@ export async function getTransfers(barcode: string): Promise<AssetTransfer[]> {
 
 export async function getAssetHistory(
   barcode: string,
-  role: AppRole | null,
+  permissions: ReadonlySet<Permission>,
 ): Promise<AssetHistory> {
   const asset = await prisma.asset.findUnique({ where: { barcode }, select: { id: true } })
   if (!asset) throw new NotFoundError(`Asset ${barcode} not found`)
 
-  const permissions = role ? ROLE_PERMISSIONS[role] : []
   const entityTypes: string[] = ['Asset']
-  if (permissions.includes('view_purchase_price')) entityTypes.push('AssetPurchaseCost')
-  if (permissions.includes('view_sale_price')) entityTypes.push('AssetSalePrice')
+  if (permissions.has('view_purchase_price')) entityTypes.push('AssetPurchaseCost')
+  if (permissions.has('view_sale_price')) entityTypes.push('AssetSalePrice')
 
   const rows = await prisma.history.findMany({
     where: { entity_type: { in: entityTypes }, entity_id: asset.id },

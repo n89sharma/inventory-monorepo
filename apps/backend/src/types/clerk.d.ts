@@ -1,4 +1,4 @@
-import type { AppRole } from 'shared-types'
+import type { AppRole, Permission } from 'shared-types'
 
 export {}
 
@@ -13,6 +13,6 @@ declare global {
 declare module 'express' {
   interface Locals {
     dbUserId: number
-    dbUserRole: AppRole | null
+    permissions: ReadonlySet<Permission>
   }
 }

@@ -41,7 +41,7 @@ export const getArrivals = asyncHandler(async (req, res) => {
 
 export const getArrival = asyncHandler(async (req, res) => {
   const { arrivalNumber } = req.params
-  const data = await getArrivalSer(arrivalNumber, res.locals.dbUserRole)
+  const data = await getArrivalSer(arrivalNumber, res.locals.permissions)
   res.json(successResponse(data))
 })
 
