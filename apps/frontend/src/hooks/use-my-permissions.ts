@@ -1,7 +1,7 @@
 import { getMyPermissions } from '@/data/api/role-api'
 import { CATALOG_DATA_OPTIONS } from '@/lib/swr-options'
 import type { MyPermissions } from 'shared-types'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 const MY_PERMISSIONS_KEY = 'my-permissions'
 const NO_PERMISSIONS: MyPermissions = []
@@ -16,4 +16,8 @@ export function useMyPermissions(): MyPermissions {
 
 export function useMyPermissionsLoaded(): boolean {
   return useMyPermissionsQuery().data !== undefined
+}
+
+export function invalidateMyPermissions() {
+  return mutate(MY_PERMISSIONS_KEY)
 }

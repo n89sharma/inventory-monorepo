@@ -132,6 +132,7 @@ const REPORTS_SUB_ITEMS = [
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
 
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
+const ROLES_ITEM = { title: 'Roles & Permissions', url: '/settings/roles' }
 
 // Opens the group when its section becomes active, while leaving a manual
 // collapse in place until the user navigates into the section again.
@@ -179,6 +180,7 @@ export function AppSidebar(): React.JSX.Element {
 
   const canManageSettings = useCan('update_settings')
   const canManageUsers = useCan('update_users')
+  const canManageRoles = useCan('update_user_roles')
   const canViewReports = useCan('view_reports')
   const canViewSalePrice = useCan('view_sale_price')
   const canViewProfitabilityReport = useCan('view_profitability_report')
@@ -374,6 +376,16 @@ export function AppSidebar(): React.JSX.Element {
                               <Link to={USER_PERMISSIONS_ITEM.url}>
                                 {USER_PERMISSIONS_ITEM.title}
                               </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        )}
+                        {canManageRoles && (
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={location.pathname === ROLES_ITEM.url ? true : undefined}
+                            >
+                              <Link to={ROLES_ITEM.url}>{ROLES_ITEM.title}</Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         )}

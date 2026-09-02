@@ -176,6 +176,11 @@ const UserManagementPage = lazy(() =>
     default: m.UserManagementPage,
   })),
 )
+const RolesSettingsPage = lazy(() =>
+  import('./components/settings/roles-settings-page').then((m) => ({
+    default: m.RolesSettingsPage,
+  })),
+)
 
 function AppRoutes() {
   const location = useLocation()
@@ -494,6 +499,14 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="update_users">
                           <UserManagementPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/roles"
+                      element={
+                        <PermissionRoute permission="update_user_roles">
+                          <RolesSettingsPage />
                         </PermissionRoute>
                       }
                     />
