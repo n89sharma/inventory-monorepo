@@ -36,3 +36,26 @@ export const UpdateModelSchema = z.object({
 })
 
 export type UpdateModel = z.infer<typeof UpdateModelSchema>
+
+// GET /models/merge-preview?ids=
+export const ModelMergeCandidateSchema = z.object({
+  id: z.number(),
+  brand_name: z.string(),
+  model_name: z.string(),
+  reference_count: z.number(),
+})
+
+export const ModelMergePreviewSchema = z.object({
+  winner_id: z.number(),
+  candidates: z.array(ModelMergeCandidateSchema),
+})
+
+// POST /models/merge
+export const MergeModelSchema = z.object({
+  ids: z.array(z.number()).min(2),
+  model: UpdateModelSchema,
+})
+
+export type ModelMergeCandidate = z.infer<typeof ModelMergeCandidateSchema>
+export type ModelMergePreview = z.infer<typeof ModelMergePreviewSchema>
+export type MergeModel = z.infer<typeof MergeModelSchema>

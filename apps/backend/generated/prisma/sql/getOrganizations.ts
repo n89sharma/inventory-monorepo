@@ -13,7 +13,7 @@ export namespace getOrganizations {
   export type Parameters = []
   export type Result = {
     id: number
-    account_number: string
+    account_number: string | null
     name: string
     contact_name: string | null
     phone: string | null

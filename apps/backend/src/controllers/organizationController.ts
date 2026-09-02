@@ -2,7 +2,9 @@ import { Request, Response } from 'express'
 import {
   ApiResponse,
   CreateOrgSchema,
+  MergeOrgSchema,
   OrgDetail,
+  OrgMergePreview,
   UpdateOrgSchema,
   successResponse,
 } from 'shared-types'
@@ -27,3 +29,19 @@ export const updateOrganization = asyncHandler(async (req: Request, res: Respons
   await organizationService.updateOrganization(Number(req.params.orgId), body)
   res.status(204).send()
 })
+
+const MergeOrgPreviewSchema = MergeOrgSchema.pick({ ids: true })
+
+export const previewOrganizationMerge = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<OrgMergePreview>>) => {
+    const { ids } = MergeOrgPreviewSchema.parse(req.body)
+    res.json(successResponse(await organizationService.previewOrganizationMerge(ids)))
+  },
+)
+
+export const mergeOrganizations = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<{ id: number }>>) => {
+    const { ids, organization } = MergeOrgSchema.parse(req.body)
+    res.json(successResponse(await organizationService.mergeOrganizations(ids, organization)))
+  },
+)

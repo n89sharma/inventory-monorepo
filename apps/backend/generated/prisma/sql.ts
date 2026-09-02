@@ -61,7 +61,11 @@ export * from "./sql/getModelLastSale.js"
 
 export * from "./sql/getModelPriceHistory.js"
 
+export * from "./sql/getModelReferenceCounts.js"
+
 export * from "./sql/getModels.js"
+
+export * from "./sql/getOrganizationReferenceCounts.js"
 
 export * from "./sql/getOrganizations.js"
 

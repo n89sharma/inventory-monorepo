@@ -53,3 +53,26 @@ export const UpdateOrgSchema = z.object({
 })
 
 export type UpdateOrg = z.infer<typeof UpdateOrgSchema>
+
+// GET /organizations/merge-preview?ids=
+export const OrgMergeCandidateSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  account_number: z.string().nullable(),
+  reference_count: z.number(),
+})
+
+export const OrgMergePreviewSchema = z.object({
+  winner_id: z.number(),
+  candidates: z.array(OrgMergeCandidateSchema),
+})
+
+// POST /organizations/merge
+export const MergeOrgSchema = z.object({
+  ids: z.array(z.number()).min(2),
+  organization: UpdateOrgSchema,
+})
+
+export type OrgMergeCandidate = z.infer<typeof OrgMergeCandidateSchema>
+export type OrgMergePreview = z.infer<typeof OrgMergePreviewSchema>
+export type MergeOrg = z.infer<typeof MergeOrgSchema>
