@@ -1,5 +1,5 @@
 import { api } from '@/data/api/axios-client'
-import type { AppRole, SetRole, ToggleActive, User } from 'shared-types'
+import type { SetRole, ToggleActive, User } from 'shared-types'
 import { SetRoleSchema, ToggleActiveSchema, UserSchema } from 'shared-types'
 import { z } from 'zod'
 
@@ -8,7 +8,7 @@ export async function getUsers(): Promise<User[]> {
   return z.array(UserSchema).parse(data)
 }
 
-export async function setUserRole(userId: number, role: AppRole): Promise<void> {
+export async function setUserRole(userId: number, role: string): Promise<void> {
   const setUserRoleBody = SetRoleSchema.parse({ role } satisfies SetRole)
   await api.put(`/admin/users/${userId}/role`, setUserRoleBody)
 }

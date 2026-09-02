@@ -1,26 +1,7 @@
 import { z } from 'zod'
 
-export const AppRoles = [
-  'admin',
-  'leadership',
-  'general_manager',
-  'inventory_manager',
-  'senior_accountant',
-  'accountant',
-  'tech',
-  'branch_manager',
-  'senior_sales',
-  'sales',
-  'sales_assistant',
-  'shipping',
-  'picker',
-  'member',
-] as const
-
-export type AppRole = (typeof AppRoles)[number]
-
 export const SetRoleSchema = z.object({
-  role: z.enum(AppRoles),
+  role: z.string(),
 })
 export type SetRole = z.infer<typeof SetRoleSchema>
 
@@ -29,7 +10,7 @@ export const UserSchema = z.object({
   name: z.string(),
   email: z.string().nullable(),
   is_active: z.boolean(),
-  role: z.enum(AppRoles).nullable(),
+  role: z.string().nullable(),
   clerk_id: z.string().nullable(),
   default_warehouse_id: z.int().nullable(),
 })

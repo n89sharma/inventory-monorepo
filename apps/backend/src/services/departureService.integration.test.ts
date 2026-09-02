@@ -1,9 +1,4 @@
-import {
-  ASSET_STATUS,
-  DEFAULT_OUTGOING_STATUS,
-  OUTGOING_STATUS,
-  ROLE_PERMISSIONS,
-} from 'shared-types'
+import { ASSET_STATUS, DEFAULT_OUTGOING_STATUS, OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
@@ -36,13 +31,6 @@ import {
 } from './departureService.js'
 import { createHold } from './holdService.js'
 import { createInvoice } from './invoiceService.js'
-
-const ROLES_WITH_RETURN_TO_STOCK = [
-  'admin',
-  'leadership',
-  'general_manager',
-  'inventory_manager',
-] as const
 
 async function getAssetCollectionLinks(assetId: number) {
   return prisma.asset.findUniqueOrThrow({
@@ -383,12 +371,5 @@ describe('departureService', () => {
     expect(priceChange?.before?.sale_price).toBe(SEEDED_ASSET_COST.sale_price)
     expect(priceChange?.after?.sale_price).toBeNull()
     expect(changesFor('Asset').some((c) => c.after?.status === ASSET_STATUS.IN_STOCK)).toBe(true)
-  })
-
-  it('grants return_to_stock to exactly the four intended roles', () => {
-    const granted = Object.entries(ROLE_PERMISSIONS)
-      .filter(([, permissions]) => permissions.includes('return_to_stock'))
-      .map(([role]) => role)
-    expect(granted.sort()).toEqual([...ROLES_WITH_RETURN_TO_STOCK].sort())
   })
 })

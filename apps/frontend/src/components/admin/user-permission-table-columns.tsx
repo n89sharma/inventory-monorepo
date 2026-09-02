@@ -2,7 +2,7 @@ import { Button } from '@/components/shadcn/button'
 import { sortableHeader } from '@/components/table-columns/column-primitives'
 import { CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { User } from 'shared-types'
+import type { Role, User } from 'shared-types'
 
 function ActivationButton({
   user,
@@ -28,11 +28,13 @@ function ActivationButton({
 }
 
 export function createUserPermissionTableColumns(
+  roles: Role[],
   currentUserId: number | null | undefined,
   onEditRole: (user: User) => void,
   onDeactivate: (user: User) => void,
   onReactivate: (user: User) => void,
 ): ColumnDef<User>[] {
+  const roleByCode = new Map(roles.map((role) => [role.code, role]))
   return [
     {
       accessorKey: 'name',
@@ -47,7 +49,8 @@ export function createUserPermissionTableColumns(
     {
       accessorKey: 'role',
       header: sortableHeader<User>('Role'),
-      cell: ({ row }) => row.original.role ?? '',
+      cell: ({ row }) =>
+        row.original.role ? (roleByCode.get(row.original.role)?.name ?? row.original.role) : '',
     },
     {
       id: 'clerk_user',
@@ -71,7 +74,8 @@ export function createUserPermissionTableColumns(
       meta: { reorderable: false },
       cell: ({ row }) => {
         const user = row.original
-        if (user.id === currentUserId || user.role === 'admin' || !user.clerk_id) return null
+        const isSystemRole = user.role !== null && (roleByCode.get(user.role)?.is_system ?? false)
+        if (user.id === currentUserId || isSystemRole || !user.clerk_id) return null
         return (
           <div className="flex gap-2 justify-center">
             <Button variant="outline" size="sm" onClick={() => onEditRole(user)}>

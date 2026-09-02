@@ -1,12 +1,10 @@
 import { prisma } from '../prisma.js'
 
-export const DEFAULT_ROLE = 'member'
-
 interface ClerkUserCreatedInput {
   clerkId: string
   email: string | null
   name: string
-  role: string
+  role: string | null
 }
 
 interface ClerkUserUpdatedInput {

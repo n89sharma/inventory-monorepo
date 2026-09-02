@@ -3,8 +3,8 @@ import { verifyWebhook } from '@clerk/express/webhooks'
 import { Request, Response } from 'express'
 import { userIdCache } from '../middleware/requireAuth.js'
 import { logger } from '../lib/logger.js'
+import { getDefaultRoleCode } from '../services/roleService.js'
 import {
-  DEFAULT_ROLE,
   deactivateClerkUser,
   syncClerkUserCreated,
   syncClerkUserUpdated,
@@ -43,12 +43,13 @@ export async function handleClerkWebhook(req: Request, res: Response) {
       const email = getPrimaryEmail(email_addresses, primary_email_address_id)
       const name = buildName(first_name, last_name, email?.split('@')[0] ?? id)
 
-      await syncClerkUserCreated({ clerkId: id, email, name, role: DEFAULT_ROLE })
+      const defaultRole = await getDefaultRoleCode()
+      await syncClerkUserCreated({ clerkId: id, email, name, role: defaultRole })
 
       // Only set Clerk metadata if no role exists yet (preserves manually assigned roles)
       const existingRole = evt.data.public_metadata?.role
       if (!existingRole) {
-        await clerkClient.users.updateUserMetadata(id, { publicMetadata: { role: DEFAULT_ROLE } })
+        await clerkClient.users.updateUserMetadata(id, { publicMetadata: { role: defaultRole } })
       }
     }
 

@@ -29,29 +29,28 @@ import {
 } from '@/components/shadcn/select'
 import { Toggle } from '@/components/shadcn/toggle'
 import { useCurrentUser } from '@/hooks/use-current-user'
+import { useRoles } from '@/hooks/use-role-list'
 import { useUsers } from '@/hooks/use-user'
 import { useUserMutations } from '@/hooks/use-user-mutations'
-import { formatTitleCase } from '@/lib/formatters'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useCallback, useMemo, useState } from 'react'
-import { AppRoles, type AppRole, type User } from 'shared-types'
+import { type User } from 'shared-types'
 import { toast } from 'sonner'
 import { createUserPermissionTableColumns } from './user-permission-table-columns'
 
 const TABLE_LABEL = 'Users'
 
-const ASSIGNABLE_ROLES = AppRoles.filter((r) => r !== 'admin')
-
 export function UserManagementPage() {
   const currentUserId = useCurrentUser()?.id
 
   const users = useUsers()
+  const roles = useRoles()
   const { setUserRole, toggleUserActive } = useUserMutations()
 
   const [showActiveOnly, setShowActiveOnly] = useState(true)
   const [showClerkOnly, setShowClerkOnly] = useState(true)
   const [editRoleTarget, setEditRoleTarget] = useState<User | null>(null)
-  const [selectedRole, setSelectedRole] = useState<AppRole | ''>('')
+  const [selectedRole, setSelectedRole] = useState('')
   const [roleSaving, setRoleSaving] = useState(false)
   const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null)
 
@@ -107,12 +106,13 @@ export function UserManagementPage() {
   const columns = useMemo(
     () =>
       createUserPermissionTableColumns(
+        roles,
         currentUserId,
         handleEditRole,
         handleDeactivate,
         handleReactivate,
       ),
-    [currentUserId, handleEditRole, handleDeactivate, handleReactivate],
+    [roles, currentUserId, handleEditRole, handleDeactivate, handleReactivate],
   )
 
   return (
@@ -179,17 +179,19 @@ export function UserManagementPage() {
           </DialogHeader>
           <Field>
             <FieldLabel>New Role</FieldLabel>
-            <Select value={selectedRole} onValueChange={(val) => setSelectedRole(val as AppRole)}>
+            <Select value={selectedRole} onValueChange={setSelectedRole}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent position="popper">
                 <SelectGroup>
-                  {ASSIGNABLE_ROLES.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {formatTitleCase(role)}
-                    </SelectItem>
-                  ))}
+                  {roles
+                    .filter((role) => !role.is_system)
+                    .map((role) => (
+                      <SelectItem key={role.code} value={role.code}>
+                        {role.name}
+                      </SelectItem>
+                    ))}
                 </SelectGroup>
               </SelectContent>
             </Select>

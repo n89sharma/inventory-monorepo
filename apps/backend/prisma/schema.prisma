@@ -45,6 +45,31 @@ model InvoiceType {
   invoices Invoice[]
 }
 
+model Role {
+  code        String  @id
+  name        String  @unique
+  is_system   Boolean @default(false)
+  is_default  Boolean @default(false)
+  permissions RolePermission[]
+  users       User[]
+}
+
+model Permission {
+  key   String           @id
+  roles RolePermission[]
+}
+
+model RolePermission {
+  role_code      String
+  permission_key String
+
+  role       Role       @relation(fields: [role_code], references: [code], onDelete: Cascade)
+  permission Permission @relation(fields: [permission_key], references: [key], onDelete: Cascade)
+
+  @@id([role_code, permission_key])
+  @@index([permission_key])
+}
+
 model Country {
   id     Int     @id @default(autoincrement())
   name   String
@@ -541,6 +566,7 @@ model User {
   default_warehouse_id Int?
   role                 String?
 
+  assigned_role        Role?               @relation(fields: [role], references: [code], onDelete: Restrict, onUpdate: Restrict)
   default_warehouse    Warehouse?          @relation(fields: [default_warehouse_id], references: [id])
   asset_errors_added   AssetError[]        @relation("ErrorAddedBy")
   asset_errors_fixed   AssetError[]        @relation("ErrorFixedBy")

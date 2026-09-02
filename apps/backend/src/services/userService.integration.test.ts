@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { prisma } from '../prisma.js'
-import { DEFAULT_ROLE, deactivateClerkUser, syncClerkUserCreated } from './userService.js'
+import { deactivateClerkUser, syncClerkUserCreated } from './userService.js'
 
 // Distinct prefix so cleanup can target only rows this suite creates — users are not
 // touched by cleanupTransactionalData, and `name` is unique so leftovers would break reruns.
 const NAME_PREFIX = 'clerk-test:'
+const DEFAULT_ROLE = 'member'
 
 async function cleanupUsers(): Promise<void> {
   await prisma.user.deleteMany({ where: { name: { startsWith: NAME_PREFIX } } })

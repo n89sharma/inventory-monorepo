@@ -1,7 +1,7 @@
 import { makeAssetSearchRow } from '@/test/asset-factories'
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { AppRole, AssetSearchRow } from 'shared-types'
+import type { AssetSearchRow, Permission } from 'shared-types'
 import { AssetCostTotalsRow } from './asset-cost-totals-row'
 
 const NO_COST = {
@@ -14,16 +14,18 @@ const NO_COST = {
   cost_sale_price: null,
 } as const satisfies Partial<AssetSearchRow>
 
-const mocks = vi.hoisted(() => ({ role: 'admin' as AppRole }))
+const ALL_PRICE_PERMISSIONS: Permission[] = ['view_purchase_price', 'view_sale_price']
 
-vi.mock('@/hooks/use-role', () => ({ useRole: () => mocks.role }))
+const mocks = vi.hoisted(() => ({ permissions: [] as Permission[] }))
+
+vi.mock('@/hooks/use-my-permissions', () => ({ useMyPermissions: () => mocks.permissions }))
 
 function totalFor(label: string): string {
   return screen.getByText(label).nextElementSibling?.textContent ?? ''
 }
 
 beforeEach(() => {
-  mocks.role = 'admin'
+  mocks.permissions = ALL_PRICE_PERMISSIONS
 })
 
 describe('AssetCostTotalsRow', () => {
@@ -108,15 +110,15 @@ describe('AssetCostTotalsRow', () => {
   // The row reads as one profitability statement, so a viewer who may see only half of
   // it sees none of it: sale prices alone would let purchase costs be inferred from any
   // margin, and the line would not add up.
-  it('renders nothing for a role holding only view_sale_price', () => {
-    mocks.role = 'sales'
+  it('renders nothing for a viewer holding only view_sale_price', () => {
+    mocks.permissions = ['view_sale_price']
     const { container } = render(<AssetCostTotalsRow assets={[makeAssetSearchRow()]} />)
 
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders nothing for a role with neither price permission', () => {
-    mocks.role = 'member'
+  it('renders nothing for a viewer with neither price permission', () => {
+    mocks.permissions = []
     const { container } = render(<AssetCostTotalsRow assets={[makeAssetSearchRow()]} />)
 
     expect(container).toBeEmptyDOMElement()

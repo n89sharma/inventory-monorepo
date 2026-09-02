@@ -1,8 +1,9 @@
 import { getAuth } from '@clerk/express'
 import { NextFunction, Request, Response } from 'express'
 import { LRUCache } from 'lru-cache'
-import { ROLE_PERMISSIONS, response401 } from 'shared-types'
+import { response401 } from 'shared-types'
 import { prisma } from '../prisma.js'
+import { getPermissionsForRole, NO_PERMISSIONS } from '../services/roleService.js'
 
 // clerk_id → internal DB user id
 const USER_ID_CACHE_MAX = 500
@@ -20,7 +21,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
 
   const role = sessionClaims?.metadata?.role ?? null
-  res.locals.permissions = new Set(role ? ROLE_PERMISSIONS[role] : [])
+  res.locals.permissions = role ? await getPermissionsForRole(role) : NO_PERMISSIONS
 
   const cached = userIdCache.get(userId)
   if (cached !== undefined) {

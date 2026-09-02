@@ -57,6 +57,9 @@ export const ModelName = {
   Readiness: 'Readiness',
   FileType: 'FileType',
   InvoiceType: 'InvoiceType',
+  Role: 'Role',
+  Permission: 'Permission',
+  RolePermission: 'RolePermission',
   Country: 'Country',
   Asset: 'Asset',
   TechnicalSpecification: 'TechnicalSpecification',
@@ -151,6 +154,31 @@ export const InvoiceTypeScalarFieldEnum = {
 } as const
 
 export type InvoiceTypeScalarFieldEnum = (typeof InvoiceTypeScalarFieldEnum)[keyof typeof InvoiceTypeScalarFieldEnum]
+
+
+export const RoleScalarFieldEnum = {
+  code: 'code',
+  name: 'name',
+  is_system: 'is_system',
+  is_default: 'is_default'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  key: 'key'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  role_code: 'role_code',
+  permission_key: 'permission_key'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
 export const CountryScalarFieldEnum = {

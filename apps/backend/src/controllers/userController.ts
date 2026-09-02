@@ -6,8 +6,7 @@ import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
 import { userIdCache } from '../middleware/requireAuth.js'
 import { prisma } from '../prisma.js'
-
-const DEFAULT_ROLE = 'member'
+import { getDefaultRoleCode } from '../services/roleService.js'
 
 export const UserQuerySchema = z.object({
   filterActive: z
@@ -56,7 +55,7 @@ export const toggleUserActive = asyncHandler(async (req, res) => {
   if (!user) throw new NotFoundError('User not found')
   if (!user.clerk_id) throw new NotFoundError('User not in Clerk')
 
-  const role = is_active ? DEFAULT_ROLE : null
+  const role = is_active ? await getDefaultRoleCode() : null
 
   await Promise.all([
     prisma.user.update({ where: { id: targetDbUserId }, data: { is_active, role } }),

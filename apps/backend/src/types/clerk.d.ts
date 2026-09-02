@@ -1,11 +1,11 @@
-import type { AppRole, Permission } from 'shared-types'
+import type { Permission } from 'shared-types'
 
 export {}
 
 declare global {
   interface CustomJwtSessionClaims {
     metadata?: {
-      role?: AppRole
+      role?: string
     }
   }
 }

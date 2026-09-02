@@ -2,15 +2,15 @@ import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibili
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { AppRole } from 'shared-types'
+import { PERMISSIONS, type Permission } from 'shared-types'
 import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 
 const DEFAULT_IDS = ['location', 'status'] as const satisfies readonly AssetColumnId[]
 const PURCHASE_COST_ID = 'cost_purchase_cost' satisfies AssetColumnId
 
-const mocks = vi.hoisted(() => ({ role: 'admin' as AppRole }))
+const mocks = vi.hoisted(() => ({ permissions: [] as Permission[] }))
 
-vi.mock('@/hooks/use-role', () => ({ useRole: () => mocks.role }))
+vi.mock('@/hooks/use-my-permissions', () => ({ useMyPermissions: () => mocks.permissions }))
 
 function renderWithParams(
   searchParams: string,
@@ -27,7 +27,7 @@ function renderWithParams(
 }
 
 beforeEach(() => {
-  mocks.role = 'admin'
+  mocks.permissions = [...PERMISSIONS]
 })
 
 describe('useAssetColumnVisibilityParam', () => {
@@ -116,7 +116,7 @@ describe('useAssetColumnVisibilityParam', () => {
   })
 
   it('keeps a forced column hidden when the viewer lacks its permission', () => {
-    mocks.role = 'member'
+    mocks.permissions = []
     const { result } = renderWithParams('?cols=', undefined, [PURCHASE_COST_ID])
     expect(result.current.visibleColumns.has(PURCHASE_COST_ID)).toBe(false)
     expect(result.current.columnVisibility).not.toHaveProperty(PURCHASE_COST_ID)

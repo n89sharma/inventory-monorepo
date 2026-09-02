@@ -22,6 +22,8 @@ import savedViewRoutes from './routes/savedViewRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import storePartRoutes from './routes/storePartRoutes.js'
 import transferRoutes from './routes/transferRoutes.js'
+import meRoutes from './routes/meRoutes.js'
+import roleRoutes from './routes/roleRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
 
@@ -138,6 +140,8 @@ app.use('/locations', locationRoutes)
 app.use('/models', modelRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
+app.use('/roles', roleRoutes)
+app.use('/me', meRoutes)
 app.use('/admin', adminRoutes)
 app.use('/search', searchRoutes)
 app.use('/reports', reportRoutes)

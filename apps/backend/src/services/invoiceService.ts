@@ -1,5 +1,4 @@
 import {
-  AppRole,
   AssetDelta,
   CreateInvoice,
   INVOICE_TYPE,
@@ -289,7 +288,7 @@ export async function getInvoice(
       name: invoice.updated_by.name,
       email: invoice.updated_by.email,
       is_active: invoice.updated_by.is_active,
-      role: invoice.updated_by.role as AppRole | null,
+      role: invoice.updated_by.role,
       clerk_id: invoice.updated_by.clerk_id,
       default_warehouse_id: invoice.updated_by.default_warehouse_id,
     },
