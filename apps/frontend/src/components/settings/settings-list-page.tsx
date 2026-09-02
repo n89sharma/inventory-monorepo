@@ -10,15 +10,13 @@ import type {
   TableOptions,
 } from '@tanstack/react-table'
 
-const DEFAULT_SORT = { id: 'id', desc: false }
-
 interface SettingsListPageProps<TData, TValue> {
   title: string
   label: string
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   actions?: React.ReactNode
-  defaultSort?: { id: string; desc: boolean }
+  defaultSort: { id: string; desc: boolean }
   pinLeft?: string[]
   getRowId?: (row: TData) => string
   rowSelection?: RowSelectionState
@@ -33,7 +31,7 @@ export function SettingsListPage<TData, TValue>({
   columns,
   data,
   actions,
-  defaultSort = DEFAULT_SORT,
+  defaultSort,
   pinLeft,
   getRowId,
   rowSelection,

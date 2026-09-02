@@ -20,6 +20,8 @@ import { CollectionPage } from '../collections/collection-page'
 import { SearchBar } from '../shared/search-bar'
 import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
 
+const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
+
 export function HoldSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
   const [holdBy, setHoldBy] = useHeldByOptionParam()
@@ -44,6 +46,7 @@ export function HoldSummaryPage(): React.JSX.Element {
       title="Holds"
       columns={columns}
       data={holds}
+      defaultSort={CREATED_AT_DESC_SORT}
       onRowMouseEnter={(hold) => preloadHoldDetail(hold.hold_number)}
       getRowHref={getRowHref}
       searchBar={

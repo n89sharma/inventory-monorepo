@@ -20,6 +20,8 @@ import { SearchBar } from '../shared/search-bar'
 import { SearchSelectOptionFilter } from '../shared/search-select/search-select-option-filter'
 import { SelectOptionsInline } from '../shared/search-select/select-options'
 
+const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
+
 export function ArrivalsSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
   const [destination, setDestination] = useDestinationOptionParam()
@@ -44,6 +46,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
       title="Arrivals"
       columns={columns}
       data={arrivals}
+      defaultSort={CREATED_AT_DESC_SORT}
       onRowMouseEnter={(arrival) => preloadArrivalDetail(arrival.arrival_number)}
       getRowHref={getRowHref}
       searchBar={

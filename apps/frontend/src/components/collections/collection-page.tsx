@@ -15,7 +15,7 @@ interface CollectionPageProps<TData, TValue> {
   actions?: React.ReactNode
   onRowMouseEnter?: (row: TData) => void
   getRowHref?: (row: TData) => string
-  defaultSort?: { id: string; desc: boolean }
+  defaultSort: { id: string; desc: boolean }
   pinLeft?: string[]
   renderTableFilter?: (table: Table<TData>) => React.ReactNode
 }
@@ -29,7 +29,7 @@ export function CollectionPage<TData, TValue>({
   actions,
   onRowMouseEnter,
   getRowHref,
-  defaultSort = { id: 'created_at', desc: true },
+  defaultSort,
   pinLeft,
   renderTableFilter,
 }: CollectionPageProps<TData, TValue>) {

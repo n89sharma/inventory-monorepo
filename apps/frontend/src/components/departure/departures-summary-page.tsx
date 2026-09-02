@@ -20,6 +20,8 @@ import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { DepartureSummary } from 'shared-types'
 
+const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
+
 export function DepartureSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
   const [origin, setOrigin] = useOriginOptionParam()
@@ -44,6 +46,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
       title="Departures"
       columns={columns}
       data={departures}
+      defaultSort={CREATED_AT_DESC_SORT}
       onRowMouseEnter={(departure) => preloadDepartureDetail(departure.departure_number)}
       getRowHref={getRowHref}
       searchBar={

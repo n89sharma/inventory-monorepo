@@ -27,6 +27,7 @@ import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
 const PINNED_COLUMN_IDS = ['invoice_date', 'invoice_reference']
+const INVOICE_DATE_DESC_SORT = { id: 'invoice_date', desc: true } as const
 const CSV_MIME_TYPE = 'text/csv'
 const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 
@@ -78,6 +79,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       title={INVOICE_PAGE_TITLE[invoiceType]}
       columns={columns}
       data={invoices}
+      defaultSort={INVOICE_DATE_DESC_SORT}
       pinLeft={PINNED_COLUMN_IDS}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
