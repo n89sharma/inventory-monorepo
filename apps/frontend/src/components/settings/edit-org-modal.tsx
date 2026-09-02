@@ -1,4 +1,4 @@
-import { ControlledInputWithClear } from '@/components/settings/controlled-input-with-clear'
+import { OrgFormFields } from '@/components/settings/org-form-fields'
 import { useOrgMutations } from '@/hooks/use-org-mutations'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
 import { flattenFieldErrors } from '@/lib/utils'
@@ -10,7 +10,6 @@ import type { OrgDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
-import { FieldGroup } from '../shadcn/field'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
 
 interface EditOrgModalProps {
@@ -72,79 +71,7 @@ export function EditOrgModal({ open, onOpenChange, org }: EditOrgModalProps): Re
           <DialogTitle>Edit Organization</DialogTitle>
         </DialogHeader>
         <form onSubmit={(e) => e.preventDefault()}>
-          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <ControlledInputWithClear
-              control={form.control}
-              name="account_number"
-              fieldLabel="Account Number"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="name"
-              fieldLabel="Name"
-              fieldRequired={true}
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="contact_name"
-              fieldLabel="Contact Name"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="phone"
-              fieldLabel="Phone"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="mobile"
-              fieldLabel="Mobile"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="primary_email"
-              fieldLabel="Email"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="address"
-              fieldLabel="Address"
-              inputType="string"
-              className="col-span-2"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="city"
-              fieldLabel="City"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="province"
-              fieldLabel="Province"
-              inputType="string"
-            />
-
-            <ControlledInputWithClear
-              control={form.control}
-              name="country"
-              fieldLabel="Country"
-              inputType="string"
-            />
-          </FieldGroup>
+          <OrgFormFields control={form.control} />
         </form>
         <DialogFooter>
           <Button variant="secondary" onClick={submitForm} type="button" disabled={isSubmitting}>
