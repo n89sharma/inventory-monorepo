@@ -28,6 +28,7 @@ const PURCHASE_INVOICE: InvoiceSummary = {
   transporters: ['Speedy'],
   purchase_cost: 1200,
   transport_cost: 300,
+  transfer_cost: 150,
   total_cost: 1500,
   sale_price: null,
 }
@@ -68,6 +69,7 @@ describe('invoice summary CSV columns', () => {
       'Cleared',
       'Purchase Cost',
       'Transport Cost',
+      'Transfer Cost',
       'Total Cost',
       'Sale Price',
       'Notes',

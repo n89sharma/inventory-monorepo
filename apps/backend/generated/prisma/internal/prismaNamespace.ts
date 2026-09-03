@@ -3502,6 +3502,7 @@ export const CostScalarFieldEnum = {
   asset_id: 'asset_id',
   purchase_cost: 'purchase_cost',
   transport_cost: 'transport_cost',
+  transfer_cost: 'transfer_cost',
   processing_cost: 'processing_cost',
   other_cost: 'other_cost',
   parts_cost: 'parts_cost',

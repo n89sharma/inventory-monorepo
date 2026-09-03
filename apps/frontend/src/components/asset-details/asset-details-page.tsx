@@ -516,6 +516,11 @@ export const AssetDetailsPage = () => {
                           rowClassName={ROW_GAP}
                         />
                         <DataCurrencyRow
+                          label="Transfer Cost"
+                          value={cost.transfer_cost}
+                          rowClassName={ROW_GAP}
+                        />
+                        <DataCurrencyRow
                           label="Processing Cost"
                           value={cost.processing_cost}
                           rowClassName={ROW_GAP}

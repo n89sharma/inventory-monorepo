@@ -13,6 +13,7 @@ import { bulkUpdateAssetPricing, patchAssetPricing } from './assetPricingService
 const FULL_PRICING = {
   purchase_cost: 100,
   transport_cost: 10,
+  transfer_cost: 8,
   processing_cost: 5,
   other_cost: 2,
   parts_cost: 3,
@@ -34,13 +35,13 @@ describe('assetPricingService', () => {
     await cleanupTransactionalData()
   })
 
-  it('computes total_cost as the sum of the five cost components', async () => {
+  it('computes total_cost as the sum of the six cost components', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
 
     await patchAssetPricing(asset.barcode, FULL_PRICING, refs.userId)
 
     const cost = await getAssetCost(asset.id)
-    expect(cost?.total_cost).toBe(120)
+    expect(cost?.total_cost).toBe(128)
     expect(cost?.purchase_cost).toBe(100)
     expect(cost?.sale_price).toBe(200)
   })
@@ -51,14 +52,14 @@ describe('assetPricingService', () => {
 
     const returned = await patchAssetPricing(asset.barcode, { purchase_cost: 150 }, refs.userId)
 
-    expect(returned).toEqual({ ...FULL_PRICING, purchase_cost: 150, total_cost: 170 })
+    expect(returned).toEqual({ ...FULL_PRICING, purchase_cost: 150, total_cost: 178 })
     const cost = await getAssetCost(asset.id)
     expect(cost?.purchase_cost).toBe(150)
     expect(cost?.transport_cost).toBe(10)
     expect(cost?.other_cost).toBe(2)
     expect(cost?.parts_cost).toBe(3)
     expect(cost?.sale_price).toBe(200)
-    expect(cost?.total_cost).toBe(170)
+    expect(cost?.total_cost).toBe(178)
   })
 
   it('creates the cost row when the asset has none, leaving unpatched fields null', async () => {
@@ -69,6 +70,7 @@ describe('assetPricingService', () => {
     expect(returned).toEqual({
       purchase_cost: null,
       transport_cost: null,
+      transfer_cost: null,
       processing_cost: null,
       other_cost: null,
       parts_cost: null,
@@ -98,7 +100,7 @@ describe('assetPricingService', () => {
     expect(cost?.other_cost).toBe(FULL_PRICING.other_cost)
     expect(cost?.sale_price).toBe(FULL_PRICING.sale_price)
     expect(cost?.purchase_cost).toBe(200)
-    expect(cost?.total_cost).toBe(200 + 10 + 5 + 2 + 3)
+    expect(cost?.total_cost).toBe(200 + 10 + 8 + 5 + 2 + 3)
   })
 
   it('applies a bulk update per asset, leaving the others alone', async () => {

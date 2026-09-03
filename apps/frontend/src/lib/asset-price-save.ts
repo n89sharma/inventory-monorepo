@@ -20,6 +20,7 @@ function withCost(asset: AssetSearchRow, cost: AssetCost): AssetSearchRow {
     ...asset,
     cost_purchase_cost: cost.purchase_cost,
     cost_transport_cost: cost.transport_cost,
+    cost_transfer_cost: cost.transfer_cost,
     cost_processing_cost: cost.processing_cost,
     cost_other_cost: cost.other_cost,
     cost_parts_cost: cost.parts_cost,

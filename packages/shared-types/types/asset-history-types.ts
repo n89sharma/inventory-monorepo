@@ -35,6 +35,7 @@ export const AssetUpdateDiffSchema = z.object({
   toner_life_k: z.number().nullable().optional(),
   purchase_cost: z.number().nullable().optional(),
   transport_cost: z.number().nullable().optional(),
+  transfer_cost: z.number().nullable().optional(),
   processing_cost: z.number().nullable().optional(),
   other_cost: z.number().nullable().optional(),
   parts_cost: z.number().nullable().optional(),

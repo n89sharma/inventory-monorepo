@@ -10,6 +10,7 @@ export function redactSearchRowCost(
     ...row,
     cost_purchase_cost: canViewPurchase ? row.cost_purchase_cost : null,
     cost_transport_cost: canViewPurchase ? row.cost_transport_cost : null,
+    cost_transfer_cost: canViewPurchase ? row.cost_transfer_cost : null,
     cost_processing_cost: canViewPurchase ? row.cost_processing_cost : null,
     cost_other_cost: canViewPurchase ? row.cost_other_cost : null,
     cost_parts_cost: canViewPurchase ? row.cost_parts_cost : null,
@@ -28,6 +29,7 @@ export function redactAssetCost(
   return {
     purchase_cost: canViewPurchase ? cost.purchase_cost : null,
     transport_cost: canViewPurchase ? cost.transport_cost : null,
+    transfer_cost: canViewPurchase ? cost.transfer_cost : null,
     processing_cost: canViewPurchase ? cost.processing_cost : null,
     other_cost: canViewPurchase ? cost.other_cost : null,
     parts_cost: canViewPurchase ? cost.parts_cost : null,

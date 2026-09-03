@@ -31,6 +31,7 @@ export type CostAvgAggregateOutputType = {
   asset_id: number | null
   purchase_cost: runtime.Decimal | null
   transport_cost: runtime.Decimal | null
+  transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   parts_cost: runtime.Decimal | null
@@ -43,6 +44,7 @@ export type CostSumAggregateOutputType = {
   asset_id: number | null
   purchase_cost: runtime.Decimal | null
   transport_cost: runtime.Decimal | null
+  transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   parts_cost: runtime.Decimal | null
@@ -55,6 +57,7 @@ export type CostMinAggregateOutputType = {
   asset_id: number | null
   purchase_cost: runtime.Decimal | null
   transport_cost: runtime.Decimal | null
+  transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   parts_cost: runtime.Decimal | null
@@ -67,6 +70,7 @@ export type CostMaxAggregateOutputType = {
   asset_id: number | null
   purchase_cost: runtime.Decimal | null
   transport_cost: runtime.Decimal | null
+  transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   parts_cost: runtime.Decimal | null
@@ -79,6 +83,7 @@ export type CostCountAggregateOutputType = {
   asset_id: number
   purchase_cost: number
   transport_cost: number
+  transfer_cost: number
   processing_cost: number
   other_cost: number
   parts_cost: number
@@ -93,6 +98,7 @@ export type CostAvgAggregateInputType = {
   asset_id?: true
   purchase_cost?: true
   transport_cost?: true
+  transfer_cost?: true
   processing_cost?: true
   other_cost?: true
   parts_cost?: true
@@ -105,6 +111,7 @@ export type CostSumAggregateInputType = {
   asset_id?: true
   purchase_cost?: true
   transport_cost?: true
+  transfer_cost?: true
   processing_cost?: true
   other_cost?: true
   parts_cost?: true
@@ -117,6 +124,7 @@ export type CostMinAggregateInputType = {
   asset_id?: true
   purchase_cost?: true
   transport_cost?: true
+  transfer_cost?: true
   processing_cost?: true
   other_cost?: true
   parts_cost?: true
@@ -129,6 +137,7 @@ export type CostMaxAggregateInputType = {
   asset_id?: true
   purchase_cost?: true
   transport_cost?: true
+  transfer_cost?: true
   processing_cost?: true
   other_cost?: true
   parts_cost?: true
@@ -141,6 +150,7 @@ export type CostCountAggregateInputType = {
   asset_id?: true
   purchase_cost?: true
   transport_cost?: true
+  transfer_cost?: true
   processing_cost?: true
   other_cost?: true
   parts_cost?: true
@@ -240,6 +250,7 @@ export type CostGroupByOutputType = {
   asset_id: number
   purchase_cost: runtime.Decimal | null
   transport_cost: runtime.Decimal | null
+  transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   parts_cost: runtime.Decimal | null
@@ -275,6 +286,7 @@ export type CostWhereInput = {
   asset_id?: Prisma.IntFilter<"Cost"> | number
   purchase_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -288,6 +300,7 @@ export type CostOrderByWithRelationInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   transport_cost?: Prisma.SortOrderInput | Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   other_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   parts_cost?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -304,6 +317,7 @@ export type CostWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CostWhereInput | Prisma.CostWhereInput[]
   purchase_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.DecimalNullableFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -317,6 +331,7 @@ export type CostOrderByWithAggregationInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   transport_cost?: Prisma.SortOrderInput | Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   other_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   parts_cost?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -337,6 +352,7 @@ export type CostScalarWhereWithAggregatesInput = {
   asset_id?: Prisma.IntWithAggregatesFilter<"Cost"> | number
   purchase_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Cost"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -347,6 +363,7 @@ export type CostScalarWhereWithAggregatesInput = {
 export type CostCreateInput = {
   purchase_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -360,6 +377,7 @@ export type CostUncheckedCreateInput = {
   asset_id: number
   purchase_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -370,6 +388,7 @@ export type CostUncheckedCreateInput = {
 export type CostUpdateInput = {
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -383,6 +402,7 @@ export type CostUncheckedUpdateInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -395,6 +415,7 @@ export type CostCreateManyInput = {
   asset_id: number
   purchase_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -405,6 +426,7 @@ export type CostCreateManyInput = {
 export type CostUpdateManyMutationInput = {
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -417,6 +439,7 @@ export type CostUncheckedUpdateManyInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -434,6 +457,7 @@ export type CostCountOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrder
   transport_cost?: Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   parts_cost?: Prisma.SortOrder
@@ -446,6 +470,7 @@ export type CostAvgOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrder
   transport_cost?: Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   parts_cost?: Prisma.SortOrder
@@ -458,6 +483,7 @@ export type CostMaxOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrder
   transport_cost?: Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   parts_cost?: Prisma.SortOrder
@@ -470,6 +496,7 @@ export type CostMinOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrder
   transport_cost?: Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   parts_cost?: Prisma.SortOrder
@@ -482,6 +509,7 @@ export type CostSumOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   purchase_cost?: Prisma.SortOrder
   transport_cost?: Prisma.SortOrder
+  transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   parts_cost?: Prisma.SortOrder
@@ -532,6 +560,7 @@ export type NullableDecimalFieldUpdateOperationsInput = {
 export type CostCreateWithoutAssetInput = {
   purchase_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -543,6 +572,7 @@ export type CostUncheckedCreateWithoutAssetInput = {
   id?: number
   purchase_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -569,6 +599,7 @@ export type CostUpdateToOneWithWhereWithoutAssetInput = {
 export type CostUpdateWithoutAssetInput = {
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -580,6 +611,7 @@ export type CostUncheckedUpdateWithoutAssetInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   purchase_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   transport_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   other_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   parts_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -594,6 +626,7 @@ export type CostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   asset_id?: boolean
   purchase_cost?: boolean
   transport_cost?: boolean
+  transfer_cost?: boolean
   processing_cost?: boolean
   other_cost?: boolean
   parts_cost?: boolean
@@ -607,6 +640,7 @@ export type CostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   asset_id?: boolean
   purchase_cost?: boolean
   transport_cost?: boolean
+  transfer_cost?: boolean
   processing_cost?: boolean
   other_cost?: boolean
   parts_cost?: boolean
@@ -620,6 +654,7 @@ export type CostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   asset_id?: boolean
   purchase_cost?: boolean
   transport_cost?: boolean
+  transfer_cost?: boolean
   processing_cost?: boolean
   other_cost?: boolean
   parts_cost?: boolean
@@ -633,6 +668,7 @@ export type CostSelectScalar = {
   asset_id?: boolean
   purchase_cost?: boolean
   transport_cost?: boolean
+  transfer_cost?: boolean
   processing_cost?: boolean
   other_cost?: boolean
   parts_cost?: boolean
@@ -640,7 +676,7 @@ export type CostSelectScalar = {
   sale_price?: boolean
 }
 
-export type CostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "purchase_cost" | "transport_cost" | "processing_cost" | "other_cost" | "parts_cost" | "total_cost" | "sale_price", ExtArgs["result"]["cost"]>
+export type CostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "asset_id" | "purchase_cost" | "transport_cost" | "transfer_cost" | "processing_cost" | "other_cost" | "parts_cost" | "total_cost" | "sale_price", ExtArgs["result"]["cost"]>
 export type CostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
 }
@@ -661,6 +697,7 @@ export type $CostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     asset_id: number
     purchase_cost: runtime.Decimal | null
     transport_cost: runtime.Decimal | null
+    transfer_cost: runtime.Decimal | null
     processing_cost: runtime.Decimal | null
     other_cost: runtime.Decimal | null
     parts_cost: runtime.Decimal | null
@@ -1094,6 +1131,7 @@ export interface CostFieldRefs {
   readonly asset_id: Prisma.FieldRef<"Cost", 'Int'>
   readonly purchase_cost: Prisma.FieldRef<"Cost", 'Decimal'>
   readonly transport_cost: Prisma.FieldRef<"Cost", 'Decimal'>
+  readonly transfer_cost: Prisma.FieldRef<"Cost", 'Decimal'>
   readonly processing_cost: Prisma.FieldRef<"Cost", 'Decimal'>
   readonly other_cost: Prisma.FieldRef<"Cost", 'Decimal'>
   readonly parts_cost: Prisma.FieldRef<"Cost", 'Decimal'>

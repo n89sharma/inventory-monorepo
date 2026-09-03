@@ -19,6 +19,7 @@ select
   arr.transporters as transporters,
   cost.purchase_cost as purchase_cost,
   cost.transport_cost as transport_cost,
+  cost.transfer_cost as transfer_cost,
   cost.total_cost as total_cost,
   cost.sale_price as sale_price
 from "Invoice" i
@@ -54,6 +55,7 @@ from "Invoice" i
     select
       sum(c.purchase_cost) as purchase_cost,
       sum(c.transport_cost) as transport_cost,
+      sum(c.transfer_cost) as transfer_cost,
       sum(c.total_cost) as total_cost,
       sum(c.sale_price) as sale_price
     from "Asset" a

@@ -13,6 +13,7 @@ import { recordAssetUpdate } from './historyService.js'
 const COST_SELECT = {
   purchase_cost: true,
   transport_cost: true,
+  transfer_cost: true,
   processing_cost: true,
   other_cost: true,
   parts_cost: true,
@@ -26,6 +27,7 @@ function toAssetCost(row: CostRow | null): AssetCost {
   return {
     purchase_cost: decimalToNumber(row?.purchase_cost ?? null),
     transport_cost: decimalToNumber(row?.transport_cost ?? null),
+    transfer_cost: decimalToNumber(row?.transfer_cost ?? null),
     processing_cost: decimalToNumber(row?.processing_cost ?? null),
     other_cost: decimalToNumber(row?.other_cost ?? null),
     parts_cost: decimalToNumber(row?.parts_cost ?? null),
@@ -40,6 +42,7 @@ function mergePricing(current: AssetCost, patch: PatchAssetPricing): AssetCost {
   const merged = {
     purchase_cost: patch.purchase_cost ?? current.purchase_cost,
     transport_cost: patch.transport_cost ?? current.transport_cost,
+    transfer_cost: patch.transfer_cost ?? current.transfer_cost,
     processing_cost: patch.processing_cost ?? current.processing_cost,
     other_cost: patch.other_cost ?? current.other_cost,
     parts_cost: patch.parts_cost ?? current.parts_cost,

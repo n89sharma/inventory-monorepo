@@ -95,6 +95,7 @@ type AssetSearchRowDb = LocationRow & {
   specs_toner_life_k: number | null
   cost_purchase_cost: Prisma.Decimal | null
   cost_transport_cost: Prisma.Decimal | null
+  cost_transfer_cost: Prisma.Decimal | null
   cost_processing_cost: Prisma.Decimal | null
   cost_other_cost: Prisma.Decimal | null
   cost_parts_cost: Prisma.Decimal | null
@@ -150,6 +151,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     specs_toner_life_k: r.specs_toner_life_k,
     cost_purchase_cost: decimalToNumber(r.cost_purchase_cost),
     cost_transport_cost: decimalToNumber(r.cost_transport_cost),
+    cost_transfer_cost: decimalToNumber(r.cost_transfer_cost),
     cost_processing_cost: decimalToNumber(r.cost_processing_cost),
     cost_other_cost: decimalToNumber(r.cost_other_cost),
     cost_parts_cost: decimalToNumber(r.cost_parts_cost),
@@ -203,6 +205,7 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     cost: {
       purchase_cost: r.purchase_cost?.toNumber() ?? null,
       transport_cost: r.transport_cost?.toNumber() ?? null,
+      transfer_cost: r.transfer_cost?.toNumber() ?? null,
       processing_cost: r.processing_cost?.toNumber() ?? null,
       other_cost: r.other_cost?.toNumber() ?? null,
       parts_cost: r.parts_cost?.toNumber() ?? null,

@@ -25,6 +25,7 @@ select
   -- cost
   c.purchase_cost as purchase_cost,
   c.transport_cost as transport_cost,
+  c.transfer_cost as transfer_cost,
   c.processing_cost as processing_cost,
   c.other_cost as other_cost,
   c.parts_cost as parts_cost,

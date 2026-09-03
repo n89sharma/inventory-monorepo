@@ -88,6 +88,7 @@ type AssetUpdateFields = Partial<{
   toner_life_k: number | null
   purchase_cost: number | null
   transport_cost: number | null
+  transfer_cost: number | null
   processing_cost: number | null
   other_cost: number | null
   parts_cost: number | null

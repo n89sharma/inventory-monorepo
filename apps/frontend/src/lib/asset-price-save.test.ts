@@ -21,10 +21,11 @@ const SPEC = { detailCacheKey: DETAIL_CACHE_KEY, invalidateLists: vi.fn() }
 const RECOMPUTED_COST: AssetCost = {
   purchase_cost: 300,
   transport_cost: 20,
+  transfer_cost: 15,
   processing_cost: 5,
   other_cost: 0,
   parts_cost: 0,
-  total_cost: 325,
+  total_cost: 340,
   sale_price: 200,
 }
 
@@ -59,7 +60,7 @@ describe('saveAssetPrice cache update', () => {
     ])
 
     expect(row.cost_purchase_cost).toBe(300)
-    expect(row.cost_total_cost).toBe(325)
+    expect(row.cost_total_cost).toBe(340)
   })
 
   it('refreshes every cost field, not only the one that was patched', async () => {
@@ -71,6 +72,7 @@ describe('saveAssetPrice cache update', () => {
     expect(row).toMatchObject({
       cost_purchase_cost: RECOMPUTED_COST.purchase_cost,
       cost_transport_cost: RECOMPUTED_COST.transport_cost,
+      cost_transfer_cost: RECOMPUTED_COST.transfer_cost,
       cost_processing_cost: RECOMPUTED_COST.processing_cost,
       cost_other_cost: RECOMPUTED_COST.other_cost,
       cost_parts_cost: RECOMPUTED_COST.parts_cost,

@@ -101,6 +101,7 @@ const TRANSPORT_COST_COLUMN = currencyColumn(
   'Transport Cost',
   'view_purchase_price',
 )
+const TRANSFER_COST_COLUMN = currencyColumn('transfer_cost', 'Transfer Cost', 'view_purchase_price')
 const TOTAL_COST_COLUMN = currencyColumn('total_cost', 'Total Cost', 'view_purchase_price')
 const SALE_PRICE_COLUMN = currencyColumn('sale_price', 'Sale Price', 'view_sale_price')
 
@@ -120,6 +121,7 @@ const PURCHASE_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
   CLEARED_COLUMN,
   PURCHASE_COST_COLUMN,
   TRANSPORT_COST_COLUMN,
+  TRANSFER_COST_COLUMN,
   TOTAL_COST_COLUMN,
   SALE_PRICE_COLUMN,
   NOTES_COLUMN,
@@ -133,6 +135,7 @@ const SALES_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
   organizationColumn('Customer'),
   PURCHASE_COST_COLUMN,
   TRANSPORT_COST_COLUMN,
+  TRANSFER_COST_COLUMN,
   TOTAL_COST_COLUMN,
   SALE_PRICE_COLUMN,
   NOTES_COLUMN,

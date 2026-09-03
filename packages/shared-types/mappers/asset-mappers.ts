@@ -25,6 +25,7 @@ export function searchRowToAssetSummary(row: AssetSearchRow): AssetSummary {
     cost: {
       purchase_cost: row.cost_purchase_cost,
       transport_cost: row.cost_transport_cost,
+      transfer_cost: row.cost_transfer_cost,
       processing_cost: row.cost_processing_cost,
       other_cost: row.cost_other_cost,
       parts_cost: row.cost_parts_cost,

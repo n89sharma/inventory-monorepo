@@ -15,6 +15,7 @@ import { getProfitabilityCube } from './profitabilityService.js'
 const NO_COST: typeof SEEDED_ASSET_COST = {
   purchase_cost: null,
   transport_cost: null,
+  transfer_cost: null,
   processing_cost: null,
   other_cost: null,
   parts_cost: null,

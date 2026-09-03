@@ -7,6 +7,7 @@ export const ASSET_PRICING_FIELDS = [...COST_COMPONENT_FIELDS, 'sale_price'] as 
 export const COST_FIELD_LABELS = {
   purchase_cost: 'Purchase Cost',
   transport_cost: 'Transport Cost',
+  transfer_cost: 'Transfer Cost',
   processing_cost: 'Processing Cost',
   other_cost: 'Other Cost',
   parts_cost: 'Parts Cost',

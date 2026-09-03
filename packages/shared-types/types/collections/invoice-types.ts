@@ -26,6 +26,7 @@ export const InvoiceSummarySchema = CollectionSummarySchema.extend({
   transporters: z.array(z.string()),
   purchase_cost: z.number().nullable(),
   transport_cost: z.number().nullable(),
+  transfer_cost: z.number().nullable(),
   total_cost: z.number().nullable(),
   sale_price: z.number().nullable(),
 })

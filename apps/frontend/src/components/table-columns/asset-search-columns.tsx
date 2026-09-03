@@ -406,6 +406,14 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => formatUSDWithSymbol(a.cost_transport_cost),
   },
   {
+    id: 'cost_transfer_cost',
+    label: 'Transfer Cost',
+    section: 'cost',
+    permissions: ['view_purchase_price'],
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_transfer_cost),
+  },
+  {
     id: 'cost_processing_cost',
     label: 'Processing Cost',
     section: 'cost',

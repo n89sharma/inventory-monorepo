@@ -1,6 +1,7 @@
 export const EDITABLE_PRICE_FIELDS = [
   'purchase_cost',
   'transport_cost',
+  'transfer_cost',
   'processing_cost',
   'other_cost',
   'sale_price',
@@ -11,6 +12,7 @@ export type EditablePriceField = (typeof EDITABLE_PRICE_FIELDS)[number]
 export const EDITABLE_PRICE_COLUMNS = {
   cost_purchase_cost: 'purchase_cost',
   cost_transport_cost: 'transport_cost',
+  cost_transfer_cost: 'transfer_cost',
   cost_processing_cost: 'processing_cost',
   cost_sale_price: 'sale_price',
 } as const satisfies Record<string, EditablePriceField>

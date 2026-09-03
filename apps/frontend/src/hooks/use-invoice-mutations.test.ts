@@ -35,6 +35,7 @@ function makeCost(purchaseCost: number): AssetCost {
   return {
     purchase_cost: purchaseCost,
     transport_cost: 0,
+    transfer_cost: 0,
     processing_cost: 0,
     other_cost: 0,
     parts_cost: 0,

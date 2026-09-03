@@ -253,6 +253,7 @@ export async function getInvoices(
     transporters: row.transporters ?? [],
     purchase_cost: canViewPurchase ? (decimalToNumber(row.purchase_cost) ?? 0) : null,
     transport_cost: canViewPurchase ? (decimalToNumber(row.transport_cost) ?? 0) : null,
+    transfer_cost: canViewPurchase ? (decimalToNumber(row.transfer_cost) ?? 0) : null,
     total_cost: canViewPurchase ? (decimalToNumber(row.total_cost) ?? 0) : null,
     sale_price: canViewSale ? (decimalToNumber(row.sale_price) ?? 0) : null,
   }))

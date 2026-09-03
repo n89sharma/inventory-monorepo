@@ -28,6 +28,7 @@ export function makeAssetSearchRow(overrides: Partial<AssetSearchRow> = {}): Ass
     specs_toner_life_k: null,
     cost_purchase_cost: 100,
     cost_transport_cost: 20,
+    cost_transfer_cost: 0,
     cost_processing_cost: 5,
     cost_other_cost: 0,
     cost_parts_cost: 0,

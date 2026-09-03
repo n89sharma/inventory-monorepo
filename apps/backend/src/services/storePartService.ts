@@ -320,6 +320,7 @@ export async function addStorePartToAsset(
       select: {
         purchase_cost: true,
         transport_cost: true,
+        transfer_cost: true,
         processing_cost: true,
         other_cost: true,
         parts_cost: true,

@@ -169,6 +169,7 @@ model Cost {
   asset_id        Int      @unique
   purchase_cost   Decimal? @db.Decimal(12, 2)
   transport_cost  Decimal? @db.Decimal(12, 2)
+  transfer_cost   Decimal? @db.Decimal(12, 2)
   processing_cost Decimal? @db.Decimal(12, 2)
   other_cost      Decimal? @db.Decimal(12, 2)
   parts_cost      Decimal? @db.Decimal(12, 2)
@@ -179,6 +180,7 @@ model Cost {
 
   @@index([purchase_cost])
   @@index([transport_cost])
+  @@index([transfer_cost])
   @@index([processing_cost])
   @@index([other_cost])
   @@index([parts_cost])

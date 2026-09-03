@@ -6,6 +6,8 @@ import {
   createArrivedAssets,
   getAssetCost,
   seedArrivalTestData,
+  seedAssetCost,
+  SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -104,6 +106,26 @@ describe('storePartService', () => {
     expect(cost?.total_cost).toBe(15)
 
     expect((await summaryRow(storePartId))?.on_hand).toBe(7)
+  })
+
+  // storePartService recomputes total_cost itself rather than going through
+  // assetPricingService, so every cost component has to survive a consumption.
+  it('keeps every other cost component in the total when a part is consumed', async () => {
+    const storePartId = await purchaseNewPart(10, 5)
+    const [asset] = await createArrivedAssets(refs, 1)
+    await seedAssetCost(asset.id)
+
+    const consume: AddStorePartToAsset = {
+      store_part_id: storePartId,
+      warehouse_id: refs.warehouse.id,
+      quantity: 3,
+    }
+    await addStorePartToAsset(asset.barcode, consume, refs.userId)
+
+    const cost = await getAssetCost(asset.id)
+    expect(cost?.parts_cost).toBe(SEEDED_ASSET_COST.parts_cost! + 15)
+    expect(cost?.transfer_cost).toBe(SEEDED_ASSET_COST.transfer_cost)
+    expect(cost?.total_cost).toBe(SEEDED_ASSET_COST.total_cost! + 15)
   })
 
   it('rejects consuming more of a part than is on hand', async () => {

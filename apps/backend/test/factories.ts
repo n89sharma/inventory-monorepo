@@ -367,6 +367,7 @@ export function buildCreateInvoiceInput(
 export interface AssetCost {
   purchase_cost: number | null
   transport_cost: number | null
+  transfer_cost: number | null
   processing_cost: number | null
   other_cost: number | null
   parts_cost: number | null
@@ -384,16 +385,18 @@ export const NO_PERMISSIONS: ReadonlySet<Permission> = new Set()
 export const SEEDED_ASSET_COST: AssetCost = {
   purchase_cost: 100,
   transport_cost: 20,
+  transfer_cost: 25,
   processing_cost: 30,
   other_cost: 5,
   parts_cost: 15,
-  total_cost: 170,
+  total_cost: 195,
   sale_price: 500,
 }
 
 export const REDACTED_ASSET_COST: AssetCost = {
   purchase_cost: null,
   transport_cost: null,
+  transfer_cost: null,
   processing_cost: null,
   other_cost: null,
   parts_cost: null,
@@ -419,6 +422,7 @@ export async function getAssetCost(assetId: number): Promise<AssetCost | null> {
     select: {
       purchase_cost: true,
       transport_cost: true,
+      transfer_cost: true,
       processing_cost: true,
       other_cost: true,
       parts_cost: true,
@@ -430,6 +434,7 @@ export async function getAssetCost(assetId: number): Promise<AssetCost | null> {
   return {
     purchase_cost: cost.purchase_cost?.toNumber() ?? null,
     transport_cost: cost.transport_cost?.toNumber() ?? null,
+    transfer_cost: cost.transfer_cost?.toNumber() ?? null,
     processing_cost: cost.processing_cost?.toNumber() ?? null,
     other_cost: cost.other_cost?.toNumber() ?? null,
     parts_cost: cost.parts_cost?.toNumber() ?? null,

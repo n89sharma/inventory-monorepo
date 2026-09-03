@@ -39,6 +39,7 @@ export type AssetIdentity = z.infer<typeof AssetIdentitySchema>
 export const AssetCostSchema = z.object({
   purchase_cost: z.number().nullable(),
   transport_cost: z.number().nullable(),
+  transfer_cost: z.number().nullable(),
   processing_cost: z.number().nullable(),
   other_cost: z.number().nullable(),
   parts_cost: z.number().nullable(),
@@ -53,6 +54,7 @@ export type AssetCost = z.infer<typeof AssetCostSchema>
 export const COST_COMPONENT_FIELDS = [
   'purchase_cost',
   'transport_cost',
+  'transfer_cost',
   'processing_cost',
   'other_cost',
   'parts_cost',
@@ -104,6 +106,7 @@ export const AssetSearchRowSchema = z.object({
   specs_toner_life_k: z.number().nullable(),
   cost_purchase_cost: z.number().nullable(),
   cost_transport_cost: z.number().nullable(),
+  cost_transfer_cost: z.number().nullable(),
   cost_processing_cost: z.number().nullable(),
   cost_other_cost: z.number().nullable(),
   cost_parts_cost: z.number().nullable(),
@@ -401,6 +404,7 @@ export type CreateComment = z.infer<typeof CreateCommentSchema>
 export const UpdateAssetPricingSchema = z.object({
   purchase_cost: z.number().nonnegative(),
   transport_cost: z.number().nonnegative(),
+  transfer_cost: z.number().nonnegative(),
   processing_cost: z.number().nonnegative(),
   other_cost: z.number().nonnegative(),
   parts_cost: z.number().nonnegative(),
