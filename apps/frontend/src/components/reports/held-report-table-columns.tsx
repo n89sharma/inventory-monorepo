@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 
 const DAYS_SUFFIX = 'd'
 const INDENT_PER_DEPTH_REM = 2.5
-const MEDIAN_HELD_WARNING_THRESHOLD = 30
+const MAX_HELD_WARNING_THRESHOLD = 30
 const ROW_WARNING_CLASS = 'data-row-warning'
 
 export type HeldReportTableRow = {
@@ -15,7 +15,7 @@ export type HeldReportTableRow = {
   label: string
   assetCount: number
   holdCount: number
-  medianHeldDays: number
+  maxHeldDays: number
   href: string
   subRows?: HeldReportTableRow[]
 }
@@ -26,14 +26,14 @@ export function toHeldReportTableRows(salespeople: SalespersonHoldsGroup[]): Hel
     label: rep.salesRepName,
     assetCount: rep.assetCount,
     holdCount: rep.holdCount,
-    medianHeldDays: rep.medianHeldDays,
+    maxHeldDays: rep.maxHeldDays,
     href: buildSearchOnHandUrl({ heldForId: rep.salesRepId }),
     subRows: rep.customers.map((customer) => ({
       rowId: `rep-${rep.salesRepId}-customer-${customer.customerId}`,
       label: customer.customerName,
       assetCount: customer.assetCount,
       holdCount: customer.holdCount,
-      medianHeldDays: customer.medianHeldDays,
+      maxHeldDays: customer.maxHeldDays,
       href: buildSearchOnHandUrl({
         heldForId: rep.salesRepId,
         holdCustomerId: customer.customerId,
@@ -51,7 +51,7 @@ export function getHeldReportSubRows(row: HeldReportTableRow): HeldReportTableRo
 }
 
 export function getHeldReportRowClassName(row: HeldReportTableRow): string | undefined {
-  if (row.medianHeldDays > MEDIAN_HELD_WARNING_THRESHOLD) return ROW_WARNING_CLASS
+  if (row.maxHeldDays > MAX_HELD_WARNING_THRESHOLD) return ROW_WARNING_CLASS
   return undefined
 }
 
@@ -109,9 +109,9 @@ export const HELD_REPORT_COLUMNS: ColumnDef<HeldReportTableRow>[] = [
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
-    id: 'medianHeldDays',
-    header: 'Median Held Days',
-    cell: ({ row }) => formatDays(row.original.medianHeldDays),
+    id: 'maxHeldDays',
+    header: 'Max Held Days',
+    cell: ({ row }) => formatDays(row.original.maxHeldDays),
     meta: { cellClassName: 'text-center tabular-nums' },
   },
 ]

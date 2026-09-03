@@ -5,7 +5,7 @@ type CustomerHoldsGroup = {
   customerName: string
   assetCount: number
   holdCount: number
-  medianHeldDays: number
+  maxHeldDays: number
 }
 
 export type SalespersonHoldsGroup = {
@@ -13,7 +13,7 @@ export type SalespersonHoldsGroup = {
   salesRepName: string
   assetCount: number
   holdCount: number
-  medianHeldDays: number
+  maxHeldDays: number
   customers: CustomerHoldsGroup[]
 }
 
@@ -21,7 +21,7 @@ type HeldReportTotals = {
   assetCount: number
   holdCount: number
   salespersonCount: number
-  medianHeldDays: number
+  maxHeldDays: number
 }
 
 export type HeldReportSummary = {
@@ -29,11 +29,9 @@ export type HeldReportSummary = {
   salespeople: SalespersonHoldsGroup[]
 }
 
-function median(values: number[]): number {
+function maximum(values: number[]): number {
   if (values.length === 0) return 0
-  const sorted = [...values].sort((a, b) => a - b)
-  const mid = Math.floor(sorted.length / 2)
-  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid]
+  return Math.max(...values)
 }
 
 function byHoldCountDesc(a: { holdCount: number }, b: { holdCount: number }): number {
@@ -96,14 +94,14 @@ export function aggregateHeldReport(rows: HeldReportRow[]): HeldReportSummary {
       salesRepName: rep.salesRepName,
       assetCount: rep.assetCount,
       holdCount: rep.daysHeld.length,
-      medianHeldDays: median(rep.daysHeld),
+      maxHeldDays: maximum(rep.daysHeld),
       customers: Array.from(rep.customers.values())
         .map((customer) => ({
           customerId: customer.customerId,
           customerName: customer.customerName,
           assetCount: customer.assetCount,
           holdCount: customer.daysHeld.length,
-          medianHeldDays: median(customer.daysHeld),
+          maxHeldDays: maximum(customer.daysHeld),
         }))
         .sort(byHoldCountDesc),
     }))
@@ -114,7 +112,7 @@ export function aggregateHeldReport(rows: HeldReportRow[]): HeldReportSummary {
       assetCount: totalAssetCount,
       holdCount: rows.length,
       salespersonCount: reps.size,
-      medianHeldDays: median(rows.map((row) => row.days_held)),
+      maxHeldDays: maximum(rows.map((row) => row.days_held)),
     },
     salespeople,
   }

@@ -39,7 +39,7 @@ function HeldReportSummaryCards({
       <MetricCard label="Assets Held" value={String(totals.assetCount)} />
       <MetricCard label="Total Holds" value={String(totals.holdCount)} />
       <MetricCard label="Salespeople with Holds" value={String(totals.salespersonCount)} />
-      <MetricCard label="Median Held Days" value={formatDays(totals.medianHeldDays)} />
+      <MetricCard label="Max Held Days" value={formatDays(totals.maxHeldDays)} />
     </div>
   )
 }
