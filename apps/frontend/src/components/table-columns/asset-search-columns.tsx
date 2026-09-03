@@ -155,18 +155,18 @@ function InvoiceCell({
 }
 
 // One line, so every row in a grid is the same height and the virtualiser can place rows by
-// arithmetic instead of measuring them. Comments run to several lines; the full text is on
+// arithmetic instead of measuring them. Free text runs to several lines; the full value is on
 // the title, and the asset's detail page shows it in full.
-function LastCommentCell({ comment }: { comment: string | null }): ReactNode {
-  if (!comment) return ''
+function TruncatedTextCell({ text }: { text: string | null }): ReactNode {
+  if (!text) return ''
   return (
-    <div className={LAST_COMMENT_CLASS} title={comment}>
-      {comment}
+    <div className={TRUNCATED_TEXT_CLASS} title={text}>
+      {text}
     </div>
   )
 }
 
-const LAST_COMMENT_CLASS = 'max-w-100 truncate text-left text-xs'
+const TRUNCATED_TEXT_CLASS = 'max-w-100 truncate text-left text-xs'
 
 function optionalNumber(value: number | null): string {
   return value == null ? '' : String(value)
@@ -544,7 +544,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Last Comment',
     section: 'other',
     text: (a) => a.latest_comment ?? '',
-    cell: (a) => <LastCommentCell comment={a.latest_comment} />,
+    cell: (a) => <TruncatedTextCell text={a.latest_comment} />,
   },
 ] as const satisfies readonly AssetSearchColumn[]
 
