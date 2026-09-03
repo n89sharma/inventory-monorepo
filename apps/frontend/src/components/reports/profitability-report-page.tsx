@@ -50,9 +50,18 @@ import type { ProfitabilityCubeRow } from 'shared-types'
 
 const TABLE_LABEL = 'Profitability by month'
 
-const YEARS_IN_DROPDOWN = 5
-const CURRENT_YEAR = getDefaultYear()
-const YEARS = Array.from({ length: YEARS_IN_DROPDOWN }, (_, i) => CURRENT_YEAR - i)
+// The report is trusted from EARLIEST_YEAR onward, so the dropdown offers nothing before it.
+// Today that leaves a single year; it widens on its own as years pass.
+const EARLIEST_YEAR = 2026
+const CURRENT_YEAR = Math.max(getDefaultYear(), EARLIEST_YEAR)
+const YEARS = Array.from({ length: CURRENT_YEAR - EARLIEST_YEAR + 1 }, (_, i) => CURRENT_YEAR - i)
+
+// A shared or hand-edited URL can name a year the dropdown no longer offers. Falling back
+// keeps the report from querying a year the reader cannot see selected.
+function useSelectableYear(): [number, (next: number) => void] {
+  const [year, setYear] = useYearParam(CURRENT_YEAR)
+  return [YEARS.includes(year) ? year : CURRENT_YEAR, setYear]
+}
 
 const EMPTY_CUBE: ProfitabilityCubeRow[] = []
 
@@ -71,7 +80,7 @@ function countActiveFilters(filters: ProfitabilityFilters): number {
 }
 
 function ProfitabilityFilterBar(): React.JSX.Element {
-  const [year, setYear] = useYearParam(CURRENT_YEAR)
+  const [year, setYear] = useSelectableYear()
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [salesRep, setSalesRep] = useSalespersonParam()
   const [vendor, setVendor] = useVendorParam()
@@ -176,7 +185,7 @@ function ProfitabilityReportBody({
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
-  const [year] = useYearParam(CURRENT_YEAR)
+  const [year] = useSelectableYear()
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [salesRep, setSalesRep] = useSalespersonParam()
   const [vendor, setVendor] = useVendorParam()

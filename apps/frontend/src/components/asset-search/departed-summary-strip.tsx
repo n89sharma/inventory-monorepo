@@ -5,9 +5,12 @@ import { formatMarginPercent, formatUSDWithSymbol } from '@/lib/formatters'
 import type { AssetSearchRow } from 'shared-types'
 
 export function DepartedSummaryStrip({ assets }: { assets: AssetSearchRow[] }): React.ReactNode {
+  const canViewProfitability = useCan('view_profitability_report')
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
-  if (!canViewSalePrice || !canViewPurchasePrice) return null
+  // The price permissions stay in the guard because the backend redacts the very fields these
+  // totals sum: without them every row reads as unpriced and the strip shows a confident zero.
+  if (!canViewProfitability || !canViewSalePrice || !canViewPurchasePrice) return null
 
   const summary = summariseDepartedAssets(assets)
   return (
