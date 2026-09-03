@@ -13,19 +13,20 @@ select
   extract(month from dep.created_at)::int                   as month,
   count(*)::int                                             as asset_count,
 
-  coalesce(sum(c.total_cost), 0)::float8                    as cogs,
-  coalesce(sum(c.sale_price), 0)::float8                    as gross_revenue,
-  coalesce(sum(c.sale_price - c.total_cost), 0)::float8     as gross_margin
+  coalesce(sum(coalesce(c.total_cost, 0)), 0)::float8              as cogs,
+  coalesce(sum(c.sale_price), 0)::float8                          as gross_revenue,
+  coalesce(sum(c.sale_price - coalesce(c.total_cost, 0)), 0)::float8 as gross_margin
 
 from "Asset" a
 join "Cost" c on c.asset_id = a.id
 join "Departure" dep on dep.id = a.departure_id
 join "Model" m on m.id = a.model_id
 left join "Arrival" arr on arr.id = a.arrival_id
+-- A sale price is the only thing an asset needs to count. Costs are not required to be
+-- present or non-zero: an asset sold against no recorded cost is a real 100% margin, and
+-- excluding it understated revenue. A null cost is read as zero inside the sums so revenue
+-- and margin stay reconcilable rather than the row being dropped from one and not the other.
 where extract(year from dep.created_at)::int = $1
-  and c.purchase_cost is not null
-  and c.transport_cost is not null
-  and c.total_cost is not null and c.total_cost > 0
   and c.sale_price is not null and c.sale_price > 0
 group by
   dep.origin_id,

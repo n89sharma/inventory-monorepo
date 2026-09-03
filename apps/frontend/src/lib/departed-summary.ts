@@ -12,20 +12,22 @@ export type DepartedSummary = {
   marginPercent: number
 }
 
-function hasNonZeroPrices(asset: DepartedAssetPrices): boolean {
-  return (asset.cost_sale_price ?? 0) > 0 && (asset.cost_total_cost ?? 0) > 0
+function isSold(asset: DepartedAssetPrices): boolean {
+  return (asset.cost_sale_price ?? 0) > 0
 }
 
-// Money is summed only over assets carrying both a cost and a sale price, matching the
-// profitability report, so a half-priced asset cannot inflate the margin. pricedAssets
-// against totalAssets is what tells the reader how much of the list the money describes.
+// A sale price is the only thing an asset needs to count, matching the profitability report.
+// An absent cost is read as zero rather than excluding the sale: by the time an asset carries
+// a sale price its costs have been written, and a genuinely costless sale is 100% margin, not
+// a row to drop. pricedAssets against totalAssets tells the reader how much of the list the
+// money describes.
 export function summariseDepartedAssets(assets: readonly DepartedAssetPrices[]): DepartedSummary {
   let grossRevenue = 0
   let cogs = 0
   let pricedAssets = 0
 
   for (const asset of assets) {
-    if (!hasNonZeroPrices(asset)) continue
+    if (!isSold(asset)) continue
     grossRevenue += asset.cost_sale_price ?? 0
     cogs += asset.cost_total_cost ?? 0
     pricedAssets += 1
