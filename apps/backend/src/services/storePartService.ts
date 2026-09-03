@@ -17,7 +17,7 @@ import {
   getStoreStockLayers as getStoreStockLayersDb,
 } from '../../generated/prisma/sql.js'
 import { getNextSequence } from '../lib/db-utils.js'
-import { decimalToNumber } from '../lib/decimal.js'
+import { decimalToNumber, totalCostDecimal } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import {
   consumptionCost,
@@ -326,11 +326,7 @@ export async function addStorePartToAsset(
       },
     })
     const parts_cost = (currentCost?.parts_cost ?? ZERO_COST).add(addedCost)
-    const total_cost = (currentCost?.purchase_cost ?? ZERO_COST)
-      .add(currentCost?.transport_cost ?? ZERO_COST)
-      .add(currentCost?.processing_cost ?? ZERO_COST)
-      .add(currentCost?.other_cost ?? ZERO_COST)
-      .add(parts_cost)
+    const total_cost = totalCostDecimal({ ...currentCost, parts_cost })
 
     await tx.cost.upsert({
       where: { asset_id: asset.id },

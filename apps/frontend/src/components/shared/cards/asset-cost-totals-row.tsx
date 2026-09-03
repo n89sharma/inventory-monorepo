@@ -1,5 +1,6 @@
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { useCan } from '@/hooks/use-can'
+import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import { formatMarginPercent, formatUSDWithSymbol } from '@/lib/formatters'
 import type { AssetSearchRow } from 'shared-types'
 
@@ -11,11 +12,11 @@ type CostTotalFieldId =
   | 'cost_sale_price'
 
 const COST_TOTAL_FIELDS = [
-  { id: 'cost_purchase_cost', label: 'Purchase Cost' },
-  { id: 'cost_transport_cost', label: 'Transport Cost' },
-  { id: 'cost_processing_cost', label: 'Processing Cost' },
+  { id: 'cost_purchase_cost', label: COST_FIELD_LABELS.purchase_cost },
+  { id: 'cost_transport_cost', label: COST_FIELD_LABELS.transport_cost },
+  { id: 'cost_processing_cost', label: COST_FIELD_LABELS.processing_cost },
   { id: 'cost_total_cost', label: 'Total Cost' },
-  { id: 'cost_sale_price', label: 'Sale Price' },
+  { id: 'cost_sale_price', label: COST_FIELD_LABELS.sale_price },
 ] as const satisfies readonly { id: CostTotalFieldId; label: string }[]
 
 function sumCost(assets: AssetSearchRow[], field: CostTotalFieldId): number {

@@ -48,6 +48,18 @@ export const AssetCostSchema = z.object({
 
 export type AssetCost = z.infer<typeof AssetCostSchema>
 
+// The components that sum to total_cost. total_cost is excluded (it is the sum);
+// sale_price is excluded (it is not a cost).
+export const COST_COMPONENT_FIELDS = [
+  'purchase_cost',
+  'transport_cost',
+  'processing_cost',
+  'other_cost',
+  'parts_cost',
+] as const
+
+export type CostComponentField = (typeof COST_COMPONENT_FIELDS)[number]
+
 export const AssetSummarySchema = AssetIdentitySchema.extend({
   meter_total: z.number().nullable(),
   cassettes: z.number().nullable(),

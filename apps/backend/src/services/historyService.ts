@@ -1,4 +1,4 @@
-import { CollectionHistory, CollectionHistoryRecord } from 'shared-types'
+import { CollectionHistory, CollectionHistoryRecord, COST_COMPONENT_FIELDS } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
 import { logger } from '../lib/logger.js'
 import { prisma } from '../prisma.js'
@@ -96,14 +96,7 @@ type AssetUpdateFields = Partial<{
   error_ids: number[]
 }>
 
-const PURCHASE_COST_FIELDS = [
-  'purchase_cost',
-  'transport_cost',
-  'processing_cost',
-  'other_cost',
-  'parts_cost',
-  'total_cost',
-] as const
+const PURCHASE_COST_FIELDS = [...COST_COMPONENT_FIELDS, 'total_cost'] as const
 
 type DepartureUpdateFields = Partial<{
   origin_id: number

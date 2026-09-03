@@ -1,3 +1,4 @@
+import { ASSET_PRICING_FIELDS, COST_FIELD_LABELS } from '@/lib/cost-fields'
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
 import { getReadinessDisplay } from '../shared/readiness/readiness-config'
 import { EntryHeader, FieldDiffRow, HistoryTimeline } from './history-primitives'
@@ -38,12 +39,7 @@ const UPDATE_FIELDS: UpdateField[] = [
   { key: 'toner_life_m', label: 'Toner Life M' },
   { key: 'toner_life_y', label: 'Toner Life Y' },
   { key: 'toner_life_k', label: 'Toner Life K' },
-  { key: 'purchase_cost', label: 'Purchase Cost' },
-  { key: 'transport_cost', label: 'Transport Cost' },
-  { key: 'processing_cost', label: 'Processing Cost' },
-  { key: 'other_cost', label: 'Other Cost' },
-  { key: 'parts_cost', label: 'Parts Cost' },
-  { key: 'sale_price', label: 'Sale Price' },
+  ...ASSET_PRICING_FIELDS.map((key): UpdateField => ({ key, label: COST_FIELD_LABELS[key] })),
   { key: 'error_codes', label: 'Errors' },
 ]
 

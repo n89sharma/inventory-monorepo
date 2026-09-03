@@ -12,12 +12,18 @@ import { PriceInput } from '@/components/shared/price-input'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { ASSET_PRICING_FIELDS, COST_FIELD_LABELS, type CostFieldId } from '@/lib/cost-fields'
 import { formatUSD } from '@/lib/formatters'
 import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
-import type { AssetDetails } from 'shared-types'
+import {
+  COST_COMPONENT_FIELDS,
+  totalCostFromComponents,
+  type AssetDetails,
+  type UpdateAssetPricing,
+} from 'shared-types'
 import { toast } from 'sonner'
 
 interface EditPricingModalProps {
@@ -26,37 +32,20 @@ interface EditPricingModalProps {
   assetDetails: AssetDetails | null
 }
 
-interface PricingFields {
-  purchase_cost: string
-  transport_cost: string
-  processing_cost: string
-  other_cost: string
-  parts_cost: string
-  sale_price: string
+type PricingFields = Record<CostFieldId, string>
+
+function mapPricingFields(read: (field: CostFieldId) => string): PricingFields {
+  return Object.fromEntries(ASSET_PRICING_FIELDS.map((f) => [f, read(f)])) as PricingFields
 }
 
-const EMPTY_PRICING: PricingFields = {
-  purchase_cost: '',
-  transport_cost: '',
-  processing_cost: '',
-  other_cost: '',
-  parts_cost: '',
-  sale_price: '',
-}
+const EMPTY_PRICING: PricingFields = mapPricingFields(() => '')
 
 const INPUT_WIDTH = 'max-w-[160px]'
 
 function toPricingFields(assetDetails: AssetDetails | null): PricingFields {
   if (!assetDetails) return EMPTY_PRICING
   const { cost } = assetDetails
-  return {
-    purchase_cost: cost.purchase_cost?.toString() ?? '',
-    transport_cost: cost.transport_cost?.toString() ?? '',
-    processing_cost: cost.processing_cost?.toString() ?? '',
-    other_cost: cost.other_cost?.toString() ?? '',
-    parts_cost: cost.parts_cost?.toString() ?? '',
-    sale_price: cost.sale_price?.toString() ?? '',
-  }
+  return mapPricingFields((field) => cost[field]?.toString() ?? '')
 }
 
 function toNum(value: string | undefined): number {
@@ -118,25 +107,20 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
   )
 
   const watched = useWatch({ control: form.control })
-  const totalCost =
-    toNum(watched.purchase_cost) +
-    toNum(watched.transport_cost) +
-    toNum(watched.processing_cost) +
-    toNum(watched.other_cost) +
-    toNum(watched.parts_cost)
+  const totalCost = totalCostFromComponents(
+    Object.fromEntries(COST_COMPONENT_FIELDS.map((f) => [f, toNum(watched[f])])),
+  )
 
   if (!assetDetails) return null
 
   async function onValid(fields: PricingFields) {
     try {
-      await updateAssetPricing(assetDetails!.barcode, {
-        purchase_cost: toNum(fields.purchase_cost),
-        transport_cost: toNum(fields.transport_cost),
-        processing_cost: toNum(fields.processing_cost),
-        other_cost: toNum(fields.other_cost),
-        parts_cost: toNum(fields.parts_cost),
-        sale_price: toNum(fields.sale_price),
-      })
+      await updateAssetPricing(
+        assetDetails!.barcode,
+        Object.fromEntries(
+          ASSET_PRICING_FIELDS.map((f) => [f, toNum(fields[f])]),
+        ) as UpdateAssetPricing,
+      )
       form.reset(fields, DISCARD_USER_EDITS)
       toast.success('Pricing updated.', { position: 'top-center' })
       onOpenChange(false)
@@ -159,11 +143,14 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
         <div className="flex flex-col gap-6">
           <FormSection title="Costs">
             <div className="flex flex-col gap-2">
-              <PriceField control={form.control} name="purchase_cost" label="Purchase" />
-              <PriceField control={form.control} name="transport_cost" label="Transport" />
-              <PriceField control={form.control} name="processing_cost" label="Processing" />
-              <PriceField control={form.control} name="parts_cost" label="Parts" />
-              <PriceField control={form.control} name="other_cost" label="Other" />
+              {COST_COMPONENT_FIELDS.map((field) => (
+                <PriceField
+                  key={field}
+                  control={form.control}
+                  name={field}
+                  label={COST_FIELD_LABELS[field]}
+                />
+              ))}
               <HorizontalField label="Total">
                 <ReadOnlyPrice value={totalCost} />
               </HorizontalField>
@@ -171,7 +158,11 @@ export function EditPricingModal({ open, onOpenChange, assetDetails }: EditPrici
           </FormSection>
 
           <FormSection title="Sale">
-            <PriceField control={form.control} name="sale_price" label="Sale Price" />
+            <PriceField
+              control={form.control}
+              name="sale_price"
+              label={COST_FIELD_LABELS.sale_price}
+            />
           </FormSection>
         </div>
 

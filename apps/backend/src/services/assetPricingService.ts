@@ -1,4 +1,9 @@
-import { AssetCost, BulkUpdateAssetPricing, PatchAssetPricing } from 'shared-types'
+import {
+  AssetCost,
+  BulkUpdateAssetPricing,
+  PatchAssetPricing,
+  totalCostFromComponents,
+} from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -40,13 +45,7 @@ function mergePricing(current: AssetCost, patch: PatchAssetPricing): AssetCost {
     parts_cost: patch.parts_cost ?? current.parts_cost,
     sale_price: patch.sale_price ?? current.sale_price,
   }
-  const total_cost =
-    (merged.purchase_cost ?? 0) +
-    (merged.transport_cost ?? 0) +
-    (merged.processing_cost ?? 0) +
-    (merged.other_cost ?? 0) +
-    (merged.parts_cost ?? 0)
-  return { ...merged, total_cost }
+  return { ...merged, total_cost: totalCostFromComponents(merged) }
 }
 
 export async function patchAssetPricing(

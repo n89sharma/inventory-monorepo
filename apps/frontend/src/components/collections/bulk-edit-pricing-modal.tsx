@@ -8,6 +8,7 @@ import {
 } from '@/components/shadcn/dialog'
 import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table'
 import { PriceInput } from '@/components/shared/price-input'
+import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import { EDITABLE_PRICE_FIELDS, type EditablePriceField } from '@/lib/price-cell-navigation'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
@@ -40,12 +41,7 @@ type PricingRow = {
   brand: string
   model: string
   meter_total: number | null
-  purchase_cost: string
-  transport_cost: string
-  processing_cost: string
-  other_cost: string
-  sale_price: string
-}
+} & Record<EditablePriceField, string>
 
 function makeEditableColumn(field: EditablePriceField, header: string): ColumnDef<PricingRow> {
   return {
@@ -99,11 +95,7 @@ const columns: ColumnDef<PricingRow>[] = [
     ),
     size: 80,
   },
-  makeEditableColumn('purchase_cost', 'Purchase Cost'),
-  makeEditableColumn('transport_cost', 'Transport Cost'),
-  makeEditableColumn('processing_cost', 'Processing Cost'),
-  makeEditableColumn('other_cost', 'Other Cost'),
-  makeEditableColumn('sale_price', 'Sale Price'),
+  ...EDITABLE_PRICE_FIELDS.map((field) => makeEditableColumn(field, COST_FIELD_LABELS[field])),
 ]
 
 function toAmount(text: string): number {
@@ -139,6 +131,15 @@ function cellText(
   return draft?.[field] ?? serverText(cost, field)
 }
 
+function costCells(
+  cost: AssetCost | undefined,
+  draft: PriceDraft | undefined,
+): Record<EditablePriceField, string> {
+  return Object.fromEntries(
+    EDITABLE_PRICE_FIELDS.map((field) => [field, cellText(cost, draft, field)]),
+  ) as Record<EditablePriceField, string>
+}
+
 function buildRows(
   assets: AssetSummary[],
   pricing: AssetPricing,
@@ -153,11 +154,7 @@ function buildRows(
       brand: asset.brand,
       model: asset.model,
       meter_total: asset.meter_total,
-      purchase_cost: cellText(cost, draft, 'purchase_cost'),
-      transport_cost: cellText(cost, draft, 'transport_cost'),
-      processing_cost: cellText(cost, draft, 'processing_cost'),
-      other_cost: cellText(cost, draft, 'other_cost'),
-      sale_price: cellText(cost, draft, 'sale_price'),
+      ...costCells(cost, draft),
     }
   })
 }
