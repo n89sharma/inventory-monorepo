@@ -79,6 +79,8 @@ const EMPTY_SPECS_FORM: SpecsForm = {
   tonerLifeM: null,
   tonerLifeY: null,
   tonerLifeK: null,
+  isDamaged: false,
+  damageNotes: null,
 }
 
 const CLEARED_MANUFACTURING_ORIGIN = { countryOfOrigin: null, manufacturedYear: null } as const
@@ -165,6 +167,10 @@ export function EditSpecsModal({
       tonerLifeM: specs.toner_life_m,
       tonerLifeY: specs.toner_life_y,
       tonerLifeK: specs.toner_life_k,
+      // An asset that predates the damage columns has never been inspected. The checkbox has
+      // no third state, so it opens unticked and a save records "no damage" on its behalf.
+      isDamaged: assetDetails.is_damaged ?? false,
+      damageNotes: assetDetails.damage_notes,
     }
   }, [assetDetails, models, readinesses, countries, components, accessories])
 
@@ -259,6 +265,8 @@ export function EditSpecsModal({
         toner_life_y: formValues.tonerLifeY,
         toner_life_k: formValues.tonerLifeK,
         accessory_ids: formValues.coreFunctions.map((cf) => cf.id),
+        is_damaged: formValues.isDamaged,
+        damage_notes: formValues.isDamaged ? formValues.damageNotes : null,
         duplicate_serial_acknowledged: duplicateSerialAcknowledged,
       })
       form.reset(formValues, DISCARD_USER_EDITS)

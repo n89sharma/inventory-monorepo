@@ -92,3 +92,11 @@ export function formatHistoryTimestamp(changedOn: Date | string): string {
   }
   return format(date, 'd MMM, yyyy')
 }
+
+// Damage is tri-state: an asset that predates the column has never been inspected, and reads as
+// blank rather than claiming either answer.
+export function formatDamaged(isDamaged: boolean | null): string {
+  if (isDamaged == null) return ''
+  if (isDamaged) return 'Yes'
+  return 'No'
+}

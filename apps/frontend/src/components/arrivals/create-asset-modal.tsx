@@ -62,6 +62,8 @@ function getDefaultNewAsset(allReadinesses: Status[] = []): AssetForm {
     tonerLifeK: null,
     errors: [],
     comment: null,
+    isDamaged: false,
+    damageNotes: null,
     duplicateSerialAcknowledged: false,
   }
 }
@@ -197,6 +199,7 @@ export function CreateAssetModal({
       tonerLifeM: rawAsset.tonerLifeM ?? 0,
       tonerLifeY: rawAsset.tonerLifeY ?? 0,
       tonerLifeK: rawAsset.tonerLifeK ?? 0,
+      damageNotes: rawAsset.isDamaged ? rawAsset.damageNotes : null,
     }
     if (isEditMode && onUpdateAsset) {
       setIsSubmitting(true)

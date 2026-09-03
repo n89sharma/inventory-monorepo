@@ -1,4 +1,5 @@
 import { UpdateAssetSpecs } from 'shared-types'
+import { damageColumns } from '../lib/asset-damage.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import {
@@ -46,6 +47,8 @@ export async function updateAssetSpecs(
       serial_number: true,
       country_of_origin_id: true,
       manufactured_year: true,
+      is_damaged: true,
+      damage_notes: true,
       model: { select: { id: true, brand_id: true } },
       asset_errors: { where: { is_fixed: false }, select: { error_id: true }, take: 1 },
       technical_specification: {
@@ -142,6 +145,7 @@ export async function updateAssetSpecs(
         readiness_id: specs.readiness_id,
         country_of_origin_id: specs.country_of_origin_id,
         manufactured_year: specs.manufactured_year,
+        ...damageColumns(specs.is_damaged, specs.damage_notes),
       },
     })
     await tx.technicalSpecification.upsert({
@@ -200,6 +204,8 @@ export async function updateAssetSpecs(
       readiness_id: asset.readiness_id,
       country_of_origin_id: asset.country_of_origin_id,
       manufactured_year: asset.manufactured_year,
+      is_damaged: asset.is_damaged,
+      damage_notes: asset.damage_notes,
       cassettes: asset.technical_specification?.cassettes,
       component_id: asset.technical_specification?.component_id,
       meter_black: asset.technical_specification?.meter_black,
@@ -221,6 +227,7 @@ export async function updateAssetSpecs(
       readiness_id: specs.readiness_id,
       country_of_origin_id: specs.country_of_origin_id,
       manufactured_year: specs.manufactured_year,
+      ...damageColumns(specs.is_damaged, specs.damage_notes),
       cassettes: specs.cassettes,
       component_id: specs.component_id,
       meter_black: specs.meter_black,

@@ -121,6 +121,8 @@ type AssetSearchRowDb = LocationRow & {
   latest_comment: string | null
   latest_comment_by: string | null
   latest_comment_at: Date | null
+  is_damaged: boolean | null
+  damage_notes: string | null
 }
 
 export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
@@ -177,6 +179,8 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     latest_comment: r.latest_comment,
     latest_comment_by: r.latest_comment_by,
     latest_comment_at: r.latest_comment_at,
+    is_damaged: r.is_damaged,
+    damage_notes: r.damage_notes,
   }
 }
 
@@ -235,6 +239,8 @@ export function mapAssetDetail(r: AssetDetailRow): AssetDetails {
     purchase_invoice: mapInvoice(r),
     sales_invoice: mapSalesInvoice(r),
     latest_comment: r.latest_comment,
+    is_damaged: r.is_damaged,
+    damage_notes: r.damage_notes,
   }
 }
 

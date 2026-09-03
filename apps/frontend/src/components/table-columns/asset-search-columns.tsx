@@ -3,6 +3,7 @@ import { getReadinessDisplay } from '@/components/shared/readiness/readiness-con
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
+  formatDamaged,
   formatDate,
   formatLocation,
   formatMarginPercent,
@@ -229,6 +230,24 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     sortable: true,
     text: (a) => getReadinessDisplay(a.readiness),
     cell: (a) => <ReadinessIcon status={a.readiness} />,
+  },
+  {
+    id: 'is_damaged',
+    label: 'Damaged',
+    section: 'status',
+    sortable: true,
+    // Undefined rather than null so an asset nobody has inspected sorts to the end instead of
+    // grouping with the undamaged ones.
+    accessor: (a) => a.is_damaged ?? undefined,
+    sortUndefined: 'last',
+    text: (a) => formatDamaged(a.is_damaged),
+  },
+  {
+    id: 'damage_notes',
+    label: 'Damage Notes',
+    section: 'status',
+    text: (a) => a.damage_notes ?? '',
+    cell: (a) => <TruncatedTextCell text={a.damage_notes} />,
   },
   {
     id: 'location',

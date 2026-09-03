@@ -17,6 +17,8 @@ select
   l.bin as bin,
   a.created_at as created_at,
   a.is_in_transit as is_in_transit,
+  a.is_damaged as is_damaged,
+  a.damage_notes as damage_notes,
   co."name" as country_of_origin,
   a.country_of_origin_id as country_of_origin_id,
   a.manufactured_year as manufactured_year,

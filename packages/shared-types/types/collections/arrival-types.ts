@@ -42,7 +42,9 @@ export type CreateArrival = z.infer<typeof CreateArrivalSchema>
 // countryOfOrigin is nullable here (not in CreateAsset) because legacy asset
 // rows pre-date that field being required. The non-null rule is enforced at
 // the frontend form layer so the user must pick a country when editing.
-export const UpdateAssetSchema = CreateAssetSchema.extend({
+// safeExtend, not extend: CreateAssetSchema carries the damage-notes refinement, and Zod refuses
+// to overwrite a key (countryOfOrigin) on a refined object schema through plain extend.
+export const UpdateAssetSchema = CreateAssetSchema.safeExtend({
   id: z.number().optional(),
   countryOfOrigin: CountrySchema.nullable(),
 })

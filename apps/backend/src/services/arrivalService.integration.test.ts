@@ -76,6 +76,40 @@ describe('createArrival', () => {
     expect(arrivalNumber).toMatch(/^A-YYZ-\d{7}$/)
   })
 
+  it('stores the damage recorded on arrival, and no note on an undamaged asset', async () => {
+    const input = buildCreateArrivalInput(refs, 2)
+    input.assets[0].isDamaged = true
+    input.assets[0].damageNotes = 'Dented side panel'
+    // A note typed before the box was unticked must not survive the write.
+    input.assets[1].damageNotes = 'Typed then withdrawn'
+    const arrivalNumber = await createArrival(input, refs.userId)
+
+    const assets = await prisma.asset.findMany({
+      where: { arrival: { arrival_number: arrivalNumber } },
+      select: { serial_number: true, is_damaged: true, damage_notes: true },
+    })
+    // Keyed by serial: the write order of a batched create is not the input order.
+    const bySerial = new Map(assets.map((a) => [a.serial_number, a]))
+    expect(bySerial.get(input.assets[0].serialNumber)).toMatchObject({
+      is_damaged: true,
+      damage_notes: 'Dented side panel',
+    })
+    expect(bySerial.get(input.assets[1].serialNumber)).toMatchObject({
+      is_damaged: false,
+      damage_notes: null,
+    })
+  })
+
+  it('reads the damage back onto the arrival detail rows', async () => {
+    const input = buildCreateArrivalInput(refs, 1)
+    input.assets[0].isDamaged = true
+    input.assets[0].damageNotes = 'Cracked glass'
+    const arrivalNumber = await createArrival(input, refs.userId)
+
+    const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
+    expect(assets[0]).toMatchObject({ is_damaged: true, damage_notes: 'Cracked glass' })
+  })
+
   it('barcodes each asset <cityCode>-<7-digit sequence>', async () => {
     const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 1), refs.userId)
     const assets = await prisma.asset.findMany({

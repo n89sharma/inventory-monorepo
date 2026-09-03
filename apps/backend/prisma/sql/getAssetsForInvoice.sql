@@ -8,6 +8,8 @@ select
   s.status as status,
   rd.status as readiness,
   a.is_in_transit as is_in_transit,
+  a.is_damaged as is_damaged,
+  a.damage_notes as damage_notes,
   a.created_at as created_at,
   co."name" as country_of_origin,
   a.manufactured_year as manufactured_year,

@@ -86,6 +86,8 @@ type AssetUpdateFields = Partial<{
   toner_life_m: number | null
   toner_life_y: number | null
   toner_life_k: number | null
+  is_damaged: boolean | null
+  damage_notes: string | null
   purchase_cost: number | null
   transport_cost: number | null
   transfer_cost: number | null
@@ -466,6 +468,8 @@ const ASSET_PLAIN_FIELDS = [
   'toner_life_m',
   'toner_life_y',
   'toner_life_k',
+  'is_damaged',
+  'damage_notes',
 ]
 
 const ASSET_UPDATE_SPEC: FieldSpec[] = [

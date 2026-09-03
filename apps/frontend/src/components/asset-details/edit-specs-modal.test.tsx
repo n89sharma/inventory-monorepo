@@ -11,6 +11,7 @@ import type {
   Status,
   UpdateAssetSpecs,
 } from 'shared-types'
+import { DAMAGE_NOTES_REQUIRED } from 'shared-types'
 import { MemoryRouter } from 'react-router-dom'
 import { toast } from 'sonner'
 import { SWRConfig } from 'swr'
@@ -140,6 +141,8 @@ function buildAssetDetails(model: ModelSummary, overrides: Partial<AssetDetails>
     country_of_origin_id: null,
     manufactured_year: null,
     specs: COLOUR_SPECS,
+    is_damaged: null,
+    damage_notes: null,
     ...overrides,
   } as AssetDetails
 }
@@ -232,6 +235,10 @@ function save() {
   fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 }
 
+function toggleDamaged() {
+  fireEvent.click(fieldControl('Damage', 'button[role="checkbox"]'))
+}
+
 describe('EditSpecsModal', () => {
   let updateAssetSpecs: Mock<UpdateAssetSpecsFn>
 
@@ -286,6 +293,53 @@ describe('EditSpecsModal', () => {
     await waitFor(() => expect(toast.error).toHaveBeenCalled())
     expect(vi.mocked(toast.error).mock.calls[0][0]).toContain('Drum life C required')
     expect(updateAssetSpecs).not.toHaveBeenCalled()
+  })
+
+  it('will not save a damaged asset with no note explaining the damage', async () => {
+    renderModal(buildAssetDetails(COLOUR_CANON, { readiness: PP_OK.status }), [])
+
+    toggleDamaged()
+    save()
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(vi.mocked(toast.error).mock.calls[0][0]).toContain(DAMAGE_NOTES_REQUIRED)
+    expect(updateAssetSpecs).not.toHaveBeenCalled()
+  })
+
+  it('discards the note when the damage is unticked, so the two never disagree', async () => {
+    renderModal(
+      buildAssetDetails(COLOUR_CANON, {
+        readiness: PP_OK.status,
+        is_damaged: true,
+        damage_notes: 'Dented side panel',
+      }),
+      [],
+    )
+
+    toggleDamaged()
+    save()
+
+    await waitFor(() => expect(updateAssetSpecs).toHaveBeenCalledOnce())
+    expect(updateAssetSpecs.mock.calls[0][1]).toMatchObject({
+      is_damaged: false,
+      damage_notes: null,
+    })
+  })
+
+  it('sends the damage a user records on an asset that was never inspected', async () => {
+    renderModal(buildAssetDetails(COLOUR_CANON, { readiness: PP_OK.status }), [])
+
+    toggleDamaged()
+    fireEvent.change(fieldControl('Damage Notes', 'textarea'), {
+      target: { value: 'Cracked glass' },
+    })
+    save()
+
+    await waitFor(() => expect(updateAssetSpecs).toHaveBeenCalledOnce())
+    expect(updateAssetSpecs.mock.calls[0][1]).toMatchObject({
+      is_damaged: true,
+      damage_notes: 'Cracked glass',
+    })
   })
 
   it('leaves readiness, the finisher and the consumables alone on a same-brand model change', async () => {

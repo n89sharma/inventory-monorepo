@@ -54,6 +54,8 @@ export function makeAssetSearchRow(overrides: Partial<AssetSearchRow> = {}): Ass
     latest_comment: null,
     latest_comment_by: null,
     latest_comment_at: null,
+    is_damaged: null,
+    damage_notes: null,
     ...overrides,
   }
 }

@@ -3469,6 +3469,8 @@ export const AssetScalarFieldEnum = {
   manufactured_year: 'manufactured_year',
   created_at: 'created_at',
   is_in_transit: 'is_in_transit',
+  is_damaged: 'is_damaged',
+  damage_notes: 'damage_notes',
   barcode_normalized: 'barcode_normalized',
   serial_normalized: 'serial_normalized'
 } as const

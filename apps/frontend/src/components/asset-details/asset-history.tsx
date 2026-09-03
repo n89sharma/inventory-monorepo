@@ -1,4 +1,5 @@
 import { ASSET_PRICING_FIELDS, COST_FIELD_LABELS } from '@/lib/cost-fields'
+import { formatDamaged } from '@/lib/formatters'
 import type { AssetHistory, AssetHistoryRecord, AssetUpdateDiff } from 'shared-types'
 import { getReadinessDisplay } from '../shared/readiness/readiness-config'
 import { EntryHeader, FieldDiffRow, HistoryTimeline } from './history-primitives'
@@ -8,6 +9,9 @@ type UpdateRecord = Extract<AssetHistoryRecord, { action_type: 'UPDATE' }>
 
 const formatReadinessDiff = (value: unknown) =>
   typeof value === 'string' ? getReadinessDisplay(value) : value
+
+const formatDamagedDiff = (value: unknown) =>
+  typeof value === 'boolean' ? formatDamaged(value) : value
 
 type UpdateField = {
   key: keyof AssetUpdateDiff
@@ -39,6 +43,8 @@ const UPDATE_FIELDS: UpdateField[] = [
   { key: 'toner_life_m', label: 'Toner Life M' },
   { key: 'toner_life_y', label: 'Toner Life Y' },
   { key: 'toner_life_k', label: 'Toner Life K' },
+  { key: 'is_damaged', label: 'Damaged', format: formatDamagedDiff },
+  { key: 'damage_notes', label: 'Damage Notes' },
   ...ASSET_PRICING_FIELDS.map((key): UpdateField => ({ key, label: COST_FIELD_LABELS[key] })),
   { key: 'error_codes', label: 'Errors' },
 ]

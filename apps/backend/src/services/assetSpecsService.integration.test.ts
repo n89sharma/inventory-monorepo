@@ -359,6 +359,39 @@ describe('assetSpecsService', () => {
     ).rejects.toThrow(ValidationError)
   })
 
+  it('records damage and clears the note once the damage is unticked', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { is_damaged: true, damage_notes: 'Dented side panel' }),
+      refs.userId,
+    )
+    await expect(
+      prisma.asset.findUniqueOrThrow({
+        where: { barcode: asset.barcode },
+        select: { is_damaged: true, damage_notes: true },
+      }),
+    ).resolves.toEqual({ is_damaged: true, damage_notes: 'Dented side panel' })
+
+    const sinceId = await getMaxHistoryId()
+    await updateAssetSpecs(
+      asset.barcode,
+      buildUpdateAssetSpecs(refs, { is_damaged: false, damage_notes: 'Dented side panel' }),
+      refs.userId,
+    )
+    await expect(
+      prisma.asset.findUniqueOrThrow({
+        where: { barcode: asset.barcode },
+        select: { is_damaged: true, damage_notes: true },
+      }),
+    ).resolves.toEqual({ is_damaged: false, damage_notes: null })
+
+    const [change] = await assetUpdateChangesSince(sinceId, asset.id)
+    expect(change?.before).toMatchObject({ is_damaged: true, damage_notes: 'Dented side panel' })
+    expect(change?.after).toMatchObject({ is_damaged: false, damage_notes: null })
+  })
+
   it('validates the component against the new model brand, not the old one', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const componentId = await seedComponent(refs.brandId, 'OldBrandComponent')

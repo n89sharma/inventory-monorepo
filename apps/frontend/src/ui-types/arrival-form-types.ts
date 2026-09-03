@@ -10,6 +10,7 @@ import type {
 } from 'shared-types'
 import {
   ComponentSchema,
+  DAMAGE_NOTES_REQUIRED,
   CoreFunctionsSchema,
   CountrySchema,
   MIN_MANUFACTURED_YEAR,
@@ -57,6 +58,8 @@ const specFieldsShape = {
   tonerLifeM: z.number().min(0).nullable(),
   tonerLifeY: z.number().min(0).nullable(),
   tonerLifeK: z.number().min(0).nullable(),
+  isDamaged: z.boolean(),
+  damageNotes: z.string().max(2000).nullable(),
 } as const
 
 // Meter fields apply only to metered asset types; cassettes and the drum/toner
@@ -96,6 +99,9 @@ function refineSpecFields(
   }
   if (visibility.cassettes) {
     requireField(val, 'cassettes', 'Cassettes', ctx)
+  }
+  if (val.isDamaged === true && !(val.damageNotes as string | null)?.trim()) {
+    ctx.addIssue({ code: 'custom', path: ['damageNotes'], message: DAMAGE_NOTES_REQUIRED })
   }
   if (visibility.consumables) {
     requireField(val, 'drumLifeK', 'Drum life K', ctx)
@@ -186,6 +192,8 @@ export type AssetForm = {
   tonerLifeM: number | null
   tonerLifeY: number | null
   tonerLifeK: number | null
+  isDamaged: boolean
+  damageNotes: string | null
   errors: UpdateError[]
   comment: string | null
   duplicateSerialAcknowledged: boolean
@@ -210,6 +218,8 @@ export type SpecsForm = {
   tonerLifeM: number | null
   tonerLifeY: number | null
   tonerLifeK: number | null
+  isDamaged: boolean
+  damageNotes: string | null
 }
 
 export type ArrivalForm = {

@@ -26,11 +26,20 @@ import {
   type SelectOption,
 } from '@/ui-types/select-option-types'
 import { useMemo, useState } from 'react'
-import { Controller, useWatch, type Control, type FieldValues, type Path } from 'react-hook-form'
+import {
+  Controller,
+  useController,
+  useWatch,
+  type Control,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form'
 import type { Component, CoreFunction, Country, Status } from 'shared-types'
+import { Checkbox } from '../shadcn/checkbox'
 import { Input } from '../shadcn/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../shadcn/input-group'
 import MultipleSelector from '../shadcn/multiple-selector'
+import { Textarea } from '../shadcn/textarea'
 
 // Shared width for the single-line inputs across the Create/Edit Asset and Edit
 // Specs modals — widest of the previous values so every box fits its content.
@@ -43,6 +52,10 @@ const MONO_CHANNELS: Channel[] = ['K']
 // dedicated Cassettes and Internal Finisher fields. Already-selected values on
 // an existing asset are still shown; these are only removed from the options.
 const EXCLUDED_CORE_FUNCTIONS = ['CASS', 'FIN']
+
+const DAMAGE_NOTES_MAX_LENGTH = 2000
+const DAMAGE_NOTES_ROWS = 3
+const DAMAGE_CHECKBOX_ID = 'asset-is-damaged'
 
 type CMYKFieldNames<T extends FieldValues> = {
   c: Path<T>
@@ -275,6 +288,46 @@ function ControlledComponentSearch<T extends FieldValues>({
   )
 }
 
+// Physical damage found on the machine, recorded on arrival and correctable afterwards.
+// Unticking discards the notes rather than leaving them on an asset that now reads as
+// undamaged — the same invariant the backend enforces on write.
+function DamageFields<T extends FieldValues>({ control }: { control: Control<T> }) {
+  const isDamagedField = useController({ control, name: 'isDamaged' as Path<T> }).field
+  const notes = useController({ control, name: 'damageNotes' as Path<T> })
+  const isDamaged = isDamagedField.value === true
+
+  function handleDamagedChange(newIsDamaged: boolean) {
+    isDamagedField.onChange(newIsDamaged)
+    if (newIsDamaged) return
+    notes.field.onChange(null)
+  }
+
+  return (
+    <>
+      <HorizontalField label="Damage" htmlFor={DAMAGE_CHECKBOX_ID}>
+        <Checkbox
+          id={DAMAGE_CHECKBOX_ID}
+          checked={isDamaged}
+          onCheckedChange={(checked) => handleDamagedChange(checked === true)}
+        />
+      </HorizontalField>
+
+      {isDamaged && (
+        <HorizontalField label="Damage Notes" required>
+          <Textarea
+            value={(notes.field.value as string | null) ?? ''}
+            onChange={(e) => notes.field.onChange(e.target.value === '' ? null : e.target.value)}
+            onBlur={notes.field.onBlur}
+            aria-invalid={notes.fieldState.invalid}
+            maxLength={DAMAGE_NOTES_MAX_LENGTH}
+            rows={DAMAGE_NOTES_ROWS}
+          />
+        </HorizontalField>
+      )}
+    </>
+  )
+}
+
 interface TechnicalSpecsFieldsProps<T extends FieldValues> {
   control: Control<T>
   isColour: boolean
@@ -342,6 +395,8 @@ export function TechnicalSpecsFields<T extends FieldValues>({
         </HorizontalField>
 
         {renderAfterReadiness}
+
+        <DamageFields control={control} />
 
         {visibility.manufacturingOrigin ? (
           <>

@@ -15,6 +15,7 @@ import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generate
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
 import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
 import { getModelSummary } from './modelService.js'
+import { damageColumns } from '../lib/asset-damage.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { mapAssetSearchRow, mapAssetSummary } from '../lib/asset-mappers.js'
@@ -136,6 +137,10 @@ function mapDbAssetToUpdateAsset(dbAsset: UpdateArrivalAssetDb, model: ModelSumm
     tonerLifeK: dbAsset.technical_specification?.toner_life_k ?? 0,
     errors: dbAsset.asset_errors.map((r) => ({ error_id: r.error_id, is_fixed: r.is_fixed })),
     comment: dbAsset.comments[0]?.comment ?? null,
+    // An asset that predates the damage columns reads as undamaged in the form, the same
+    // resolution the specs modal makes: the checkbox has no third state to show.
+    isDamaged: dbAsset.is_damaged ?? false,
+    damageNotes: dbAsset.damage_notes,
     // A loaded asset has acknowledged nothing; the client re-acknowledges if it changes the serial.
     duplicateSerialAcknowledged: false,
   }
@@ -244,6 +249,7 @@ function mapInputAssetToPrismaCreateAsset(
       ? { connect: { id: asset.countryOfOrigin.id } }
       : undefined,
     manufactured_year: asset.manufacturedYear,
+    ...damageColumns(asset.isDamaged, asset.damageNotes),
     asset_accessories: {
       create: asset.coreFunctions.map((c) => ({ accessory_id: c.id })),
     },
@@ -479,6 +485,7 @@ async function updateArrivalAssetCoreFields(
       readiness_id: asset.readiness.id,
       country_of_origin_id: asset.countryOfOrigin?.id ?? null,
       manufactured_year: asset.manufacturedYear,
+      ...damageColumns(asset.isDamaged, asset.damageNotes),
       technical_specification: {
         update: {
           meter_black: asset.meterBlack,
@@ -529,6 +536,8 @@ export async function updateArrivalAsset(
       readiness_id: true,
       country_of_origin_id: true,
       manufactured_year: true,
+      is_damaged: true,
+      damage_notes: true,
       technical_specification: {
         select: {
           meter_black: true,
@@ -581,6 +590,8 @@ export async function updateArrivalAsset(
       readiness_id: existing.readiness_id,
       country_of_origin_id: existing.country_of_origin_id,
       manufactured_year: existing.manufactured_year,
+      is_damaged: existing.is_damaged,
+      damage_notes: existing.damage_notes,
       meter_black: existing.technical_specification?.meter_black,
       meter_colour: existing.technical_specification?.meter_colour,
       cassettes: existing.technical_specification?.cassettes,
@@ -600,6 +611,7 @@ export async function updateArrivalAsset(
       readiness_id: asset.readiness.id,
       country_of_origin_id: asset.countryOfOrigin?.id ?? null,
       manufactured_year: asset.manufacturedYear,
+      ...damageColumns(asset.isDamaged, asset.damageNotes),
       meter_black: asset.meterBlack,
       meter_colour: asset.meterColour,
       cassettes: asset.cassettes,

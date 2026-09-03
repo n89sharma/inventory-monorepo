@@ -73,6 +73,8 @@ export type AssetMinAggregateOutputType = {
   manufactured_year: number | null
   created_at: Date | null
   is_in_transit: boolean | null
+  is_damaged: boolean | null
+  damage_notes: string | null
   barcode_normalized: string | null
   serial_normalized: string | null
 }
@@ -94,6 +96,8 @@ export type AssetMaxAggregateOutputType = {
   manufactured_year: number | null
   created_at: Date | null
   is_in_transit: boolean | null
+  is_damaged: boolean | null
+  damage_notes: string | null
   barcode_normalized: string | null
   serial_normalized: string | null
 }
@@ -115,6 +119,8 @@ export type AssetCountAggregateOutputType = {
   manufactured_year: number
   created_at: number
   is_in_transit: number
+  is_damaged: number
+  damage_notes: number
   barcode_normalized: number
   serial_normalized: number
   _all: number
@@ -168,6 +174,8 @@ export type AssetMinAggregateInputType = {
   manufactured_year?: true
   created_at?: true
   is_in_transit?: true
+  is_damaged?: true
+  damage_notes?: true
   barcode_normalized?: true
   serial_normalized?: true
 }
@@ -189,6 +197,8 @@ export type AssetMaxAggregateInputType = {
   manufactured_year?: true
   created_at?: true
   is_in_transit?: true
+  is_damaged?: true
+  damage_notes?: true
   barcode_normalized?: true
   serial_normalized?: true
 }
@@ -210,6 +220,8 @@ export type AssetCountAggregateInputType = {
   manufactured_year?: true
   created_at?: true
   is_in_transit?: true
+  is_damaged?: true
+  damage_notes?: true
   barcode_normalized?: true
   serial_normalized?: true
   _all?: true
@@ -318,6 +330,8 @@ export type AssetGroupByOutputType = {
   manufactured_year: number | null
   created_at: Date
   is_in_transit: boolean
+  is_damaged: boolean | null
+  damage_notes: string | null
   barcode_normalized: string | null
   serial_normalized: string | null
   _count: AssetCountAggregateOutputType | null
@@ -362,6 +376,8 @@ export type AssetWhereInput = {
   manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
   created_at?: Prisma.DateTimeFilter<"Asset"> | Date | string
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
+  is_damaged?: Prisma.BoolNullableFilter<"Asset"> | boolean | null
+  damage_notes?: Prisma.StringNullableFilter<"Asset"> | string | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   cost?: Prisma.XOR<Prisma.CostNullableScalarRelationFilter, Prisma.CostWhereInput> | null
@@ -403,6 +419,8 @@ export type AssetOrderByWithRelationInput = {
   manufactured_year?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
+  is_damaged?: Prisma.SortOrderInput | Prisma.SortOrder
+  damage_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   serial_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   cost?: Prisma.CostOrderByWithRelationInput
@@ -447,6 +465,8 @@ export type AssetWhereUniqueInput = Prisma.AtLeast<{
   manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
   created_at?: Prisma.DateTimeFilter<"Asset"> | Date | string
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
+  is_damaged?: Prisma.BoolNullableFilter<"Asset"> | boolean | null
+  damage_notes?: Prisma.StringNullableFilter<"Asset"> | string | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   cost?: Prisma.XOR<Prisma.CostNullableScalarRelationFilter, Prisma.CostWhereInput> | null
@@ -488,6 +508,8 @@ export type AssetOrderByWithAggregationInput = {
   manufactured_year?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
+  is_damaged?: Prisma.SortOrderInput | Prisma.SortOrder
+  damage_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   serial_normalized?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AssetCountOrderByAggregateInput
@@ -517,6 +539,8 @@ export type AssetScalarWhereWithAggregatesInput = {
   manufactured_year?: Prisma.IntNullableWithAggregatesFilter<"Asset"> | number | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Asset"> | Date | string
   is_in_transit?: Prisma.BoolWithAggregatesFilter<"Asset"> | boolean
+  is_damaged?: Prisma.BoolNullableWithAggregatesFilter<"Asset"> | boolean | null
+  damage_notes?: Prisma.StringNullableWithAggregatesFilter<"Asset"> | string | null
   barcode_normalized?: Prisma.StringNullableWithAggregatesFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableWithAggregatesFilter<"Asset"> | string | null
 }
@@ -527,6 +551,8 @@ export type AssetCreateInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -568,6 +594,8 @@ export type AssetUncheckedCreateInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -588,6 +616,8 @@ export type AssetUpdateInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -629,6 +659,8 @@ export type AssetUncheckedUpdateInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -660,6 +692,8 @@ export type AssetCreateManyInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -670,6 +704,8 @@ export type AssetUpdateManyMutationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -691,6 +727,8 @@ export type AssetUncheckedUpdateManyInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -722,6 +760,8 @@ export type AssetCountOrderByAggregateInput = {
   manufactured_year?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
+  is_damaged?: Prisma.SortOrder
+  damage_notes?: Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
 }
@@ -758,6 +798,8 @@ export type AssetMaxOrderByAggregateInput = {
   manufactured_year?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
+  is_damaged?: Prisma.SortOrder
+  damage_notes?: Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
 }
@@ -779,6 +821,8 @@ export type AssetMinOrderByAggregateInput = {
   manufactured_year?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   is_in_transit?: Prisma.SortOrder
+  is_damaged?: Prisma.SortOrder
+  damage_notes?: Prisma.SortOrder
   barcode_normalized?: Prisma.SortOrder
   serial_normalized?: Prisma.SortOrder
 }
@@ -939,6 +983,10 @@ export type NullableIntFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
@@ -1385,6 +1433,8 @@ export type AssetCreateWithoutStatusInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1424,6 +1474,8 @@ export type AssetUncheckedCreateWithoutStatusInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1484,6 +1536,8 @@ export type AssetScalarWhereInput = {
   manufactured_year?: Prisma.IntNullableFilter<"Asset"> | number | null
   created_at?: Prisma.DateTimeFilter<"Asset"> | Date | string
   is_in_transit?: Prisma.BoolFilter<"Asset"> | boolean
+  is_damaged?: Prisma.BoolNullableFilter<"Asset"> | boolean | null
+  damage_notes?: Prisma.StringNullableFilter<"Asset"> | string | null
   barcode_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
   serial_normalized?: Prisma.StringNullableFilter<"Asset"> | string | null
 }
@@ -1494,6 +1548,8 @@ export type AssetCreateWithoutReadinessInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1533,6 +1589,8 @@ export type AssetUncheckedCreateWithoutReadinessInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1579,6 +1637,8 @@ export type AssetCreateWithoutCountry_of_originInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1618,6 +1678,8 @@ export type AssetUncheckedCreateWithoutCountry_of_originInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1664,6 +1726,8 @@ export type AssetCreateWithoutTechnical_specificationInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1704,6 +1768,8 @@ export type AssetUncheckedCreateWithoutTechnical_specificationInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -1739,6 +1805,8 @@ export type AssetUpdateWithoutTechnical_specificationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -1779,6 +1847,8 @@ export type AssetUncheckedUpdateWithoutTechnical_specificationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -1798,6 +1868,8 @@ export type AssetCreateWithoutCostInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   technical_specification?: Prisma.TechnicalSpecificationCreateNestedOneWithoutAssetInput
@@ -1838,6 +1910,8 @@ export type AssetUncheckedCreateWithoutCostInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   technical_specification?: Prisma.TechnicalSpecificationUncheckedCreateNestedOneWithoutAssetInput
@@ -1873,6 +1947,8 @@ export type AssetUpdateWithoutCostInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   technical_specification?: Prisma.TechnicalSpecificationUpdateOneWithoutAssetNestedInput
@@ -1913,6 +1989,8 @@ export type AssetUncheckedUpdateWithoutCostInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   technical_specification?: Prisma.TechnicalSpecificationUncheckedUpdateOneWithoutAssetNestedInput
@@ -1932,6 +2010,8 @@ export type AssetCreateWithoutAsset_accessoriesInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -1972,6 +2052,8 @@ export type AssetUncheckedCreateWithoutAsset_accessoriesInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2007,6 +2089,8 @@ export type AssetUpdateWithoutAsset_accessoriesInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2047,6 +2131,8 @@ export type AssetUncheckedUpdateWithoutAsset_accessoriesInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2066,6 +2152,8 @@ export type AssetCreateWithoutAsset_errorsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2106,6 +2194,8 @@ export type AssetUncheckedCreateWithoutAsset_errorsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2141,6 +2231,8 @@ export type AssetUpdateWithoutAsset_errorsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2181,6 +2273,8 @@ export type AssetUncheckedUpdateWithoutAsset_errorsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2200,6 +2294,8 @@ export type AssetCreateWithoutAsset_store_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2240,6 +2336,8 @@ export type AssetUncheckedCreateWithoutAsset_store_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2275,6 +2373,8 @@ export type AssetUpdateWithoutAsset_store_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2315,6 +2415,8 @@ export type AssetUncheckedUpdateWithoutAsset_store_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2334,6 +2436,8 @@ export type AssetCreateWithoutReceived_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2374,6 +2478,8 @@ export type AssetUncheckedCreateWithoutReceived_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2398,6 +2504,8 @@ export type AssetCreateWithoutDonated_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2438,6 +2546,8 @@ export type AssetUncheckedCreateWithoutDonated_partsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2473,6 +2583,8 @@ export type AssetUpdateWithoutReceived_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2513,6 +2625,8 @@ export type AssetUncheckedUpdateWithoutReceived_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2543,6 +2657,8 @@ export type AssetUpdateWithoutDonated_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2583,6 +2699,8 @@ export type AssetUncheckedUpdateWithoutDonated_partsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2602,6 +2720,8 @@ export type AssetCreateWithoutAsset_transfersInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2642,6 +2762,8 @@ export type AssetUncheckedCreateWithoutAsset_transfersInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2677,6 +2799,8 @@ export type AssetUpdateWithoutAsset_transfersInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -2717,6 +2841,8 @@ export type AssetUncheckedUpdateWithoutAsset_transfersInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -2736,6 +2862,8 @@ export type AssetCreateWithoutArrivalInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2775,6 +2903,8 @@ export type AssetUncheckedCreateWithoutArrivalInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2821,6 +2951,8 @@ export type AssetCreateWithoutDepartureInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2860,6 +2992,8 @@ export type AssetUncheckedCreateWithoutDepartureInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2906,6 +3040,8 @@ export type AssetCreateWithoutHoldInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -2945,6 +3081,8 @@ export type AssetUncheckedCreateWithoutHoldInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -2991,6 +3129,8 @@ export type AssetCreateWithoutPurchase_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3030,6 +3170,8 @@ export type AssetUncheckedCreateWithoutPurchase_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3060,6 +3202,8 @@ export type AssetCreateWithoutSales_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3099,6 +3243,8 @@ export type AssetUncheckedCreateWithoutSales_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3161,6 +3307,8 @@ export type AssetCreateWithoutLocationInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3200,6 +3348,8 @@ export type AssetUncheckedCreateWithoutLocationInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3246,6 +3396,8 @@ export type AssetCreateWithoutModelInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3285,6 +3437,8 @@ export type AssetUncheckedCreateWithoutModelInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3331,6 +3485,8 @@ export type AssetCreateWithoutFilesInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3371,6 +3527,8 @@ export type AssetUncheckedCreateWithoutFilesInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3406,6 +3564,8 @@ export type AssetUpdateWithoutFilesInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3446,6 +3606,8 @@ export type AssetUncheckedUpdateWithoutFilesInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3465,6 +3627,8 @@ export type AssetCreateWithoutCommentsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostCreateNestedOneWithoutAssetInput
@@ -3505,6 +3669,8 @@ export type AssetUncheckedCreateWithoutCommentsInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
   cost?: Prisma.CostUncheckedCreateNestedOneWithoutAssetInput
@@ -3540,6 +3706,8 @@ export type AssetUpdateWithoutCommentsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3580,6 +3748,8 @@ export type AssetUncheckedUpdateWithoutCommentsInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3609,6 +3779,8 @@ export type AssetCreateManyStatusInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -3619,6 +3791,8 @@ export type AssetUpdateWithoutStatusInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3658,6 +3832,8 @@ export type AssetUncheckedUpdateWithoutStatusInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3688,6 +3864,8 @@ export type AssetUncheckedUpdateManyWithoutStatusInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -3708,6 +3886,8 @@ export type AssetCreateManyReadinessInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -3718,6 +3898,8 @@ export type AssetUpdateWithoutReadinessInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3757,6 +3939,8 @@ export type AssetUncheckedUpdateWithoutReadinessInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3787,6 +3971,8 @@ export type AssetUncheckedUpdateManyWithoutReadinessInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -3807,6 +3993,8 @@ export type AssetCreateManyCountry_of_originInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -3817,6 +4005,8 @@ export type AssetUpdateWithoutCountry_of_originInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3856,6 +4046,8 @@ export type AssetUncheckedUpdateWithoutCountry_of_originInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3886,6 +4078,8 @@ export type AssetUncheckedUpdateManyWithoutCountry_of_originInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -3906,6 +4100,8 @@ export type AssetCreateManyArrivalInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -3916,6 +4112,8 @@ export type AssetUpdateWithoutArrivalInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -3955,6 +4153,8 @@ export type AssetUncheckedUpdateWithoutArrivalInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -3985,6 +4185,8 @@ export type AssetUncheckedUpdateManyWithoutArrivalInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4005,6 +4207,8 @@ export type AssetCreateManyDepartureInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4015,6 +4219,8 @@ export type AssetUpdateWithoutDepartureInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4054,6 +4260,8 @@ export type AssetUncheckedUpdateWithoutDepartureInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4084,6 +4292,8 @@ export type AssetUncheckedUpdateManyWithoutDepartureInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4104,6 +4314,8 @@ export type AssetCreateManyHoldInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4114,6 +4326,8 @@ export type AssetUpdateWithoutHoldInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4153,6 +4367,8 @@ export type AssetUncheckedUpdateWithoutHoldInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4183,6 +4399,8 @@ export type AssetUncheckedUpdateManyWithoutHoldInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4203,6 +4421,8 @@ export type AssetCreateManyPurchase_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4223,6 +4443,8 @@ export type AssetCreateManySales_invoiceInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4233,6 +4455,8 @@ export type AssetUpdateWithoutPurchase_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4272,6 +4496,8 @@ export type AssetUncheckedUpdateWithoutPurchase_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4302,6 +4528,8 @@ export type AssetUncheckedUpdateManyWithoutPurchase_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4312,6 +4540,8 @@ export type AssetUpdateWithoutSales_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4351,6 +4581,8 @@ export type AssetUncheckedUpdateWithoutSales_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4381,6 +4613,8 @@ export type AssetUncheckedUpdateManyWithoutSales_invoiceInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4401,6 +4635,8 @@ export type AssetCreateManyLocationInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4411,6 +4647,8 @@ export type AssetUpdateWithoutLocationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4450,6 +4688,8 @@ export type AssetUncheckedUpdateWithoutLocationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4480,6 +4720,8 @@ export type AssetUncheckedUpdateManyWithoutLocationInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4500,6 +4742,8 @@ export type AssetCreateManyModelInput = {
   manufactured_year?: number | null
   created_at: Date | string
   is_in_transit?: boolean
+  is_damaged?: boolean | null
+  damage_notes?: string | null
   barcode_normalized?: string | null
   serial_normalized?: string | null
 }
@@ -4510,6 +4754,8 @@ export type AssetUpdateWithoutModelInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUpdateOneWithoutAssetNestedInput
@@ -4549,6 +4795,8 @@ export type AssetUncheckedUpdateWithoutModelInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cost?: Prisma.CostUncheckedUpdateOneWithoutAssetNestedInput
@@ -4579,6 +4827,8 @@ export type AssetUncheckedUpdateManyWithoutModelInput = {
   manufactured_year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_in_transit?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  is_damaged?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  damage_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barcode_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   serial_normalized?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -4694,6 +4944,8 @@ export type AssetSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   manufactured_year?: boolean
   created_at?: boolean
   is_in_transit?: boolean
+  is_damaged?: boolean
+  damage_notes?: boolean
   barcode_normalized?: boolean
   serial_normalized?: boolean
   cost?: boolean | Prisma.Asset$costArgs<ExtArgs>
@@ -4736,6 +4988,8 @@ export type AssetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   manufactured_year?: boolean
   created_at?: boolean
   is_in_transit?: boolean
+  is_damaged?: boolean
+  damage_notes?: boolean
   barcode_normalized?: boolean
   serial_normalized?: boolean
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
@@ -4767,6 +5021,8 @@ export type AssetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   manufactured_year?: boolean
   created_at?: boolean
   is_in_transit?: boolean
+  is_damaged?: boolean
+  damage_notes?: boolean
   barcode_normalized?: boolean
   serial_normalized?: boolean
   model?: boolean | Prisma.ModelDefaultArgs<ExtArgs>
@@ -4798,11 +5054,13 @@ export type AssetSelectScalar = {
   manufactured_year?: boolean
   created_at?: boolean
   is_in_transit?: boolean
+  is_damaged?: boolean
+  damage_notes?: boolean
   barcode_normalized?: boolean
   serial_normalized?: boolean
 }
 
-export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "location_id" | "status_id" | "readiness_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "country_of_origin_id" | "manufactured_year" | "created_at" | "is_in_transit" | "barcode_normalized" | "serial_normalized", ExtArgs["result"]["asset"]>
+export type AssetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barcode" | "serial_number" | "model_id" | "location_id" | "status_id" | "readiness_id" | "purchase_invoice_id" | "sales_invoice_id" | "arrival_id" | "departure_id" | "hold_id" | "country_of_origin_id" | "manufactured_year" | "created_at" | "is_in_transit" | "is_damaged" | "damage_notes" | "barcode_normalized" | "serial_normalized", ExtArgs["result"]["asset"]>
 export type AssetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cost?: boolean | Prisma.Asset$costArgs<ExtArgs>
   technical_specification?: boolean | Prisma.Asset$technical_specificationArgs<ExtArgs>
@@ -4892,6 +5150,8 @@ export type $AssetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     manufactured_year: number | null
     created_at: Date
     is_in_transit: boolean
+    is_damaged: boolean | null
+    damage_notes: string | null
     barcode_normalized: string | null
     serial_normalized: string | null
   }, ExtArgs["result"]["asset"]>
@@ -5353,6 +5613,8 @@ export interface AssetFieldRefs {
   readonly manufactured_year: Prisma.FieldRef<"Asset", 'Int'>
   readonly created_at: Prisma.FieldRef<"Asset", 'DateTime'>
   readonly is_in_transit: Prisma.FieldRef<"Asset", 'Boolean'>
+  readonly is_damaged: Prisma.FieldRef<"Asset", 'Boolean'>
+  readonly damage_notes: Prisma.FieldRef<"Asset", 'String'>
   readonly barcode_normalized: Prisma.FieldRef<"Asset", 'String'>
   readonly serial_normalized: Prisma.FieldRef<"Asset", 'String'>
 }

@@ -134,6 +134,8 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     latest_comment: 'Looks good',
     latest_comment_by: 'Carol',
     latest_comment_at: new Date(2026, 6, 12),
+    is_damaged: null,
+    damage_notes: null,
     ...overrides,
   }
 }
@@ -162,7 +164,7 @@ describe('asset-search report columns', () => {
   it('writes the full header row', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(
-      'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Location,' +
+      'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Damaged,Damage Notes,Location,' +
         'Country of Origin,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
@@ -176,7 +178,7 @@ describe('asset-search report columns', () => {
   it("writes each column's CSV text", () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
-      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,NYC | Receiving,' +
+      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,NYC | Receiving,' +
         'Japan,12,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
         'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
@@ -242,10 +244,12 @@ describe('asset-search report columns', () => {
       sales_invoice_invoice_number: null,
       sales_invoice_invoice_reference: null,
       latest_comment: null,
+      is_damaged: null,
+      damage_notes: null,
     })
     const { data } = csvFor(nulled, liveColumnIds())
     expect(data).toBe(
-      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,' +
+      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,,' +
         ',,"1,234 lbs",5,,,,' +
         ',,,,,' +
         ',,,,,,,,' +
@@ -370,6 +374,27 @@ describe('asset search column sorting', () => {
     expect(sortedBarcodes(rows, 'days_held', true)).toEqual(['THIRTY', 'FIVE', 'UNHELD'])
   })
 
+  it('reads damage as three states, blank for an asset nobody has inspected', () => {
+    const damageText = (isDamaged: boolean | null) =>
+      csvFor(makeRow({ is_damaged: isDamaged }), ['is_damaged']).data
+    expect(damageText(true)).toBe('BC-1,IR-2020,SN-1,Yes')
+    expect(damageText(false)).toBe('BC-1,IR-2020,SN-1,No')
+    expect(damageText(null)).toBe('BC-1,IR-2020,SN-1,')
+  })
+
+  it('exports the damage notes and sorts the never-inspected assets last', () => {
+    expect(csvFor(makeRow({ damage_notes: 'Dented, side panel' }), ['damage_notes']).data).toBe(
+      'BC-1,IR-2020,SN-1,"Dented, side panel"',
+    )
+    const rows = [
+      makeRow({ barcode: 'UNKNOWN', is_damaged: null }),
+      makeRow({ barcode: 'DAMAGED', is_damaged: true }),
+      makeRow({ barcode: 'CLEAN', is_damaged: false }),
+    ]
+    expect(sortedBarcodes(rows, 'is_damaged')).toEqual(['CLEAN', 'DAMAGED', 'UNKNOWN'])
+    expect(sortedBarcodes(rows, 'is_damaged', true)).toEqual(['DAMAGED', 'CLEAN', 'UNKNOWN'])
+  })
+
   it('orders location by the string the cell displays', () => {
     const at = (warehouse_code: string, zone: string) => ({
       warehouse_id: 1,
@@ -492,7 +517,7 @@ describe('asset search columns', () => {
       ),
     }))
     expect(grouped).toEqual([
-      { section: 'status', ids: ['status', 'readiness'] },
+      { section: 'status', ids: ['status', 'readiness', 'is_damaged', 'damage_notes'] },
       {
         section: 'general_specs',
         ids: ['specs_meter_total', 'specs_cassettes', 'specs_internal_finisher', 'accessories'],

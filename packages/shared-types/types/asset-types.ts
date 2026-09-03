@@ -132,6 +132,8 @@ export const AssetSearchRowSchema = z.object({
   latest_comment: z.string().nullable(),
   latest_comment_by: z.string().nullable(),
   latest_comment_at: z.coerce.date().nullable(),
+  is_damaged: z.boolean().nullable(),
+  damage_notes: z.string().nullable(),
 })
 
 export type AssetSearchRow = z.infer<typeof AssetSearchRowSchema>
@@ -240,6 +242,8 @@ export const AssetDetailsSchema = z.object({
     })
     .nullable(),
   latest_comment: z.string().nullable(),
+  is_damaged: z.boolean().nullable(),
+  damage_notes: z.string().nullable(),
 })
 
 export type AssetDetails = z.infer<typeof AssetDetailsSchema>
@@ -253,37 +257,49 @@ export const UpdateErrorSchema = z.object({
 })
 export type UpdateError = z.infer<typeof UpdateErrorSchema>
 
+// A damaged asset must say what the damage is: the flag on its own is not a report. Shared by
+// the create/update asset payloads and the specs update, which name the fields differently.
+export const DAMAGE_NOTES_REQUIRED = 'Damage notes are required when the asset is damaged'
+
 // POST /arrivals  (and POST /arrivals/:n/assets) — payload for creating an asset
-export const CreateAssetSchema = z.object({
-  model: ModelSummarySchema.refine((val) => !!val, 'Model is required'),
-  serialNumber: z.string().refine((val) => val.length > 0, 'Serial number is required'),
-  meterBlack: z.number().min(0, 'Meter must be positive'),
-  meterColour: z.number().min(0, 'Meter must be positive'),
-  cassettes: z.number().min(0, 'Cassettes are required'),
-  readiness: StatusSchema,
-  countryOfOrigin: CountrySchema.nullable(),
-  manufacturedYear: z
-    .number()
-    .int()
-    .min(MIN_MANUFACTURED_YEAR)
-    .max(MAX_MANUFACTURED_YEAR)
-    .nullable(),
-  componentId: z.number().int().positive().nullable(),
-  coreFunctions: z.array(CoreFunctionsSchema),
-  drumLifeC: z.number().min(0, 'Drum life C required'),
-  drumLifeM: z.number().min(0, 'Drum life M required'),
-  drumLifeY: z.number().min(0, 'Drum life Y required'),
-  drumLifeK: z.number().min(0, 'Drum life K required'),
-  tonerLifeC: z.number().min(0, 'Toner life C required'),
-  tonerLifeM: z.number().min(0, 'Toner life M required'),
-  tonerLifeY: z.number().min(0, 'Toner life Y required'),
-  tonerLifeK: z.number().min(0, 'Toner life K required'),
-  errors: z.array(UpdateErrorSchema).default([]),
-  comment: z.string().max(2000).nullable().default(null),
-  // Set by the client once the user has confirmed a serial number that already exists.
-  // The write path rejects an unacknowledged duplicate — see lib/serial-duplicates.ts.
-  duplicateSerialAcknowledged: z.boolean().default(false),
-})
+export const CreateAssetSchema = z
+  .object({
+    model: ModelSummarySchema.refine((val) => !!val, 'Model is required'),
+    serialNumber: z.string().refine((val) => val.length > 0, 'Serial number is required'),
+    meterBlack: z.number().min(0, 'Meter must be positive'),
+    meterColour: z.number().min(0, 'Meter must be positive'),
+    cassettes: z.number().min(0, 'Cassettes are required'),
+    readiness: StatusSchema,
+    countryOfOrigin: CountrySchema.nullable(),
+    manufacturedYear: z
+      .number()
+      .int()
+      .min(MIN_MANUFACTURED_YEAR)
+      .max(MAX_MANUFACTURED_YEAR)
+      .nullable(),
+    componentId: z.number().int().positive().nullable(),
+    coreFunctions: z.array(CoreFunctionsSchema),
+    drumLifeC: z.number().min(0, 'Drum life C required'),
+    drumLifeM: z.number().min(0, 'Drum life M required'),
+    drumLifeY: z.number().min(0, 'Drum life Y required'),
+    drumLifeK: z.number().min(0, 'Drum life K required'),
+    tonerLifeC: z.number().min(0, 'Toner life C required'),
+    tonerLifeM: z.number().min(0, 'Toner life M required'),
+    tonerLifeY: z.number().min(0, 'Toner life Y required'),
+    tonerLifeK: z.number().min(0, 'Toner life K required'),
+    errors: z.array(UpdateErrorSchema).default([]),
+    comment: z.string().max(2000).nullable().default(null),
+    // Set by the client once the user has confirmed a serial number that already exists.
+    // The write path rejects an unacknowledged duplicate — see lib/serial-duplicates.ts.
+    duplicateSerialAcknowledged: z.boolean().default(false),
+    isDamaged: z.boolean().default(false),
+    damageNotes: z.string().max(2000).nullable().default(null),
+  })
+  .superRefine((val, ctx) => {
+    if (!val.isDamaged) return
+    if (val.damageNotes?.trim()) return
+    ctx.addIssue({ code: 'custom', path: ['damageNotes'], message: DAMAGE_NOTES_REQUIRED })
+  })
 export type CreateAsset = z.infer<typeof CreateAssetSchema>
 
 export const AssetErrorSchema = z.object({
@@ -433,27 +449,35 @@ export const BulkUpdateAssetPricingSchema = z.object({
 
 export type BulkUpdateAssetPricing = z.infer<typeof BulkUpdateAssetPricingSchema>
 
-export const UpdateAssetSpecsSchema = z.object({
-  model_id: z.number().int().positive(),
-  serial_number: z.string().refine((val) => val.length > 0, 'Serial number is required'),
-  readiness_id: z.number().int().positive(),
-  country_of_origin_id: z.number().int().positive().nullable(),
-  manufactured_year: z.number().int().nullable(),
-  cassettes: z.number().int().nonnegative().nullable(),
-  component_id: z.number().int().positive().nullable(),
-  meter_black: z.number().int().nonnegative().nullable(),
-  meter_colour: z.number().int().nonnegative().nullable(),
-  drum_life_c: z.number().int().nonnegative().nullable(),
-  drum_life_m: z.number().int().nonnegative().nullable(),
-  drum_life_y: z.number().int().nonnegative().nullable(),
-  drum_life_k: z.number().int().nonnegative().nullable(),
-  toner_life_c: z.number().int().nonnegative().nullable(),
-  toner_life_m: z.number().int().nonnegative().nullable(),
-  toner_life_y: z.number().int().nonnegative().nullable(),
-  toner_life_k: z.number().int().nonnegative().nullable(),
-  accessory_ids: z.array(z.number().int().positive()),
-  duplicate_serial_acknowledged: z.boolean().default(false),
-})
+export const UpdateAssetSpecsSchema = z
+  .object({
+    model_id: z.number().int().positive(),
+    serial_number: z.string().refine((val) => val.length > 0, 'Serial number is required'),
+    readiness_id: z.number().int().positive(),
+    country_of_origin_id: z.number().int().positive().nullable(),
+    manufactured_year: z.number().int().nullable(),
+    cassettes: z.number().int().nonnegative().nullable(),
+    component_id: z.number().int().positive().nullable(),
+    meter_black: z.number().int().nonnegative().nullable(),
+    meter_colour: z.number().int().nonnegative().nullable(),
+    drum_life_c: z.number().int().nonnegative().nullable(),
+    drum_life_m: z.number().int().nonnegative().nullable(),
+    drum_life_y: z.number().int().nonnegative().nullable(),
+    drum_life_k: z.number().int().nonnegative().nullable(),
+    toner_life_c: z.number().int().nonnegative().nullable(),
+    toner_life_m: z.number().int().nonnegative().nullable(),
+    toner_life_y: z.number().int().nonnegative().nullable(),
+    toner_life_k: z.number().int().nonnegative().nullable(),
+    accessory_ids: z.array(z.number().int().positive()),
+    duplicate_serial_acknowledged: z.boolean().default(false),
+    is_damaged: z.boolean(),
+    damage_notes: z.string().max(2000).nullable(),
+  })
+  .superRefine((val, ctx) => {
+    if (!val.is_damaged) return
+    if (val.damage_notes?.trim()) return
+    ctx.addIssue({ code: 'custom', path: ['damage_notes'], message: DAMAGE_NOTES_REQUIRED })
+  })
 
 export type UpdateAssetSpecs = z.infer<typeof UpdateAssetSpecsSchema>
 

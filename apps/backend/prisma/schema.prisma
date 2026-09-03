@@ -100,6 +100,9 @@ model Asset {
 
   is_in_transit Boolean @default(false)
 
+  is_damaged   Boolean?
+  damage_notes String?  @db.Text
+
   barcode_normalized String? @default(dbgenerated()) @map("barcode_normalized")
   serial_normalized  String? @default(dbgenerated()) @map("serial_normalized")
 
