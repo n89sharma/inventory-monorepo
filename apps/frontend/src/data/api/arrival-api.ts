@@ -18,6 +18,7 @@ import type {
   CreateAsset,
   MoveArrivalAssets,
   OrgSummary,
+  SplitArrival,
   UpdateArrivalMetadata,
   UpdateAsset,
   Warehouse,
@@ -31,6 +32,7 @@ import {
   CreateArrivalSchema,
   CreateAssetSchema,
   MoveArrivalAssetsSchema,
+  SplitArrivalSchema,
   UpdateArrivalMetadataSchema,
   UpdateAssetSchema,
 } from 'shared-types'
@@ -126,6 +128,18 @@ export async function moveArrivalAssets(
 ): Promise<void> {
   const moveArrivalAssetsBody = MoveArrivalAssetsSchema.parse(move satisfies MoveArrivalAssets)
   await api.post(`/arrivals/${destinationArrivalNumber}/move-assets`, moveArrivalAssetsBody)
+}
+
+export async function splitArrival(
+  sourceArrivalNumber: string,
+  split: SplitArrival,
+): Promise<string> {
+  const splitArrivalBody = SplitArrivalSchema.parse(split satisfies SplitArrival)
+  const { data } = await api.post<CreateArrivalResponse>(
+    `/arrivals/${sourceArrivalNumber}/split`,
+    splitArrivalBody,
+  )
+  return CreateArrivalResponseSchema.parse(data).arrivalNumber
 }
 
 export async function createSingleArrivalAsset(

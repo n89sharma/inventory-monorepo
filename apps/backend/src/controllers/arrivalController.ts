@@ -6,6 +6,7 @@ import {
   CreateArrivalSchema,
   CreateAssetSchema,
   MoveArrivalAssetsSchema,
+  SplitArrivalSchema,
   UpdateArrivalMetadataSchema,
   UpdateAssetSchema,
   successResponse,
@@ -23,6 +24,7 @@ import {
   getArrivalAssetForUpdate as getArrivalAssetForUpdateSer,
   getArrival as getArrivalSer,
   moveAssetsToArrival as moveAssetsToArrivalSer,
+  splitArrival as splitArrivalSer,
   addRemoveCollectionFromAssetsAndRecord as patchArrivalAssetsSer,
   patchArrivalMetadata as patchArrivalMetadataSer,
   updateArrivalAsset as updateArrivalAssetSer,
@@ -48,6 +50,12 @@ export const getArrival = asyncHandler(async (req, res) => {
 export const createArrival = asyncHandler(async (req, res) => {
   const validatedArrival = CreateArrivalSchema.parse(req.body)
   const arrivalNumber = await createArrivalSer(validatedArrival, res.locals.dbUserId)
+  res.status(201).json({ arrivalNumber })
+})
+
+export const splitArrival = asyncHandler(async (req, res) => {
+  const split = SplitArrivalSchema.parse(req.body)
+  const arrivalNumber = await splitArrivalSer(req.params.arrivalNumber, split, res.locals.dbUserId)
   res.status(201).json({ arrivalNumber })
 })
 

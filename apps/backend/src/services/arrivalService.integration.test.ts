@@ -1,4 +1,4 @@
-import { ASSET_STATUS } from 'shared-types'
+import { ASSET_STATUS, type SplitArrival } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
@@ -15,7 +15,13 @@ import {
 } from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { createArrival, deleteArrival, getArrival, moveAssetsToArrival } from './arrivalService.js'
+import {
+  createArrival,
+  deleteArrival,
+  getArrival,
+  moveAssetsToArrival,
+  splitArrival,
+} from './arrivalService.js'
 import { deleteAsset } from './assetDeleteService.js'
 
 async function getArrivalId(arrivalNumber: string): Promise<number> {
@@ -179,6 +185,102 @@ describe('moveAssetsToArrival', () => {
       ConflictError,
     )
   })
+})
+
+describe('splitArrival', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('creates the new arrival from the payload, in the source arrival warehouse', async () => {
+    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const [moved] = await getArrivalAssetIds(source)
+
+    const splitNumber = await splitArrival(source, buildSplitInput([moved]), refs.userId)
+
+    const created = await prisma.arrival.findUniqueOrThrow({
+      where: { arrival_number: splitNumber },
+      select: { origin_id: true, destination_id: true, transporter_id: true, notes: true },
+    })
+    const sourceWarehouse = await prisma.arrival.findUniqueOrThrow({
+      where: { arrival_number: source },
+      select: { destination_id: true },
+    })
+    expect(splitNumber).toMatch(/^A-YYZ-\d{7}$/)
+    expect(created).toMatchObject({
+      origin_id: refs.customer.id,
+      destination_id: sourceWarehouse.destination_id,
+      transporter_id: refs.transporter.id,
+      notes: 'Second vendor on the same truck',
+    })
+  })
+
+  it('reassigns only the selected assets and leaves the rest on the source', async () => {
+    const source = await createArrival(buildCreateArrivalInput(refs, 3), refs.userId)
+    const [moved, stays] = await getArrivalAssetIds(source)
+    const sourceId = await getArrivalId(source)
+
+    const splitNumber = await splitArrival(source, buildSplitInput([moved]), refs.userId)
+
+    expect(await getAssetArrivalId(moved)).toBe(await getArrivalId(splitNumber))
+    expect(await getAssetArrivalId(stays)).toBe(sourceId)
+    expect(await getArrivalAssetIds(source)).toHaveLength(2)
+  })
+
+  it('records history for the new arrival and the moved assets', async () => {
+    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const [moved] = await getArrivalAssetIds(source)
+    const beforeSplit = await getMaxHistoryId()
+
+    await splitArrival(source, buildSplitInput([moved]), refs.userId)
+
+    expect(await getMaxHistoryId()).toBeGreaterThan(beforeSplit)
+  })
+
+  it('rejects a split that would empty the source arrival', async () => {
+    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const assetIds = await getArrivalAssetIds(source)
+
+    await expect(splitArrival(source, buildSplitInput(assetIds), refs.userId)).rejects.toThrow(
+      ConflictError,
+    )
+    expect(await getArrivalAssetIds(source)).toHaveLength(2)
+  })
+
+  it('rejects an asset that is not on the source arrival', async () => {
+    const source = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const other = await createArrival(buildCreateArrivalInput(refs, 2), refs.userId)
+    const [foreign] = await getArrivalAssetIds(other)
+
+    await expect(splitArrival(source, buildSplitInput([foreign]), refs.userId)).rejects.toThrow(
+      ConflictError,
+    )
+  })
+
+  it('rejects a split of an arrival that does not exist', async () => {
+    await expect(splitArrival('A-YYZ-9999999', buildSplitInput([1]), refs.userId)).rejects.toThrow(
+      NotFoundError,
+    )
+  })
+
+  function buildSplitInput(assetIds: number[]): SplitArrival {
+    return {
+      vendor: refs.customer,
+      transporter: refs.transporter,
+      comment: 'Second vendor on the same truck',
+      assetIds,
+    }
+  }
 })
 
 describe('getArrival', () => {

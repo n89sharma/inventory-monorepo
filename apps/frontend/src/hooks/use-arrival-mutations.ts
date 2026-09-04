@@ -5,6 +5,7 @@ import {
   getArrivalAssetForUpdate,
   moveArrivalAssets,
   patchArrivalAssets,
+  splitArrival,
   updateArrivalAsset,
   updateArrivalMetadata,
 } from '@/data/api/arrival-api'
@@ -21,7 +22,7 @@ import {
   scheduleBulkAssetRemoval,
 } from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
-import type { AssetIdentity, Component, PatchAssetPricing } from 'shared-types'
+import type { AssetIdentity, Component, PatchAssetPricing, SplitArrival } from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: ArrivalForm) {
@@ -121,6 +122,21 @@ async function moveAssets(
   invalidateArrivalLists()
 }
 
+async function splitAssets(
+  sourceArrivalNumber: string,
+  split: Omit<SplitArrival, 'assetIds'>,
+  assets: AssetIdentity[],
+) {
+  const arrivalNumber = await splitArrival(sourceArrivalNumber, {
+    ...split,
+    assetIds: assets.map((a) => a.id),
+  })
+  mutate(arrivalDetailKey(sourceArrivalNumber))
+  invalidateAssetDetails(assets.map((a) => a.barcode))
+  invalidateArrivalLists()
+  return arrivalNumber
+}
+
 async function remove(arrivalNumber: string) {
   await deleteArrival(arrivalNumber)
   clearArrivalDetail(arrivalNumber)
@@ -138,6 +154,7 @@ const mutations = {
   removeAsset,
   bulkRemoveAssets,
   moveAssets,
+  splitAssets,
   flushPending,
 } as const
 

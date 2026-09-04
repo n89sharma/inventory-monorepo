@@ -10,6 +10,7 @@ import {
   moveArrivalAssets,
   patchArrivalAssets,
   patchArrivalMetadata,
+  splitArrival,
   updateArrivalAsset,
 } from '../controllers/arrivalController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
@@ -45,6 +46,7 @@ router.post(
   requirePermission('create_update_arrival'),
   createSingleArrivalAsset,
 )
+router.post('/:arrivalNumber/split', requirePermission('create_update_arrival'), splitArrival)
 router.post(
   '/:arrivalNumber/move-assets',
   requirePermission('create_update_arrival'),

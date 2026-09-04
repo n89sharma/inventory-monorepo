@@ -7,6 +7,7 @@ import {
   CreateArrival,
   CreateAsset,
   ModelSummary,
+  SplitArrival,
   UpdateArrivalMetadata,
   UpdateAsset,
 } from 'shared-types'
@@ -451,26 +452,104 @@ export async function moveAssetsToArrival(
   if (!source) throw new NotFoundError(`Arrival ${sourceArrivalNumber} not found`)
   if (!destination) throw new NotFoundError(`Arrival ${destinationArrivalNumber} not found`)
 
-  await prisma.$transaction(async (tx) => {
-    const assets = await tx.asset.findMany({
-      where: { id: { in: assetIds } },
-      select: { id: true, arrival_id: true },
-    })
-    if (assets.length !== assetIds.length || assets.some((a) => a.arrival_id !== source.id)) {
-      throw new ConflictError(
-        `The following assets are no longer on arrival ${sourceArrivalNumber} and cannot be moved`,
-      )
-    }
-
-    await tx.asset.updateMany({
-      where: { id: { in: assetIds }, arrival_id: source.id },
-      data: { arrival_id: destination.id },
-    })
-  })
+  await prisma.$transaction((tx) =>
+    reassignAssetsToArrival(tx, sourceArrivalNumber, source.id, destination.id, assetIds),
+  )
 
   await recordCollectionMoveOnAssets(assetIds, 'arrival_id', source.id, destination.id, userId)
   await recordAssetUpdateOnCollection('Arrival', source.id, [], assetIds, userId)
   await recordAssetUpdateOnCollection('Arrival', destination.id, assetIds, [], userId)
+}
+
+async function reassignAssetsToArrival(
+  tx: Prisma.TransactionClient,
+  sourceArrivalNumber: string,
+  sourceArrivalId: number,
+  destinationArrivalId: number,
+  assetIds: number[],
+): Promise<void> {
+  const assets = await tx.asset.findMany({
+    where: { id: { in: assetIds } },
+    select: { id: true, arrival_id: true },
+  })
+  if (assets.length !== assetIds.length || assets.some((a) => a.arrival_id !== sourceArrivalId)) {
+    throw new ConflictError(
+      `The following assets are no longer on arrival ${sourceArrivalNumber} and cannot be moved`,
+    )
+  }
+
+  await tx.asset.updateMany({
+    where: { id: { in: assetIds }, arrival_id: sourceArrivalId },
+    data: { arrival_id: destinationArrivalId },
+  })
+}
+
+export async function splitArrival(
+  sourceArrivalNumber: string,
+  split: SplitArrival,
+  userId: number,
+): Promise<string> {
+  const source = await prisma.arrival.findUnique({
+    where: { arrival_number: sourceArrivalNumber },
+    select: {
+      id: true,
+      destination: { select: { id: true, city_code: true } },
+      _count: { select: { assets: true } },
+    },
+  })
+  if (!source) throw new NotFoundError(`Arrival ${sourceArrivalNumber} not found`)
+  assertArrivalKeepsAnAsset(sourceArrivalNumber, source._count.assets, split.assetIds.length)
+
+  const currentDateTime = new Date()
+  const arrivalNumber = await getNewArrivalNumber(source.destination.city_code)
+
+  const newArrival = await prisma.$transaction(async (tx) => {
+    const remaining = await tx.asset.count({ where: { arrival_id: source.id } })
+    assertArrivalKeepsAnAsset(sourceArrivalNumber, remaining, split.assetIds.length)
+
+    const created = await tx.arrival.create({
+      data: {
+        arrival_number: arrivalNumber,
+        origin: { connect: { id: split.vendor.id } },
+        destination: { connect: { id: source.destination.id } },
+        transporter: { connect: { id: split.transporter.id } },
+        notes: split.comment,
+        created_at: currentDateTime,
+        created_by: { connect: { id: userId } },
+      },
+      select: { id: true },
+    })
+    await reassignAssetsToArrival(tx, sourceArrivalNumber, source.id, created.id, split.assetIds)
+    return created
+  })
+
+  await recordArrivalCreate(
+    newArrival.id,
+    {
+      arrival_number: arrivalNumber,
+      origin_id: split.vendor.id,
+      destination_id: source.destination.id,
+      created_at: currentDateTime,
+    },
+    userId,
+  )
+  await recordCollectionMoveOnAssets(split.assetIds, 'arrival_id', source.id, newArrival.id, userId)
+  await recordAssetUpdateOnCollection('Arrival', source.id, [], split.assetIds, userId)
+  await recordAssetUpdateOnCollection('Arrival', newArrival.id, split.assetIds, [], userId)
+
+  return arrivalNumber
+}
+
+function assertArrivalKeepsAnAsset(
+  arrivalNumber: string,
+  assetCount: number,
+  splitCount: number,
+): void {
+  if (splitCount >= assetCount) {
+    throw new ConflictError(
+      `Arrival ${arrivalNumber} must keep at least one asset — split off fewer assets`,
+    )
+  }
 }
 
 async function updateArrivalAssetCoreFields(

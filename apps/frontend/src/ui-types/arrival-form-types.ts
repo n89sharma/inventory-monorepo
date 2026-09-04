@@ -244,3 +244,9 @@ export type ArrivalMetadataForm = {
   warehouse: SelectOption<Warehouse>
   comment: string
 }
+
+// The new arrival made by splitting an existing one: same fields as the metadata form minus the
+// warehouse, which the backend inherits from the source arrival.
+export const SplitArrivalFormSchema = ArrivalMetadataFormSchema.omit({ warehouse: true })
+
+export type SplitArrivalForm = Omit<ArrivalMetadataForm, 'warehouse'>

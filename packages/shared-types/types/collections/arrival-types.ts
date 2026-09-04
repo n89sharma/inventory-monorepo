@@ -65,3 +65,13 @@ export const MoveArrivalAssetsSchema = z.object({
   assetIds: z.array(z.number().int()).min(1),
 })
 export type MoveArrivalAssets = z.infer<typeof MoveArrivalAssetsSchema>
+
+// POST /arrivals/:arrivalNumber/split — :arrivalNumber is the source arrival. The new arrival
+// inherits the source's warehouse, so no warehouse is accepted from the client.
+export const SplitArrivalSchema = z.object({
+  vendor: OrgSummarySchema,
+  transporter: OrgSummarySchema,
+  comment: z.string().nullable(),
+  assetIds: z.array(z.number().int()).min(1),
+})
+export type SplitArrival = z.infer<typeof SplitArrivalSchema>
