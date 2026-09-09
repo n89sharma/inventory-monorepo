@@ -1,6 +1,7 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { AddPartModal } from '@/components/asset-details/add-part-modal'
 import { AssetEditBar } from '@/components/asset-details/asset-edit-bar'
+import { AssetErrorsList } from '@/components/asset-details/asset-errors-editor'
 import { AssetHistoryList } from '@/components/asset-details/asset-history'
 import { Comment } from '@/components/asset-details/comment'
 import {
@@ -24,7 +25,6 @@ import { OptionalSection } from '@/components/asset-details/optional-section'
 import { PartsSection } from '@/components/asset-details/parts-section'
 import { SectionEditButton } from '@/components/asset-details/section-edit-button'
 import { StickyDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
-import { Badge } from '@/components/shadcn/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { getBreadcrumForAssetDetails } from '@/components/shared/breadcrumb-segments'
 import { CopyButton } from '@/components/shared/copy-button'
@@ -162,11 +162,6 @@ function RailField({ label, children }: { label: string; children: React.ReactNo
       <span className="text-xs">{children}</span>
     </div>
   )
-}
-
-function ErrorStatusBadge({ isFixed }: { isFixed: boolean }) {
-  if (isFixed) return <Badge variant="success">Fixed</Badge>
-  return <Badge variant="destructive">Open</Badge>
 }
 
 type LifecycleItem = { key: string; date: Date | null; node: React.ReactNode }
@@ -448,18 +443,8 @@ export const AssetDetailsPage = () => {
                     )
                   }
                 />
-                <OptionalSection condition={!!errors?.length} fallback="No errors on record">
-                  <DataRowContainer>
-                    {errors?.map((e) => (
-                      <DataRow
-                        key={`${e.code}-${e.added_at}`}
-                        label={e.code}
-                        rowClassName={ROW_GAP}
-                      >
-                        <ErrorStatusBadge isFixed={e.is_fixed} />
-                      </DataRow>
-                    ))}
-                  </DataRowContainer>
+                <OptionalSection condition={errors.length > 0} fallback="No errors on record">
+                  <AssetErrorsList errors={errors} />
                 </OptionalSection>
               </Section>
 

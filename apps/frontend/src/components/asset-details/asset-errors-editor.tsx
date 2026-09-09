@@ -1,10 +1,16 @@
 import { Badge } from '@/components/shadcn/badge'
 import { Button } from '@/components/shadcn/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { useErrorCodes } from '@/hooks/use-reference-data'
 import { cn } from '@/lib/utils'
 import { TrashIcon } from '@phosphor-icons/react'
-import { useState, type ReactNode } from 'react'
-import type { Error as ReferenceErrorType, UpdateError } from 'shared-types'
+import { useCallback, useState, useSyncExternalStore, type ReactNode } from 'react'
+import type { AssetError, Error as ReferenceErrorType, UpdateError } from 'shared-types'
+
+// Descriptions run to 2400+ characters on some codes; the page shows a preview, the tooltip the rest.
+const DESCRIPTION_CLAMP = 'line-clamp-3'
+
+const NOOP_UNSUBSCRIBE = () => {}
 
 /**
  * Props passed to the caller-supplied search input. These match
@@ -33,24 +39,10 @@ interface AssetErrorsEditorProps {
   renderSearch: (props: AssetErrorsSearchSlotProps) => ReactNode
 }
 
-function ErrorStatusBadge({
-  isFixed,
-  toggleable,
-  onToggle,
-}: {
-  isFixed: boolean
-  toggleable: boolean
-  onToggle: () => void
-}) {
+function ErrorStatusBadge({ isFixed, onToggle }: { isFixed: boolean; onToggle?: () => void }) {
   const variant = isFixed ? 'success' : 'destructive'
   const label = isFixed ? 'Fixed' : 'Open'
-  if (!toggleable) {
-    return (
-      <Badge variant={variant} className="cursor-not-allowed">
-        {label}
-      </Badge>
-    )
-  }
+  if (!onToggle) return <Badge variant={variant}>{label}</Badge>
   return (
     <Badge asChild variant={variant}>
       <button
@@ -61,6 +53,111 @@ function ErrorStatusBadge({
         {label}
       </button>
     </Badge>
+  )
+}
+
+type AssetErrorItemProps = React.ComponentProps<'div'> & {
+  code: string
+  description: string | null | undefined
+  descriptionClassName?: string
+  descriptionRef?: React.Ref<HTMLSpanElement>
+}
+
+function AssetErrorItem({
+  code,
+  description,
+  descriptionClassName,
+  descriptionRef,
+  className,
+  children,
+  ...rest
+}: AssetErrorItemProps) {
+  return (
+    <div
+      className={cn('flex items-center border-b px-3 py-2 last:border-0 gap-2', className)}
+      {...rest}
+    >
+      <div className="flex flex-1 flex-col min-w-0">
+        <span className="font-medium break-words">{code}</span>
+        {description && (
+          <span
+            ref={descriptionRef}
+            className={cn('text-xs text-muted-foreground break-words', descriptionClassName)}
+          >
+            {description}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Reports whether the observed element is actually cut off by its line clamp.
+ * Re-measures on resize, since the Errors card is fluid and the same description
+ * clamps at a narrow viewport but not a wide one.
+ */
+function useClampedOverflow() {
+  const [element, setElement] = useState<HTMLSpanElement | null>(null)
+
+  const subscribe = useCallback(
+    (onSizeChange: () => void) => {
+      if (!element) return NOOP_UNSUBSCRIBE
+      const observer = new ResizeObserver(onSizeChange)
+      observer.observe(element)
+      return () => observer.disconnect()
+    },
+    [element],
+  )
+
+  const getSnapshot = useCallback(() => {
+    if (!element) return false
+    return element.scrollHeight > element.clientHeight
+  }, [element])
+
+  return { measureRef: setElement, clamped: useSyncExternalStore(subscribe, getSnapshot) }
+}
+
+function AssetErrorListItem({ error }: { error: AssetError }) {
+  // Some codes carry an empty string rather than null, so a null check isn't enough.
+  const description = error.description?.trim()
+  const { measureRef, clamped } = useClampedOverflow()
+
+  const row = (
+    <AssetErrorItem
+      code={error.code}
+      description={description}
+      descriptionClassName={DESCRIPTION_CLAMP}
+      descriptionRef={measureRef}
+      tabIndex={clamped ? 0 : undefined}
+      className={clamped ? 'cursor-default' : undefined}
+    >
+      <div className="flex w-16 justify-center">
+        <ErrorStatusBadge isFixed={error.is_fixed} />
+      </div>
+    </AssetErrorItem>
+  )
+
+  // Nothing is hidden unless the clamp actually bites, so there is nothing to reveal.
+  if (!clamped) return row
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{row}</TooltipTrigger>
+      <TooltipContent align="start">{description}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+/** Read-only counterpart to `AssetErrorsEditor`, sharing its row markup. */
+export function AssetErrorsList({ errors }: { errors: AssetError[] }) {
+  return (
+    <div className="rounded-md border">
+      {errors.map((e) => (
+        <AssetErrorListItem key={e.error_id} error={e} />
+      ))}
+    </div>
   )
 }
 
@@ -121,21 +218,11 @@ export function AssetErrorsEditor({
             const code = ref?.code ?? `#${e.error_id}`
             const description = ref?.description
             return (
-              <div
-                key={e.error_id}
-                className="flex items-center border-b px-3 py-2 last:border-0 gap-2"
-              >
-                <div className="flex flex-1 flex-col min-w-0">
-                  <span className="font-medium break-words">{code}</span>
-                  {description && (
-                    <span className="text-xs text-muted-foreground break-words">{description}</span>
-                  )}
-                </div>
+              <AssetErrorItem key={e.error_id} code={code} description={description}>
                 <div className="flex w-16 justify-center">
                   <ErrorStatusBadge
                     isFixed={e.is_fixed}
-                    toggleable={statusToggleable}
-                    onToggle={() => handleToggleFixed(e.error_id)}
+                    onToggle={statusToggleable ? () => handleToggleFixed(e.error_id) : undefined}
                   />
                 </div>
                 <div className="flex w-8 justify-center">
@@ -150,7 +237,7 @@ export function AssetErrorsEditor({
                     <TrashIcon />
                   </Button>
                 </div>
-              </div>
+              </AssetErrorItem>
             )
           })}
         </div>
