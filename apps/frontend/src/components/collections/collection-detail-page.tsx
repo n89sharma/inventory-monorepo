@@ -23,7 +23,7 @@ import {
 import { DataGrid } from '@/components/shared/data-table'
 import { Switch } from '@/components/shadcn/switch'
 import { Label } from '@/components/shadcn/label'
-import { BulkEditBar } from './bulk-edit-bar'
+import { BulkEditBar, type BulkExtraActionGroup } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
 const TABLE_LABEL = 'Collection assets'
@@ -67,7 +67,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderBulkExtraActions?: (args: {
     selectedAssets: AssetSearchRow[]
     clearSelection: () => void
-  }) => React.ReactNode
+  }) => { groups: BulkExtraActionGroup[]; dialogs: React.ReactNode } | null
   onRelease?: () => void
   onDelete?: () => void
 }
@@ -231,6 +231,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         onRowSelectionChange={setRowSelection}
         renderAboveTable={(table) => {
           const filteredRowIds = table.getFilteredRowModel().rows.map((row) => row.id)
+          const extraActions = renderBulkExtraActions?.({ selectedAssets, clearSelection })
           return (
             <BulkEditBar
               selectedAssets={selectedSummaries}
@@ -242,10 +243,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               totalCount={filteredRowIds.length}
               hiddenCount={entity.assets.length - filteredRowIds.length}
               onSelectAll={() => selectAll(filteredRowIds)}
-              extraActions={renderBulkExtraActions?.({
-                selectedAssets,
-                clearSelection,
-              })}
+              extraActionGroups={extraActions?.groups}
+              extraDialogs={extraActions?.dialogs}
             />
           )
         }}

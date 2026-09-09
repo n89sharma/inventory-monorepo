@@ -17,7 +17,6 @@ import { toast } from 'sonner'
 import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { AlertDialogDescription } from '../shadcn/alert-dialog'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
-import { Button } from '../shadcn/button'
 import { EditHoldMetadataModal } from './edit-hold-metadata-modal'
 import { MoveToHoldModal } from './move-to-hold-modal'
 
@@ -83,11 +82,11 @@ export function HoldDetailsPage(): React.JSX.Element {
         }
         renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
           if (!canEditHold) return null
-          return (
-            <>
-              <Button variant="secondary" onClick={() => setMoveOpen(true)}>
-                Move to hold
-              </Button>
+          return {
+            groups: [
+              { actions: [{ label: 'Move to another hold', onSelect: () => setMoveOpen(true) }] },
+            ],
+            dialogs: (
               <MoveToHoldModal
                 open={moveOpen}
                 onOpenChange={setMoveOpen}
@@ -95,8 +94,8 @@ export function HoldDetailsPage(): React.JSX.Element {
                 selectedAssets={selectedAssets}
                 onConfirmSuccess={clearSelection}
               />
-            </>
-          )
+            ),
+          }
         }}
         onFlushPending={mutations.flushPending}
         onRelease={() => setReleaseOpen(true)}

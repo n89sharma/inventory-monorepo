@@ -16,7 +16,6 @@ import { useParams } from 'react-router-dom'
 import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
 import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { Button } from '../shadcn/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
 import { CreateAssetModal } from './create-asset-modal'
 import { EditArrivalMetadataModal } from './edit-arrival-metadata-modal'
@@ -24,33 +23,6 @@ import { MoveToArrivalModal } from './move-to-arrival-modal'
 import { SplitArrivalModal } from './split-arrival-modal'
 
 const SPLIT_DISABLED_HINT = 'An arrival must keep at least one asset — clear a row to split.'
-
-// Splitting every asset off would leave the source arrival empty, which the API refuses; the
-// tooltip says so on a disabled trigger, which needs a wrapper element to receive the hover.
-function SplitArrivalButton({
-  assetCount,
-  selectedCount,
-  onClick,
-}: {
-  assetCount: number
-  selectedCount: number
-  onClick: () => void
-}) {
-  const splitsEveryAsset = selectedCount >= assetCount
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="inline-block">
-          <Button variant="secondary" disabled={splitsEveryAsset} onClick={onClick}>
-            Split to new arrival
-          </Button>
-        </span>
-      </TooltipTrigger>
-      <TooltipContent hidden={!splitsEveryAsset}>{SPLIT_DISABLED_HINT}</TooltipContent>
-    </Tooltip>
-  )
-}
 
 export function ArrivalDetailsPage(): React.JSX.Element {
   const { collectionId: arrivalNumber } = useParams<{ collectionId: string }>()
@@ -135,34 +107,41 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       onBulkRemove={(assets) => mutations.bulkRemoveAssets(arrivalNumber, assets)}
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
         if (!canEditArrival) return null
-        return (
-          <>
-            <Button variant="secondary" onClick={() => setMoveOpen(true)}>
-              Move to arrival
-            </Button>
-            <MoveToArrivalModal
-              open={moveOpen}
-              onOpenChange={setMoveOpen}
-              sourceArrivalNumber={arrivalNumber}
-              selectedAssets={selectedAssets}
-              onConfirmSuccess={clearSelection}
-            />
-            <SplitArrivalButton
-              assetCount={detail.data?.assets.length ?? 0}
-              selectedCount={selectedAssets.length}
-              onClick={() => setSplitOpen(true)}
-            />
-            <SplitArrivalModal
-              open={splitOpen}
-              onOpenChange={setSplitOpen}
-              sourceArrivalNumber={arrivalNumber}
-              sourceWarehouseCode={detail.data?.warehouse?.city_code ?? null}
-              sourceTransporter={detail.data?.transporter ?? null}
-              selectedAssets={selectedAssets}
-              onConfirmSuccess={clearSelection}
-            />
-          </>
-        )
+        const splitsEveryAsset = selectedAssets.length >= (detail.data?.assets.length ?? 0)
+        return {
+          groups: [
+            {
+              actions: [
+                { label: 'Move to another arrival', onSelect: () => setMoveOpen(true) },
+                {
+                  label: 'Split to a new arrival',
+                  onSelect: () => setSplitOpen(true),
+                  blockedReason: splitsEveryAsset ? SPLIT_DISABLED_HINT : undefined,
+                },
+              ],
+            },
+          ],
+          dialogs: (
+            <>
+              <MoveToArrivalModal
+                open={moveOpen}
+                onOpenChange={setMoveOpen}
+                sourceArrivalNumber={arrivalNumber}
+                selectedAssets={selectedAssets}
+                onConfirmSuccess={clearSelection}
+              />
+              <SplitArrivalModal
+                open={splitOpen}
+                onOpenChange={setSplitOpen}
+                sourceArrivalNumber={arrivalNumber}
+                sourceWarehouseCode={detail.data?.warehouse?.city_code ?? null}
+                sourceTransporter={detail.data?.transporter ?? null}
+                selectedAssets={selectedAssets}
+                onConfirmSuccess={clearSelection}
+              />
+            </>
+          ),
+        }
       }}
       onFlushPending={mutations.flushPending}
       onDelete={handleDelete}

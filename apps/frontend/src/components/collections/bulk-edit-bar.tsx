@@ -1,20 +1,80 @@
 import { useCan } from '@/hooks/use-can'
-import { CurrencyDollarIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, TrashIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AssetSummary } from 'shared-types'
 import { BulkEditPricingModal } from './bulk-edit-pricing-modal'
 import { Button } from '../shadcn/button'
+import { Separator } from '../shadcn/separator'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
 import { AddToCollectionModal } from './add-to-collection-modal'
 import { BulkActionBar } from './bulk-action-bar'
 
 type CollectionType = 'transfers' | 'departures' | 'holds' | 'invoices' | 'arrivals'
+
+const NEW_COLLECTION_OPTIONS = [
+  { collectionType: 'transfers', label: 'Transfer', route: '/transfers/new' },
+  { collectionType: 'departures', label: 'Departure', route: '/departures/new' },
+  { collectionType: 'holds', label: 'Hold', route: '/holds/new' },
+  { collectionType: 'invoices', label: 'Invoice', route: '/invoices/new' },
+] as const satisfies readonly { collectionType: CollectionType; label: string; route: string }[]
+
+const EXISTING_COLLECTION_LABEL = 'Existing collection…'
+const NEW_COLLECTION_HEADING = 'New'
+
+export type BulkExtraAction = {
+  label: string
+  onSelect: () => void
+  blockedReason?: string
+}
+
+export type BulkExtraActionGroup = {
+  heading?: string
+  actions: BulkExtraAction[]
+}
+
+// The bar clears the selection on a window-level Escape; without this, dismissing a menu would
+// also discard what the user just selected.
+function stopEscapePropagation(event: KeyboardEvent) {
+  event.stopPropagation()
+}
+
+function BulkExtraActionItem({ action }: { action: BulkExtraAction }): React.JSX.Element {
+  if (action.blockedReason !== undefined) {
+    return (
+      <DropdownMenuItem disabled className="flex-col items-start gap-0.5">
+        <span>{action.label}</span>
+        <span className="text-xs">{action.blockedReason}</span>
+      </DropdownMenuItem>
+    )
+  }
+  return <DropdownMenuItem onSelect={action.onSelect}>{action.label}</DropdownMenuItem>
+}
+
+function BulkExtraActionGroupItems({
+  group,
+  showSeparator,
+}: {
+  group: BulkExtraActionGroup
+  showSeparator: boolean
+}): React.JSX.Element {
+  return (
+    <>
+      {showSeparator && <DropdownMenuSeparator />}
+      {group.heading !== undefined && <DropdownMenuLabel>{group.heading}</DropdownMenuLabel>}
+      {group.actions.map((action) => (
+        <BulkExtraActionItem key={action.label} action={action} />
+      ))}
+    </>
+  )
+}
 
 type BulkEditBarProps = {
   selectedAssets: AssetSummary[]
@@ -27,7 +87,8 @@ type BulkEditBarProps = {
   hiddenCount?: number
   onSelectAll?: () => void
   onBulkRemove?: (assets: AssetSummary[]) => void
-  extraActions?: React.ReactNode
+  extraActionGroups?: BulkExtraActionGroup[]
+  extraDialogs?: React.ReactNode
 }
 
 export function BulkEditBar({
@@ -41,7 +102,8 @@ export function BulkEditBar({
   hiddenCount,
   onSelectAll,
   onBulkRemove,
-  extraActions,
+  extraActionGroups,
+  extraDialogs,
 }: BulkEditBarProps): React.JSX.Element {
   const navigate = useNavigate()
   const [addToOpen, setAddToOpen] = useState(false)
@@ -69,6 +131,13 @@ export function BulkEditBar({
   const showBulkPricing = onPriceSaveSuccess !== undefined && canEditPrices
   const canCreateAnyCollection =
     canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
+
+  const newCollectionOptions = NEW_COLLECTION_OPTIONS.filter(
+    (option) =>
+      option.collectionType !== currentCollectionType &&
+      collectionPermissionMap[option.collectionType],
+  )
+  const extraGroups = extraActionGroups?.filter((group) => group.actions.length > 0) ?? []
 
   function handleBulkRemove() {
     if (!onBulkRemove) return
@@ -101,65 +170,77 @@ export function BulkEditBar({
         onSelectAll={onSelectAll}
         onClear={onClear}
       >
-        {extraActions}
         {canCreateAnyCollection && (
           <DropdownMenu>
             <Button asChild variant="default">
               <DropdownMenuTrigger>
-                <PlusIcon />
-                Create
+                Add to
+                <CaretDownIcon />
               </DropdownMenuTrigger>
             </Button>
-            <DropdownMenuContent className="w-max" side="top" align="end">
-              {currentCollectionType !== 'transfers' && canCreateTransfer && (
-                <DropdownMenuItem
-                  key="transfers"
-                  onSelect={() => createNewCollection('/transfers/new')}
-                >
-                  Transfer
-                </DropdownMenuItem>
-              )}
-              {currentCollectionType !== 'departures' && canCreateDeparture && (
-                <DropdownMenuItem
-                  key="departures"
-                  onSelect={() => createNewCollection('/departures/new')}
-                >
-                  Departure
-                </DropdownMenuItem>
-              )}
-              {currentCollectionType !== 'holds' && canCreateHold && (
-                <DropdownMenuItem key="holds" onSelect={() => createNewCollection('/holds/new')}>
-                  Hold
-                </DropdownMenuItem>
-              )}
-              {currentCollectionType !== 'invoices' && canCreateInvoice && (
-                <DropdownMenuItem
-                  key="invoices"
-                  onSelect={() => createNewCollection('/invoices/new')}
-                >
-                  Invoice
-                </DropdownMenuItem>
+            <DropdownMenuContent
+              className="w-max"
+              side="top"
+              align="end"
+              onEscapeKeyDown={stopEscapePropagation}
+            >
+              <DropdownMenuItem onSelect={openAddTo}>{EXISTING_COLLECTION_LABEL}</DropdownMenuItem>
+              {newCollectionOptions.length > 0 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>{NEW_COLLECTION_HEADING}</DropdownMenuLabel>
+                  {newCollectionOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.collectionType}
+                      onSelect={() => createNewCollection(option.route)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))}
+                </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        {canCreateAnyCollection && (
-          <Button variant="secondary" onClick={openAddTo}>
-            Add to
-          </Button>
-        )}
         {showBulkPricing && (
           <Button variant="secondary" onClick={openBulkPricing}>
-            <CurrencyDollarIcon />
             Edit prices
           </Button>
         )}
-        {showBulkRemove && (
-          <Button variant="destructive" className="ml-6" onClick={handleBulkRemove}>
-            <TrashIcon />
-            Remove
-          </Button>
+        {extraGroups.length > 0 && (
+          <DropdownMenu>
+            <Button asChild variant="secondary">
+              <DropdownMenuTrigger>
+                More
+                <CaretDownIcon />
+              </DropdownMenuTrigger>
+            </Button>
+            <DropdownMenuContent
+              className="w-max"
+              side="top"
+              align="end"
+              onEscapeKeyDown={stopEscapePropagation}
+            >
+              {extraGroups.map((group, groupIndex) => (
+                <BulkExtraActionGroupItems
+                  key={group.heading ?? String(groupIndex)}
+                  group={group}
+                  showSeparator={groupIndex > 0}
+                />
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
+        {showBulkRemove && (
+          <>
+            <Separator orientation="vertical" className="mx-1 h-5" />
+            <Button variant="destructive" onClick={handleBulkRemove}>
+              <TrashIcon />
+              Remove
+            </Button>
+          </>
+        )}
+        {extraDialogs}
       </BulkActionBar>
       <AddToCollectionModal
         open={addToOpen}

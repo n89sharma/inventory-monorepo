@@ -3,36 +3,34 @@ import { EditDepartureMetadataModal } from '@/components/departure/edit-departur
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
+import type { BulkExtraAction, BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { DepartureOutgoingStatusMenu } from '@/components/departure/departure-outgoing-status-menu'
-import { ReturnToStockAction } from '@/components/departure/return-to-stock-action'
+import { ReturnToStockDialog } from '@/components/departure/return-to-stock-dialog'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useCan } from '@/hooks/use-can'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSearchRow, OutgoingStatus, PatchAssetPricing } from 'shared-types'
+import {
+  OUTGOING_STATUS_LABELS,
+  OutgoingStatusSchema,
+  type AssetSearchRow,
+  type OutgoingStatus,
+  type PatchAssetPricing,
+} from 'shared-types'
 
-type DepartureBulkActionsProps = {
-  selectedAssets: AssetSearchRow[]
-  onApplyOutgoingStatus: (status: OutgoingStatus) => void
-  onReturnToStock: () => void
-}
+const OUTGOING_STATUS_OPTIONS = OutgoingStatusSchema.options
+const OUTGOING_STATUS_HEADING = 'Set outgoing status'
+const RETURN_TO_STOCK_LABEL = 'Return to stock'
 
-function DepartureBulkActions({
-  selectedAssets,
-  onApplyOutgoingStatus,
-  onReturnToStock,
-}: DepartureBulkActionsProps): React.JSX.Element {
-  return (
-    <>
-      <ReturnToStockAction assetCount={selectedAssets.length} onConfirm={onReturnToStock} />
-      <DepartureOutgoingStatusMenu onApply={onApplyOutgoingStatus} />
-    </>
-  )
+function buildOutgoingStatusActions(onApply: (status: OutgoingStatus) => void): BulkExtraAction[] {
+  return OUTGOING_STATUS_OPTIONS.map((status) => ({
+    label: OUTGOING_STATUS_LABELS[status],
+    onSelect: () => onApply(status),
+  }))
 }
 
 export function DepartureDetailsPage(): React.JSX.Element {
@@ -42,7 +40,9 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const mutations = useDepartureMutations()
   const detail = useDepartureDetail(departureNumber)
   const canCreateEditDeparture = useCan('create_update_departure')
+  const canReturnToStock = useCan('return_to_stock')
   const can = useCan()
+  const [returnToStockOpen, setReturnToStockOpen] = useState(false)
 
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
@@ -100,23 +100,41 @@ export function DepartureDetailsPage(): React.JSX.Element {
           />
         )
       }
-      renderBulkExtraActions={({ selectedAssets, clearSelection }) => (
-        <DepartureBulkActions
-          selectedAssets={selectedAssets}
-          onApplyOutgoingStatus={(status) => {
-            mutations.setOutgoingStatus(
-              departureNumber,
-              selectedAssets.map((a) => a.id),
-              status,
-            )
-            clearSelection()
-          }}
-          onReturnToStock={() => {
-            mutations.returnToStock(departureNumber, selectedAssets)
-            clearSelection()
-          }}
-        />
-      )}
+      renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
+        const groups: BulkExtraActionGroup[] = []
+        if (canCreateEditDeparture) {
+          groups.push({
+            heading: OUTGOING_STATUS_HEADING,
+            actions: buildOutgoingStatusActions((status) => {
+              mutations.setOutgoingStatus(
+                departureNumber,
+                selectedAssets.map((a) => a.id),
+                status,
+              )
+              clearSelection()
+            }),
+          })
+        }
+        if (canReturnToStock) {
+          groups.push({
+            actions: [{ label: RETURN_TO_STOCK_LABEL, onSelect: () => setReturnToStockOpen(true) }],
+          })
+        }
+        return {
+          groups,
+          dialogs: canReturnToStock && (
+            <ReturnToStockDialog
+              assetCount={selectedAssets.length}
+              open={returnToStockOpen}
+              onOpenChange={setReturnToStockOpen}
+              onConfirm={() => {
+                mutations.returnToStock(departureNumber, selectedAssets)
+                clearSelection()
+              }}
+            />
+          ),
+        }
+      }}
     />
   )
 }

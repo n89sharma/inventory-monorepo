@@ -1,7 +1,10 @@
+import { XIcon } from '@phosphor-icons/react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '../shadcn/button'
 import { useSidebar } from '../shadcn/sidebar'
+
+const CLEAR_SELECTION_LABEL = 'Clear selection'
 
 type BulkActionBarProps = {
   selectedCount: number
@@ -65,10 +68,10 @@ export function BulkActionBar({
             Select all
           </Button>
         )}
-        <Button variant="ghost" onClick={onClear}>
-          Clear
-        </Button>
         {children}
+        <Button variant="ghost" size="icon" aria-label={CLEAR_SELECTION_LABEL} onClick={onClear}>
+          <XIcon />
+        </Button>
       </div>
     </div>,
     document.getElementById('main-content') ?? document.body,
