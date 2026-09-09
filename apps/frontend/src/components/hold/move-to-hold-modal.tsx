@@ -1,18 +1,26 @@
 import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
-import { useState } from 'react'
-import type { AssetIdentity, HoldSuggestion } from 'shared-types'
+import { useMemo, useState } from 'react'
+import type { AssetIdentity, GlobalSearchResult, HoldSuggestion } from 'shared-types'
 import { toast } from 'sonner'
-import { DetailGrid, SearchView } from '../collections/collection-search'
-import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
+import { DetailGrid } from '../collections/collection-search'
+import { CollectionSearchSelect } from '../collections/collection-search-select'
+import type { SelectedCollection } from '../collections/collection-search-types'
 import { Button } from '../shadcn/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../shadcn/dialog'
 
 interface DestinationStepProps {
   selected: HoldSuggestion | null
   query: string
   isLoading: boolean
-  holds: HoldSuggestion[]
+  results: GlobalSearchResult
   onQueryChange: (value: string) => void
   onSelect: (collection: SelectedCollection) => void
   onClearSelection: () => void
@@ -22,7 +30,7 @@ function DestinationStep({
   selected,
   query,
   isLoading,
-  holds,
+  results,
   onQueryChange,
   onSelect,
   onClearSelection,
@@ -40,13 +48,14 @@ function DestinationStep({
     )
   }
   return (
-    <SearchView
+    <CollectionSearchSelect
+      label="Destination hold"
       query={query}
       onQueryChange={onQueryChange}
       isLoading={isLoading}
-      results={{ ...emptyResults, holds }}
+      results={results}
+      eligibleTypes={HOLD_SEARCH_TYPES}
       onSelect={onSelect}
-      label="Destination hold"
     />
   )
 }
@@ -74,9 +83,15 @@ export function MoveToHoldModal({
   const assetCount = selectedAssets.length
   const assetNoun = `asset${assetCount !== 1 ? 's' : ''}`
 
-  const { results, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
+  const { results: searchResults, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
   // An asset cannot be moved to the hold it is already on.
-  const holds = results.holds.filter((h) => h.hold_number !== sourceHoldNumber)
+  const results = useMemo(
+    () => ({
+      ...searchResults,
+      holds: searchResults.holds.filter((h) => h.hold_number !== sourceHoldNumber),
+    }),
+    [searchResults, sourceHoldNumber],
+  )
 
   function handleSelect(collection: SelectedCollection) {
     if (collection.kind !== 'hold') return
@@ -120,19 +135,16 @@ export function MoveToHoldModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Move to hold</DialogTitle>
+          <DialogDescription>
+            {assetCount} {assetNoun} selected
+          </DialogDescription>
         </DialogHeader>
-
-        <div className="flex flex-col gap-1 rounded-md border px-3 py-2">
-          <p>
-            Move {assetCount} {assetNoun} from Hold {sourceHoldNumber}
-          </p>
-        </div>
 
         <DestinationStep
           selected={selected}
           query={query}
           isLoading={isLoading}
-          holds={holds}
+          results={results}
           onQueryChange={setQuery}
           onSelect={handleSelect}
           onClearSelection={handleClearSelection}

@@ -1,18 +1,26 @@
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
 import { ARRIVAL_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
-import { useState } from 'react'
-import type { ArrivalSuggestion, AssetIdentity } from 'shared-types'
+import { useMemo, useState } from 'react'
+import type { ArrivalSuggestion, AssetIdentity, GlobalSearchResult } from 'shared-types'
 import { toast } from 'sonner'
-import { DetailGrid, SearchView } from '../collections/collection-search'
-import { emptyResults, type SelectedCollection } from '../collections/collection-search-types'
+import { DetailGrid } from '../collections/collection-search'
+import { CollectionSearchSelect } from '../collections/collection-search-select'
+import type { SelectedCollection } from '../collections/collection-search-types'
 import { Button } from '../shadcn/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../shadcn/dialog'
 
 interface DestinationStepProps {
   selected: ArrivalSuggestion | null
   query: string
   isLoading: boolean
-  arrivals: ArrivalSuggestion[]
+  results: GlobalSearchResult
   onQueryChange: (value: string) => void
   onSelect: (collection: SelectedCollection) => void
   onClearSelection: () => void
@@ -22,7 +30,7 @@ function DestinationStep({
   selected,
   query,
   isLoading,
-  arrivals,
+  results,
   onQueryChange,
   onSelect,
   onClearSelection,
@@ -40,13 +48,14 @@ function DestinationStep({
     )
   }
   return (
-    <SearchView
+    <CollectionSearchSelect
+      label="Destination arrival"
       query={query}
       onQueryChange={onQueryChange}
       isLoading={isLoading}
-      results={{ ...emptyResults, arrivals }}
+      results={results}
+      eligibleTypes={ARRIVAL_SEARCH_TYPES}
       onSelect={onSelect}
-      label="Destination arrival"
     />
   )
 }
@@ -74,9 +83,15 @@ export function MoveToArrivalModal({
   const assetCount = selectedAssets.length
   const assetNoun = `asset${assetCount !== 1 ? 's' : ''}`
 
-  const { results, isLoading } = useGlobalSearch(query, ARRIVAL_SEARCH_TYPES)
+  const { results: searchResults, isLoading } = useGlobalSearch(query, ARRIVAL_SEARCH_TYPES)
   // An asset cannot be moved to the arrival it is already on.
-  const arrivals = results.arrivals.filter((a) => a.arrival_number !== sourceArrivalNumber)
+  const results = useMemo(
+    () => ({
+      ...searchResults,
+      arrivals: searchResults.arrivals.filter((a) => a.arrival_number !== sourceArrivalNumber),
+    }),
+    [searchResults, sourceArrivalNumber],
+  )
 
   function handleSelect(collection: SelectedCollection) {
     if (collection.kind !== 'arrival') return
@@ -124,19 +139,16 @@ export function MoveToArrivalModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Move to arrival</DialogTitle>
+          <DialogDescription>
+            {assetCount} {assetNoun} selected
+          </DialogDescription>
         </DialogHeader>
-
-        <div className="flex flex-col gap-1 rounded-md border px-3 py-2">
-          <p>
-            Move {assetCount} {assetNoun} from Arrival {sourceArrivalNumber}
-          </p>
-        </div>
 
         <DestinationStep
           selected={selected}
           query={query}
           isLoading={isLoading}
-          arrivals={arrivals}
+          results={results}
           onQueryChange={setQuery}
           onSelect={handleSelect}
           onClearSelection={handleClearSelection}

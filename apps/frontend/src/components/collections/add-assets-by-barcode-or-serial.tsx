@@ -1,16 +1,18 @@
 import { useAssetStore } from '@/data/store/asset-store'
+import { useListKeyboardNavigation } from '@/hooks/use-list-keyboard-navigation'
+import { sanitizeScannedCode } from '@/lib/input-sanitizers'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { BarcodeIcon, CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useId, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { CommandResultList } from '../global-search/command-result-list'
+import { resultOptionId } from '../global-search/search-results'
 import { Input } from '../shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 
 const buildAddAssetPlaceholder = (entityName: string) =>
   `Scan barcode or serial to add to this ${entityName}…`
 
-const BARCODE_INPUT_SANITIZER = /[^a-zA-Z0-9-.]/g
 const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 interface AddAssetsByBarcodeOrSerialProps {
@@ -36,6 +38,7 @@ export function AddAssetsByBarcodeOrSerial({
 }: AddAssetsByBarcodeOrSerialProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listboxId = useId()
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [assetError, setAssetError] = useState<string | null>(null)
@@ -108,28 +111,40 @@ export function AddAssetsByBarcodeOrSerial({
     }
   }, [exactMatches, hasExactMatch, normalizedQuery])
 
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = e.target.value.replace(BARCODE_INPUT_SANITIZER, '').toUpperCase()
-    setDisplayValue(val)
-    setSearchQuery(val)
-    setAssetError(null)
-    setSuggestionsAllowed(true)
-  }
-
   function handleSuggestionSelect(suggestion: BarcodeSuggestion) {
     setSuggestionsAllowed(false)
     addByBarcode(suggestion.barcode)
   }
 
+  const {
+    highlightedIndex,
+    onKeyDown: onSuggestionKeyDown,
+    resetHighlight,
+  } = useListKeyboardNavigation({
+    items: suggestions,
+    onSelect: handleSuggestionSelect,
+    onDismiss: () => setSuggestionsAllowed(false),
+  })
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = sanitizeScannedCode(e.target.value).toUpperCase()
+    setDisplayValue(val)
+    setSearchQuery(val)
+    setAssetError(null)
+    setSuggestionsAllowed(true)
+    resetHighlight()
+  }
+
+  // Enter commits what was typed or scanned unless the user arrowed into a suggestion.
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && highlightedIndex < 0) {
       e.preventDefault()
       setSuggestionsAllowed(false)
       if (hasExactMatch) addByBarcode(exactMatches[0].barcode)
       else if (displayValue) addByBarcode(displayValue)
-    } else if (e.key === 'Escape') {
-      setSuggestionsAllowed(false)
+      return
     }
+    onSuggestionKeyDown(e)
   }
 
   return (
@@ -147,6 +162,12 @@ export function AddAssetsByBarcodeOrSerial({
               ref={inputRef}
               placeholder={buildAddAssetPlaceholder(entityName)}
               aria-label="Add asset by barcode or serial number"
+              role="combobox"
+              aria-expanded={popoverOpen}
+              aria-controls={listboxId}
+              aria-activedescendant={
+                highlightedIndex >= 0 ? resultOptionId(listboxId, highlightedIndex) : undefined
+              }
               value={displayValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
@@ -169,8 +190,9 @@ export function AddAssetsByBarcodeOrSerial({
         >
           <CommandResultList
             items={suggestions}
+            listboxId={listboxId}
+            highlightedIndex={highlightedIndex}
             getKey={(s) => s.barcode}
-            getValue={(s) => s.barcode}
             getColumns={(s) => [s.barcode, s.serial_number, s.asset_type, s.model]}
             onSelect={handleSuggestionSelect}
           />

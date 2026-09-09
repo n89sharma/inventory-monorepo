@@ -3,10 +3,16 @@ import { HOLD_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { useHoldMutations } from '@/hooks/use-hold-mutations'
 import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
-import { searchRowToAssetSummary, type AssetSummary, type HoldSuggestion } from 'shared-types'
+import {
+  searchRowToAssetSummary,
+  type AssetSummary,
+  type GlobalSearchResult,
+  type HoldSuggestion,
+} from 'shared-types'
 import { toast } from 'sonner'
-import { DetailGrid, SearchView } from './collection-search'
-import { emptyResults, type CollectionResults } from './collection-search-types'
+import { DetailGrid } from './collection-search'
+import { CollectionSearchSelect } from './collection-search-select'
+import type { SelectedCollection } from './collection-search-types'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 
@@ -57,8 +63,8 @@ function HoldSelectionStep({
   query: string
   onQueryChange: (value: string) => void
   isLoading: boolean
-  results: CollectionResults
-  onSelect: React.ComponentProps<typeof SearchView>['onSelect']
+  results: GlobalSearchResult
+  onSelect: (collection: SelectedCollection) => void
 }) {
   if (selected !== null) {
     return (
@@ -70,12 +76,13 @@ function HoldSelectionStep({
     )
   }
   return (
-    <SearchView
+    <CollectionSearchSelect
       label="Hold"
       query={query}
       onQueryChange={onQueryChange}
       isLoading={isLoading}
       results={results}
+      eligibleTypes={HOLD_SEARCH_TYPES}
       onSelect={onSelect}
     />
   )
@@ -98,11 +105,9 @@ export function AddFromHoldModal({
 }: AddFromHoldModalProps) {
   const holdMutations = useHoldMutations()
   const [query, setQuery] = useState('')
-  const { results: searchResults, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
+  const { results, isLoading } = useGlobalSearch(query, HOLD_SEARCH_TYPES)
   const [selected, setSelected] = useState<HoldSuggestion | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
-
-  const results: CollectionResults = { ...emptyResults, holds: searchResults.holds }
 
   function handleQueryChange(value: string) {
     setQuery(value)
@@ -154,7 +159,7 @@ export function AddFromHoldModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Assets from Hold</DialogTitle>
+          <DialogTitle>Add assets from hold</DialogTitle>
         </DialogHeader>
 
         <HoldSelectionStep

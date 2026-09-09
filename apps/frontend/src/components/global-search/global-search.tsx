@@ -1,16 +1,24 @@
 import { Input } from '@/components/shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import { useGlobalSearch } from '@/hooks/use-global-search'
+import { useListKeyboardNavigation } from '@/hooks/use-list-keyboard-navigation'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
+import { sanitizeSearchText } from '@/lib/input-sanitizers'
 import { cn } from '@/lib/utils'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react'
-import { useEffect, useRef, useState } from 'react'
+import { SEARCH_ENTITY_TYPES } from 'shared-types'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SearchPopoverContent, type FlatResult } from './search-popover-content'
+import { SearchPopoverContent } from './search-popover-content'
+import {
+  buildSearchResultTabs,
+  getActiveTabItems,
+  resultOptionId,
+  type FlatResult,
+} from './search-results'
 
-const tabs = ['assets', 'arrivals', 'departures', 'transfers', 'holds', 'invoices'] as const
-type Tab = (typeof tabs)[number]
+const PREFETCH_DELAY_MS = 100
 
 function SearchInputAdornment({ query, onClear }: { query: string; onClear: () => void }) {
   if (query) {
@@ -41,12 +49,14 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
   const [query, setQuery] = useState('')
   const { results, isLoading } = useGlobalSearch(query)
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<Tab>('assets')
+  const [activeTab, setActiveTab] = useState<string>(SEARCH_ENTITY_TYPES[0])
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listboxId = useId()
   const navigate = useNavigate()
 
-  const hasResults = tabs.some((tab) => results[tab].length > 0)
+  const tabs = useMemo(() => buildSearchResultTabs(results, SEARCH_ENTITY_TYPES), [results])
+  const activeItems = getActiveTabItems(tabs, activeTab)
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -59,19 +69,6 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-
-  const [prevResults, setPrevResults] = useState(results)
-  if (results !== prevResults) {
-    setPrevResults(results)
-    const firstWithResults = tabs.find((tab) => results[tab].length > 0)
-    if (firstWithResults) setActiveTab(firstWithResults)
-  }
-
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = e.target.value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase()
-    setQuery(val)
-    setPopoverOpen(Boolean(val))
-  }
 
   function navigateTo(item: FlatResult) {
     setPopoverOpen(false)
@@ -97,13 +94,37 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
     inputRef.current?.blur()
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Escape') clearSearch()
+  const { highlightedIndex, onKeyDown, resetHighlight } = useListKeyboardNavigation({
+    items: activeItems,
+    onSelect: navigateTo,
+    onDismiss: clearSearch,
+  })
+
+  const [prevTabs, setPrevTabs] = useState(tabs)
+  if (tabs !== prevTabs) {
+    setPrevTabs(tabs)
+    const firstWithResults = tabs.find((tab) => tab.items.length > 0)
+    if (firstWithResults) setActiveTab(firstWithResults.type)
+    resetHighlight()
   }
 
-  function handlePrefetch(barcode: string) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = sanitizeSearchText(e.target.value)
+    setQuery(val)
+    setPopoverOpen(Boolean(val))
+    resetHighlight()
+  }
+
+  function handleTabChange(tab: string) {
+    setActiveTab(tab)
+    resetHighlight()
+  }
+
+  function handlePrefetch(item: FlatResult) {
+    if (item.kind !== 'asset') return
+    const { barcode } = item.data
     if (prefetchTimer.current) clearTimeout(prefetchTimer.current)
-    prefetchTimer.current = setTimeout(() => preloadAssetDetail(barcode), 100)
+    prefetchTimer.current = setTimeout(() => preloadAssetDetail(barcode), PREFETCH_DELAY_MS)
   }
 
   return (
@@ -120,10 +141,16 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
               type="text"
               name="search"
               autoComplete="off"
+              role="combobox"
+              aria-expanded={popoverOpen}
+              aria-controls={listboxId}
+              aria-activedescendant={
+                highlightedIndex >= 0 ? resultOptionId(listboxId, highlightedIndex) : undefined
+              }
               placeholder="Global search…"
               value={query}
               onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
+              onKeyDown={onKeyDown}
               className="pl-8 pr-20"
             />
             <SearchInputAdornment query={query} onClear={clearSearch} />
@@ -137,10 +164,11 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
         >
           <SearchPopoverContent
             isLoading={isLoading}
-            hasResults={hasResults}
-            results={results}
+            tabs={tabs}
             activeTab={activeTab}
-            onTabChange={(tab) => setActiveTab(tab as Tab)}
+            onTabChange={handleTabChange}
+            listboxId={listboxId}
+            highlightedIndex={highlightedIndex}
             onSelect={navigateTo}
             onHover={handlePrefetch}
           />

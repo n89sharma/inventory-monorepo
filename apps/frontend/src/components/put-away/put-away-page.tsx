@@ -17,6 +17,7 @@ import { useAssetByBarcode } from '@/hooks/use-asset-lookup'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useWarehouseLocations } from '@/hooks/use-locations'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
+import { sanitizeScannedCode } from '@/lib/input-sanitizers'
 import { cn } from '@/lib/utils'
 import {
   ArrowRightIcon,
@@ -33,7 +34,6 @@ import { toast } from 'sonner'
 
 const PAGE_TITLE = 'Put Away'
 const BIN_ZONE = 'BIN'
-const SCAN_SANITIZER = /[^a-zA-Z0-9._-]/g
 const LOCATION_ERROR_DELAY_MS = 500
 const ASSET_LOOKUP_DELAY_MS = 500
 const LOCATION_NOT_FOUND_MESSAGE = 'Location not available'
@@ -54,7 +54,7 @@ interface PutAwayForm {
 }
 
 function sanitizeScan(value: string): string {
-  return value.replace(SCAN_SANITIZER, '').toUpperCase()
+  return sanitizeScannedCode(value).toUpperCase()
 }
 
 function scanInputClassName(success: boolean): string {

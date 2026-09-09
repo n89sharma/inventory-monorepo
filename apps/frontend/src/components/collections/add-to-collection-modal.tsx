@@ -7,14 +7,27 @@ import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { ENTITY_CONFIG, type LinkableEntity } from '@/lib/entity-config'
 import { formatDate } from '@/lib/formatters'
-import { useState } from 'react'
-import type { AssetSearchRow, AssetSummary } from 'shared-types'
+import { useMemo, useState } from 'react'
+import type {
+  AssetSearchRow,
+  AssetSummary,
+  GlobalSearchResult,
+  SearchEntityType,
+} from 'shared-types'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
-import { DetailGrid, SearchView } from './collection-search'
-import type { CollectionResults, SelectedCollection } from './collection-search-types'
+import { DetailGrid } from './collection-search'
+import { CollectionSearchSelect } from './collection-search-select'
+import type { SelectedCollection } from './collection-search-types'
 import { Button } from '../shadcn/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../shadcn/dialog'
 
 type CollectionRef = { entity: LinkableEntity; id: string; label: string }
 
@@ -50,29 +63,24 @@ function getDetailFields(s: SelectedCollection): { label: string; value: string 
       return [
         { label: 'Origin', value: s.data.origin_code },
         { label: 'Destination', value: s.data.destination },
-        { label: 'Transporter', value: null },
         { label: 'Date', value: formatDate(s.data.created_at) },
       ]
     case 'transfer':
       return [
         { label: 'Origin', value: s.data.origin_code },
         { label: 'Destination', value: s.data.destination_code },
-        { label: 'Transporter', value: null },
         { label: 'Date', value: formatDate(s.data.created_at) },
       ]
     case 'hold':
       return [
         { label: 'Created for', value: s.data.created_for },
         { label: 'Customer', value: s.data.customer },
-        { label: 'From', value: null },
-        { label: 'To', value: null },
       ]
     case 'invoice':
       return [
         { label: 'Reference', value: s.data.invoice_reference },
         { label: 'Organization', value: s.data.organization },
         { label: 'Invoice type', value: s.data.invoice_type },
-        { label: 'Cleared', value: null },
         { label: 'Date', value: formatDate(s.data.created_at) },
       ]
   }
@@ -104,77 +112,81 @@ function CollectionAssetsAddedMessage({
   )
 }
 
+function DuplicateNotice({
+  assetCount,
+  duplicateCount,
+  isLoadingDetail,
+  collectionLabelText,
+}: {
+  assetCount: number
+  duplicateCount: number
+  isLoadingDetail: boolean
+  collectionLabelText: string
+}) {
+  if (isLoadingDetail) {
+    return <p className="text-muted-foreground">Checking for duplicates…</p>
+  }
+  if (duplicateCount === 0) return null
+  return (
+    <div className="rounded-md border border-amber-600/40 bg-amber-600/5 px-3 py-2 text-amber-600">
+      {duplicateCount} of {assetCount} asset{assetCount !== 1 ? 's' : ''} already on{' '}
+      {collectionLabelText} and will be skipped
+    </div>
+  )
+}
+
 function CollectionSelectionStep({
   selected,
   onClear,
+  assetCount,
+  duplicateCount,
+  isLoadingDetail,
   query,
   onQueryChange,
   isLoading,
   results,
+  eligibleTypes,
   onSelect,
 }: {
   selected: SelectedCollection | null
   onClear: () => void
+  assetCount: number
+  duplicateCount: number
+  isLoadingDetail: boolean
   query: string
   onQueryChange: (value: string) => void
   isLoading: boolean
-  results: CollectionResults
-  onSelect: React.ComponentProps<typeof SearchView>['onSelect']
+  results: GlobalSearchResult
+  eligibleTypes: readonly SearchEntityType[]
+  onSelect: (collection: SelectedCollection) => void
 }) {
   if (selected !== null) {
     return (
-      <DetailGrid
-        title={collectionLabel(selected)}
-        fields={getDetailFields(selected)}
-        onClear={onClear}
-      />
+      <div className="flex flex-col gap-3">
+        <DetailGrid
+          title={collectionLabel(selected)}
+          fields={getDetailFields(selected)}
+          onClear={onClear}
+        />
+        <DuplicateNotice
+          assetCount={assetCount}
+          duplicateCount={duplicateCount}
+          isLoadingDetail={isLoadingDetail}
+          collectionLabelText={collectionLabel(selected)}
+        />
+      </div>
     )
   }
   return (
-    <SearchView
+    <CollectionSearchSelect
+      label="Collection"
       query={query}
       onQueryChange={onQueryChange}
       isLoading={isLoading}
       results={results}
+      eligibleTypes={eligibleTypes}
       onSelect={onSelect}
     />
-  )
-}
-
-function InformationSection({
-  assetCount,
-  selected,
-  duplicateCount,
-  isLoadingDetail,
-}: {
-  assetCount: number
-  selected: SelectedCollection | null
-  duplicateCount: number
-  isLoadingDetail: boolean
-}) {
-  const target = selected !== null ? ` ${collectionLabel(selected)}` : ':'
-
-  let secondLine: React.ReactNode = null
-  if (selected !== null) {
-    if (isLoadingDetail) {
-      secondLine = <p className="text-muted-foreground">Checking for duplicates…</p>
-    } else if (duplicateCount > 0) {
-      secondLine = (
-        <p className="text-amber-600">
-          Found {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}. Duplicates will be
-          skipped
-        </p>
-      )
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-1 rounded-md border px-3 py-2">
-      <p>
-        Add {assetCount} asset{assetCount !== 1 ? 's' : ''} to{target}
-      </p>
-      {secondLine}
-    </div>
   )
 }
 
@@ -211,16 +223,17 @@ export function AddToCollectionModal({
 
   const assetCount = selectedAssets.length
 
-  const { results: searchResults, isLoading } = useGlobalSearch(query)
+  const { results, isLoading } = useGlobalSearch(query)
   // Arrivals never take assets this way, and a collection the user cannot edit
   // is not offered as a target.
-  const results: CollectionResults = {
-    arrivals: [],
-    departures: canCreateDeparture ? searchResults.departures : [],
-    transfers: canCreateTransfer ? searchResults.transfers : [],
-    holds: canCreateHold ? searchResults.holds : [],
-    invoices: canCreateInvoice ? searchResults.invoices : [],
-  }
+  const eligibleTypes = useMemo(() => {
+    const types: SearchEntityType[] = []
+    if (canCreateDeparture) types.push('departures')
+    if (canCreateTransfer) types.push('transfers')
+    if (canCreateHold) types.push('holds')
+    if (canCreateInvoice) types.push('invoices')
+    return types
+  }, [canCreateDeparture, canCreateTransfer, canCreateHold, canCreateInvoice])
 
   async function handleSelect(collection: SelectedCollection) {
     setSelected(collection)
@@ -336,23 +349,23 @@ export function AddToCollectionModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add to Collection</DialogTitle>
+          <DialogTitle>Add to collection</DialogTitle>
+          <DialogDescription>
+            {assetCount} asset{assetCount !== 1 ? 's' : ''} selected
+          </DialogDescription>
         </DialogHeader>
-
-        <InformationSection
-          assetCount={assetCount}
-          selected={selected}
-          duplicateCount={duplicateCount}
-          isLoadingDetail={isLoadingDetail}
-        />
 
         <CollectionSelectionStep
           selected={selected}
           onClear={handleClearSelection}
+          assetCount={assetCount}
+          duplicateCount={duplicateCount}
+          isLoadingDetail={isLoadingDetail}
           query={query}
           onQueryChange={setQuery}
           isLoading={isLoading}
           results={results}
+          eligibleTypes={eligibleTypes}
           onSelect={handleSelect}
         />
 
