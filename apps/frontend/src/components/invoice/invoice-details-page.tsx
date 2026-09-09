@@ -42,10 +42,9 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       createCollectionDetailColumns({
         getHref: assetHref,
         can,
-        onDelete: (asset) => mutations.removeAsset(invoiceNumber, asset),
         priceEditorRegistry,
       }),
-    [mutations, invoiceNumber, can, priceEditorRegistry],
+    [can, priceEditorRegistry],
   )
 
   return (

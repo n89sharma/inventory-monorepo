@@ -19,11 +19,7 @@ import {
   saveAssetPrice,
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
-import {
-  flushPendingRemovals,
-  scheduleAssetRemoval,
-  scheduleBulkAssetRemoval,
-} from '@/lib/asset-removal-undo'
+import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
 import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
@@ -136,18 +132,6 @@ function flushPending(transferNumber: string) {
   flushPendingPriceInvalidation(priceSaveSpec(transferNumber))
 }
 
-function removeAsset(transferNumber: string, asset: AssetIdentity) {
-  scheduleAssetRemoval(
-    {
-      collectionId: transferNumber,
-      detailCacheKey: transferDetailKey(transferNumber),
-      patchAssets: (delta) => patchTransferAssets(transferNumber, delta),
-      invalidateLists: invalidateTransferLists,
-    },
-    asset,
-  )
-}
-
 function bulkRemoveAssets(transferNumber: string, assets: AssetIdentity[]) {
   scheduleBulkAssetRemoval(
     {
@@ -178,7 +162,6 @@ const mutations = {
   dispatch,
   receive,
   updatePrice,
-  removeAsset,
   bulkRemoveAssets,
   flushPending,
 } as const

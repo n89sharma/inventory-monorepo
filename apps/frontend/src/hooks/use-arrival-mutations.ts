@@ -16,11 +16,7 @@ import {
   saveAssetPrice,
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
-import {
-  flushPendingRemovals,
-  scheduleAssetRemoval,
-  scheduleBulkAssetRemoval,
-} from '@/lib/asset-removal-undo'
+import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { ArrivalForm, ArrivalMetadataForm, AssetForm } from '@/ui-types/arrival-form-types'
 import type { AssetIdentity, Component, PatchAssetPricing, SplitArrival } from 'shared-types'
 import { mutate } from 'swr'
@@ -59,18 +55,6 @@ async function updateAsset(arrivalNumber: string, assetId: number, asset: AssetF
   const updated = await updateArrivalAsset(arrivalNumber, assetId, asset)
   invalidateAssetDetails([updated.barcode])
   mutate(cacheKey)
-}
-
-function removeAsset(arrivalNumber: string, asset: AssetIdentity) {
-  scheduleAssetRemoval(
-    {
-      collectionId: arrivalNumber,
-      detailCacheKey: arrivalDetailKey(arrivalNumber),
-      patchAssets: (delta) => patchArrivalAssets(arrivalNumber, delta),
-      invalidateLists: invalidateArrivalLists,
-    },
-    asset,
-  )
 }
 
 function bulkRemoveAssets(arrivalNumber: string, assets: AssetIdentity[]) {
@@ -151,7 +135,6 @@ const mutations = {
   getAssetForEdit,
   updateAsset,
   updatePrice,
-  removeAsset,
   bulkRemoveAssets,
   moveAssets,
   splitAssets,

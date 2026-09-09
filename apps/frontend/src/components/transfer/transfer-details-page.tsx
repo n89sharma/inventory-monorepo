@@ -47,12 +47,9 @@ export function TransferDetailsPage(): React.JSX.Element {
       createCollectionDetailColumns({
         getHref: assetHref,
         can,
-        onDelete: canEditAssets
-          ? (asset) => mutations.removeAsset(transferNumber, asset)
-          : undefined,
         priceEditorRegistry,
       }),
-    [mutations, transferNumber, can, canEditAssets, priceEditorRegistry],
+    [can, priceEditorRegistry],
   )
 
   return (

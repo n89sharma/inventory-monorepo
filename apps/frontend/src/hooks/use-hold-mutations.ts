@@ -8,11 +8,7 @@ import {
 } from '@/data/api/hold-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { holdDetailKey, invalidateHoldLists } from '@/hooks/use-hold'
-import {
-  flushPendingRemovals,
-  scheduleAssetRemoval,
-  scheduleBulkAssetRemoval,
-} from '@/lib/asset-removal-undo'
+import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { HoldForm, HoldMetadataForm } from '@/ui-types/hold-form-types'
 import type { AssetIdentity, AssetSearchRow, AssetSummary } from 'shared-types'
 import { mutate } from 'swr'
@@ -74,18 +70,6 @@ async function archive(holdNumber: string) {
   invalidateHoldLists()
 }
 
-function removeAsset(holdNumber: string, asset: AssetIdentity) {
-  scheduleAssetRemoval(
-    {
-      collectionId: holdNumber,
-      detailCacheKey: holdDetailKey(holdNumber),
-      patchAssets: (delta) => patchHoldAssets(holdNumber, delta),
-      invalidateLists: invalidateHoldLists,
-    },
-    asset,
-  )
-}
-
 async function moveAssets(
   sourceHoldNumber: string,
   destinationHoldNumber: string,
@@ -120,7 +104,6 @@ const mutations = {
   addAsset,
   updateMetadata,
   archive,
-  removeAsset,
   bulkRemoveAssets,
   moveAssets,
   flushPending: flushPendingRemovals,

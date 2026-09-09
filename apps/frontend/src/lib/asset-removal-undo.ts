@@ -33,39 +33,6 @@ function buildUndo(key: string, detailCacheKey: string) {
   }
 }
 
-export function scheduleAssetRemoval(spec: RemovalSpec, asset: AssetIdentity): void {
-  const key = makeKey(spec.collectionId, String(asset.id))
-
-  mutate<HasAssets>(
-    spec.detailCacheKey,
-    (current) =>
-      current ? { ...current, assets: current.assets.filter((a) => a.id !== asset.id) } : current,
-    { revalidate: false },
-  )
-
-  const commit = async () => {
-    pendingRemovals.delete(key)
-    try {
-      await spec.patchAssets({ assetIdsToAdd: [], assetIdsToRemove: [asset.id] })
-      invalidateAssetDetails([asset.barcode])
-      spec.invalidateLists()
-    } finally {
-      mutate(spec.detailCacheKey)
-    }
-  }
-
-  const timer = setTimeout(() => {
-    void commit()
-  }, UNDO_WINDOW_MS)
-  pendingRemovals.set(key, { timer, commit })
-
-  toast.success(`Asset ${asset.barcode} removed`, {
-    position: 'top-center',
-    duration: UNDO_WINDOW_MS,
-    action: { label: 'Undo', onClick: buildUndo(key, spec.detailCacheKey) },
-  })
-}
-
 export function scheduleBulkAssetRemoval(spec: RemovalSpec, assets: AssetIdentity[]): void {
   if (assets.length === 0) return
   const ids = assets.map((a) => a.id)

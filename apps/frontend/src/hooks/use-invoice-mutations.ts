@@ -12,11 +12,7 @@ import {
   saveAssetPrice,
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
-import {
-  flushPendingRemovals,
-  scheduleAssetRemoval,
-  scheduleBulkAssetRemoval,
-} from '@/lib/asset-removal-undo'
+import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { InvoiceForm, InvoiceMetadataForm } from '@/ui-types/invoice-form-types'
 import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
 import { mutate } from 'swr'
@@ -85,18 +81,6 @@ async function updateMetadata(invoiceNumber: string, metadata: InvoiceMetadataFo
   invalidateInvoiceLists()
 }
 
-function removeAsset(invoiceNumber: string, asset: AssetIdentity) {
-  scheduleAssetRemoval(
-    {
-      collectionId: invoiceNumber,
-      detailCacheKey: invoiceDetailKey(invoiceNumber),
-      patchAssets: (delta) => patchInvoiceAssets(invoiceNumber, delta),
-      invalidateLists: invalidateInvoiceLists,
-    },
-    asset,
-  )
-}
-
 function bulkRemoveAssets(invoiceNumber: string, assets: AssetIdentity[]) {
   scheduleBulkAssetRemoval(
     {
@@ -130,7 +114,6 @@ const mutations = {
   addAsset,
   updatePrice,
   updateMetadata,
-  removeAsset,
   bulkRemoveAssets,
   flushPending,
 } as const

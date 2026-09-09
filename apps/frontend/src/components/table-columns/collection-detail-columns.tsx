@@ -1,6 +1,6 @@
 import { Button } from '@/components/shadcn/button'
 import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
+import { PencilSimpleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AssetSearchRow, Permission } from 'shared-types'
 import type { AssetColumnId } from './asset-search-columns'
@@ -40,12 +40,11 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION = {
 
 function actionColumns(
   onEdit?: (asset: AssetSearchRow) => void,
-  onDelete?: (asset: AssetSearchRow) => void,
   disabledRowId?: number | null,
 ): ColumnDef<AssetSearchRow>[] {
-  const columns: ColumnDef<AssetSearchRow>[] = []
-  if (onEdit) {
-    columns.push({
+  if (!onEdit) return []
+  return [
+    {
       id: 'edit',
       meta: { reorderable: false },
       cell: ({ row }) => (
@@ -55,41 +54,20 @@ function actionColumns(
           type="button"
           aria-label="Edit asset"
           onClick={() => onEdit(row.original)}
+          disabled={disabledRowId === row.original.id}
         >
           <PencilSimpleIcon />
         </Button>
       ),
       enableSorting: false,
       enableHiding: false,
-    })
-  }
-  if (onDelete) {
-    columns.push({
-      id: 'delete',
-      meta: { reorderable: false },
-      cell: ({ row }) => (
-        <Button
-          variant="outline"
-          size="icon"
-          type="button"
-          aria-label="Remove asset"
-          onClick={() => onDelete(row.original)}
-          disabled={disabledRowId === row.original.id}
-        >
-          <TrashIcon />
-        </Button>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    })
-  }
-  return columns
+    },
+  ]
 }
 
 export interface CollectionDetailColumnOptions {
   getHref: (asset: AssetSearchRow) => string
   can: (permission: Permission) => boolean
-  onDelete?: (asset: AssetSearchRow) => void
   onEdit?: (asset: AssetSearchRow) => void
   disabledRowId?: number | null
   priceEditorRegistry?: PriceCellEditorRegistry
@@ -98,7 +76,6 @@ export interface CollectionDetailColumnOptions {
 export function createCollectionDetailColumns({
   getHref,
   can,
-  onDelete,
   onEdit,
   disabledRowId,
   priceEditorRegistry,
@@ -106,6 +83,6 @@ export function createCollectionDetailColumns({
   return [
     createSelectColumn<AssetSearchRow>(),
     ...createSearchPageColumns(getHref, can, priceEditorRegistry),
-    ...actionColumns(onEdit, onDelete, disabledRowId),
+    ...actionColumns(onEdit, disabledRowId),
   ]
 }

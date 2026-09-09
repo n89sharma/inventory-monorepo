@@ -108,7 +108,6 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       createCollectionDetailColumns({
         getHref: assetHref,
         can,
-        onDelete: (asset) => mutations.removeAsset(arrivalNumber, asset),
         onEdit: canEditArrival
           ? (asset) =>
               handleEditAsset(asset.id, {
@@ -119,15 +118,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
         disabledRowId: editingAssetId,
         priceEditorRegistry,
       }),
-    [
-      mutations,
-      arrivalNumber,
-      can,
-      canEditArrival,
-      editingAssetId,
-      handleEditAsset,
-      priceEditorRegistry,
-    ],
+    [can, canEditArrival, editingAssetId, handleEditAsset, priceEditorRegistry],
   )
 
   return (

@@ -28,7 +28,6 @@ const mocks = vi.hoisted(() => {
     dispatch: vi.fn(),
     receive: vi.fn(),
     setOutgoingStatus: vi.fn(),
-    removeAsset: vi.fn(),
     bulkRemoveAssets: vi.fn(),
     moveAssets: vi.fn(),
     flushPending: vi.fn(),

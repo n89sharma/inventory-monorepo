@@ -26,7 +26,6 @@ vi.mock('@/hooks/use-invoice', () => ({
 }))
 vi.mock('@/lib/asset-removal-undo', () => ({
   flushPendingRemovals: mocks.flushPendingRemovals,
-  scheduleAssetRemoval: vi.fn(),
   scheduleBulkAssetRemoval: vi.fn(),
 }))
 vi.mock('swr', () => ({ mutate: vi.fn().mockResolvedValue(undefined) }))
