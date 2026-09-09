@@ -30,6 +30,7 @@ describe('editablePriceFieldForColumn', () => {
   it('maps an editable cost column to the field the API patches', () => {
     expect(editablePriceFieldForColumn('cost_purchase_cost')).toBe('purchase_cost')
     expect(editablePriceFieldForColumn('cost_transport_cost')).toBe('transport_cost')
+    expect(editablePriceFieldForColumn('cost_other_cost')).toBe('other_cost')
     expect(editablePriceFieldForColumn('cost_sale_price')).toBe('sale_price')
   })
 

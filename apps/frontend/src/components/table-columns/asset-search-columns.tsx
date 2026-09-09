@@ -2,6 +2,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/too
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
+import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import {
   formatDamaged,
   formatDate,
@@ -439,6 +440,22 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     permissions: ['view_purchase_price'],
     sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_processing_cost),
+  },
+  {
+    id: 'cost_other_cost',
+    label: COST_FIELD_LABELS.other_cost,
+    section: 'cost',
+    permissions: ['view_purchase_price'],
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_other_cost),
+  },
+  {
+    id: 'cost_parts_cost',
+    label: COST_FIELD_LABELS.parts_cost,
+    section: 'cost',
+    permissions: ['view_purchase_price'],
+    sortable: true,
+    text: (a) => formatUSDWithSymbol(a.cost_parts_cost),
   },
   {
     id: 'cost_total_cost',

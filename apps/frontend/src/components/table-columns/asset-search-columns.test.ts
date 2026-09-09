@@ -168,7 +168,8 @@ describe('asset-search report columns', () => {
         'Country of Origin,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
-        'Purchase Cost,Transport Cost,Transfer Cost,Processing Cost,Total Cost,Sale Price,' +
+        'Purchase Cost,Transport Cost,Transfer Cost,Processing Cost,Other Cost,Parts Cost,' +
+        'Total Cost,Sale Price,' +
         'Gross Margin,' +
         'Margin %,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
         'Created,Stock Days,Purchase Invoice,Sales Invoice,Errors,Last Comment',
@@ -182,7 +183,7 @@ describe('asset-search report columns', () => {
         'Japan,12,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
         'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
-        '"$1,234.00",$200.00,$50.00,$100.00,"$1,534.00","$3,000.00","$1,466.00",' +
+        '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00","$1,466.00",' +
         '48.9%,H-1,Alice,Bob,ACME_CORP,"July 01, 2026",' +
         '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
     )
@@ -253,7 +254,7 @@ describe('asset-search report columns', () => {
         ',,"1,234 lbs",5,,,,' +
         ',,,,,' +
         ',,,,,,,,' +
-        ',,,,,,,,' +
+        ',,,,,,,,,,' +
         ',,,,,' +
         '"July 15, 2026",12,,,,',
     )
@@ -529,6 +530,8 @@ describe('asset search columns', () => {
           'cost_transport_cost',
           'cost_transfer_cost',
           'cost_processing_cost',
+          'cost_other_cost',
+          'cost_parts_cost',
           'cost_total_cost',
           'cost_sale_price',
         ],

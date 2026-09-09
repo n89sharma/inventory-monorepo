@@ -96,9 +96,26 @@ describe('the asset price grid', () => {
     expect(screen.queryByLabelText('Total Cost for BC-2')).toBeNull()
   })
 
-  it('skips Total Cost when tabbing right', async () => {
+  it('never renders a Parts Cost editor, because the store-part ledger derives it', async () => {
+    renderGrid()
+
+    fireEvent.click(fieldOf(FIRST_FIELD_LABEL, 'BC-2'))
+
+    expect(screen.queryByLabelText('Parts Cost for BC-2')).toBeNull()
+  })
+
+  it('tabs right into Other Cost', async () => {
     renderGrid()
     const input = await openEditor('Processing Cost', 'BC-2')
+
+    fireEvent.keyDown(input, { key: 'Tab' })
+
+    await expectEditing('Other Cost', 'BC-2')
+  })
+
+  it('skips Parts Cost and Total Cost when tabbing right', async () => {
+    renderGrid()
+    const input = await openEditor('Other Cost', 'BC-2')
 
     fireEvent.keyDown(input, { key: 'Tab' })
 

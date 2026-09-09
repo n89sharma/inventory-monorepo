@@ -14,6 +14,7 @@ export const EDITABLE_PRICE_COLUMNS = {
   cost_transport_cost: 'transport_cost',
   cost_transfer_cost: 'transfer_cost',
   cost_processing_cost: 'processing_cost',
+  cost_other_cost: 'other_cost',
   cost_sale_price: 'sale_price',
 } as const satisfies Record<string, EditablePriceField>
 

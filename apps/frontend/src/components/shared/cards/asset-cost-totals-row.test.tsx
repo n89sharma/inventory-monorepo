@@ -37,14 +37,18 @@ describe('AssetCostTotalsRow', () => {
             cost_purchase_cost: 100,
             cost_transport_cost: 20,
             cost_processing_cost: 5,
-            cost_total_cost: 125,
+            cost_other_cost: 5,
+            cost_parts_cost: 10,
+            cost_total_cost: 140,
             cost_sale_price: 200,
           }),
           makeAssetSearchRow({
             cost_purchase_cost: 250,
             cost_transport_cost: 30,
             cost_processing_cost: 20,
-            cost_total_cost: 300,
+            cost_other_cost: 15,
+            cost_parts_cost: 5,
+            cost_total_cost: 320,
             cost_sale_price: 500,
           }),
         ]}
@@ -54,7 +58,9 @@ describe('AssetCostTotalsRow', () => {
     expect(totalFor('Purchase Cost')).toBe('$350.00')
     expect(totalFor('Transport Cost')).toBe('$50.00')
     expect(totalFor('Processing Cost')).toBe('$25.00')
-    expect(totalFor('Total Cost')).toBe('$425.00')
+    expect(totalFor('Other Cost')).toBe('$20.00')
+    expect(totalFor('Parts Cost')).toBe('$15.00')
+    expect(totalFor('Total Cost')).toBe('$460.00')
     expect(totalFor('Sale Price')).toBe('$700.00')
   })
 

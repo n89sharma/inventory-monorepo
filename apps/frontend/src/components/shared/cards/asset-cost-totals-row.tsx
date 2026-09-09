@@ -9,6 +9,8 @@ type CostTotalFieldId =
   | 'cost_transport_cost'
   | 'cost_transfer_cost'
   | 'cost_processing_cost'
+  | 'cost_other_cost'
+  | 'cost_parts_cost'
   | 'cost_total_cost'
   | 'cost_sale_price'
 
@@ -17,6 +19,8 @@ const COST_TOTAL_FIELDS = [
   { id: 'cost_transport_cost', label: COST_FIELD_LABELS.transport_cost },
   { id: 'cost_transfer_cost', label: COST_FIELD_LABELS.transfer_cost },
   { id: 'cost_processing_cost', label: COST_FIELD_LABELS.processing_cost },
+  { id: 'cost_other_cost', label: COST_FIELD_LABELS.other_cost },
+  { id: 'cost_parts_cost', label: COST_FIELD_LABELS.parts_cost },
   { id: 'cost_total_cost', label: 'Total Cost' },
   { id: 'cost_sale_price', label: COST_FIELD_LABELS.sale_price },
 ] as const satisfies readonly { id: CostTotalFieldId; label: string }[]
