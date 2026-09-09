@@ -66,6 +66,7 @@ export function BulkEditBar({
   const canRemoveFromCollection =
     currentCollectionType !== undefined && collectionPermissionMap[currentCollectionType]
   const showBulkRemove = onBulkRemove !== undefined && canRemoveFromCollection
+  const showBulkPricing = onPriceSaveSuccess !== undefined && canEditPrices
   const canCreateAnyCollection =
     canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
 
@@ -147,7 +148,7 @@ export function BulkEditBar({
             Add to
           </Button>
         )}
-        {canEditPrices && (
+        {showBulkPricing && (
           <Button variant="secondary" onClick={openBulkPricing}>
             <CurrencyDollarIcon />
             Edit prices
