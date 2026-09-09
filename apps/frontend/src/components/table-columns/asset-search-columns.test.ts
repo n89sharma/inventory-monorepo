@@ -165,7 +165,7 @@ describe('asset-search report columns', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Damaged,Damage Notes,Location,' +
-        'Country of Origin,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
+        'Country of Origin,Manufactured Year,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
         'Purchase Cost,Transport Cost,Transfer Cost,Processing Cost,Other Cost,Parts Cost,' +
@@ -180,7 +180,7 @@ describe('asset-search report columns', () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,NYC | Receiving,' +
-        'Japan,12,"1,234 lbs",5,26,2,FIN-1,' +
+        'Japan,2020,12,"1,234 lbs",5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
         'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
         '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00","$1,466.00",' +
@@ -210,6 +210,7 @@ describe('asset-search report columns', () => {
     const nulled = makeRow({
       location: null,
       country_of_origin: null,
+      manufactured_year: null,
       specs_meter_total: null,
       specs_cassettes: null,
       specs_internal_finisher: null,
@@ -251,7 +252,7 @@ describe('asset-search report columns', () => {
     const { data } = csvFor(nulled, liveColumnIds())
     expect(data).toBe(
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,,' +
-        ',,"1,234 lbs",5,,,,' +
+        ',,,"1,234 lbs",5,,,,' +
         ',,,,,' +
         ',,,,,,,,' +
         ',,,,,,,,,,' +
@@ -565,6 +566,7 @@ describe('asset search columns', () => {
           'brand',
           'asset_type',
           'country_of_origin',
+          'manufactured_year',
           'weight',
           'size',
           'specs_toner_life_c',

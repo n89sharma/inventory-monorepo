@@ -265,6 +265,13 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     text: (a) => formatTitleCase(a.country_of_origin ?? ''),
   },
   {
+    id: 'manufactured_year',
+    label: 'Manufactured Year',
+    section: 'detailed_specs',
+    sortable: true,
+    text: (a) => optionalNumber(a.manufactured_year),
+  },
+  {
     id: 'specs_meter_total',
     label: 'Total Meter',
     section: 'general_specs',
