@@ -9,13 +9,22 @@ interface SearchBarProps {
   searchOptions: SearchOptions
   setSearchOptions: SetSearchOptions
   onSearch?: (searchOptions: SearchOptions) => Promise<void>
+  fromLabel?: string
+  toLabel?: string
+  leadingFilter?: React.ReactNode
   children?: React.ReactNode
 }
+
+const DEFAULT_FROM_LABEL = 'From'
+const DEFAULT_TO_LABEL = 'To'
 
 export function SearchBar({
   searchOptions,
   setSearchOptions,
   onSearch,
+  fromLabel = DEFAULT_FROM_LABEL,
+  toLabel = DEFAULT_TO_LABEL,
+  leadingFilter,
   children,
 }: SearchBarProps): React.JSX.Element {
   const { fromDate, toDate } = searchOptions
@@ -60,9 +69,16 @@ export function SearchBar({
     <div className="flex flex-row flex-wrap gap-2 items-end">
       <QuickSearchButtons days={[7, 30, 60]} onSearch={handleQuickSearch} />
 
-      <DatePickerFieldInline label="From" id="from-date" date={fromDate} setDate={setFromDate} />
+      {leadingFilter}
 
-      <DatePickerFieldInline label="To" id="to-date" date={toDate} setDate={setToDate} />
+      <DatePickerFieldInline
+        label={fromLabel}
+        id="from-date"
+        date={fromDate}
+        setDate={setFromDate}
+      />
+
+      <DatePickerFieldInline label={toLabel} id="to-date" date={toDate} setDate={setToDate} />
 
       {children}
     </div>

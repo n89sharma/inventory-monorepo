@@ -1,4 +1,8 @@
-import { INVOICE_COLUMNS_BY_TYPE } from '@/components/invoice/invoice-columns'
+import {
+  INVOICE_COLUMNS_BY_TYPE,
+  INVOICE_DEFAULT_SORT_BY_TYPE,
+  INVOICE_PINNED_COLUMN_IDS_BY_TYPE,
+} from '@/components/invoice/invoice-columns'
 import { Button } from '@/components/shadcn/button'
 import { CollectionPage } from '@/components/collections/collection-page'
 import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
@@ -26,8 +30,6 @@ import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
-const PINNED_COLUMN_IDS = ['invoice_date', 'invoice_reference']
-const INVOICE_DATE_DESC_SORT = { id: 'invoice_date', desc: true } as const
 const CSV_MIME_TYPE = 'text/csv'
 const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 
@@ -79,8 +81,8 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       title={INVOICE_PAGE_TITLE[invoiceType]}
       columns={columns}
       data={invoices}
-      defaultSort={INVOICE_DATE_DESC_SORT}
-      pinLeft={PINNED_COLUMN_IDS}
+      defaultSort={INVOICE_DEFAULT_SORT_BY_TYPE[invoiceType]}
+      pinLeft={INVOICE_PINNED_COLUMN_IDS_BY_TYPE[invoiceType]}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
       renderTableFilter={(table) => (
@@ -105,9 +107,10 @@ export function InvoicesSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate }}
           setSearchOptions={{ setFromDate, setToDate }}
-        >
-          <InvoiceTypeToggle value={invoiceType} onChange={setInvoiceType} />
-        </SearchBar>
+          fromLabel={INVOICE_DATE_FILTER_LABEL[invoiceType].from}
+          toLabel={INVOICE_DATE_FILTER_LABEL[invoiceType].to}
+          leadingFilter={<InvoiceTypeToggle value={invoiceType} onChange={setInvoiceType} />}
+        />
       }
       actions={
         <div className="flex items-center gap-2">
@@ -149,6 +152,11 @@ const INVOICE_PAGE_TITLE = {
   [INVOICE_TYPE.purchase]: 'Purchase Invoices',
   [INVOICE_TYPE.sales]: 'Sales Invoices',
 } as const satisfies Record<InvoiceTypeFilter, string>
+
+const INVOICE_DATE_FILTER_LABEL = {
+  [INVOICE_TYPE.purchase]: { from: 'Arrival From', to: 'Arrival To' },
+  [INVOICE_TYPE.sales]: { from: 'Departure From', to: 'Departure To' },
+} as const satisfies Record<InvoiceTypeFilter, { from: string; to: string }>
 
 const INVOICE_TYPE_TOGGLE_LABEL = {
   [INVOICE_TYPE.purchase]: 'Show Sales',

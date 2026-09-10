@@ -51,8 +51,6 @@ export * from "./sql/getHolds.js"
 
 export * from "./sql/getInStockSummary.js"
 
-export * from "./sql/getInvoices.js"
-
 export * from "./sql/getLocations.js"
 
 export * from "./sql/getLocationsByWarehouse.js"
@@ -70,6 +68,10 @@ export * from "./sql/getOrganizationReferenceCounts.js"
 export * from "./sql/getOrganizations.js"
 
 export * from "./sql/getProfitabilityCube.js"
+
+export * from "./sql/getPurchaseInvoices.js"
+
+export * from "./sql/getSalesInvoices.js"
 
 export * from "./sql/getStorePartLedger.js"
 

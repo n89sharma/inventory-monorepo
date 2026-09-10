@@ -7,6 +7,7 @@ import {
 import { ID_COLUMN_SIZE, IdLink } from '@/components/table-columns/column-primitives'
 import type { SummaryColumn } from '@/components/table-columns/summary-column'
 import { formatDate, formatUSDWithSymbol } from '@/lib/formatters'
+import type { SortingFn } from '@tanstack/react-table'
 import { parseISO } from 'date-fns'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
@@ -19,13 +20,47 @@ type InvoiceSummaryColumn = SummaryColumn<InvoiceSummary, InvoiceCellContext>
 
 const CLEARED_TEXT = { true: 'Yes', false: 'No' } as const
 const LIST_SEPARATOR = ', '
+const DATE_SPAN_SEPARATOR = ' – '
+const DATE_SPAN_COLUMN_SIZE = 280
+const NO_DATE_SORT_VALUE = ''
 
 const INVOICE_DATE_COLUMN: InvoiceSummaryColumn = {
   id: 'invoice_date',
-  label: 'Date',
+  label: 'Invoice Date',
   text: (invoice) => formatDate(parseISO(invoice.invoice_date)),
   sortable: true,
   size: 140,
+}
+
+function formatDateSpan(startDate: string | null, endDate: string | null): string {
+  if (startDate === null) return ''
+  const start = formatDate(parseISO(startDate))
+  if (endDate === null || endDate === startDate) return start
+  return `${start}${DATE_SPAN_SEPARATOR}${formatDate(parseISO(endDate))}`
+}
+
+const dateSpanSort: SortingFn<InvoiceSummary> = (rowA, rowB, columnId) => {
+  const a = rowA.getValue<string | null>(columnId) ?? NO_DATE_SORT_VALUE
+  const b = rowB.getValue<string | null>(columnId) ?? NO_DATE_SORT_VALUE
+  return a.localeCompare(b)
+}
+
+const ARRIVAL_DATES_COLUMN: InvoiceSummaryColumn = {
+  id: 'arrival_start_date',
+  label: 'Arrival Dates',
+  text: (invoice) => formatDateSpan(invoice.arrival_start_date, invoice.arrival_end_date),
+  sortable: true,
+  sortingFn: dateSpanSort,
+  size: DATE_SPAN_COLUMN_SIZE,
+}
+
+const DEPARTURE_DATES_COLUMN: InvoiceSummaryColumn = {
+  id: 'departure_start_date',
+  label: 'Departure Dates',
+  text: (invoice) => formatDateSpan(invoice.departure_start_date, invoice.departure_end_date),
+  sortable: true,
+  sortingFn: dateSpanSort,
+  size: DATE_SPAN_COLUMN_SIZE,
 }
 
 const REFERENCE_COLUMN: InvoiceSummaryColumn = {
@@ -112,6 +147,7 @@ const NOTES_COLUMN: InvoiceSummaryColumn = {
 }
 
 const PURCHASE_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
+  ARRIVAL_DATES_COLUMN,
   INVOICE_DATE_COLUMN,
   REFERENCE_COLUMN,
   organizationColumn('Vendor'),
@@ -130,6 +166,7 @@ const PURCHASE_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
 ]
 
 const SALES_INVOICE_COLUMNS: readonly InvoiceSummaryColumn[] = [
+  DEPARTURE_DATES_COLUMN,
   INVOICE_DATE_COLUMN,
   REFERENCE_COLUMN,
   organizationColumn('Customer'),
@@ -147,3 +184,24 @@ export const INVOICE_COLUMNS_BY_TYPE = {
   [INVOICE_TYPE.purchase]: PURCHASE_INVOICE_COLUMNS,
   [INVOICE_TYPE.sales]: SALES_INVOICE_COLUMNS,
 } as const satisfies Record<InvoiceTypeFilter, readonly InvoiceSummaryColumn[]>
+
+const PURCHASE_PINNED_COLUMN_IDS = [
+  ARRIVAL_DATES_COLUMN.id,
+  INVOICE_DATE_COLUMN.id,
+  REFERENCE_COLUMN.id,
+]
+const SALES_PINNED_COLUMN_IDS = [
+  DEPARTURE_DATES_COLUMN.id,
+  INVOICE_DATE_COLUMN.id,
+  REFERENCE_COLUMN.id,
+]
+
+export const INVOICE_PINNED_COLUMN_IDS_BY_TYPE = {
+  [INVOICE_TYPE.purchase]: PURCHASE_PINNED_COLUMN_IDS,
+  [INVOICE_TYPE.sales]: SALES_PINNED_COLUMN_IDS,
+} as const satisfies Record<InvoiceTypeFilter, readonly string[]>
+
+export const INVOICE_DEFAULT_SORT_BY_TYPE = {
+  [INVOICE_TYPE.purchase]: { id: ARRIVAL_DATES_COLUMN.id, desc: true },
+  [INVOICE_TYPE.sales]: { id: DEPARTURE_DATES_COLUMN.id, desc: true },
+} as const satisfies Record<InvoiceTypeFilter, { id: string; desc: boolean }>

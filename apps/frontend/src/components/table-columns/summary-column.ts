@@ -13,6 +13,7 @@ export type SummaryColumn<TRow, TContext> = {
   permission?: Permission
   size?: number
   sortable?: boolean
+  sortingFn?: ColumnDef<TRow>['sortingFn']
   filterFn?: ColumnDef<TRow>['filterFn']
 }
 
@@ -32,9 +33,12 @@ export function toColumnDefs<TRow, TContext>(
     header: column.sortable ? sortableHeader<TRow>(column.label) : column.label,
     enableSorting: column.sortable ?? false,
     size: column.size,
-    filterFn: column.filterFn,
     cell: ({ row }) =>
       column.cell ? column.cell(row.original, context) : column.text(row.original),
+    // A present-but-undefined key overrides TanStack's own `'auto'` default in its
+    // `{...defaultColumn, ...columnDef}` merge, leaving the column with no resolver.
+    ...(column.sortingFn === undefined ? {} : { sortingFn: column.sortingFn }),
+    ...(column.filterFn === undefined ? {} : { filterFn: column.filterFn }),
   }))
 }
 

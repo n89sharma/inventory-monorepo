@@ -1,7 +1,8 @@
-import { ASSET_STATUS } from 'shared-types'
+import { ASSET_STATUS, INVOICE_TYPE, OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
+  buildCreateDepartureInput,
   buildCreateInvoiceInput,
   cleanupTransactionalData,
   createArrivedAssets,
@@ -17,11 +18,13 @@ import {
 } from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { createDeparture } from './departureService.js'
 import {
   addRemoveCollectionFromAssetsAndRecord as patchInvoiceAssets,
   createInvoice,
   deleteInvoice,
   getInvoice,
+  getInvoices,
   patchInvoiceMetadata,
 } from './invoiceService.js'
 
@@ -276,5 +279,145 @@ describe('deleteInvoice', () => {
 
   it('throws when the invoice number does not exist', async () => {
     await expect(deleteInvoice('I-9999999', refs.userId)).rejects.toThrow(NotFoundError)
+  })
+})
+
+const FEBRUARY_WINDOW = {
+  fromDate: new Date('2026-02-01T00:00:00.000Z'),
+  toDate: new Date('2026-02-28T23:59:59.999Z'),
+}
+const MARCH_WINDOW = {
+  fromDate: new Date('2026-03-01T00:00:00.000Z'),
+  toDate: new Date('2026-03-31T23:59:59.999Z'),
+}
+const APRIL_WINDOW = {
+  fromDate: new Date('2026-04-01T00:00:00.000Z'),
+  toDate: new Date('2026-04-30T23:59:59.999Z'),
+}
+
+function atUtcNoon(ymd: string): Date {
+  return new Date(`${ymd}T12:00:00.000Z`)
+}
+
+async function setArrivalDate(assetId: number, ymd: string): Promise<void> {
+  const { arrival_id } = await prisma.asset.findUniqueOrThrow({
+    where: { id: assetId },
+    select: { arrival_id: true },
+  })
+  if (arrival_id === null) throw new Error(`Asset ${assetId} has no arrival`)
+  await prisma.arrival.update({ where: { id: arrival_id }, data: { created_at: atUtcNoon(ymd) } })
+}
+
+async function setDepartureDate(departureNumber: string, ymd: string): Promise<void> {
+  await prisma.departure.update({
+    where: { departure_number: departureNumber },
+    data: { created_at: atUtcNoon(ymd) },
+  })
+}
+
+async function setInvoiceDate(invoiceNumber: string, ymd: string): Promise<void> {
+  await prisma.invoice.update({
+    where: { invoice_number: invoiceNumber },
+    data: { invoice_date: new Date(`${ymd}T00:00:00.000Z`) },
+  })
+}
+
+async function detachArrival(assetId: number): Promise<void> {
+  await prisma.asset.update({ where: { id: assetId }, data: { arrival_id: null } })
+}
+
+async function listPurchaseInvoices(window: typeof MARCH_WINDOW) {
+  return getInvoices(window.fromDate, window.toDate, INVOICE_TYPE.purchase, ALL_PRICE_PERMISSIONS)
+}
+
+async function listSalesInvoices(window: typeof MARCH_WINDOW) {
+  return getInvoices(window.fromDate, window.toDate, INVOICE_TYPE.sales, ALL_PRICE_PERMISSIONS)
+}
+
+describe('invoiceService.getInvoices date window', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('matches a purchase invoice on its arrival date, not its invoice date', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypePurchaseId),
+      refs.userId,
+    )
+    await setInvoiceDate(invoiceNumber, '2026-02-10')
+    await setArrivalDate(asset.id, '2026-03-05')
+
+    expect((await listPurchaseInvoices(MARCH_WINDOW)).map((i) => i.invoice_number)).toEqual([
+      invoiceNumber,
+    ])
+    expect(await listPurchaseInvoices(FEBRUARY_WINDOW)).toEqual([])
+  })
+
+  it('matches an invoice spanning two months in either month and reports the span', async () => {
+    const [firstAsset] = await createArrivedAssets(refs, 1)
+    const [secondAsset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [firstAsset, secondAsset], refs.invoiceTypePurchaseId),
+      refs.userId,
+    )
+    await setArrivalDate(firstAsset.id, '2026-03-28')
+    await setArrivalDate(secondAsset.id, '2026-04-02')
+
+    const [march] = await listPurchaseInvoices(MARCH_WINDOW)
+    const [april] = await listPurchaseInvoices(APRIL_WINDOW)
+
+    expect(march?.invoice_number).toBe(invoiceNumber)
+    expect(april?.invoice_number).toBe(invoiceNumber)
+    expect(march?.arrival_start_date).toBe('2026-03-28')
+    expect(march?.arrival_end_date).toBe('2026-04-02')
+  })
+
+  it('falls back to the invoice date when no asset is linked to an arrival', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypePurchaseId),
+      refs.userId,
+    )
+    await setInvoiceDate(invoiceNumber, '2026-03-10')
+    await detachArrival(asset.id)
+
+    const [march] = await listPurchaseInvoices(MARCH_WINDOW)
+
+    expect(march?.invoice_number).toBe(invoiceNumber)
+    expect(march?.arrival_start_date).toBeNull()
+    expect(await listPurchaseInvoices(FEBRUARY_WINDOW)).toEqual([])
+  })
+
+  it('matches a sales invoice on its departure date and keeps it out of the purchase list', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    await setInvoiceDate(invoiceNumber, '2026-01-15')
+    await setDepartureDate(departureNumber, '2026-03-20')
+    await setArrivalDate(asset.id, '2026-03-05')
+
+    const [march] = await listSalesInvoices(MARCH_WINDOW)
+
+    expect(march?.invoice_number).toBe(invoiceNumber)
+    expect(march?.departure_start_date).toBe('2026-03-20')
+    expect(march?.departure_end_date).toBe('2026-03-20')
+    expect(await listPurchaseInvoices(MARCH_WINDOW)).toEqual([])
   })
 })

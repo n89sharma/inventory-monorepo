@@ -22,6 +22,10 @@ const PURCHASE_INVOICE: InvoiceSummary = {
   is_cleared: true,
   invoice_type: INVOICE_TYPE.purchase,
   invoice_date: '2026-03-04',
+  arrival_start_date: '2026-03-28',
+  arrival_end_date: '2026-04-02',
+  departure_start_date: null,
+  departure_end_date: null,
   notes: 'Split, over two trucks',
   destination_codes: ['TOR', 'MTL'],
   arrival_numbers: ['ARR-1', 'ARR-2'],
@@ -51,16 +55,21 @@ function headersFor(
   return csvColumnsFor(invoiceType, can).map((column) => column.header)
 }
 
-function valueFor(header: string): string {
+function csvValueFor(header: string, invoice: InvoiceSummary): string {
   const column = csvColumnsFor(INVOICE_TYPE.purchase, ALLOW_ALL).find((c) => c.header === header)
   if (!column) throw new Error(`No CSV column headed ${header}`)
-  return column.value(PURCHASE_INVOICE)
+  return column.value(invoice)
+}
+
+function valueFor(header: string): string {
+  return csvValueFor(header, PURCHASE_INVOICE)
 }
 
 describe('invoice summary CSV columns', () => {
   it('exports the purchase columns in table order', () => {
     expect(headersFor(INVOICE_TYPE.purchase, ALLOW_ALL)).toEqual([
-      'Date',
+      'Arrival Dates',
+      'Invoice Date',
       'Reference Invoice Number',
       'Vendor',
       'Warehouse',
@@ -100,6 +109,30 @@ describe('invoice summary CSV columns', () => {
   it('leaves a null money value empty rather than writing $0', () => {
     expect(valueFor('Purchase Cost')).toBe('$1,200.00')
     expect(valueFor('Sale Price')).toBe('')
+  })
+
+  it('spans the arrival dates, collapsing to one date when they match', () => {
+    expect(valueFor('Arrival Dates')).toBe('March 28, 2026 – April 02, 2026')
+    expect(
+      csvValueFor('Arrival Dates', {
+        ...PURCHASE_INVOICE,
+        arrival_end_date: PURCHASE_INVOICE.arrival_start_date,
+      }),
+    ).toBe('March 28, 2026')
+  })
+
+  it('leaves the arrival dates empty when no asset is linked to an arrival', () => {
+    expect(
+      csvValueFor('Arrival Dates', {
+        ...PURCHASE_INVOICE,
+        arrival_start_date: null,
+        arrival_end_date: null,
+      }),
+    ).toBe('')
+  })
+
+  it('heads the sales movement column with the departure dates', () => {
+    expect(headersFor(INVOICE_TYPE.sales, ALLOW_ALL)[0]).toBe('Departure Dates')
   })
 
   it('drops the arrival and cleared columns for sales invoices', () => {

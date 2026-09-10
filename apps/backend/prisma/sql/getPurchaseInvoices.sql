@@ -1,3 +1,22 @@
+with matched_invoice as (
+  select distinct a.purchase_invoice_id as id
+  from "Arrival" ar
+  join "Asset" a on a.arrival_id = ar.id
+  where ar.created_at between $1 and $2
+    and a.purchase_invoice_id is not null
+  union
+  select i.id
+  from "Invoice" i
+  join "InvoiceType" it on it.id = i.invoice_type_id
+  where it.type = 'PURCHASE'
+    and i.invoice_date between $1 and $2
+    and not exists (
+      select 1
+      from "Asset" a
+      where a.purchase_invoice_id = i.id
+        and a.arrival_id is not null
+    )
+)
 select
   i.id as id,
   i.invoice_number,
@@ -17,12 +36,15 @@ select
   arr.destination_codes as destination_codes,
   arr.arrival_numbers as arrival_numbers,
   arr.transporters as transporters,
+  mv.arrival_start_date as arrival_start_date,
+  mv.arrival_end_date as arrival_end_date,
   cost.purchase_cost as purchase_cost,
   cost.transport_cost as transport_cost,
   cost.transfer_cost as transfer_cost,
   cost.total_cost as total_cost,
   cost.sale_price as sale_price
 from "Invoice" i
+  join matched_invoice mi on mi.id = i.id
   join "InvoiceType" it on it.id = i.invoice_type_id
   join "Organization" o on o.id = i.organization_id
   join "User" u on u.id = i.updated_by_id
@@ -38,7 +60,7 @@ from "Invoice" i
     from "Asset" ast
     join "Model" m on m.id = ast.model_id
     join "AssetType" atype on atype.id = m.asset_type_id
-    where ast.purchase_invoice_id = i.id or ast.sales_invoice_id = i.id
+    where ast.purchase_invoice_id = i.id
   ) ac on true
   left join lateral (
     select
@@ -49,8 +71,16 @@ from "Invoice" i
     join "Arrival" ar on ar.id = a.arrival_id
     join "Organization" t on t.id = ar.transporter_id
     join "Warehouse" w on w.id = ar.destination_id
-    where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
+    where a.purchase_invoice_id = i.id
   ) arr on true
+  left join lateral (
+    select
+      min(ar.created_at) as arrival_start_date,
+      max(ar.created_at) as arrival_end_date
+    from "Asset" a
+    join "Arrival" ar on ar.id = a.arrival_id
+    where a.purchase_invoice_id = i.id
+  ) mv on true
   left join lateral (
     select
       sum(c.purchase_cost) as purchase_cost,
@@ -60,9 +90,8 @@ from "Invoice" i
       sum(c.sale_price) as sale_price
     from "Asset" a
     join "Cost" c on c.asset_id = a.id
-    where a.purchase_invoice_id = i.id or a.sales_invoice_id = i.id
+    where a.purchase_invoice_id = i.id
   ) cost on true
-where it.type = $3
-  and i.invoice_date between $1 and $2
-order by i.invoice_date desc
+where it.type = 'PURCHASE'
+order by coalesce(mv.arrival_start_date, i.invoice_date::timestamp) desc
 limit 500

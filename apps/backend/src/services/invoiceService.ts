@@ -11,7 +11,8 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import {
   getArrivalsForInvoice,
   getAssetsForInvoice,
-  getInvoices as getInvoicesDb,
+  getPurchaseInvoices as getPurchaseInvoicesDb,
+  getSalesInvoices as getSalesInvoicesDb,
 } from '../../generated/prisma/sql.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
@@ -38,6 +39,10 @@ const INVOICE_NUMBER_PAD = 7
 
 function toYmd(date: Date): string {
   return date.toISOString().slice(0, 10)
+}
+
+function toYmdOrNull(date: Date | null): string | null {
+  return date === null ? null : toYmd(date)
 }
 
 async function getNewInvoiceNumber(): Promise<string> {
@@ -236,17 +241,28 @@ export async function deleteInvoice(invoiceNumber: string, userId: number): Prom
   logger.warn('Invoice deleted', { invoiceNumber, userId })
 }
 
-export async function getInvoices(
-  fromDate: Date,
-  toDate: Date,
-  invoiceType: string,
+type InvoiceMovementDates = Pick<
+  InvoiceSummary,
+  'arrival_start_date' | 'arrival_end_date' | 'departure_start_date' | 'departure_end_date'
+>
+
+const NO_MOVEMENT_DATES = {
+  arrival_start_date: null,
+  arrival_end_date: null,
+  departure_start_date: null,
+  departure_end_date: null,
+} as const satisfies InvoiceMovementDates
+
+function toInvoiceSummary(
+  row: Omit<getPurchaseInvoicesDb.Result, 'arrival_start_date' | 'arrival_end_date'>,
+  movementDates: InvoiceMovementDates,
   permissions: ReadonlySet<Permission>,
-): Promise<InvoiceSummary[]> {
+): InvoiceSummary {
   const canViewPurchase = permissions.has('view_purchase_price')
   const canViewSale = permissions.has('view_sale_price')
-  const rows = await prisma.$queryRawTyped(getInvoicesDb(fromDate, toDate, invoiceType))
-  return rows.map((row) => ({
+  return {
     ...row,
+    ...movementDates,
     invoice_date: toYmd(row.invoice_date),
     destination_codes: row.destination_codes ?? [],
     arrival_numbers: row.arrival_numbers ?? [],
@@ -256,7 +272,41 @@ export async function getInvoices(
     transfer_cost: canViewPurchase ? (decimalToNumber(row.transfer_cost) ?? 0) : null,
     total_cost: canViewPurchase ? (decimalToNumber(row.total_cost) ?? 0) : null,
     sale_price: canViewSale ? (decimalToNumber(row.sale_price) ?? 0) : null,
-  }))
+  }
+}
+
+export async function getInvoices(
+  fromDate: Date,
+  toDate: Date,
+  invoiceType: string,
+  permissions: ReadonlySet<Permission>,
+): Promise<InvoiceSummary[]> {
+  if (invoiceType === INVOICE_TYPE.sales) {
+    const rows = await prisma.$queryRawTyped(getSalesInvoicesDb(fromDate, toDate))
+    return rows.map((row) =>
+      toInvoiceSummary(
+        row,
+        {
+          ...NO_MOVEMENT_DATES,
+          departure_start_date: toYmdOrNull(row.departure_start_date),
+          departure_end_date: toYmdOrNull(row.departure_end_date),
+        },
+        permissions,
+      ),
+    )
+  }
+  const rows = await prisma.$queryRawTyped(getPurchaseInvoicesDb(fromDate, toDate))
+  return rows.map((row) =>
+    toInvoiceSummary(
+      row,
+      {
+        ...NO_MOVEMENT_DATES,
+        arrival_start_date: toYmdOrNull(row.arrival_start_date),
+        arrival_end_date: toYmdOrNull(row.arrival_end_date),
+      },
+      permissions,
+    ),
+  )
 }
 
 export async function getInvoice(
