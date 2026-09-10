@@ -4,6 +4,7 @@ import type {
   ColumnDef,
   ColumnFiltersState,
   ColumnOrderState,
+  ColumnPinningState,
   ExpandedState,
   Header,
   OnChangeFn,
@@ -24,7 +25,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
@@ -339,6 +340,11 @@ function DataTableBase<TData, TValue>({
   const columnOrder = controlledColumnOrder ?? internalColumnOrder
   const onColumnOrderChange = onControlledColumnOrderChange ?? setInternalColumnOrder
 
+  const columnPinning = useMemo<ColumnPinningState>(
+    () => ({ left: pinLeft ?? [], right: [] }),
+    [pinLeft],
+  )
+
   // Hover only triggers a prefetch, so its identity never affects what a row renders.
   // Holding it in a ref lets callers pass an inline arrow without breaking DataRow's memo.
   const onRowMouseEnterRef = useRef(onRowMouseEnter)
@@ -374,6 +380,7 @@ function DataTableBase<TData, TValue>({
       columnFilters,
       columnVisibility,
       columnOrder,
+      columnPinning,
       expanded,
     },
     initialState: {
@@ -381,7 +388,6 @@ function DataTableBase<TData, TValue>({
         pageSize: frame.virtualRows ? ALL_ROWS_PAGE_SIZE : DEFAULT_PAGE_SIZE,
         pageIndex: 0,
       },
-      columnPinning: { left: pinLeft ?? [], right: [] },
     },
   })
 
