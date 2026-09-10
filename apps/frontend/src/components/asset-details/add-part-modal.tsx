@@ -1,4 +1,5 @@
 import { Button } from '@/components/shadcn/button'
+import { Checkbox } from '@/components/shadcn/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,7 @@ import {
   type AddStorePartForm,
 } from '@/ui-types/store-part-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRightIcon, ArrowsLeftRightIcon, CircleNotchIcon, XIcon } from '@phosphor-icons/react'
+import { ArrowLeftIcon, ArrowRightIcon, CircleNotchIcon, XIcon } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import { CreateSalvagedPartSchema, type CreateSalvagedPart, type Warehouse } from 'shared-types'
@@ -39,6 +40,11 @@ interface AddPartModalProps {
 
 // Floor the panel to the taller (Machine) tab so switching tabs never resizes the dialog.
 const TAB_BODY_MIN_HEIGHT = 'min-h-80'
+
+// Matches the green pairing used by put-away-page.tsx. Red mirrors it; `destructive` stays
+// reserved for validation errors.
+const GOOD_PART_CLASS_NAME = 'font-bold text-green-800 dark:text-green-300'
+const BAD_PART_CLASS_NAME = 'font-bold text-red-800 dark:text-red-300'
 
 function DonorBarcodeField({
   value,
@@ -81,9 +87,34 @@ function DonorBarcodeField({
   )
 }
 
-function ExchangeToggleIcon({ isExchange }: { isExchange: boolean }) {
-  if (isExchange) return <ArrowsLeftRightIcon />
-  return <ArrowRightIcon />
+function MachineLabel({ children }: { children: string }) {
+  return <span className="text-xs text-muted-foreground">{children}</span>
+}
+
+function PartFlowIndicator({ isExchange }: { isExchange: boolean }) {
+  return (
+    <div className="grid h-8 w-full grid-cols-[auto_1fr_auto] content-center items-center gap-x-1.5 text-xs">
+      <span />
+      <span className={cn('whitespace-nowrap text-center', GOOD_PART_CLASS_NAME)}>good part</span>
+      <ArrowRightIcon
+        aria-hidden="true"
+        weight="bold"
+        className={cn('size-3.5', GOOD_PART_CLASS_NAME)}
+      />
+
+      {isExchange && (
+        <>
+          <ArrowLeftIcon
+            aria-hidden="true"
+            weight="bold"
+            className={cn('size-3.5', BAD_PART_CLASS_NAME)}
+          />
+          <span className={cn('whitespace-nowrap text-center', BAD_PART_CLASS_NAME)}>bad part</span>
+          <span />
+        </>
+      )}
+    </div>
+  )
 }
 
 export function AddPartModal({ open, onOpenChange, recipientBarcode }: AddPartModalProps) {
@@ -91,7 +122,7 @@ export function AddPartModal({ open, onOpenChange, recipientBarcode }: AddPartMo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Add Part</DialogTitle>
         </DialogHeader>
@@ -128,6 +159,7 @@ function MachineTab({ recipientBarcode, onClose }: TabProps) {
     defaultValues: { donor_barcode: '', part: '', is_exchange: true, notes: '' },
   })
 
+  const isExchange = useWatch({ control: form.control, name: 'is_exchange' })
   const { isSubmitting } = form.formState
 
   async function handleSave(data: CreateSalvagedPart) {
@@ -148,12 +180,16 @@ function MachineTab({ recipientBarcode, onClose }: TabProps) {
     <>
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-2">
         <Field>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[1fr_7rem_1fr] items-start gap-x-2 gap-y-1">
+            <MachineLabel>Donor machine</MachineLabel>
+            <div />
+            <MachineLabel>This machine</MachineLabel>
+
             <Controller
               control={form.control}
               name="donor_barcode"
               render={({ field, fieldState }) => (
-                <div className="flex-1">
+                <div>
                   <DonorBarcodeField
                     value={field.value}
                     onChange={(barcode) => {
@@ -168,35 +204,23 @@ function MachineTab({ recipientBarcode, onClose }: TabProps) {
               )}
             />
 
-            <Controller
-              control={form.control}
-              name="is_exchange"
-              render={({ field }) => (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon-sm"
-                  aria-label={field.value ? 'Switch to one-way transfer' : 'Switch to exchange'}
-                  onClick={() => field.onChange(!field.value)}
-                >
-                  <ExchangeToggleIcon isExchange={field.value} />
-                </Button>
-              )}
-            />
+            <PartFlowIndicator isExchange={isExchange} />
 
-            <div className="flex-1">
-              <div className="flex h-8 items-center rounded-lg border bg-transparent px-2.5 text-sm">
-                <span className="font-mono">{recipientBarcode}</span>
-              </div>
+            <div className="flex h-8 items-center rounded-lg border bg-muted px-2.5 text-sm">
+              <span className="font-mono">{recipientBarcode}</span>
             </div>
           </div>
+
           <Controller
             control={form.control}
             name="is_exchange"
             render={({ field }) => (
-              <p className="text-center text-xs text-muted-foreground mt-1">
-                {field.value ? 'Exchange' : 'One-way transfer'}
-              </p>
+              <Field orientation="horizontal" className="mt-1 w-fit items-center gap-2">
+                <Checkbox id="is_exchange" checked={field.value} onCheckedChange={field.onChange} />
+                <FieldLabel htmlFor="is_exchange" className="font-normal">
+                  Exchange — bad part goes back to the donor
+                </FieldLabel>
+              </Field>
             )}
           />
         </Field>
