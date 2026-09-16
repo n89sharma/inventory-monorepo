@@ -23,7 +23,11 @@ import { useInvoiceTypes } from '@/hooks/use-reference-data'
 import { useNavigationGuard } from '@/hooks/use-navigation-guard'
 import { formatTitleCase } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
-import { InvoiceFormSchema, type InvoiceForm } from '@/ui-types/invoice-form-types'
+import {
+  InvoiceFormSchema,
+  type InvoiceForm,
+  type InvoiceTypeFilter,
+} from '@/ui-types/invoice-form-types'
 import { getSelectedOrNull, getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { startOfDay } from 'date-fns'
@@ -36,13 +40,15 @@ import {
   type Control,
   type FieldErrors,
 } from 'react-hook-form'
-import { INVOICE_TYPE, type AssetSummary, type InvoiceType } from 'shared-types'
+import { INVOICE_TYPE, type AssetSummary, type InvoiceType, type OrgSummary } from 'shared-types'
 import { toast } from 'sonner'
 
 const TABLE_LABEL = 'Invoice assets'
 
 interface InvoiceFormPageProps {
   defaultAssets?: AssetSummary[]
+  defaultOrganization?: OrgSummary
+  defaultInvoiceType?: InvoiceTypeFilter
   pageConfig: {
     pageHeading: string
     saveButtonText: string
@@ -67,13 +73,15 @@ function validateInvoiceAsset(
 
 export function InvoiceFormPage({
   defaultAssets,
+  defaultOrganization,
+  defaultInvoiceType = INVOICE_TYPE.purchase,
   pageConfig,
   breadcrumbs,
   onValidSubmit,
 }: InvoiceFormPageProps): React.JSX.Element {
   const orgs = useOrgs()
   const invoiceTypes = useInvoiceTypes()
-  const purchaseType = invoiceTypes.find((t) => t.type === INVOICE_TYPE.purchase)
+  const initialInvoiceType = invoiceTypes.find((t) => t.type === defaultInvoiceType)
   const today = startOfDay(new Date())
 
   const form = useForm<InvoiceForm>({
@@ -82,8 +90,8 @@ export function InvoiceFormPage({
     defaultValues: {
       invoice_reference: '',
       invoice_date: startOfDay(new Date()),
-      organization: null,
-      invoice_type: purchaseType ? getSelectOption(purchaseType) : UNSELECTED,
+      organization: defaultOrganization ?? null,
+      invoice_type: initialInvoiceType ? getSelectOption(initialInvoiceType) : UNSELECTED,
       is_cleared: false,
       comment: '',
       assets: defaultAssets ?? [],

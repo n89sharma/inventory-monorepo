@@ -14,6 +14,7 @@ import { InlineCaution } from '@/components/shared/inline-warning'
 import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import type { CounterpartyWarning } from '@/lib/counterparty-mismatch'
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
+import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
@@ -64,6 +65,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   ) => ColumnDef<AssetSearchRow>[]
   counterpartyWarning?: CounterpartyWarning | null
   tableMeta?: TableMeta<AssetSearchRow>
+  getInvoicePrefill?: (entity: TEntity) => InvoicePrefill
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
@@ -96,6 +98,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   buildColumns,
   counterpartyWarning,
   tableMeta,
+  getInvoicePrefill,
   renderTitle,
   renderSummaryStrip,
   renderSubtitle,
@@ -264,6 +267,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               refreshKey={refreshKey}
               currentCollectionType={section}
               returnTo={`/${section}/${collectionId}`}
+              invoicePrefill={getInvoicePrefill?.(entity)}
               onBulkRemove={onBulkRemove}
               totalCount={filteredRowIds.length}
               hiddenCount={entity.assets.length - filteredRowIds.length}

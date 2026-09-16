@@ -15,7 +15,12 @@ import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
+import {
+  INVOICE_TYPE,
+  OrgSummarySchema,
+  type AssetSearchRow,
+  type PatchAssetPricing,
+} from 'shared-types'
 import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
 import { Button } from '../shadcn/button'
 import { CollectionDetailPage } from '../collections/collection-detail-page'
@@ -112,6 +117,10 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       historyCacheKey={`arrival-history:${arrivalNumber}`}
       historyFetcher={() => getArrivalHistory(arrivalNumber)}
       onBulkRemove={(assets) => mutations.bulkRemoveAssets(arrivalNumber, assets)}
+      getInvoicePrefill={(arrival) => ({
+        invoiceType: INVOICE_TYPE.purchase,
+        organization: OrgSummarySchema.parse(arrival.vendor),
+      })}
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
         if (!canEditArrival) return null
         const splitsEveryAsset = selectedAssets.length >= (detail.data?.assets.length ?? 0)

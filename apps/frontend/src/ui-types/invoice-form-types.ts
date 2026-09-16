@@ -7,6 +7,8 @@ import { SelectOptionSchema, isSelected, type SelectOption } from './select-opti
 
 export type InvoiceTypeFilter = typeof INVOICE_TYPE.purchase | typeof INVOICE_TYPE.sales
 
+export type InvoicePrefill = { invoiceType: InvoiceTypeFilter; organization: OrgSummary }
+
 export const ORGANIZATION_HEADER = {
   [INVOICE_TYPE.purchase]: 'Vendor',
   [INVOICE_TYPE.sales]: 'Customer',

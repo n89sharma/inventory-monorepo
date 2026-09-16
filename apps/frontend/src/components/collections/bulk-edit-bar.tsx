@@ -1,4 +1,5 @@
 import { useCan } from '@/hooks/use-can'
+import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { CaretDownIcon, TrashIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -83,6 +84,7 @@ type BulkEditBarProps = {
   refreshKey?: string
   currentCollectionType?: CollectionType
   returnTo?: string
+  invoicePrefill?: InvoicePrefill
   totalCount?: number
   hiddenCount?: number
   onSelectAll?: () => void
@@ -98,6 +100,7 @@ export function BulkEditBar({
   refreshKey,
   currentCollectionType,
   returnTo,
+  invoicePrefill,
   totalCount,
   hiddenCount,
   onSelectAll,
@@ -158,7 +161,7 @@ export function BulkEditBar({
   }
 
   function createNewCollection(route: string) {
-    navigate(route, { state: { preloadedAssets: selectedAssets, returnTo } })
+    navigate(route, { state: { preloadedAssets: selectedAssets, returnTo, invoicePrefill } })
   }
 
   return (

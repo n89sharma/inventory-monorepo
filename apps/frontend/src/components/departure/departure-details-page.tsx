@@ -17,6 +17,8 @@ import { formatDate } from '@/lib/formatters'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
+  INVOICE_TYPE,
+  OrgSummarySchema,
   OUTGOING_STATUS_LABELS,
   OutgoingStatusSchema,
   type AssetSearchRow,
@@ -83,6 +85,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
       buildColumns={buildColumns}
       counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
+      getInvoicePrefill={(departure) => ({
+        invoiceType: INVOICE_TYPE.sales,
+        organization: OrgSummarySchema.parse(departure.customer),
+      })}
       renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={(departure) => (
         <>
