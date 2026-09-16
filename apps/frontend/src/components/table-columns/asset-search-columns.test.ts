@@ -165,7 +165,7 @@ describe('asset-search report columns', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(
       'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Damaged,Damage Notes,Location,' +
-        'Country of Origin,Manufactured Year,Total Meter (K),Weight,Size,Days Held,Cassettes,Internal Finisher,' +
+        'Country of Origin,Manufactured Year,Total Meter (K),Weight (lbs),Size,Days Held,Cassettes,Internal Finisher,' +
         'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
         'Purchase Cost,Transport Cost,Transfer Cost,Processing Cost,Other Cost,Parts Cost,' +
@@ -180,7 +180,7 @@ describe('asset-search report columns', () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,NYC | Receiving,' +
-        'Japan,2020,12,"1,234 lbs",5,26,2,FIN-1,' +
+        'Japan,2020,12,1234,5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
         'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
         '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00","$1,466.00",' +
@@ -204,6 +204,19 @@ describe('asset-search report columns', () => {
     expect(meterText(900)).toBe('0.9')
     expect(meterText(0)).toBe('0')
     expect(meterText(null)).toBe('')
+  })
+
+  it('exports the weight as a plain number, with the unit moved to the CSV header', () => {
+    const weightColumn = ASSET_SEARCH_COLUMNS.find((c) => c.id === 'weight')
+    const weightText = (weight: number) => weightColumn?.text(makeRow({ weight }))
+    expect(weightColumn?.label).toBe('Weight')
+    expect(weightColumn?.csvHeader).toBe('Weight (lbs)')
+    expect(weightColumn?.cell?.(makeRow({ weight: 1234.6 }), { detailHref: noHref })).toBe(
+      '1,235 lbs',
+    )
+    expect(weightText(1234.6)).toBe('1234.6')
+    expect(weightText(1234)).toBe('1234')
+    expect(weightText(0)).toBe('0')
   })
 
   it('emits an empty field for every nullable column left null', () => {
@@ -252,7 +265,7 @@ describe('asset-search report columns', () => {
     const { data } = csvFor(nulled, liveColumnIds())
     expect(data).toBe(
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,,' +
-        ',,,"1,234 lbs",5,,,,' +
+        ',,,1234,5,,,,' +
         ',,,,,' +
         ',,,,,,,,' +
         ',,,,,,,,,,' +

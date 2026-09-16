@@ -319,7 +319,9 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Weight',
     section: 'detailed_specs',
     sortable: true,
-    text: (a) => formatWeight(a.weight),
+    csvHeader: 'Weight (lbs)',
+    cell: (a) => formatWeight(a.weight),
+    text: (a) => String(a.weight),
   },
   {
     id: 'size',
