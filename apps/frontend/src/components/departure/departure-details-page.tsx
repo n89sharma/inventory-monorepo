@@ -1,4 +1,6 @@
+import { departureCustomerWarning } from '@/components/departure/departure-customer-mismatch'
 import { DepartureSummaryStrip } from '@/components/departure/departure-summary-strip'
+import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { EditDepartureMetadataModal } from '@/components/departure/edit-departure-metadata-modal'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
@@ -12,7 +14,7 @@ import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useCan } from '@/hooks/use-can'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   OUTGOING_STATUS_LABELS,
@@ -39,6 +41,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
 
   const mutations = useDepartureMutations()
   const detail = useDepartureDetail(departureNumber)
+  const counterpartyWarning = useMemo(
+    () => (detail.data ? departureCustomerWarning(detail.data) : null),
+    [detail.data],
+  )
   const canCreateEditDeparture = useCan('create_update_departure')
   const canReturnToStock = useCan('return_to_stock')
   const can = useCan()
@@ -52,9 +58,10 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSearchRow) => string) =>
+    (assetHref: (asset: AssetSearchRow) => string, assetWarningOf: AssetWarningOf) =>
       createCollectionDetailColumns({
         getHref: assetHref,
+        assetWarningOf,
         can,
         priceEditorRegistry,
       }),
@@ -74,6 +81,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
       historyFetcher={() => getDepartureHistory(departureNumber)}
       onFlushPending={mutations.flushPending}
       buildColumns={buildColumns}
+      counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
       renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={(departure) => (

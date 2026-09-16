@@ -10,7 +10,7 @@ import {
   UpdateDepartureMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
-import { getAssetsForDepartures } from '../../generated/prisma/sql.js'
+import { getAssetsForDepartures, getInvoicesForDeparture } from '../../generated/prisma/sql.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
@@ -35,7 +35,7 @@ export async function getDeparture(
   departureNumber: string,
   permissions: ReadonlySet<Permission>,
 ): Promise<DepartureDetail> {
-  const [departure, assets] = await Promise.all([
+  const [departure, assets, invoices] = await Promise.all([
     prisma.departure.findUnique({
       where: { departure_number: departureNumber },
       include: {
@@ -47,6 +47,7 @@ export async function getDeparture(
       },
     }),
     prisma.$queryRawTyped(getAssetsForDepartures(departureNumber)),
+    prisma.$queryRawTyped(getInvoicesForDeparture(departureNumber)),
   ])
   if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
   return {
@@ -59,6 +60,7 @@ export async function getDeparture(
     created_by: departure.created_by?.name,
     salesperson: departure.sales_representative && mapUser(departure.sales_representative),
     assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
+    invoices,
   }
 }
 

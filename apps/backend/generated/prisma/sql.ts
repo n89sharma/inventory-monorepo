@@ -45,11 +45,17 @@ export * from "./sql/getDepartedAssets.js"
 
 export * from "./sql/getDepartures.js"
 
+export * from "./sql/getDeparturesForInvoice.js"
+
 export * from "./sql/getHeldReport.js"
 
 export * from "./sql/getHolds.js"
 
 export * from "./sql/getInStockSummary.js"
+
+export * from "./sql/getInvoicesForArrival.js"
+
+export * from "./sql/getInvoicesForDeparture.js"
 
 export * from "./sql/getLocations.js"
 

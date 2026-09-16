@@ -40,8 +40,17 @@ export const InvoiceArrivalSchema = z.object({
   arrival_number: z.string(),
   transporter: z.string(),
   destination_code: z.string(),
+  vendor_id: z.number().int(),
+  vendor: z.string(),
 })
 export type InvoiceArrival = z.infer<typeof InvoiceArrivalSchema>
+
+export const InvoiceDepartureSchema = z.object({
+  departure_number: z.string(),
+  customer_id: z.number().int(),
+  customer: z.string(),
+})
+export type InvoiceDeparture = z.infer<typeof InvoiceDepartureSchema>
 
 // GET /invoices/:invoiceNumber
 export const InvoiceDetailSchema = z.object({
@@ -56,6 +65,7 @@ export const InvoiceDetailSchema = z.object({
   customer: OrgDetailSchema,
   assets: z.array(AssetSearchRowSchema),
   arrivals: z.array(InvoiceArrivalSchema),
+  departures: z.array(InvoiceDepartureSchema),
 })
 export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>
 

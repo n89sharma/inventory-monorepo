@@ -200,10 +200,37 @@ describe('invoiceService', () => {
     for (const arrival of invoice.arrivals) {
       expect(arrival.transporter).toBe(refs.transporter.name)
       expect(arrival.destination_code).toBe(refs.warehouse.city_code)
+      expect(arrival.vendor_id).toBe(refs.vendor.id)
+      expect(arrival.vendor).toBe(refs.vendor.name)
       expect(arrival.arrival_number).toMatch(/^A-/)
     }
     const arrivalNumbers = invoice.arrivals.map((a) => a.arrival_number)
     expect(new Set(arrivalNumbers).size).toBe(2)
+  })
+
+  it('returns the distinct departures of the invoiced assets with their customer', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, assets, refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(
+        refs,
+        assets.map((asset) => ({ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD })),
+      ),
+      refs.userId,
+    )
+
+    const invoice = await getInvoice(invoiceNumber, ALL_PRICE_PERMISSIONS)
+
+    expect(invoice.departures).toEqual([
+      {
+        departure_number: departureNumber,
+        customer_id: refs.customer.id,
+        customer: refs.customer.name,
+      },
+    ])
   })
 
   it('numbers the invoice I-<7-digit sequence>', async () => {

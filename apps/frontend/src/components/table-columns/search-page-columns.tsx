@@ -11,6 +11,7 @@ import {
   canViewColumn,
   type AssetCellContext,
   type AssetSearchColumn,
+  type AssetWarningOf,
 } from './asset-search-columns'
 import { sortableHeader } from './column-primitives'
 
@@ -66,8 +67,9 @@ export function createSearchPageColumns(
   detailHref: (row: AssetSearchRow) => string,
   can: (permission: Permission) => boolean,
   priceEditorRegistry?: PriceCellEditorRegistry,
+  assetWarningOf?: AssetWarningOf,
 ): ColumnDef<AssetSearchRow>[] {
-  const context = { detailHref, priceEditorRegistry }
+  const context = { detailHref, priceEditorRegistry, assetWarningOf }
   return ASSET_SEARCH_COLUMNS.filter((column) => canViewColumn(column, can)).map((column) =>
     toColumnDef(column, context),
   )

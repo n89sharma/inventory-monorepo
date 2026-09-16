@@ -14,7 +14,11 @@ import {
 import type { Prisma } from '../../generated/prisma/client.js'
 import { AssetCreateWithoutArrivalInput, AssetDefaultArgs } from '../../generated/prisma/models.js'
 import { AssetGetPayload } from '../../generated/prisma/models/Asset.js'
-import { getAssetByBarcode, getAssetsForArrival } from '../../generated/prisma/sql.js'
+import {
+  getAssetByBarcode,
+  getAssetsForArrival,
+  getInvoicesForArrival,
+} from '../../generated/prisma/sql.js'
 import { getModelSummary } from './modelService.js'
 import { damageColumns } from '../lib/asset-damage.js'
 import { validateComponentBrands } from '../lib/asset-component-validation.js'
@@ -95,12 +99,13 @@ export async function getArrival(
   arrivalNumber: string,
   permissions: ReadonlySet<Permission>,
 ): Promise<ArrivalDetail> {
-  const [arrival, assets] = await Promise.all([
+  const [arrival, assets, invoices] = await Promise.all([
     prisma.arrival.findUnique({
       where: { arrival_number: arrivalNumber },
       include: { origin: true, destination: true, transporter: true, created_by: true },
     }),
     prisma.$queryRawTyped(getAssetsForArrival(arrivalNumber)),
+    prisma.$queryRawTyped(getInvoicesForArrival(arrivalNumber)),
   ])
   if (!arrival) throw new NotFoundError(`Arrival ${arrivalNumber} not found`)
   return {
@@ -112,6 +117,7 @@ export async function getArrival(
     created_at: arrival.created_at,
     created_by: arrival.created_by.name,
     assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
+    invoices,
   }
 }
 

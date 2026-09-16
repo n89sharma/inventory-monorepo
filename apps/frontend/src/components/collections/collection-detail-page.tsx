@@ -9,11 +9,14 @@ import {
   DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION,
   type CollectionSection,
 } from '@/components/table-columns/collection-detail-columns'
+import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
+import { InlineCaution } from '@/components/shared/inline-warning'
 import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
+import type { CounterpartyWarning } from '@/lib/counterparty-mismatch'
 import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
 import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import {
   searchRowToAssetSummary,
   type AssetSearchRow,
@@ -32,6 +35,8 @@ const TABLE_LABEL = 'Collection assets'
 const COPIER_ASSET_TYPE = 'COPIER'
 
 const COPIERS_ONLY_LABEL = 'View copier only'
+
+const COUNTERPARTY_MISMATCH_ROW_CLASS = 'data-row-warning print:[--row-bg:var(--color-background)]'
 
 const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 const getAssetRowId = (asset: AssetSearchRow) => asset.barcode
@@ -53,7 +58,11 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   historyFetcher: () => Promise<CollectionHistory>
   onBulkRemove?: (assets: AssetSummary[]) => void
   onFlushPending?: (collectionId: string) => void
-  buildColumns: (assetHref: (asset: AssetSearchRow) => string) => ColumnDef<AssetSearchRow>[]
+  buildColumns: (
+    assetHref: (asset: AssetSearchRow) => string,
+    assetWarningOf: AssetWarningOf,
+  ) => ColumnDef<AssetSearchRow>[]
+  counterpartyWarning?: CounterpartyWarning | null
   tableMeta?: TableMeta<AssetSearchRow>
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
@@ -85,6 +94,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   onBulkRemove,
   onFlushPending,
   buildColumns,
+  counterpartyWarning,
   tableMeta,
   renderTitle,
   renderSummaryStrip,
@@ -116,7 +126,21 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
       collectionAssetHref(section, collectionId, asset.barcode, searchParams),
     [section, collectionId, searchParams],
   )
-  const columns = useMemo(() => buildColumns(assetHref), [buildColumns, assetHref])
+  const assetWarningOf = useCallback(
+    (asset: AssetSearchRow) => counterpartyWarning?.assetWarnings.get(asset.barcode),
+    [counterpartyWarning],
+  )
+  const getRowClassName = useCallback(
+    (asset: AssetSearchRow) =>
+      counterpartyWarning?.assetWarnings.has(asset.barcode)
+        ? COUNTERPARTY_MISMATCH_ROW_CLASS
+        : undefined,
+    [counterpartyWarning],
+  )
+  const columns = useMemo(
+    () => buildColumns(assetHref, assetWarningOf),
+    [buildColumns, assetHref, assetWarningOf],
+  )
 
   const assets = detail.data?.assets
   const visibleAssets = useMemo(() => {
@@ -183,6 +207,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
       />
       <PageSection className="flex flex-col gap-4">
         {renderSummaryStrip(entity)}
+        {counterpartyWarning ? <CounterpartyMismatchCallout warning={counterpartyWarning} /> : null}
         {renderMetadataModal(entity, {
           open: isMetadataModalOpen,
           onOpenChange: setIsMetadataModalOpen,
@@ -250,6 +275,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         }}
         onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
         getRowHref={assetHref}
+        getRowClassName={getRowClassName}
         getRowId={getAssetRowId}
         defaultSort={DEFAULT_ASSET_SORT}
         pinLeft={PINNED_ASSET_COLUMN_IDS}
@@ -260,6 +286,20 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         meta={tableMeta}
       />
     </GridPageContent>
+  )
+}
+
+function CounterpartyMismatchCallout({
+  warning,
+}: {
+  warning: CounterpartyWarning
+}): React.JSX.Element {
+  return (
+    <div className="print:hidden">
+      <InlineCaution>
+        <span className="font-medium">{warning.title}:</span> {warning.summary}
+      </InlineCaution>
+    </div>
   )
 }
 

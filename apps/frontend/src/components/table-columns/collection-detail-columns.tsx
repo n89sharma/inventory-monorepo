@@ -3,7 +3,7 @@ import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AssetSearchRow, Permission } from 'shared-types'
-import type { AssetColumnId } from './asset-search-columns'
+import type { AssetColumnId, AssetWarningOf } from './asset-search-columns'
 import { createSelectColumn } from './column-primitives'
 import { createSearchPageColumns } from './search-page-columns'
 
@@ -71,6 +71,7 @@ export interface CollectionDetailColumnOptions {
   onEdit?: (asset: AssetSearchRow) => void
   disabledRowId?: number | null
   priceEditorRegistry?: PriceCellEditorRegistry
+  assetWarningOf?: AssetWarningOf
 }
 
 export function createCollectionDetailColumns({
@@ -79,10 +80,11 @@ export function createCollectionDetailColumns({
   onEdit,
   disabledRowId,
   priceEditorRegistry,
+  assetWarningOf,
 }: CollectionDetailColumnOptions): ColumnDef<AssetSearchRow>[] {
   return [
     createSelectColumn<AssetSearchRow>(),
-    ...createSearchPageColumns(getHref, can, priceEditorRegistry),
+    ...createSearchPageColumns(getHref, can, priceEditorRegistry, assetWarningOf),
     ...actionColumns(onEdit, disabledRowId),
   ]
 }

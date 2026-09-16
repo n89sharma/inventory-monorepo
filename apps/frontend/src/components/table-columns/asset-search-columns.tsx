@@ -2,6 +2,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/too
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
 import { StatusBadge } from '@/components/shared/status-badge'
+import { WarningIcon } from '@phosphor-icons/react'
 import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import {
   formatDamaged,
@@ -71,10 +72,13 @@ export type ColumnSectionId =
 
 // What the barcode cell needs from the page rendering it: every list links an asset
 // back to its own section, so the href cannot be static.
+export type AssetWarningOf = (row: AssetSearchRow) => string | undefined
+
 export type AssetCellContext = {
   detailHref: (row: AssetSearchRow) => string
   // Supplied only when the viewer holds edit_prices; absent renders read-only cost text.
   priceEditorRegistry?: PriceCellEditorRegistry
+  assetWarningOf?: AssetWarningOf
 }
 
 export type AssetSearchColumn = {
@@ -134,6 +138,34 @@ function StatusCell({ asset }: { asset: AssetSearchRow }): ReactNode {
   )
 }
 
+function BarcodeCell({
+  barcode,
+  href,
+  warning,
+}: {
+  barcode: string
+  href: string
+  warning: string | undefined
+}): ReactNode {
+  const link = <IdLink to={href}>{barcode}</IdLink>
+  if (!warning) return link
+  return (
+    <span className="inline-flex items-center gap-1">
+      {link}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" aria-label={warning} className={ASSET_WARNING_ICON_CLASS}>
+            <WarningIcon aria-hidden="true" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{warning}</TooltipContent>
+      </Tooltip>
+    </span>
+  )
+}
+
+const ASSET_WARNING_ICON_CLASS = 'text-amber-600 dark:text-amber-400 print:hidden'
+
 function CollectionNumberCell({
   collectionNumber,
   detailHref,
@@ -185,7 +217,9 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     sortable: true,
     size: ID_COLUMN_SIZE,
     text: (a) => a.barcode,
-    cell: (a, { detailHref }) => <IdLink to={detailHref(a)}>{a.barcode}</IdLink>,
+    cell: (a, { detailHref, assetWarningOf }) => (
+      <BarcodeCell barcode={a.barcode} href={detailHref(a)} warning={assetWarningOf?.(a)} />
+    ),
   },
   {
     id: 'brand',

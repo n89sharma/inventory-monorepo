@@ -19,6 +19,7 @@ import {
   seedArrivalTestData,
   seedAssetCost,
   SEEDED_ASSET_COST,
+  TEST_INVOICE_REFERENCE,
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -89,6 +90,32 @@ describe('departureService', () => {
 
     const departure = await getDeparture(departureNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(departure.assets[0])).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('returns the sales invoices of its assets with the invoiced customer', async () => {
+    const [invoiced, uninvoiced] = await createArrivedAssets(refs, 2)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [invoiced], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: invoiced.id, outgoing_status: OUTGOING_STATUS.SOLD },
+        { id: uninvoiced.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    const departure = await getDeparture(departureNumber, ALL_PRICE_PERMISSIONS)
+
+    expect(departure.invoices).toEqual([
+      {
+        invoice_number: invoiceNumber,
+        invoice_reference: TEST_INVOICE_REFERENCE,
+        customer_id: refs.customer.id,
+        customer: refs.customer.name,
+      },
+    ])
   })
 
   it('applies each asset its own outgoing status on creation', async () => {

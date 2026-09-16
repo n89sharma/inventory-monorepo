@@ -11,6 +11,7 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import {
   getArrivalsForInvoice,
   getAssetsForInvoice,
+  getDeparturesForInvoice,
   getPurchaseInvoices as getPurchaseInvoicesDb,
   getSalesInvoices as getSalesInvoicesDb,
 } from '../../generated/prisma/sql.js'
@@ -313,7 +314,7 @@ export async function getInvoice(
   invoiceNumber: string,
   permissions: ReadonlySet<Permission>,
 ): Promise<InvoiceDetail> {
-  const [invoice, assets, arrivals] = await Promise.all([
+  const [invoice, assets, arrivals, departures] = await Promise.all([
     prisma.invoice.findUnique({
       where: { invoice_number: invoiceNumber },
       include: {
@@ -324,6 +325,7 @@ export async function getInvoice(
     }),
     prisma.$queryRawTyped(getAssetsForInvoice(invoiceNumber)),
     prisma.$queryRawTyped(getArrivalsForInvoice(invoiceNumber)),
+    prisma.$queryRawTyped(getDeparturesForInvoice(invoiceNumber)),
   ])
   if (!invoice) throw new NotFoundError(`Invoice ${invoiceNumber} not found`)
   return {
@@ -346,5 +348,6 @@ export async function getInvoice(
     customer: invoice.organization,
     assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
     arrivals,
+    departures,
   }
 }

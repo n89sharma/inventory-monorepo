@@ -1,9 +1,11 @@
-import { ASSET_STATUS, type SplitArrival } from 'shared-types'
+import { ASSET_STATUS, searchRowToAssetSummary, type SplitArrival } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   buildCreateArrivalInput,
+  buildCreateInvoiceInput,
   cleanupTransactionalData,
+  TEST_INVOICE_REFERENCE,
   assetCostOf,
   ALL_PRICE_PERMISSIONS,
   NO_PERMISSIONS,
@@ -23,6 +25,7 @@ import {
   splitArrival,
 } from './arrivalService.js'
 import { deleteAsset } from './assetDeleteService.js'
+import { createInvoice } from './invoiceService.js'
 
 async function getArrivalId(arrivalNumber: string): Promise<number> {
   const arrival = await prisma.arrival.findUniqueOrThrow({
@@ -317,6 +320,28 @@ describe('getArrival', () => {
 
     const arrival = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
     expect(assetCostOf(arrival.assets[0])).toEqual(REDACTED_ASSET_COST)
+  })
+
+  it('returns the purchase invoices of its assets with the invoiced vendor', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs, 3), refs.userId)
+    const { assets } = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
+    const [first, second] = assets.map(searchRowToAssetSummary)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [first, second], refs.invoiceTypePurchaseId),
+      refs.userId,
+    )
+
+    const arrival = await getArrival(arrivalNumber, ALL_PRICE_PERMISSIONS)
+
+    // two invoiced assets collapse to one invoice; the uninvoiced third adds nothing
+    expect(arrival.invoices).toEqual([
+      {
+        invoice_number: invoiceNumber,
+        invoice_reference: TEST_INVOICE_REFERENCE,
+        vendor_id: refs.customer.id,
+        vendor: refs.customer.name,
+      },
+    ])
   })
 })
 

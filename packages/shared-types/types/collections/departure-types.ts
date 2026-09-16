@@ -15,6 +15,14 @@ export const DepartureSummarySchema = CollectionSummarySchema.extend({
 })
 export type DepartureSummary = z.infer<typeof DepartureSummarySchema>
 
+export const DepartureInvoiceSchema = z.object({
+  invoice_number: z.string(),
+  invoice_reference: z.string(),
+  customer_id: z.number().int(),
+  customer: z.string(),
+})
+export type DepartureInvoice = z.infer<typeof DepartureInvoiceSchema>
+
 // GET /departures/:departureNumber
 export const DepartureDetailSchema = z.object({
   departure_number: z.string(),
@@ -26,6 +34,7 @@ export const DepartureDetailSchema = z.object({
   created_by: z.string().optional(),
   salesperson: UserSchema.nullable(),
   assets: z.array(AssetSearchRowSchema),
+  invoices: z.array(DepartureInvoiceSchema),
 })
 export type DepartureDetail = z.infer<typeof DepartureDetailSchema>
 

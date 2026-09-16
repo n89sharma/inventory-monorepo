@@ -1,4 +1,6 @@
 import { ArrivalSummaryStrip } from '@/components/arrivals/arrival-summary-strip'
+import { arrivalVendorWarning } from '@/components/arrivals/arrival-vendor-mismatch'
+import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { getArrivalHistory } from '@/data/api/arrival-api'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
@@ -11,7 +13,7 @@ import type { PersistedAsset } from '@/hooks/use-serial-number-check'
 import { formatDate } from '@/lib/formatters'
 import { PlusIcon } from '@phosphor-icons/react'
 import type { AssetForm } from '@/ui-types/arrival-form-types'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
 import { createCollectionDetailColumns } from '../table-columns/collection-detail-columns'
@@ -32,6 +34,10 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const canEditArrival = useCan('create_update_arrival')
   const can = useCan()
   const detail = useArrivalDetail(arrivalNumber)
+  const counterpartyWarning = useMemo(
+    () => (detail.data ? arrivalVendorWarning(detail.data) : null),
+    [detail.data],
+  )
   const components = useAssetComponents()
 
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
@@ -76,9 +82,10 @@ export function ArrivalDetailsPage(): React.JSX.Element {
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSearchRow) => string) =>
+    (assetHref: (asset: AssetSearchRow) => string, assetWarningOf: AssetWarningOf) =>
       createCollectionDetailColumns({
         getHref: assetHref,
+        assetWarningOf,
         can,
         onEdit: canEditArrival
           ? (asset) =>
@@ -146,6 +153,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       onFlushPending={mutations.flushPending}
       onDelete={handleDelete}
       buildColumns={buildColumns}
+      counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
       renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
       renderSubtitle={(arrival) => (

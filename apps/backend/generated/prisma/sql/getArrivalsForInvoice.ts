@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param text
  */
-export const getArrivalsForInvoice = $runtime.makeTypedQueryFactory("select distinct\nar.arrival_number as arrival_number,\nt.\"name\" as transporter,\nw.city_code as destination_code\nfrom \"Invoice\" i\njoin \"Asset\" a on (i.id = a.purchase_invoice_id or i.id = a.sales_invoice_id)\njoin \"Arrival\" ar on ar.id = a.arrival_id\njoin \"Organization\" t on t.id = ar.transporter_id\njoin \"Warehouse\" w on w.id = ar.destination_id\nwhere i.invoice_number = $1\norder by ar.arrival_number") as (text: string) => $runtime.TypedSql<getArrivalsForInvoice.Parameters, getArrivalsForInvoice.Result>
+export const getArrivalsForInvoice = $runtime.makeTypedQueryFactory("select distinct\nar.arrival_number as arrival_number,\nt.\"name\" as transporter,\nw.city_code as destination_code,\nro.id as vendor_id,\nro.\"name\" as vendor\nfrom \"Invoice\" i\njoin \"Asset\" a on (i.id = a.purchase_invoice_id or i.id = a.sales_invoice_id)\njoin \"Arrival\" ar on ar.id = a.arrival_id\njoin \"Organization\" t on t.id = ar.transporter_id\njoin \"Organization\" ro on ro.id = ar.origin_id\njoin \"Warehouse\" w on w.id = ar.destination_id\nwhere i.invoice_number = $1\norder by ar.arrival_number") as (text: string) => $runtime.TypedSql<getArrivalsForInvoice.Parameters, getArrivalsForInvoice.Result>
 
 export namespace getArrivalsForInvoice {
   export type Parameters = [text: string]
@@ -16,5 +16,7 @@ export namespace getArrivalsForInvoice {
     arrival_number: string
     transporter: string
     destination_code: string
+    vendor_id: number
+    vendor: string
   }
 }

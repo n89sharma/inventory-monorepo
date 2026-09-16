@@ -1,8 +1,10 @@
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { EditInvoiceMetadataModal } from '@/components/invoice/edit-invoice-metadata-modal'
+import { invoiceCounterpartyWarning } from '@/components/invoice/invoice-counterparty-mismatch'
 import { InvoiceSummaryStrip } from '@/components/invoice/invoice-summary-strip'
 import { SummaryField } from '@/components/shared/cards/summary-field'
+import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
 import { useCan } from '@/hooks/use-can'
@@ -12,7 +14,7 @@ import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate, formatTitleCase } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { INVOICE_TYPE, type AssetSearchRow, type PatchAssetPricing } from 'shared-types'
 
@@ -22,6 +24,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
 
   const mutations = useInvoiceMutations()
   const detail = useInvoiceDetail(invoiceNumber)
+  const counterpartyWarning = useMemo(
+    () => (detail.data ? invoiceCounterpartyWarning(detail.data) : null),
+    [detail.data],
+  )
   const canCreateEditInvoice = useCan('create_update_invoice')
   const can = useCan()
   const savePrice = useCallback(
@@ -38,9 +44,10 @@ export function InvoiceDetailsPage(): React.JSX.Element {
   )
 
   const buildColumns = useCallback(
-    (assetHref: (asset: AssetSearchRow) => string) =>
+    (assetHref: (asset: AssetSearchRow) => string, assetWarningOf: AssetWarningOf) =>
       createCollectionDetailColumns({
         getHref: assetHref,
+        assetWarningOf,
         can,
         priceEditorRegistry,
       }),
@@ -62,6 +69,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
       onFlushPending={mutations.flushPending}
       onDelete={handleDelete}
       buildColumns={buildColumns}
+      counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
       renderTitle={(invoice) => ({
         title: `Invoice ${invoice.invoice_reference}`,
