@@ -1,5 +1,5 @@
-import { DATE_PARAM_FORMAT } from '@/lib/date-param'
-import { format, isValid, parseISO } from 'date-fns'
+import { formatDateParam } from '@/lib/date-param'
+import { isValid, parseISO } from 'date-fns'
 import {
   createParser,
   parseAsArrayOf,
@@ -33,7 +33,7 @@ const parseAsDateOnly = createParser<Date>({
     const parsed = parseISO(value)
     return isValid(parsed) ? parsed : null
   },
-  serialize: (value) => format(value, DATE_PARAM_FORMAT),
+  serialize: formatDateParam,
   eq: (a, b) => a.getTime() === b.getTime(),
 })
 

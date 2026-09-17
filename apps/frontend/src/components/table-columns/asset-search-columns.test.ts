@@ -182,10 +182,10 @@ describe('asset-search report columns', () => {
       'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,NYC | Receiving,' +
         'Japan,2020,12,1234,5,26,2,FIN-1,' +
         '"Toner, Drum",80,70,60,50,' +
-        'BIG_VENDOR,A-260705-001,TOR,"July 05, 2026",RETAIL_CO,Jane Smith,D-260710-001,"July 10, 2026",' +
+        'BIG_VENDOR,A-260705-001,TOR,"Jul 5, 2026",RETAIL_CO,Jane Smith,D-260710-001,"Jul 10, 2026",' +
         '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00","$1,466.00",' +
-        '48.9%,H-1,Alice,Bob,ACME_CORP,"July 01, 2026",' +
-        '"July 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
+        '48.9%,H-1,Alice,Bob,ACME_CORP,"Jul 1, 2026",' +
+        '"Jul 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
     )
   })
 
@@ -270,7 +270,7 @@ describe('asset-search report columns', () => {
         ',,,,,,,,' +
         ',,,,,,,,,,' +
         ',,,,,' +
-        '"July 15, 2026",12,,,,',
+        '"Jul 15, 2026",12,,,,',
     )
   })
 
@@ -357,7 +357,7 @@ describe('asset search column sorting', () => {
   })
 
   it('orders date columns chronologically, not by their formatted month name', () => {
-    // Formatted as "March 05, 2026", "April 10, 2026", "July 15, 2026": as text April leads.
+    // Formatted as "March 05, 2026", "April 10, 2026", "Jul 15, 2026": as text April leads.
     const rows = [
       makeRow({ barcode: 'JULY', created_at: new Date(2026, 6, 15) }),
       makeRow({ barcode: 'MARCH', created_at: new Date(2026, 2, 5) }),

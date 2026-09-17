@@ -7,6 +7,25 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import sonarjs from 'eslint-plugin-sonarjs'
 import tseslint from 'typescript-eslint'
 
+const DATE_FNS_FORMATTERS = [
+  'format',
+  'formatDate',
+  'formatISO',
+  'formatISO9075',
+  'formatRFC3339',
+  'formatRFC7231',
+  'formatRelative',
+  'formatDistance',
+  'formatDistanceStrict',
+  'formatDistanceToNow',
+  'formatDistanceToNowStrict',
+  'intlFormat',
+  'intlFormatDistance',
+  'lightFormat',
+]
+const DATE_FORMATTING_MESSAGE =
+  'Format dates through src/lib/formatters.ts (display, filenames) or src/lib/date-param.ts (URL and request params) so every date renders the same way.'
+
 export default tseslint.config(
   { ignores: ['dist', 'src/components/shadcn/**'] },
   {
@@ -33,6 +52,29 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'import-x/no-cycle': ['error', { ignoreExternal: true }],
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'date-fns',
+              importNames: DATE_FNS_FORMATTERS,
+              message: DATE_FORMATTING_MESSAGE,
+            },
+          ],
+          patterns: [
+            {
+              group: DATE_FNS_FORMATTERS.map((name) => `date-fns/${name}`),
+              message: DATE_FORMATTING_MESSAGE,
+            },
+          ],
+        },
+      ],
+      'no-restricted-properties': [
+        'error',
+        { property: 'toLocaleDateString', message: DATE_FORMATTING_MESSAGE },
+        { property: 'toLocaleTimeString', message: DATE_FORMATTING_MESSAGE },
+      ],
       'no-restricted-syntax': [
         'error',
         {
@@ -62,6 +104,12 @@ export default tseslint.config(
     files: ['src/components/table-columns/**', 'src/components/**/*-table-columns.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    files: ['src/lib/formatters.ts', 'src/lib/date-param.ts'],
+    rules: {
+      'no-restricted-imports': 'off',
     },
   },
   {

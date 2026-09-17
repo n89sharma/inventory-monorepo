@@ -5,6 +5,9 @@ const BIN_ZONE = 'BIN'
 const THOUSAND = 1000
 const THOUSANDS_FRACTION_DIGITS = 1
 const IN_TRANSIT_LOCATION_LABEL = 'In transit'
+const DATE_FORMAT = 'MMM d, yyyy'
+const MONTH_YEAR_FORMAT = 'MMM yyyy'
+const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 
 export function formatLocation(location: AssetLocationDetails | null, isInTransit = false): string {
   if (isInTransit) return IN_TRANSIT_LOCATION_LABEL
@@ -64,12 +67,20 @@ export function formatTitleCase(str: string): string {
 
 export function formatDateWithTime(rawDate: Date | null): string {
   if (rawDate === null) return ''
-  return format(rawDate, 'MMMM dd, yyyy, h:mm a')
+  return format(rawDate, `${DATE_FORMAT}, h:mm a`)
 }
 
 export function formatDate(rawDate: Date | null): string {
   if (rawDate === null) return ''
-  return format(rawDate, 'MMMM dd, yyyy')
+  return format(rawDate, DATE_FORMAT)
+}
+
+export function formatMonthYear(rawDate: Date): string {
+  return format(rawDate, MONTH_YEAR_FORMAT)
+}
+
+export function formatFilenameDate(rawDate: Date): string {
+  return format(rawDate, FILENAME_DATE_FORMAT)
 }
 
 export function formatHistoryTimestamp(changedOn: Date | string): string {
@@ -90,7 +101,7 @@ export function formatHistoryTimestamp(changedOn: Date | string): string {
   if (diffMinutes < 2880) {
     return 'yesterday'
   }
-  return format(date, 'd MMM, yyyy')
+  return formatDate(date)
 }
 
 // Damage is tri-state: an asset that predates the column has never been inspected, and reads as

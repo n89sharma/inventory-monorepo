@@ -24,12 +24,12 @@ import {
   type PriceHistoryRange,
 } from '@/lib/filters/hooks'
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
-import { formatUSD } from '@/lib/formatters'
+import { formatDate, formatMonthYear, formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-price-history-summary'
 import { searchListAssetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
-import { format, subMonths } from 'date-fns'
+import { subMonths } from 'date-fns'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -40,14 +40,12 @@ const TABLE_LABEL = 'Model price history'
 const EMPTY_SALES: ModelPriceHistoryRow[] = []
 const RANGE_OPTIONS = [6, 12] as const satisfies readonly PriceHistoryRange[]
 const NO_MEDIAN = '—'
-const MONTH_YEAR_FORMAT = 'MMM yyyy'
-const SALE_DATE_FORMAT = 'MMMM d, yyyy'
 
 const SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true }
 
 function formatSaleSummary(sale: ModelPriceHistoryRow): string {
-  return `for $${formatUSD(sale.sale_price)} on ${format(sale.departed_at, SALE_DATE_FORMAT)}`
+  return `for $${formatUSD(sale.sale_price)} on ${formatDate(sale.departed_at)}`
 }
 
 function formatSalesCount(count: number): string {
@@ -106,8 +104,8 @@ function RangeSentence({
   range: PriceHistoryRange
 }): React.JSX.Element {
   const now = new Date()
-  const from = format(subMonths(now, range), MONTH_YEAR_FORMAT)
-  const to = format(now, MONTH_YEAR_FORMAT)
+  const from = formatMonthYear(subMonths(now, range))
+  const to = formatMonthYear(now)
   return (
     <p className="text-sm text-muted-foreground">
       Data from {formatSalesCount(count)} in {from} to {to} shown.

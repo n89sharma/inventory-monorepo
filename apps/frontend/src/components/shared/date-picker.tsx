@@ -9,7 +9,7 @@ import {
   UNSELECTED,
   type SelectOption,
 } from '@/ui-types/select-option-types'
-import { format } from 'date-fns'
+import { formatDate } from '@/lib/formatters'
 import { useState } from 'react'
 import type { Matcher } from 'react-day-picker'
 import { useController, type Control, type FieldValues, type Path } from 'react-hook-form'
@@ -36,7 +36,7 @@ export function DatePickerFieldInline({
   endMonth,
 }: DatePickerFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
-  const triggerLabel = isSelected(date) ? `${label}: ${format(date.selected, 'PPP')}` : label
+  const triggerLabel = isSelected(date) ? `${label}: ${formatDate(date.selected)}` : label
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

@@ -18,12 +18,12 @@ import { useCollectionDateRange, useInvoiceTypeParam } from '@/lib/filters/hooks
 import { preloadInvoiceDetail, useInvoicesList } from '@/hooks/use-invoice'
 import { toCsv } from '@/lib/csv'
 import { downloadFile } from '@/lib/download-file'
+import { formatFilenameDate } from '@/lib/formatters'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import { getSelectedOrNull } from '@/ui-types/select-option-types'
 import { ORGANIZATION_HEADER, type InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import { collectionDetailHref } from '@/ui-types/navigation-context'
 import { PlusIcon } from '@phosphor-icons/react'
-import { format } from 'date-fns'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -31,7 +31,6 @@ import { toast } from 'sonner'
 import { INVOICE_TYPE, type InvoiceSummary } from 'shared-types'
 
 const CSV_MIME_TYPE = 'text/csv'
-const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 
 export function InvoicesSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -145,7 +144,7 @@ function exportFilename(
 ): string {
   const name = INVOICE_EXPORT_NAME[invoiceType]
   if (fromDate === null || toDate === null) return `${name}.csv`
-  return `${name}-${format(fromDate, FILENAME_DATE_FORMAT)}-${format(toDate, FILENAME_DATE_FORMAT)}.csv`
+  return `${name}-${formatFilenameDate(fromDate)}-${formatFilenameDate(toDate)}.csv`
 }
 
 const INVOICE_PAGE_TITLE = {

@@ -15,18 +15,17 @@ import { useCan } from '@/hooks/use-can'
 import { preloadStorePartDetail, useStorePartsList } from '@/hooks/use-store-part'
 import { toCsv } from '@/lib/csv'
 import { downloadFile } from '@/lib/download-file'
+import { formatFilenameDate } from '@/lib/formatters'
 import { useStoreSearchParam, useStoreWarehousesParam } from '@/lib/filters/hooks'
 import { rankMatches } from '@/lib/rank-matches'
 import { buildStorePartPath } from '@/lib/filters/serializers'
 import { waitForNextPaint } from '@/lib/wait-for-next-paint'
 import { PlusIcon } from '@phosphor-icons/react'
-import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import type { StorePart, StorePartSummary, Warehouse } from 'shared-types'
 
 const CSV_MIME_TYPE = 'text/csv'
-const FILENAME_DATE_FORMAT = 'yyyyMMdd'
 const ALL_WAREHOUSES_LABEL = 'all'
 
 function storePartSearchText(row: StorePartSummary): string {
@@ -42,7 +41,7 @@ function storePartHref(row: StorePartSummary): string {
 function storeExportFilename(warehouses: Warehouse[], exportedAt: Date): string {
   const scope =
     warehouses.length > 0 ? warehouses.map((w) => w.city_code).join('-') : ALL_WAREHOUSES_LABEL
-  return `store-${scope}-${format(exportedAt, FILENAME_DATE_FORMAT)}.csv`
+  return `store-${scope}-${formatFilenameDate(exportedAt)}.csv`
 }
 
 export function StorePartsListPage(): React.JSX.Element {

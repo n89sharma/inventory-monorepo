@@ -112,13 +112,13 @@ describe('invoice summary CSV columns', () => {
   })
 
   it('spans the arrival dates, collapsing to one date when they match', () => {
-    expect(valueFor('Arrival Dates')).toBe('March 28, 2026 – April 02, 2026')
+    expect(valueFor('Arrival Dates')).toBe('Mar 28, 2026 – Apr 2, 2026')
     expect(
       csvValueFor('Arrival Dates', {
         ...PURCHASE_INVOICE,
         arrival_end_date: PURCHASE_INVOICE.arrival_start_date,
       }),
-    ).toBe('March 28, 2026')
+    ).toBe('Mar 28, 2026')
   })
 
   it('leaves the arrival dates empty when no asset is linked to an arrival', () => {
