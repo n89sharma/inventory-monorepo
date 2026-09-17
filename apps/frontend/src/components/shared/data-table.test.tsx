@@ -1,4 +1,4 @@
-import { DataGrid, DataTable } from '@/components/shared/data-table'
+import { DataGrid, DataGridWithoutResultCount, DataTable } from '@/components/shared/data-table'
 import { render, screen } from '@testing-library/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { MemoryRouter } from 'react-router-dom'
@@ -57,6 +57,16 @@ describe('DataGrid', () => {
     renderInRouter(<DataGrid label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)
     expect(screen.queryByRole('button', { name: 'First page' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('DataGridWithoutResultCount', () => {
+  it('leaves the result count to the page', () => {
+    renderInRouter(
+      <DataGridWithoutResultCount label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />,
+    )
+    expect(screen.queryByText(`${ROW_COUNT} results`)).not.toBeInTheDocument()
+    expect(screen.getByRole('table', { name: TABLE_LABEL })).toBeInTheDocument()
   })
 })
 

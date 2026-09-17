@@ -125,6 +125,9 @@ type TableFrame = {
   // by measurement, so a wrong value drifts further out of true the deeper you scroll.
   // Every cell is whitespace-nowrap and single-line, which is what keeps that true.
   virtualRows?: { rowHeight: number; overscan: number }
+  // A grid has no pager to carry the total, so it prints a result count above the rows unless
+  // the page carries the count itself.
+  countsResults: boolean
 }
 
 // Rows are 29px: p-1 either side of a 13px line-height, plus a 1px bottom border.
@@ -142,6 +145,12 @@ const GRID_FRAME = {
   border: 'flex min-h-0 flex-1 flex-col border-y',
   scrollRegion: 'flex-1 min-h-0 overflow-auto outline-none',
   virtualRows: { rowHeight: GRID_ROW_HEIGHT, overscan: GRID_OVERSCAN },
+  countsResults: true,
+} as const satisfies TableFrame
+
+const UNCOUNTED_GRID_FRAME = {
+  ...GRID_FRAME,
+  countsResults: false,
 } as const satisfies TableFrame
 
 // Grows with its rows and scrolls horizontally only, for a table that sits inside a form.
@@ -149,6 +158,7 @@ const IN_FLOW_FRAME = {
   root: '',
   border: 'overflow-hidden rounded-md border',
   scrollRegion: 'overflow-x-auto outline-none',
+  countsResults: false,
 } as const satisfies TableFrame
 
 const SCROLL_REGION_SLOT = 'table-scroll'
@@ -472,9 +482,8 @@ function DataTableBase<TData, TValue>({
       >
         <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
           <div className={`${frame.border} ${SCROLL_REGION_FOCUS_CLASS}`}>
-            {/* A grid has no pager to carry the total, and only the table knows it once a
-                column filter has run. */}
-            {virtualRows && (
+            {/* Only the table knows the total once a column filter has run. */}
+            {frame.countsResults && (
               <div className={RESULT_COUNT_CLASS}>
                 {totalRows.toLocaleString()} {totalRows === 1 ? 'result' : 'results'}
               </div>
@@ -625,6 +634,11 @@ function DataTableBase<TData, TValue>({
 // sits at the bottom of the viewport instead of below the last row. For list and report pages.
 export function DataGrid<TData, TValue>(props: DataTableProps<TData, TValue>) {
   return <DataTableBase {...props} frame={GRID_FRAME} />
+}
+
+// A DataGrid for a page whose own filter controls already show how many rows each one yields.
+export function DataGridWithoutResultCount<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  return <DataTableBase {...props} frame={UNCOUNTED_GRID_FRAME} />
 }
 
 // Lays out in flow and grows with its rows, for a table that sits inside a form under a

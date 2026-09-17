@@ -1,3 +1,4 @@
+import { ASSET_TYPE_FILTER_VALUES } from '@/lib/asset-type-filter'
 import { formatDateParam } from '@/lib/date-param'
 import { isValid, parseISO } from 'date-fns'
 import {
@@ -96,4 +97,5 @@ export const FILTER_PARSERS = {
   invoiceref: parseAsString,
   range: parseAsInteger,
   specs: parseAsOnFlag,
+  asset_type: parseAsStringLiteral(ASSET_TYPE_FILTER_VALUES),
 }

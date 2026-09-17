@@ -1,4 +1,3 @@
-import { AssetCompositionField } from '@/components/shared/cards/asset-composition-field'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { SummaryStrip } from '@/components/shared/cards/summary-strip'
 import { formatDate } from '@/lib/formatters'
@@ -12,7 +11,6 @@ export function HoldSummaryStrip({ hold }: { hold: HoldDetail }) {
       {hold.from_dt && <SummaryField label="From" value={formatDate(hold.from_dt)} />}
       {hold.archived_at && <SummaryField label="Released" value={formatDate(hold.archived_at)} />}
       {hold.notes && <SummaryField label="Note" value={hold.notes} />}
-      <AssetCompositionField assets={hold.assets} />
     </SummaryStrip>
   )
 }

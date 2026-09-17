@@ -17,25 +17,29 @@ import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-ta
 import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useQueryState } from 'nuqs'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   searchRowToAssetSummary,
   type AssetSearchRow,
   type AssetSummary,
   type CollectionHistory,
 } from 'shared-types'
-import { DataGrid } from '@/components/shared/data-table'
-import { Switch } from '@/components/shadcn/switch'
-import { Label } from '@/components/shadcn/label'
+import { DataGridWithoutResultCount } from '@/components/shared/data-table'
+import {
+  countAssetTypes,
+  filterAssetsByType,
+  resolveAssetTypeFilter,
+  type AssetTypeFilter,
+} from '@/lib/asset-type-filter'
+import { FILTER_PARSERS } from '@/lib/filters/parsers'
+import { AssetTypeFilterGroup } from './asset-type-filter-group'
 import { BulkEditBar, type BulkExtraActionGroup } from './bulk-edit-bar'
 import { CollectionEditBar } from './collection-edit-bar'
 
 const TABLE_LABEL = 'Collection assets'
 
-// Raw database casing; the title-cased reference-data value ('Copier') would never match.
-const COPIER_ASSET_TYPE = 'COPIER'
-
-const COPIERS_ONLY_LABEL = 'View copier only'
+const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
 const COUNTERPARTY_MISMATCH_ROW_CLASS = 'data-row-warning print:[--row-bg:var(--color-background)]'
 
@@ -113,7 +117,10 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   const searchParams = useOptimisticSearchParams()
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [copiersOnly, setCopiersOnly] = useState(true)
+  const [assetTypeParam, setAssetTypeParam] = useQueryState(
+    ASSET_TYPE_PARAM_KEY,
+    FILTER_PARSERS.asset_type,
+  )
   const {
     visibleColumns,
     setVisibleColumns,
@@ -146,11 +153,15 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   )
 
   const assets = detail.data?.assets
-  const visibleAssets = useMemo(() => {
-    if (!assets) return EMPTY_ASSETS
-    if (!copiersOnly) return assets
-    return assets.filter((asset) => asset.asset_type === COPIER_ASSET_TYPE)
-  }, [assets, copiersOnly])
+  const assetTypeCounts = useMemo(() => countAssetTypes(assets ?? EMPTY_ASSETS), [assets])
+  const defaultAssetTypeFilter = resolveAssetTypeFilter(null, assetTypeCounts)
+  const assetTypeFilter = resolveAssetTypeFilter(assetTypeParam, assetTypeCounts)
+  const visibleAssets = useMemo(
+    () => filterAssetsByType(assets ?? EMPTY_ASSETS, assetTypeFilter),
+    [assets, assetTypeFilter],
+  )
+  const handleAssetTypeFilterChange = (newFilter: AssetTypeFilter) =>
+    void setAssetTypeParam(newFilter === defaultAssetTypeFilter ? null : newFilter)
 
   useEffect(() => {
     return () => onFlushPending?.(collectionId)
@@ -218,7 +229,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         {renderAddAssetBar?.(entity)}
       </PageSection>
 
-      <DataGrid
+      <DataGridWithoutResultCount
         label={TABLE_LABEL}
         columns={columns}
         data={visibleAssets}
@@ -229,23 +240,27 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               columnId="barcode"
               placeholder="Barcode"
               clearLabel="Clear barcode"
-              className="w-50"
+              className="w-44"
             />
             <ColumnTextFilter
               table={table}
               columnId="serial_number"
               placeholder="Serial number"
               clearLabel="Clear serial number"
-              className="w-50"
+              className="w-44"
             />
             <ColumnTextFilter
               table={table}
               columnId="model"
               placeholder="Model"
               clearLabel="Clear model"
-              className="w-50"
+              className="w-44"
             />
-            <CopierFilterToggle copiersOnly={copiersOnly} onCopiersOnlyChange={setCopiersOnly} />
+            <AssetTypeFilterGroup
+              value={assetTypeFilter}
+              counts={assetTypeCounts}
+              onValueChange={handleAssetTypeFilterChange}
+            />
             <div className="ml-auto">
               <ColumnPickerButton
                 visible={visibleColumns}
@@ -303,26 +318,6 @@ function CounterpartyMismatchCallout({
       <InlineCaution>
         <span className="font-medium">{warning.title}:</span> {warning.summary}
       </InlineCaution>
-    </div>
-  )
-}
-
-interface CopierFilterToggleProps {
-  copiersOnly: boolean
-  onCopiersOnlyChange: (copiersOnly: boolean) => void
-}
-
-function CopierFilterToggle({
-  copiersOnly,
-  onCopiersOnlyChange,
-}: CopierFilterToggleProps): React.JSX.Element {
-  const switchId = useId()
-  return (
-    <div className="flex shrink-0 items-center gap-2">
-      <Switch id={switchId} checked={copiersOnly} onCheckedChange={onCopiersOnlyChange} />
-      <Label htmlFor={switchId} className="whitespace-nowrap">
-        {COPIERS_ONLY_LABEL}
-      </Label>
     </div>
   )
 }
