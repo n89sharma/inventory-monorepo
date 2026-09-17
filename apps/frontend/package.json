@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint . --max-warnings 0 --cache --cache-strategy content --cache-location node_modules/.cache/eslint/",
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",

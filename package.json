@@ -24,7 +24,7 @@
     "flint": "npm run lint -w apps/frontend",
     "btypecheck": "npm run typecheck -w apps/backend",
     "ftypecheck": "npm run typecheck -w apps/frontend",
-    "verify": "npm run tlint && npm run blint && npm run flint && npm run knip && npm run tbuild && npm run btypecheck && npm run bbuild && npm run ftypecheck",
+    "verify": "concurrently --group npm:tlint npm:blint npm:flint npm:knip npm:tbuild && concurrently --group --names btypecheck+bbuild,ftypecheck \"npm run btypecheck && npm run bbuild\" npm:ftypecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run btest && npm run ftest",
@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "concurrently": "^10.0.5",
     "husky": "^9.1.7",
     "knip": "^6.20.0",
     "lint-staged": "^16.4.0",

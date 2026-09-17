@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0 --cache --cache-strategy content --cache-location node_modules/.cache/eslint/"
   },
   "dependencies": {
     "zod": "^4.4.3"

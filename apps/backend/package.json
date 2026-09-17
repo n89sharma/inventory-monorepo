@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b tsconfig.build.json",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.tmp/tsconfig.typecheck.tsbuildinfo",
+    "lint": "eslint . --max-warnings 0 --cache --cache-strategy content --cache-location node_modules/.cache/eslint/",
     "start": "node dist/src/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
