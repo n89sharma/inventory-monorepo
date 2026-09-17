@@ -1,7 +1,8 @@
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/shadcn/hover-card'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { useCan } from '@/hooks/use-can'
-import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import { formatMarginPercent, formatUSDWithSymbol } from '@/lib/formatters'
+import { Fragment } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
 type CostTotalFieldId =
@@ -14,15 +15,15 @@ type CostTotalFieldId =
   | 'cost_total_cost'
   | 'cost_sale_price'
 
-const COST_TOTAL_FIELDS = [
-  { id: 'cost_purchase_cost', label: COST_FIELD_LABELS.purchase_cost },
-  { id: 'cost_transport_cost', label: COST_FIELD_LABELS.transport_cost },
-  { id: 'cost_transfer_cost', label: COST_FIELD_LABELS.transfer_cost },
-  { id: 'cost_processing_cost', label: COST_FIELD_LABELS.processing_cost },
-  { id: 'cost_other_cost', label: COST_FIELD_LABELS.other_cost },
-  { id: 'cost_parts_cost', label: COST_FIELD_LABELS.parts_cost },
-  { id: 'cost_total_cost', label: 'Total Cost' },
-  { id: 'cost_sale_price', label: COST_FIELD_LABELS.sale_price },
+const COST_BREAKDOWN_OPEN_DELAY_MS = 200
+
+const COST_BREAKDOWN_FIELDS = [
+  { id: 'cost_purchase_cost', label: 'Purchase' },
+  { id: 'cost_transport_cost', label: 'Transport' },
+  { id: 'cost_transfer_cost', label: 'Transfer' },
+  { id: 'cost_processing_cost', label: 'Processing' },
+  { id: 'cost_parts_cost', label: 'Parts' },
+  { id: 'cost_other_cost', label: 'Other' },
 ] as const satisfies readonly { id: CostTotalFieldId; label: string }[]
 
 function sumCost(assets: AssetSearchRow[], field: CostTotalFieldId): number {
@@ -42,16 +43,41 @@ export function AssetCostTotalsRow({ assets }: { assets: AssetSearchRow[] }) {
   const marginPercent = salePrice === 0 ? 0 : (grossMargin / salePrice) * 100
 
   return (
-    <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-      {COST_TOTAL_FIELDS.map((field) => (
-        <SummaryField
-          key={field.id}
-          label={field.label}
-          value={formatUSDWithSymbol(sumCost(assets, field.id))}
-        />
-      ))}
-      <SummaryField label="Gross Margin" value={formatUSDWithSymbol(grossMargin)} />
-      <SummaryField label="Margin %" value={formatMarginPercent(marginPercent)} />
+    <HoverCard openDelay={COST_BREAKDOWN_OPEN_DELAY_MS}>
+      <HoverCardTrigger asChild>
+        <div
+          tabIndex={0}
+          className="flex w-fit flex-wrap items-baseline gap-x-6 gap-y-1 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <SummaryField label="Total Cost" value={formatUSDWithSymbol(totalCost)} />
+          <SummaryField label="Sale Price" value={formatUSDWithSymbol(salePrice)} />
+          <SummaryField
+            label="Margin"
+            value={`${formatUSDWithSymbol(grossMargin)} (${formatMarginPercent(marginPercent)})`}
+          />
+        </div>
+      </HoverCardTrigger>
+      <HoverCardContent align="start" className="w-56">
+        <CostBreakdown assets={assets} totalCost={totalCost} />
+      </HoverCardContent>
+    </HoverCard>
+  )
+}
+
+function CostBreakdown({ assets, totalCost }: { assets: AssetSearchRow[]; totalCost: number }) {
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="font-medium">Cost</div>
+      <dl className="grid grid-cols-[1fr_auto] gap-x-6 gap-y-1 tabular-nums">
+        {COST_BREAKDOWN_FIELDS.map((field) => (
+          <Fragment key={field.id}>
+            <dt className="text-muted-foreground">{field.label}</dt>
+            <dd className="text-right">{formatUSDWithSymbol(sumCost(assets, field.id))}</dd>
+          </Fragment>
+        ))}
+        <dt className="border-t pt-1 font-medium">Total</dt>
+        <dd className="border-t pt-1 text-right font-medium">{formatUSDWithSymbol(totalCost)}</dd>
+      </dl>
     </div>
   )
 }

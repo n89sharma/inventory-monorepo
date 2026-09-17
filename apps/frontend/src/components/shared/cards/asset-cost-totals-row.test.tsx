@@ -1,5 +1,5 @@
 import { makeAssetSearchRow } from '@/test/asset-factories'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow, Permission } from 'shared-types'
 import { AssetCostTotalsRow } from './asset-cost-totals-row'
@@ -24,12 +24,17 @@ function totalFor(label: string): string {
   return screen.getByText(label).nextElementSibling?.textContent ?? ''
 }
 
+async function openCostBreakdown() {
+  fireEvent.pointerEnter(screen.getByText('Margin'))
+  await screen.findByText('Cost')
+}
+
 beforeEach(() => {
   mocks.permissions = ALL_PRICE_PERMISSIONS
 })
 
 describe('AssetCostTotalsRow', () => {
-  it('sums each cost field across the assets', () => {
+  it('sums each cost field across the assets into the breakdown', async () => {
     render(
       <AssetCostTotalsRow
         assets={[
@@ -55,13 +60,17 @@ describe('AssetCostTotalsRow', () => {
       />,
     )
 
-    expect(totalFor('Purchase Cost')).toBe('$350.00')
-    expect(totalFor('Transport Cost')).toBe('$50.00')
-    expect(totalFor('Processing Cost')).toBe('$25.00')
-    expect(totalFor('Other Cost')).toBe('$20.00')
-    expect(totalFor('Parts Cost')).toBe('$15.00')
     expect(totalFor('Total Cost')).toBe('$460.00')
     expect(totalFor('Sale Price')).toBe('$700.00')
+
+    await openCostBreakdown()
+
+    expect(totalFor('Purchase')).toBe('$350.00')
+    expect(totalFor('Transport')).toBe('$50.00')
+    expect(totalFor('Processing')).toBe('$25.00')
+    expect(totalFor('Other')).toBe('$20.00')
+    expect(totalFor('Parts')).toBe('$15.00')
+    expect(totalFor('Total')).toBe('$460.00')
   })
 
   // The margin has to reconcile with the Sale Price and Total Cost printed beside it,
@@ -76,8 +85,7 @@ describe('AssetCostTotalsRow', () => {
       />,
     )
 
-    expect(totalFor('Gross Margin')).toBe('$275.00')
-    expect(totalFor('Margin %')).toBe('39.3%')
+    expect(totalFor('Margin')).toBe('$275.00 (39.3%)')
   })
 
   it('keeps the minus outside the dollar sign when the assets sold below cost', () => {
@@ -87,18 +95,16 @@ describe('AssetCostTotalsRow', () => {
       />,
     )
 
-    expect(totalFor('Gross Margin')).toBe('-$100.00')
-    expect(totalFor('Margin %')).toBe('-25.0%')
+    expect(totalFor('Margin')).toBe('-$100.00 (-25.0%)')
   })
 
   it('reports a flat margin rather than dividing by a zero sale price', () => {
     render(<AssetCostTotalsRow assets={[makeAssetSearchRow({ ...NO_COST })]} />)
 
-    expect(totalFor('Gross Margin')).toBe('$0.00')
-    expect(totalFor('Margin %')).toBe('0.0%')
+    expect(totalFor('Margin')).toBe('$0.00 (0.0%)')
   })
 
-  it('treats null cost fields as zero', () => {
+  it('treats null cost fields as zero', async () => {
     render(
       <AssetCostTotalsRow
         assets={[
@@ -109,8 +115,11 @@ describe('AssetCostTotalsRow', () => {
       />,
     )
 
-    expect(totalFor('Purchase Cost')).toBe('$100.00')
     expect(totalFor('Sale Price')).toBe('$0.00')
+
+    await openCostBreakdown()
+
+    expect(totalFor('Purchase')).toBe('$100.00')
   })
 
   // The row reads as one profitability statement, so a viewer who may see only half of
