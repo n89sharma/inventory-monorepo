@@ -7,7 +7,7 @@
     },
     "apps/frontend": {
       "entry": ["src/components/shadcn/**", "src/**/*.d.ts"],
-      "ignoreDependencies": ["shadcn", "vite-bundle-visualizer"],
+      "ignoreDependencies": ["vite-bundle-visualizer"],
       "ignoreBinaries": ["dot"],
       "ignore": [".dependency-cruiser-tree.cjs"]
     }
