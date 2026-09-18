@@ -1,9 +1,10 @@
 import { useAssetStore } from '@/data/store/asset-store'
 import { useListKeyboardNavigation } from '@/hooks/use-list-keyboard-navigation'
 import { sanitizeScannedCode } from '@/lib/input-sanitizers'
+import { cn } from '@/lib/utils'
 import { ASSET_SEARCH_TYPES, useGlobalSearch } from '@/hooks/use-global-search'
 import { BarcodeIcon, CircleNotchIcon } from '@phosphor-icons/react'
-import { useEffect, useEffectEvent, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useId, useMemo, useRef, useState } from 'react'
 import type { AssetSummary, BarcodeSuggestion } from 'shared-types'
 import { CommandResultList } from '../global-search/command-result-list'
 import { resultOptionId } from '../global-search/search-results'
@@ -22,8 +23,11 @@ interface AddAssetsByBarcodeOrSerialProps {
   validateAsset?: (asset: AssetSummary) => string | null
   disabled?: boolean
   className?: string
+  inputId?: string
+  inputClassName?: string
   onCommit?: (asset: AssetSummary) => Promise<void>
   showLeadingIcon?: boolean
+  ref?: React.Ref<HTMLInputElement>
 }
 
 export function AddAssetsByBarcodeOrSerial({
@@ -33,11 +37,22 @@ export function AddAssetsByBarcodeOrSerial({
   validateAsset,
   disabled,
   className,
+  inputId,
+  inputClassName,
   onCommit,
   showLeadingIcon,
+  ref,
 }: AddAssetsByBarcodeOrSerialProps): React.JSX.Element {
   const getAssetByBarcode = useAssetStore((state) => state.getAssetByBarcode)
   const inputRef = useRef<HTMLInputElement>(null)
+  const assignInput = useCallback(
+    (node: HTMLInputElement | null) => {
+      inputRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) ref.current = node
+    },
+    [ref],
+  )
   const listboxId = useId()
   const [displayValue, setDisplayValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -159,7 +174,8 @@ export function AddAssetsByBarcodeOrSerial({
               <BarcodeIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
             )}
             <Input
-              ref={inputRef}
+              id={inputId}
+              ref={assignInput}
               placeholder={buildAddAssetPlaceholder(entityName)}
               aria-label="Add asset by barcode or serial number"
               role="combobox"
@@ -172,7 +188,7 @@ export function AddAssetsByBarcodeOrSerial({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               disabled={disabled}
-              className={showLeadingIcon ? 'pl-8 pr-8' : 'pr-8'}
+              className={cn(showLeadingIcon ? 'pl-8 pr-8' : 'pr-8', inputClassName)}
             />
             {isLookingUp && (
               <CircleNotchIcon

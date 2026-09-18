@@ -488,3 +488,15 @@ export const UpdateAssetLocationSchema = z.object({
 })
 
 export type UpdateAssetLocation = z.infer<typeof UpdateAssetLocationSchema>
+
+export const MAX_BULK_LOCATION_ASSETS = 500
+
+export const BulkUpdateAssetLocationSchema = UpdateAssetLocationSchema.extend({
+  barcodes: z
+    .array(z.string().min(1))
+    .min(1)
+    .max(MAX_BULK_LOCATION_ASSETS)
+    .refine((barcodes) => new Set(barcodes).size === barcodes.length, 'Duplicate barcodes'),
+})
+
+export type BulkUpdateAssetLocation = z.infer<typeof BulkUpdateAssetLocationSchema>

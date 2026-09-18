@@ -1,5 +1,6 @@
 import { PageContent } from '@/components/app-layout/page-content'
 import { StickyPageHeader } from '@/components/app-layout/sticky-page-header'
+import { AddAssetsByBarcodeOrSerial } from '@/components/collections/add-assets-by-barcode-or-serial'
 import { Button } from '@/components/shadcn/button'
 import { Field, FieldError, FieldLabel } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
@@ -13,7 +14,6 @@ import {
 } from '@/components/shadcn/select'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
-import { useAssetByBarcode } from '@/hooks/use-asset-lookup'
 import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useWarehouseLocations } from '@/hooks/use-locations'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -23,11 +23,10 @@ import {
   ArrowRightIcon,
   CircleNotchIcon,
   MapPinIcon,
-  PrinterIcon,
   WarningIcon,
   XIcon,
 } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { AssetLocation, AssetSummary, Warehouse } from 'shared-types'
 import { toast } from 'sonner'
@@ -35,9 +34,11 @@ import { toast } from 'sonner'
 const PAGE_TITLE = 'Put Away'
 const BIN_ZONE = 'BIN'
 const LOCATION_ERROR_DELAY_MS = 500
-const ASSET_LOOKUP_DELAY_MS = 500
 const LOCATION_NOT_FOUND_MESSAGE = 'Location not available'
-const ASSET_NOT_FOUND_MESSAGE = 'Asset not found'
+const IN_TRANSIT_MESSAGE = 'is in transit — receive the transfer first'
+const ALREADY_HERE_PREFIX = 'Already at'
+const SCAN_LIST_NAME = 'list'
+const ASSET_INPUT_ID = 'put-away-asset'
 const EMPTY_LOCATIONS: AssetLocation[] = []
 
 function findScannedLocation(locations: AssetLocation[], scanned: string): AssetLocation | null {
@@ -50,16 +51,17 @@ function findScannedLocation(locations: AssetLocation[], scanned: string): Asset
 
 interface PutAwayForm {
   location: string
-  asset: string
 }
 
 function sanitizeScan(value: string): string {
   return sanitizeScannedCode(value).toUpperCase()
 }
 
+const SCAN_INPUT_SIZE = 'h-12 text-lg md:text-lg'
+
 function scanInputClassName(success: boolean): string {
   return cn(
-    'h-12 text-lg md:text-lg',
+    SCAN_INPUT_SIZE,
     success &&
       'border-green-600 bg-green-500/10 text-green-800 focus-visible:ring-green-600/40 dark:border-green-500 dark:text-green-300',
   )
@@ -75,6 +77,20 @@ function currentLocationLabel(asset: AssetSummary): string {
   return asset.location.bin || asset.location.zone
 }
 
+function atLocation(asset: AssetSummary, location: AssetLocation): boolean {
+  if (!asset.location) return false
+  return (
+    asset.location.warehouse_id === location.warehouse_id &&
+    asset.location.zone === location.zone &&
+    asset.location.bin === location.bin
+  )
+}
+
+function assetCountLabel(count: number): string {
+  if (count === 1) return '1 asset'
+  return `${count} assets`
+}
+
 function ClearButton({ onClear }: { onClear: () => void }): React.JSX.Element {
   return (
     <button
@@ -86,27 +102,6 @@ function ClearButton({ onClear }: { onClear: () => void }): React.JSX.Element {
       <XIcon size={18} />
     </button>
   )
-}
-
-function AssetAdornment({
-  lookingUp,
-  value,
-  onClear,
-}: {
-  lookingUp: boolean
-  value: string
-  onClear: () => void
-}): React.JSX.Element | null {
-  if (lookingUp) {
-    return (
-      <CircleNotchIcon
-        className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground"
-        size={18}
-      />
-    )
-  }
-  if (value) return <ClearButton onClear={onClear} />
-  return null
 }
 
 function LocationField({
@@ -156,56 +151,82 @@ function LocationField({
   )
 }
 
-function AssetField({
-  inputRef,
-  value,
-  onChange,
-  onBlur,
-  onClear,
-  error,
-  success,
-  disabled,
-  lookingUp,
+function RowDestination({
+  asset,
+  location,
+  alreadyHere,
 }: {
-  inputRef: React.Ref<HTMLInputElement>
-  value: string
-  onChange: (value: string) => void
-  onBlur: () => void
-  onClear: () => void
-  error?: string
-  success: boolean
-  disabled: boolean
-  lookingUp: boolean
+  asset: AssetSummary
+  location: AssetLocation | null
+  alreadyHere: boolean
 }): React.JSX.Element {
+  if (alreadyHere && location) {
+    return (
+      <p className="text-muted-foreground">
+        {ALREADY_HERE_PREFIX} {locationName(location)}
+      </p>
+    )
+  }
   return (
-    <Field data-invalid={!!error}>
-      <FieldLabel htmlFor="put-away-asset">Asset</FieldLabel>
-      <div className="relative">
-        <PrinterIcon
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          size={24}
-        />
-        <Input
-          id="put-away-asset"
-          ref={inputRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={onBlur}
-          placeholder="Scan asset barcode"
-          disabled={disabled}
-          aria-invalid={!!error}
-          autoComplete="off"
-          className={cn(scanInputClassName(success), 'pl-11 pr-10')}
-        />
-        <AssetAdornment lookingUp={lookingUp} value={value} onClear={onClear} />
+    <div className="flex items-center gap-3">
+      <span className="text-muted-foreground">{currentLocationLabel(asset)}</span>
+      <ArrowRightIcon className="shrink-0" />
+      <span className="font-semibold tabular-nums">{location ? locationName(location) : '—'}</span>
+    </div>
+  )
+}
+
+function ScannedAssetRow({
+  asset,
+  location,
+  warehouse,
+  onRemove,
+}: {
+  asset: AssetSummary
+  location: AssetLocation | null
+  warehouse: Warehouse | null
+  onRemove: () => void
+}): React.JSX.Element {
+  const alreadyHere = !!location && atLocation(asset, location)
+  const crossWarehouse =
+    !alreadyHere &&
+    !!asset.location &&
+    !!warehouse &&
+    asset.location.warehouse_code !== warehouse.city_code
+
+  return (
+    <li className="flex flex-col gap-2 rounded-lg border p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-semibold">
+            {asset.brand} {asset.model}
+          </p>
+          <p className="text-sm text-muted-foreground tabular-nums">{asset.barcode}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={`Remove ${asset.barcode}`}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <XIcon size={18} />
+        </button>
       </div>
-      <FieldError>{error}</FieldError>
-    </Field>
+      <RowDestination asset={asset} location={location} alreadyHere={alreadyHere} />
+      {crossWarehouse ? (
+        <div className="flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
+          <WarningIcon className="shrink-0" weight="fill" />
+          <span>
+            Moving out of {asset.location?.warehouse_code} into {warehouse?.city_code}
+          </span>
+        </div>
+      ) : null}
+    </li>
   )
 }
 
 export function PutAwayPage(): React.JSX.Element {
-  const updateAssetLocation = useAssetStore((state) => state.updateAssetLocation)
+  const bulkUpdateAssetLocation = useAssetStore((state) => state.bulkUpdateAssetLocation)
 
   const activeWarehouses = useActiveWarehouses()
   const defaultWarehouse = useProfileDefaultWarehouse()
@@ -222,53 +243,33 @@ export function PutAwayPage(): React.JSX.Element {
     warehouseId ?? null,
   )
   const [saving, setSaving] = useState(false)
+  const [scannedAssets, setScannedAssets] = useState<AssetSummary[]>([])
+  const assetInputRef = useRef<HTMLInputElement>(null)
 
-  const form = useForm<PutAwayForm>({ defaultValues: { location: '', asset: '' } })
+  const form = useForm<PutAwayForm>({ defaultValues: { location: '' } })
   const locationValue = useWatch({ control: form.control, name: 'location' })
-  const assetValue = useWatch({ control: form.control, name: 'asset' })
-
   const settledLocation = useDebouncedValue(locationValue, LOCATION_ERROR_DELAY_MS)
-  const settledAsset = useDebouncedValue(assetValue, ASSET_LOOKUP_DELAY_MS)
-
-  const {
-    data: fetchedAsset,
-    error: lookupError,
-    isLoading: lookingUp,
-  } = useAssetByBarcode(settledAsset)
 
   const selectedLocation = useMemo(
     () => findScannedLocation(locations, locationValue),
     [locations, locationValue],
   )
-  const scannedAsset = assetValue ? (fetchedAsset ?? null) : null
 
   const locationError =
     locationValue && !selectedLocation && settledLocation === locationValue
       ? LOCATION_NOT_FOUND_MESSAGE
       : undefined
-  const assetError = assetValue && lookupError ? ASSET_NOT_FOUND_MESSAGE : undefined
-
-  const locationSuccess = !!selectedLocation
-  const assetSuccess = !!scannedAsset
-  const crossWarehouse =
-    !!scannedAsset?.location &&
-    !!selectedWarehouse &&
-    scannedAsset.location.warehouse_code !== selectedWarehouse.city_code
 
   function scanLocation(raw: string, onChange: (value: string) => void) {
     const scanned = sanitizeScan(raw)
     onChange(scanned)
-    if (findScannedLocation(locations, scanned)) form.setFocus('asset')
-  }
-
-  function resetAsset() {
-    form.setValue('asset', '')
-    form.setFocus('asset')
+    if (findScannedLocation(locations, scanned)) assetInputRef.current?.focus()
   }
 
   function selectWarehouse(value: string) {
     setSelectedWarehouseId(Number(value))
-    form.reset({ location: '', asset: '' })
+    setScannedAssets([])
+    form.reset({ location: '' })
   }
 
   function clearLocation() {
@@ -276,19 +277,35 @@ export function PutAwayPage(): React.JSX.Element {
     form.setFocus('location')
   }
 
-  async function handleConfirm() {
-    if (!scannedAsset || !selectedLocation) return
+  function validateAsset(asset: AssetSummary): string | null {
+    if (asset.is_in_transit) return `Asset ${asset.barcode} ${IN_TRANSIT_MESSAGE}.`
+    return null
+  }
+
+  function addAsset(asset: AssetSummary) {
+    setScannedAssets((prev) => [asset, ...prev])
+  }
+
+  function removeAsset(barcode: string) {
+    setScannedAssets((prev) => prev.filter((a) => a.barcode !== barcode))
+  }
+
+  async function handleSave() {
+    if (!selectedLocation || scannedAssets.length === 0) return
     setSaving(true)
     try {
-      await updateAssetLocation(scannedAsset.barcode, {
+      await bulkUpdateAssetLocation({
         warehouse_id: selectedLocation.warehouse_id,
         zone_id: selectedLocation.zone_id,
         bin: selectedLocation.bin,
+        barcodes: scannedAssets.map((a) => a.barcode),
       })
-      toast.success(`Moved ${scannedAsset.barcode} to ${locationName(selectedLocation)}`, {
-        position: 'top-center',
-      })
-      resetAsset()
+      toast.success(
+        `Moved ${assetCountLabel(scannedAssets.length)} to ${locationName(selectedLocation)}`,
+        { position: 'top-center' },
+      )
+      setScannedAssets([])
+      assetInputRef.current?.focus()
     } catch {
       // interceptor already showed the error toast
     }
@@ -332,75 +349,66 @@ export function PutAwayPage(): React.JSX.Element {
               onBlur={field.onBlur}
               onClear={clearLocation}
               error={locationError}
-              success={locationSuccess}
+              success={!!selectedLocation}
               disabled={fetchingLocations || saving}
             />
           )}
         />
 
-        <Controller
-          name="asset"
-          control={form.control}
-          render={({ field }) => (
-            <AssetField
-              inputRef={field.ref}
-              value={field.value}
-              onChange={(value) => field.onChange(sanitizeScan(value))}
-              onBlur={field.onBlur}
-              onClear={resetAsset}
-              error={assetError}
-              success={assetSuccess}
-              disabled={fetchingLocations || saving}
-              lookingUp={lookingUp}
-            />
-          )}
-        />
+        <Field>
+          <FieldLabel htmlFor={ASSET_INPUT_ID}>Asset</FieldLabel>
+          <AddAssetsByBarcodeOrSerial
+            ref={assetInputRef}
+            getAssets={() => scannedAssets}
+            onAddAsset={addAsset}
+            entityName={SCAN_LIST_NAME}
+            validateAsset={validateAsset}
+            disabled={saving}
+            inputId={ASSET_INPUT_ID}
+            inputClassName={SCAN_INPUT_SIZE}
+          />
+        </Field>
 
-        {scannedAsset && selectedLocation ? (
-          <div className="flex flex-col gap-3 rounded-lg border p-4">
-            <div>
-              <p className="text-lg font-semibold">
-                {scannedAsset.brand} {scannedAsset.model}
-              </p>
-              <p className="text-sm text-muted-foreground tabular-nums">{scannedAsset.barcode}</p>
+        {scannedAssets.length > 0 ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium text-muted-foreground">
+              {assetCountLabel(scannedAssets.length)}
+            </p>
+            <ul className="flex flex-col gap-3">
+              {scannedAssets.map((asset) => (
+                <ScannedAssetRow
+                  key={asset.barcode}
+                  asset={asset}
+                  location={selectedLocation}
+                  warehouse={selectedWarehouse}
+                  onRemove={() => removeAsset(asset.barcode)}
+                />
+              ))}
+            </ul>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setScannedAssets([])}
+                disabled={saving}
+                className="h-14 text-lg"
+              >
+                Clear
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving || !selectedLocation}
+                className="h-14 text-lg"
+              >
+                {saving ? (
+                  <>
+                    <CircleNotchIcon className="animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  `Save ${assetCountLabel(scannedAssets.length)}`
+                )}
+              </Button>
             </div>
-            <div className="flex items-center gap-3 text-base">
-              <span className="text-muted-foreground">{currentLocationLabel(scannedAsset)}</span>
-              <ArrowRightIcon className="shrink-0" />
-              <span className="font-semibold tabular-nums">{locationName(selectedLocation)}</span>
-            </div>
-            {crossWarehouse ? (
-              <div className="flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
-                <WarningIcon className="shrink-0" weight="fill" />
-                <span>
-                  Moving out of {scannedAsset.location?.warehouse_code} into{' '}
-                  {selectedWarehouse?.city_code}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {scannedAsset && selectedLocation ? (
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={resetAsset}
-              disabled={saving}
-              className="h-14 text-lg"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleConfirm} disabled={saving} className="h-14 text-lg">
-              {saving ? (
-                <>
-                  <CircleNotchIcon className="animate-spin" />
-                  Saving…
-                </>
-              ) : (
-                'Save'
-              )}
-            </Button>
           </div>
         ) : null}
       </PageContent>

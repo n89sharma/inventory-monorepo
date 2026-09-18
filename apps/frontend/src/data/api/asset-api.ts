@@ -16,6 +16,7 @@ import type {
   AssetTransfer,
   AssetType,
   Brand,
+  BulkUpdateAssetLocation,
   BulkUpdateAssetPricing,
   Component,
   Comment,
@@ -46,6 +47,7 @@ import {
   AssetsBySerialNumberRequestSchema,
   AssetsBySerialNumberResultSchema,
   AssetTransferSchema,
+  BulkUpdateAssetLocationSchema,
   BulkUpdateAssetPricingSchema,
   CommentSchema,
   CoreFunctionsSchema,
@@ -144,6 +146,13 @@ export async function updateAssetLocation(
     data satisfies UpdateAssetLocation,
   )
   await api.put(`/assets/${barcode}/location`, updateAssetLocationBody, { skipErrorToast })
+}
+
+export async function bulkUpdateAssetLocation(data: BulkUpdateAssetLocation): Promise<void> {
+  const bulkUpdateAssetLocationBody = BulkUpdateAssetLocationSchema.parse(
+    data satisfies BulkUpdateAssetLocation,
+  )
+  await api.put('/assets/bulk/location', bulkUpdateAssetLocationBody)
 }
 
 export async function postComment(barcode: string, data: CreateComment): Promise<void> {

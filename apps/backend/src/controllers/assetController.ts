@@ -4,6 +4,7 @@ import {
   ApiResponse,
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
+  BulkUpdateAssetLocationSchema,
   BulkUpdateAssetPricingSchema,
   MAX_DEPARTED_WINDOW_MONTHS,
   PatchAssetPricingSchema,
@@ -49,6 +50,7 @@ import {
 import { updateAssetErrors as updateAssetErrorsSer } from '../services/assetErrorService.js'
 import { createComment as createCommentSer } from '../services/assetCommentService.js'
 import {
+  bulkUpdateAssetLocation as bulkUpdateAssetLocationSer,
   getLocationsByWarehouse as getLocationsByWarehouseSer,
   updateAssetLocation as updateAssetLocationSer,
 } from '../services/assetLocationService.js'
@@ -415,6 +417,12 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
   const { barcode } = req.params
   const validated = UpdateAssetLocationSchema.parse(req.body)
   await updateAssetLocationSer(barcode, validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
+
+export const bulkUpdateAssetLocation = asyncHandler(async (req, res) => {
+  const validated = BulkUpdateAssetLocationSchema.parse(req.body)
+  await bulkUpdateAssetLocationSer(validated, res.locals.dbUserId)
   res.json(successResponse(null))
 })
 

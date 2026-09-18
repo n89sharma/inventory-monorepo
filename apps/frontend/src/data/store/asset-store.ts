@@ -1,4 +1,5 @@
 import {
+  bulkUpdateAssetLocation as bulkUpdateAssetLocationApi,
   bulkUpdateAssetPricing as bulkUpdateAssetPricingApi,
   createAssetHarvestedPart as createAssetHarvestedPartApi,
   deleteAsset as deleteAssetApi,
@@ -21,6 +22,7 @@ import { invalidateAssetHistory } from '@/hooks/use-asset-history'
 import { invalidateStorePartLists, storePartDetailKey } from '@/hooks/use-store-part'
 import type {
   AssetSummary,
+  BulkUpdateAssetLocation,
   BulkUpdateAssetPricing,
   CreateComment,
   CreateSalvagedPart,
@@ -48,6 +50,7 @@ interface AssetStore {
     data: UpdateAssetLocation,
     skipErrorToast?: boolean,
   ) => Promise<void>
+  bulkUpdateAssetLocation: (data: BulkUpdateAssetLocation) => Promise<void>
   updateAssetPricing: (barcode: string, data: UpdateAssetPricing) => Promise<void>
   updateAssetSpecs: (barcode: string, data: UpdateAssetSpecs) => Promise<void>
   getAssetByBarcode: (barcode: string, skipErrorToast?: boolean) => Promise<AssetSummary>
@@ -89,6 +92,12 @@ export const useAssetStore = create<AssetStore>(() => ({
     await updateAssetLocationApi(barcode, data, skipErrorToast)
     mutate(assetDetailKey(barcode))
     invalidateAssetHistory([barcode])
+  },
+
+  bulkUpdateAssetLocation: async (data) => {
+    await bulkUpdateAssetLocationApi(data)
+    invalidateAssetDetails(data.barcodes)
+    invalidateAssetHistory(data.barcodes)
   },
 
   updateAssetPricing: async (barcode, data) => {

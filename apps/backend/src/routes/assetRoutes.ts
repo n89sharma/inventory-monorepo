@@ -4,6 +4,7 @@ import {
   LocationsByWarehouseQuerySchema,
   DepartedAssetQuerySchema,
   SerialCheckQuerySchema,
+  bulkUpdateAssetLocation,
   bulkUpdateAssetPricing,
   createAssetComment,
   createAssetHarvestedPart,
@@ -62,6 +63,7 @@ router.delete('/:barcode', requirePermission('delete_asset'), deleteAsset)
 router.get('/:barcode/accessories', requirePermission('view_asset'), getAssetAccessories)
 router.get('/:barcode/errors', requirePermission('view_asset'), getAssetErrors)
 router.put('/:barcode/errors', requirePermission('update_tech_specs'), updateAssetErrors)
+router.put('/bulk/location', requirePermission('update_location'), bulkUpdateAssetLocation)
 router.put('/:barcode/location', requirePermission('update_location'), updateAssetLocation)
 router.put('/bulk/pricing', requirePermission('edit_prices'), bulkUpdateAssetPricing)
 router.put('/:barcode/pricing', requirePermission('edit_prices'), updateAssetPricing)
