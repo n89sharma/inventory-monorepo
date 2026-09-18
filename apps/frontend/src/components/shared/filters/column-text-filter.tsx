@@ -1,6 +1,4 @@
-import { Button } from '@/components/shadcn/button'
-import { Input } from '@/components/shadcn/input'
-import { XIcon } from '@phosphor-icons/react'
+import { FilterTextInput } from '@/components/shared/filters/filter-text-input'
 import type { Table } from '@tanstack/react-table'
 
 /**
@@ -25,26 +23,12 @@ export function ColumnTextFilter<TData>({
   if (!column) return null
   const value = (column.getFilterValue() as string | undefined) ?? ''
   return (
-    <div className={`relative ${className ?? ''}`.trim()}>
-      <Input
-        value={value}
-        onChange={(event) => column.setFilterValue(event.target.value || undefined)}
-        placeholder={placeholder}
-        aria-label={placeholder}
-        className="bg-background pr-8"
-      />
-      {value && (
-        <Button
-          variant="ghost"
-          size="icon"
-          type="button"
-          aria-label={clearLabel}
-          onClick={() => column.setFilterValue(undefined)}
-          className="absolute right-1 top-1/2 size-6 -translate-y-1/2"
-        >
-          <XIcon />
-        </Button>
-      )}
-    </div>
+    <FilterTextInput
+      value={value}
+      onValueChange={(newValue) => column.setFilterValue(newValue || undefined)}
+      placeholder={placeholder}
+      clearLabel={clearLabel}
+      className={className}
+    />
   )
 }
