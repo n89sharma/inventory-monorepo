@@ -98,6 +98,9 @@ interface DataTableProps<TData, TValue> {
   // Faceting walks the filtered rows once per column to collect distinct values, so it
   // is only wired up by tables that render a facet-driven filter.
   facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
+  // A row survives the search when any opted-in column contains the query. The caller names
+  // those columns, because the TanStack default admits every string column it finds.
+  textSearch?: Pick<TableOptions<TData>, 'getColumnCanGlobalFilter'>
   // Callbacks a cell renderer reaches through table.options.meta. Read at event time off
   // the live table instance, so DataRow's memo never serves a stale one.
   meta?: TableMeta<TData>
@@ -330,6 +333,7 @@ function DataTableBase<TData, TValue>({
   renderTableFilter,
   renderAboveTable,
   facetedRowModels,
+  textSearch,
   meta,
 }: DataTableBaseProps<TData, TValue>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>(
@@ -337,6 +341,7 @@ function DataTableBase<TData, TValue>({
   )
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
   const [draggedColumnLabel, setDraggedColumnLabel] = useState('')
@@ -374,8 +379,10 @@ function DataTableBase<TData, TValue>({
     onColumnVisibilityChange,
     onColumnOrderChange,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     ...facetedRowModels,
+    ...textSearch,
     meta,
     enableRowSelection: true,
     onRowSelectionChange,
@@ -388,6 +395,7 @@ function DataTableBase<TData, TValue>({
       sorting,
       rowSelection,
       columnFilters,
+      globalFilter,
       columnVisibility,
       columnOrder,
       columnPinning,

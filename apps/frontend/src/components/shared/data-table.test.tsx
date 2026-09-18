@@ -1,6 +1,7 @@
 import { DataGrid, DataGridWithoutResultCount, DataTable } from '@/components/shared/data-table'
-import { render, screen } from '@testing-library/react'
-import type { ColumnDef } from '@tanstack/react-table'
+import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
+import { fireEvent, render, screen } from '@testing-library/react'
+import type { ColumnDef, TableOptions } from '@tanstack/react-table'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
@@ -67,6 +68,105 @@ describe('DataGridWithoutResultCount', () => {
     )
     expect(screen.queryByText(`${ROW_COUNT} results`)).not.toBeInTheDocument()
     expect(screen.getByRole('table', { name: TABLE_LABEL })).toBeInTheDocument()
+  })
+})
+
+const SEARCH_PLACEHOLDER = 'Barcode, serial or model'
+const SEARCH_CLEAR_LABEL = 'Clear search'
+
+type Part = { id: number; barcode: string; serial_number: string; model: string; note: string }
+
+const PART_COLUMNS: ColumnDef<Part, unknown>[] = [
+  { id: 'barcode', accessorKey: 'barcode', header: 'Barcode' },
+  { id: 'serial_number', accessorKey: 'serial_number', header: 'Serial' },
+  { id: 'model', accessorKey: 'model', header: 'Model' },
+  { id: 'note', accessorKey: 'note', header: 'Note' },
+]
+
+// One row per searchable field carries the query, so a hit on any single field has to be
+// enough. The fourth carries it only in a column outside the allow-list.
+const PARTS: Part[] = [
+  { id: 1, barcode: 'ALPHA-1', serial_number: 'ser-1', model: 'mod-1', note: 'note-1' },
+  { id: 2, barcode: 'bar-2', serial_number: 'alpha-2', model: 'mod-2', note: 'note-2' },
+  { id: 3, barcode: 'bar-3', serial_number: 'ser-3', model: 'Alpha Model', note: 'note-3' },
+  { id: 4, barcode: 'bar-4', serial_number: 'ser-4', model: 'mod-4', note: 'ALPHA note' },
+]
+
+const SEARCHABLE_PART_COLUMN_IDS = new Set(['barcode', 'serial_number', 'model'])
+
+const PART_TEXT_SEARCH = {
+  getColumnCanGlobalFilter: (column) => SEARCHABLE_PART_COLUMN_IDS.has(column.id),
+} as const satisfies Pick<TableOptions<Part>, 'getColumnCanGlobalFilter'>
+
+function renderSearchableParts() {
+  return renderInRouter(
+    <DataTable
+      label={TABLE_LABEL}
+      columns={PART_COLUMNS}
+      data={PARTS}
+      textSearch={PART_TEXT_SEARCH}
+      renderTableFilter={(table) => (
+        <TableTextFilter
+          table={table}
+          placeholder={SEARCH_PLACEHOLDER}
+          clearLabel={SEARCH_CLEAR_LABEL}
+        />
+      )}
+    />,
+  )
+}
+
+function search(query: string) {
+  fireEvent.change(screen.getByRole('textbox', { name: SEARCH_PLACEHOLDER }), {
+    target: { value: query },
+  })
+}
+
+describe('table text search', () => {
+  it('keeps a row when any searchable column matches', () => {
+    renderSearchableParts()
+    search('alpha')
+    expect(bodyRowCount()).toBe(3)
+    expect(screen.getByText('ALPHA-1')).toBeInTheDocument()
+    expect(screen.getByText('alpha-2')).toBeInTheDocument()
+    expect(screen.getByText('Alpha Model')).toBeInTheDocument()
+  })
+
+  it('ignores columns the caller left out of the search', () => {
+    renderSearchableParts()
+    search('alpha')
+    expect(screen.queryByText('ALPHA note')).not.toBeInTheDocument()
+  })
+
+  it('matches case-insensitively and mid-string', () => {
+    renderSearchableParts()
+    search('ALPHA-2')
+    expect(bodyRowCount()).toBe(1)
+    expect(screen.getByText('alpha-2')).toBeInTheDocument()
+
+    search('lpha mod')
+    expect(bodyRowCount()).toBe(1)
+    expect(screen.getByText('Alpha Model')).toBeInTheDocument()
+  })
+
+  it('reports an empty result set', () => {
+    renderSearchableParts()
+    search('no-such-asset')
+    expect(screen.getByText('No results.')).toBeInTheDocument()
+  })
+
+  it('restores every row when the search is cleared', () => {
+    renderSearchableParts()
+    search('alpha')
+    fireEvent.click(screen.getByRole('button', { name: SEARCH_CLEAR_LABEL }))
+    expect(bodyRowCount()).toBe(PARTS.length)
+    expect(screen.getByRole('textbox', { name: SEARCH_PLACEHOLDER })).toHaveValue('')
+  })
+
+  it('leaves a table that opts out unfiltered', () => {
+    renderInRouter(<DataTable label={TABLE_LABEL} columns={PART_COLUMNS} data={PARTS} />)
+    expect(bodyRowCount()).toBe(PARTS.length)
+    expect(screen.queryByRole('textbox', { name: SEARCH_PLACEHOLDER })).not.toBeInTheDocument()
   })
 })
 

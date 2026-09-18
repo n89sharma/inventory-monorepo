@@ -1,9 +1,12 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
-import { ColumnTextFilter } from '@/components/shared/filters/column-text-filter'
+import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
-import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
+import {
+  PINNED_ASSET_COLUMN_IDS,
+  SEARCHABLE_ASSET_COLUMN_IDS,
+} from '@/components/table-columns/column-primitives'
 import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import {
   DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION,
@@ -13,7 +16,7 @@ import type { AssetWarningOf } from '@/components/table-columns/asset-search-col
 import { InlineCaution } from '@/components/shared/inline-warning'
 import { useAssetColumnVisibilityParam } from '@/hooks/use-asset-column-visibility-param'
 import type { CounterpartyWarning } from '@/lib/counterparty-mismatch'
-import type { ColumnDef, RowSelectionState, TableMeta } from '@tanstack/react-table'
+import type { ColumnDef, RowSelectionState, TableMeta, TableOptions } from '@tanstack/react-table'
 import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { collectionAssetHref, queryStringFrom } from '@/ui-types/navigation-context'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
@@ -42,6 +45,14 @@ const TABLE_LABEL = 'Collection assets'
 const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
 const COUNTERPARTY_MISMATCH_ROW_CLASS = 'data-row-warning print:[--row-bg:var(--color-background)]'
+
+const ASSET_SEARCH_PLACEHOLDER = 'Barcode, serial or model'
+const ASSET_SEARCH_CLEAR_LABEL = 'Clear search'
+const SEARCHABLE_ASSET_COLUMN_ID_SET = new Set<string>(SEARCHABLE_ASSET_COLUMN_IDS)
+
+const ASSET_TEXT_SEARCH = {
+  getColumnCanGlobalFilter: (column) => SEARCHABLE_ASSET_COLUMN_ID_SET.has(column.id),
+} as const satisfies Pick<TableOptions<AssetSearchRow>, 'getColumnCanGlobalFilter'>
 
 const DEFAULT_ASSET_SORT = { id: 'created_at', desc: true } as const
 const getAssetRowId = (asset: AssetSearchRow) => asset.barcode
@@ -233,28 +244,14 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         label={TABLE_LABEL}
         columns={columns}
         data={visibleAssets}
+        textSearch={ASSET_TEXT_SEARCH}
         renderTableFilter={(table) => (
           <>
-            <ColumnTextFilter
+            <TableTextFilter
               table={table}
-              columnId="barcode"
-              placeholder="Barcode"
-              clearLabel="Clear barcode"
-              className="w-44"
-            />
-            <ColumnTextFilter
-              table={table}
-              columnId="serial_number"
-              placeholder="Serial number"
-              clearLabel="Clear serial number"
-              className="w-44"
-            />
-            <ColumnTextFilter
-              table={table}
-              columnId="model"
-              placeholder="Model"
-              clearLabel="Clear model"
-              className="w-44"
+              placeholder={ASSET_SEARCH_PLACEHOLDER}
+              clearLabel={ASSET_SEARCH_CLEAR_LABEL}
+              className="w-96"
             />
             <AssetTypeFilterGroup
               value={assetTypeFilter}

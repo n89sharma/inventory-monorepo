@@ -18,6 +18,8 @@ export const SERIAL_NUMBER_COLUMN_SIZE = 150
 
 export const PINNED_ASSET_COLUMN_IDS = ['select', 'barcode', 'serial_number', 'model']
 
+export const SEARCHABLE_ASSET_COLUMN_IDS = ['barcode', 'serial_number', 'model']
+
 export function IdLink({ to, children }: { to: string; children: ReactNode }) {
   return (
     <Link to={to} className={ID_LINK_CLASS}>
