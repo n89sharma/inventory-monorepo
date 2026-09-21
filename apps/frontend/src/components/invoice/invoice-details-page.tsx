@@ -81,7 +81,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         copyValue: invoice.invoice_reference,
       })}
       getNote={(invoice) => invoice.notes}
-      renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
+      renderCostSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
       renderTitleBadge={(invoice) => (
         <>
           <InvoiceTypeBadge type={invoice.invoice_type.type} />

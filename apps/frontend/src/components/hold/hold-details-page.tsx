@@ -104,7 +104,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}
         getNote={(hold) => hold.notes}
-        renderSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
+        renderCostSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
         renderTitleBadge={(hold) => hold.archived_at && <StatusBadge status={RELEASED_STATUS} />}
         renderSubtitle={(hold) => (
           <>

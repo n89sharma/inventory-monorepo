@@ -1,12 +1,12 @@
 import type { ArrivalDetail } from 'shared-types'
 import { InvoiceSummaryField } from '../invoice/invoice-summary-field'
 import { purchaseInvoiceOf } from '@/lib/asset-invoice'
-import { SummaryStrip } from '../shared/cards/summary-strip'
+import { CostSummaryStrip } from '../shared/cards/cost-summary-strip'
 
 export function ArrivalSummaryStrip({ arrival }: { arrival: ArrivalDetail }) {
   return (
-    <SummaryStrip assets={arrival.assets}>
+    <CostSummaryStrip assets={arrival.assets}>
       <InvoiceSummaryField assets={arrival.assets} getInvoice={purchaseInvoiceOf} />
-    </SummaryStrip>
+    </CostSummaryStrip>
   )
 }

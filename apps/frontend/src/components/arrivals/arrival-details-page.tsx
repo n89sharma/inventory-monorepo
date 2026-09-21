@@ -169,7 +169,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
       getNote={(arrival) => arrival.comment}
-      renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
+      renderCostSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
       renderSubtitle={(arrival) => (
         <>
           <SummaryValue value={formatDate(arrival.created_at)} />

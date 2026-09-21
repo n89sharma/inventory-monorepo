@@ -94,7 +94,7 @@ export function TransferDetailsPage(): React.JSX.Element {
         />
       )}
       getNote={(transfer) => transfer.notes}
-      renderSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
+      renderCostSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
       renderTitleBadge={(transfer) => <TransferStatusBadge status={transfer.status} />}
       renderSubtitle={(transfer) => (
         <>

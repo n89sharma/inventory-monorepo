@@ -84,7 +84,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderTitleBadge?: (entity: TEntity) => React.ReactNode
   getNote?: (entity: TEntity) => string | null
-  renderSummaryStrip: (entity: TEntity) => React.ReactNode
+  renderCostSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
     entity: TEntity,
@@ -119,7 +119,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   renderTitle,
   renderTitleBadge,
   getNote,
-  renderSummaryStrip,
+  renderCostSummaryStrip,
   renderSubtitle,
   renderMetadataModal,
   renderAddAssetBar,
@@ -237,7 +237,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         }
       />
       <PageSection className="flex flex-col gap-1">
-        {renderSummaryStrip(entity)}
+        {renderCostSummaryStrip(entity)}
         {counterpartyWarning ? <CounterpartyMismatchCallout warning={counterpartyWarning} /> : null}
         {renderMetadataModal(entity, {
           open: isMetadataModalOpen,

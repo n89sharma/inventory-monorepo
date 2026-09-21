@@ -1,7 +1,7 @@
 import { AssetCostTotalsRow } from '@/components/shared/cards/asset-cost-totals-row'
 import type { AssetSearchRow } from 'shared-types'
 
-export function SummaryStrip({
+export function CostSummaryStrip({
   assets,
   children,
 }: {

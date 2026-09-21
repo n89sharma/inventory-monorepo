@@ -94,7 +94,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
         organization: OrgSummarySchema.parse(departure.customer),
       })}
       getNote={(departure) => departure.notes}
-      renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
+      renderCostSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={(departure) => (
         <>
           <SummaryValue value={formatDate(departure.created_at)} />
