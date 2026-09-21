@@ -196,7 +196,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
           <div className="flex items-center gap-2">
             <Button type="button" onClick={() => setIsAssetModalOpen(true)}>
               <PlusIcon />
-              Create Asset
+              New Asset
             </Button>
             <CreateAssetModal
               open={isAssetModalOpen}

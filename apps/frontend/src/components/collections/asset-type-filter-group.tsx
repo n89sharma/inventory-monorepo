@@ -39,6 +39,7 @@ export function AssetTypeFilterGroup({
       {ASSET_TYPE_FILTER_OPTIONS.map((option) => (
         <ToggleGroupItem
           key={option.value}
+          size="sm"
           value={option.value}
           disabled={counts[option.value] === 0}
           className={ITEM_CLASS}

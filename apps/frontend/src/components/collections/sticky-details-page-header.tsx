@@ -16,15 +16,15 @@ type StickyDetailsPageHeaderProps = {
 function DetailsPageHeaderContent(props: StickyDetailsPageHeaderProps): React.JSX.Element {
   const { breadcrumbSegments, actions, subtitle, titleBadge } = props
   return (
-    <>
-      <div className="flex items-center gap-4">
-        <div className="min-w-0 flex-1">
-          {breadcrumbSegments.length > 0 ? (
-            <PageBreadcrumbToTitle segments={breadcrumbSegments} />
-          ) : null}
-        </div>
-        {actions}
+    // Breadcrumb and title stack in the left column while the actions span both rows on the
+    // right, so the icon buttons cannot stretch the row the breadcrumb sits in.
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1">
+      <div className="min-w-0">
+        {breadcrumbSegments.length > 0 ? (
+          <PageBreadcrumbToTitle segments={breadcrumbSegments} />
+        ) : null}
       </div>
+      <div className="row-span-2 self-start justify-self-end">{actions}</div>
       {props.titleNode ?? (
         <h1 className="text-2xl font-semibold group flex items-center gap-2">
           {props.title}
@@ -32,8 +32,8 @@ function DetailsPageHeaderContent(props: StickyDetailsPageHeaderProps): React.JS
           {titleBadge}
         </h1>
       )}
-      {subtitle && <div className="text-sm">{subtitle}</div>}
-    </>
+      {subtitle && <div className="col-span-2 text-sm">{subtitle}</div>}
+    </div>
   )
 }
 

@@ -34,6 +34,12 @@ import { CollectionNoteButton } from './collection-note-button'
 const BARCODE_PRINT_SECTION = 'arrivals'
 const CSV_MIME_TYPE = 'text/csv'
 
+export type CollectionMenuAction = {
+  label: string
+  icon?: React.ReactNode
+  onSelect: () => void
+}
+
 type CollectionEditBarProps = {
   section: CollectionSection
   collectionId: string
@@ -43,6 +49,7 @@ type CollectionEditBarProps = {
   selectedAssets?: AssetSearchRow[]
   visibleColumns: Set<string>
   note?: string | null
+  menuActions?: CollectionMenuAction[]
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
@@ -59,6 +66,7 @@ export function CollectionEditBar({
   selectedAssets,
   visibleColumns,
   note,
+  menuActions,
   historyCacheKey,
   historyFetcher,
   onEdit,
@@ -166,20 +174,26 @@ export function CollectionEditBar({
       <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
         <PrinterIcon />
       </Button>
-      {(canCreateEditEntity || showDelete) && (
+      {(canCreateEditEntity || showDelete || menuActions?.length) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
               <DotsThreeVerticalIcon aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-auto">
             {canCreateEditEntity && (
               <DropdownMenuItem onSelect={onEdit}>
                 <PencilSimpleIcon />
                 Edit
               </DropdownMenuItem>
             )}
+            {menuActions?.map((action) => (
+              <DropdownMenuItem key={action.label} onSelect={action.onSelect}>
+                {action.icon}
+                {action.label}
+              </DropdownMenuItem>
+            ))}
             {showRelease && (
               <DropdownMenuItem variant="destructive" onSelect={onRelease}>
                 <LockSimpleOpenIcon />

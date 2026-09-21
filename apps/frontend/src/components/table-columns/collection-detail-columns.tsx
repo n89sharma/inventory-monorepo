@@ -46,11 +46,11 @@ function actionColumns(
   return [
     {
       id: 'edit',
-      meta: { reorderable: false },
+      meta: { reorderable: false, cellClassName: 'py-0' },
       cell: ({ row }) => (
         <Button
           variant="outline"
-          size="icon"
+          size="icon-sm"
           type="button"
           aria-label="Edit asset"
           onClick={() => onEdit(row.original)}

@@ -109,7 +109,7 @@ type DataTableBaseProps<TData, TValue> = DataTableProps<TData, TValue> & { frame
 const DEFAULT_PAGE_SIZE = 75
 
 export const TABLE_HEAD_CLASS =
-  'whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
+  'h-7 whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
 
 const TABLE_FOOT_CELL_CLASS = 'whitespace-nowrap bg-muted text-center font-semibold'
 

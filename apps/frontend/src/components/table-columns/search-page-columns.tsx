@@ -32,6 +32,7 @@ function toPriceColumnDef(
     accessorKey: column.id,
     header: column.label,
     size: EDITABLE_COST_COLUMN_SIZE,
+    meta: { cellClassName: 'py-0' },
     cell: ({ row, table }) => (
       <AssetPriceCell
         row={row}

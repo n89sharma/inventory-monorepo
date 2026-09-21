@@ -32,7 +32,7 @@ export function ColumnPickerButton({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          size="icon"
+          size="icon-sm"
           aria-label={`Columns (${visibleCount} of ${permittedColumns.length} shown)`}
         >
           <SlidersIcon />

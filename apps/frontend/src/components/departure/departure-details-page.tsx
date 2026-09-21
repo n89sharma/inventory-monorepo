@@ -1,3 +1,4 @@
+import { PlusIcon } from '@phosphor-icons/react'
 import { OrgName } from '@/components/shared/org-name'
 import { InvoiceSummaryField } from '@/components/invoice/invoice-summary-field'
 import { salesInvoiceOf } from '@/lib/asset-invoice'
@@ -7,6 +8,7 @@ import type { AssetWarningOf } from '@/components/table-columns/asset-search-col
 import { EditDepartureMetadataModal } from '@/components/departure/edit-departure-metadata-modal'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
+import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import type { BulkExtraAction, BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
@@ -42,6 +44,8 @@ function buildOutgoingStatusActions(onApply: (status: OutgoingStatus) => void): 
   }))
 }
 
+const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
+
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
   if (departureNumber === undefined) throw new Error('Missing collectionId parameter')
@@ -63,6 +67,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
     [mutations, departureNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+  const [addFromHoldOpen, setAddFromHoldOpen] = useState(false)
 
   const buildColumns = useCallback(
     (assetHref: (asset: AssetSearchRow) => string, assetWarningOf: AssetWarningOf) =>
@@ -95,6 +100,26 @@ export function DepartureDetailsPage(): React.JSX.Element {
         organization: OrgSummarySchema.parse(departure.customer),
       })}
       getNote={(departure) => departure.notes}
+      renderMenuActions={(departure) => ({
+        actions: canCreateEditDeparture
+          ? [
+              {
+                label: ADD_FROM_HOLD_LABEL,
+                icon: <PlusIcon />,
+                onSelect: () => setAddFromHoldOpen(true),
+              },
+            ]
+          : [],
+        dialogs: (
+          <AddFromHoldModal
+            open={addFromHoldOpen}
+            onOpenChange={setAddFromHoldOpen}
+            getAssets={() => departure.assets}
+            onAddAsset={() => {}}
+            onCommitBatch={(assets) => mutations.addAssetBatch(departureNumber, assets)}
+          />
+        ),
+      })}
       renderSummaryStrip={(departure) => (
         <>
           <SummaryValue value={formatDate(departure.created_at)} />
@@ -123,7 +148,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
             existingAssets={departure.assets}
             entityName="departure"
             onAddSingle={(asset) => mutations.addAsset(departureNumber, asset)}
-            onAddBatchFromHold={(assets) => mutations.addAssetBatch(departureNumber, assets)}
           />
         )
       }

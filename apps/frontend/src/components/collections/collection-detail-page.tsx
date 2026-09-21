@@ -39,13 +39,11 @@ import {
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { AssetTypeFilterGroup } from './asset-type-filter-group'
 import { BulkEditBar, type BulkExtraActionGroup } from './bulk-edit-bar'
-import { CollectionEditBar } from './collection-edit-bar'
+import { CollectionEditBar, type CollectionMenuAction } from './collection-edit-bar'
 
 const TABLE_LABEL = 'Collection assets'
 
 const ASSET_TYPE_PARAM_KEY = 'asset_type'
-
-const COUNTERPARTY_MISMATCH_ROW_CLASS = 'data-row-warning print:[--row-bg:var(--color-background)]'
 
 const ASSET_SEARCH_PLACEHOLDER = 'Search barcode, serial, model'
 const ASSET_SEARCH_CLEAR_LABEL = 'Clear search'
@@ -85,6 +83,10 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderTitleBadge?: (entity: TEntity) => React.ReactNode
   getNote?: (entity: TEntity) => string | null
+  renderMenuActions?: (entity: TEntity) => {
+    actions: CollectionMenuAction[]
+    dialogs: React.ReactNode
+  }
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
     entity: TEntity,
@@ -119,6 +121,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   renderTitle,
   renderTitleBadge,
   getNote,
+  renderMenuActions,
   renderSummaryStrip,
   renderMetadataModal,
   renderAddAssetBar,
@@ -154,13 +157,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     (asset: AssetSearchRow) => counterpartyWarning?.assetWarnings.get(asset.barcode),
     [counterpartyWarning],
   )
-  const getRowClassName = useCallback(
-    (asset: AssetSearchRow) =>
-      counterpartyWarning?.assetWarnings.has(asset.barcode)
-        ? COUNTERPARTY_MISMATCH_ROW_CLASS
-        : undefined,
-    [counterpartyWarning],
-  )
   const columns = useMemo(
     () => buildColumns(assetHref, assetWarningOf),
     [buildColumns, assetHref, assetWarningOf],
@@ -191,6 +187,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   if (!detail.data) return <div>{notFoundLabel}</div>
 
   const entity = detail.data
+  const menuActions = renderMenuActions?.(entity)
 
   const selectedAssets = entity.assets.filter((asset) => rowSelection[asset.barcode])
   const selectedSummaries = selectedAssets.map(searchRowToAssetSummary)
@@ -221,6 +218,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               selectedAssets={selectedAssets}
               visibleColumns={visibleColumns}
               note={getNote?.(entity)}
+              menuActions={menuActions?.actions}
               historyCacheKey={historyCacheKey}
               historyFetcher={historyFetcher}
               onEdit={() => setIsMetadataModalOpen(true)}
@@ -237,10 +235,11 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
       />
       <CostSummaryStrip assets={entity.assets} />
       {counterpartyWarning ? (
-        <PageSection>
+        <PageSection className="pt-0">
           <CounterpartyMismatchCallout warning={counterpartyWarning} />
         </PageSection>
       ) : null}
+      {menuActions?.dialogs}
       {renderMetadataModal(entity, {
         open: isMetadataModalOpen,
         onOpenChange: setIsMetadataModalOpen,
@@ -298,7 +297,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         }}
         onRowMouseEnter={(asset) => preloadAssetDetail(asset.barcode)}
         getRowHref={assetHref}
-        getRowClassName={getRowClassName}
         getRowId={getAssetRowId}
         defaultSort={DEFAULT_ASSET_SORT}
         pinLeft={PINNED_ASSET_COLUMN_IDS}

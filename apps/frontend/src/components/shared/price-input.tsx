@@ -54,7 +54,7 @@ export function PriceInput({
         placeholder={PLACEHOLDER}
         aria-label={label}
         aria-invalid={invalid}
-        className="pl-6 tabular-nums"
+        className="h-7 pl-6 tabular-nums"
       />
       {saving && <CircleNotchIcon className={SPINNER_CLASS} aria-hidden="true" />}
     </div>

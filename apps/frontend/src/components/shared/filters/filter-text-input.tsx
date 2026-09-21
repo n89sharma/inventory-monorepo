@@ -38,7 +38,7 @@ export function FilterTextInput({
         onChange={(event) => onValueChange(event.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className={cn('bg-background pr-8', leadingIcon && 'pl-8')}
+        className={cn('h-7 bg-background pr-8', leadingIcon && 'pl-8')}
       />
       {value && (
         <Button

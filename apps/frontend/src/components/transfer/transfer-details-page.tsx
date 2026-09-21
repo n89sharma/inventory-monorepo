@@ -1,7 +1,9 @@
+import { PlusIcon } from '@phosphor-icons/react'
 import { OrgName } from '@/components/shared/org-name'
 import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
+import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
 import { SummaryRoute } from '@/components/shared/cards/summary-route'
@@ -17,7 +19,7 @@ import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   TRANSFER_STATUS,
@@ -26,6 +28,8 @@ import {
   type TransferDetail,
 } from 'shared-types'
 import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
+
+const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
 
 export function TransferDetailsPage(): React.JSX.Element {
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
@@ -44,6 +48,7 @@ export function TransferDetailsPage(): React.JSX.Element {
     [mutations, transferNumber],
   )
   const { priceEditorRegistry, tableMeta } = usePriceCellEditing(savePrice)
+  const [addFromHoldOpen, setAddFromHoldOpen] = useState(false)
   const handleDelete = useEntityDelete('Transfer', transferNumber, transferNumber, mutations.remove)
 
   const buildColumns = useCallback(
@@ -94,6 +99,26 @@ export function TransferDetailsPage(): React.JSX.Element {
       )}
       getNote={(transfer) => transfer.notes}
       renderTitleBadge={(transfer) => <TransferStatusBadge status={transfer.status} />}
+      renderMenuActions={(transfer) => ({
+        actions: canEditAssets
+          ? [
+              {
+                label: ADD_FROM_HOLD_LABEL,
+                icon: <PlusIcon />,
+                onSelect: () => setAddFromHoldOpen(true),
+              },
+            ]
+          : [],
+        dialogs: (
+          <AddFromHoldModal
+            open={addFromHoldOpen}
+            onOpenChange={setAddFromHoldOpen}
+            getAssets={() => transfer.assets}
+            onAddAsset={() => {}}
+            onCommitBatch={(assets) => mutations.addAssetBatch(transferNumber, assets)}
+          />
+        ),
+      })}
       renderSummaryStrip={(transfer) => (
         <>
           <SummaryValue value={formatDate(transfer.created_at)} />
@@ -117,7 +142,6 @@ export function TransferDetailsPage(): React.JSX.Element {
             existingAssets={transfer.assets}
             entityName="transfer"
             onAddSingle={(asset) => mutations.addAsset(transferNumber, asset)}
-            onAddBatchFromHold={(assets) => mutations.addAssetBatch(transferNumber, assets)}
           />
         )
       }

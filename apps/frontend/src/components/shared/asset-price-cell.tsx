@@ -20,7 +20,7 @@ const MOVE_FIELD_KEY = 'Tab'
 const ENTRY_TAB_INDEX = 0
 const ROVING_TAB_INDEX = -1
 const READ_BUTTON_CLASS =
-  'h-8 w-full rounded-lg border border-transparent px-2.5 py-1 text-base tabular-nums ' +
+  'h-7 w-full rounded-lg border border-transparent px-2.5 py-0 text-base tabular-nums ' +
   'transition-colors outline-none cursor-text md:text-sm ' +
   'hover:border-input hover:bg-muted/40 ' +
   'focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 ' +
