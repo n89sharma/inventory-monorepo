@@ -85,7 +85,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderTitleBadge?: (entity: TEntity) => React.ReactNode
   getNote?: (entity: TEntity) => string | null
   renderCostSummaryStrip: (entity: TEntity) => React.ReactNode
-  renderSubtitle: (entity: TEntity) => React.ReactNode
+  renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
     entity: TEntity,
     control: { open: boolean; onOpenChange: (open: boolean) => void },
@@ -120,7 +120,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   renderTitleBadge,
   getNote,
   renderCostSummaryStrip,
-  renderSubtitle,
+  renderSummaryStrip,
   renderMetadataModal,
   renderAddAssetBar,
   renderHeaderActions,
@@ -232,7 +232,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         }
         subtitle={
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            {renderSubtitle(entity)}
+            {renderSummaryStrip(entity)}
           </div>
         }
       />

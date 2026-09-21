@@ -95,7 +95,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
       })}
       getNote={(departure) => departure.notes}
       renderCostSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
-      renderSubtitle={(departure) => (
+      renderSummaryStrip={(departure) => (
         <>
           <SummaryValue value={formatDate(departure.created_at)} />
           <SummaryRoute

@@ -96,7 +96,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       getNote={(transfer) => transfer.notes}
       renderCostSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
       renderTitleBadge={(transfer) => <TransferStatusBadge status={transfer.status} />}
-      renderSubtitle={(transfer) => (
+      renderSummaryStrip={(transfer) => (
         <>
           <SummaryValue value={formatDate(transfer.created_at)} />
           <SummaryRoute from={transfer.origin.city_code} to={transfer.destination.city_code} />

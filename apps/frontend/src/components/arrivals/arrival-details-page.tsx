@@ -170,7 +170,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       tableMeta={tableMeta}
       getNote={(arrival) => arrival.comment}
       renderCostSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
-      renderSubtitle={(arrival) => (
+      renderSummaryStrip={(arrival) => (
         <>
           <SummaryValue value={formatDate(arrival.created_at)} />
           <SummaryRoute

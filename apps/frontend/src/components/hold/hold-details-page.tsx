@@ -106,7 +106,7 @@ export function HoldDetailsPage(): React.JSX.Element {
         getNote={(hold) => hold.notes}
         renderCostSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
         renderTitleBadge={(hold) => hold.archived_at && <StatusBadge status={RELEASED_STATUS} />}
-        renderSubtitle={(hold) => (
+        renderSummaryStrip={(hold) => (
           <>
             <SummaryValue value={formatDate(hold.created_at)} />
             <SummaryValue value={<OrgName name={hold.customer.name} />} />

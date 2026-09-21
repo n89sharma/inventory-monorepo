@@ -88,7 +88,7 @@ export function InvoiceDetailsPage(): React.JSX.Element {
           <InvoiceClearedBadge cleared={invoice.is_cleared} />
         </>
       )}
-      renderSubtitle={(invoice) => (
+      renderSummaryStrip={(invoice) => (
         <>
           <SummaryValue value={formatDate(parseISO(invoice.invoice_date))} />
           <InvoiceRoute invoice={invoice} />
