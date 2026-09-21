@@ -1,3 +1,5 @@
+import { OrgName } from '@/components/shared/org-name'
+import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { departureCustomerWarning } from '@/components/departure/departure-customer-mismatch'
 import { DepartureSummaryStrip } from '@/components/departure/departure-summary-strip'
 import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
@@ -6,7 +8,9 @@ import { createCollectionDetailColumns } from '@/components/table-columns/collec
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import type { BulkExtraAction, BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
-import { SummaryField } from '@/components/shared/cards/summary-field'
+import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
+import { SummaryRoute } from '@/components/shared/cards/summary-route'
+import { SummaryValue } from '@/components/shared/cards/summary-value'
 import { ReturnToStockDialog } from '@/components/departure/return-to-stock-dialog'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
@@ -89,11 +93,19 @@ export function DepartureDetailsPage(): React.JSX.Element {
         invoiceType: INVOICE_TYPE.sales,
         organization: OrgSummarySchema.parse(departure.customer),
       })}
+      getNote={(departure) => departure.notes}
       renderSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSubtitle={(departure) => (
         <>
-          <SummaryField label="Customer" value={departure.customer.name} />
-          <SummaryField label="Departed" value={formatDate(departure.created_at)} />
+          <SummaryValue value={formatDate(departure.created_at)} />
+          <SummaryRoute
+            from={departure.origin.city_code}
+            to={<OrgName name={departure.customer.name} />}
+          />
+          <SummaryValue value={departure.salesperson?.name} />
+          <SummaryValue value={<OrgName name={departure.transporter.name} />} />
+          <AssetTotalsField assets={departure.assets} />
+          <CreatedByField value={departure.created_by} />
         </>
       )}
       renderMetadataModal={(departure, control) => (

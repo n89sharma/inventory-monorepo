@@ -30,11 +30,12 @@ export function ColumnPickerButton({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="default" className="gap-1.5">
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={`Columns (${visibleCount} of ${permittedColumns.length} shown)`}
+        >
           <SlidersIcon />
-          <span>
-            Columns ({visibleCount} / {permittedColumns.length})
-          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-144 p-2">

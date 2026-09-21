@@ -1,7 +1,11 @@
+import { OrgName } from '@/components/shared/org-name'
+import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { ArrivalSummaryStrip } from '@/components/arrivals/arrival-summary-strip'
 import { arrivalVendorWarning } from '@/components/arrivals/arrival-vendor-mismatch'
 import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
-import { SummaryField } from '@/components/shared/cards/summary-field'
+import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
+import { SummaryRoute } from '@/components/shared/cards/summary-route'
+import { SummaryValue } from '@/components/shared/cards/summary-value'
 import { getArrivalHistory } from '@/data/api/arrival-api'
 import { arrivalDetailKey, useArrivalDetail } from '@/hooks/use-arrival'
 import { useArrivalMutations } from '@/hooks/use-arrival-mutations'
@@ -164,11 +168,18 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       buildColumns={buildColumns}
       counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
+      getNote={(arrival) => arrival.comment}
       renderSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
       renderSubtitle={(arrival) => (
         <>
-          <SummaryField label="Vendor" value={arrival.vendor.name} />
-          <SummaryField label="Arrived" value={formatDate(arrival.created_at)} />
+          <SummaryValue value={formatDate(arrival.created_at)} />
+          <SummaryRoute
+            from={<OrgName name={arrival.vendor.name} />}
+            to={arrival.warehouse?.city_code}
+          />
+          <SummaryValue value={<OrgName name={arrival.transporter.name} />} />
+          <AssetTotalsField assets={arrival.assets} />
+          <CreatedByField value={arrival.created_by} />
         </>
       )}
       renderMetadataModal={(arrival, control) => (
@@ -181,8 +192,8 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       )}
       renderAddAssetBar={() =>
         canEditArrival && (
-          <div className="flex justify-end">
-            <Button type="button" variant="secondary" onClick={() => setIsAssetModalOpen(true)}>
+          <div className="flex items-center gap-2">
+            <Button type="button" onClick={() => setIsAssetModalOpen(true)}>
               <PlusIcon />
               Create Asset
             </Button>

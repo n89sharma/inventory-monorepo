@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip'
 import { getReadinessDisplay } from '@/components/shared/readiness/readiness-config'
 import { ReadinessIcon } from '@/components/shared/readiness/readiness-icon'
+import { OrgName } from '@/components/shared/org-name'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { WarningIcon } from '@phosphor-icons/react'
 import { COST_FIELD_LABELS } from '@/lib/cost-fields'
@@ -393,6 +394,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     section: 'arrival',
     sortable: true,
     text: (a) => a.vendor ?? '',
+    cell: (a) => <OrgName name={a.vendor} />,
   },
   {
     id: 'arrival_number',
@@ -424,6 +426,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     section: 'departure',
     sortable: true,
     text: (a) => a.customer ?? '',
+    cell: (a) => <OrgName name={a.customer} />,
   },
   {
     id: 'salesperson',
@@ -565,6 +568,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     section: 'hold',
     sortable: true,
     text: (a) => a.hold_customer ?? '',
+    cell: (a) => <OrgName name={a.hold_customer} />,
   },
   {
     id: 'hold_created_at',

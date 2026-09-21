@@ -60,14 +60,12 @@ import {
 
 import { Button } from '@/components/shadcn/button'
 import { useGridScrollRestoration } from '@/hooks/use-grid-scroll-restoration'
-import { SELECT_COLUMN_SIZE } from '@/components/table-columns/column-primitives'
 import {
   CaretDoubleLeftIcon,
   CaretDoubleRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
   DotsSixVerticalIcon,
-  FunnelSimpleIcon,
 } from '@phosphor-icons/react'
 
 interface DataTableProps<TData, TValue> {
@@ -497,13 +495,7 @@ function DataTableBase<TData, TValue>({
               </div>
             )}
             {renderTableFilter && (
-              <div className="flex shrink-0 items-center gap-4 border-b bg-muted py-2 pr-2">
-                <div
-                  className="flex shrink-0 items-center justify-center pl-4"
-                  style={{ width: SELECT_COLUMN_SIZE }}
-                >
-                  <FunnelSimpleIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-                </div>
+              <div className="flex shrink-0 items-center gap-4 border-b bg-muted p-2">
                 {renderTableFilter(table)}
               </div>
             )}

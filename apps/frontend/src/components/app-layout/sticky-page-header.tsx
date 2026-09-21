@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 const DETAILS_HEADER_HEIGHT_PROPERTY = '--details-header-height'
 
 const HEADER_BAR = 'sticky top-0 z-20 bg-background border-b'
-const HEADER_INNER = 'w-full px-4 pt-4 pb-3 flex flex-col gap-2'
+const HEADER_INNER = 'w-full p-2 flex flex-col gap-1'
 const HEADER_GUTTER = 'max-w-7xl mx-auto'
 
 // Declared outside the component so its identity is stable: React re-runs a ref

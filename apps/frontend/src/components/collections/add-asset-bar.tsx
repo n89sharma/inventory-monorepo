@@ -26,16 +26,15 @@ export function AddAssetBar({
         showLeadingIcon
         validateAsset={validateAsset}
         onCommit={onAddSingle}
-        className="w-96"
+        className="w-72"
+        inputClassName="bg-background"
       />
       {onAddBatchFromHold && (
-        <div className="ml-auto">
-          <AddFromHoldButton
-            getAssets={() => existingAssets}
-            onAddAsset={() => {}}
-            onCommitBatch={onAddBatchFromHold}
-          />
-        </div>
+        <AddFromHoldButton
+          getAssets={() => existingAssets}
+          onAddAsset={() => {}}
+          onCommitBatch={onAddBatchFromHold}
+        />
       )}
     </div>
   )

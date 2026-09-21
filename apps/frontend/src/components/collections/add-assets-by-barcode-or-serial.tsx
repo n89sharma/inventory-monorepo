@@ -11,8 +11,7 @@ import { resultOptionId } from '../global-search/search-results'
 import { Input } from '../shadcn/input'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../shadcn/popover'
 
-const buildAddAssetPlaceholder = (entityName: string) =>
-  `Scan barcode or serial to add to this ${entityName}…`
+const ADD_ASSET_PLACEHOLDER = 'Scan barcode or serial…'
 
 const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
@@ -171,12 +170,15 @@ export function AddAssetsByBarcodeOrSerial({
         <PopoverAnchor asChild>
           <div className="relative">
             {showLeadingIcon && (
-              <BarcodeIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none" />
+              <BarcodeIcon
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground size-4 pointer-events-none"
+                aria-hidden="true"
+              />
             )}
             <Input
               id={inputId}
               ref={assignInput}
-              placeholder={buildAddAssetPlaceholder(entityName)}
+              placeholder={ADD_ASSET_PLACEHOLDER}
               aria-label="Add asset by barcode or serial number"
               role="combobox"
               aria-expanded={popoverOpen}

@@ -1,4 +1,7 @@
+import { SummaryValue } from '@/components/shared/cards/summary-value'
 import { formatWeight } from '@/lib/formatters'
+
+const SIZE_UNIT = 'ft'
 
 const sizeFormatter = new Intl.NumberFormat('en-US')
 
@@ -12,16 +15,8 @@ export function AssetTotalsField({ assets }: { assets: { weight: number; size: n
 
   return (
     <>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-muted-foreground">Total Weight</span>
-        <span className="font-medium tabular-nums">{formatWeight(totalWeight)}</span>
-      </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-muted-foreground">Total Size</span>
-        <span className="font-medium tabular-nums">
-          {sizeFormatter.format(Math.round(totalSize))}
-        </span>
-      </div>
+      <SummaryValue value={formatWeight(totalWeight)} />
+      <SummaryValue value={`${sizeFormatter.format(Math.round(totalSize))} ${SIZE_UNIT}`} />
     </>
   )
 }

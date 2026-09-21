@@ -1,4 +1,4 @@
-import { formatDate } from '@/lib/formatters'
+import { formatDate, formatOrgName } from '@/lib/formatters'
 import type {
   ArrivalSuggestion,
   BarcodeSuggestion,
@@ -103,14 +103,14 @@ export function getSearchResultColumns(result: FlatResult): string[] {
         result.data.arrival_number,
         formatDate(result.data.created_at),
         result.data.warehouse_code,
-        result.data.vendor,
+        formatOrgName(result.data.vendor),
       ]
     case 'departure':
       return [
         result.data.departure_number,
         formatDate(result.data.created_at),
         result.data.origin_code,
-        result.data.destination,
+        formatOrgName(result.data.destination),
       ]
     case 'transfer':
       return [
@@ -123,7 +123,7 @@ export function getSearchResultColumns(result: FlatResult): string[] {
       return [
         result.data.hold_number,
         formatDate(result.data.created_at),
-        result.data.customer,
+        formatOrgName(result.data.customer),
         result.data.created_for,
       ]
     case 'invoice':
@@ -131,7 +131,7 @@ export function getSearchResultColumns(result: FlatResult): string[] {
         result.data.invoice_reference,
         result.data.invoice_number,
         formatDate(result.data.created_at),
-        result.data.organization,
+        formatOrgName(result.data.organization),
         result.data.invoice_type,
       ]
   }

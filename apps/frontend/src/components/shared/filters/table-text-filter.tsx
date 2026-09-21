@@ -1,4 +1,5 @@
 import { FilterTextInput } from '@/components/shared/filters/filter-text-input'
+import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import type { Table } from '@tanstack/react-table'
 
 /**
@@ -22,6 +23,7 @@ export function TableTextFilter<TData>({
     <FilterTextInput
       value={value}
       onValueChange={(newValue) => table.setGlobalFilter(newValue)}
+      leadingIcon={<MagnifyingGlassIcon className="size-4" />}
       placeholder={placeholder}
       clearLabel={clearLabel}
       className={className}

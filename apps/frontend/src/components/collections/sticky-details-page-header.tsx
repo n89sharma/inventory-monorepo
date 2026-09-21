@@ -7,27 +7,31 @@ type StickyDetailsPageHeaderProps = {
   breadcrumbSegments: BreadcrumbSegment[]
   actions: React.ReactNode
   subtitle?: React.ReactNode
+  titleBadge?: React.ReactNode
 } & (
   | { title: string; copyValue: string; titleNode?: never }
   | { titleNode: React.ReactNode; title?: never; copyValue?: never }
 )
 
 function DetailsPageHeaderContent(props: StickyDetailsPageHeaderProps): React.JSX.Element {
-  const { breadcrumbSegments, actions, subtitle } = props
+  const { breadcrumbSegments, actions, subtitle, titleBadge } = props
   return (
     <>
-      {breadcrumbSegments.length > 0 ? (
-        <PageBreadcrumbToTitle segments={breadcrumbSegments} />
-      ) : null}
-      <div className="flex items-center justify-between gap-4">
-        {props.titleNode ?? (
-          <h1 className="text-2xl font-semibold group flex items-center gap-2">
-            {props.title}
-            <CopyButton value={props.copyValue} />
-          </h1>
-        )}
+      <div className="flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          {breadcrumbSegments.length > 0 ? (
+            <PageBreadcrumbToTitle segments={breadcrumbSegments} />
+          ) : null}
+        </div>
         {actions}
       </div>
+      {props.titleNode ?? (
+        <h1 className="text-2xl font-semibold group flex items-center gap-2">
+          {props.title}
+          <CopyButton value={props.copyValue} />
+          {titleBadge}
+        </h1>
+      )}
       {subtitle && <div className="text-sm">{subtitle}</div>}
     </>
   )

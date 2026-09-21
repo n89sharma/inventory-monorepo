@@ -58,6 +58,16 @@ export function formatMarginPercent(value: number | undefined): string {
   return `${value.toFixed(MARGIN_PERCENT_FRACTION_DIGITS)}%`
 }
 
+const ORG_NAME_WORD_LIMIT = 2
+const ELLIPSIS = '…'
+
+// Display-only shortening: exports and the organizations settings page keep the full name.
+export function formatOrgName(name: string): string {
+  const words = name.trim().split(/\s+/)
+  if (words.length <= ORG_NAME_WORD_LIMIT) return words.join(' ')
+  return `${words.slice(0, ORG_NAME_WORD_LIMIT).join(' ')}${ELLIPSIS}`
+}
+
 export function formatTitleCase(str: string): string {
   return str
     .toLowerCase()

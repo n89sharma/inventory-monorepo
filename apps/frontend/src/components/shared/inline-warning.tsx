@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 import { WarningIcon } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 
-const CALLOUT_BASE = 'flex items-start justify-between gap-2 rounded-lg border px-3 py-2 text-sm'
+const CALLOUT_BASE = 'flex items-start justify-between gap-2 rounded-lg border px-2 py-1 text-sm'
 
 const WARNING_TONE = 'border-destructive/30 bg-destructive/10 text-destructive'
 

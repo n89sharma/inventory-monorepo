@@ -46,7 +46,7 @@ const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
 const COUNTERPARTY_MISMATCH_ROW_CLASS = 'data-row-warning print:[--row-bg:var(--color-background)]'
 
-const ASSET_SEARCH_PLACEHOLDER = 'Barcode, serial or model'
+const ASSET_SEARCH_PLACEHOLDER = 'Search barcode, serial, model'
 const ASSET_SEARCH_CLEAR_LABEL = 'Clear search'
 const SEARCHABLE_ASSET_COLUMN_ID_SET = new Set<string>(SEARCHABLE_ASSET_COLUMN_IDS)
 
@@ -82,6 +82,8 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   tableMeta?: TableMeta<AssetSearchRow>
   getInvoicePrefill?: (entity: TEntity) => InvoicePrefill
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
+  renderTitleBadge?: (entity: TEntity) => React.ReactNode
+  getNote?: (entity: TEntity) => string | null
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSubtitle: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
@@ -115,6 +117,8 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   tableMeta,
   getInvoicePrefill,
   renderTitle,
+  renderTitleBadge,
+  getNote,
   renderSummaryStrip,
   renderSubtitle,
   renderMetadataModal,
@@ -205,6 +209,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
         title={header.title}
         copyValue={header.copyValue}
+        titleBadge={renderTitleBadge?.(entity)}
         actions={
           <div className="flex items-center gap-2">
             {renderHeaderActions?.(entity)}
@@ -216,6 +221,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               assets={entity.assets}
               selectedAssets={selectedAssets}
               visibleColumns={visibleColumns}
+              note={getNote?.(entity)}
               historyCacheKey={historyCacheKey}
               historyFetcher={historyFetcher}
               onEdit={() => setIsMetadataModalOpen(true)}
@@ -230,14 +236,13 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
           </div>
         }
       />
-      <PageSection className="flex flex-col gap-4">
+      <PageSection className="flex flex-col gap-1">
         {renderSummaryStrip(entity)}
         {counterpartyWarning ? <CounterpartyMismatchCallout warning={counterpartyWarning} /> : null}
         {renderMetadataModal(entity, {
           open: isMetadataModalOpen,
           onOpenChange: setIsMetadataModalOpen,
         })}
-        {renderAddAssetBar?.(entity)}
       </PageSection>
 
       <DataGridWithoutResultCount
@@ -247,18 +252,19 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         textSearch={ASSET_TEXT_SEARCH}
         renderTableFilter={(table) => (
           <>
-            <TableTextFilter
-              table={table}
-              placeholder={ASSET_SEARCH_PLACEHOLDER}
-              clearLabel={ASSET_SEARCH_CLEAR_LABEL}
-              className="w-96"
-            />
-            <AssetTypeFilterGroup
-              value={assetTypeFilter}
-              counts={assetTypeCounts}
-              onValueChange={handleAssetTypeFilterChange}
-            />
-            <div className="ml-auto">
+            {renderAddAssetBar?.(entity)}
+            <div className="ml-auto flex items-center gap-4">
+              <TableTextFilter
+                table={table}
+                placeholder={ASSET_SEARCH_PLACEHOLDER}
+                clearLabel={ASSET_SEARCH_CLEAR_LABEL}
+                className="w-60"
+              />
+              <AssetTypeFilterGroup
+                value={assetTypeFilter}
+                counts={assetTypeCounts}
+                onValueChange={handleAssetTypeFilterChange}
+              />
               <ColumnPickerButton
                 visible={visibleColumns}
                 onVisibleChange={setVisibleColumns}

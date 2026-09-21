@@ -22,5 +22,5 @@ export function GridPageContent({ children, className }: PageContentProps): Reac
 // The parts of a grid page that are not the grid. Full width like the grid and the page
 // header above it, with only enough padding to keep content off the viewport edge.
 export function PageSection({ children, className }: PageContentProps): React.JSX.Element {
-  return <div className={cn('w-full shrink-0 px-4 py-2', className)}>{children}</div>
+  return <div className={cn('w-full shrink-0 px-2 py-1', className)}>{children}</div>
 }

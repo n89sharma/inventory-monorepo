@@ -1,9 +1,14 @@
+import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
 import { EditInvoiceMetadataModal } from '@/components/invoice/edit-invoice-metadata-modal'
 import { invoiceCounterpartyWarning } from '@/components/invoice/invoice-counterparty-mismatch'
 import { InvoiceSummaryStrip } from '@/components/invoice/invoice-summary-strip'
-import { SummaryField } from '@/components/shared/cards/summary-field'
+import { SummaryValue } from '@/components/shared/cards/summary-value'
+import { InvoiceClearedBadge } from '@/components/invoice/invoice-cleared-badge'
+import { InvoiceRoute } from '@/components/invoice/invoice-route'
+import { InvoiceTransporters } from '@/components/invoice/invoice-transporters'
+import { InvoiceTypeBadge } from '@/components/invoice/invoice-type-badge'
 import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { getInvoiceHistory } from '@/data/api/invoice-api'
@@ -12,11 +17,11 @@ import { invoiceDetailKey, useInvoiceDetail } from '@/hooks/use-invoice'
 import { useInvoiceMutations } from '@/hooks/use-invoice-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
-import { formatDate, formatTitleCase } from '@/lib/formatters'
+import { formatDate } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { INVOICE_TYPE, type AssetSearchRow, type PatchAssetPricing } from 'shared-types'
+import type { AssetSearchRow, PatchAssetPricing } from 'shared-types'
 
 export function InvoiceDetailsPage(): React.JSX.Element {
   const { collectionId: invoiceNumber } = useParams<{ collectionId: string }>()
@@ -75,16 +80,20 @@ export function InvoiceDetailsPage(): React.JSX.Element {
         title: `Invoice ${invoice.invoice_reference}`,
         copyValue: invoice.invoice_reference,
       })}
+      getNote={(invoice) => invoice.notes}
       renderSummaryStrip={(invoice) => <InvoiceSummaryStrip invoice={invoice} />}
+      renderTitleBadge={(invoice) => (
+        <>
+          <InvoiceTypeBadge type={invoice.invoice_type.type} />
+          <InvoiceClearedBadge cleared={invoice.is_cleared} />
+        </>
+      )}
       renderSubtitle={(invoice) => (
         <>
-          <SummaryField
-            label={invoice.invoice_type.type === INVOICE_TYPE.sales ? 'Customer' : 'Vendor'}
-            value={invoice.customer.name}
-          />
-          <SummaryField label="System Invoice Number" value={invoiceNumber} />
-          <SummaryField label="Date" value={formatDate(parseISO(invoice.invoice_date))} />
-          <SummaryField label="Type" value={formatTitleCase(invoice.invoice_type.type)} />
+          <SummaryValue value={formatDate(parseISO(invoice.invoice_date))} />
+          <InvoiceRoute invoice={invoice} />
+          <InvoiceTransporters arrivals={invoice.arrivals} />
+          <CreatedByField value={invoice.created_by.name} />
         </>
       )}
       renderMetadataModal={(invoice, control) => (

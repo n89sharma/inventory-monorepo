@@ -1,6 +1,9 @@
+import { OrgName } from '@/components/shared/org-name'
+import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { HoldSummaryStrip } from '@/components/hold/hold-summary-strip'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { SummaryField } from '@/components/shared/cards/summary-field'
+import { SummaryValue } from '@/components/shared/cards/summary-value'
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { getHoldHistory } from '@/data/api/hold-api'
@@ -100,13 +103,18 @@ export function HoldDetailsPage(): React.JSX.Element {
         onFlushPending={mutations.flushPending}
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}
+        getNote={(hold) => hold.notes}
         renderSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
+        renderTitleBadge={(hold) => hold.archived_at && <StatusBadge status={RELEASED_STATUS} />}
         renderSubtitle={(hold) => (
           <>
-            <SummaryField label="Customer" value={hold.customer.name} />
-            <SummaryField label="For" value={hold.created_for.name} />
-            {hold.to_dt && <SummaryField label="To" value={formatDate(hold.to_dt)} />}
-            {hold.archived_at && <StatusBadge status={RELEASED_STATUS} />}
+            <SummaryValue value={formatDate(hold.created_at)} />
+            <SummaryValue value={<OrgName name={hold.customer.name} />} />
+            <SummaryValue value={hold.created_for.name} />
+            {hold.archived_at && (
+              <SummaryField label="Released" value={formatDate(hold.archived_at)} />
+            )}
+            <CreatedByField value={hold.created_by.name} />
           </>
         )}
         renderMetadataModal={(hold, control) => (

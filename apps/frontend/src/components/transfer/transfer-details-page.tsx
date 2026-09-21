@@ -1,7 +1,12 @@
+import { OrgName } from '@/components/shared/org-name'
+import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
-import { SummaryField } from '@/components/shared/cards/summary-field'
+import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
+import { SummaryRoute } from '@/components/shared/cards/summary-route'
+import { SummaryValue } from '@/components/shared/cards/summary-value'
+import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
 import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
@@ -12,7 +17,7 @@ import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
-import { formatDate, formatTitleCase } from '@/lib/formatters'
+import { formatDate } from '@/lib/formatters'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -88,13 +93,16 @@ export function TransferDetailsPage(): React.JSX.Element {
           }
         />
       )}
+      getNote={(transfer) => transfer.notes}
       renderSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
+      renderTitleBadge={(transfer) => <TransferStatusBadge status={transfer.status} />}
       renderSubtitle={(transfer) => (
         <>
-          <SummaryField label="Status" value={formatTitleCase(transfer.status)} />
-          <SummaryField label="From" value={transfer.origin.city_code} />
-          <SummaryField label="To" value={transfer.destination.city_code} />
-          <SummaryField label="Date" value={formatDate(transfer.created_at)} />
+          <SummaryValue value={formatDate(transfer.created_at)} />
+          <SummaryRoute from={transfer.origin.city_code} to={transfer.destination.city_code} />
+          <SummaryValue value={<OrgName name={transfer.transporter.name} />} />
+          <AssetTotalsField assets={transfer.assets} />
+          <CreatedByField value={transfer.created_by} />
         </>
       )}
       renderMetadataModal={(transfer, control) => (

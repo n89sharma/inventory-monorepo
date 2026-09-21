@@ -21,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../shadcn/dropdown-menu'
 import { DeleteEntityDialog } from '../shared/delete-entity-dialog'
@@ -28,6 +29,7 @@ import { ShareButton } from '../shared/share-button'
 import { type CollectionSection } from '../table-columns/collection-detail-columns'
 import { searchPageRowsToCsv } from '../table-columns/search-page-report-columns'
 import { CollectionHistorySheet } from './collection-history-sheet'
+import { CollectionNoteButton } from './collection-note-button'
 
 const BARCODE_PRINT_SECTION = 'arrivals'
 const CSV_MIME_TYPE = 'text/csv'
@@ -40,6 +42,7 @@ type CollectionEditBarProps = {
   assets?: AssetSearchRow[]
   selectedAssets?: AssetSearchRow[]
   visibleColumns: Set<string>
+  note?: string | null
   historyCacheKey: string
   historyFetcher: () => Promise<CollectionHistory>
   onEdit: () => void
@@ -55,6 +58,7 @@ export function CollectionEditBar({
   assets,
   selectedAssets,
   visibleColumns,
+  note,
   historyCacheKey,
   historyFetcher,
   onEdit,
@@ -126,9 +130,11 @@ export function CollectionEditBar({
 
   const showRelease = canCreateEditEntity && Boolean(onRelease)
   const showDelete = canDelete && Boolean(onDelete)
+  const showSeparator = showDelete && (canCreateEditEntity || showRelease)
 
   return (
     <div className="flex gap-2 print:hidden">
+      <CollectionNoteButton note={note} />
       <CollectionHistorySheet cacheKey={historyCacheKey} fetcher={historyFetcher} />
       <ShareButton />
       {assets !== undefined && (
@@ -160,13 +166,7 @@ export function CollectionEditBar({
       <Button variant="outline" size="icon" onClick={() => window.print()} aria-label="Print page">
         <PrinterIcon />
       </Button>
-      {canCreateEditEntity && (
-        <Button onClick={onEdit}>
-          <PencilSimpleIcon />
-          Edit
-        </Button>
-      )}
-      {(showRelease || showDelete) && (
+      {(canCreateEditEntity || showDelete) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -174,12 +174,19 @@ export function CollectionEditBar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            {canCreateEditEntity && (
+              <DropdownMenuItem onSelect={onEdit}>
+                <PencilSimpleIcon />
+                Edit
+              </DropdownMenuItem>
+            )}
             {showRelease && (
               <DropdownMenuItem variant="destructive" onSelect={onRelease}>
                 <LockSimpleOpenIcon />
                 Release
               </DropdownMenuItem>
             )}
+            {showSeparator && <DropdownMenuSeparator />}
             {showDelete && (
               <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
                 <TrashIcon />
