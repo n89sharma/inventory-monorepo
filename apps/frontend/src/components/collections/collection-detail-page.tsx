@@ -1,4 +1,5 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
+import { CostSummaryStrip } from '@/components/shared/cards/cost-summary-strip'
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
 import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
@@ -84,7 +85,6 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderTitle?: (entity: TEntity) => { title: string; copyValue: string }
   renderTitleBadge?: (entity: TEntity) => React.ReactNode
   getNote?: (entity: TEntity) => string | null
-  renderCostSummaryStrip: (entity: TEntity) => React.ReactNode
   renderSummaryStrip: (entity: TEntity) => React.ReactNode
   renderMetadataModal: (
     entity: TEntity,
@@ -119,7 +119,6 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   renderTitle,
   renderTitleBadge,
   getNote,
-  renderCostSummaryStrip,
   renderSummaryStrip,
   renderMetadataModal,
   renderAddAssetBar,
@@ -236,14 +235,16 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
           </div>
         }
       />
-      <PageSection className="flex flex-col gap-1">
-        {renderCostSummaryStrip(entity)}
-        {counterpartyWarning ? <CounterpartyMismatchCallout warning={counterpartyWarning} /> : null}
-        {renderMetadataModal(entity, {
-          open: isMetadataModalOpen,
-          onOpenChange: setIsMetadataModalOpen,
-        })}
-      </PageSection>
+      <CostSummaryStrip assets={entity.assets} />
+      {counterpartyWarning ? (
+        <PageSection>
+          <CounterpartyMismatchCallout warning={counterpartyWarning} />
+        </PageSection>
+      ) : null}
+      {renderMetadataModal(entity, {
+        open: isMetadataModalOpen,
+        onOpenChange: setIsMetadataModalOpen,
+      })}
 
       <DataGridWithoutResultCount
         label={TABLE_LABEL}

@@ -10,7 +10,6 @@ import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
 import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
-import { TransferSummaryStrip } from '@/components/transfer/transfer-summary-strip'
 import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
@@ -94,7 +93,6 @@ export function TransferDetailsPage(): React.JSX.Element {
         />
       )}
       getNote={(transfer) => transfer.notes}
-      renderCostSummaryStrip={(transfer) => <TransferSummaryStrip transfer={transfer} />}
       renderTitleBadge={(transfer) => <TransferStatusBadge status={transfer.status} />}
       renderSummaryStrip={(transfer) => (
         <>

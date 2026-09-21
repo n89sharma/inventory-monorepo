@@ -1,6 +1,7 @@
 import { OrgName } from '@/components/shared/org-name'
+import { InvoiceSummaryField } from '@/components/invoice/invoice-summary-field'
+import { purchaseInvoiceOf } from '@/lib/asset-invoice'
 import { CreatedByField } from '@/components/shared/cards/created-by-field'
-import { ArrivalSummaryStrip } from '@/components/arrivals/arrival-summary-strip'
 import { arrivalVendorWarning } from '@/components/arrivals/arrival-vendor-mismatch'
 import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
@@ -169,7 +170,6 @@ export function ArrivalDetailsPage(): React.JSX.Element {
       counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
       getNote={(arrival) => arrival.comment}
-      renderCostSummaryStrip={(arrival) => <ArrivalSummaryStrip arrival={arrival} />}
       renderSummaryStrip={(arrival) => (
         <>
           <SummaryValue value={formatDate(arrival.created_at)} />
@@ -178,6 +178,7 @@ export function ArrivalDetailsPage(): React.JSX.Element {
             to={arrival.warehouse?.city_code}
           />
           <SummaryValue value={<OrgName name={arrival.transporter.name} />} />
+          <InvoiceSummaryField assets={arrival.assets} getInvoice={purchaseInvoiceOf} />
           <AssetTotalsField assets={arrival.assets} />
           <CreatedByField value={arrival.created_by} />
         </>

@@ -1,6 +1,5 @@
 import { OrgName } from '@/components/shared/org-name'
 import { CreatedByField } from '@/components/shared/cards/created-by-field'
-import { HoldSummaryStrip } from '@/components/hold/hold-summary-strip'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { SummaryValue } from '@/components/shared/cards/summary-value'
@@ -104,7 +103,6 @@ export function HoldDetailsPage(): React.JSX.Element {
         onRelease={() => setReleaseOpen(true)}
         buildColumns={buildColumns}
         getNote={(hold) => hold.notes}
-        renderCostSummaryStrip={(hold) => <HoldSummaryStrip hold={hold} />}
         renderTitleBadge={(hold) => hold.archived_at && <StatusBadge status={RELEASED_STATUS} />}
         renderSummaryStrip={(hold) => (
           <>

@@ -3,42 +3,28 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { AssetSearchRow } from 'shared-types'
 
-type InvoiceBucket = { invoice: AssetInvoice | null; count: number }
+const SEPARATOR = ', '
 
+type InvoiceBucket = { invoice: AssetInvoice; count: number }
+
+// Assets with no invoice are left out: the grid's invoice column already shows which rows
+// those are, and the summary strip is a place for links.
 function groupAssetsByInvoice(
   assets: AssetSearchRow[],
   getInvoice: AssetInvoiceSelector,
 ): InvoiceBucket[] {
-  const buckets = new Map<string | null, InvoiceBucket>()
+  const buckets = new Map<string, InvoiceBucket>()
   for (const asset of assets) {
     const invoice = getInvoice(asset)
-    const key = invoice?.invoice_number ?? null
-    const bucket = buckets.get(key)
+    if (invoice === null) continue
+    const bucket = buckets.get(invoice.invoice_number)
     if (bucket) {
       bucket.count += 1
     } else {
-      buckets.set(key, { invoice, count: 1 })
+      buckets.set(invoice.invoice_number, { invoice, count: 1 })
     }
   }
-  return [...buckets.values()].sort((a, b) => {
-    if (a.invoice === null) return 1
-    if (b.invoice === null) return -1
-    return b.count - a.count
-  })
-}
-
-function InvoiceBucketLabel({ bucket }: { bucket: InvoiceBucket }) {
-  if (bucket.invoice === null) {
-    return <span className="text-muted-foreground">No invoice ({bucket.count})</span>
-  }
-  return (
-    <Link
-      to={`/invoices/${bucket.invoice.invoice_number}`}
-      className="text-primary hover:underline"
-    >
-      {bucket.invoice.invoice_reference} ({bucket.count})
-    </Link>
-  )
+  return [...buckets.values()].sort((a, b) => b.count - a.count)
 }
 
 export function InvoiceSummaryField({
@@ -54,16 +40,18 @@ export function InvoiceSummaryField({
   )
   if (invoiceBuckets.length === 0) return null
   return (
-    <div className="flex items-baseline gap-1.5">
-      <span className="text-muted-foreground">Invoices</span>
-      <span>
-        {invoiceBuckets.map((bucket, i) => (
-          <span key={bucket.invoice?.invoice_number ?? '__none__'}>
-            {i > 0 && ', '}
-            <InvoiceBucketLabel bucket={bucket} />
-          </span>
-        ))}
-      </span>
-    </div>
+    <span>
+      {invoiceBuckets.map((bucket, i) => (
+        <span key={bucket.invoice.invoice_number}>
+          {i > 0 && SEPARATOR}
+          <Link
+            to={`/invoices/${bucket.invoice.invoice_number}`}
+            className="text-primary hover:underline"
+          >
+            {bucket.invoice.invoice_reference} ({bucket.count})
+          </Link>
+        </span>
+      ))}
+    </span>
   )
 }

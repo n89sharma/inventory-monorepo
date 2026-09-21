@@ -1,7 +1,8 @@
 import { OrgName } from '@/components/shared/org-name'
+import { InvoiceSummaryField } from '@/components/invoice/invoice-summary-field'
+import { salesInvoiceOf } from '@/lib/asset-invoice'
 import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { departureCustomerWarning } from '@/components/departure/departure-customer-mismatch'
-import { DepartureSummaryStrip } from '@/components/departure/departure-summary-strip'
 import type { AssetWarningOf } from '@/components/table-columns/asset-search-columns'
 import { EditDepartureMetadataModal } from '@/components/departure/edit-departure-metadata-modal'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
@@ -94,7 +95,6 @@ export function DepartureDetailsPage(): React.JSX.Element {
         organization: OrgSummarySchema.parse(departure.customer),
       })}
       getNote={(departure) => departure.notes}
-      renderCostSummaryStrip={(departure) => <DepartureSummaryStrip departure={departure} />}
       renderSummaryStrip={(departure) => (
         <>
           <SummaryValue value={formatDate(departure.created_at)} />
@@ -104,6 +104,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
           />
           <SummaryValue value={departure.salesperson?.name} />
           <SummaryValue value={<OrgName name={departure.transporter.name} />} />
+          <InvoiceSummaryField assets={departure.assets} getInvoice={salesInvoiceOf} />
           <AssetTotalsField assets={departure.assets} />
           <CreatedByField value={departure.created_by} />
         </>

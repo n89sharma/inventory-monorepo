@@ -495,7 +495,7 @@ function DataTableBase<TData, TValue>({
               </div>
             )}
             {renderTableFilter && (
-              <div className="flex shrink-0 items-center gap-4 border-b bg-muted p-2">
+              <div className="flex shrink-0 items-center gap-4 border-b bg-muted px-2 py-1">
                 {renderTableFilter(table)}
               </div>
             )}

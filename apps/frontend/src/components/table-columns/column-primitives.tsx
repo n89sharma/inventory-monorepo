@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom'
 
 export const ID_COLUMN_SIZE = 120
 const ID_LINK_CLASS = 'font-mono text-foreground hover:underline'
-export const SELECT_COLUMN_SIZE = 44
+const SELECT_COLUMN_SIZE = 44
 export const MODEL_COLUMN_SIZE = 100
 export const SERIAL_NUMBER_COLUMN_SIZE = 150
 

@@ -1,6 +1,6 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/shadcn/hover-card'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { useCan } from '@/hooks/use-can'
+import { useCanViewProfitability } from '@/hooks/use-can-view-profitability'
 import { formatMarginPercent, formatUSDWithSymbol } from '@/lib/formatters'
 import { Fragment } from 'react'
 import type { AssetSearchRow } from 'shared-types'
@@ -31,8 +31,7 @@ function sumCost(assets: AssetSearchRow[], field: CostTotalFieldId): number {
 }
 
 export function AssetCostTotalsRow({ assets }: { assets: AssetSearchRow[] }) {
-  const can = useCan()
-  const canViewProfitability = can('view_purchase_price') && can('view_sale_price')
+  const canViewProfitability = useCanViewProfitability()
   if (!canViewProfitability) return null
 
   // Margin is derived from the same two totals this row prints, rather than from the
