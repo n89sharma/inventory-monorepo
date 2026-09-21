@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/shadcn/checkbox'
-import { createEditColumn, sortableHeader } from '@/components/table-columns/column-primitives'
+import { createEditColumn } from '@/components/table-columns/column-primitives'
 import { formatTitleCase } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ModelSummary } from 'shared-types'
@@ -11,26 +11,26 @@ export function createModelTableColumns(
     {
       accessorKey: 'brand_name',
       filterFn: 'includesString',
-      header: sortableHeader<ModelSummary>('Brand'),
+      header: 'Brand',
     },
     {
       accessorKey: 'model_name',
       filterFn: 'includesString',
-      header: sortableHeader<ModelSummary>('Name'),
+      header: 'Name',
     },
     {
       id: 'asset_type',
       accessorFn: (model) => formatTitleCase(model.asset_type),
       filterFn: 'equals',
-      header: sortableHeader<ModelSummary>('Type'),
+      header: 'Type',
     },
     {
       accessorKey: 'weight',
-      header: sortableHeader<ModelSummary>('Weight'),
+      header: 'Weight',
     },
     {
       accessorKey: 'size',
-      header: sortableHeader<ModelSummary>('Size'),
+      header: 'Size',
     },
     {
       accessorKey: 'is_colour',

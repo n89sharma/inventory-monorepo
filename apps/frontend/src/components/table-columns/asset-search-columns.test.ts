@@ -3,17 +3,21 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   type ColumnDef,
-  type HeaderContext,
 } from '@tanstack/react-table'
-import { isValidElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow, Permission } from 'shared-types'
-import { ASSET_SEARCH_COLUMNS, canViewColumn, COLUMN_SECTIONS } from './asset-search-columns'
+import {
+  ASSET_SEARCH_COLUMNS,
+  canViewColumn,
+  COLUMN_SECTIONS,
+  IDENTITY_COLUMN_IDS,
+} from './asset-search-columns'
+import { PINNED_ASSET_COLUMN_IDS } from './column-primitives'
 import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 
 const CSV_ROW_DELIMITER = '\r\n'
-const ALWAYS_VISIBLE_COLUMN_IDS = ['barcode', 'model', 'serial_number']
+const IDENTITY_SECTION_COLUMN_IDS = ['barcode', 'model', 'serial_number']
 const MARGIN_COLUMN_IDS = ['gross_margin', 'margin_percent']
 
 const allows =
@@ -33,16 +37,7 @@ function columnId(column: ColumnDef<AssetSearchRow>): string {
 }
 
 function headerLabel(column: ColumnDef<AssetSearchRow>): string {
-  const header = column.header
-  if (typeof header === 'string') return header
-  if (typeof header === 'function') {
-    const context = {
-      column: { toggleSorting: () => {}, getIsSorted: () => false },
-    } as unknown as HeaderContext<AssetSearchRow, unknown>
-    const node = header(context)
-    if (isValidElement(node)) return (node.props as { label?: string }).label ?? ''
-  }
-  return ''
+  return typeof column.header === 'string' ? column.header : ''
 }
 
 function csvHeaderLabel(column: ColumnDef<AssetSearchRow>): string {
@@ -54,8 +49,11 @@ function liveColumnIds(): string[] {
   return createSearchPageColumns(noHref, allowsEverything).map(columnId)
 }
 
+// The identity columns are pickable now, so a caller that wants them in the export has to
+// ask for them. Every case below reads an asset by its barcode, so they all do.
 function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: string } {
-  const [header, data] = searchPageRowsToCsv([row], new Set(ids)).split(CSV_ROW_DELIMITER)
+  const visible = new Set<string>([...IDENTITY_COLUMN_IDS, ...ids])
+  const [header, data] = searchPageRowsToCsv([row], visible).split(CSV_ROW_DELIMITER)
   return { header, data }
 }
 
@@ -156,9 +154,9 @@ describe('asset-search report columns', () => {
     expect(header.split(',')).toEqual(liveColumns.map(csvHeaderLabel))
   })
 
-  it('exports the always-visible columns even when the viewer chose none', () => {
-    const { header } = csvFor(makeRow(), [])
-    expect(header.split(',')).toEqual(['Barcode', 'Model', 'Serial Number'])
+  it('exports nothing at all when the viewer has turned every column off', () => {
+    const emptyExport = searchPageRowsToCsv([makeRow()], new Set())
+    expect(emptyExport.split(CSV_ROW_DELIMITER)).toEqual(['', ''])
   })
 
   it('writes the full header row', () => {
@@ -293,7 +291,7 @@ describe('asset-search report columns', () => {
     )
   })
 
-  it('emits only visible columns, keeping the always-on identity columns', () => {
+  it('emits only the columns the viewer chose, in registry order', () => {
     const { header } = csvFor(makeRow(), ['status'])
     expect(header).toBe('Barcode,Model,Serial Number,Status')
   })
@@ -304,7 +302,7 @@ describe('asset-search report columns', () => {
     const older = makeRow({ barcode: 'OLD', created_at: new Date(2026, 2, 5) })
     const newer = makeRow({ barcode: 'NEW', created_at: new Date(2026, 6, 15) })
     const barcodesOf = (rows: AssetSearchRow[]) =>
-      searchPageRowsToCsv(rows, new Set(['status']))
+      searchPageRowsToCsv(rows, new Set(['barcode']))
         .split(CSV_ROW_DELIMITER)
         .slice(1)
         .map((line) => line.split(',')[0])
@@ -510,16 +508,20 @@ describe('asset search columns', () => {
     )
   })
 
-  it('marks exactly barcode, model and serial number always visible', () => {
-    const alwaysVisible = ASSET_SEARCH_COLUMNS.filter((c) => c.alwaysVisible).map((c) => c.id)
-    expect(alwaysVisible).toEqual(ALWAYS_VISIBLE_COLUMN_IDS)
+  // Pinned left and shown by default, but pickable like any other column.
+  it('puts exactly barcode, serial number and model in the identity section', () => {
+    const identity = ASSET_SEARCH_COLUMNS.filter((c) => c.section === 'identity').map((c) => c.id)
+    expect(identity).toEqual(IDENTITY_SECTION_COLUMN_IDS)
+    expect([...IDENTITY_COLUMN_IDS]).toEqual(
+      PINNED_ASSET_COLUMN_IDS.filter((id) => id !== 'select'),
+    )
   })
 
-  it('keeps every pickable column in a section the picker renders', () => {
+  it('keeps every column in a section the picker renders', () => {
     const renderedSections = new Set<string>(COLUMN_SECTIONS.map((section) => section.id))
-    const orphaned = ASSET_SEARCH_COLUMNS.filter(
-      (c) => !c.alwaysVisible && !renderedSections.has(c.section),
-    ).map((c) => c.id)
+    const orphaned = ASSET_SEARCH_COLUMNS.filter((c) => !renderedSections.has(c.section)).map(
+      (c) => c.id,
+    )
 
     expect(orphaned).toEqual([])
   })
@@ -527,11 +529,10 @@ describe('asset search columns', () => {
   it('groups the pickable columns by section, in picker order', () => {
     const grouped = COLUMN_SECTIONS.map((section) => ({
       section: section.id,
-      ids: ASSET_SEARCH_COLUMNS.filter((c) => !c.alwaysVisible && c.section === section.id).map(
-        (c) => c.id,
-      ),
+      ids: ASSET_SEARCH_COLUMNS.filter((c) => c.section === section.id).map((c) => c.id),
     }))
     expect(grouped).toEqual([
+      { section: 'identity', ids: ['barcode', 'model', 'serial_number'] },
       { section: 'status', ids: ['status', 'readiness', 'is_damaged', 'damage_notes'] },
       {
         section: 'general_specs',

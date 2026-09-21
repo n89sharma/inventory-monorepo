@@ -21,7 +21,6 @@ function createdAtColumn<TRow extends CollectionSummarySchema, TContext>(): Coll
     label: 'Date',
     text: (row) => formatDate(row.created_at),
     cell: (row) => (row.created_at ? formatDate(row.created_at) : '-'),
-    sortable: true,
     size: 140,
   }
 }

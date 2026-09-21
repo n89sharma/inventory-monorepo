@@ -28,7 +28,6 @@ const INVOICE_DATE_COLUMN: InvoiceSummaryColumn = {
   id: 'invoice_date',
   label: 'Invoice Date',
   text: (invoice) => formatDate(parseISO(invoice.invoice_date)),
-  sortable: true,
   size: 140,
 }
 
@@ -49,7 +48,6 @@ const ARRIVAL_DATES_COLUMN: InvoiceSummaryColumn = {
   id: 'arrival_start_date',
   label: 'Arrival Dates',
   text: (invoice) => formatDateSpan(invoice.arrival_start_date, invoice.arrival_end_date),
-  sortable: true,
   sortingFn: dateSpanSort,
   size: DATE_SPAN_COLUMN_SIZE,
 }
@@ -58,7 +56,6 @@ const DEPARTURE_DATES_COLUMN: InvoiceSummaryColumn = {
   id: 'departure_start_date',
   label: 'Departure Dates',
   text: (invoice) => formatDateSpan(invoice.departure_start_date, invoice.departure_end_date),
-  sortable: true,
   sortingFn: dateSpanSort,
   size: DATE_SPAN_COLUMN_SIZE,
 }
@@ -79,7 +76,6 @@ function organizationColumn(label: string): InvoiceSummaryColumn {
     id: 'organization',
     label,
     text: (invoice) => invoice.organization ?? '',
-    sortable: true,
     filterFn: 'includesString',
   }
 }

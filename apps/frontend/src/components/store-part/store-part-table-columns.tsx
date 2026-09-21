@@ -38,7 +38,6 @@ export const STORE_PART_COLUMNS: readonly StorePartColumn[] = [
     label: 'On hand',
     text: (row) => String(row.on_hand),
     cell: (row) => <div className={CENTERED_NUMERIC}>{row.on_hand}</div>,
-    sortable: true,
   },
   {
     id: 'effective_unit_cost',
@@ -56,7 +55,6 @@ export const STORE_PART_COLUMNS: readonly StorePartColumn[] = [
     label: 'Total value',
     text: (row) => formatUSDWithSymbol(row.stock_value),
     cell: (row) => <div className={CENTERED_NUMERIC}>{formatUSDWithSymbol(row.stock_value)}</div>,
-    sortable: true,
     permission: 'view_purchase_price',
   },
   {
@@ -66,6 +64,5 @@ export const STORE_PART_COLUMNS: readonly StorePartColumn[] = [
     cell: (row) => (
       <div className={CENTERED}>{row.last_updated ? formatDate(row.last_updated) : '-'}</div>
     ),
-    sortable: true,
   },
 ]

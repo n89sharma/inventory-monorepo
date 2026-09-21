@@ -9,14 +9,12 @@ const PLAIN_COLUMN: SummaryColumn<Row, typeof NO_CONTEXT> = {
   id: 'name',
   label: 'Name',
   text: (row) => row.name,
-  sortable: true,
 }
 
 const CUSTOM_SORT_COLUMN: SummaryColumn<Row, typeof NO_CONTEXT> = {
   id: 'start_date',
   label: 'Start Date',
   text: (row) => row.start_date ?? '',
-  sortable: true,
   sortingFn: () => 0,
   filterFn: 'includesString',
 }

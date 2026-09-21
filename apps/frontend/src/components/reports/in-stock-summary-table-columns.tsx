@@ -8,7 +8,6 @@ import { modelPriceHistoryHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
-import { sortableHeader } from '@/components/table-columns/column-primitives'
 
 function isModelRow(row: InStockSummaryTableRow): row is InStockSummaryModelRow {
   return 'subRows' in row
@@ -29,6 +28,9 @@ function nullsLow(value: number | null): number {
   return value ?? Number.NEGATIVE_INFINITY
 }
 
+const sortByCityCode = modelRowSorter((a, b) => a.city_code.localeCompare(b.city_code))
+const sortByBrandName = modelRowSorter((a, b) => a.brand_name.localeCompare(b.brand_name))
+const sortByAssetType = modelRowSorter((a, b) => a.asset_type.localeCompare(b.asset_type))
 const sortByModelCount = modelRowSorter((a, b) => a.asset_count - b.asset_count)
 const sortByModelName = modelRowSorter((a, b) => a.model_name.localeCompare(b.model_name))
 const sortByPurchaseCost = modelRowSorter(
@@ -89,20 +91,23 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
     accessorKey: 'city_code',
     header: 'Warehouse',
     cell: ({ row }) => scopeCell(row, (r) => r.city_code),
+    sortingFn: sortByCityCode,
   },
   {
     accessorKey: 'brand_name',
     header: 'Brand',
     cell: ({ row }) => scopeCell(row, (r) => r.brand_name),
+    sortingFn: sortByBrandName,
   },
   {
     accessorKey: 'asset_type',
     header: 'Asset Type',
     cell: ({ row }) => scopeCell(row, (r) => formatTitleCase(r.asset_type)),
+    sortingFn: sortByAssetType,
   },
   {
     accessorKey: 'model_name',
-    header: sortableHeader<InStockSummaryTableRow>('Model'),
+    header: 'Model',
     cell: ({ row }) => <ModelCell row={row} />,
     sortingFn: sortByModelName,
   },
@@ -113,21 +118,21 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   },
   {
     accessorKey: 'avg_purchase_cost',
-    header: sortableHeader<InStockSummaryTableRow>('Avg Purchase Cost'),
+    header: 'Avg Purchase Cost',
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_purchase_cost),
     sortingFn: sortByPurchaseCost,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
     accessorKey: 'avg_total_cost',
-    header: sortableHeader<InStockSummaryTableRow>('Avg Total Cost'),
+    header: 'Avg Total Cost',
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_total_cost),
     sortingFn: sortByTotalCost,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
     accessorKey: 'asset_count',
-    header: sortableHeader<InStockSummaryTableRow>('Count'),
+    header: 'Count',
     cell: ({ row }) => row.original.asset_count,
     sortingFn: sortByModelCount,
     meta: { cellClassName: 'text-center tabular-nums' },

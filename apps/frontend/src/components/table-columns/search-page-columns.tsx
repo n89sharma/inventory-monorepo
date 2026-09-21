@@ -13,7 +13,6 @@ import {
   type AssetSearchColumn,
   type AssetWarningOf,
 } from './asset-search-columns'
-import { sortableHeader } from './column-primitives'
 
 const EDITABLE_COST_COLUMN_SIZE = 110
 
@@ -55,10 +54,9 @@ function toColumnDef(
   return {
     id: column.id,
     ...(column.accessor ? { accessorFn: column.accessor } : { accessorKey: column.id }),
-    header: column.sortable ? sortableHeader<AssetSearchRow>(column.label) : column.label,
+    header: column.label,
     size: column.size,
     sortUndefined: column.sortUndefined,
-    enableHiding: !column.alwaysVisible,
     cell: ({ row }) =>
       column.cell ? column.cell(row.original, context) : column.text(row.original),
   }

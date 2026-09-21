@@ -63,7 +63,7 @@ function makeEditableColumn(field: EditablePriceField, header: string): ColumnDe
 const columns: ColumnDef<PricingRow>[] = [
   {
     accessorKey: 'brand',
-    header: () => <div className="text-center">Brand</div>,
+    header: 'Brand',
     cell: ({ getValue }) => (
       <div className="text-center text-muted-foreground">{getValue() as string}</div>
     ),
@@ -71,25 +71,25 @@ const columns: ColumnDef<PricingRow>[] = [
   },
   {
     accessorKey: 'model',
-    header: () => <div className="text-center">Model</div>,
+    header: 'Model',
     cell: ({ getValue }) => <div className="text-center ">{getValue() as string}</div>,
     size: 90,
   },
   {
     accessorKey: 'barcode',
-    header: () => <div className="text-center">Barcode</div>,
+    header: 'Barcode',
     cell: ({ getValue }) => <div className="text-center font-mono">{getValue() as string}</div>,
     size: 120,
   },
   {
     accessorKey: 'serial_number',
-    header: () => <div className="text-center">Serial #</div>,
+    header: 'Serial #',
     cell: ({ getValue }) => <div className="text-center font-mono">{getValue() as string}</div>,
     size: 120,
   },
   {
     id: 'meter',
-    header: () => <div className="text-center">Meter</div>,
+    header: 'Meter',
     cell: ({ row }) => (
       <div className="text-center">{formatThousandsK(row.original.meter_total)}</div>
     ),

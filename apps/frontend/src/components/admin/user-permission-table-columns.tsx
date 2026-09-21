@@ -1,5 +1,4 @@
 import { Button } from '@/components/shadcn/button'
-import { sortableHeader } from '@/components/table-columns/column-primitives'
 import { CheckCircleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Role, User } from 'shared-types'
@@ -39,16 +38,16 @@ export function createUserPermissionTableColumns(
     {
       accessorKey: 'name',
       filterFn: 'includesString',
-      header: sortableHeader<User>('Name'),
+      header: 'Name',
     },
     {
       accessorKey: 'email',
       filterFn: 'includesString',
-      header: sortableHeader<User>('Email'),
+      header: 'Email',
     },
     {
       accessorKey: 'role',
-      header: sortableHeader<User>('Role'),
+      header: 'Role',
       cell: ({ row }) =>
         row.original.role ? (roleByCode.get(row.original.role)?.name ?? row.original.role) : '',
     },
@@ -65,7 +64,7 @@ export function createUserPermissionTableColumns(
     },
     {
       accessorKey: 'is_active',
-      header: sortableHeader<User>('Status'),
+      header: 'Status',
       cell: ({ row }) => (row.original.is_active ? 'Active' : 'Inactive'),
     },
     {

@@ -88,9 +88,6 @@ export type AssetSearchColumn = {
   readonly section: ColumnSectionId
   // Every listed permission is required; a viewer missing any one loses the column.
   readonly permissions?: readonly Permission[]
-  // Shown unconditionally and never offered in the picker: barcode, serial number, model.
-  readonly alwaysVisible?: boolean
-  readonly sortable?: boolean
   readonly size?: number
   readonly sortUndefined?: 'last'
   // Raw value TanStack sorts and filters on. Omit when `id` is an AssetSearchRow key,
@@ -105,9 +102,10 @@ export type AssetSearchColumn = {
 }
 
 // Order here is the order the picker lists its groups in. Table column order is
-// independent: it follows ASSET_SEARCH_COLUMNS. 'identity' is deliberately absent —
-// its columns are alwaysVisible, so listing it would render an empty group.
+// independent: it follows ASSET_SEARCH_COLUMNS, and the identity columns are pinned left,
+// which overrides that order and the reader's own arrangement alike.
 export const COLUMN_SECTIONS = [
+  { id: 'identity', label: 'ID' },
   { id: 'status', label: 'Status' },
   { id: 'general_specs', label: 'General Specifications' },
   { id: 'cost', label: 'Cost' },
@@ -214,8 +212,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'barcode',
     label: 'Barcode',
     section: 'identity',
-    alwaysVisible: true,
-    sortable: true,
     size: ID_COLUMN_SIZE,
     text: (a) => a.barcode,
     cell: (a, { detailHref, assetWarningOf }) => (
@@ -232,8 +228,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'model',
     label: 'Model',
     section: 'identity',
-    alwaysVisible: true,
-    sortable: true,
     size: MODEL_COLUMN_SIZE,
     text: (a) => a.model,
   },
@@ -247,8 +241,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'serial_number',
     label: 'Serial Number',
     section: 'identity',
-    alwaysVisible: true,
-    sortable: true,
     size: SERIAL_NUMBER_COLUMN_SIZE,
     text: (a) => a.serial_number,
   },
@@ -263,7 +255,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'readiness',
     label: 'Readiness',
     section: 'status',
-    sortable: true,
     text: (a) => getReadinessDisplay(a.readiness),
     cell: (a) => <ReadinessIcon status={a.readiness} />,
   },
@@ -271,7 +262,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'is_damaged',
     label: 'Damaged',
     section: 'status',
-    sortable: true,
     // Undefined rather than null so an asset nobody has inspected sorts to the end instead of
     // grouping with the undamaged ones.
     accessor: (a) => a.is_damaged ?? undefined,
@@ -289,7 +279,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'location',
     label: 'Location',
     section: 'other',
-    sortable: true,
     accessor: (a) => formatLocation(a.location, a.is_in_transit),
     text: (a) => formatLocation(a.location, a.is_in_transit),
   },
@@ -303,14 +292,12 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'manufactured_year',
     label: 'Manufactured Year',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.manufactured_year),
   },
   {
     id: 'specs_meter_total',
     label: 'Total Meter',
     section: 'general_specs',
-    sortable: true,
     csvHeader: 'Total Meter (K)',
     cell: (a) => formatThousandsK(a.specs_meter_total),
     text: (a) => formatThousands(a.specs_meter_total),
@@ -319,7 +306,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'weight',
     label: 'Weight',
     section: 'detailed_specs',
-    sortable: true,
     csvHeader: 'Weight (lbs)',
     cell: (a) => formatWeight(a.weight),
     text: (a) => String(a.weight),
@@ -328,14 +314,12 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'size',
     label: 'Size',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => String(a.size),
   },
   {
     id: 'days_held',
     label: 'Days Held',
     section: 'hold',
-    sortable: true,
     sortUndefined: 'last',
     accessor: (a) => daysHeld(a.hold_created_at),
     text: (a) => optionalNumber(daysHeld(a.hold_created_at) ?? null),
@@ -344,14 +328,12 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'specs_cassettes',
     label: 'Cassettes',
     section: 'general_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.specs_cassettes),
   },
   {
     id: 'specs_internal_finisher',
     label: 'Internal Finisher',
     section: 'general_specs',
-    sortable: true,
     text: (a) => a.specs_internal_finisher ?? '',
   },
   {
@@ -364,35 +346,30 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'specs_toner_life_c',
     label: 'Toner Life C',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_c),
   },
   {
     id: 'specs_toner_life_m',
     label: 'Toner Life M',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_m),
   },
   {
     id: 'specs_toner_life_y',
     label: 'Toner Life Y',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_y),
   },
   {
     id: 'specs_toner_life_k',
     label: 'Toner Life K',
     section: 'detailed_specs',
-    sortable: true,
     text: (a) => optionalNumber(a.specs_toner_life_k),
   },
   {
     id: 'vendor',
     label: 'Vendor',
     section: 'arrival',
-    sortable: true,
     text: (a) => a.vendor ?? '',
     cell: (a) => <OrgName name={a.vendor} />,
   },
@@ -400,7 +377,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'arrival_number',
     label: 'Arrival #',
     section: 'arrival',
-    sortable: true,
     text: (a) => a.arrival_number ?? '',
     cell: (a) => (
       <CollectionNumberCell collectionNumber={a.arrival_number} detailHref={arrivalDetailHref} />
@@ -410,21 +386,18 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'arrival_warehouse_code',
     label: 'Arrival Warehouse',
     section: 'arrival',
-    sortable: true,
     text: (a) => a.arrival_warehouse_code ?? '',
   },
   {
     id: 'arrival_created_at',
     label: 'Arrived At',
     section: 'arrival',
-    sortable: true,
     text: (a) => formatDate(a.arrival_created_at),
   },
   {
     id: 'customer',
     label: 'Customer',
     section: 'departure',
-    sortable: true,
     text: (a) => a.customer ?? '',
     cell: (a) => <OrgName name={a.customer} />,
   },
@@ -432,14 +405,12 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'salesperson',
     label: 'Salesperson',
     section: 'departure',
-    sortable: true,
     text: (a) => formatTitleCase(a.salesperson ?? ''),
   },
   {
     id: 'departure_number',
     label: 'Departure #',
     section: 'departure',
-    sortable: true,
     text: (a) => a.departure_number ?? '',
     cell: (a) => (
       <CollectionNumberCell
@@ -452,7 +423,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'departed_at',
     label: 'Departed At',
     section: 'departure',
-    sortable: true,
     text: (a) => formatDate(a.departed_at),
   },
   {
@@ -460,7 +430,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Purchase Cost',
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_purchase_cost),
   },
   {
@@ -468,7 +437,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Transport Cost',
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_transport_cost),
   },
   {
@@ -476,7 +444,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Transfer Cost',
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_transfer_cost),
   },
   {
@@ -484,7 +451,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Processing Cost',
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_processing_cost),
   },
   {
@@ -492,7 +458,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: COST_FIELD_LABELS.other_cost,
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_other_cost),
   },
   {
@@ -500,7 +465,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: COST_FIELD_LABELS.parts_cost,
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_parts_cost),
   },
   {
@@ -508,7 +472,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Total Cost',
     section: 'cost',
     permissions: ['view_purchase_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_total_cost),
   },
   {
@@ -516,7 +479,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Sale Price',
     section: 'cost',
     permissions: ['view_sale_price'],
-    sortable: true,
     text: (a) => formatUSDWithSymbol(a.cost_sale_price),
   },
   {
@@ -524,7 +486,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Gross Margin',
     section: 'profitability',
     permissions: MARGIN_PERMISSIONS,
-    sortable: true,
     sortUndefined: 'last',
     accessor: (a) => grossMargin(a.cost_sale_price, a.cost_total_cost),
     text: (a) => formatUSDWithSymbol(grossMargin(a.cost_sale_price, a.cost_total_cost) ?? null),
@@ -534,7 +495,6 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     label: 'Margin %',
     section: 'profitability',
     permissions: MARGIN_PERMISSIONS,
-    sortable: true,
     sortUndefined: 'last',
     accessor: (a) => marginPercent(a.cost_sale_price, a.cost_total_cost),
     text: (a) => formatMarginPercent(marginPercent(a.cost_sale_price, a.cost_total_cost)),
@@ -552,21 +512,18 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'held_by',
     label: 'Held By',
     section: 'hold',
-    sortable: true,
     text: (a) => a.held_by ?? '',
   },
   {
     id: 'hold_created_for',
     label: 'Held For',
     section: 'hold',
-    sortable: true,
     text: (a) => a.hold_created_for ?? '',
   },
   {
     id: 'hold_customer',
     label: 'Hold Customer',
     section: 'hold',
-    sortable: true,
     text: (a) => a.hold_customer ?? '',
     cell: (a) => <OrgName name={a.hold_customer} />,
   },
@@ -574,21 +531,18 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'hold_created_at',
     label: 'Hold Created',
     section: 'hold',
-    sortable: true,
     text: (a) => formatDate(a.hold_created_at),
   },
   {
     id: 'created_at',
     label: 'Created',
     section: 'other',
-    sortable: true,
     text: (a) => formatDate(a.created_at),
   },
   {
     id: 'stock_days',
     label: 'Stock Days',
     section: 'other',
-    sortable: true,
     accessor: (a) => stockDays(a.created_at),
     text: (a) => String(stockDays(a.created_at)),
   },
@@ -635,7 +589,16 @@ export type AssetColumnId = (typeof ASSET_SEARCH_COLUMN_LITERALS)[number]['id']
 
 export const ASSET_SEARCH_COLUMNS: readonly AssetSearchColumn[] = ASSET_SEARCH_COLUMN_LITERALS
 
+// Pinned left in this order and shown by default on every list. Offered in the picker like
+// any other column: a reader who does not need them can turn them off, but not move them.
+export const IDENTITY_COLUMN_IDS = [
+  'barcode',
+  'serial_number',
+  'model',
+] as const satisfies readonly AssetColumnId[]
+
 const MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'readiness',
   'specs_meter_total',
@@ -643,6 +606,7 @@ const MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 const ONHAND_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'readiness',
   'specs_meter_total',
@@ -651,6 +615,7 @@ const ONHAND_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 const DEPARTED_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'specs_meter_total',
   'vendor',
@@ -664,6 +629,7 @@ const DEPARTED_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 const HARVESTED_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'location',
   'specs_meter_total',
@@ -671,6 +637,7 @@ const HARVESTED_DEFAULT_COLUMN_IDS = [
 ] as const satisfies readonly AssetColumnId[]
 
 export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'arrival_created_at',
 ] as const satisfies readonly AssetColumnId[]
@@ -691,21 +658,8 @@ export function canViewColumn(
   return column.permissions?.every((permission) => can(permission)) ?? true
 }
 
-export function userCanToggleColumn(
-  column: AssetSearchColumn,
-  can: (permission: Permission) => boolean,
-): boolean {
-  const isAlwaysVisible = column.alwaysVisible ?? false
-  const userCanViewColumn = canViewColumn(column, can)
-  return !isAlwaysVisible && userCanViewColumn
-}
-
 export function orderedVisibleColumns(visibleColumns: Set<string>): readonly AssetSearchColumn[] {
-  return ASSET_SEARCH_COLUMNS.filter((column) => {
-    const isAlwaysVisible = column.alwaysVisible ?? false
-    const userChoseColumn = visibleColumns.has(column.id)
-    return isAlwaysVisible || userChoseColumn
-  })
+  return ASSET_SEARCH_COLUMNS.filter((column) => visibleColumns.has(column.id))
 }
 
 // Filters a stored/shared set of column ids down to what the current viewer may see:

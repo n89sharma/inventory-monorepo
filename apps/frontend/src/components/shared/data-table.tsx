@@ -13,6 +13,7 @@ import type {
   TableOptions,
   Row,
   RowSelectionState,
+  SortDirection,
   SortingState,
   VisibilityState,
 } from '@tanstack/react-table'
@@ -61,6 +62,8 @@ import {
 import { Button } from '@/components/shadcn/button'
 import { useGridScrollRestoration } from '@/hooks/use-grid-scroll-restoration'
 import {
+  ArrowDownIcon,
+  ArrowUpIcon,
   CaretDoubleLeftIcon,
   CaretDoubleRightIcon,
   CaretLeftIcon,
@@ -193,6 +196,11 @@ const GRIP_CLASS =
   'absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity ' +
   '[cursor:var(--cursor-grab)] active:[cursor:var(--cursor-grabbing)] ' +
   'group-hover/head:opacity-60 focus-visible:opacity-100'
+// Fills the cell so the whole header reads as the hit area, and reserves nothing for the
+// arrow: the column is sized to its content, which the arrow joins once a sort is applied.
+const SORT_TOGGLE_CLASS =
+  'inline-flex w-full items-center justify-center gap-1 whitespace-normal ' +
+  'cursor-pointer select-none hover:text-foreground'
 const DRAG_CHIP_CLASS =
   'flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium shadow-md'
 
@@ -229,9 +237,41 @@ function headerCellClassName<TData>(header: Header<TData, unknown>): string {
   return `${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`
 }
 
+// Nothing marks a column as sortable at rest: every column is, so a hint on each one would
+// be noise. The arrow appears only once a sort is applied, and names its direction.
+function SortDirectionIcon({ direction }: { direction: SortDirection }): React.JSX.Element {
+  if (direction === 'asc') return <ArrowUpIcon aria-hidden="true" />
+  return <ArrowDownIcon aria-hidden="true" />
+}
+
+function SortToggle<TData>({ header }: { header: Header<TData, unknown> }): React.JSX.Element {
+  const { column } = header
+  const direction = column.getIsSorted()
+  return (
+    <button
+      type="button"
+      className={SORT_TOGGLE_CLASS}
+      onClick={() => column.toggleSorting(direction === 'asc')}
+    >
+      {flexRender(column.columnDef.header, header.getContext())}
+      {direction && <SortDirectionIcon direction={direction} />}
+    </button>
+  )
+}
+
 function headerContent<TData>(header: Header<TData, unknown>): React.ReactNode {
   if (header.isPlaceholder) return null
-  return flexRender(header.column.columnDef.header, header.getContext())
+  if (!header.column.getCanSort()) {
+    return flexRender(header.column.columnDef.header, header.getContext())
+  }
+  return <SortToggle header={header} />
+}
+
+function ariaSort<TData>(column: Column<TData>): 'ascending' | 'descending' | undefined {
+  const direction = column.getIsSorted()
+  if (direction === 'asc') return 'ascending'
+  if (direction === 'desc') return 'descending'
+  return undefined
 }
 
 function HeaderCell<TData>({ header }: { header: Header<TData, unknown> }): React.JSX.Element {
@@ -245,7 +285,11 @@ function StaticHeaderCell<TData>({
   header: Header<TData, unknown>
 }): React.JSX.Element {
   return (
-    <TableHead style={headerCellStyle(header)} className={headerCellClassName(header)}>
+    <TableHead
+      aria-sort={ariaSort(header.column)}
+      style={headerCellStyle(header)}
+      className={headerCellClassName(header)}
+    >
       {headerContent(header)}
     </TableHead>
   )
@@ -270,6 +314,7 @@ function SortableHeaderCell<TData>({
   return (
     <TableHead
       ref={setNodeRef}
+      aria-sort={ariaSort(header.column)}
       style={headerCellStyle(header)}
       className={`group/head relative ${headerCellClassName(header)} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
     >

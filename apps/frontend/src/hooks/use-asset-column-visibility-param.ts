@@ -1,7 +1,7 @@
 import {
   ASSET_SEARCH_COLUMNS,
+  canViewColumn,
   resolveVisibleColumns,
-  userCanToggleColumn,
   type AssetColumnId,
 } from '@/components/table-columns/asset-search-columns'
 import { useCan } from '@/hooks/use-can'
@@ -76,7 +76,7 @@ export function useAssetColumnVisibilityParam(
   const columnVisibility = useMemo<VisibilityState>(() => {
     const out: VisibilityState = {}
     for (const column of ASSET_SEARCH_COLUMNS) {
-      if (userCanToggleColumn(column, can)) {
+      if (canViewColumn(column, can)) {
         out[column.id] = visibleColumns.has(column.id)
       }
     }
@@ -93,8 +93,8 @@ export function useAssetColumnVisibilityParam(
   )
 
   // `visibleColumns` is built by walking `cols` in order, so the set iterates in the order
-  // the user arranged. Pinned and always-visible columns are absent, which is harmless:
-  // TanStack appends unlisted columns and pinning overrides columnOrder for those anyway.
+  // the user arranged. The pinned identity columns sit in it too, which is harmless:
+  // pinning overrides columnOrder, so their placement never follows this list.
   const columnOrder = useMemo<ColumnOrderState>(() => [...visibleColumns], [visibleColumns])
 
   const onColumnOrderChange = useCallback<OnChangeFn<ColumnOrderState>>(

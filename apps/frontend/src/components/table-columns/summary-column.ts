@@ -2,7 +2,6 @@ import type { CsvColumn } from '@/lib/csv'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import type { Permission } from 'shared-types'
-import { sortableHeader } from './column-primitives'
 
 export type SummaryColumn<TRow, TContext> = {
   id: string
@@ -12,7 +11,6 @@ export type SummaryColumn<TRow, TContext> = {
   cell?: (row: TRow, context: TContext) => ReactNode
   permission?: Permission
   size?: number
-  sortable?: boolean
   sortingFn?: ColumnDef<TRow>['sortingFn']
   filterFn?: ColumnDef<TRow>['filterFn']
 }
@@ -30,8 +28,7 @@ export function toColumnDefs<TRow, TContext>(
 ): ColumnDef<TRow>[] {
   return columns.map((column) => ({
     accessorKey: column.id,
-    header: column.sortable ? sortableHeader<TRow>(column.label) : column.label,
-    enableSorting: column.sortable ?? false,
+    header: column.label,
     size: column.size,
     cell: ({ row }) =>
       column.cell ? column.cell(row.original, context) : column.text(row.original),

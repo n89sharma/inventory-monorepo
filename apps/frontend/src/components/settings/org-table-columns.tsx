@@ -1,4 +1,4 @@
-import { createEditColumn, sortableHeader } from '@/components/table-columns/column-primitives'
+import { createEditColumn } from '@/components/table-columns/column-primitives'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { OrgDetail } from 'shared-types'
 
@@ -9,37 +9,37 @@ export function createOrgTableColumns(
     {
       accessorKey: 'account_number',
       filterFn: 'includesString',
-      header: sortableHeader<OrgDetail>('Account Number'),
+      header: 'Account Number',
       cell: ({ row }) => row.original.account_number ?? '',
     },
     {
       accessorKey: 'name',
       filterFn: 'includesString',
-      header: sortableHeader<OrgDetail>('Name'),
+      header: 'Name',
     },
     {
       accessorKey: 'mobile',
-      header: sortableHeader<OrgDetail>('Mobile'),
+      header: 'Mobile',
       cell: ({ row }) => row.original.mobile ?? '',
     },
     {
       accessorKey: 'primary_email',
-      header: sortableHeader<OrgDetail>('Email'),
+      header: 'Email',
       cell: ({ row }) => row.original.primary_email ?? '',
     },
     {
       accessorKey: 'address',
-      header: sortableHeader<OrgDetail>('Address'),
+      header: 'Address',
       cell: ({ row }) => row.original.address ?? '',
     },
     {
       accessorKey: 'city',
-      header: sortableHeader<OrgDetail>('City'),
+      header: 'City',
       cell: ({ row }) => row.original.city ?? '',
     },
     {
       accessorKey: 'country',
-      header: sortableHeader<OrgDetail>('Country'),
+      header: 'Country',
       cell: ({ row }) => row.original.country ?? '',
     },
     ...(onEdit ? [createEditColumn<OrgDetail>(onEdit, 'Edit organization')] : []),

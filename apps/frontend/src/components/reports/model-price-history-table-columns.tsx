@@ -1,4 +1,4 @@
-import { createIdColumn, sortableHeader } from '@/components/table-columns/column-primitives'
+import { createIdColumn } from '@/components/table-columns/column-primitives'
 import { Badge } from '@/components/shadcn/badge'
 import {
   formatDate,
@@ -21,42 +21,42 @@ export function createModelPriceHistoryColumns(
     }),
     {
       accessorKey: 'meter',
-      header: sortableHeader<ModelPriceHistoryRow>('Meter'),
+      header: 'Meter',
       cell: ({ row }) => formatThousandsK(row.original.meter),
     },
     {
       accessorKey: 'vendor',
-      header: sortableHeader<ModelPriceHistoryRow>('Vendor'),
+      header: 'Vendor',
       cell: ({ row }) => formatTitleCase(row.original.vendor ?? ''),
     },
     {
       accessorKey: 'arrived_at',
-      header: sortableHeader<ModelPriceHistoryRow>('Arrived At'),
+      header: 'Arrived At',
       cell: ({ row }) => (row.original.arrived_at ? formatDate(row.original.arrived_at) : ''),
     },
     {
       accessorKey: 'customer',
-      header: sortableHeader<ModelPriceHistoryRow>('Customer'),
+      header: 'Customer',
       cell: ({ row }) => formatTitleCase(row.original.customer ?? ''),
     },
     {
       accessorKey: 'departed_at',
-      header: sortableHeader<ModelPriceHistoryRow>('Departed At'),
+      header: 'Departed At',
       cell: ({ row }) => formatDate(row.original.departed_at),
     },
     {
       accessorKey: 'purchase_price',
-      header: sortableHeader<ModelPriceHistoryRow>('Purchase Price'),
+      header: 'Purchase Price',
       cell: ({ row }) => formatUSDWithSymbol(row.original.purchase_price),
     },
     {
       accessorKey: 'sale_price',
-      header: sortableHeader<ModelPriceHistoryRow>('Sale Price'),
+      header: 'Sale Price',
       cell: ({ row }) => formatUSDWithSymbol(row.original.sale_price),
     },
     {
       accessorKey: 'salesperson',
-      header: sortableHeader<ModelPriceHistoryRow>('Salesperson'),
+      header: 'Salesperson',
       cell: ({ row }) => row.original.salesperson ?? '',
     },
     {

@@ -42,7 +42,8 @@ describe('useAssetColumnVisibilityParam', () => {
     const { result } = renderWithParams('?cols=')
     expect(result.current.visibleColumns.size).toBe(0)
     expect(Object.values(result.current.columnVisibility).every((visible) => !visible)).toBe(true)
-    expect(result.current.columnVisibility).not.toHaveProperty('barcode')
+    // The identity columns are pickable like any other, so an empty param hides them too.
+    expect(result.current.columnVisibility).toHaveProperty('barcode', false)
   })
 
   it('writes an empty param rather than clearing it when the last column is unchecked', async () => {
@@ -144,14 +145,15 @@ describe('useAssetColumnVisibilityParam', () => {
     act(() =>
       result.current.onColumnVisibilityChange((prev) => ({
         ...prev,
-        barcode: true,
         select: true,
+        barcode: true,
         brand: true,
       })),
     )
 
     await waitFor(() => expect(onUrlUpdate).toHaveBeenCalledOnce())
-    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,brand')
+    // 'select' is the row-checkbox column, which is no asset field and so is never stored.
+    expect(onUrlUpdate.mock.calls[0]![0].searchParams.get('cols')).toBe('status,barcode,brand')
   })
 
   it('keeps a forced column out of the param it writes', async () => {

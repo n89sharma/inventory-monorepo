@@ -3,13 +3,18 @@ import type { PriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AssetSearchRow, Permission } from 'shared-types'
-import type { AssetColumnId, AssetWarningOf } from './asset-search-columns'
+import {
+  IDENTITY_COLUMN_IDS,
+  type AssetColumnId,
+  type AssetWarningOf,
+} from './asset-search-columns'
 import { createSelectColumn } from './column-primitives'
 import { createSearchPageColumns } from './search-page-columns'
 
 export type CollectionSection = 'arrivals' | 'transfers' | 'departures' | 'invoices' | 'holds'
 
 const COMMON_DEFAULT_COLUMN_IDS = [
+  ...IDENTITY_COLUMN_IDS,
   'status',
   'readiness',
   'specs_meter_total',
