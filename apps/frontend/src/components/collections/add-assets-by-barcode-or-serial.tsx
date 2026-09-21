@@ -15,8 +15,7 @@ const ADD_ASSET_PLACEHOLDER = 'Scan barcode or serial…'
 
 const normalizeCode = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
-const PREFIX_POSITION =
-  'absolute top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground'
+const PREFIX_POSITION = 'absolute top-1/2 -translate-y-1/2 pointer-events-none'
 
 // The chip states what the box does, which a placeholder stops doing the moment a code is
 // typed into it. Without a label there is nothing to chip, so the glyph stands alone.
@@ -29,11 +28,16 @@ function InputPrefix({
 }): React.JSX.Element | null {
   if (label === undefined) {
     if (!showIcon) return null
-    return <BarcodeIcon className={`${PREFIX_POSITION} left-2.5 size-4`} aria-hidden="true" />
+    return (
+      <BarcodeIcon
+        className={`${PREFIX_POSITION} text-muted-foreground left-2.5 size-4`}
+        aria-hidden="true"
+      />
+    )
   }
   return (
     <span
-      className={`${PREFIX_POSITION} left-1 flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-xs`}
+      className={`${PREFIX_POSITION} text-foreground left-1 flex items-center gap-1 rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium`}
       aria-hidden="true"
     >
       {label}
@@ -217,7 +221,7 @@ export function AddAssetsByBarcodeOrSerial({
               onKeyDown={handleKeyDown}
               disabled={disabled}
               autoFocus={autoFocus}
-              className={cn(prefixLabel ? 'pl-16' : 'pl-8', 'pr-8', inputClassName)}
+              className={cn(prefixLabel ? 'pl-24' : 'pl-8', 'pr-8', inputClassName)}
             />
             {isLookingUp && (
               <CircleNotchIcon

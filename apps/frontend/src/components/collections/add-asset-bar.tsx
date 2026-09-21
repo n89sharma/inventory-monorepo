@@ -1,7 +1,7 @@
 import type { AssetSummary } from 'shared-types'
 import { AddAssetsByBarcodeOrSerial } from './add-assets-by-barcode-or-serial'
 
-const ADD_PREFIX_LABEL = 'Add'
+const ADD_PREFIX_LABEL = 'Add Asset'
 
 interface AddAssetBarProps {
   existingAssets: { id: number; barcode: string }[]
@@ -28,7 +28,7 @@ export function AddAssetBar({
         validateAsset={validateAsset}
         onCommit={onAddSingle}
         className="w-72"
-        inputClassName="h-7 border-primary/40 bg-background ring-4 ring-primary/10"
+        inputClassName="h-7 bg-background"
       />
     </div>
   )
