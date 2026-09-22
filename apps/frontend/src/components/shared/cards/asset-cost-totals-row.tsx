@@ -1,6 +1,7 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/shadcn/hover-card'
 import { SummaryField } from '@/components/shared/cards/summary-field'
-import { useCanViewProfitability } from '@/hooks/use-can-view-profitability'
+import { useCan } from '@/hooks/use-can'
+import { useCanViewCosts } from '@/hooks/use-can-view-costs'
 import { formatMarginPercent, formatUSDWithSymbol } from '@/lib/formatters'
 import { Fragment } from 'react'
 import type { AssetSearchRow } from 'shared-types'
@@ -31,8 +32,9 @@ function sumCost(assets: AssetSearchRow[], field: CostTotalFieldId): number {
 }
 
 export function AssetCostTotalsRow({ assets }: { assets: AssetSearchRow[] }) {
-  const canViewProfitability = useCanViewProfitability()
-  if (!canViewProfitability) return null
+  const canViewCosts = useCanViewCosts()
+  const canViewProfitabilityReport = useCan('view_profitability_report')
+  if (!canViewCosts) return null
 
   // Margin is derived from the same two totals this row prints, rather than from the
   // priced-assets-only rule the departed report uses, so the line reconciles on screen.
@@ -50,10 +52,12 @@ export function AssetCostTotalsRow({ assets }: { assets: AssetSearchRow[] }) {
         >
           <SummaryField label="Total Cost" value={formatUSDWithSymbol(totalCost)} />
           <SummaryField label="Sale Price" value={formatUSDWithSymbol(salePrice)} />
-          <SummaryField
-            label="Margin"
-            value={`${formatUSDWithSymbol(grossMargin)} (${formatMarginPercent(marginPercent)})`}
-          />
+          {canViewProfitabilityReport && (
+            <SummaryField
+              label="Margin"
+              value={`${formatUSDWithSymbol(grossMargin)} (${formatMarginPercent(marginPercent)})`}
+            />
+          )}
         </div>
       </HoverCardTrigger>
       <HoverCardContent align="start" className="w-56">

@@ -14,7 +14,11 @@ const NO_COST = {
   cost_sale_price: null,
 } as const satisfies Partial<AssetSearchRow>
 
-const ALL_PRICE_PERMISSIONS: Permission[] = ['view_purchase_price', 'view_sale_price']
+const COST_ROW_PERMISSIONS: Permission[] = [
+  'view_purchase_price',
+  'view_sale_price',
+  'view_profitability_report',
+]
 
 const mocks = vi.hoisted(() => ({ permissions: [] as Permission[] }))
 
@@ -25,12 +29,12 @@ function totalFor(label: string): string {
 }
 
 async function openCostBreakdown() {
-  fireEvent.pointerEnter(screen.getByText('Margin'))
+  fireEvent.pointerEnter(screen.getByText('Total Cost'))
   await screen.findByText('Cost')
 }
 
 beforeEach(() => {
-  mocks.permissions = ALL_PRICE_PERMISSIONS
+  mocks.permissions = COST_ROW_PERMISSIONS
 })
 
 describe('AssetCostTotalsRow', () => {
@@ -130,6 +134,14 @@ describe('AssetCostTotalsRow', () => {
     const { container } = render(<AssetCostTotalsRow assets={[makeAssetSearchRow()]} />)
 
     expect(container).toBeEmptyDOMElement()
+  })
+
+  it('hides the margin from a viewer without view_profitability_report', () => {
+    mocks.permissions = ['view_purchase_price', 'view_sale_price']
+    render(<AssetCostTotalsRow assets={[makeAssetSearchRow({ cost_sale_price: 200 })]} />)
+
+    expect(screen.getByText('Sale Price')).toBeInTheDocument()
+    expect(screen.queryByText('Margin')).not.toBeInTheDocument()
   })
 
   it('renders nothing for a viewer with neither price permission', () => {
