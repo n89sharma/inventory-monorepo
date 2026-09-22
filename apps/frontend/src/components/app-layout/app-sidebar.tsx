@@ -18,6 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  SidebarTrigger,
 } from '@/components/shadcn/sidebar'
 import { useBrands } from '@/hooks/use-reference-data'
 import { useCan } from '@/hooks/use-can'
@@ -41,7 +42,6 @@ import {
   LockOpenIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
-  StackIcon,
   ToolboxIcon,
   TruckTrailerIcon,
   WarehouseIcon,
@@ -134,6 +134,15 @@ const REPORTS_SUB_ITEMS = [
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 const ROLES_ITEM = { title: 'Roles & Permissions', url: '/settings/roles' }
 
+function CollapsibleCaret() {
+  return (
+    <CaretDownIcon
+      className="ml-auto size-3.5! transition-transform group-data-[state=closed]/collapsible:rotate-90"
+      aria-hidden="true"
+    />
+  )
+}
+
 // Opens the group when its section becomes active, while leaving a manual
 // collapse in place until the user navigates into the section again.
 function useGroupOpenOnActive(isActive: boolean): [boolean, (open: boolean) => void] {
@@ -213,13 +222,11 @@ export function AppSidebar(): React.JSX.Element {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex flex-row gap-2">
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <StackIcon aria-hidden="true" />
-              </div>
-              <div className="flex items-center">
-                <span className="truncate font-medium">Shiva Exports Ltd</span>
-              </div>
+            <div className="flex flex-row items-center gap-2">
+              <span className="truncate text-sm font-medium group-data-[collapsible=icon]:hidden">
+                Shiva Exports Ltd
+              </span>
+              <SidebarTrigger className="ml-auto" />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -240,10 +247,7 @@ export function AppSidebar(): React.JSX.Element {
                     <SidebarMenuButton isActive={isSearchAssetsActive ? true : undefined}>
                       <MagnifyingGlassIcon aria-hidden="true" />
                       <span>Search Assets</span>
-                      <CaretDownIcon
-                        className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
-                        aria-hidden="true"
-                      />
+                      <CollapsibleCaret />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
@@ -303,10 +307,7 @@ export function AppSidebar(): React.JSX.Element {
                       <SidebarMenuButton isActive={isReportsActive ? true : undefined}>
                         <ChartLineUpIcon aria-hidden="true" />
                         <span>Reports</span>
-                        <CaretDownIcon
-                          className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
-                          aria-hidden="true"
-                        />
+                        <CollapsibleCaret />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -347,10 +348,7 @@ export function AppSidebar(): React.JSX.Element {
                       <SidebarMenuButton isActive={isSettingsActive ? true : undefined}>
                         <GearIcon aria-hidden="true" />
                         <span>Settings</span>
-                        <CaretDownIcon
-                          className="ml-auto transition-transform group-data-[state=closed]/collapsible:rotate-90"
-                          aria-hidden="true"
-                        />
+                        <CollapsibleCaret />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>

@@ -151,7 +151,7 @@ export const GlobalSearch = ({ className }: { className?: string }) => {
               value={query}
               onChange={handleInputChange}
               onKeyDown={onKeyDown}
-              className="pl-8 pr-20"
+              className="h-7 rounded-md pl-8 pr-20"
             />
             <SearchInputAdornment query={query} onClear={clearSearch} />
           </div>
