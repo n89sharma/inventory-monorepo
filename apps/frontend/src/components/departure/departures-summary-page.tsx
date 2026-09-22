@@ -78,7 +78,7 @@ export function DepartureSummaryPage(): React.JSX.Element {
           <Button asChild>
             <Link to="/departures/new">
               <PlusIcon />
-              Create Departure
+              New Departure
             </Link>
           </Button>
         ) : undefined

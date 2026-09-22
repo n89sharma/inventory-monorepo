@@ -88,7 +88,7 @@ export function HoldSummaryPage(): React.JSX.Element {
           <Button asChild>
             <Link to="/holds/new">
               <PlusIcon />
-              Create Hold
+              New Hold
             </Link>
           </Button>
         ) : undefined

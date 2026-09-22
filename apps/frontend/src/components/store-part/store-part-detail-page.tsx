@@ -114,7 +114,7 @@ export function StorePartDetailPage(): React.JSX.Element {
               title={warehouse ? undefined : 'Open from a warehouse to record a transaction'}
             >
               <PlusIcon aria-hidden="true" />
-              Transaction
+              New Transaction
             </Button>
           </div>
         }

@@ -140,7 +140,7 @@ export function StorePartsListPage(): React.JSX.Element {
               }
             >
               <PlusIcon aria-hidden="true" />
-              Transaction
+              New Transaction
             </Button>
           </div>
         }

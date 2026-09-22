@@ -78,7 +78,7 @@ export function ArrivalsSummaryPage(): React.JSX.Element {
           <Button asChild>
             <Link to="/arrivals/new">
               <PlusIcon />
-              Create Arrival
+              New Arrival
             </Link>
           </Button>
         ) : undefined

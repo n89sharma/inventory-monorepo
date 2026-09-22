@@ -122,7 +122,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
             <Button asChild>
               <Link to="/invoices/new">
                 <PlusIcon />
-                Create Invoice
+                New Invoice
               </Link>
             </Button>
           )}

@@ -74,7 +74,7 @@ export function TransferSummaryPage(): React.JSX.Element {
           <Button asChild>
             <Link to="/transfers/new">
               <PlusIcon />
-              Create Transfer
+              New Transfer
             </Link>
           </Button>
         ) : undefined
