@@ -196,6 +196,11 @@ const GRIP_CLASS =
   'absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity ' +
   '[cursor:var(--cursor-grab)] active:[cursor:var(--cursor-grabbing)] ' +
   'group-hover/head:opacity-60 focus-visible:opacity-100'
+// The grip is absolute, so it adds nothing to the column's measured width: a column whose
+// label and data are both narrow would size flush to the label and let the grip sit on top
+// of it. This clears the grip's lane (2px offset + a 14px icon) and mirrors it on the right
+// so the label stays centred over its data. Only the draggable headers carry a grip.
+const GRIP_LANE_CLASS = 'px-4.5'
 // Fills the cell so the whole header reads as the hit area, and reserves nothing for the
 // arrow: the column is sized to its content, which the arrow joins once a sort is applied.
 const SORT_TOGGLE_CLASS =
@@ -316,7 +321,7 @@ function SortableHeaderCell<TData>({
       ref={setNodeRef}
       aria-sort={ariaSort(header.column)}
       style={headerCellStyle(header)}
-      className={`group/head relative ${headerCellClassName(header)} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
+      className={`group/head relative ${headerCellClassName(header)} ${GRIP_LANE_CLASS} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
     >
       {/* Labelled through aria-label rather than visually hidden text, which would land in
           the innerText the drag chip reads back. */}
