@@ -1,7 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
-import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
@@ -80,11 +79,6 @@ export function AssetSearchPage({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ColumnPickerButton
-              visible={visibleColumns}
-              onVisibleChange={setVisibleColumns}
-              onReset={resetColumns}
-            />
             <SavedViewsButton pageKey={savedViewPageKey} visibleColumns={visibleColumns} />
             <ShareButton />
             <ExportCsvButton
@@ -116,6 +110,9 @@ export function AssetSearchPage({
           defaultSort={defaultSort}
           sorting={sorting}
           onSortingChange={onSortingChange}
+          visibleColumns={visibleColumns}
+          onVisibleColumnsChange={setVisibleColumns}
+          onResetColumns={resetColumns}
         />
       </div>
     </GridPageContent>

@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/shadcn/select'
-import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataGrid } from '@/components/shared/data-table'
 import { MetricCard } from './metric-card'
@@ -253,9 +252,6 @@ export function ProfitabilityReportPage(): React.JSX.Element {
           </div>
         </div>
         <ProfitabilityFilterBar />
-        {activeFilterCount > 0 ? (
-          <ActiveFilterBar count={activeFilterCount} onClear={clearFilters} />
-        ) : null}
       </GridPageHeader>
       <div
         className={cn(

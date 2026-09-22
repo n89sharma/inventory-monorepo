@@ -2,13 +2,11 @@ import { GridPageContent, PageSection } from '@/components/app-layout/page-conte
 import { CostSummaryStrip } from '@/components/shared/cards/cost-summary-strip'
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { getBreadcrumbForAssetSummary } from '@/components/shared/breadcrumb-segments'
-import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
 import { preloadAssetDetail } from '@/hooks/use-asset-detail'
 import {
   PINNED_ASSET_COLUMN_IDS,
   SEARCHABLE_ASSET_COLUMN_IDS,
 } from '@/components/table-columns/column-primitives'
-import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import {
   DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION,
   type CollectionSection,
@@ -37,16 +35,14 @@ import {
   type AssetTypeFilter,
 } from '@/lib/asset-type-filter'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
-import { AssetTypeFilterGroup } from './asset-type-filter-group'
 import { BulkEditBar, type BulkExtraActionGroup } from './bulk-edit-bar'
+import { CollectionAssetsToolbar } from './collection-assets-toolbar'
 import { CollectionEditBar, type CollectionMenuAction } from './collection-edit-bar'
 
 const TABLE_LABEL = 'Collection assets'
 
 const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
-const ASSET_SEARCH_PLACEHOLDER = 'Search barcode, serial, model'
-const ASSET_SEARCH_CLEAR_LABEL = 'Clear search'
 const SEARCHABLE_ASSET_COLUMN_ID_SET = new Set<string>(SEARCHABLE_ASSET_COLUMN_IDS)
 
 const ASSET_TEXT_SEARCH = {
@@ -251,27 +247,16 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         data={visibleAssets}
         textSearch={ASSET_TEXT_SEARCH}
         renderToolbar={(table) => (
-          <>
-            {renderAddAssetBar?.(entity)}
-            <div className="ml-auto flex items-center gap-4">
-              <TableTextFilter
-                table={table}
-                placeholder={ASSET_SEARCH_PLACEHOLDER}
-                clearLabel={ASSET_SEARCH_CLEAR_LABEL}
-                className="w-60"
-              />
-              <AssetTypeFilterGroup
-                value={assetTypeFilter}
-                counts={assetTypeCounts}
-                onValueChange={handleAssetTypeFilterChange}
-              />
-              <ColumnPickerButton
-                visible={visibleColumns}
-                onVisibleChange={setVisibleColumns}
-                onReset={reset}
-              />
-            </div>
-          </>
+          <CollectionAssetsToolbar
+            table={table}
+            addAssetBar={renderAddAssetBar?.(entity)}
+            assetTypeFilter={assetTypeFilter}
+            assetTypeCounts={assetTypeCounts}
+            onAssetTypeFilterChange={handleAssetTypeFilterChange}
+            visibleColumns={visibleColumns}
+            onVisibleColumnsChange={setVisibleColumns}
+            onResetColumns={reset}
+          />
         )}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}

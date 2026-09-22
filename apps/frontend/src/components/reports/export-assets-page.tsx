@@ -5,7 +5,6 @@ import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
-import { ColumnPickerButton } from '@/components/shared/column-picker-button'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { InlineWarning } from '@/components/shared/inline-warning'
 import { useAssetSelection } from '@/hooks/use-asset-selection'
@@ -134,11 +133,6 @@ export function ExportAssetsPage(): React.JSX.Element {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <ColumnPickerButton
-              visible={visibleColumns}
-              onVisibleChange={setVisibleColumns}
-              onReset={reset}
-            />
             <ExportCsvButton
               loading={selection.exportLoading}
               disabled={selection.exportDisabled}
@@ -174,6 +168,9 @@ export function ExportAssetsPage(): React.JSX.Element {
           columnOrder={displayOrder}
           onColumnOrderChange={onColumnOrderChange}
           getRowHref={getRowHref}
+          visibleColumns={visibleColumns}
+          onVisibleColumnsChange={setVisibleColumns}
+          onResetColumns={reset}
         />
       </div>
     </GridPageContent>

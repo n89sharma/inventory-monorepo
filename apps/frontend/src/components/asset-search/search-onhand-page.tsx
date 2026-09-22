@@ -19,7 +19,6 @@ import {
   usePriceCheckParam,
   useStatusesParam,
   useWarehousesParam,
-  type FilterParamGroups,
 } from '@/lib/filters/hooks'
 import { formatTitleCase } from '@/lib/formatters'
 import { useCallback, useMemo } from 'react'
@@ -30,14 +29,6 @@ const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
 const PURCHASE_COST_COLUMN_ID = 'cost_purchase_cost'
 const PRICE_CHECK_COLUMN_IDS = [PURCHASE_COST_COLUMN_ID] as const
 const DAYS_HELD_WARNING_THRESHOLD = 30
-const SCOPE_FILTER_GROUPS = [
-  ['wh'],
-  ['status'],
-  ['pricecheck'],
-  ['heldby'],
-  ['heldfor'],
-  ['holdcustomer'],
-] as const satisfies FilterParamGroups
 const ROW_WARNING_CLASS = 'data-row-warning'
 const ALL_STATUSES_LABEL = 'All'
 const STATUS_GROUP_LABEL = 'Filter by status'
@@ -187,7 +178,7 @@ export function SearchOnHandPage(): React.JSX.Element {
       getRowClassName={heldRowClassName}
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
     >
-      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
+      <AssetFilterBar scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }

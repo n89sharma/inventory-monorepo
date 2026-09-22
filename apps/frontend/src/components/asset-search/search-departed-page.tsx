@@ -15,22 +15,12 @@ import {
   useSalespersonParam,
   useShowOtherParam,
   useWarehousesParam,
-  type FilterParamGroups,
 } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true } as const
-// `from`/`to` are the page's scope, not a filter: they always carry a value, so counting
-// them would report a filter as active before the user touches anything.
-const SCOPE_FILTER_GROUPS = [
-  ['wh'],
-  ['other'],
-  ['customer'],
-  ['sp'],
-  ['invoiceref'],
-] as const satisfies FilterParamGroups
 
 export function SearchDepartedPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
@@ -122,7 +112,7 @@ export function SearchDepartedPage(): React.JSX.Element {
       defaultSort={DEPARTED_AT_DESC_SORT}
       summaryStrip={<DepartedSummaryStrip assets={assets} />}
     >
-      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
+      <AssetFilterBar scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }

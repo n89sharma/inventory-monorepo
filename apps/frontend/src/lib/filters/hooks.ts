@@ -528,25 +528,6 @@ export function countActiveFilterGroups(
   return groups.filter((group) => group.some((key) => isFilterApplied(values[key]))).length
 }
 
-export function useActiveFilters(groups: FilterParamGroups): {
-  count: number
-  clearAll: () => void
-} {
-  const keys = useMemo(() => groups.flat(), [groups])
-  const parsers = useMemo(
-    () => Object.fromEntries(keys.map((key) => [key, FILTER_PARSERS[key]])),
-    [keys],
-  )
-  const [values, setValues] = useQueryStates(parsers)
-
-  const clearAll = useCallback(
-    () => void setValues(Object.fromEntries(keys.map((key) => [key, null]))),
-    [keys, setValues],
-  )
-
-  return { count: countActiveFilterGroups(groups, values), clearAll }
-}
-
 export function getDepartedFloor(): Date {
   return startOfDay(subMonths(new Date(), MAX_DEPARTED_WINDOW_MONTHS))
 }

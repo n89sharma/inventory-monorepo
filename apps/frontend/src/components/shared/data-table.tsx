@@ -60,6 +60,7 @@ import {
 } from '@/components/shadcn/table'
 
 import { Button } from '@/components/shadcn/button'
+import { TableResultCount, TableToolbar, TableToolbarEnd } from '@/components/shared/table-toolbar'
 import { useGridScrollRestoration } from '@/hooks/use-grid-scroll-restoration'
 import {
   ArrowDownIcon,
@@ -129,7 +130,7 @@ type TableFrame = {
   // by measurement, so a wrong value drifts further out of true the deeper you scroll.
   // Every cell is whitespace-nowrap and single-line, which is what keeps that true.
   virtualRows?: { rowHeight: number; overscan: number }
-  // A grid has no pager to carry the total, so it prints a result count above the rows unless
+  // A grid has no pager to carry the total, so it leads the toolbar with a result count unless
   // the page carries the count itself.
   countsResults: boolean
 }
@@ -140,13 +141,13 @@ const GRID_OVERSCAN = 12
 // A virtualised grid never paginates; the row model has to hand over every row.
 const ALL_ROWS_PAGE_SIZE = Number.MAX_SAFE_INTEGER
 
-const RESULT_COUNT_CLASS = 'shrink-0 border-b px-4 py-1 text-xs text-muted-foreground'
-
 // Claims what its flex column has left and scrolls on both axes, so both scrollbars sit on
 // the viewport edges. No side border or radius: the grid runs edge to edge.
 const GRID_FRAME = {
   root: 'flex min-h-0 flex-1 flex-col',
-  border: 'flex min-h-0 flex-1 flex-col border-y',
+  // -mt-px laps the top border over the bottom border of whatever sits above, so the two
+  // hairlines read as one rather than stacking into a thick rule.
+  border: '-mt-px flex min-h-0 flex-1 flex-col border-y',
   scrollRegion: 'flex-1 min-h-0 overflow-auto outline-none',
   virtualRows: { rowHeight: GRID_ROW_HEIGHT, overscan: GRID_OVERSCAN },
   countsResults: true,
@@ -538,16 +539,15 @@ function DataTableBase<TData, TValue>({
       >
         <SortableContext items={reorderableColumnIds} strategy={horizontalListSortingStrategy}>
           <div className={`${frame.border} ${SCROLL_REGION_FOCUS_CLASS}`}>
-            {/* Only the table knows the total once a column filter has run. */}
-            {frame.countsResults && (
-              <div className={RESULT_COUNT_CLASS}>
-                {totalRows.toLocaleString()} {totalRows === 1 ? 'result' : 'results'}
-              </div>
-            )}
-            {renderToolbar && (
-              <div className="flex shrink-0 items-center gap-4 border-b bg-muted px-2 py-1">
-                {renderToolbar(table)}
-              </div>
+            {(frame.countsResults || renderToolbar) && (
+              <TableToolbar>
+                {renderToolbar?.(table)}
+                {frame.countsResults && (
+                  <TableToolbarEnd>
+                    <TableResultCount table={table} />
+                  </TableToolbarEnd>
+                )}
+              </TableToolbar>
             )}
             <div
               data-slot={SCROLL_REGION_SLOT}

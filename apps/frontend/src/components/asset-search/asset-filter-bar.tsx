@@ -5,10 +5,8 @@ import { InternalFinisherFilter } from '@/components/shared/filters/internal-fin
 import { MeterRangeInput } from '@/components/shared/filters/meter-range-input'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { ReadinessFilter } from '@/components/shared/filters/readiness-filter'
-import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
 import { FilterRow } from '@/components/shared/filter-row'
 import {
-  useActiveFilters,
   useAssetTypesParam,
   useBrandParam,
   useCassettesParam,
@@ -16,32 +14,18 @@ import {
   useMeterRangeParam,
   useModelParam,
   useReadinessesParam,
-  type FilterParamGroups,
 } from '@/lib/filters/hooks'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 
 const DEFAULT_MODEL_PLACEHOLDER = 'Model'
-
-// The controls this bar renders itself; each page adds its own scope filters.
-const ASSET_FILTER_GROUPS = [
-  ['brand'],
-  ['type'],
-  ['model', 'q'],
-  ['readiness'],
-  ['meter_min', 'meter_max'],
-  ['cas'],
-  ['fin'],
-] as const satisfies FilterParamGroups
 
 // Memoised so a URL write for something the bar does not own, such as the grid's sort,
 // stops here instead of re-rendering every control and popover below it.
 export const AssetFilterBar = memo(function AssetFilterBar({
   scopeFilters,
-  scopeFilterGroups,
   modelPlaceholder = DEFAULT_MODEL_PLACEHOLDER,
 }: {
   scopeFilters?: React.ReactNode
-  scopeFilterGroups: FilterParamGroups
   modelPlaceholder?: string
 }): React.JSX.Element {
   const [brand, setBrand] = useBrandParam()
@@ -51,11 +35,6 @@ export const AssetFilterBar = memo(function AssetFilterBar({
   const { min, max, setMin, setMax } = useMeterRangeParam()
   const [cassettes, setCassettes] = useCassettesParam()
   const [internalFinisher, setInternalFinisher] = useInternalFinisherParam()
-  const filterGroups = useMemo(
-    () => [...scopeFilterGroups, ...ASSET_FILTER_GROUPS],
-    [scopeFilterGroups],
-  )
-  const { count, clearAll } = useActiveFilters(filterGroups)
 
   return (
     <>
@@ -97,8 +76,6 @@ export const AssetFilterBar = memo(function AssetFilterBar({
           onClear={() => setInternalFinisher(null)}
         />
       </FilterRow>
-
-      {count > 0 ? <ActiveFilterBar count={count} onClear={clearAll} /> : null}
     </>
   )
 })

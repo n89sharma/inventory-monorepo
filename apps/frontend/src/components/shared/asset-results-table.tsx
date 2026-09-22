@@ -3,7 +3,8 @@ import {
   createSelectColumn,
   PINNED_ASSET_COLUMN_IDS,
 } from '@/components/table-columns/column-primitives'
-import { DataGrid } from '@/components/shared/data-table'
+import { AssetResultsToolbar } from '@/components/shared/asset-results-toolbar'
+import { DataGridWithoutResultCount } from '@/components/shared/data-table'
 import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
 import { useCan } from '@/hooks/use-can'
 import type {
@@ -35,6 +36,9 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   defaultSort = STOCK_DAYS_ASC_SORT,
   sorting,
   onSortingChange,
+  visibleColumns,
+  onVisibleColumnsChange,
+  onResetColumns,
 }: {
   assets: AssetSearchRow[]
   rowSelection: RowSelectionState
@@ -49,6 +53,9 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   defaultSort?: { id: string; desc: boolean }
   sorting?: SortingState
   onSortingChange?: OnChangeFn<SortingState>
+  visibleColumns: Set<string>
+  onVisibleColumnsChange: (next: Set<string>) => void
+  onResetColumns: () => void
 }) {
   const can = useCan()
   const columns = useMemo(
@@ -75,7 +82,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         totalCount={assets.length}
         onSelectAll={selectAllAssets}
       />
-      <DataGrid
+      <DataGridWithoutResultCount
         label={TABLE_LABEL}
         columns={columns}
         data={assets}
@@ -92,6 +99,14 @@ export const AssetResultsTable = memo(function AssetResultsTable({
         onColumnVisibilityChange={onColumnVisibilityChange}
         columnOrder={columnOrder}
         onColumnOrderChange={onColumnOrderChange}
+        renderToolbar={(table) => (
+          <AssetResultsToolbar
+            table={table}
+            visibleColumns={visibleColumns}
+            onVisibleColumnsChange={onVisibleColumnsChange}
+            onResetColumns={onResetColumns}
+          />
+        )}
       />
     </>
   )

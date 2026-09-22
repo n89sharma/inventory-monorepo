@@ -85,7 +85,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
       renderToolbar={(table) => (
-        <div className="flex gap-2">
+        <>
           <ColumnTextFilter
             table={table}
             columnId="invoice_reference"
@@ -100,7 +100,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
             clearLabel={`Clear ${ORGANIZATION_HEADER[invoiceType].toLowerCase()} name`}
             className="w-64"
           />
-        </div>
+        </>
       )}
       searchBar={
         <SearchBar

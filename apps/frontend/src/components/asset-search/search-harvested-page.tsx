@@ -2,13 +2,12 @@ import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { useSearchHarvested } from '@/hooks/use-search-harvested'
-import { useAssetFilters, useWarehousesParam, type FilterParamGroups } from '@/lib/filters/hooks'
+import { useAssetFilters, useWarehousesParam } from '@/lib/filters/hooks'
 import { useCallback, useMemo } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true } as const
-const SCOPE_FILTER_GROUPS = [['wh']] as const satisfies FilterParamGroups
 
 export function SearchHarvestedPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
@@ -38,7 +37,7 @@ export function SearchHarvestedPage(): React.JSX.Element {
       onBulkPriceSave={handleBulkPriceSave}
       defaultSort={DEPARTED_AT_DESC_SORT}
     >
-      <AssetFilterBar scopeFilterGroups={SCOPE_FILTER_GROUPS} scopeFilters={scopeFilters} />
+      <AssetFilterBar scopeFilters={scopeFilters} />
     </AssetSearchPage>
   )
 }
