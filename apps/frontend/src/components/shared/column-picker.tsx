@@ -159,15 +159,16 @@ export function ColumnPicker({
       <SearchBar query={query} onQueryChange={setQuery} />
 
       <div className={cn(SCROLL_AREA_MAX_HEIGHT, 'overflow-y-auto -mx-0.5 px-0.5')}>
-        {/* The multi-column element must size to its content: capping its height instead
-            makes the browser lay the overflow out as further columns to the right. */}
-        <div className="columns-2 gap-4">
+        {/* A row-major grid rather than a newspaper flow: sections read left to right in
+            COLUMN_SECTIONS order, so the most-wanted ones stay at the top of the popover.
+            Paired sections are independent, so each starts at the top of its own row. */}
+        <div className="grid grid-cols-2 items-start gap-x-4 gap-y-4">
           {hasAnyMatch ? (
             groupedSections.map(({ section, columns, visibleColumns }) => {
               const allOn = visibleColumns.length === columns.length
               const columnIds = columns.map((c) => c.id)
               return (
-                <div key={section.id} className="mb-4 break-inside-avoid last:mb-0">
+                <div key={section.id}>
                   <SectionHeader
                     label={section.label}
                     allVisible={allOn}
@@ -185,7 +186,9 @@ export function ColumnPicker({
               )
             })
           ) : (
-            <div className="px-2 py-4 text-sm text-muted-foreground">{EMPTY_RESULT_TEXT}</div>
+            <div className="col-span-2 px-2 py-4 text-sm text-muted-foreground">
+              {EMPTY_RESULT_TEXT}
+            </div>
           )}
         </div>
       </div>

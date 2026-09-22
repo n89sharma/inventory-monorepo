@@ -47,7 +47,7 @@ type CollectionEditBarProps = {
   canCreateEditEntity: boolean
   assets?: AssetSearchRow[]
   selectedAssets?: AssetSearchRow[]
-  visibleColumns: Set<string>
+  displayOrder: readonly string[]
   note?: string | null
   menuActions?: CollectionMenuAction[]
   historyCacheKey: string
@@ -64,7 +64,7 @@ export function CollectionEditBar({
   canCreateEditEntity,
   assets,
   selectedAssets,
-  visibleColumns,
+  displayOrder,
   note,
   menuActions,
   historyCacheKey,
@@ -99,7 +99,7 @@ export function CollectionEditBar({
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = searchPageRowsToCsv(exportableAssets, visibleColumns)
+      const csv = searchPageRowsToCsv(exportableAssets, displayOrder)
       downloadFile(
         `${section}-${toFilenameStem(displayId, collectionId)}.csv`,
         new Blob([csv], { type: CSV_MIME_TYPE }),

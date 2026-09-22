@@ -3,7 +3,10 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { PERMISSIONS, type Permission } from 'shared-types'
-import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
+import {
+  ASSET_COLUMN_ORDER,
+  type AssetColumnId,
+} from '@/components/table-columns/asset-search-columns'
 
 const DEFAULT_IDS = ['location', 'status'] as const satisfies readonly AssetColumnId[]
 const PURCHASE_COST_ID = 'cost_purchase_cost' satisfies AssetColumnId
@@ -78,7 +81,33 @@ describe('useAssetColumnVisibilityParam', () => {
 
   it('reads the column order back in the order the param stores it', () => {
     const { result } = renderWithParams('?cols=status,location')
-    expect(result.current.columnOrder).toEqual(['status', 'location'])
+    expect(result.current.displayOrder).toEqual(['status', 'location'])
+  })
+
+  // The defaults say only which columns open; ASSET_COLUMN_ORDER decides where they sit.
+  it('opens in canonical order when the param is absent, whatever order the defaults list', () => {
+    const { result } = renderWithParams('')
+    expect(result.current.displayOrder).toEqual(
+      ASSET_COLUMN_ORDER.filter((id) => DEFAULT_IDS.includes(id as (typeof DEFAULT_IDS)[number])),
+    )
+  })
+
+  // A forced id is never written to the param, so it has no stored position to honour.
+  it('slots a forced column into its canonical position rather than appending it', () => {
+    const { result } = renderWithParams('?cols=status,latest_comment', undefined, [
+      PURCHASE_COST_ID,
+    ])
+    expect(result.current.displayOrder).toEqual([PURCHASE_COST_ID, 'status', 'latest_comment'])
+  })
+
+  it('leaves a hidden pinned column out of the order', () => {
+    const { result } = renderWithParams('?cols=status')
+    expect(result.current.displayOrder).toEqual(['status'])
+  })
+
+  it('leads with a pinned column wherever the param stores it', () => {
+    const { result } = renderWithParams('?cols=status,barcode')
+    expect(result.current.displayOrder).toEqual(['barcode', 'status'])
   })
 
   it('writes a reordered default selection rather than clearing the param', async () => {

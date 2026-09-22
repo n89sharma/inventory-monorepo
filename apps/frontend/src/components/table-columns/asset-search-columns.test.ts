@@ -7,17 +7,21 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetSearchRow, Permission } from 'shared-types'
 import {
+  ASSET_COLUMN_ORDER,
   ASSET_SEARCH_COLUMNS,
   canViewColumn,
   COLUMN_SECTIONS,
+  ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS,
+  DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST,
   IDENTITY_COLUMN_IDS,
 } from './asset-search-columns'
+import { DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION } from './collection-detail-columns'
 import { PINNED_ASSET_COLUMN_IDS } from './column-primitives'
 import { createSearchPageColumns } from './search-page-columns'
 import { searchPageRowsToCsv } from './search-page-report-columns'
 
 const CSV_ROW_DELIMITER = '\r\n'
-const IDENTITY_SECTION_COLUMN_IDS = ['barcode', 'model', 'serial_number']
+const ID_SECTION_COLUMN_IDS = ['barcode', 'serial_number']
 const MARGIN_COLUMN_IDS = ['gross_margin', 'margin_percent']
 
 const allows =
@@ -50,10 +54,12 @@ function liveColumnIds(): string[] {
 }
 
 // The identity columns are pickable now, so a caller that wants them in the export has to
-// ask for them. Every case below reads an asset by its barcode, so they all do.
+// ask for them. Every case below reads an asset by its barcode, so they all do. The export
+// follows the order it is handed, so the ids are resolved to ASSET_COLUMN_ORDER first.
 function csvFor(row: AssetSearchRow, ids: string[]): { header: string; data: string } {
-  const visible = new Set<string>([...IDENTITY_COLUMN_IDS, ...ids])
-  const [header, data] = searchPageRowsToCsv([row], visible).split(CSV_ROW_DELIMITER)
+  const wanted = new Set<string>([...IDENTITY_COLUMN_IDS, ...ids])
+  const orderedIds = ASSET_COLUMN_ORDER.filter((id) => wanted.has(id))
+  const [header, data] = searchPageRowsToCsv([row], orderedIds).split(CSV_ROW_DELIMITER)
   return { header, data }
 }
 
@@ -148,42 +154,50 @@ afterEach(() => {
 })
 
 describe('asset-search report columns', () => {
-  it('exports one CSV column per live table column, in table order', () => {
+  it('exports one CSV column per live table column, in canonical order', () => {
     const liveColumns = createSearchPageColumns(noHref, allowsEverything)
+    const byId = new Map(liveColumns.map((column) => [columnId(column), column]))
     const { header } = csvFor(makeRow(), liveColumns.map(columnId))
-    expect(header.split(',')).toEqual(liveColumns.map(csvHeaderLabel))
+
+    expect(header.split(',')).toEqual(ASSET_COLUMN_ORDER.map((id) => csvHeaderLabel(byId.get(id)!)))
   })
 
   it('exports nothing at all when the viewer has turned every column off', () => {
-    const emptyExport = searchPageRowsToCsv([makeRow()], new Set())
+    const emptyExport = searchPageRowsToCsv([makeRow()], [])
     expect(emptyExport.split(CSV_ROW_DELIMITER)).toEqual(['', ''])
   })
 
   it('writes the full header row', () => {
     const { header } = csvFor(makeRow(), liveColumnIds())
     expect(header).toBe(
-      'Barcode,Brand,Model,Asset Type,Serial Number,Status,Readiness,Damaged,Damage Notes,Location,' +
-        'Country of Origin,Manufactured Year,Total Meter (K),Weight (lbs),Size,Days Held,Cassettes,Internal Finisher,' +
-        'Accessories,Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
-        'Vendor,Arrival #,Arrival Warehouse,Arrived At,Customer,Salesperson,Departure #,Departed At,' +
+      'Barcode,Serial Number,Model,Total Meter (K),Cassettes,Internal Finisher,Accessories,' +
+        'Brand,Asset Type,Country of Origin,Manufactured Year,Weight (lbs),Size,' +
+        'Toner Life C,Toner Life M,Toner Life Y,Toner Life K,' +
         'Purchase Cost,Transport Cost,Transfer Cost,Processing Cost,Other Cost,Parts Cost,' +
         'Total Cost,Sale Price,' +
-        'Gross Margin,' +
-        'Margin %,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
-        'Created,Stock Days,Purchase Invoice,Sales Invoice,Errors,Last Comment',
+        'Status,Readiness,Damaged,Damage Notes,' +
+        'Vendor,Arrival #,Arrival Warehouse,Arrived At,' +
+        'Days Held,Hold #,Held By,Held For,Hold Customer,Hold Created,' +
+        'Customer,Salesperson,Departure #,Departed At,' +
+        'Purchase Invoice,Sales Invoice,Gross Margin,Margin %,' +
+        'Location,Created,Stock Days,Errors,Last Comment',
     )
   })
 
   it("writes each column's CSV text", () => {
     const { data } = csvFor(makeRow(), liveColumnIds())
     expect(data).toBe(
-      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,NYC | Receiving,' +
-        'Japan,2020,12,1234,5,26,2,FIN-1,' +
-        '"Toner, Drum",80,70,60,50,' +
-        'BIG_VENDOR,A-260705-001,TOR,"Jul 5, 2026",RETAIL_CO,Jane Smith,D-260710-001,"Jul 10, 2026",' +
-        '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00","$1,466.00",' +
-        '48.9%,H-1,Alice,Bob,ACME_CORP,"Jul 1, 2026",' +
-        '"Jul 15, 2026",12,VENDOR-REF-4,CUST-REF-9,"E001, E045",Looks good',
+      'BC-1,SN-1,IR-2020,12,2,FIN-1,"Toner, Drum",' +
+        'CANON,Copier,Japan,2020,1234,5,' +
+        '80,70,60,50,' +
+        '"$1,234.00",$200.00,$50.00,$100.00,$0.00,$0.00,"$1,534.00","$3,000.00",' +
+        'In Stock,PP OK,,,' +
+        'BIG_VENDOR,A-260705-001,TOR,"Jul 5, 2026",' +
+        '26,H-1,Alice,Bob,ACME_CORP,"Jul 1, 2026",' +
+        'RETAIL_CO,Jane Smith,D-260710-001,"Jul 10, 2026",' +
+        'VENDOR-REF-4,CUST-REF-9,' +
+        '"$1,466.00",48.9%,' +
+        'NYC | Receiving,"Jul 15, 2026",12,"E001, E045",Looks good',
     )
   })
 
@@ -262,13 +276,7 @@ describe('asset-search report columns', () => {
     })
     const { data } = csvFor(nulled, liveColumnIds())
     expect(data).toBe(
-      'BC-1,CANON,IR-2020,Copier,SN-1,In Stock,PP OK,,,,' +
-        ',,,1234,5,,,,' +
-        ',,,,,' +
-        ',,,,,,,,' +
-        ',,,,,,,,,,' +
-        ',,,,,' +
-        '"Jul 15, 2026",12,,,,',
+      'BC-1,SN-1,IR-2020,,,,,CANON,Copier,,,1234,5,,,,,,,,,,,,,In Stock,PP OK,,,,,,,,,,,,,,,,,,,,,,"Jul 15, 2026",12,,',
     )
   })
 
@@ -282,18 +290,18 @@ describe('asset-search report columns', () => {
         bin: 'A12',
       },
     })
-    expect(csvFor(binRow, ['location']).data).toBe('BC-1,IR-2020,SN-1,NYC | A12')
+    expect(csvFor(binRow, ['location']).data).toBe('BC-1,SN-1,IR-2020,NYC | A12')
   })
 
   it('reports an in-transit asset regardless of its stored location', () => {
     expect(csvFor(makeRow({ is_in_transit: true }), ['location']).data).toBe(
-      'BC-1,IR-2020,SN-1,In transit',
+      'BC-1,SN-1,IR-2020,In transit',
     )
   })
 
-  it('emits only the columns the viewer chose, in registry order', () => {
+  it('emits only the columns the viewer chose, in canonical order', () => {
     const { header } = csvFor(makeRow(), ['status'])
-    expect(header).toBe('Barcode,Model,Serial Number,Status')
+    expect(header).toBe('Barcode,Serial Number,Model,Status')
   })
 
   // The CSV preserves whatever order it is handed. It does not sort, so the row order
@@ -302,7 +310,7 @@ describe('asset-search report columns', () => {
     const older = makeRow({ barcode: 'OLD', created_at: new Date(2026, 2, 5) })
     const newer = makeRow({ barcode: 'NEW', created_at: new Date(2026, 6, 15) })
     const barcodesOf = (rows: AssetSearchRow[]) =>
-      searchPageRowsToCsv(rows, new Set(['barcode']))
+      searchPageRowsToCsv(rows, ['barcode'])
         .split(CSV_ROW_DELIMITER)
         .slice(1)
         .map((line) => line.split(',')[0])
@@ -390,14 +398,14 @@ describe('asset search column sorting', () => {
   it('reads damage as three states, blank for an asset nobody has inspected', () => {
     const damageText = (isDamaged: boolean | null) =>
       csvFor(makeRow({ is_damaged: isDamaged }), ['is_damaged']).data
-    expect(damageText(true)).toBe('BC-1,IR-2020,SN-1,Yes')
-    expect(damageText(false)).toBe('BC-1,IR-2020,SN-1,No')
-    expect(damageText(null)).toBe('BC-1,IR-2020,SN-1,')
+    expect(damageText(true)).toBe('BC-1,SN-1,IR-2020,Yes')
+    expect(damageText(false)).toBe('BC-1,SN-1,IR-2020,No')
+    expect(damageText(null)).toBe('BC-1,SN-1,IR-2020,')
   })
 
   it('exports the damage notes and sorts the never-inspected assets last', () => {
     expect(csvFor(makeRow({ damage_notes: 'Dented, side panel' }), ['damage_notes']).data).toBe(
-      'BC-1,IR-2020,SN-1,"Dented, side panel"',
+      'BC-1,SN-1,IR-2020,"Dented, side panel"',
     )
     const rows = [
       makeRow({ barcode: 'UNKNOWN', is_damaged: null }),
@@ -440,31 +448,31 @@ describe('margin columns', () => {
 
   it('reports the margin and its percentage of the sale price', () => {
     expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: 1000 })).toBe(
-      'BC-1,IR-2020,SN-1,$400.00,28.6%',
+      'BC-1,SN-1,IR-2020,$400.00,28.6%',
     )
   })
 
   it('keeps the minus outside the dollar sign when an asset sold below cost', () => {
     expect(marginCsv({ cost_sale_price: 800, cost_total_cost: 1000 })).toBe(
-      'BC-1,IR-2020,SN-1,-$200.00,-25.0%',
+      'BC-1,SN-1,IR-2020,-$200.00,-25.0%',
     )
   })
 
   it('writes off the whole cost when an asset left at a zero sale price', () => {
     expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 500 })).toBe(
-      'BC-1,IR-2020,SN-1,-$500.00,-100.0%',
+      'BC-1,SN-1,IR-2020,-$500.00,-100.0%',
     )
   })
 
   it('reports flat rather than a total loss when both the sale price and cost are zero', () => {
     expect(marginCsv({ cost_sale_price: 0, cost_total_cost: 0 })).toBe(
-      'BC-1,IR-2020,SN-1,$0.00,0.0%',
+      'BC-1,SN-1,IR-2020,$0.00,0.0%',
     )
   })
 
   it('leaves both columns empty when either input is missing', () => {
-    expect(marginCsv({ cost_sale_price: null, cost_total_cost: 500 })).toBe('BC-1,IR-2020,SN-1,,')
-    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: null })).toBe('BC-1,IR-2020,SN-1,,')
+    expect(marginCsv({ cost_sale_price: null, cost_total_cost: 500 })).toBe('BC-1,SN-1,IR-2020,,')
+    expect(marginCsv({ cost_sale_price: 1400, cost_total_cost: null })).toBe('BC-1,SN-1,IR-2020,,')
   })
 
   it('orders by the computed number, not its formatted text, keeping unpriced assets last', () => {
@@ -508,13 +516,43 @@ describe('asset search columns', () => {
     )
   })
 
-  // Pinned left and shown by default, but pickable like any other column.
-  it('puts exactly barcode, serial number and model in the identity section', () => {
-    const identity = ASSET_SEARCH_COLUMNS.filter((c) => c.section === 'identity').map((c) => c.id)
-    expect(identity).toEqual(IDENTITY_SECTION_COLUMN_IDS)
-    expect([...IDENTITY_COLUMN_IDS]).toEqual(
-      PINNED_ASSET_COLUMN_IDS.filter((id) => id !== 'select'),
-    )
+  // Barcode alone stays pinned, as the identifier a reader scans a row by. Serial number
+  // and model are default-on and open on the left, but scroll and reorder freely.
+  it('pins barcode only, and defaults the identity columns on', () => {
+    expect(PINNED_ASSET_COLUMN_IDS.filter((id) => id !== 'select')).toEqual(['barcode'])
+    expect([...IDENTITY_COLUMN_IDS]).toEqual(['barcode', 'serial_number', 'model'])
+
+    const idSection = ASSET_SEARCH_COLUMNS.filter((c) => c.section === 'identity').map((c) => c.id)
+    expect(idSection).toEqual(ID_SECTION_COLUMN_IDS)
+  })
+
+  it('opens with the ID section, then General Specifications', () => {
+    expect(ASSET_COLUMN_ORDER.slice(0, 7)).toEqual([
+      'barcode',
+      'serial_number',
+      'model',
+      'specs_meter_total',
+      'specs_cassettes',
+      'specs_internal_finisher',
+      'accessories',
+    ])
+  })
+
+  // writeCols compares a stored list against these arrays positionally to decide the param sits
+  // at its default and can leave the URL. An id out of canonical order there would leave `cols`
+  // stuck in every link, so the ordering is asserted rather than left to review.
+  it('writes every default list in canonical order', () => {
+    const defaultLists = [
+      ...Object.values(DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST),
+      ...Object.values(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION),
+      ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS,
+      IDENTITY_COLUMN_IDS,
+    ]
+
+    for (const ids of defaultLists) {
+      const wanted = new Set<string>(ids)
+      expect(ids).toEqual(ASSET_COLUMN_ORDER.filter((id) => wanted.has(id)))
+    }
   })
 
   it('keeps every column in a section the picker renders', () => {
@@ -532,11 +570,31 @@ describe('asset search columns', () => {
       ids: ASSET_SEARCH_COLUMNS.filter((c) => c.section === section.id).map((c) => c.id),
     }))
     expect(grouped).toEqual([
-      { section: 'identity', ids: ['barcode', 'model', 'serial_number'] },
-      { section: 'status', ids: ['status', 'readiness', 'is_damaged', 'damage_notes'] },
+      { section: 'identity', ids: ['barcode', 'serial_number'] },
       {
         section: 'general_specs',
-        ids: ['specs_meter_total', 'specs_cassettes', 'specs_internal_finisher', 'accessories'],
+        ids: [
+          'model',
+          'specs_meter_total',
+          'specs_cassettes',
+          'specs_internal_finisher',
+          'accessories',
+        ],
+      },
+      {
+        section: 'detailed_specs',
+        ids: [
+          'brand',
+          'asset_type',
+          'country_of_origin',
+          'manufactured_year',
+          'weight',
+          'size',
+          'specs_toner_life_c',
+          'specs_toner_life_m',
+          'specs_toner_life_y',
+          'specs_toner_life_k',
+        ],
       },
       {
         section: 'cost',
@@ -551,10 +609,7 @@ describe('asset search columns', () => {
           'cost_sale_price',
         ],
       },
-      {
-        section: 'invoice',
-        ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
-      },
+      { section: 'status', ids: ['status', 'readiness', 'is_damaged', 'damage_notes'] },
       {
         section: 'arrival',
         ids: ['vendor', 'arrival_number', 'arrival_warehouse_code', 'arrival_created_at'],
@@ -575,19 +630,8 @@ describe('asset search columns', () => {
         ids: ['customer', 'salesperson', 'departure_number', 'departed_at'],
       },
       {
-        section: 'detailed_specs',
-        ids: [
-          'brand',
-          'asset_type',
-          'country_of_origin',
-          'manufactured_year',
-          'weight',
-          'size',
-          'specs_toner_life_c',
-          'specs_toner_life_m',
-          'specs_toner_life_y',
-          'specs_toner_life_k',
-        ],
+        section: 'invoice',
+        ids: ['purchase_invoice_invoice_reference', 'sales_invoice_invoice_reference'],
       },
       { section: 'profitability', ids: ['gross_margin', 'margin_percent'] },
       {

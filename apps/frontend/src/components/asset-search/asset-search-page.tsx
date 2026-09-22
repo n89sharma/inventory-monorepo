@@ -51,7 +51,7 @@ export function AssetSearchPage({
     setVisibleColumns,
     columnVisibility,
     onColumnVisibilityChange,
-    columnOrder,
+    displayOrder,
     onColumnOrderChange,
     reset: resetColumns,
   } = useAssetColumnVisibilityParam(
@@ -59,7 +59,7 @@ export function AssetSearchPage({
     forceVisibleColumnIds,
   )
   const [sorting, onSortingChange] = useTableSortParam(defaultSort ?? DEFAULT_ASSET_SORT)
-  const selection = useAssetSelection(assets, visibleColumns, `${navContext}-assets.csv`)
+  const selection = useAssetSelection(assets, displayOrder, `${navContext}-assets.csv`)
   const getRowHref = useCallback(
     (a: AssetSearchRow) => searchListAssetDetailHref(navContext, a.barcode, searchParams),
     [navContext, searchParams],
@@ -109,7 +109,7 @@ export function AssetSearchPage({
           onBulkPriceSave={onBulkPriceSave}
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={onColumnVisibilityChange}
-          columnOrder={columnOrder}
+          columnOrder={displayOrder}
           onColumnOrderChange={onColumnOrderChange}
           getRowHref={getRowHref}
           getRowClassName={getRowClassName}

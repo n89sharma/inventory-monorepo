@@ -11,7 +11,7 @@ const DEFAULT_EXPORT_FILENAME = 'assets.csv'
 
 export function useAssetSelection(
   assets: AssetSearchRow[],
-  visibleColumns: Set<string>,
+  orderedIds: readonly string[],
   exportFilename: string = DEFAULT_EXPORT_FILENAME,
 ): {
   rowSelection: RowSelectionState
@@ -46,7 +46,7 @@ export function useAssetSelection(
     setExportLoading(true)
     try {
       await waitForNextPaint()
-      const csv = searchPageRowsToCsv(rows, visibleColumns)
+      const csv = searchPageRowsToCsv(rows, orderedIds)
       downloadFile(exportFilename, new Blob([csv], { type: CSV_MIME_TYPE }))
     } catch {
       toast.error('Failed to export assets', { position: 'top-center' })

@@ -108,11 +108,11 @@ export function ExportAssetsPage(): React.JSX.Element {
     setVisibleColumns,
     columnVisibility,
     onColumnVisibilityChange,
-    columnOrder,
+    displayOrder,
     onColumnOrderChange,
     reset,
   } = useAssetColumnVisibilityParam(ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS)
-  const selection = useAssetSelection(assets, visibleColumns, 'export-assets.csv')
+  const selection = useAssetSelection(assets, displayOrder, 'export-assets.csv')
 
   const getRowHref = useCallback((asset: AssetSearchRow) => assetDetailHref(asset.barcode), [])
   const handleBulkPriceSave = useCallback(() => {
@@ -171,7 +171,7 @@ export function ExportAssetsPage(): React.JSX.Element {
           onBulkPriceSave={handleBulkPriceSave}
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={onColumnVisibilityChange}
-          columnOrder={columnOrder}
+          columnOrder={displayOrder}
           onColumnOrderChange={onColumnOrderChange}
           getRowHref={getRowHref}
         />

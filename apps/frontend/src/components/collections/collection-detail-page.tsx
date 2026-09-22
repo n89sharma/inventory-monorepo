@@ -143,7 +143,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     setVisibleColumns,
     columnVisibility,
     onColumnVisibilityChange,
-    columnOrder,
+    displayOrder,
     onColumnOrderChange,
     reset,
   } = useAssetColumnVisibilityParam(DEFAULT_VISIBLE_COLUMN_IDS_BY_SECTION[section])
@@ -216,7 +216,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
               canCreateEditEntity={canCreateEditEntity}
               assets={entity.assets}
               selectedAssets={selectedAssets}
-              visibleColumns={visibleColumns}
+              displayOrder={displayOrder}
               note={getNote?.(entity)}
               menuActions={menuActions?.actions}
               historyCacheKey={historyCacheKey}
@@ -302,7 +302,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         pinLeft={PINNED_ASSET_COLUMN_IDS}
         columnVisibility={columnVisibility}
         onColumnVisibilityChange={onColumnVisibilityChange}
-        columnOrder={columnOrder}
+        columnOrder={displayOrder}
         onColumnOrderChange={onColumnOrderChange}
         meta={tableMeta}
       />

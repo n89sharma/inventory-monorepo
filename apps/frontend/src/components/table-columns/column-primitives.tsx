@@ -11,7 +11,7 @@ const SELECT_COLUMN_SIZE = 44
 export const MODEL_COLUMN_SIZE = 100
 export const SERIAL_NUMBER_COLUMN_SIZE = 150
 
-export const PINNED_ASSET_COLUMN_IDS = ['select', 'barcode', 'serial_number', 'model']
+export const PINNED_ASSET_COLUMN_IDS = ['select', 'barcode']
 
 export const SEARCHABLE_ASSET_COLUMN_IDS = ['barcode', 'serial_number', 'model']
 

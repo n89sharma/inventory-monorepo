@@ -106,14 +106,14 @@ export type AssetSearchColumn = {
 // which overrides that order and the reader's own arrangement alike.
 export const COLUMN_SECTIONS = [
   { id: 'identity', label: 'ID' },
-  { id: 'status', label: 'Status' },
   { id: 'general_specs', label: 'General Specifications' },
+  { id: 'detailed_specs', label: 'Detailed Specifications' },
   { id: 'cost', label: 'Cost' },
-  { id: 'invoice', label: 'Invoice' },
+  { id: 'status', label: 'Status' },
   { id: 'arrival', label: 'Arrival' },
   { id: 'hold', label: 'Hold' },
   { id: 'departure', label: 'Departure' },
-  { id: 'detailed_specs', label: 'Detailed Specifications' },
+  { id: 'invoice', label: 'Invoice' },
   { id: 'profitability', label: 'Profitability' },
   { id: 'other', label: 'Other' },
 ] as const satisfies readonly { id: ColumnSectionId; label: string }[]
@@ -227,7 +227,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
   {
     id: 'model',
     label: 'Model',
-    section: 'identity',
+    section: 'general_specs',
     size: MODEL_COLUMN_SIZE,
     text: (a) => a.model,
   },
@@ -589,8 +589,17 @@ export type AssetColumnId = (typeof ASSET_SEARCH_COLUMN_LITERALS)[number]['id']
 
 export const ASSET_SEARCH_COLUMNS: readonly AssetSearchColumn[] = ASSET_SEARCH_COLUMN_LITERALS
 
-// Pinned left in this order and shown by default on every list. Offered in the picker like
-// any other column: a reader who does not need them can turn them off, but not move them.
+// The order every list opens in: the column picker's own layout, section by section and
+// registry order within each. Read off the literals rather than ASSET_SEARCH_COLUMNS so the
+// ids stay AssetColumnId instead of widening to string.
+export const ASSET_COLUMN_ORDER = COLUMN_SECTIONS.flatMap((section) =>
+  ASSET_SEARCH_COLUMN_LITERALS.filter((column) => column.section === section.id).map((c) => c.id),
+)
+
+// Shown by default on every list. Only barcode is pinned; serial number and model scroll and
+// reorder like any other column. Order here is ASSET_COLUMN_ORDER's, as it is in every default
+// list below: writeCols compares against these arrays positionally to decide the param is at
+// its default and can be dropped from the URL.
 export const IDENTITY_COLUMN_IDS = [
   'barcode',
   'serial_number',
@@ -599,40 +608,40 @@ export const IDENTITY_COLUMN_IDS = [
 
 const MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS = [
   ...IDENTITY_COLUMN_IDS,
+  'specs_meter_total',
   'status',
   'readiness',
-  'specs_meter_total',
   'stock_days',
 ] as const satisfies readonly AssetColumnId[]
 
 const ONHAND_DEFAULT_COLUMN_IDS = [
   ...IDENTITY_COLUMN_IDS,
+  'specs_meter_total',
   'status',
   'readiness',
-  'specs_meter_total',
   'stock_days',
   'latest_comment',
 ] as const satisfies readonly AssetColumnId[]
 
 const DEPARTED_DEFAULT_COLUMN_IDS = [
   ...IDENTITY_COLUMN_IDS,
-  'status',
   'specs_meter_total',
+  'cost_total_cost',
+  'cost_sale_price',
+  'status',
   'vendor',
   'arrival_created_at',
   'customer',
   'departed_at',
-  'cost_total_cost',
-  'cost_sale_price',
   'gross_margin',
   'margin_percent',
 ] as const satisfies readonly AssetColumnId[]
 
 const HARVESTED_DEFAULT_COLUMN_IDS = [
   ...IDENTITY_COLUMN_IDS,
+  'specs_meter_total',
   'status',
   'location',
-  'specs_meter_total',
   'latest_comment',
 ] as const satisfies readonly AssetColumnId[]
 
@@ -658,8 +667,10 @@ export function canViewColumn(
   return column.permissions?.every((permission) => can(permission)) ?? true
 }
 
-export function orderedVisibleColumns(visibleColumns: Set<string>): readonly AssetSearchColumn[] {
-  return ASSET_SEARCH_COLUMNS.filter((column) => visibleColumns.has(column.id))
+// Takes the resolved display order rather than a set, so the CSV writes its columns in the
+// order the grid renders them and the two cannot drift apart.
+export function orderedVisibleColumns(orderedIds: readonly string[]): readonly AssetSearchColumn[] {
+  return orderedIds.flatMap((id) => COLUMN_BY_ID.get(id) ?? [])
 }
 
 // Filters a stored/shared set of column ids down to what the current viewer may see:

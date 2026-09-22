@@ -1,9 +1,11 @@
 import {
+  ASSET_COLUMN_ORDER,
   ASSET_SEARCH_COLUMNS,
   canViewColumn,
   resolveVisibleColumns,
   type AssetColumnId,
 } from '@/components/table-columns/asset-search-columns'
+import { PINNED_ASSET_COLUMN_IDS } from '@/components/table-columns/column-primitives'
 import { useCan } from '@/hooks/use-can'
 import { COLS_PARAM_KEY, FILTER_PARSERS } from '@/lib/filters/parsers'
 import type { ColumnOrderState, OnChangeFn, VisibilityState } from '@tanstack/react-table'
@@ -18,10 +20,21 @@ const COLS_PARSER = FILTER_PARSERS.cols
 
 // Position-sensitive, because `cols` carries the column order as well as the selection:
 // a set comparison would read a reordered default selection as "still default", clear the
-// param, and throw the order away.
+// param, and throw the order away. Every default list is written in ASSET_COLUMN_ORDER, so
+// an untouched grid compares equal here and keeps the param out of the URL.
 function isDefaultOrder(ids: string[], defaultIds: readonly AssetColumnId[]): boolean {
   if (ids.length !== defaultIds.length) return false
   return ids.every((id, index) => id === defaultIds[index])
+}
+
+const canonicalIndex = (id: string): number => ASSET_COLUMN_ORDER.indexOf(id as AssetColumnId)
+
+// Slots an id that the stored order does not carry into its canonical place: before the first
+// column that follows it in ASSET_COLUMN_ORDER, or last when none does.
+function insertAtCanonicalPosition(orderedIds: string[], id: string): string[] {
+  const position = orderedIds.findIndex((curr) => canonicalIndex(curr) > canonicalIndex(id))
+  if (position === -1) return [...orderedIds, id]
+  return [...orderedIds.slice(0, position), id, ...orderedIds.slice(position)]
 }
 
 export function useAssetColumnVisibilityParam(
@@ -32,7 +45,7 @@ export function useAssetColumnVisibilityParam(
   setVisibleColumns: (columns: Set<string>) => void
   columnVisibility: VisibilityState
   onColumnVisibilityChange: OnChangeFn<VisibilityState>
-  columnOrder: ColumnOrderState
+  displayOrder: ColumnOrderState
   onColumnOrderChange: OnChangeFn<ColumnOrderState>
   reset: () => void
 } {
@@ -60,14 +73,15 @@ export function useAssetColumnVisibilityParam(
   )
 
   // Keeps whatever order the user dragged the surviving columns into, and appends a newly
-  // enabled column at the end rather than rebuilding the list in registry order.
+  // enabled column at the end rather than slotting it into its canonical place: the stored
+  // arrangement is the reader's own, and turning a column on should not rearrange it.
   const setVisibleColumns = useCallback(
     (next: Set<string>) => {
       const currIds = cols ?? [...defaultIds]
       const keptIds = currIds.filter((id) => next.has(id))
-      const addedIds = ASSET_SEARCH_COLUMNS.filter(
-        (column) => next.has(column.id) && !keptIds.includes(column.id),
-      ).map((column) => column.id)
+      const addedIds = ASSET_COLUMN_ORDER.filter(
+        (id) => next.has(id) && !keptIds.includes(id),
+      ) as readonly string[]
       writeCols([...keptIds, ...addedIds])
     },
     [cols, defaultIds, writeCols],
@@ -92,17 +106,24 @@ export function useAssetColumnVisibilityParam(
     [columnVisibility, setVisibleColumns],
   )
 
-  // `visibleColumns` is built by walking `cols` in order, so the set iterates in the order
-  // the user arranged. The pinned identity columns sit in it too, which is harmless:
-  // pinning overrides columnOrder, so their placement never follows this list.
-  const columnOrder = useMemo<ColumnOrderState>(() => [...visibleColumns], [visibleColumns])
+  // The one resolved order, read by both the grid and the CSV export so they cannot disagree.
+  // Absent `cols` the grid opens in ASSET_COLUMN_ORDER; a stored arrangement is used verbatim.
+  // Pinned columns lead, because that is where the grid renders them whatever `cols` says, and
+  // they are filtered by visibility so a hidden barcode does not return through the prefix.
+  const displayOrder = useMemo<ColumnOrderState>(() => {
+    const storedOrder = cols ?? ASSET_COLUMN_ORDER
+    const chosenOrder = storedOrder.filter((id) => visibleColumns.has(id))
+    const withForced = [...forcedColumns].reduce(insertAtCanonicalPosition, chosenOrder)
+    const pinnedOrder = PINNED_ASSET_COLUMN_IDS.filter((id) => visibleColumns.has(id))
+    return [...pinnedOrder, ...withForced.filter((id) => !pinnedOrder.includes(id))]
+  }, [cols, visibleColumns, forcedColumns])
 
   const onColumnOrderChange = useCallback<OnChangeFn<ColumnOrderState>>(
     (updater) => {
-      const newOrder = typeof updater === 'function' ? updater(columnOrder) : updater
+      const newOrder = typeof updater === 'function' ? updater(displayOrder) : updater
       writeCols(newOrder)
     },
-    [columnOrder, writeCols],
+    [displayOrder, writeCols],
   )
 
   const reset = useCallback(() => void setCols(null), [setCols])
@@ -112,7 +133,7 @@ export function useAssetColumnVisibilityParam(
     setVisibleColumns,
     columnVisibility,
     onColumnVisibilityChange,
-    columnOrder,
+    displayOrder,
     onColumnOrderChange,
     reset,
   }
