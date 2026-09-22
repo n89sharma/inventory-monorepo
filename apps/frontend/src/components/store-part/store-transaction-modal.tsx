@@ -8,6 +8,12 @@ import {
 } from '@/components/shadcn/dialog'
 import { FieldError } from '@/components/shadcn/field'
 import { Input } from '@/components/shadcn/input'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/shadcn/input-group'
 import { Textarea } from '@/components/shadcn/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { HorizontalField } from '@/components/shared/horizontal-field'
@@ -19,7 +25,7 @@ import {
   type StoreTransactionForm,
 } from '@/ui-types/store-part-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleNotchIcon } from '@phosphor-icons/react'
+import { CircleNotchIcon, XIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Controller, useForm, useWatch, type Control, type FieldErrors } from 'react-hook-form'
 import type { StorePart, StoreTransactionKind } from 'shared-types'
@@ -58,28 +64,113 @@ interface StoreTransactionModalProps {
 
 type StoreTransactionFormBodyProps = Omit<StoreTransactionModalProps, 'open'>
 
-function isNewPart(part: StoreTransactionForm['part']): boolean {
-  return part !== null && !('id' in part)
-}
-
 function PartField({
   lockedPart,
+  creatingPart,
   control,
   kind,
   allParts,
   partQuery,
   onQueryChange,
+  onCreatePart,
+  onCancelNewPart,
 }: {
   lockedPart: StorePart | undefined
+  creatingPart: boolean
   control: Control<StoreTransactionForm>
   kind: StoreTransactionKind
   allParts: StorePart[]
   partQuery: string
   onQueryChange: (query: string) => void
+  onCreatePart: (partNumber: string) => void
+  onCancelNewPart: () => void
 }) {
   if (lockedPart) {
     return <span className="font-mono text-sm">{lockedPart.part_number}</span>
   }
+  if (creatingPart) {
+    return <NewPartNumberField control={control} onCancel={onCancelNewPart} />
+  }
+  return (
+    <ExistingPartSearch
+      control={control}
+      kind={kind}
+      allParts={allParts}
+      partQuery={partQuery}
+      onQueryChange={onQueryChange}
+      onCreatePart={onCreatePart}
+    />
+  )
+}
+
+function NewPartNumberField({
+  control,
+  onCancel,
+}: {
+  control: Control<StoreTransactionForm>
+  onCancel: () => void
+}) {
+  return (
+    <Controller
+      control={control}
+      name="newPart.part_number"
+      render={({ field, fieldState }) => (
+        <div className="flex flex-col gap-1">
+          <InputGroup>
+            <InputGroupInput
+              {...field}
+              placeholder="Part number"
+              autoComplete="off"
+              aria-invalid={fieldState.invalid}
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                size="icon-sm"
+                onClick={onCancel}
+                type="button"
+                aria-label="Cancel new part"
+              >
+                <XIcon aria-hidden="true" />
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
+          <FieldError errors={fieldState.error ? [fieldState.error] : []} />
+        </div>
+      )}
+    />
+  )
+}
+
+function NewPartDescriptionField({ control }: { control: Control<StoreTransactionForm> }) {
+  return (
+    <Controller
+      control={control}
+      name="newPart.description"
+      render={({ field, fieldState }) => (
+        <div className="flex flex-col gap-1">
+          <Input {...field} placeholder="Part description" aria-invalid={fieldState.invalid} />
+          <FieldError errors={fieldState.error ? [fieldState.error] : []} />
+        </div>
+      )}
+    />
+  )
+}
+
+function ExistingPartSearch({
+  control,
+  kind,
+  allParts,
+  partQuery,
+  onQueryChange,
+  onCreatePart,
+}: {
+  control: Control<StoreTransactionForm>
+  kind: StoreTransactionKind
+  allParts: StorePart[]
+  partQuery: string
+  onQueryChange: (query: string) => void
+  onCreatePart: (partNumber: string) => void
+}) {
   return (
     <Controller
       control={control}
@@ -101,7 +192,7 @@ function PartField({
             onCreateOption={
               kind === 'PURCHASE'
                 ? (query) => {
-                    field.onChange({ part_number: query, description: '' })
+                    onCreatePart(query)
                     onQueryChange('')
                   }
                 : undefined
@@ -146,7 +237,7 @@ function StoreTransactionFormBody({
   const [partQuery, setPartQuery] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const { control, handleSubmit, setValue } = useForm<StoreTransactionForm>({
+  const { control, handleSubmit, setValue, clearErrors } = useForm<StoreTransactionForm>({
     resolver: zodResolver(StoreTransactionFormSchema),
     defaultValues: lockedPart
       ? { ...EMPTY_STORE_TRANSACTION_FORM, part: lockedPart }
@@ -155,10 +246,11 @@ function StoreTransactionFormBody({
 
   const kind = useWatch({ control, name: 'kind' })
   const part = useWatch({ control, name: 'part' })
+  const newPart = useWatch({ control, name: 'newPart' })
   const quantity = useWatch({ control, name: 'quantity' })
 
-  const selectedPartId = part !== null && 'id' in part ? part.id : null
-  const onHand = selectedPartId === null ? null : (onHandByPartId[selectedPartId] ?? 0)
+  const creatingPart = newPart !== null
+  const onHand = part === null ? null : (onHandByPartId[part.id] ?? 0)
   const overStock =
     kind === 'SALE' && onHand !== null && /^\d+$/.test(quantity) && Number(quantity) > onHand
 
@@ -166,8 +258,19 @@ function StoreTransactionFormBody({
     const picked = KIND_OPTIONS.find((o) => o.value === next)?.value
     if (!picked) return
     // A SALE cannot create a new part — drop any in-progress new part.
-    if (picked === 'SALE' && isNewPart(part)) setValue('part', null, { shouldValidate: true })
+    if (picked === 'SALE' && creatingPart) setValue('newPart', null, { shouldValidate: true })
     setValue('kind', picked, { shouldValidate: true })
+  }
+
+  function handleCreatePart(partNumber: string) {
+    setValue('part', null)
+    setValue('newPart', { part_number: partNumber, description: '' })
+    clearErrors('part')
+  }
+
+  function handleCancelNewPart() {
+    setValue('newPart', null)
+    clearErrors('newPart')
   }
 
   async function onValid(values: StoreTransactionForm) {
@@ -189,6 +292,8 @@ function StoreTransactionFormBody({
   function onInvalid(formErrors: FieldErrors<StoreTransactionForm>) {
     const message =
       formErrors.part?.message ??
+      formErrors.newPart?.part_number?.message ??
+      formErrors.newPart?.description?.message ??
       formErrors.quantity?.message ??
       'Please fix the highlighted fields'
     toast.error(message, { position: 'top-center' })
@@ -228,29 +333,20 @@ function StoreTransactionFormBody({
         <HorizontalField label="Part" required>
           <PartField
             lockedPart={lockedPart}
+            creatingPart={creatingPart}
             control={control}
             kind={kind}
             allParts={allParts}
             partQuery={partQuery}
             onQueryChange={setPartQuery}
+            onCreatePart={handleCreatePart}
+            onCancelNewPart={handleCancelNewPart}
           />
         </HorizontalField>
 
-        {isNewPart(part) && (
+        {creatingPart && (
           <HorizontalField label="Description" required>
-            <Input
-              value={part && !('id' in part) ? part.description : ''}
-              onChange={(e) => {
-                if (part && !('id' in part)) {
-                  setValue(
-                    'part',
-                    { ...part, description: e.target.value },
-                    { shouldValidate: true },
-                  )
-                }
-              }}
-              placeholder="Part description"
-            />
+            <NewPartDescriptionField control={control} />
           </HorizontalField>
         )}
 

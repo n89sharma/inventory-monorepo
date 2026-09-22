@@ -40,7 +40,7 @@ export async function recordStoreTransaction(
 ): Promise<StoreTransactionResponse> {
   const recordStoreTransactionBody = RecordStoreTransactionSchema.parse({
     kind: form.kind,
-    part: buildPartPayload(form.part),
+    part: buildPartPayload(form),
     warehouse_id: warehouseId,
     quantity: Number(form.quantity),
     unit_cost: form.unitCost.trim() === '' ? null : Number(form.unitCost),
@@ -50,10 +50,10 @@ export async function recordStoreTransaction(
   return StoreTransactionResponseSchema.parse(data)
 }
 
-function buildPartPayload(part: StoreTransactionForm['part']): RecordStoreTransaction['part'] {
-  if (part === null) throw new Error('No part selected')
-  if ('id' in part) return { mode: 'existing', store_part_id: part.id }
-  return { mode: 'new', part_number: part.part_number, description: part.description }
+function buildPartPayload(form: StoreTransactionForm): RecordStoreTransaction['part'] {
+  if (form.newPart !== null) return { mode: 'new', ...form.newPart }
+  if (form.part !== null) return { mode: 'existing', store_part_id: form.part.id }
+  throw new Error('No part selected')
 }
 
 export async function revalueStorePart(

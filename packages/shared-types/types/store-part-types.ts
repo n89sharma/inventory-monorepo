@@ -12,8 +12,12 @@ export type StorePart = z.infer<typeof StorePartSchema>
 
 // StorePart without its id — a part to be created on first purchase
 export const CreateStorePartSchema = z.object({
-  part_number: z.string().min(1).max(50).regex(PART_NUMBER_PATTERN, 'Invalid part number'),
-  description: z.string().min(1),
+  part_number: z
+    .string()
+    .min(1, 'Enter a part number')
+    .max(50, 'Part number must be at most 50 characters')
+    .regex(PART_NUMBER_PATTERN, 'Part number may only contain letters, numbers, -, _ and .'),
+  description: z.string().min(1, 'Enter a description'),
 })
 export type CreateStorePart = z.infer<typeof CreateStorePartSchema>
 

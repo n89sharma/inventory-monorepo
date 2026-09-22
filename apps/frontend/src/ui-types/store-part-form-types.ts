@@ -8,21 +8,22 @@ import {
 import { z } from 'zod'
 
 // kind: PURCHASE adds stock, SALE deducts it.
-// part: an existing StorePart (has id), a new CreateStorePart (no id), or nothing yet.
-// A SALE requires an existing part — you cannot sell a part that isn't stocked.
+// part: the selected existing StorePart; newPart: a part being created on this purchase.
+// At most one is set. A SALE requires an existing part — you cannot sell a part that isn't stocked.
 export const StoreTransactionFormSchema = z
   .object({
     kind: StoreTransactionKindSchema,
-    part: z.union([StorePartSchema, CreateStorePartSchema]).nullable(),
+    part: StorePartSchema.nullable(),
+    newPart: CreateStorePartSchema.nullable(),
     quantity: z.string(),
     unitCost: z.string(),
     notes: z.string(),
   })
-  .refine((form) => form.part !== null, {
+  .refine((form) => form.part !== null || form.newPart !== null, {
     message: 'Select or create a part',
     path: ['part'],
   })
-  .refine((form) => form.kind === 'PURCHASE' || (form.part !== null && 'id' in form.part), {
+  .refine((form) => form.kind === 'PURCHASE' || form.newPart === null, {
     message: 'A sale requires an existing part',
     path: ['part'],
   })
@@ -36,6 +37,7 @@ export type StoreTransactionForm = z.infer<typeof StoreTransactionFormSchema>
 export const EMPTY_STORE_TRANSACTION_FORM: StoreTransactionForm = {
   kind: 'PURCHASE',
   part: null,
+  newPart: null,
   quantity: '',
   unitCost: '',
   notes: '',
