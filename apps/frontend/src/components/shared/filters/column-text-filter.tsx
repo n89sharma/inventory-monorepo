@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/react-table'
 /**
  * Table-toolbar free-text filter for a high-cardinality column (serial number, barcode):
  * typing narrows rows whose value contains the query. Mount via {@link DataTable}'s
- * `renderTableFilter`. The column needs `filterFn: 'includesString'`.
+ * `renderToolbar`. The column needs `filterFn: 'includesString'`.
  */
 export function ColumnTextFilter<TData>({
   table,

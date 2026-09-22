@@ -94,7 +94,7 @@ interface DataTableProps<TData, TValue> {
   // state pass both so a drag persists wherever that state is stored.
   columnOrder?: ColumnOrderState
   onColumnOrderChange?: OnChangeFn<ColumnOrderState>
-  renderTableFilter?: (table: ReactTableInstance<TData>) => React.ReactNode
+  renderToolbar?: (table: ReactTableInstance<TData>) => React.ReactNode
   renderAboveTable?: (table: ReactTableInstance<TData>) => React.ReactNode
   // Faceting walks the filtered rows once per column to collect distinct values, so it
   // is only wired up by tables that render a facet-driven filter.
@@ -378,7 +378,7 @@ function DataTableBase<TData, TValue>({
   onColumnVisibilityChange,
   columnOrder: controlledColumnOrder,
   onColumnOrderChange: onControlledColumnOrderChange,
-  renderTableFilter,
+  renderToolbar,
   renderAboveTable,
   facetedRowModels,
   textSearch,
@@ -544,9 +544,9 @@ function DataTableBase<TData, TValue>({
                 {totalRows.toLocaleString()} {totalRows === 1 ? 'result' : 'results'}
               </div>
             )}
-            {renderTableFilter && (
+            {renderToolbar && (
               <div className="flex shrink-0 items-center gap-4 border-b bg-muted px-2 py-1">
-                {renderTableFilter(table)}
+                {renderToolbar(table)}
               </div>
             )}
             <div

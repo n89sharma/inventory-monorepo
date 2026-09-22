@@ -5,7 +5,7 @@ import type { Table } from '@tanstack/react-table'
 /**
  * Table-toolbar filter bound to a string column's faceted values: options are the
  * distinct values present in the loaded rows, selection drives the column's exact-match
- * filter. Mount via {@link DataTable}'s `renderTableFilter`. The column needs
+ * filter. Mount via {@link DataTable}'s `renderToolbar`. The column needs
  * `filterFn: 'equals'`.
  */
 export function ColumnFacetFilter<TData>({

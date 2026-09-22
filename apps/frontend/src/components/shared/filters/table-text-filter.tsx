@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/react-table'
 
 /**
  * Table-toolbar free-text filter that keeps a row when any searchable column contains the
- * query. Mount via {@link DataTable}'s `renderTableFilter`; the table needs a `textSearch`
+ * query. Mount via {@link DataTable}'s `renderToolbar`; the table needs a `textSearch`
  * predicate naming the columns that take part.
  */
 export function TableTextFilter<TData>({

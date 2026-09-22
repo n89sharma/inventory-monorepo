@@ -22,7 +22,7 @@ interface SettingsListPageProps<TData, TValue> {
   rowSelection?: RowSelectionState
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
   facetedRowModels?: Pick<TableOptions<TData>, 'getFacetedRowModel' | 'getFacetedUniqueValues'>
-  renderTableFilter?: (table: Table<TData>) => React.ReactNode
+  renderToolbar?: (table: Table<TData>) => React.ReactNode
 }
 
 export function SettingsListPage<TData, TValue>({
@@ -37,7 +37,7 @@ export function SettingsListPage<TData, TValue>({
   rowSelection,
   onRowSelectionChange,
   facetedRowModels,
-  renderTableFilter,
+  renderToolbar,
 }: SettingsListPageProps<TData, TValue>) {
   const [sorting, onSortingChange] = useTableSortParam(defaultSort)
   return (
@@ -60,7 +60,7 @@ export function SettingsListPage<TData, TValue>({
         sorting={sorting}
         onSortingChange={onSortingChange}
         facetedRowModels={facetedRowModels}
-        renderTableFilter={renderTableFilter}
+        renderToolbar={renderToolbar}
       />
     </GridPageContent>
   )

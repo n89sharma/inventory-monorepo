@@ -44,7 +44,7 @@ export function BrandsSettingsPage(): React.JSX.Element {
             <PlusIcon /> Add Brand
           </Button>
         }
-        renderTableFilter={(table) => (
+        renderToolbar={(table) => (
           <ColumnTextFilter
             table={table}
             columnId="name"

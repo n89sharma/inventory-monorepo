@@ -84,7 +84,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
       pinLeft={INVOICE_PINNED_COLUMN_IDS_BY_TYPE[invoiceType]}
       onRowMouseEnter={(invoice) => preloadInvoiceDetail(invoice.invoice_number)}
       getRowHref={getRowHref}
-      renderTableFilter={(table) => (
+      renderToolbar={(table) => (
         <div className="flex gap-2">
           <ColumnTextFilter
             table={table}

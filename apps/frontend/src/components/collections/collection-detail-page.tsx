@@ -250,7 +250,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         columns={columns}
         data={visibleAssets}
         textSearch={ASSET_TEXT_SEARCH}
-        renderTableFilter={(table) => (
+        renderToolbar={(table) => (
           <>
             {renderAddAssetBar?.(entity)}
             <div className="ml-auto flex items-center gap-4">

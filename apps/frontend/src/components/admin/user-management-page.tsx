@@ -146,7 +146,7 @@ export function UserManagementPage() {
         label={TABLE_LABEL}
         columns={columns}
         data={displayedUsers}
-        renderTableFilter={(table) => (
+        renderToolbar={(table) => (
           <>
             <ColumnTextFilter
               table={table}

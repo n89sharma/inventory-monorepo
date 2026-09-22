@@ -17,7 +17,7 @@ interface CollectionPageProps<TData, TValue> {
   getRowHref?: (row: TData) => string
   defaultSort: { id: string; desc: boolean }
   pinLeft?: string[]
-  renderTableFilter?: (table: Table<TData>) => React.ReactNode
+  renderToolbar?: (table: Table<TData>) => React.ReactNode
 }
 
 export function CollectionPage<TData, TValue>({
@@ -31,7 +31,7 @@ export function CollectionPage<TData, TValue>({
   getRowHref,
   defaultSort,
   pinLeft,
-  renderTableFilter,
+  renderToolbar,
 }: CollectionPageProps<TData, TValue>) {
   const [sorting, onSortingChange] = useTableSortParam(defaultSort)
   return (
@@ -54,7 +54,7 @@ export function CollectionPage<TData, TValue>({
         pinLeft={pinLeft}
         sorting={sorting}
         onSortingChange={onSortingChange}
-        renderTableFilter={renderTableFilter}
+        renderToolbar={renderToolbar}
       />
     </GridPageContent>
   )

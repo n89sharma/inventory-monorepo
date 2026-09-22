@@ -74,7 +74,7 @@ export function LocationsSettingsPage(): React.JSX.Element {
           </PendingIcon>
         </Button>
       }
-      renderTableFilter={(table) => (
+      renderToolbar={(table) => (
         <>
           <ColumnTextFilter
             table={table}

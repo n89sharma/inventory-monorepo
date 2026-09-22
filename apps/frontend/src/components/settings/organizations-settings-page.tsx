@@ -68,7 +68,7 @@ export function OrganizationsSettingsPage(): React.JSX.Element {
             </Button>
           </div>
         }
-        renderTableFilter={(table) => (
+        renderToolbar={(table) => (
           <>
             <ColumnTextFilter
               table={table}

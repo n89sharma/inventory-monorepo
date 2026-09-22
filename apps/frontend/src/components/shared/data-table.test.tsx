@@ -105,7 +105,7 @@ function renderSearchableParts() {
       columns={PART_COLUMNS}
       data={PARTS}
       textSearch={PART_TEXT_SEARCH}
-      renderTableFilter={(table) => (
+      renderToolbar={(table) => (
         <TableTextFilter
           table={table}
           placeholder={SEARCH_PLACEHOLDER}
