@@ -2,7 +2,6 @@ import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { DepartedSummaryStrip } from '@/components/asset-search/departed-summary-strip'
 import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { DepartedDateRangeFilter } from '@/components/shared/filters/departed-date-range-filter'
-import { InvoiceReferenceFilter } from '@/components/shared/filters/invoice-reference-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { Toggle } from '@/components/shadcn/toggle'
@@ -40,7 +39,7 @@ export function SearchDepartedPage(): React.JSX.Element {
   const { from, to, setRange } = useDepartedRangeParam()
   const [customer, setCustomer] = useCustomerParam()
   const [salesperson, setSalesperson] = useSalespersonParam()
-  const [invoiceReference, setInvoiceReference] = useInvoiceRefParam()
+  const [invoiceReference] = useInvoiceRefParam()
 
   const filters = useMemo(
     () => ({
@@ -58,7 +57,6 @@ export function SearchDepartedPage(): React.JSX.Element {
 
   const clearCustomer = useCallback(() => setCustomer(null), [setCustomer])
   const clearSalesperson = useCallback(() => setSalesperson(null), [setSalesperson])
-  const clearInvoiceReference = useCallback(() => setInvoiceReference(''), [setInvoiceReference])
 
   // Held as one element so a URL write that touches none of these filters, such as sorting
   // the grid, re-renders neither the controls nor the popovers they own.
@@ -72,7 +70,7 @@ export function SearchDepartedPage(): React.JSX.Element {
           onPressedChange={setShowOther}
           aria-label="Show scrapped assets"
         >
-          {showOther ? 'Show Sold' : 'Show Scrapped'}
+          {showOther ? 'Sold' : 'Scrapped'}
         </Toggle>
         <DepartedDateRangeFilter from={from} to={to} onChange={setRange} />
         <OrganizationFilter
@@ -88,11 +86,6 @@ export function SearchDepartedPage(): React.JSX.Element {
           onClear={clearSalesperson}
           placeholder="Salesperson"
           clearLabel="Clear salesperson"
-        />
-        <InvoiceReferenceFilter
-          value={invoiceReference}
-          onChange={setInvoiceReference}
-          onClear={clearInvoiceReference}
         />
       </>
     ),
@@ -110,9 +103,6 @@ export function SearchDepartedPage(): React.JSX.Element {
       salesperson,
       setSalesperson,
       clearSalesperson,
-      invoiceReference,
-      setInvoiceReference,
-      clearInvoiceReference,
     ],
   )
 

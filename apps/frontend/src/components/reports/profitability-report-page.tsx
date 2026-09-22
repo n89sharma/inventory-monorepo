@@ -1,5 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
+import { FilterRow } from '@/components/shared/filter-row'
 import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { UserFilter } from '@/components/shared/filters/user-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
@@ -88,7 +89,7 @@ function ProfitabilityFilterBar(): React.JSX.Element {
   const [brand, setBrand] = useBrandParam()
 
   return (
-    <div className="flex flex-row flex-wrap gap-2 items-center">
+    <FilterRow>
       <Select value={String(year)} onValueChange={(raw) => setYear(Number.parseInt(raw, 10))}>
         <SelectTrigger className="w-32">
           <SelectValue />
@@ -131,7 +132,7 @@ function ProfitabilityFilterBar(): React.JSX.Element {
       />
 
       <BrandFilter selection={brand} onSelectionChange={setBrand} onClear={() => setBrand(null)} />
-    </div>
+    </FilterRow>
   )
 }
 

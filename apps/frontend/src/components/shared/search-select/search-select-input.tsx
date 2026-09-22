@@ -149,7 +149,10 @@ export function SearchSelectInput<T>({
     return (
       <div className={className}>
         <Field data-invalid={error}>
-          <div className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5">
+          <div
+            data-slot="search-select-selection"
+            className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5"
+          >
             <Badge variant="secondary" className="min-w-0 max-w-full gap-1 pr-0.5">
               <span className="truncate">{getLabel(selection)}</span>
               <button

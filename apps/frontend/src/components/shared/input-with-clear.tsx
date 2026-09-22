@@ -1,4 +1,6 @@
+import { sanitizeDecimalInput } from '@/lib/input-sanitizers'
 import { XIcon } from '@phosphor-icons/react'
+import { useState } from 'react'
 import { Field, FieldLabel } from '../shadcn/field'
 import {
   InputGroup,
@@ -38,14 +40,33 @@ function InputWithClearBody({
   suffix,
 }: InputWithClearBodyProps): React.JSX.Element {
   const resolvedInputType = inputType ?? 'string'
+  const numeric = resolvedInputType === 'number'
+  const [draft, setDraft] = useState(() => String(value ?? ''))
+  const [prevValue, setPrevValue] = useState(value)
 
   function coerce(raw: string): string | number | null {
     if (raw === '') return null
-    if (resolvedInputType === 'number') {
+    if (numeric) {
       const parsed = Number(raw)
       return isNaN(parsed) ? null : parsed
     }
     return raw
+  }
+
+  const currValue = value
+  if (prevValue !== currValue) {
+    setPrevValue(currValue)
+    if (coerce(draft) !== currValue) setDraft(String(currValue ?? ''))
+  }
+
+  function handleChange(raw: string) {
+    if (!numeric) {
+      onValueChange(coerce(raw))
+      return
+    }
+    const sanitized = sanitizeDecimalInput(raw)
+    setDraft(sanitized)
+    onValueChange(coerce(sanitized))
   }
 
   function isValuePresent() {
@@ -63,18 +84,19 @@ function InputWithClearBody({
           </InputGroupAddon>
         ) : null}
         <InputGroupInput
-          type={resolvedInputType}
-          value={value ?? ''}
-          onChange={(e) => onValueChange(coerce(e.target.value))}
+          type="text"
+          inputMode={numeric ? 'decimal' : undefined}
+          value={numeric ? draft : (value ?? '')}
+          onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder}
           aria-invalid={error}
           className={inputClassName}
         ></InputGroupInput>
 
-        <InputGroupAddon align="inline-end">
-          {suffix ? <span className="text-muted-foreground pr-1">{suffix}</span> : null}
+        <InputGroupAddon align="inline-end" className="gap-1 pr-2 has-[>button]:mr-0">
+          {suffix ? <span className="text-muted-foreground">{suffix}</span> : null}
           <InputGroupButton
-            size="icon-sm"
+            size="icon-xs"
             aria-label="Clear"
             onClick={() => onValueChange(null)}
             hidden={!isValuePresent()}

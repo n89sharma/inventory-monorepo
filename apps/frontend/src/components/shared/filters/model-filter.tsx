@@ -27,10 +27,12 @@ export function ModelFilter({
       onQueryChange={onQueryChange}
       onClear={onClear}
       options={models}
-      getLabel={modelLabel}
+      getLabel={(m) => m.model_name}
+      getColumns={(m) => [m.model_name, m.brand_name]}
+      getSearchText={modelLabel}
       placeholder={placeholder}
       clearLabel="Clear model"
-      className="w-50"
+      className="w-36"
     />
   )
 }

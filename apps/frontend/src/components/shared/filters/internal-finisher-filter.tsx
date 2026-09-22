@@ -29,10 +29,12 @@ export function InternalFinisherFilter({
         onClear()
       }}
       options={allComponents}
-      getLabel={componentLabel}
-      placeholder="Internal Finisher"
+      getLabel={(c) => c.name}
+      getColumns={(c) => [c.name, c.brand_name]}
+      getSearchText={componentLabel}
+      placeholder="Finisher"
       clearLabel="Clear internal finisher"
-      className="w-35"
+      className="w-24"
     />
   )
 }

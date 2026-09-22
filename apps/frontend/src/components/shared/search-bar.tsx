@@ -3,6 +3,7 @@ import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-t
 import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
 import React from 'react'
 import { DatePickerFieldInline } from './date-picker'
+import { FilterRow } from './filter-row'
 import { QuickSearchButtons } from './quick-search-buttons'
 
 interface SearchBarProps {
@@ -66,7 +67,7 @@ export function SearchBar({
   }
 
   return (
-    <div className="flex flex-row flex-wrap gap-2 items-end">
+    <FilterRow>
       <QuickSearchButtons days={[7, 30, 60]} onSearch={handleQuickSearch} />
 
       {leadingFilter}
@@ -81,6 +82,6 @@ export function SearchBar({
       <DatePickerFieldInline label={toLabel} id="to-date" date={toDate} setDate={setToDate} />
 
       {children}
-    </div>
+    </FilterRow>
   )
 }

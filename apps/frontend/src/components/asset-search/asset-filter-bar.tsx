@@ -6,6 +6,7 @@ import { MeterRangeInput } from '@/components/shared/filters/meter-range-input'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { ReadinessFilter } from '@/components/shared/filters/readiness-filter'
 import { ActiveFilterBar } from '@/components/shared/active-filter-bar'
+import { FilterRow } from '@/components/shared/filter-row'
 import {
   useActiveFilters,
   useAssetTypesParam,
@@ -58,9 +59,9 @@ export const AssetFilterBar = memo(function AssetFilterBar({
 
   return (
     <>
-      <div className="flex flex-row flex-wrap gap-2 items-end">{scopeFilters}</div>
+      <FilterRow>{scopeFilters}</FilterRow>
 
-      <div className="flex flex-row flex-wrap gap-2 items-end">
+      <FilterRow>
         <BrandFilter
           selection={brand}
           onSelectionChange={setBrand}
@@ -85,7 +86,7 @@ export const AssetFilterBar = memo(function AssetFilterBar({
           max={max}
           onMinChange={setMin}
           onMaxChange={setMax}
-          className="w-72"
+          className="w-56"
         />
 
         <CassettesFilter value={cassettes} onValueChange={setCassettes} />
@@ -95,7 +96,7 @@ export const AssetFilterBar = memo(function AssetFilterBar({
           onSelectionChange={setInternalFinisher}
           onClear={() => setInternalFinisher(null)}
         />
-      </div>
+      </FilterRow>
 
       {count > 0 ? <ActiveFilterBar count={count} onClear={clearAll} /> : null}
     </>

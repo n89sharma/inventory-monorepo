@@ -1,5 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
+import { FilterRow } from '@/components/shared/filter-row'
 import { createModelPriceHistoryColumns } from './model-price-history-table-columns'
 import { Button } from '@/components/shadcn/button'
 import { DataGrid, TABLE_HEAD_CLASS } from '@/components/shared/data-table'
@@ -242,50 +243,49 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
             <ShareButton />
           </div>
         </div>
-        <form
-          className="flex flex-row flex-wrap gap-2 items-end"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <ModelFilter
-            selection={model}
-            query={modelQuery}
-            onSelectionChange={(m) => {
-              setModelQuery('')
-              setModel(m)
-            }}
-            onQueryChange={setModelQuery}
-            onClear={() => {
-              setModelQuery('')
-              clear()
-            }}
-            placeholder="Model *"
-          />
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FilterRow>
+            <ModelFilter
+              selection={model}
+              query={modelQuery}
+              onSelectionChange={(m) => {
+                setModelQuery('')
+                setModel(m)
+              }}
+              onQueryChange={setModelQuery}
+              onClear={() => {
+                setModelQuery('')
+                clear()
+              }}
+              placeholder="Model *"
+            />
 
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            value={String(range)}
-            onValueChange={(value) => {
-              if (value === '') return
-              setRange(value === '12' ? 12 : 6)
-            }}
-            aria-label="Price history range"
-          >
-            {RANGE_OPTIONS.map((option) => (
-              <ToggleGroupItem key={option} value={String(option)}>
-                {option} mo ({rangeCounts[option]})
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            <ToggleGroup
+              type="single"
+              variant="outline"
+              value={String(range)}
+              onValueChange={(value) => {
+                if (value === '') return
+                setRange(value === '12' ? 12 : 6)
+              }}
+              aria-label="Price history range"
+            >
+              {RANGE_OPTIONS.map((option) => (
+                <ToggleGroupItem key={option} value={String(option)}>
+                  {option} mo ({rangeCounts[option]})
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
 
-          <Toggle
-            variant="outline"
-            pressed={specsVisible}
-            onPressedChange={setSpecsVisible}
-            aria-label="Show spec columns"
-          >
-            {specsVisible ? 'Hide Specs' : 'Show Specs'}
-          </Toggle>
+            <Toggle
+              variant="outline"
+              pressed={specsVisible}
+              onPressedChange={setSpecsVisible}
+              aria-label="Show spec columns"
+            >
+              {specsVisible ? 'Hide Specs' : 'Show Specs'}
+            </Toggle>
+          </FilterRow>
         </form>
       </GridPageHeader>
       <div

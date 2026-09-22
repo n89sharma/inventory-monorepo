@@ -18,9 +18,9 @@ export function CassettesFilter({
         const next = Number.isInteger(val) && val >= 0 ? val : null
         onValueChange(next)
       }}
-      fieldLabel="Cassettes (min)"
+      fieldLabel="Cassettes"
       inputType="number"
-      className="w-35"
+      className="w-28"
     />
   )
 }

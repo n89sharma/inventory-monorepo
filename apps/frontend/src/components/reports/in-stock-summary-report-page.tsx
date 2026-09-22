@@ -3,6 +3,7 @@ import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
+import { FilterRow } from '@/components/shared/filter-row'
 import { IN_STOCK_SUMMARY_COLUMNS } from './in-stock-summary-table-columns'
 import { DataGrid } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
@@ -146,24 +147,23 @@ export function InStockSummaryReportPage(): React.JSX.Element {
           </div>
           <ShareButton />
         </div>
-        <form
-          className="flex flex-row flex-wrap items-center gap-2"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
-          <BrandFilter
-            selection={brand}
-            onSelectionChange={setBrand}
-            onClear={() => setBrand(null)}
-          />
-          <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
-          <ModelFilter
-            selection={model}
-            query={modelQuery}
-            onSelectionChange={setModel}
-            onQueryChange={setModelQuery}
-            onClear={clearModel}
-          />
+        <form onSubmit={(e) => e.preventDefault()}>
+          <FilterRow>
+            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+            <BrandFilter
+              selection={brand}
+              onSelectionChange={setBrand}
+              onClear={() => setBrand(null)}
+            />
+            <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
+            <ModelFilter
+              selection={model}
+              query={modelQuery}
+              onSelectionChange={setModel}
+              onQueryChange={setModelQuery}
+              onClear={clearModel}
+            />
+          </FilterRow>
         </form>
       </GridPageHeader>
       <div
