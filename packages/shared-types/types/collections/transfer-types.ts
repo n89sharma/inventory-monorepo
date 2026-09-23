@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { AssetSearchRowSchema, AssetSummarySchema } from '../asset-types.js'
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { WarehouseSchema } from '../reference-data-types.js'
+import { TransferCostsSchema } from '../transfer-cost-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
 
 // Transfer lifecycle. DB stores the raw string (Transfer.status); this is the compile-time
@@ -64,6 +65,12 @@ export const UpdateTransferMetadataSchema = z
     path: ['destination'],
   })
 export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema>
+
+// POST /transfers/:transferNumber/dispatch — null costs means the origin warehouse defaults.
+export const DispatchTransferSchema = z.object({
+  costs: TransferCostsSchema.nullable(),
+})
+export type DispatchTransfer = z.infer<typeof DispatchTransferSchema>
 
 // PATCH /transfers/:transferNumber/notes
 export const UpdateTransferNotesSchema = z.object({

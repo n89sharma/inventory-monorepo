@@ -5,10 +5,14 @@ import {
   AssetDeltaSchema,
   CollectionHistory,
   CreateTransferSchema,
+  DispatchTransferSchema,
+  TransferCostsSchema,
   TransferDetail,
   TransferSummary,
+  WarehouseTransferCost,
   UpdateTransferMetadataSchema,
   UpdateTransferNotesSchema,
+  response403,
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
@@ -28,6 +32,14 @@ import {
   receiveTransfer as receiveTransferSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
+import {
+  getWarehouseTransferCosts as getWarehouseTransferCostsSer,
+  updateWarehouseTransferCost as updateWarehouseTransferCostSer,
+} from '../services/transferCostService.js'
+
+// Dispatch itself needs only create_update_transfer; overriding the warehouse defaults is a
+// price edit, so the saved defaults apply for everyone else.
+const EDIT_COST_PERMISSION = 'edit_prices'
 
 export const TransferQuerySchema = z
   .object({
@@ -91,7 +103,12 @@ export const patchTransferAssets = asyncHandler(async (req, res) => {
 })
 
 export const dispatchTransfer = asyncHandler(async (req, res) => {
-  await dispatchTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  const { costs } = DispatchTransferSchema.parse(req.body)
+  if (costs !== null && !res.locals.permissions.has(EDIT_COST_PERMISSION)) {
+    res.status(403).json(response403('Forbidden: insufficient permissions'))
+    return
+  }
+  await dispatchTransferSer(req.params.transferNumber, res.locals.dbUserId, costs)
   res.status(204).send()
 })
 
@@ -115,5 +132,17 @@ export const getTransferHistory = asyncHandler(
 
 export const deleteTransfer = asyncHandler(async (req, res) => {
   await deleteTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const getWarehouseTransferCosts = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<WarehouseTransferCost[]>>) => {
+    res.json(successResponse(await getWarehouseTransferCostsSer()))
+  },
+)
+
+export const updateWarehouseTransferCost = asyncHandler(async (req, res) => {
+  const body = TransferCostsSchema.parse(req.body)
+  await updateWarehouseTransferCostSer(Number(req.params.warehouseId), body, res.locals.dbUserId)
   res.status(204).send()
 })

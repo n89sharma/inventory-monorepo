@@ -17,6 +17,7 @@ import {
   Permission,
   searchRowToAssetSummary,
   Status,
+  TransferCosts,
   UpdateAssetSpecs,
   Warehouse,
 } from 'shared-types'
@@ -573,7 +574,21 @@ export async function getHoldArchivedAt(holdNumber: string): Promise<Date | null
 }
 
 // Delete all transactional data in FK-safe order, leaving idempotent reference rows.
+export async function seedWarehouseTransferCost(
+  warehouseId: number,
+  userId: number,
+  costs: TransferCosts,
+): Promise<void> {
+  const data = { ...costs, updated_by_id: userId, updated_at: new Date() }
+  await prisma.warehouseTransferCost.upsert({
+    where: { warehouse_id: warehouseId },
+    create: { warehouse_id: warehouseId, ...data },
+    update: data,
+  })
+}
+
 export async function cleanupTransactionalData(): Promise<void> {
+  await prisma.warehouseTransferCost.deleteMany()
   await prisma.savedView.deleteMany()
   await prisma.history.deleteMany()
   await prisma.assetStorePart.deleteMany()

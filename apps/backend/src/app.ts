@@ -21,6 +21,7 @@ import reportRoutes from './routes/reportRoutes.js'
 import savedViewRoutes from './routes/savedViewRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import storePartRoutes from './routes/storePartRoutes.js'
+import transferCostRoutes from './routes/transferCostRoutes.js'
 import transferRoutes from './routes/transferRoutes.js'
 import meRoutes from './routes/meRoutes.js'
 import roleRoutes from './routes/roleRoutes.js'
@@ -134,6 +135,7 @@ app.use('/assets', assetRoutes)
 app.use('/arrivals', arrivalRoutes)
 app.use('/departures', departureRoutes)
 app.use('/transfers', transferRoutes)
+app.use('/transfer-costs', transferCostRoutes)
 app.use('/holds', holdRoutes)
 app.use('/invoices', invoiceRoutes)
 app.use('/locations', locationRoutes)

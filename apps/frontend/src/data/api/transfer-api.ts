@@ -11,6 +11,8 @@ import type {
   AssetSummary,
   CollectionHistory,
   CreateTransfer,
+  DispatchTransfer,
+  TransferCosts,
   TransferDetail,
   TransferSummary,
   UpdateTransferMetadata,
@@ -22,6 +24,7 @@ import {
   AssetSummarySchema,
   CollectionHistorySchema,
   CreateTransferSchema,
+  DispatchTransferSchema,
   TransferDetailSchema,
   TransferSummarySchema,
   UpdateTransferMetadataSchema,
@@ -107,8 +110,12 @@ export async function patchTransferAssets(
   await api.patch(`/transfers/${transferNumber}/assets`, patchTransferAssetsBody)
 }
 
-export async function dispatchTransfer(transferNumber: string): Promise<void> {
-  await api.post(`/transfers/${transferNumber}/dispatch`)
+export async function dispatchTransfer(
+  transferNumber: string,
+  costs: TransferCosts | null,
+): Promise<void> {
+  const dispatchTransferBody = DispatchTransferSchema.parse({ costs } satisfies DispatchTransfer)
+  await api.post(`/transfers/${transferNumber}/dispatch`, dispatchTransferBody)
 }
 
 export async function receiveTransfer(transferNumber: string): Promise<void> {

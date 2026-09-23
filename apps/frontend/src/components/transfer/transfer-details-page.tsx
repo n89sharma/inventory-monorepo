@@ -82,11 +82,13 @@ export function TransferDetailsPage(): React.JSX.Element {
       renderHeaderActions={(transfer) => (
         <TransferLifecycleActions
           status={transfer.status}
+          originId={transfer.origin.id}
           assetCount={transfer.assets.length}
-          onDispatch={() =>
+          onDispatch={(costs) =>
             mutations.dispatch(
               transferNumber,
               transfer.assets.map((a) => a.barcode),
+              costs,
             )
           }
           onReceive={() =>

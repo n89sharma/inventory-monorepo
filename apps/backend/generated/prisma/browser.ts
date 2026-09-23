@@ -168,6 +168,11 @@ export type Zone = Prisma.ZoneModel
  */
 export type Warehouse = Prisma.WarehouseModel
 /**
+ * Model WarehouseTransferCost
+ * 
+ */
+export type WarehouseTransferCost = Prisma.WarehouseTransferCostModel
+/**
  * Model Brand
  * 
  */

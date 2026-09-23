@@ -414,6 +414,7 @@ export const ModelName = {
   Location: 'Location',
   Zone: 'Zone',
   Warehouse: 'Warehouse',
+  WarehouseTransferCost: 'WarehouseTransferCost',
   Brand: 'Brand',
   Model: 'Model',
   Component: 'Component',
@@ -438,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "brand" | "model" | "component" | "file" | "comment" | "user" | "savedView" | "organization" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "savedView" | "organization" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2662,6 +2663,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WarehouseTransferCost: {
+      payload: Prisma.$WarehouseTransferCostPayload<ExtArgs>
+      fields: Prisma.WarehouseTransferCostFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WarehouseTransferCostFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WarehouseTransferCostFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        findFirst: {
+          args: Prisma.WarehouseTransferCostFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WarehouseTransferCostFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        findMany: {
+          args: Prisma.WarehouseTransferCostFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>[]
+        }
+        create: {
+          args: Prisma.WarehouseTransferCostCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        createMany: {
+          args: Prisma.WarehouseTransferCostCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WarehouseTransferCostCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>[]
+        }
+        delete: {
+          args: Prisma.WarehouseTransferCostDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        update: {
+          args: Prisma.WarehouseTransferCostUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        deleteMany: {
+          args: Prisma.WarehouseTransferCostDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WarehouseTransferCostUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WarehouseTransferCostUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>[]
+        }
+        upsert: {
+          args: Prisma.WarehouseTransferCostUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WarehouseTransferCostPayload>
+        }
+        aggregate: {
+          args: Prisma.WarehouseTransferCostAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWarehouseTransferCost>
+        }
+        groupBy: {
+          args: Prisma.WarehouseTransferCostGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WarehouseTransferCostGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WarehouseTransferCostCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WarehouseTransferCostCountAggregateOutputType> | number
+        }
+      }
+    }
     Brand: {
       payload: Prisma.$BrandPayload<ExtArgs>
       fields: Prisma.BrandFieldRefs
@@ -3618,7 +3693,10 @@ export const TransferScalarFieldEnum = {
   transporter_id: 'transporter_id',
   created_by_id: 'created_by_id',
   notes: 'notes',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost'
 } as const
 
 export type TransferScalarFieldEnum = (typeof TransferScalarFieldEnum)[keyof typeof TransferScalarFieldEnum]
@@ -3720,6 +3798,18 @@ export const WarehouseScalarFieldEnum = {
 } as const
 
 export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
+
+
+export const WarehouseTransferCostScalarFieldEnum = {
+  warehouse_id: 'warehouse_id',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost',
+  updated_by_id: 'updated_by_id',
+  updated_at: 'updated_at'
+} as const
+
+export type WarehouseTransferCostScalarFieldEnum = (typeof WarehouseTransferCostScalarFieldEnum)[keyof typeof WarehouseTransferCostScalarFieldEnum]
 
 
 export const BrandScalarFieldEnum = {
@@ -4131,6 +4221,7 @@ export type GlobalOmitConfig = {
   location?: Prisma.LocationOmit
   zone?: Prisma.ZoneOmit
   warehouse?: Prisma.WarehouseOmit
+  warehouseTransferCost?: Prisma.WarehouseTransferCostOmit
   brand?: Prisma.BrandOmit
   model?: Prisma.ModelOmit
   component?: Prisma.ComponentOmit

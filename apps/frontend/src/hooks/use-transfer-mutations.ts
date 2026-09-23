@@ -21,7 +21,13 @@ import {
 } from '@/lib/asset-price-save'
 import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { TransferForm, TransferMetadataForm } from '@/ui-types/transfer-form-types'
-import type { AssetIdentity, AssetSearchRow, AssetSummary, PatchAssetPricing } from 'shared-types'
+import type {
+  AssetIdentity,
+  AssetSearchRow,
+  AssetSummary,
+  PatchAssetPricing,
+  TransferCosts,
+} from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: TransferForm) {
@@ -96,8 +102,8 @@ async function updateNotes(transferNumber: string, comment: string) {
   invalidateTransferLists()
 }
 
-async function dispatch(transferNumber: string, barcodes: string[]) {
-  await dispatchTransfer(transferNumber)
+async function dispatch(transferNumber: string, barcodes: string[], costs: TransferCosts | null) {
+  await dispatchTransfer(transferNumber, costs)
   mutate(transferDetailKey(transferNumber))
   invalidateAssetDetails(barcodes)
   invalidateTransferLists()

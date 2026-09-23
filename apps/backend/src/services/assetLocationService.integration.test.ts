@@ -138,7 +138,7 @@ describe('assetLocationService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
 
     await expect(
       updateAssetLocation(asset.barcode, shelf(refs, 'A1'), refs.userId),
@@ -183,7 +183,7 @@ describe('assetLocationService', () => {
         buildCreateTransferInput(refs, [assets[1]]),
         refs.userId,
       )
-      await dispatchTransfer(transferNumber, refs.userId)
+      await dispatchTransfer(transferNumber, refs.userId, null)
 
       await expect(
         bulkUpdateAssetLocation(

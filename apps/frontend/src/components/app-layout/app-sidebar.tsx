@@ -131,6 +131,7 @@ const REPORTS_SUB_ITEMS = [
   { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_profitability_report' },
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
 
+const TRANSFER_COSTS_ITEM = { title: 'Transfer Costs', url: '/settings/transfer-costs' }
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
 const ROLES_ITEM = { title: 'Roles & Permissions', url: '/settings/roles' }
 
@@ -192,6 +193,7 @@ export function AppSidebar(): React.JSX.Element {
   const canManageRoles = useCan('update_user_roles')
   const canViewReports = useCan('view_reports')
   const canViewSalePrice = useCan('view_sale_price')
+  const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewProfitabilityReport = useCan('view_profitability_report')
   const canPutAway = useCan('update_location')
   const canViewCollections = useCan('view_collections')
@@ -363,6 +365,18 @@ export function AppSidebar(): React.JSX.Element {
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         ))}
+                        {canViewPurchasePrice && (
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={
+                                location.pathname === TRANSFER_COSTS_ITEM.url ? true : undefined
+                              }
+                            >
+                              <Link to={TRANSFER_COSTS_ITEM.url}>{TRANSFER_COSTS_ITEM.title}</Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        )}
                         {canManageUsers && (
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton

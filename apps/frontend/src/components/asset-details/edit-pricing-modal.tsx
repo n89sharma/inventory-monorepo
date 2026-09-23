@@ -8,7 +8,7 @@ import {
 } from '@/components/shadcn/dialog'
 import { FormSection } from '@/components/asset-details/form-section'
 import { HorizontalField } from '@/components/shared/horizontal-field'
-import { PriceInput } from '@/components/shared/price-input'
+import { PriceField } from '@/components/shared/price-field'
 import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
@@ -17,7 +17,7 @@ import { formatUSD } from '@/lib/formatters'
 import { DISCARD_USER_EDITS, KEEP_USER_EDITS_ON_SERVER_REFRESH } from '@/lib/form-reset-options'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
-import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   COST_COMPONENT_FIELDS,
   totalCostFromComponents,
@@ -50,33 +50,6 @@ function toPricingFields(assetDetails: AssetDetails | null): PricingFields {
 
 function toNum(value: string | undefined): number {
   return parseFloat(value ?? '') || 0
-}
-
-function PriceField({
-  control,
-  name,
-  label,
-}: {
-  control: Control<PricingFields>
-  name: keyof PricingFields
-  label: string
-}) {
-  return (
-    <HorizontalField label={label}>
-      <Controller
-        control={control}
-        name={name}
-        render={({ field }) => (
-          <PriceInput
-            value={field.value}
-            onChange={field.onChange}
-            label={label}
-            className={INPUT_WIDTH}
-          />
-        )}
-      />
-    </HorizontalField>
-  )
 }
 
 function ReadOnlyPrice({ value }: { value: number }) {

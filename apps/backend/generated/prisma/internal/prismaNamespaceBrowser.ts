@@ -81,6 +81,7 @@ export const ModelName = {
   Location: 'Location',
   Zone: 'Zone',
   Warehouse: 'Warehouse',
+  WarehouseTransferCost: 'WarehouseTransferCost',
   Brand: 'Brand',
   Model: 'Model',
   Component: 'Component',
@@ -355,7 +356,10 @@ export const TransferScalarFieldEnum = {
   transporter_id: 'transporter_id',
   created_by_id: 'created_by_id',
   notes: 'notes',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost'
 } as const
 
 export type TransferScalarFieldEnum = (typeof TransferScalarFieldEnum)[keyof typeof TransferScalarFieldEnum]
@@ -457,6 +461,18 @@ export const WarehouseScalarFieldEnum = {
 } as const
 
 export type WarehouseScalarFieldEnum = (typeof WarehouseScalarFieldEnum)[keyof typeof WarehouseScalarFieldEnum]
+
+
+export const WarehouseTransferCostScalarFieldEnum = {
+  warehouse_id: 'warehouse_id',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost',
+  updated_by_id: 'updated_by_id',
+  updated_at: 'updated_at'
+} as const
+
+export type WarehouseTransferCostScalarFieldEnum = (typeof WarehouseTransferCostScalarFieldEnum)[keyof typeof WarehouseTransferCostScalarFieldEnum]
 
 
 export const BrandScalarFieldEnum = {

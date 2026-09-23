@@ -1,25 +1,34 @@
 import {
   Permission,
+  AssetCost,
   AssetDelta,
   CreateTransfer,
   TRANSFER_STATUS,
+  TransferCosts,
   TransferDetail,
   UpdateTransferMetadata,
   UpdateTransferNotes,
 } from 'shared-types'
-import type { Prisma } from '../../generated/prisma/client.js'
+import { Prisma } from '../../generated/prisma/client.js'
 import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
+import { COST_SELECT, toAssetCost } from '../lib/asset-cost.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { ZERO, totalCostDecimal } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { pluralize } from '../lib/pluralize.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
+  recordAssetUpdate,
   recordAssetUpdateOnCollection,
   recordTransferCreate,
   recordTransferUpdate,
 } from './historyService.js'
+import {
+  getWarehouseTransferCostDecimals,
+  type TransferCostDecimals,
+} from './transferCostService.js'
 import { prisma } from '../prisma.js'
 
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
@@ -182,11 +191,76 @@ export async function patchTransferAssets(
   )
 }
 
-export async function dispatchTransfer(transferNumber: string, userId: number): Promise<void> {
-  const transferId = await prisma.$transaction(async (tx) => {
+function toCostDecimals(costs: TransferCosts): TransferCostDecimals {
+  return {
+    transfer_cost: new Prisma.Decimal(costs.transfer_cost),
+    processing_cost: new Prisma.Decimal(costs.processing_cost),
+    other_cost: new Prisma.Decimal(costs.other_cost),
+  }
+}
+
+type AssetCostChange = { assetId: number; prevCost: AssetCost; newCost: AssetCost }
+
+// Every machine on the transfer carries the full per-machine amount, added on top of what it
+// already cost; the total is re-derived from the components afterwards.
+async function applyTransferCostsToAssets(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+  costs: TransferCostDecimals,
+): Promise<AssetCostChange[]> {
+  const rows = await tx.cost.findMany({
+    where: { asset_id: { in: assetIds } },
+    select: { asset_id: true, ...COST_SELECT },
+  })
+  const rowByAssetId = new Map(rows.map(({ asset_id, ...cost }) => [asset_id, cost]))
+
+  const changes: AssetCostChange[] = []
+  for (const assetId of assetIds) {
+    const row = rowByAssetId.get(assetId) ?? null
+    const components = {
+      transfer_cost: (row?.transfer_cost ?? ZERO).add(costs.transfer_cost),
+      processing_cost: (row?.processing_cost ?? ZERO).add(costs.processing_cost),
+      other_cost: (row?.other_cost ?? ZERO).add(costs.other_cost),
+    }
+    const total_cost = totalCostDecimal({ ...row, ...components })
+    const data = { ...components, total_cost }
+
+    await tx.cost.upsert({
+      where: { asset_id: assetId },
+      update: data,
+      create: { asset_id: assetId, ...data },
+    })
+
+    const prevCost = toAssetCost(row)
+    changes.push({
+      assetId,
+      prevCost,
+      newCost: {
+        ...prevCost,
+        transfer_cost: components.transfer_cost.toNumber(),
+        processing_cost: components.processing_cost.toNumber(),
+        other_cost: components.other_cost.toNumber(),
+        total_cost: total_cost.toNumber(),
+      },
+    })
+  }
+  return changes
+}
+
+export async function dispatchTransfer(
+  transferNumber: string,
+  userId: number,
+  costs: TransferCosts | null,
+): Promise<void> {
+  const { transferId, costChanges } = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
-      select: { id: true, status: true, asset_transfers: { select: { asset_id: true } } },
+      select: {
+        id: true,
+        status: true,
+        origin_id: true,
+        asset_transfers: { select: { asset_id: true } },
+      },
     })
     if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
     if (transfer.status !== TRANSFER_STATUS.DRAFT) {
@@ -196,15 +270,21 @@ export async function dispatchTransfer(transferNumber: string, userId: number): 
     if (assetIds.length === 0) {
       throw new ConflictError(`Transfer ${transferNumber} has no assets to dispatch`)
     }
+    const appliedCosts =
+      costs === null
+        ? await getWarehouseTransferCostDecimals(tx, transfer.origin_id)
+        : toCostDecimals(costs)
+
     await tx.transfer.update({
       where: { id: transfer.id },
-      data: { status: TRANSFER_STATUS.IN_TRANSIT },
+      data: { status: TRANSFER_STATUS.IN_TRANSIT, ...appliedCosts },
     })
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
       data: { location_id: null, is_in_transit: true },
     })
-    return transfer.id
+    const costChanges = await applyTransferCostsToAssets(tx, assetIds, appliedCosts)
+    return { transferId: transfer.id, costChanges }
   })
 
   await recordTransferUpdate(
@@ -212,6 +292,11 @@ export async function dispatchTransfer(transferNumber: string, userId: number): 
     { status: TRANSFER_STATUS.DRAFT },
     { status: TRANSFER_STATUS.IN_TRANSIT },
     userId,
+  )
+  await Promise.all(
+    costChanges.map(({ assetId, prevCost, newCost }) =>
+      recordAssetUpdate(assetId, prevCost, newCost, userId),
+    ),
   )
 }
 

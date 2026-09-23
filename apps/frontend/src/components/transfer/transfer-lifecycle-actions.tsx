@@ -9,10 +9,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
+import { DispatchTransferModal } from '@/components/transfer/dispatch-transfer-modal'
 import { useCan } from '@/hooks/use-can'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { TRANSFER_STATUS } from 'shared-types'
+import { TRANSFER_STATUS, type TransferCosts } from 'shared-types'
 
 type LifecycleButtonProps = {
   label: string
@@ -62,15 +63,48 @@ function LifecycleButton({
   )
 }
 
+type DispatchActionProps = {
+  originId: number
+  assetCount: number
+  onDispatch: (costs: TransferCosts | null) => Promise<void>
+}
+
+// Choosing the amounts is a price edit; everyone else dispatches on the warehouse defaults.
+function DispatchAction({
+  originId,
+  assetCount,
+  onDispatch,
+}: DispatchActionProps): React.JSX.Element {
+  const canEditPrices = useCan('edit_prices')
+  const canViewPurchasePrice = useCan('view_purchase_price')
+
+  if (canEditPrices && canViewPurchasePrice) {
+    return (
+      <DispatchTransferModal originId={originId} assetCount={assetCount} onDispatch={onDispatch} />
+    )
+  }
+
+  return (
+    <LifecycleButton
+      label="Dispatch"
+      title="Dispatch this transfer?"
+      description={`This marks ${assetCount} machine(s) as in transit and clears their location. The transfer can't be edited after dispatch.`}
+      onConfirm={() => onDispatch(null)}
+    />
+  )
+}
+
 type TransferLifecycleActionsProps = {
   status: string
+  originId: number
   assetCount: number
-  onDispatch: () => Promise<void>
+  onDispatch: (costs: TransferCosts | null) => Promise<void>
   onReceive: () => Promise<void>
 }
 
 export function TransferLifecycleActions({
   status,
+  originId,
   assetCount,
   onDispatch,
   onReceive,
@@ -79,14 +113,7 @@ export function TransferLifecycleActions({
   if (!canCreateEditTransfer) return null
 
   if (status === TRANSFER_STATUS.DRAFT) {
-    return (
-      <LifecycleButton
-        label="Dispatch"
-        title="Dispatch this transfer?"
-        description={`This marks ${assetCount} machine(s) as in transit and clears their location. The transfer can't be edited after dispatch.`}
-        onConfirm={onDispatch}
-      />
-    )
+    return <DispatchAction originId={originId} assetCount={assetCount} onDispatch={onDispatch} />
   }
 
   if (status === TRANSFER_STATUS.IN_TRANSIT) {
