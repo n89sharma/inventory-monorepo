@@ -3696,6 +3696,7 @@ export const TransferScalarFieldEnum = {
   created_at: 'created_at',
   transfer_cost: 'transfer_cost',
   processing_cost: 'processing_cost',
+  tested_processing_cost: 'tested_processing_cost',
   other_cost: 'other_cost'
 } as const
 
@@ -3804,6 +3805,7 @@ export const WarehouseTransferCostScalarFieldEnum = {
   warehouse_id: 'warehouse_id',
   transfer_cost: 'transfer_cost',
   processing_cost: 'processing_cost',
+  tested_processing_cost: 'tested_processing_cost',
   other_cost: 'other_cost',
   updated_by_id: 'updated_by_id',
   updated_at: 'updated_at'

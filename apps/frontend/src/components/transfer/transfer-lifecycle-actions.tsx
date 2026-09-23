@@ -66,6 +66,7 @@ function LifecycleButton({
 type DispatchActionProps = {
   originId: number
   assetCount: number
+  testedCount: number
   onDispatch: (costs: TransferCosts | null) => Promise<void>
 }
 
@@ -73,6 +74,7 @@ type DispatchActionProps = {
 function DispatchAction({
   originId,
   assetCount,
+  testedCount,
   onDispatch,
 }: DispatchActionProps): React.JSX.Element {
   const canEditPrices = useCan('edit_prices')
@@ -80,7 +82,12 @@ function DispatchAction({
 
   if (canEditPrices && canViewPurchasePrice) {
     return (
-      <DispatchTransferModal originId={originId} assetCount={assetCount} onDispatch={onDispatch} />
+      <DispatchTransferModal
+        originId={originId}
+        assetCount={assetCount}
+        testedCount={testedCount}
+        onDispatch={onDispatch}
+      />
     )
   }
 
@@ -98,6 +105,7 @@ type TransferLifecycleActionsProps = {
   status: string
   originId: number
   assetCount: number
+  testedCount: number
   onDispatch: (costs: TransferCosts | null) => Promise<void>
   onReceive: () => Promise<void>
 }
@@ -106,6 +114,7 @@ export function TransferLifecycleActions({
   status,
   originId,
   assetCount,
+  testedCount,
   onDispatch,
   onReceive,
 }: TransferLifecycleActionsProps): React.JSX.Element | null {
@@ -113,7 +122,14 @@ export function TransferLifecycleActions({
   if (!canCreateEditTransfer) return null
 
   if (status === TRANSFER_STATUS.DRAFT) {
-    return <DispatchAction originId={originId} assetCount={assetCount} onDispatch={onDispatch} />
+    return (
+      <DispatchAction
+        originId={originId}
+        assetCount={assetCount}
+        testedCount={testedCount}
+        onDispatch={onDispatch}
+      />
+    )
   }
 
   if (status === TRANSFER_STATUS.IN_TRANSIT) {

@@ -13,3 +13,6 @@ export const COST_FIELD_LABELS = {
   parts_cost: 'Parts Cost',
   sale_price: 'Sale Price',
 } as const satisfies Record<CostFieldId, string>
+
+// Not an asset cost field: a per-warehouse transfer default that feeds processing_cost.
+export const TESTED_PROCESSING_COST_LABEL = 'Tested Processing Cost'

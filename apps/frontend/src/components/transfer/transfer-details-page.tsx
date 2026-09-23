@@ -30,6 +30,7 @@ import {
 import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 
 const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
+const UNTESTED_READINESS = 'UNTESTED'
 
 export function TransferDetailsPage(): React.JSX.Element {
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
@@ -84,6 +85,7 @@ export function TransferDetailsPage(): React.JSX.Element {
           status={transfer.status}
           originId={transfer.origin.id}
           assetCount={transfer.assets.length}
+          testedCount={transfer.assets.filter((a) => a.readiness !== UNTESTED_READINESS).length}
           onDispatch={(costs) =>
             mutations.dispatch(
               transferNumber,

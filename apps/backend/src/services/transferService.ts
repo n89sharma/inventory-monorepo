@@ -32,6 +32,7 @@ import {
 import { prisma } from '../prisma.js'
 
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
+const UNTESTED_READINESS = 'UNTESTED'
 
 export async function getTransfer(
   transferNumber: string,
@@ -195,19 +196,34 @@ function toCostDecimals(costs: TransferCosts): TransferCostDecimals {
   return {
     transfer_cost: new Prisma.Decimal(costs.transfer_cost),
     processing_cost: new Prisma.Decimal(costs.processing_cost),
+    tested_processing_cost: new Prisma.Decimal(costs.tested_processing_cost),
     other_cost: new Prisma.Decimal(costs.other_cost),
   }
+}
+
+// A machine counts as tested once its readiness has moved off UNTESTED, errors included.
+async function loadTestedAssetIds(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+): Promise<Set<number>> {
+  const tested = await tx.asset.findMany({
+    where: { id: { in: assetIds }, readiness: { status: { not: UNTESTED_READINESS } } },
+    select: { id: true },
+  })
+  return new Set(tested.map((asset) => asset.id))
 }
 
 type AssetCostChange = { assetId: number; prevCost: AssetCost; newCost: AssetCost }
 
 // Every machine on the transfer carries the full per-machine amount, added on top of what it
-// already cost; the total is re-derived from the components afterwards.
+// already cost, and a tested machine carries the extra processing charge as well; the total is
+// re-derived from the components afterwards.
 async function applyTransferCostsToAssets(
   tx: Prisma.TransactionClient,
   assetIds: number[],
   costs: TransferCostDecimals,
 ): Promise<AssetCostChange[]> {
+  const testedAssetIds = await loadTestedAssetIds(tx, assetIds)
   const rows = await tx.cost.findMany({
     where: { asset_id: { in: assetIds } },
     select: { asset_id: true, ...COST_SELECT },
@@ -217,9 +233,12 @@ async function applyTransferCostsToAssets(
   const changes: AssetCostChange[] = []
   for (const assetId of assetIds) {
     const row = rowByAssetId.get(assetId) ?? null
+    const addedProcessing = testedAssetIds.has(assetId)
+      ? costs.processing_cost.add(costs.tested_processing_cost)
+      : costs.processing_cost
     const components = {
       transfer_cost: (row?.transfer_cost ?? ZERO).add(costs.transfer_cost),
-      processing_cost: (row?.processing_cost ?? ZERO).add(costs.processing_cost),
+      processing_cost: (row?.processing_cost ?? ZERO).add(addedProcessing),
       other_cost: (row?.other_cost ?? ZERO).add(costs.other_cost),
     }
     const total_cost = totalCostDecimal({ ...row, ...components })

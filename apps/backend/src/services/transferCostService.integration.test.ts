@@ -27,12 +27,12 @@ describe('transferCostService', () => {
   it('creates a row on the first save and updates it on the next', async () => {
     await updateWarehouseTransferCost(
       refs.warehouse.id,
-      { transfer_cost: 10, processing_cost: 4, other_cost: 1 },
+      { transfer_cost: 10, processing_cost: 4, tested_processing_cost: 7, other_cost: 1 },
       refs.userId,
     )
     await updateWarehouseTransferCost(
       refs.warehouse.id,
-      { transfer_cost: 12.5, processing_cost: 0, other_cost: 1 },
+      { transfer_cost: 12.5, processing_cost: 0, tested_processing_cost: 8.25, other_cost: 1 },
       refs.userId,
     )
 
@@ -41,6 +41,7 @@ describe('transferCostService', () => {
         warehouse_id: refs.warehouse.id,
         transfer_cost: 12.5,
         processing_cost: 0,
+        tested_processing_cost: 8.25,
         other_cost: 1,
       },
     ])
@@ -50,7 +51,7 @@ describe('transferCostService', () => {
     await expect(
       updateWarehouseTransferCost(
         UNKNOWN_WAREHOUSE_ID,
-        { transfer_cost: 1, processing_cost: 1, other_cost: 1 },
+        { transfer_cost: 1, processing_cost: 1, tested_processing_cost: 1, other_cost: 1 },
         refs.userId,
       ),
     ).rejects.toBeInstanceOf(NotFoundError)

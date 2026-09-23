@@ -30,6 +30,7 @@ export type WarehouseTransferCostAvgAggregateOutputType = {
   warehouse_id: number | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
+  tested_processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   updated_by_id: number | null
 }
@@ -38,6 +39,7 @@ export type WarehouseTransferCostSumAggregateOutputType = {
   warehouse_id: number | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
+  tested_processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   updated_by_id: number | null
 }
@@ -46,6 +48,7 @@ export type WarehouseTransferCostMinAggregateOutputType = {
   warehouse_id: number | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
+  tested_processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   updated_by_id: number | null
   updated_at: Date | null
@@ -55,6 +58,7 @@ export type WarehouseTransferCostMaxAggregateOutputType = {
   warehouse_id: number | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
+  tested_processing_cost: runtime.Decimal | null
   other_cost: runtime.Decimal | null
   updated_by_id: number | null
   updated_at: Date | null
@@ -64,6 +68,7 @@ export type WarehouseTransferCostCountAggregateOutputType = {
   warehouse_id: number
   transfer_cost: number
   processing_cost: number
+  tested_processing_cost: number
   other_cost: number
   updated_by_id: number
   updated_at: number
@@ -75,6 +80,7 @@ export type WarehouseTransferCostAvgAggregateInputType = {
   warehouse_id?: true
   transfer_cost?: true
   processing_cost?: true
+  tested_processing_cost?: true
   other_cost?: true
   updated_by_id?: true
 }
@@ -83,6 +89,7 @@ export type WarehouseTransferCostSumAggregateInputType = {
   warehouse_id?: true
   transfer_cost?: true
   processing_cost?: true
+  tested_processing_cost?: true
   other_cost?: true
   updated_by_id?: true
 }
@@ -91,6 +98,7 @@ export type WarehouseTransferCostMinAggregateInputType = {
   warehouse_id?: true
   transfer_cost?: true
   processing_cost?: true
+  tested_processing_cost?: true
   other_cost?: true
   updated_by_id?: true
   updated_at?: true
@@ -100,6 +108,7 @@ export type WarehouseTransferCostMaxAggregateInputType = {
   warehouse_id?: true
   transfer_cost?: true
   processing_cost?: true
+  tested_processing_cost?: true
   other_cost?: true
   updated_by_id?: true
   updated_at?: true
@@ -109,6 +118,7 @@ export type WarehouseTransferCostCountAggregateInputType = {
   warehouse_id?: true
   transfer_cost?: true
   processing_cost?: true
+  tested_processing_cost?: true
   other_cost?: true
   updated_by_id?: true
   updated_at?: true
@@ -205,6 +215,7 @@ export type WarehouseTransferCostGroupByOutputType = {
   warehouse_id: number
   transfer_cost: runtime.Decimal
   processing_cost: runtime.Decimal
+  tested_processing_cost: runtime.Decimal
   other_cost: runtime.Decimal
   updated_by_id: number
   updated_at: Date
@@ -237,6 +248,7 @@ export type WarehouseTransferCostWhereInput = {
   warehouse_id?: Prisma.IntFilter<"WarehouseTransferCost"> | number
   transfer_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFilter<"WarehouseTransferCost"> | number
   updated_at?: Prisma.DateTimeFilter<"WarehouseTransferCost"> | Date | string
@@ -248,6 +260,7 @@ export type WarehouseTransferCostOrderByWithRelationInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -262,6 +275,7 @@ export type WarehouseTransferCostWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.WarehouseTransferCostWhereInput | Prisma.WarehouseTransferCostWhereInput[]
   transfer_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFilter<"WarehouseTransferCost"> | number
   updated_at?: Prisma.DateTimeFilter<"WarehouseTransferCost"> | Date | string
@@ -273,6 +287,7 @@ export type WarehouseTransferCostOrderByWithAggregationInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -290,6 +305,7 @@ export type WarehouseTransferCostScalarWhereWithAggregatesInput = {
   warehouse_id?: Prisma.IntWithAggregatesFilter<"WarehouseTransferCost"> | number
   transfer_cost?: Prisma.DecimalWithAggregatesFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalWithAggregatesFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalWithAggregatesFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalWithAggregatesFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntWithAggregatesFilter<"WarehouseTransferCost"> | number
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"WarehouseTransferCost"> | Date | string
@@ -298,6 +314,7 @@ export type WarehouseTransferCostScalarWhereWithAggregatesInput = {
 export type WarehouseTransferCostCreateInput = {
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at: Date | string
   warehouse: Prisma.WarehouseCreateNestedOneWithoutTransfer_costsInput
@@ -308,6 +325,7 @@ export type WarehouseTransferCostUncheckedCreateInput = {
   warehouse_id: number
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id: number
   updated_at: Date | string
@@ -316,6 +334,7 @@ export type WarehouseTransferCostUncheckedCreateInput = {
 export type WarehouseTransferCostUpdateInput = {
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutTransfer_costsNestedInput
@@ -326,6 +345,7 @@ export type WarehouseTransferCostUncheckedUpdateInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,6 +355,7 @@ export type WarehouseTransferCostCreateManyInput = {
   warehouse_id: number
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id: number
   updated_at: Date | string
@@ -343,6 +364,7 @@ export type WarehouseTransferCostCreateManyInput = {
 export type WarehouseTransferCostUpdateManyMutationInput = {
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -351,6 +373,7 @@ export type WarehouseTransferCostUncheckedUpdateManyInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -365,6 +388,7 @@ export type WarehouseTransferCostCountOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -374,6 +398,7 @@ export type WarehouseTransferCostAvgOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
 }
@@ -382,6 +407,7 @@ export type WarehouseTransferCostMaxOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -391,6 +417,7 @@ export type WarehouseTransferCostMinOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -400,6 +427,7 @@ export type WarehouseTransferCostSumOrderByAggregateInput = {
   warehouse_id?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
+  tested_processing_cost?: Prisma.SortOrder
   other_cost?: Prisma.SortOrder
   updated_by_id?: Prisma.SortOrder
 }
@@ -491,6 +519,7 @@ export type WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
 export type WarehouseTransferCostCreateWithoutWarehouseInput = {
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at: Date | string
   updated_by: Prisma.UserCreateNestedOneWithoutTransfer_costs_setInput
@@ -499,6 +528,7 @@ export type WarehouseTransferCostCreateWithoutWarehouseInput = {
 export type WarehouseTransferCostUncheckedCreateWithoutWarehouseInput = {
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id: number
   updated_at: Date | string
@@ -523,6 +553,7 @@ export type WarehouseTransferCostUpdateToOneWithWhereWithoutWarehouseInput = {
 export type WarehouseTransferCostUpdateWithoutWarehouseInput = {
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_by?: Prisma.UserUpdateOneRequiredWithoutTransfer_costs_setNestedInput
@@ -531,6 +562,7 @@ export type WarehouseTransferCostUpdateWithoutWarehouseInput = {
 export type WarehouseTransferCostUncheckedUpdateWithoutWarehouseInput = {
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -539,6 +571,7 @@ export type WarehouseTransferCostUncheckedUpdateWithoutWarehouseInput = {
 export type WarehouseTransferCostCreateWithoutUpdated_byInput = {
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at: Date | string
   warehouse: Prisma.WarehouseCreateNestedOneWithoutTransfer_costsInput
@@ -548,6 +581,7 @@ export type WarehouseTransferCostUncheckedCreateWithoutUpdated_byInput = {
   warehouse_id: number
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at: Date | string
 }
@@ -585,6 +619,7 @@ export type WarehouseTransferCostScalarWhereInput = {
   warehouse_id?: Prisma.IntFilter<"WarehouseTransferCost"> | number
   transfer_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFilter<"WarehouseTransferCost"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_by_id?: Prisma.IntFilter<"WarehouseTransferCost"> | number
   updated_at?: Prisma.DateTimeFilter<"WarehouseTransferCost"> | Date | string
@@ -594,6 +629,7 @@ export type WarehouseTransferCostCreateManyUpdated_byInput = {
   warehouse_id: number
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at: Date | string
 }
@@ -601,6 +637,7 @@ export type WarehouseTransferCostCreateManyUpdated_byInput = {
 export type WarehouseTransferCostUpdateWithoutUpdated_byInput = {
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   warehouse?: Prisma.WarehouseUpdateOneRequiredWithoutTransfer_costsNestedInput
@@ -610,6 +647,7 @@ export type WarehouseTransferCostUncheckedUpdateWithoutUpdated_byInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -618,6 +656,7 @@ export type WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byInput = {
   warehouse_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tested_processing_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   other_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -628,6 +667,7 @@ export type WarehouseTransferCostSelect<ExtArgs extends runtime.Types.Extensions
   warehouse_id?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
+  tested_processing_cost?: boolean
   other_cost?: boolean
   updated_by_id?: boolean
   updated_at?: boolean
@@ -639,6 +679,7 @@ export type WarehouseTransferCostSelectCreateManyAndReturn<ExtArgs extends runti
   warehouse_id?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
+  tested_processing_cost?: boolean
   other_cost?: boolean
   updated_by_id?: boolean
   updated_at?: boolean
@@ -650,6 +691,7 @@ export type WarehouseTransferCostSelectUpdateManyAndReturn<ExtArgs extends runti
   warehouse_id?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
+  tested_processing_cost?: boolean
   other_cost?: boolean
   updated_by_id?: boolean
   updated_at?: boolean
@@ -661,12 +703,13 @@ export type WarehouseTransferCostSelectScalar = {
   warehouse_id?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
+  tested_processing_cost?: boolean
   other_cost?: boolean
   updated_by_id?: boolean
   updated_at?: boolean
 }
 
-export type WarehouseTransferCostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"warehouse_id" | "transfer_cost" | "processing_cost" | "other_cost" | "updated_by_id" | "updated_at", ExtArgs["result"]["warehouseTransferCost"]>
+export type WarehouseTransferCostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"warehouse_id" | "transfer_cost" | "processing_cost" | "tested_processing_cost" | "other_cost" | "updated_by_id" | "updated_at", ExtArgs["result"]["warehouseTransferCost"]>
 export type WarehouseTransferCostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   warehouse?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   updated_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -690,6 +733,7 @@ export type $WarehouseTransferCostPayload<ExtArgs extends runtime.Types.Extensio
     warehouse_id: number
     transfer_cost: runtime.Decimal
     processing_cost: runtime.Decimal
+    tested_processing_cost: runtime.Decimal
     other_cost: runtime.Decimal
     updated_by_id: number
     updated_at: Date
@@ -1121,6 +1165,7 @@ export interface WarehouseTransferCostFieldRefs {
   readonly warehouse_id: Prisma.FieldRef<"WarehouseTransferCost", 'Int'>
   readonly transfer_cost: Prisma.FieldRef<"WarehouseTransferCost", 'Decimal'>
   readonly processing_cost: Prisma.FieldRef<"WarehouseTransferCost", 'Decimal'>
+  readonly tested_processing_cost: Prisma.FieldRef<"WarehouseTransferCost", 'Decimal'>
   readonly other_cost: Prisma.FieldRef<"WarehouseTransferCost", 'Decimal'>
   readonly updated_by_id: Prisma.FieldRef<"WarehouseTransferCost", 'Int'>
   readonly updated_at: Prisma.FieldRef<"WarehouseTransferCost", 'DateTime'>

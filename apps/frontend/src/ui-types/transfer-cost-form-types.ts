@@ -10,6 +10,7 @@ const AmountSchema = z
 export const TransferCostFormSchema = z.object({
   transfer_cost: AmountSchema,
   processing_cost: AmountSchema,
+  tested_processing_cost: AmountSchema,
   other_cost: AmountSchema,
 })
 
@@ -19,6 +20,7 @@ export function toTransferCosts(form: TransferCostForm): TransferCosts {
   return {
     transfer_cost: parseFloat(form.transfer_cost),
     processing_cost: parseFloat(form.processing_cost),
+    tested_processing_cost: parseFloat(form.tested_processing_cost),
     other_cost: parseFloat(form.other_cost),
   }
 }
@@ -27,6 +29,7 @@ export function toTransferCostForm(costs: TransferCosts): TransferCostForm {
   return {
     transfer_cost: costs.transfer_cost.toString(),
     processing_cost: costs.processing_cost.toString(),
+    tested_processing_cost: costs.tested_processing_cost.toString(),
     other_cost: costs.other_cost.toString(),
   }
 }

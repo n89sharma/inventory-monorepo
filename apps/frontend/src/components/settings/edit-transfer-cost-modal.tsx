@@ -12,7 +12,7 @@ import { UnsavedChangesDialog } from '@/components/shared/unsaved-changes-dialog
 import { updateWarehouseTransferCost } from '@/data/api/transfer-cost-api'
 import { invalidateWarehouseTransferCosts } from '@/hooks/use-transfer-costs'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
-import { COST_FIELD_LABELS } from '@/lib/cost-fields'
+import { COST_FIELD_LABELS, TESTED_PROCESSING_COST_LABEL } from '@/lib/cost-fields'
 import { flattenFieldErrors } from '@/lib/utils'
 import {
   TransferCostFormSchema,
@@ -70,6 +70,7 @@ export function EditTransferCostModal({
         </DialogHeader>
         <p className="text-muted-foreground text-sm">
           These amounts are applied to each machine on a transfer dispatched from this warehouse.
+          The tested amount is added on top for machines that are no longer untested.
         </p>
         <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-2">
           <PriceField
@@ -81,6 +82,11 @@ export function EditTransferCostModal({
             control={form.control}
             name="processing_cost"
             label={COST_FIELD_LABELS.processing_cost}
+          />
+          <PriceField
+            control={form.control}
+            name="tested_processing_cost"
+            label={TESTED_PROCESSING_COST_LABEL}
           />
           <PriceField
             control={form.control}

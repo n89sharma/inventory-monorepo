@@ -587,6 +587,11 @@ export async function seedWarehouseTransferCost(
   })
 }
 
+export async function setAssetReadiness(assetId: number, status: string): Promise<void> {
+  const readiness = await prisma.readiness.findUniqueOrThrow({ where: { status } })
+  await prisma.asset.update({ where: { id: assetId }, data: { readiness_id: readiness.id } })
+}
+
 export async function cleanupTransactionalData(): Promise<void> {
   await prisma.warehouseTransferCost.deleteMany()
   await prisma.savedView.deleteMany()

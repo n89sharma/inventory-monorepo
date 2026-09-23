@@ -4,7 +4,12 @@ import type { TransferCosts, WarehouseTransferCost } from 'shared-types'
 import useSWR, { mutate } from 'swr'
 
 const TRANSFER_COSTS_KEY = 'transfer-costs'
-const ZERO_COSTS = { transfer_cost: 0, processing_cost: 0, other_cost: 0 } as const
+const ZERO_COSTS = {
+  transfer_cost: 0,
+  processing_cost: 0,
+  tested_processing_cost: 0,
+  other_cost: 0,
+} as const
 
 export function useWarehouseTransferCosts(): WarehouseTransferCost[] | undefined {
   const { data } = useSWR(TRANSFER_COSTS_KEY, getWarehouseTransferCosts, CATALOG_DATA_OPTIONS)
@@ -21,6 +26,7 @@ export function warehouseCostsOf(
   return {
     transfer_cost: saved.transfer_cost,
     processing_cost: saved.processing_cost,
+    tested_processing_cost: saved.tested_processing_cost,
     other_cost: saved.other_cost,
   }
 }

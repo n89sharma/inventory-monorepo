@@ -5,6 +5,8 @@ import { z } from 'zod'
 export const TransferCostsSchema = z.object({
   transfer_cost: z.number().nonnegative(),
   processing_cost: z.number().nonnegative(),
+  // Added on top of processing_cost for every machine whose readiness is not UNTESTED.
+  tested_processing_cost: z.number().nonnegative(),
   other_cost: z.number().nonnegative(),
 })
 export type TransferCosts = z.infer<typeof TransferCostsSchema>

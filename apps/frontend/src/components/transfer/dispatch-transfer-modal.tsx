@@ -10,7 +10,7 @@ import {
 } from '@/components/shadcn/dialog'
 import { PriceField } from '@/components/shared/price-field'
 import { useWarehouseTransferCosts, warehouseCostsOf } from '@/hooks/use-transfer-costs'
-import { COST_FIELD_LABELS } from '@/lib/cost-fields'
+import { COST_FIELD_LABELS, TESTED_PROCESSING_COST_LABEL } from '@/lib/cost-fields'
 import { formatUSDWithSymbol } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
 import {
@@ -29,6 +29,7 @@ import { toast } from 'sonner'
 interface DispatchTransferModalProps {
   originId: number
   assetCount: number
+  testedCount: number
   onDispatch: (costs: TransferCosts | null) => Promise<void>
 }
 
@@ -39,6 +40,7 @@ function amountOf(value: string | undefined): number {
 interface DispatchCostFormProps {
   defaultCosts: TransferCosts
   assetCount: number
+  testedCount: number
   onConfirm: (costs: TransferCosts) => Promise<void>
   onCancel: () => void
 }
@@ -46,6 +48,7 @@ interface DispatchCostFormProps {
 function DispatchCostForm({
   defaultCosts,
   assetCount,
+  testedCount,
   onConfirm,
   onCancel,
 }: DispatchCostFormProps): React.JSX.Element {
@@ -60,6 +63,7 @@ function DispatchCostForm({
     amountOf(watched.transfer_cost) +
     amountOf(watched.processing_cost) +
     amountOf(watched.other_cost)
+  const total = perMachine * assetCount + amountOf(watched.tested_processing_cost) * testedCount
 
   function onInvalidSubmit(errors: FieldErrors<TransferCostForm>) {
     toast.error(`Form has errors: ${flattenFieldErrors(errors, [])}`, { position: 'top-center' })
@@ -82,11 +86,16 @@ function DispatchCostForm({
           name="processing_cost"
           label={COST_FIELD_LABELS.processing_cost}
         />
+        <PriceField
+          control={form.control}
+          name="tested_processing_cost"
+          label={TESTED_PROCESSING_COST_LABEL}
+        />
         <PriceField control={form.control} name="other_cost" label={COST_FIELD_LABELS.other_cost} />
       </form>
       <p className="text-muted-foreground text-sm">
-        Each machine is charged {formatUSDWithSymbol(perMachine)}, adding{' '}
-        {formatUSDWithSymbol(perMachine * assetCount)} across {assetCount} machines.
+        {testedCount} of {assetCount} machines are tested. Adds {formatUSDWithSymbol(total)} across{' '}
+        {assetCount} machines.
       </p>
       <DialogFooter>
         <Button onClick={submitForm} disabled={isSubmitting} type="button">
@@ -105,6 +114,7 @@ function DispatchCostForm({
 export function DispatchTransferModal({
   originId,
   assetCount,
+  testedCount,
   onDispatch,
 }: DispatchTransferModalProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
@@ -125,13 +135,15 @@ export function DispatchTransferModal({
           <DialogTitle>Dispatch this transfer?</DialogTitle>
           <DialogDescription>
             This marks {assetCount} machine(s) as in transit and clears their location. The transfer
-            can&apos;t be edited after dispatch. These costs are added to each machine.
+            can&apos;t be edited after dispatch. These costs are added to each machine, and the
+            tested amount only to machines that are no longer untested.
           </DialogDescription>
         </DialogHeader>
         {transferCosts && (
           <DispatchCostForm
             defaultCosts={warehouseCostsOf(transferCosts, originId)}
             assetCount={assetCount}
+            testedCount={testedCount}
             onConfirm={handleConfirm}
             onCancel={() => setOpen(false)}
           />

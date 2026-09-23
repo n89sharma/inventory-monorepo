@@ -13,9 +13,11 @@ import {
   seedAssetCost,
   getAssetCost,
   seedWarehouseTransferCost,
+  setAssetReadiness,
   SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
+import type { TransferCosts } from 'shared-types'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
@@ -28,6 +30,8 @@ import {
   patchTransferNotes,
   receiveTransfer,
 } from './transferService.js'
+
+const TESTED_READINESS = 'PP_OK'
 
 async function getTransferNotes(transferNumber: string): Promise<string | null> {
   const transfer = await prisma.transfer.findUniqueOrThrow({
@@ -45,20 +49,22 @@ async function getTransferStatus(transferNumber: string): Promise<string> {
   return transfer.status
 }
 
-async function getTransferCosts(
-  transferNumber: string,
-): Promise<{
-  transfer_cost: number | null
-  processing_cost: number | null
-  other_cost: number | null
-}> {
+type TransferCostRow = Record<keyof TransferCosts, number | null>
+
+async function getTransferCosts(transferNumber: string): Promise<TransferCostRow> {
   const transfer = await prisma.transfer.findUniqueOrThrow({
     where: { transfer_number: transferNumber },
-    select: { transfer_cost: true, processing_cost: true, other_cost: true },
+    select: {
+      transfer_cost: true,
+      processing_cost: true,
+      tested_processing_cost: true,
+      other_cost: true,
+    },
   })
   return {
     transfer_cost: transfer.transfer_cost?.toNumber() ?? null,
     processing_cost: transfer.processing_cost?.toNumber() ?? null,
+    tested_processing_cost: transfer.tested_processing_cost?.toNumber() ?? null,
     other_cost: transfer.other_cost?.toNumber() ?? null,
   }
 }
@@ -193,6 +199,7 @@ describe('transferService', () => {
     expect(await getTransferCosts(transferNumber)).toEqual({
       transfer_cost: 0,
       processing_cost: 0,
+      tested_processing_cost: 0,
       other_cost: 0,
     })
   })
@@ -201,6 +208,7 @@ describe('transferService', () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
+      tested_processing_cost: 7,
       other_cost: 1,
     })
     const assets = await createArrivedAssets(refs, 2)
@@ -222,6 +230,7 @@ describe('transferService', () => {
     expect(await getTransferCosts(transferNumber)).toEqual({
       transfer_cost: 10,
       processing_cost: 4,
+      tested_processing_cost: 7,
       other_cost: 1,
     })
   })
@@ -230,6 +239,7 @@ describe('transferService', () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
+      tested_processing_cost: 7,
       other_cost: 1,
     })
     const [asset] = await createArrivedAssets(refs, 1)
@@ -242,6 +252,7 @@ describe('transferService', () => {
     await dispatchTransfer(transferNumber, refs.userId, {
       transfer_cost: 50,
       processing_cost: 0,
+      tested_processing_cost: 0,
       other_cost: 2.5,
     })
 
@@ -255,7 +266,41 @@ describe('transferService', () => {
     expect(await getTransferCosts(transferNumber)).toEqual({
       transfer_cost: 50,
       processing_cost: 0,
+      tested_processing_cost: 0,
       other_cost: 2.5,
+    })
+  })
+
+  it('dispatch adds the tested processing cost only to machines that are not untested', async () => {
+    await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
+      transfer_cost: 10,
+      processing_cost: 4,
+      tested_processing_cost: 7,
+      other_cost: 1,
+    })
+    const [untested, tested] = await createArrivedAssets(refs, 2)
+    await setAssetReadiness(tested.id, TESTED_READINESS)
+    for (const asset of [untested, tested]) await seedAssetCost(asset.id)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [untested, tested]),
+      refs.userId,
+    )
+
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    expect(await getAssetCost(untested.id)).toEqual({
+      ...SEEDED_ASSET_COST,
+      transfer_cost: 35,
+      processing_cost: 34,
+      other_cost: 6,
+      total_cost: 210,
+    })
+    expect(await getAssetCost(tested.id)).toEqual({
+      ...SEEDED_ASSET_COST,
+      transfer_cost: 35,
+      processing_cost: 41,
+      other_cost: 6,
+      total_cost: 217,
     })
   })
 
@@ -263,6 +308,7 @@ describe('transferService', () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
+      tested_processing_cost: 7,
       other_cost: 1,
     })
     const [asset] = await createArrivedAssets(refs, 1)

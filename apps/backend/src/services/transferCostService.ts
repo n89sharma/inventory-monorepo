@@ -8,12 +8,14 @@ const TRANSFER_COST_SELECT = {
   warehouse_id: true,
   transfer_cost: true,
   processing_cost: true,
+  tested_processing_cost: true,
   other_cost: true,
 } as const
 
 export type TransferCostDecimals = {
   transfer_cost: Prisma.Decimal
   processing_cost: Prisma.Decimal
+  tested_processing_cost: Prisma.Decimal
   other_cost: Prisma.Decimal
 }
 
@@ -23,6 +25,7 @@ export async function getWarehouseTransferCosts(): Promise<WarehouseTransferCost
     warehouse_id: row.warehouse_id,
     transfer_cost: decimalToNumber(row.transfer_cost) ?? 0,
     processing_cost: decimalToNumber(row.processing_cost) ?? 0,
+    tested_processing_cost: decimalToNumber(row.tested_processing_cost) ?? 0,
     other_cost: decimalToNumber(row.other_cost) ?? 0,
   }))
 }
@@ -53,8 +56,20 @@ export async function getWarehouseTransferCostDecimals(
 ): Promise<TransferCostDecimals> {
   const row = await tx.warehouseTransferCost.findUnique({
     where: { warehouse_id: warehouseId },
-    select: { transfer_cost: true, processing_cost: true, other_cost: true },
+    select: {
+      transfer_cost: true,
+      processing_cost: true,
+      tested_processing_cost: true,
+      other_cost: true,
+    },
   })
-  if (!row) return { transfer_cost: ZERO, processing_cost: ZERO, other_cost: ZERO }
+  if (!row) {
+    return {
+      transfer_cost: ZERO,
+      processing_cost: ZERO,
+      tested_processing_cost: ZERO,
+      other_cost: ZERO,
+    }
+  }
   return row
 }

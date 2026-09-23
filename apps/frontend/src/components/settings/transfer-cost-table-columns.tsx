@@ -28,6 +28,7 @@ export function createTransferCostTableColumns(
     { accessorKey: 'warehouse_label', header: 'Warehouse' },
     priceColumn('transfer_cost', 'Transfer Cost'),
     priceColumn('processing_cost', 'Processing Cost'),
+    priceColumn('tested_processing_cost', 'Tested Processing Cost'),
     priceColumn('other_cost', 'Other Cost'),
     ...(onEdit ? [createEditColumn<WarehouseTransferCostRow>(onEdit, 'Edit transfer costs')] : []),
   ]

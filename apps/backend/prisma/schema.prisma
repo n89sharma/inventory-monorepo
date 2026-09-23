@@ -326,6 +326,7 @@ model Transfer {
   created_at      DateTime
   transfer_cost   Decimal? @db.Decimal(12, 2)
   processing_cost Decimal? @db.Decimal(12, 2)
+  tested_processing_cost Decimal? @db.Decimal(12, 2)
   other_cost      Decimal? @db.Decimal(12, 2)
 
   origin          Warehouse       @relation("TransferOrigin", fields: [origin_id], references: [id])
@@ -492,6 +493,7 @@ model WarehouseTransferCost {
   warehouse_id    Int      @id
   transfer_cost   Decimal  @default(0) @db.Decimal(12, 2)
   processing_cost Decimal  @default(0) @db.Decimal(12, 2)
+  tested_processing_cost Decimal @default(0) @db.Decimal(12, 2)
   other_cost      Decimal  @default(0) @db.Decimal(12, 2)
   updated_by_id   Int
   updated_at      DateTime
