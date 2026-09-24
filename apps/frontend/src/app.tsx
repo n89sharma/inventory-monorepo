@@ -4,6 +4,7 @@ import { PostLoginLanding } from '@/components/app-layout/post-login-landing'
 import { ProtectedRoute } from '@/components/app-layout/protected-route'
 import { ErrorFallback } from '@/components/shared/error-fallback'
 import { PermissionRoute } from '@/components/shared/permission-route'
+import { WHATS_NEW_PATH } from '@/components/whats-new/whats-new-path'
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
 import { lazy, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -184,6 +185,21 @@ const UserManagementPage = lazy(() =>
 const RolesSettingsPage = lazy(() =>
   import('./components/settings/roles-settings-page').then((m) => ({
     default: m.RolesSettingsPage,
+  })),
+)
+const ReleasesSettingsPage = lazy(() =>
+  import('./components/settings/releases-settings-page').then((m) => ({
+    default: m.ReleasesSettingsPage,
+  })),
+)
+const ReleaseEditorPage = lazy(() =>
+  import('./components/settings/release-editor-page').then((m) => ({
+    default: m.ReleaseEditorPage,
+  })),
+)
+const WhatsNewPage = lazy(() =>
+  import('./components/whats-new/whats-new-page').then((m) => ({
+    default: m.WhatsNewPage,
   })),
 )
 
@@ -514,6 +530,23 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="update_users">
                           <UserManagementPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route path={WHATS_NEW_PATH} element={<WhatsNewPage />} />
+                    <Route
+                      path="/settings/releases"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <ReleasesSettingsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/releases/:releaseId"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <ReleaseEditorPage />
                         </PermissionRoute>
                       }
                     />

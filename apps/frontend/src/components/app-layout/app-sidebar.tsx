@@ -1,4 +1,5 @@
 import { UserMenuButton } from '@/components/app-layout/user-menu-button'
+import { WhatsNewSidebarItem } from '@/components/whats-new/whats-new-sidebar-item'
 import {
   Collapsible,
   CollapsibleContent,
@@ -113,6 +114,7 @@ const SEARCH_ASSETS_SUB_ITEMS = [
 const DATE_RANGE_ITEM_URLS = ['/arrivals', '/holds', '/transfers', '/departures', '/invoices']
 
 const SETTINGS_SUB_ITEMS = [
+  { title: 'Release Notes', url: '/settings/releases' },
   { title: 'Models', url: '/settings/models' },
   { title: 'Brands', url: '/settings/brands' },
   { title: 'Organizations', url: '/settings/organizations' },
@@ -413,6 +415,9 @@ export function AppSidebar(): React.JSX.Element {
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <WhatsNewSidebarItem />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <UserMenuButton />
           </SidebarMenuItem>

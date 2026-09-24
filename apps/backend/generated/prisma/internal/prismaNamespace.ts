@@ -421,6 +421,8 @@ export const ModelName = {
   File: 'File',
   Comment: 'Comment',
   User: 'User',
+  Release: 'Release',
+  ReleaseNote: 'ReleaseNote',
   SavedView: 'SavedView',
   Organization: 'Organization',
   History: 'History'
@@ -439,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "savedView" | "organization" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3181,6 +3183,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Release: {
+      payload: Prisma.$ReleasePayload<ExtArgs>
+      fields: Prisma.ReleaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReleaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReleaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        findFirst: {
+          args: Prisma.ReleaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReleaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        findMany: {
+          args: Prisma.ReleaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>[]
+        }
+        create: {
+          args: Prisma.ReleaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        createMany: {
+          args: Prisma.ReleaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReleaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>[]
+        }
+        delete: {
+          args: Prisma.ReleaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        update: {
+          args: Prisma.ReleaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        deleteMany: {
+          args: Prisma.ReleaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReleaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReleaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>[]
+        }
+        upsert: {
+          args: Prisma.ReleaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleasePayload>
+        }
+        aggregate: {
+          args: Prisma.ReleaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRelease>
+        }
+        groupBy: {
+          args: Prisma.ReleaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReleaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReleaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReleaseCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReleaseNote: {
+      payload: Prisma.$ReleaseNotePayload<ExtArgs>
+      fields: Prisma.ReleaseNoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReleaseNoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReleaseNoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        findFirst: {
+          args: Prisma.ReleaseNoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReleaseNoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        findMany: {
+          args: Prisma.ReleaseNoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>[]
+        }
+        create: {
+          args: Prisma.ReleaseNoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        createMany: {
+          args: Prisma.ReleaseNoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReleaseNoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>[]
+        }
+        delete: {
+          args: Prisma.ReleaseNoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        update: {
+          args: Prisma.ReleaseNoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        deleteMany: {
+          args: Prisma.ReleaseNoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReleaseNoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReleaseNoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>[]
+        }
+        upsert: {
+          args: Prisma.ReleaseNoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReleaseNotePayload>
+        }
+        aggregate: {
+          args: Prisma.ReleaseNoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReleaseNote>
+        }
+        groupBy: {
+          args: Prisma.ReleaseNoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReleaseNoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReleaseNoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReleaseNoteCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedView: {
       payload: Prisma.$SavedViewPayload<ExtArgs>
       fields: Prisma.SavedViewFieldRefs
@@ -3880,10 +4030,36 @@ export const UserScalarFieldEnum = {
   clerk_id: 'clerk_id',
   is_active: 'is_active',
   default_warehouse_id: 'default_warehouse_id',
-  role: 'role'
+  role: 'role',
+  last_seen_release_id: 'last_seen_release_id'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const ReleaseScalarFieldEnum = {
+  id: 'id',
+  version: 'version',
+  published_at: 'published_at',
+  created_at: 'created_at',
+  created_by_id: 'created_by_id'
+} as const
+
+export type ReleaseScalarFieldEnum = (typeof ReleaseScalarFieldEnum)[keyof typeof ReleaseScalarFieldEnum]
+
+
+export const ReleaseNoteScalarFieldEnum = {
+  id: 'id',
+  release_id: 'release_id',
+  section: 'section',
+  heading: 'heading',
+  link_area: 'link_area',
+  permission_key: 'permission_key',
+  bullets: 'bullets',
+  sort_order: 'sort_order'
+} as const
+
+export type ReleaseNoteScalarFieldEnum = (typeof ReleaseNoteScalarFieldEnum)[keyof typeof ReleaseNoteScalarFieldEnum]
 
 
 export const SavedViewScalarFieldEnum = {
@@ -4230,6 +4406,8 @@ export type GlobalOmitConfig = {
   file?: Prisma.FileOmit
   comment?: Prisma.CommentOmit
   user?: Prisma.UserOmit
+  release?: Prisma.ReleaseOmit
+  releaseNote?: Prisma.ReleaseNoteOmit
   savedView?: Prisma.SavedViewOmit
   organization?: Prisma.OrganizationOmit
   history?: Prisma.HistoryOmit

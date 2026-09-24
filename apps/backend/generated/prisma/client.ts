@@ -227,6 +227,16 @@ export type Comment = Prisma.CommentModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model Release
+ * 
+ */
+export type Release = Prisma.ReleaseModel
+/**
+ * Model ReleaseNote
+ * 
+ */
+export type ReleaseNote = Prisma.ReleaseNoteModel
+/**
  * Model SavedView
  * 
  */

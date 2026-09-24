@@ -151,11 +151,13 @@ export type PermissionWhereInput = {
   NOT?: Prisma.PermissionWhereInput | Prisma.PermissionWhereInput[]
   key?: Prisma.StringFilter<"Permission"> | string
   roles?: Prisma.RolePermissionListRelationFilter
+  release_notes?: Prisma.ReleaseNoteListRelationFilter
 }
 
 export type PermissionOrderByWithRelationInput = {
   key?: Prisma.SortOrder
   roles?: Prisma.RolePermissionOrderByRelationAggregateInput
+  release_notes?: Prisma.ReleaseNoteOrderByRelationAggregateInput
 }
 
 export type PermissionWhereUniqueInput = Prisma.AtLeast<{
@@ -164,6 +166,7 @@ export type PermissionWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PermissionWhereInput[]
   NOT?: Prisma.PermissionWhereInput | Prisma.PermissionWhereInput[]
   roles?: Prisma.RolePermissionListRelationFilter
+  release_notes?: Prisma.ReleaseNoteListRelationFilter
 }, "key">
 
 export type PermissionOrderByWithAggregationInput = {
@@ -183,21 +186,25 @@ export type PermissionScalarWhereWithAggregatesInput = {
 export type PermissionCreateInput = {
   key: string
   roles?: Prisma.RolePermissionCreateNestedManyWithoutPermissionInput
+  release_notes?: Prisma.ReleaseNoteCreateNestedManyWithoutPermissionInput
 }
 
 export type PermissionUncheckedCreateInput = {
   key: string
   roles?: Prisma.RolePermissionUncheckedCreateNestedManyWithoutPermissionInput
+  release_notes?: Prisma.ReleaseNoteUncheckedCreateNestedManyWithoutPermissionInput
 }
 
 export type PermissionUpdateInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.RolePermissionUpdateManyWithoutPermissionNestedInput
+  release_notes?: Prisma.ReleaseNoteUpdateManyWithoutPermissionNestedInput
 }
 
 export type PermissionUncheckedUpdateInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   roles?: Prisma.RolePermissionUncheckedUpdateManyWithoutPermissionNestedInput
+  release_notes?: Prisma.ReleaseNoteUncheckedUpdateManyWithoutPermissionNestedInput
 }
 
 export type PermissionCreateManyInput = {
@@ -229,6 +236,11 @@ export type PermissionScalarRelationFilter = {
   isNot?: Prisma.PermissionWhereInput
 }
 
+export type PermissionNullableScalarRelationFilter = {
+  is?: Prisma.PermissionWhereInput | null
+  isNot?: Prisma.PermissionWhereInput | null
+}
+
 export type PermissionCreateNestedOneWithoutRolesInput = {
   create?: Prisma.XOR<Prisma.PermissionCreateWithoutRolesInput, Prisma.PermissionUncheckedCreateWithoutRolesInput>
   connectOrCreate?: Prisma.PermissionCreateOrConnectWithoutRolesInput
@@ -243,12 +255,30 @@ export type PermissionUpdateOneRequiredWithoutRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PermissionUpdateToOneWithWhereWithoutRolesInput, Prisma.PermissionUpdateWithoutRolesInput>, Prisma.PermissionUncheckedUpdateWithoutRolesInput>
 }
 
+export type PermissionCreateNestedOneWithoutRelease_notesInput = {
+  create?: Prisma.XOR<Prisma.PermissionCreateWithoutRelease_notesInput, Prisma.PermissionUncheckedCreateWithoutRelease_notesInput>
+  connectOrCreate?: Prisma.PermissionCreateOrConnectWithoutRelease_notesInput
+  connect?: Prisma.PermissionWhereUniqueInput
+}
+
+export type PermissionUpdateOneWithoutRelease_notesNestedInput = {
+  create?: Prisma.XOR<Prisma.PermissionCreateWithoutRelease_notesInput, Prisma.PermissionUncheckedCreateWithoutRelease_notesInput>
+  connectOrCreate?: Prisma.PermissionCreateOrConnectWithoutRelease_notesInput
+  upsert?: Prisma.PermissionUpsertWithoutRelease_notesInput
+  disconnect?: Prisma.PermissionWhereInput | boolean
+  delete?: Prisma.PermissionWhereInput | boolean
+  connect?: Prisma.PermissionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PermissionUpdateToOneWithWhereWithoutRelease_notesInput, Prisma.PermissionUpdateWithoutRelease_notesInput>, Prisma.PermissionUncheckedUpdateWithoutRelease_notesInput>
+}
+
 export type PermissionCreateWithoutRolesInput = {
   key: string
+  release_notes?: Prisma.ReleaseNoteCreateNestedManyWithoutPermissionInput
 }
 
 export type PermissionUncheckedCreateWithoutRolesInput = {
   key: string
+  release_notes?: Prisma.ReleaseNoteUncheckedCreateNestedManyWithoutPermissionInput
 }
 
 export type PermissionCreateOrConnectWithoutRolesInput = {
@@ -269,10 +299,48 @@ export type PermissionUpdateToOneWithWhereWithoutRolesInput = {
 
 export type PermissionUpdateWithoutRolesInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  release_notes?: Prisma.ReleaseNoteUpdateManyWithoutPermissionNestedInput
 }
 
 export type PermissionUncheckedUpdateWithoutRolesInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  release_notes?: Prisma.ReleaseNoteUncheckedUpdateManyWithoutPermissionNestedInput
+}
+
+export type PermissionCreateWithoutRelease_notesInput = {
+  key: string
+  roles?: Prisma.RolePermissionCreateNestedManyWithoutPermissionInput
+}
+
+export type PermissionUncheckedCreateWithoutRelease_notesInput = {
+  key: string
+  roles?: Prisma.RolePermissionUncheckedCreateNestedManyWithoutPermissionInput
+}
+
+export type PermissionCreateOrConnectWithoutRelease_notesInput = {
+  where: Prisma.PermissionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PermissionCreateWithoutRelease_notesInput, Prisma.PermissionUncheckedCreateWithoutRelease_notesInput>
+}
+
+export type PermissionUpsertWithoutRelease_notesInput = {
+  update: Prisma.XOR<Prisma.PermissionUpdateWithoutRelease_notesInput, Prisma.PermissionUncheckedUpdateWithoutRelease_notesInput>
+  create: Prisma.XOR<Prisma.PermissionCreateWithoutRelease_notesInput, Prisma.PermissionUncheckedCreateWithoutRelease_notesInput>
+  where?: Prisma.PermissionWhereInput
+}
+
+export type PermissionUpdateToOneWithWhereWithoutRelease_notesInput = {
+  where?: Prisma.PermissionWhereInput
+  data: Prisma.XOR<Prisma.PermissionUpdateWithoutRelease_notesInput, Prisma.PermissionUncheckedUpdateWithoutRelease_notesInput>
+}
+
+export type PermissionUpdateWithoutRelease_notesInput = {
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  roles?: Prisma.RolePermissionUpdateManyWithoutPermissionNestedInput
+}
+
+export type PermissionUncheckedUpdateWithoutRelease_notesInput = {
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  roles?: Prisma.RolePermissionUncheckedUpdateManyWithoutPermissionNestedInput
 }
 
 
@@ -282,10 +350,12 @@ export type PermissionUncheckedUpdateWithoutRolesInput = {
 
 export type PermissionCountOutputType = {
   roles: number
+  release_notes: number
 }
 
 export type PermissionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   roles?: boolean | PermissionCountOutputTypeCountRolesArgs
+  release_notes?: boolean | PermissionCountOutputTypeCountRelease_notesArgs
 }
 
 /**
@@ -305,10 +375,18 @@ export type PermissionCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Type
   where?: Prisma.RolePermissionWhereInput
 }
 
+/**
+ * PermissionCountOutputType without action
+ */
+export type PermissionCountOutputTypeCountRelease_notesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReleaseNoteWhereInput
+}
+
 
 export type PermissionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   key?: boolean
   roles?: boolean | Prisma.Permission$rolesArgs<ExtArgs>
+  release_notes?: boolean | Prisma.Permission$release_notesArgs<ExtArgs>
   _count?: boolean | Prisma.PermissionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["permission"]>
 
@@ -327,6 +405,7 @@ export type PermissionSelectScalar = {
 export type PermissionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"key", ExtArgs["result"]["permission"]>
 export type PermissionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   roles?: boolean | Prisma.Permission$rolesArgs<ExtArgs>
+  release_notes?: boolean | Prisma.Permission$release_notesArgs<ExtArgs>
   _count?: boolean | Prisma.PermissionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PermissionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -336,6 +415,7 @@ export type $PermissionPayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "Permission"
   objects: {
     roles: Prisma.$RolePermissionPayload<ExtArgs>[]
+    release_notes: Prisma.$ReleaseNotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     key: string
@@ -734,6 +814,7 @@ readonly fields: PermissionFieldRefs;
 export interface Prisma__PermissionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   roles<T extends Prisma.Permission$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Permission$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  release_notes<T extends Prisma.Permission$release_notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Permission$release_notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReleaseNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1178,6 +1259,30 @@ export type Permission$rolesArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.RolePermissionScalarFieldEnum | Prisma.RolePermissionScalarFieldEnum[]
+}
+
+/**
+ * Permission.release_notes
+ */
+export type Permission$release_notesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReleaseNote
+   */
+  select?: Prisma.ReleaseNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReleaseNote
+   */
+  omit?: Prisma.ReleaseNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReleaseNoteInclude<ExtArgs> | null
+  where?: Prisma.ReleaseNoteWhereInput
+  orderBy?: Prisma.ReleaseNoteOrderByWithRelationInput | Prisma.ReleaseNoteOrderByWithRelationInput[]
+  cursor?: Prisma.ReleaseNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReleaseNoteScalarFieldEnum | Prisma.ReleaseNoteScalarFieldEnum[]
 }
 
 /**

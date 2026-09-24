@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/components/app-layout/app-sidebar'
 import { Header } from '@/components/app-layout/header'
 import { SidebarProvider } from '@/components/shadcn/sidebar'
+import { WhatsNewDialog } from '@/components/whats-new/whats-new-dialog'
 import { Toaster } from 'sonner'
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </a>
       <AppSidebar />
       <Toaster />
+      <WhatsNewDialog />
       <div className="flex h-svh flex-col w-full min-w-0">
         <Header className="shrink-0 bg-background" />
         {/* The app's only scrollport. Grid pages fill it exactly and scroll inside their own

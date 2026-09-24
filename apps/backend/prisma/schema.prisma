@@ -55,8 +55,9 @@ model Role {
 }
 
 model Permission {
-  key   String           @id
-  roles RolePermission[]
+  key           String           @id
+  roles         RolePermission[]
+  release_notes ReleaseNote[]
 }
 
 model RolePermission {
@@ -583,16 +584,19 @@ model Comment {
 }
 
 model User {
-  id                   Int     @id @default(autoincrement())
-  name                 String  @unique @db.Text
-  email                String? @unique @db.Text
-  clerk_id             String? @unique @db.Text
-  is_active            Boolean @default(false)
-  default_warehouse_id Int?
-  role                 String?
+  id                    Int     @id @default(autoincrement())
+  name                  String  @unique @db.Text
+  email                 String? @unique @db.Text
+  clerk_id              String? @unique @db.Text
+  is_active             Boolean @default(false)
+  default_warehouse_id  Int?
+  role                  String?
+  last_seen_release_id  Int?
 
   assigned_role        Role?               @relation(fields: [role], references: [code], onDelete: Restrict, onUpdate: Restrict)
   default_warehouse    Warehouse?          @relation(fields: [default_warehouse_id], references: [id])
+  last_seen_release    Release?            @relation("UserLastSeenRelease", fields: [last_seen_release_id], references: [id], onDelete: SetNull)
+  releases_created     Release[]           @relation("ReleaseCreatedBy")
   asset_errors_added   AssetError[]        @relation("ErrorAddedBy")
   asset_errors_fixed   AssetError[]        @relation("ErrorFixedBy")
   transfers            Transfer[]
@@ -610,6 +614,38 @@ model User {
   store_asset_parts    AssetStorePart[]
   savedViews           SavedView[]
   transfer_costs_set   WarehouseTransferCost[]
+}
+
+model Release {
+  id            Int       @id @default(autoincrement())
+  version       String?   @db.VarChar(50)
+  published_at  DateTime?
+  created_at    DateTime  @default(now())
+  created_by_id Int
+
+  created_by User          @relation("ReleaseCreatedBy", fields: [created_by_id], references: [id])
+  notes      ReleaseNote[]
+  seen_by    User[]        @relation("UserLastSeenRelease")
+
+  @@index([published_at(sort: Desc)])
+  @@index([created_by_id])
+}
+
+model ReleaseNote {
+  id             Int      @id @default(autoincrement())
+  release_id     Int
+  section        String   @db.VarChar(20)
+  heading        String?  @db.Text
+  link_area      String?  @db.VarChar(40)
+  permission_key String?
+  bullets        String[] @default([])
+  sort_order     Int
+
+  release    Release     @relation(fields: [release_id], references: [id], onDelete: Cascade)
+  permission Permission? @relation(fields: [permission_key], references: [key], onDelete: SetNull)
+
+  @@index([release_id, sort_order])
+  @@index([permission_key])
 }
 
 model SavedView {

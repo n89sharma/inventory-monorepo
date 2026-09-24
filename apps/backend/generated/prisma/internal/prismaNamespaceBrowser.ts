@@ -88,6 +88,8 @@ export const ModelName = {
   File: 'File',
   Comment: 'Comment',
   User: 'User',
+  Release: 'Release',
+  ReleaseNote: 'ReleaseNote',
   SavedView: 'SavedView',
   Organization: 'Organization',
   History: 'History'
@@ -543,10 +545,36 @@ export const UserScalarFieldEnum = {
   clerk_id: 'clerk_id',
   is_active: 'is_active',
   default_warehouse_id: 'default_warehouse_id',
-  role: 'role'
+  role: 'role',
+  last_seen_release_id: 'last_seen_release_id'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const ReleaseScalarFieldEnum = {
+  id: 'id',
+  version: 'version',
+  published_at: 'published_at',
+  created_at: 'created_at',
+  created_by_id: 'created_by_id'
+} as const
+
+export type ReleaseScalarFieldEnum = (typeof ReleaseScalarFieldEnum)[keyof typeof ReleaseScalarFieldEnum]
+
+
+export const ReleaseNoteScalarFieldEnum = {
+  id: 'id',
+  release_id: 'release_id',
+  section: 'section',
+  heading: 'heading',
+  link_area: 'link_area',
+  permission_key: 'permission_key',
+  bullets: 'bullets',
+  sort_order: 'sort_order'
+} as const
+
+export type ReleaseNoteScalarFieldEnum = (typeof ReleaseNoteScalarFieldEnum)[keyof typeof ReleaseNoteScalarFieldEnum]
 
 
 export const SavedViewScalarFieldEnum = {

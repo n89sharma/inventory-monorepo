@@ -29,11 +29,13 @@ export type AggregateUser = {
 export type UserAvgAggregateOutputType = {
   id: number | null
   default_warehouse_id: number | null
+  last_seen_release_id: number | null
 }
 
 export type UserSumAggregateOutputType = {
   id: number | null
   default_warehouse_id: number | null
+  last_seen_release_id: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -44,6 +46,7 @@ export type UserMinAggregateOutputType = {
   is_active: boolean | null
   default_warehouse_id: number | null
   role: string | null
+  last_seen_release_id: number | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -54,6 +57,7 @@ export type UserMaxAggregateOutputType = {
   is_active: boolean | null
   default_warehouse_id: number | null
   role: string | null
+  last_seen_release_id: number | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -64,6 +68,7 @@ export type UserCountAggregateOutputType = {
   is_active: number
   default_warehouse_id: number
   role: number
+  last_seen_release_id: number
   _all: number
 }
 
@@ -71,11 +76,13 @@ export type UserCountAggregateOutputType = {
 export type UserAvgAggregateInputType = {
   id?: true
   default_warehouse_id?: true
+  last_seen_release_id?: true
 }
 
 export type UserSumAggregateInputType = {
   id?: true
   default_warehouse_id?: true
+  last_seen_release_id?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -86,6 +93,7 @@ export type UserMinAggregateInputType = {
   is_active?: true
   default_warehouse_id?: true
   role?: true
+  last_seen_release_id?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -96,6 +104,7 @@ export type UserMaxAggregateInputType = {
   is_active?: true
   default_warehouse_id?: true
   role?: true
+  last_seen_release_id?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -106,6 +115,7 @@ export type UserCountAggregateInputType = {
   is_active?: true
   default_warehouse_id?: true
   role?: true
+  last_seen_release_id?: true
   _all?: true
 }
 
@@ -203,6 +213,7 @@ export type UserGroupByOutputType = {
   is_active: boolean
   default_warehouse_id: number | null
   role: string | null
+  last_seen_release_id: number | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -236,8 +247,11 @@ export type UserWhereInput = {
   is_active?: Prisma.BoolFilter<"User"> | boolean
   default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  last_seen_release_id?: Prisma.IntNullableFilter<"User"> | number | null
   assigned_role?: Prisma.XOR<Prisma.RoleNullableScalarRelationFilter, Prisma.RoleWhereInput> | null
   default_warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  last_seen_release?: Prisma.XOR<Prisma.ReleaseNullableScalarRelationFilter, Prisma.ReleaseWhereInput> | null
+  releases_created?: Prisma.ReleaseListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
   asset_errors_fixed?: Prisma.AssetErrorListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
@@ -265,8 +279,11 @@ export type UserOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrderInput | Prisma.SortOrder
   assigned_role?: Prisma.RoleOrderByWithRelationInput
   default_warehouse?: Prisma.WarehouseOrderByWithRelationInput
+  last_seen_release?: Prisma.ReleaseOrderByWithRelationInput
+  releases_created?: Prisma.ReleaseOrderByRelationAggregateInput
   asset_errors_added?: Prisma.AssetErrorOrderByRelationAggregateInput
   asset_errors_fixed?: Prisma.AssetErrorOrderByRelationAggregateInput
   transfers?: Prisma.TransferOrderByRelationAggregateInput
@@ -297,8 +314,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   is_active?: Prisma.BoolFilter<"User"> | boolean
   default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  last_seen_release_id?: Prisma.IntNullableFilter<"User"> | number | null
   assigned_role?: Prisma.XOR<Prisma.RoleNullableScalarRelationFilter, Prisma.RoleWhereInput> | null
   default_warehouse?: Prisma.XOR<Prisma.WarehouseNullableScalarRelationFilter, Prisma.WarehouseWhereInput> | null
+  last_seen_release?: Prisma.XOR<Prisma.ReleaseNullableScalarRelationFilter, Prisma.ReleaseWhereInput> | null
+  releases_created?: Prisma.ReleaseListRelationFilter
   asset_errors_added?: Prisma.AssetErrorListRelationFilter
   asset_errors_fixed?: Prisma.AssetErrorListRelationFilter
   transfers?: Prisma.TransferListRelationFilter
@@ -326,6 +346,7 @@ export type UserOrderByWithAggregationInput = {
   is_active?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -344,6 +365,7 @@ export type UserScalarWhereWithAggregatesInput = {
   is_active?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   default_warehouse_id?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   role?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  last_seen_release_id?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
 }
 
 export type UserCreateInput = {
@@ -353,6 +375,8 @@ export type UserCreateInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -380,6 +404,8 @@ export type UserUncheckedCreateInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -406,6 +432,8 @@ export type UserUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -433,6 +461,8 @@ export type UserUncheckedUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -460,6 +490,7 @@ export type UserCreateManyInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -477,6 +508,7 @@ export type UserUncheckedUpdateManyInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type UserListRelationFilter = {
@@ -507,11 +539,13 @@ export type UserCountOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -522,6 +556,7 @@ export type UserMaxOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -532,11 +567,13 @@ export type UserMinOrderByAggregateInput = {
   is_active?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   default_warehouse_id?: Prisma.SortOrder
+  last_seen_release_id?: Prisma.SortOrder
 }
 
 export type UserCreateNestedManyWithoutAssigned_roleInput = {
@@ -841,6 +878,62 @@ export type UserUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsInput, Prisma.UserUpdateWithoutCommentsInput>, Prisma.UserUncheckedUpdateWithoutCommentsInput>
 }
 
+export type UserCreateNestedOneWithoutReleases_createdInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReleases_createdInput, Prisma.UserUncheckedCreateWithoutReleases_createdInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReleases_createdInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedManyWithoutLast_seen_releaseInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput> | Prisma.UserCreateWithoutLast_seen_releaseInput[] | Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput | Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput[]
+  createMany?: Prisma.UserCreateManyLast_seen_releaseInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutLast_seen_releaseInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput> | Prisma.UserCreateWithoutLast_seen_releaseInput[] | Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput | Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput[]
+  createMany?: Prisma.UserCreateManyLast_seen_releaseInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateOneRequiredWithoutReleases_createdNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReleases_createdInput, Prisma.UserUncheckedCreateWithoutReleases_createdInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReleases_createdInput
+  upsert?: Prisma.UserUpsertWithoutReleases_createdInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReleases_createdInput, Prisma.UserUpdateWithoutReleases_createdInput>, Prisma.UserUncheckedUpdateWithoutReleases_createdInput>
+}
+
+export type UserUpdateManyWithoutLast_seen_releaseNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput> | Prisma.UserCreateWithoutLast_seen_releaseInput[] | Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput | Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput | Prisma.UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput[]
+  createMany?: Prisma.UserCreateManyLast_seen_releaseInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutLast_seen_releaseInput | Prisma.UserUpdateWithWhereUniqueWithoutLast_seen_releaseInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutLast_seen_releaseInput | Prisma.UserUpdateManyWithWhereWithoutLast_seen_releaseInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutLast_seen_releaseNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput> | Prisma.UserCreateWithoutLast_seen_releaseInput[] | Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput | Prisma.UserCreateOrConnectWithoutLast_seen_releaseInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput | Prisma.UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput[]
+  createMany?: Prisma.UserCreateManyLast_seen_releaseInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutLast_seen_releaseInput | Prisma.UserUpdateWithWhereUniqueWithoutLast_seen_releaseInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutLast_seen_releaseInput | Prisma.UserUpdateManyWithWhereWithoutLast_seen_releaseInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
 export type UserCreateNestedOneWithoutSavedViewsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSavedViewsInput, Prisma.UserUncheckedCreateWithoutSavedViewsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedViewsInput
@@ -875,6 +968,8 @@ export type UserCreateWithoutAssigned_roleInput = {
   clerk_id?: string | null
   is_active?: boolean
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -901,6 +996,8 @@ export type UserUncheckedCreateWithoutAssigned_roleInput = {
   clerk_id?: string | null
   is_active?: boolean
   default_warehouse_id?: number | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -957,6 +1054,7 @@ export type UserScalarWhereInput = {
   is_active?: Prisma.BoolFilter<"User"> | boolean
   default_warehouse_id?: Prisma.IntNullableFilter<"User"> | number | null
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  last_seen_release_id?: Prisma.IntNullableFilter<"User"> | number | null
 }
 
 export type UserCreateWithoutAsset_errors_addedInput = {
@@ -966,6 +1064,8 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
@@ -992,6 +1092,8 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1022,6 +1124,8 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
@@ -1048,6 +1152,8 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1089,6 +1195,8 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
@@ -1115,6 +1223,8 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1151,6 +1261,8 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
@@ -1177,6 +1289,8 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1202,6 +1316,8 @@ export type UserCreateWithoutStore_transactionsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1228,6 +1344,8 @@ export type UserUncheckedCreateWithoutStore_transactionsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1269,6 +1387,8 @@ export type UserUpdateWithoutStore_transactionsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -1295,6 +1415,8 @@ export type UserUncheckedUpdateWithoutStore_transactionsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1320,6 +1442,8 @@ export type UserCreateWithoutStore_asset_partsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1346,6 +1470,8 @@ export type UserUncheckedCreateWithoutStore_asset_partsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1387,6 +1513,8 @@ export type UserUpdateWithoutStore_asset_partsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -1413,6 +1541,8 @@ export type UserUncheckedUpdateWithoutStore_asset_partsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1438,6 +1568,8 @@ export type UserCreateWithoutSalvaged_asset_partsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1464,6 +1596,8 @@ export type UserUncheckedCreateWithoutSalvaged_asset_partsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1505,6 +1639,8 @@ export type UserUpdateWithoutSalvaged_asset_partsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -1531,6 +1667,8 @@ export type UserUncheckedUpdateWithoutSalvaged_asset_partsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1556,6 +1694,8 @@ export type UserCreateWithoutTransfersInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
@@ -1582,6 +1722,8 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1623,6 +1765,8 @@ export type UserUpdateWithoutTransfersInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
@@ -1649,6 +1793,8 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1674,6 +1820,8 @@ export type UserCreateWithoutArrivalsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1700,6 +1848,8 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1741,6 +1891,8 @@ export type UserUpdateWithoutArrivalsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -1767,6 +1919,8 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1792,6 +1946,8 @@ export type UserCreateWithoutDeparturesInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1818,6 +1974,8 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1848,6 +2006,8 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -1874,6 +2034,8 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -1915,6 +2077,8 @@ export type UserUpdateWithoutDeparturesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -1941,6 +2105,8 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1977,6 +2143,8 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2003,6 +2171,8 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2028,6 +2198,8 @@ export type UserCreateWithoutHolds_createdInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2054,6 +2226,8 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2084,6 +2258,8 @@ export type UserCreateWithoutHolds_forInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2110,6 +2286,8 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2151,6 +2329,8 @@ export type UserUpdateWithoutHolds_createdInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2177,6 +2357,8 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2213,6 +2395,8 @@ export type UserUpdateWithoutHolds_forInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2239,6 +2423,8 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2264,6 +2450,8 @@ export type UserCreateWithoutInvoices_updatedInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2290,6 +2478,8 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2331,6 +2521,8 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2357,6 +2549,8 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2381,6 +2575,8 @@ export type UserCreateWithoutDefault_warehouseInput = {
   clerk_id?: string | null
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2407,6 +2603,8 @@ export type UserUncheckedCreateWithoutDefault_warehouseInput = {
   clerk_id?: string | null
   is_active?: boolean
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2459,6 +2657,8 @@ export type UserCreateWithoutTransfer_costs_setInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2485,6 +2685,8 @@ export type UserUncheckedCreateWithoutTransfer_costs_setInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2526,6 +2728,8 @@ export type UserUpdateWithoutTransfer_costs_setInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2552,6 +2756,8 @@ export type UserUncheckedUpdateWithoutTransfer_costs_setInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2577,6 +2783,8 @@ export type UserCreateWithoutFilesInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2603,6 +2811,8 @@ export type UserUncheckedCreateWithoutFilesInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2644,6 +2854,8 @@ export type UserUpdateWithoutFilesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2670,6 +2882,8 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2695,6 +2909,8 @@ export type UserCreateWithoutCommentsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2721,6 +2937,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2762,6 +2980,8 @@ export type UserUpdateWithoutCommentsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2788,6 +3008,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2806,6 +3028,213 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
 }
 
+export type UserCreateWithoutReleases_createdInput = {
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+  default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserUncheckedCreateWithoutReleases_createdInput = {
+  id?: number
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  default_warehouse_id?: number | null
+  role?: string | null
+  last_seen_release_id?: number | null
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserCreateOrConnectWithoutReleases_createdInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReleases_createdInput, Prisma.UserUncheckedCreateWithoutReleases_createdInput>
+}
+
+export type UserCreateWithoutLast_seen_releaseInput = {
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+  default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserUncheckedCreateWithoutLast_seen_releaseInput = {
+  id?: number
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  default_warehouse_id?: number | null
+  role?: string | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserCreateOrConnectWithoutLast_seen_releaseInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput>
+}
+
+export type UserCreateManyLast_seen_releaseInputEnvelope = {
+  data: Prisma.UserCreateManyLast_seen_releaseInput | Prisma.UserCreateManyLast_seen_releaseInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithoutReleases_createdInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReleases_createdInput, Prisma.UserUncheckedUpdateWithoutReleases_createdInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReleases_createdInput, Prisma.UserUncheckedCreateWithoutReleases_createdInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReleases_createdInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReleases_createdInput, Prisma.UserUncheckedUpdateWithoutReleases_createdInput>
+}
+
+export type UserUpdateWithoutReleases_createdInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
+  default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReleases_createdInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLast_seen_releaseInput, Prisma.UserUncheckedUpdateWithoutLast_seen_releaseInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLast_seen_releaseInput, Prisma.UserUncheckedCreateWithoutLast_seen_releaseInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutLast_seen_releaseInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLast_seen_releaseInput, Prisma.UserUncheckedUpdateWithoutLast_seen_releaseInput>
+}
+
+export type UserUpdateManyWithWhereWithoutLast_seen_releaseInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutLast_seen_releaseInput>
+}
+
 export type UserCreateWithoutSavedViewsInput = {
   name: string
   email?: string | null
@@ -2813,6 +3242,8 @@ export type UserCreateWithoutSavedViewsInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2839,6 +3270,8 @@ export type UserUncheckedCreateWithoutSavedViewsInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2880,6 +3313,8 @@ export type UserUpdateWithoutSavedViewsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -2906,6 +3341,8 @@ export type UserUncheckedUpdateWithoutSavedViewsInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -2931,6 +3368,8 @@ export type UserCreateWithoutHistoryInput = {
   is_active?: boolean
   assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
   default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
@@ -2957,6 +3396,8 @@ export type UserUncheckedCreateWithoutHistoryInput = {
   is_active?: boolean
   default_warehouse_id?: number | null
   role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
   asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
   transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
@@ -2998,6 +3439,8 @@ export type UserUpdateWithoutHistoryInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -3024,6 +3467,8 @@ export type UserUncheckedUpdateWithoutHistoryInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -3049,6 +3494,7 @@ export type UserCreateManyAssigned_roleInput = {
   clerk_id?: string | null
   is_active?: boolean
   default_warehouse_id?: number | null
+  last_seen_release_id?: number | null
 }
 
 export type UserUpdateWithoutAssigned_roleInput = {
@@ -3057,6 +3503,8 @@ export type UserUpdateWithoutAssigned_roleInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -3083,6 +3531,8 @@ export type UserUncheckedUpdateWithoutAssigned_roleInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -3109,6 +3559,7 @@ export type UserUncheckedUpdateManyWithoutAssigned_roleInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type UserCreateManyDefault_warehouseInput = {
@@ -3118,6 +3569,7 @@ export type UserCreateManyDefault_warehouseInput = {
   clerk_id?: string | null
   is_active?: boolean
   role?: string | null
+  last_seen_release_id?: number | null
 }
 
 export type UserUpdateWithoutDefault_warehouseInput = {
@@ -3126,6 +3578,8 @@ export type UserUpdateWithoutDefault_warehouseInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
@@ -3152,6 +3606,8 @@ export type UserUncheckedUpdateWithoutDefault_warehouseInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
   transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -3178,6 +3634,82 @@ export type UserUncheckedUpdateManyWithoutDefault_warehouseInput = {
   clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type UserCreateManyLast_seen_releaseInput = {
+  id?: number
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  default_warehouse_id?: number | null
+  role?: string | null
+}
+
+export type UserUpdateWithoutLast_seen_releaseInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
+  default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLast_seen_releaseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutLast_seen_releaseInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -3186,6 +3718,7 @@ export type UserUncheckedUpdateManyWithoutDefault_warehouseInput = {
  */
 
 export type UserCountOutputType = {
+  releases_created: number
   asset_errors_added: number
   asset_errors_fixed: number
   transfers: number
@@ -3206,6 +3739,7 @@ export type UserCountOutputType = {
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  releases_created?: boolean | UserCountOutputTypeCountReleases_createdArgs
   asset_errors_added?: boolean | UserCountOutputTypeCountAsset_errors_addedArgs
   asset_errors_fixed?: boolean | UserCountOutputTypeCountAsset_errors_fixedArgs
   transfers?: boolean | UserCountOutputTypeCountTransfersArgs
@@ -3233,6 +3767,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReleases_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReleaseWhereInput
 }
 
 /**
@@ -3363,8 +3904,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   is_active?: boolean
   default_warehouse_id?: boolean
   role?: boolean
+  last_seen_release_id?: boolean
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
+  releases_created?: boolean | Prisma.User$releases_createdArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
   asset_errors_fixed?: boolean | Prisma.User$asset_errors_fixedArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
@@ -3393,8 +3937,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   is_active?: boolean
   default_warehouse_id?: boolean
   role?: boolean
+  last_seen_release_id?: boolean
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3405,8 +3951,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   is_active?: boolean
   default_warehouse_id?: boolean
   role?: boolean
+  last_seen_release_id?: boolean
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -3417,12 +3965,15 @@ export type UserSelectScalar = {
   is_active?: boolean
   default_warehouse_id?: boolean
   role?: boolean
+  last_seen_release_id?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "clerk_id" | "is_active" | "default_warehouse_id" | "role", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "clerk_id" | "is_active" | "default_warehouse_id" | "role" | "last_seen_release_id", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
+  releases_created?: boolean | Prisma.User$releases_createdArgs<ExtArgs>
   asset_errors_added?: boolean | Prisma.User$asset_errors_addedArgs<ExtArgs>
   asset_errors_fixed?: boolean | Prisma.User$asset_errors_fixedArgs<ExtArgs>
   transfers?: boolean | Prisma.User$transfersArgs<ExtArgs>
@@ -3445,10 +3996,12 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assigned_role?: boolean | Prisma.User$assigned_roleArgs<ExtArgs>
   default_warehouse?: boolean | Prisma.User$default_warehouseArgs<ExtArgs>
+  last_seen_release?: boolean | Prisma.User$last_seen_releaseArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3456,6 +4009,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     assigned_role: Prisma.$RolePayload<ExtArgs> | null
     default_warehouse: Prisma.$WarehousePayload<ExtArgs> | null
+    last_seen_release: Prisma.$ReleasePayload<ExtArgs> | null
+    releases_created: Prisma.$ReleasePayload<ExtArgs>[]
     asset_errors_added: Prisma.$AssetErrorPayload<ExtArgs>[]
     asset_errors_fixed: Prisma.$AssetErrorPayload<ExtArgs>[]
     transfers: Prisma.$TransferPayload<ExtArgs>[]
@@ -3482,6 +4037,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     is_active: boolean
     default_warehouse_id: number | null
     role: string | null
+    last_seen_release_id: number | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -3878,6 +4434,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   assigned_role<T extends Prisma.User$assigned_roleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assigned_roleArgs<ExtArgs>>): Prisma.Prisma__RoleClient<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   default_warehouse<T extends Prisma.User$default_warehouseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$default_warehouseArgs<ExtArgs>>): Prisma.Prisma__WarehouseClient<runtime.Types.Result.GetResult<Prisma.$WarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  last_seen_release<T extends Prisma.User$last_seen_releaseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$last_seen_releaseArgs<ExtArgs>>): Prisma.Prisma__ReleaseClient<runtime.Types.Result.GetResult<Prisma.$ReleasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  releases_created<T extends Prisma.User$releases_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$releases_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReleasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors_added<T extends Prisma.User$asset_errors_addedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asset_errors_addedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   asset_errors_fixed<T extends Prisma.User$asset_errors_fixedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$asset_errors_fixedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetErrorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfers<T extends Prisma.User$transfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3931,6 +4489,7 @@ export interface UserFieldRefs {
   readonly is_active: Prisma.FieldRef<"User", 'Boolean'>
   readonly default_warehouse_id: Prisma.FieldRef<"User", 'Int'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly last_seen_release_id: Prisma.FieldRef<"User", 'Int'>
 }
     
 
@@ -4367,6 +4926,49 @@ export type User$default_warehouseArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.WarehouseInclude<ExtArgs> | null
   where?: Prisma.WarehouseWhereInput
+}
+
+/**
+ * User.last_seen_release
+ */
+export type User$last_seen_releaseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Release
+   */
+  select?: Prisma.ReleaseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Release
+   */
+  omit?: Prisma.ReleaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReleaseInclude<ExtArgs> | null
+  where?: Prisma.ReleaseWhereInput
+}
+
+/**
+ * User.releases_created
+ */
+export type User$releases_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Release
+   */
+  select?: Prisma.ReleaseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Release
+   */
+  omit?: Prisma.ReleaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReleaseInclude<ExtArgs> | null
+  where?: Prisma.ReleaseWhereInput
+  orderBy?: Prisma.ReleaseOrderByWithRelationInput | Prisma.ReleaseOrderByWithRelationInput[]
+  cursor?: Prisma.ReleaseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReleaseScalarFieldEnum | Prisma.ReleaseScalarFieldEnum[]
 }
 
 /**
