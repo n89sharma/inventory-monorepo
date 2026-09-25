@@ -20,6 +20,7 @@ import { pluralize } from '../lib/pluralize.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
+  recordAssetLocationChange,
   recordAssetUpdate,
   recordAssetUpdateOnCollection,
   recordTransferCreate,
@@ -271,7 +272,7 @@ export async function dispatchTransfer(
   userId: number,
   costs: TransferCosts | null,
 ): Promise<void> {
-  const { transferId, costChanges } = await prisma.$transaction(async (tx) => {
+  const { transferId, costChanges, priorAssets } = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
       select: {
@@ -298,12 +299,16 @@ export async function dispatchTransfer(
       where: { id: transfer.id },
       data: { status: TRANSFER_STATUS.IN_TRANSIT, ...appliedCosts },
     })
+    const priorAssets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, location_id: true },
+    })
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
       data: { location_id: null, is_in_transit: true },
     })
     const costChanges = await applyTransferCostsToAssets(tx, assetIds, appliedCosts)
-    return { transferId: transfer.id, costChanges }
+    return { transferId: transfer.id, costChanges, priorAssets }
   })
 
   await recordTransferUpdate(
@@ -312,6 +317,7 @@ export async function dispatchTransfer(
     { status: TRANSFER_STATUS.IN_TRANSIT },
     userId,
   )
+  await recordAssetLocationChange(priorAssets, null, userId)
   await Promise.all(
     costChanges.map(({ assetId, prevCost, newCost }) =>
       recordAssetUpdate(assetId, prevCost, newCost, userId),
@@ -320,7 +326,7 @@ export async function dispatchTransfer(
 }
 
 export async function receiveTransfer(transferNumber: string, userId: number): Promise<void> {
-  const transferId = await prisma.$transaction(async (tx) => {
+  const { transferId, locationId, priorAssets } = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
       select: {
@@ -336,6 +342,10 @@ export async function receiveTransfer(transferNumber: string, userId: number): P
     }
     const locationId = await resolveShippingAndReceivingLocationId(tx, transfer.destination_id)
     const assetIds = transfer.asset_transfers.map((a) => a.asset_id)
+    const priorAssets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, location_id: true },
+    })
     await tx.transfer.update({
       where: { id: transfer.id },
       data: { status: TRANSFER_STATUS.COMPLETE },
@@ -344,7 +354,7 @@ export async function receiveTransfer(transferNumber: string, userId: number): P
       where: { id: { in: assetIds } },
       data: { location_id: locationId, is_in_transit: false },
     })
-    return transfer.id
+    return { transferId: transfer.id, locationId, priorAssets }
   })
 
   await recordTransferUpdate(
@@ -353,6 +363,67 @@ export async function receiveTransfer(transferNumber: string, userId: number): P
     { status: TRANSFER_STATUS.COMPLETE },
     userId,
   )
+  await recordAssetLocationChange(priorAssets, locationId, userId)
+}
+
+export async function returnTransferAssetsToOrigin(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  const returnResult = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: {
+        id: true,
+        status: true,
+        origin_id: true,
+        asset_transfers: { select: { asset_id: true } },
+      },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.IN_TRANSIT) {
+      throw new ConflictError(`Transfer ${transferNumber} is not in transit`)
+    }
+    const transferAssetIds = transfer.asset_transfers.map((a) => a.asset_id)
+    const onTransfer = new Set(transferAssetIds)
+    if (assetIds.some((id) => !onTransfer.has(id))) {
+      throw new ConflictError(`Some assets are not on transfer ${transferNumber}`)
+    }
+
+    const locationId = await resolveShippingAndReceivingLocationId(tx, transfer.origin_id)
+    const priorAssets = await tx.asset.findMany({
+      where: { id: { in: assetIds } },
+      select: { id: true, location_id: true },
+    })
+    await tx.asset.updateMany({
+      where: { id: { in: assetIds } },
+      data: { location_id: locationId, is_in_transit: false },
+    })
+    await applyTransferAssetDelta(tx, transfer.id, [], assetIds)
+
+    const returned = new Set(assetIds)
+    const revertedToDraft = transferAssetIds.every((id) => returned.has(id))
+    if (revertedToDraft) {
+      await tx.transfer.update({
+        where: { id: transfer.id },
+        data: { status: TRANSFER_STATUS.DRAFT },
+      })
+    }
+    return { transferId: transfer.id, revertedToDraft, locationId, priorAssets }
+  })
+  const { transferId, revertedToDraft, locationId, priorAssets } = returnResult
+
+  await recordAssetUpdateOnCollection('Transfer', transferId, [], assetIds, userId)
+  await recordAssetLocationChange(priorAssets, locationId, userId)
+  if (revertedToDraft) {
+    await recordTransferUpdate(
+      transferId,
+      { status: TRANSFER_STATUS.IN_TRANSIT },
+      { status: TRANSFER_STATUS.DRAFT },
+      userId,
+    )
+  }
 }
 
 async function resolveShippingAndReceivingLocationId(

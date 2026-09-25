@@ -836,6 +836,24 @@ export async function recordAssetStatusChange(
   }
 }
 
+// Records a location move for a set of assets that share one new location but may have had
+// different prior locations. Best-effort, call outside the transaction.
+export async function recordAssetLocationChange(
+  priorAssets: Array<{ id: number; location_id: number | null }>,
+  newLocationId: number | null,
+  userId: number,
+): Promise<void> {
+  const assetIdsByPriorLocation = new Map<number | null, number[]>()
+  for (const asset of priorAssets) {
+    const assetIds = assetIdsByPriorLocation.get(asset.location_id)
+    if (assetIds) assetIds.push(asset.id)
+    else assetIdsByPriorLocation.set(asset.location_id, [asset.id])
+  }
+  for (const [priorLocationId, assetIds] of assetIdsByPriorLocation) {
+    await recordBatchAssetUpdate(assetIds, 'location_id', priorLocationId, newLocationId, userId)
+  }
+}
+
 export async function recordCollectionUpdateOnAssets<K extends keyof AssetUpdateFields>(
   assetIdsToRemove: number[],
   assetIdsToAdd: number[],

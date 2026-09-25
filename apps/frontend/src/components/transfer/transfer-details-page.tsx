@@ -5,6 +5,7 @@ import { createCollectionDetailColumns } from '@/components/table-columns/collec
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
 import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
+import type { BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
 import { SummaryRoute } from '@/components/shared/cards/summary-route'
 import { SummaryValue } from '@/components/shared/cards/summary-value'
@@ -12,6 +13,7 @@ import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
 import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
+import { ReturnToOriginDialog } from '@/components/transfer/return-to-origin-dialog'
 import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
@@ -30,6 +32,7 @@ import {
 import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 
 const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
+const RETURN_TO_ORIGIN_LABEL = 'Return to origin'
 const UNTESTED_READINESS = 'UNTESTED'
 
 export function TransferDetailsPage(): React.JSX.Element {
@@ -41,7 +44,10 @@ export function TransferDetailsPage(): React.JSX.Element {
   const canCreateEditTransfer = useCan('create_update_transfer')
   const can = useCan()
   const isDraft = detail.data?.status === TRANSFER_STATUS.DRAFT
+  const isInTransit = detail.data?.status === TRANSFER_STATUS.IN_TRANSIT
   const canEditAssets = canCreateEditTransfer && isDraft
+  const canReturnToOrigin = canCreateEditTransfer && isInTransit
+  const [returnToOriginOpen, setReturnToOriginOpen] = useState(false)
 
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
@@ -149,6 +155,30 @@ export function TransferDetailsPage(): React.JSX.Element {
           />
         )
       }
+      renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
+        if (!canReturnToOrigin) return null
+        const groups: BulkExtraActionGroup[] = [
+          {
+            actions: [
+              { label: RETURN_TO_ORIGIN_LABEL, onSelect: () => setReturnToOriginOpen(true) },
+            ],
+          },
+        ]
+        return {
+          groups,
+          dialogs: (
+            <ReturnToOriginDialog
+              assetCount={selectedAssets.length}
+              open={returnToOriginOpen}
+              onOpenChange={setReturnToOriginOpen}
+              onConfirm={() => {
+                mutations.returnToOrigin(transferNumber, selectedAssets)
+                clearSelection()
+              }}
+            />
+          ),
+        }
+      }}
     />
   )
 }

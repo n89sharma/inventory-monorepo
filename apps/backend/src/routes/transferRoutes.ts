@@ -11,6 +11,7 @@ import {
   patchTransferMetadata,
   patchTransferNotes,
   receiveTransfer,
+  returnTransferAssetsToOrigin,
 } from '../controllers/transferController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -54,6 +55,11 @@ router.post(
   '/:transferNumber/receive',
   requirePermission('create_update_transfer'),
   receiveTransfer,
+)
+router.post(
+  '/:transferNumber/assets/return-to-origin',
+  requirePermission('create_update_transfer'),
+  returnTransferAssetsToOrigin,
 )
 
 export default router

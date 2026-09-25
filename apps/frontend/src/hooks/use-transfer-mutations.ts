@@ -5,6 +5,7 @@ import {
   getTransferDetail,
   patchTransferAssets,
   receiveTransfer,
+  returnTransferAssetsToOrigin,
   updateTransferMetadata,
   updateTransferNotes,
 } from '@/data/api/transfer-api'
@@ -116,6 +117,17 @@ async function receive(transferNumber: string, barcodes: string[]) {
   invalidateTransferLists()
 }
 
+async function returnToOrigin(transferNumber: string, assets: { id: number; barcode: string }[]) {
+  if (assets.length === 0) return
+  await returnTransferAssetsToOrigin(
+    transferNumber,
+    assets.map((a) => a.id),
+  )
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails(assets.map((a) => a.barcode))
+  invalidateTransferLists()
+}
+
 function priceSaveSpec(transferNumber: string): PriceSaveSpec {
   return {
     detailCacheKey: transferDetailKey(transferNumber),
@@ -167,6 +179,7 @@ const mutations = {
   updateNotes,
   dispatch,
   receive,
+  returnToOrigin,
   updatePrice,
   bulkRemoveAssets,
   flushPending,

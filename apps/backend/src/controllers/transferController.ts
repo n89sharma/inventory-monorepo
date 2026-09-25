@@ -6,6 +6,7 @@ import {
   CollectionHistory,
   CreateTransferSchema,
   DispatchTransferSchema,
+  ReturnAssetsToOriginSchema,
   TransferCostsSchema,
   TransferDetail,
   TransferSummary,
@@ -30,6 +31,7 @@ import {
   patchTransferMetadata as patchTransferMetadataSer,
   patchTransferNotes as patchTransferNotesSer,
   receiveTransfer as receiveTransferSer,
+  returnTransferAssetsToOrigin as returnTransferAssetsToOriginSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 import {
@@ -114,6 +116,12 @@ export const dispatchTransfer = asyncHandler(async (req, res) => {
 
 export const receiveTransfer = asyncHandler(async (req, res) => {
   await receiveTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const returnTransferAssetsToOrigin = asyncHandler(async (req, res) => {
+  const { assetIds } = ReturnAssetsToOriginSchema.parse(req.body)
+  await returnTransferAssetsToOriginSer(req.params.transferNumber, assetIds, res.locals.dbUserId)
   res.status(204).send()
 })
 

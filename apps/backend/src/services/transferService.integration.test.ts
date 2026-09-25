@@ -29,7 +29,9 @@ import {
   patchTransferMetadata,
   patchTransferNotes,
   receiveTransfer,
+  returnTransferAssetsToOrigin,
 } from './transferService.js'
+import type { History } from '../../generated/prisma/client.js'
 
 const TESTED_READINESS = 'PP_OK'
 
@@ -80,6 +82,40 @@ async function getAssetTransitState(
     where: { id: assetId },
     select: { is_in_transit: true, location_id: true },
   })
+}
+
+async function getTransferAssetIds(transferNumber: string): Promise<number[]> {
+  const rows = await prisma.assetTransfer.findMany({
+    where: { transfer: { transfer_number: transferNumber } },
+    select: { asset_id: true },
+    orderBy: { asset_id: 'asc' },
+  })
+  return rows.map((r) => r.asset_id)
+}
+
+async function getMaxHistoryId(): Promise<number> {
+  const { _max } = await prisma.history.aggregate({ _max: { id: true } })
+  return _max.id ?? 0
+}
+
+type LocationParts = { warehouse?: string | null; zone?: string | null; bin?: string | null }
+
+// A location move is recorded expanded into warehouse / zone / bin, not as the raw id.
+function assetLocationChange(
+  rows: History[],
+  assetId: number,
+): { before: LocationParts; after: LocationParts } | undefined {
+  return rows
+    .filter((r) => r.entity_type === 'Asset' && r.entity_id === assetId)
+    .map((r) => r.changes as { before: LocationParts; after: LocationParts })
+    .find((c) => 'warehouse' in c.after || 'zone' in c.after || 'bin' in c.after)
+}
+
+function transferStatusAfter(row: History): string | undefined {
+  if (row.entity_type !== 'Transfer') return undefined
+  const changes = row.changes as { after?: Record<string, unknown> }
+  const status = changes.after?.status
+  return typeof status === 'string' ? status : undefined
 }
 
 describe('transferService', () => {
@@ -443,6 +479,174 @@ describe('transferService', () => {
     await expect(dispatchTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
       ConflictError,
     )
+  })
+
+  it('returns a selected asset to the origin shipping & receiving and clears in transit', async () => {
+    const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
+
+    const state = await getAssetTransitState(assets[0].id)
+    expect(state.is_in_transit).toBe(false)
+    expect(state.location_id).toBe(srLocationId)
+  })
+
+  it('leaves the returned asset cost untouched', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
+      transfer_cost: 10,
+      processing_cost: 4,
+      tested_processing_cost: 7,
+      other_cost: 1,
+    })
+    const [asset] = await createArrivedAssets(refs, 1)
+    await seedAssetCost(asset.id)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await dispatchTransfer(transferNumber, refs.userId, null)
+    const dispatchedCost = await getAssetCost(asset.id)
+
+    await returnTransferAssetsToOrigin(transferNumber, [asset.id], refs.userId)
+
+    expect(await getAssetCost(asset.id)).toEqual(dispatchedCost)
+  })
+
+  it('removes only the returned asset, leaving the rest of the transfer in transit', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
+
+    expect(await getTransferAssetIds(transferNumber)).toEqual([assets[1].id])
+    expect(await getTransferStatus(transferNumber)).toBe('IN_TRANSIT')
+    const stayed = await getAssetTransitState(assets[1].id)
+    expect(stayed.is_in_transit).toBe(true)
+    expect(stayed.location_id).toBeNull()
+  })
+
+  it('reverts the transfer to draft when the last asset is returned', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
+
+    expect(await getTransferStatus(transferNumber)).toBe('DRAFT')
+    expect(await getTransferAssetIds(transferNumber)).toEqual([])
+  })
+
+  it('rejects returning assets on a transfer that is not in transit', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+
+    await expect(
+      returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('rejects returning an asset that is not on the transfer', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+    const [stranger] = await createArrivedAssets(refs, 1)
+
+    await expect(
+      returnTransferAssetsToOrigin(transferNumber, [assets[0].id, stranger.id], refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+
+    expect(await getTransferAssetIds(transferNumber)).toEqual([assets[0].id])
+    expect((await getAssetTransitState(assets[0].id)).is_in_transit).toBe(true)
+    expect((await getAssetTransitState(stranger.id)).is_in_transit).toBe(false)
+  })
+
+  it('rejects returning when the origin has no shipping & receiving location', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    await expect(
+      returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId),
+    ).rejects.toBeInstanceOf(NotFoundError)
+  })
+
+  it('records the assets removed, and the status change only on the draft revert', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    const beforeFirstReturn = await getMaxHistoryId()
+    await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
+    const firstRows = await prisma.history.findMany({ where: { id: { gt: beforeFirstReturn } } })
+    expect(
+      firstRows.some((r) => r.entity_type === 'Transfer' && r.action_type === 'ASSETS_REMOVED'),
+    ).toBe(true)
+    expect(firstRows.some((r) => transferStatusAfter(r) === 'DRAFT')).toBe(false)
+
+    const beforeLastReturn = await getMaxHistoryId()
+    await returnTransferAssetsToOrigin(transferNumber, [assets[1].id], refs.userId)
+    const lastRows = await prisma.history.findMany({ where: { id: { gt: beforeLastReturn } } })
+    expect(lastRows.some((r) => transferStatusAfter(r) === 'DRAFT')).toBe(true)
+  })
+
+  it('records the location move on each asset when dispatching', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    const sinceId = await getMaxHistoryId()
+
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(assetLocationChange(rows, asset.id)?.after.warehouse).toBeNull()
+  })
+
+  it('records the location move on each asset when receiving', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await dispatchTransfer(transferNumber, refs.userId, null)
+    const sinceId = await getMaxHistoryId()
+
+    await receiveTransfer(transferNumber, refs.userId)
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    const change = assetLocationChange(rows, asset.id)
+    expect(change?.after.warehouse).toBe(refs.warehouse2.city_code)
+    expect(change?.after.zone).toBe('SHIPPING_AND_RECEIVING')
+  })
+
+  it('records the location move on each asset when returning to origin', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await dispatchTransfer(transferNumber, refs.userId, null)
+    const sinceId = await getMaxHistoryId()
+
+    await returnTransferAssetsToOrigin(transferNumber, [asset.id], refs.userId)
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    const change = assetLocationChange(rows, asset.id)
+    expect(change?.after.warehouse).toBe(refs.warehouse.city_code)
+    expect(change?.after.zone).toBe('SHIPPING_AND_RECEIVING')
   })
 })
 

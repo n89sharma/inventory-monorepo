@@ -72,6 +72,12 @@ export const DispatchTransferSchema = z.object({
 })
 export type DispatchTransfer = z.infer<typeof DispatchTransferSchema>
 
+// POST /transfers/:transferNumber/assets/return-to-origin
+export const ReturnAssetsToOriginSchema = z.object({
+  assetIds: z.array(z.number().int()).nonempty().max(2000),
+})
+export type ReturnAssetsToOrigin = z.infer<typeof ReturnAssetsToOriginSchema>
+
 // PATCH /transfers/:transferNumber/notes
 export const UpdateTransferNotesSchema = z.object({
   comment: z.string().nullable(),

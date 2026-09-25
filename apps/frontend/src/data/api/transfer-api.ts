@@ -25,6 +25,7 @@ import {
   CollectionHistorySchema,
   CreateTransferSchema,
   DispatchTransferSchema,
+  ReturnAssetsToOriginSchema,
   TransferDetailSchema,
   TransferSummarySchema,
   UpdateTransferMetadataSchema,
@@ -120,6 +121,17 @@ export async function dispatchTransfer(
 
 export async function receiveTransfer(transferNumber: string): Promise<void> {
   await api.post(`/transfers/${transferNumber}/receive`)
+}
+
+export async function returnTransferAssetsToOrigin(
+  transferNumber: string,
+  assetIds: number[],
+): Promise<void> {
+  const returnTransferAssetsToOriginBody = ReturnAssetsToOriginSchema.parse({ assetIds })
+  await api.post(
+    `/transfers/${transferNumber}/assets/return-to-origin`,
+    returnTransferAssetsToOriginBody,
+  )
 }
 
 export async function deleteTransfer(transferNumber: string): Promise<void> {
