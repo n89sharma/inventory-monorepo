@@ -54,10 +54,55 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
 
 ## Plan format
 
-Write plans in this structure, always: **Context** (why), **Architectural decisions & risks**,
-numbered implementation sections **split Backend / Frontend with `###` subheadings**, **Out of
-scope**, **Verification**. Put a blank line between every bullet, and use subheadings within any
-long section. Optimize for scannability.
+Write plans in this structure, always: **Context**, **Decisions & risks**, numbered implementation
+sections **split Backend / Frontend with `###` subheadings**, **Naming review** (only when something
+is renamed), **Tests**. No **Out of scope** section — a scope cut is a decision, state it in
+**Decisions & risks**. Blank line between every bullet, subheadings within any long section; scannability
+over completeness. Nowhere in a plan: file paths, line numbers, or code snippets (the Zod schema in
+Shared types is the one exception).
+
+**Context**: 4-6 short bullets, plain business language a non-developer can follow, no code
+identifiers. Don't restate my prompt — state the problem, why it can't be solved today, any
+precedent feature, and the goal. Include whatever was settled in conversation _after_ the original
+prompt.
+
+**Decisions & risks**: every decision the feature settles — product, UX, workflow, data and
+technical alike, one list, business language, no code identifiers. One bullet each, opening with the
+decision as a flat statement ("Costs are not reversed."), then a sentence or two of consequence:
+what the system won't do and what the user must do instead. Edge cases and failure modes nest as
+sub-bullets. A snapshot of what was decided and what scope was cut — not a justification essay. Where
+a plausible alternative was rejected, one clause on why, never more.
+
+**Implementation sections** (Shared types, Backend, Frontend): list every affected item first,
+details below. Identify each as `Name (file-name.ts)` — entity and bare file name. Name the existing
+equivalent each one mirrors, in the same form, so it's evident the established pattern was checked.
+Then short bullets for anything non-obvious.
+
+**Shared types**: group the list under **NEW** / **UPDATED** / **DELETED** headings, then each schema
+body.
+
+**Backend**: order files along the path of the request — routes, controller, service, database —
+marking each inline, `transferController.ts (Updated)`. Under each, sub-bullet every function added,
+updated or deleted with a one-line summary that is technical about the mechanism: "removes the asset
+from the transfer and sets its location to the origin's shipping & receiving", never "returns a
+machine to origin". Name routes and controllers and move on when they hold no business logic. Then,
+per function carrying real logic, a numbered pseudocode walkthrough: one short imperative step per
+line, guards and their status codes included.
+
+**Frontend**: same shape, ordered along the data path from the user's action inward — page,
+component/dialog, api client, mutation hook. Mark a file the plan leans on but doesn't change as
+`(nil)`. One line per file on what it does differently; where it passes something new to a shared
+component, say what. Never draft dialog copy, layout or styling. Cover input validation, UI/UX
+patterns followed, timers and optimistic/undo behaviour, cache invalidation, and the order of the
+user's steps.
+
+**Naming review**: every identifier this change renames or introduces where the name is a judgement
+call — old name, new name, one clause of why. Omit the section when nothing is renamed; don't pad it.
+
+**Tests**: backend and frontend under separate subheadings, grouped by test file, each case one line
+phrased as the behaviour asserted. Then an **E2E** subheading: a flat list of scenarios, each giving
+the user's steps then the full expected end state; say when one builds on the previous. Nothing else
+— no `npm run verify` / `npm test` reminder, that's standing procedure.
 
 ## Commits
 
