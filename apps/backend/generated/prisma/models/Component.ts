@@ -40,18 +40,21 @@ export type ComponentMinAggregateOutputType = {
   id: number | null
   name: string | null
   brand_id: number | null
+  is_active: boolean | null
 }
 
 export type ComponentMaxAggregateOutputType = {
   id: number | null
   name: string | null
   brand_id: number | null
+  is_active: boolean | null
 }
 
 export type ComponentCountAggregateOutputType = {
   id: number
   name: number
   brand_id: number
+  is_active: number
   _all: number
 }
 
@@ -70,18 +73,21 @@ export type ComponentMinAggregateInputType = {
   id?: true
   name?: true
   brand_id?: true
+  is_active?: true
 }
 
 export type ComponentMaxAggregateInputType = {
   id?: true
   name?: true
   brand_id?: true
+  is_active?: true
 }
 
 export type ComponentCountAggregateInputType = {
   id?: true
   name?: true
   brand_id?: true
+  is_active?: true
   _all?: true
 }
 
@@ -175,6 +181,7 @@ export type ComponentGroupByOutputType = {
   id: number
   name: string
   brand_id: number
+  is_active: boolean
   _count: ComponentCountAggregateOutputType | null
   _avg: ComponentAvgAggregateOutputType | null
   _sum: ComponentSumAggregateOutputType | null
@@ -204,6 +211,7 @@ export type ComponentWhereInput = {
   id?: Prisma.IntFilter<"Component"> | number
   name?: Prisma.StringFilter<"Component"> | string
   brand_id?: Prisma.IntFilter<"Component"> | number
+  is_active?: Prisma.BoolFilter<"Component"> | boolean
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
   technical_specifications?: Prisma.TechnicalSpecificationListRelationFilter
 }
@@ -212,6 +220,7 @@ export type ComponentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
   brand?: Prisma.BrandOrderByWithRelationInput
   technical_specifications?: Prisma.TechnicalSpecificationOrderByRelationAggregateInput
 }
@@ -224,6 +233,7 @@ export type ComponentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ComponentWhereInput | Prisma.ComponentWhereInput[]
   name?: Prisma.StringFilter<"Component"> | string
   brand_id?: Prisma.IntFilter<"Component"> | number
+  is_active?: Prisma.BoolFilter<"Component"> | boolean
   brand?: Prisma.XOR<Prisma.BrandScalarRelationFilter, Prisma.BrandWhereInput>
   technical_specifications?: Prisma.TechnicalSpecificationListRelationFilter
 }, "id" | "brand_id_name">
@@ -232,6 +242,7 @@ export type ComponentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
   _count?: Prisma.ComponentCountOrderByAggregateInput
   _avg?: Prisma.ComponentAvgOrderByAggregateInput
   _max?: Prisma.ComponentMaxOrderByAggregateInput
@@ -246,10 +257,12 @@ export type ComponentScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Component"> | number
   name?: Prisma.StringWithAggregatesFilter<"Component"> | string
   brand_id?: Prisma.IntWithAggregatesFilter<"Component"> | number
+  is_active?: Prisma.BoolWithAggregatesFilter<"Component"> | boolean
 }
 
 export type ComponentCreateInput = {
   name: string
+  is_active?: boolean
   brand: Prisma.BrandCreateNestedOneWithoutComponentsInput
   technical_specifications?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
 }
@@ -258,11 +271,13 @@ export type ComponentUncheckedCreateInput = {
   id?: number
   name: string
   brand_id: number
+  is_active?: boolean
   technical_specifications?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand?: Prisma.BrandUpdateOneRequiredWithoutComponentsNestedInput
   technical_specifications?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
 }
@@ -271,6 +286,7 @@ export type ComponentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   technical_specifications?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
 }
 
@@ -278,16 +294,19 @@ export type ComponentCreateManyInput = {
   id?: number
   name: string
   brand_id: number
+  is_active?: boolean
 }
 
 export type ComponentUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ComponentUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ComponentNullableScalarRelationFilter = {
@@ -314,6 +333,7 @@ export type ComponentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
 }
 
 export type ComponentAvgOrderByAggregateInput = {
@@ -325,12 +345,14 @@ export type ComponentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
 }
 
 export type ComponentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   brand_id?: Prisma.SortOrder
+  is_active?: Prisma.SortOrder
 }
 
 export type ComponentSumOrderByAggregateInput = {
@@ -398,6 +420,7 @@ export type ComponentUncheckedUpdateManyWithoutBrandNestedInput = {
 
 export type ComponentCreateWithoutTechnical_specificationsInput = {
   name: string
+  is_active?: boolean
   brand: Prisma.BrandCreateNestedOneWithoutComponentsInput
 }
 
@@ -405,6 +428,7 @@ export type ComponentUncheckedCreateWithoutTechnical_specificationsInput = {
   id?: number
   name: string
   brand_id: number
+  is_active?: boolean
 }
 
 export type ComponentCreateOrConnectWithoutTechnical_specificationsInput = {
@@ -425,6 +449,7 @@ export type ComponentUpdateToOneWithWhereWithoutTechnical_specificationsInput = 
 
 export type ComponentUpdateWithoutTechnical_specificationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   brand?: Prisma.BrandUpdateOneRequiredWithoutComponentsNestedInput
 }
 
@@ -432,16 +457,19 @@ export type ComponentUncheckedUpdateWithoutTechnical_specificationsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   brand_id?: Prisma.IntFieldUpdateOperationsInput | number
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type ComponentCreateWithoutBrandInput = {
   name: string
+  is_active?: boolean
   technical_specifications?: Prisma.TechnicalSpecificationCreateNestedManyWithoutComponentInput
 }
 
 export type ComponentUncheckedCreateWithoutBrandInput = {
   id?: number
   name: string
+  is_active?: boolean
   technical_specifications?: Prisma.TechnicalSpecificationUncheckedCreateNestedManyWithoutComponentInput
 }
 
@@ -478,27 +506,32 @@ export type ComponentScalarWhereInput = {
   id?: Prisma.IntFilter<"Component"> | number
   name?: Prisma.StringFilter<"Component"> | string
   brand_id?: Prisma.IntFilter<"Component"> | number
+  is_active?: Prisma.BoolFilter<"Component"> | boolean
 }
 
 export type ComponentCreateManyBrandInput = {
   id?: number
   name: string
+  is_active?: boolean
 }
 
 export type ComponentUpdateWithoutBrandInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   technical_specifications?: Prisma.TechnicalSpecificationUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentUncheckedUpdateWithoutBrandInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   technical_specifications?: Prisma.TechnicalSpecificationUncheckedUpdateManyWithoutComponentNestedInput
 }
 
 export type ComponentUncheckedUpdateManyWithoutBrandInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -536,6 +569,7 @@ export type ComponentSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   id?: boolean
   name?: boolean
   brand_id?: boolean
+  is_active?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   technical_specifications?: boolean | Prisma.Component$technical_specificationsArgs<ExtArgs>
   _count?: boolean | Prisma.ComponentCountOutputTypeDefaultArgs<ExtArgs>
@@ -545,6 +579,7 @@ export type ComponentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   name?: boolean
   brand_id?: boolean
+  is_active?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["component"]>
 
@@ -552,6 +587,7 @@ export type ComponentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   name?: boolean
   brand_id?: boolean
+  is_active?: boolean
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["component"]>
 
@@ -559,9 +595,10 @@ export type ComponentSelectScalar = {
   id?: boolean
   name?: boolean
   brand_id?: boolean
+  is_active?: boolean
 }
 
-export type ComponentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "brand_id", ExtArgs["result"]["component"]>
+export type ComponentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "brand_id" | "is_active", ExtArgs["result"]["component"]>
 export type ComponentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   brand?: boolean | Prisma.BrandDefaultArgs<ExtArgs>
   technical_specifications?: boolean | Prisma.Component$technical_specificationsArgs<ExtArgs>
@@ -584,6 +621,7 @@ export type $ComponentPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     id: number
     name: string
     brand_id: number
+    is_active: boolean
   }, ExtArgs["result"]["component"]>
   composites: {}
 }
@@ -1012,6 +1050,7 @@ export interface ComponentFieldRefs {
   readonly id: Prisma.FieldRef<"Component", 'Int'>
   readonly name: Prisma.FieldRef<"Component", 'String'>
   readonly brand_id: Prisma.FieldRef<"Component", 'Int'>
+  readonly is_active: Prisma.FieldRef<"Component", 'Boolean'>
 }
     
 

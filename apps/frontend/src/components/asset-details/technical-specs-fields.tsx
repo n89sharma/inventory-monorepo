@@ -240,7 +240,9 @@ function getCoreFunctionOptions(cfs: CoreFunction[]) {
  * Internal-finisher picker. Mirrors the Model search input: a pill once a
  * Component is selected, a type-to-filter combobox otherwise. Options are the
  * brand's components when a brand is known, else the full cross-brand list
- * (labelled with the brand to disambiguate repeated names).
+ * (labelled with the brand to disambiguate repeated names). Inactive components
+ * are dropped from the options only: an asset already fitted with one keeps it
+ * as the selection until the user clears or replaces it.
  */
 function ControlledComponentSearch<T extends FieldValues>({
   control,
@@ -256,7 +258,7 @@ function ControlledComponentSearch<T extends FieldValues>({
   const components = useAssetComponents()
   const [query, setQuery] = useState('')
   const options = useMemo(
-    () => (brandId ? components.filter((c) => c.brand_id === brandId) : components),
+    () => components.filter((c) => c.is_active && (!brandId || c.brand_id === brandId)),
     [components, brandId],
   )
   const getLabel = (c: Component) => (brandId ? c.name : `${c.brand_name} — ${c.name}`)

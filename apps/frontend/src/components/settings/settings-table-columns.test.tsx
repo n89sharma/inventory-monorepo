@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createBrandTableColumns } from './brand-table-columns'
+import { createComponentTableColumns } from './component-table-columns'
 import { createModelTableColumns } from './model-table-columns'
 import { createOrgTableColumns } from './org-table-columns'
 
@@ -12,12 +13,14 @@ function columnIds(columns: { id?: string }[]): (string | undefined)[] {
 describe('settings table columns', () => {
   it('omits the Edit column when no edit callback is supplied', () => {
     expect(columnIds(createBrandTableColumns(undefined))).not.toContain(EDIT_COLUMN_ID)
+    expect(columnIds(createComponentTableColumns(undefined))).not.toContain(EDIT_COLUMN_ID)
     expect(columnIds(createModelTableColumns(undefined))).not.toContain(EDIT_COLUMN_ID)
     expect(columnIds(createOrgTableColumns(undefined))).not.toContain(EDIT_COLUMN_ID)
   })
 
   it('appends the Edit column when an edit callback is supplied', () => {
     expect(columnIds(createBrandTableColumns(vi.fn()))).toContain(EDIT_COLUMN_ID)
+    expect(columnIds(createComponentTableColumns(vi.fn()))).toContain(EDIT_COLUMN_ID)
     expect(columnIds(createModelTableColumns(vi.fn()))).toContain(EDIT_COLUMN_ID)
     expect(columnIds(createOrgTableColumns(vi.fn()))).toContain(EDIT_COLUMN_ID)
   })

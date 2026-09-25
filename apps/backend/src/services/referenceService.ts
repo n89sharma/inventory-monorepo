@@ -43,6 +43,7 @@ export async function getReferenceData(): Promise<ReferenceData> {
       brand_id: c.brand_id,
       brand_name: c.brand.name,
       name: c.name,
+      is_active: c.is_active,
     })),
     countries,
   }

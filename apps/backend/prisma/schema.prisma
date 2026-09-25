@@ -541,6 +541,7 @@ model Component {
   id                       Int                      @id @default(autoincrement())
   name                     String
   brand_id                 Int
+  is_active                Boolean                  @default(true)
   brand                    Brand                    @relation(fields: [brand_id], references: [id])
   technical_specifications TechnicalSpecification[]
 

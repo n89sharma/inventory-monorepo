@@ -151,10 +151,14 @@ export function CreateAssetModal({
     newAssetForm.setValue('errors', [], { shouldDirty: true, shouldValidate: true })
   }
 
-  // Errors are brand-scoped, so an error only survives a model pick when it belongs to
-  // that model's brand. The errors editor allows any brand while no model is picked,
-  // which is where the mismatches come from.
+  // Errors and the internal finisher are brand-scoped, so each only survives a model pick
+  // when it belongs to that model's brand. Their pickers allow any brand while no model is
+  // picked, which is where the mismatches come from.
   function handleModelSelected(currModel: ModelSummary) {
+    const currComponent = newAssetForm.getValues('component')
+    if (currComponent && currComponent.brand_id !== currModel.brand_id)
+      newAssetForm.setValue('component', null, { shouldDirty: true, shouldValidate: true })
+
     const brandIdByErrorId = new Map(allErrors.map((e) => [e.id, e.brand_id]))
     const currErrors = newAssetForm.getValues('errors')
     const keptErrors = currErrors.filter(

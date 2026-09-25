@@ -80,7 +80,19 @@ const HAS_ERRORS: Status = { id: 1, status: 'HAS_ERRORS' }
 const UNTESTED: Status = { id: 2, status: 'UNTESTED' }
 const PP_OK: Status = { id: 3, status: 'PP_OK' }
 
-const CANON_FINISHER: Component = { id: 7, brand_id: 1, brand_name: 'CANON', name: 'FINISHER-A1' }
+const CANON_FINISHER: Component = {
+  id: 7,
+  brand_id: 1,
+  brand_name: 'CANON',
+  name: 'FINISHER-A1',
+  is_active: true,
+}
+const RETIRED_CANON_FINISHER: Component = {
+  ...CANON_FINISHER,
+  id: 8,
+  name: 'FINISHER-A0',
+  is_active: false,
+}
 
 const OPEN_ERROR: AssetError = {
   error_id: 11,
@@ -190,7 +202,7 @@ type UpdateAssetSpecsFn = (barcode: string, data: UpdateAssetSpecs) => Promise<v
 function seedStores(updateAssetSpecs: UpdateAssetSpecsFn) {
   catalog.models = MODELS
   catalog.readinesses = [UNTESTED, HAS_ERRORS, PP_OK]
-  catalog.assetComponents = [CANON_FINISHER]
+  catalog.assetComponents = [CANON_FINISHER, RETIRED_CANON_FINISHER]
   useAssetStore.setState({ updateAssetSpecs })
   getSerialNumberMatches.mockReset()
   getSerialNumberMatches.mockResolvedValue(NO_SERIAL_MATCHES)
@@ -363,6 +375,42 @@ describe('EditSpecsModal', () => {
       toner_life_y: COLOUR_SPECS.toner_life_y,
       toner_life_k: COLOUR_SPECS.toner_life_k,
     })
+  })
+
+  it('keeps an inactive finisher the asset already has', async () => {
+    renderModal(
+      buildAssetDetails(COLOUR_CANON, {
+        readiness: PP_OK.status,
+        specs: {
+          ...COLOUR_SPECS,
+          internal_finisher: RETIRED_CANON_FINISHER.name,
+          internal_finisher_id: RETIRED_CANON_FINISHER.id,
+        },
+      }),
+      [],
+    )
+
+    expect(screen.getByText(RETIRED_CANON_FINISHER.name)).toBeInTheDocument()
+    save()
+
+    await waitFor(() => expect(updateAssetSpecs).toHaveBeenCalledOnce())
+    expect(updateAssetSpecs.mock.calls[0][1]).toMatchObject({
+      component_id: RETIRED_CANON_FINISHER.id,
+    })
+  })
+
+  it('offers only active finishers to pick', () => {
+    renderModal(buildAssetDetails(COLOUR_CANON, { readiness: PP_OK.status }), [])
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear internal finisher' }))
+    fireEvent.change(fieldControl('Internal Finisher', 'input[role="combobox"]'), {
+      target: { value: 'FINISHER' },
+    })
+
+    expect(screen.getByRole('option', { name: CANON_FINISHER.name })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('option', { name: RETIRED_CANON_FINISHER.name }),
+    ).not.toBeInTheDocument()
   })
 })
 

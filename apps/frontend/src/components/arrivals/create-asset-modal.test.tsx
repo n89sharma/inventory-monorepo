@@ -65,6 +65,28 @@ const RICOH_MODEL: ModelSummary = {
   model_name: 'CRATE',
 }
 const RICOH_MODEL_LABEL = 'RICOH CRATE'
+// Printers carry the internal finisher field, which is brand-scoped like the errors.
+const CANON_PRINTER: ModelSummary = {
+  ...MODEL,
+  id: 3,
+  model_name: 'IMAGEPRESS',
+  asset_type: 'PRINTER',
+}
+const CANON_PRINTER_LABEL = 'CANON IMAGEPRESS'
+const RICOH_PRINTER: ModelSummary = {
+  ...RICOH_MODEL,
+  id: 4,
+  model_name: 'PROC5300',
+  asset_type: 'PRINTER',
+}
+const RICOH_PRINTER_LABEL = 'RICOH PROC5300'
+const CANON_FINISHER: Component = {
+  id: 7,
+  brand_id: 1,
+  brand_name: 'CANON',
+  name: 'FINISHER-A1',
+  is_active: true,
+}
 const UNTESTED: Status = { id: 1, status: 'UNTESTED' }
 const HAS_ERRORS: Status = { id: 2, status: 'HAS_ERRORS' }
 const CANON_ERROR: ReferenceError = {
@@ -130,10 +152,10 @@ const SWR_TEST_OPTIONS = {
 }
 
 function seedStores() {
-  catalog.models = [MODEL, RICOH_MODEL]
+  catalog.models = [MODEL, RICOH_MODEL, CANON_PRINTER, RICOH_PRINTER]
   catalog.readinesses = [UNTESTED, HAS_ERRORS]
   catalog.errorCodes = [CANON_ERROR]
-  catalog.assetComponents = []
+  catalog.assetComponents = [CANON_FINISHER]
   useAssetStore.setState({ printBarcodes: vi.fn().mockResolvedValue(undefined) })
   getSerialNumberMatches.mockReset()
   getSerialNumberMatches.mockResolvedValue(NO_SERIAL_MATCHES)
@@ -257,6 +279,25 @@ describe('CreateAssetModal', () => {
     await waitFor(() =>
       expect(
         screen.queryByRole('button', { name: `Remove error ${CANON_ERROR.code}` }),
+      ).not.toBeInTheDocument(),
+    )
+  })
+
+  it('clears the internal finisher when the model moves to another brand', async () => {
+    renderModal(vi.fn().mockResolvedValue(CREATED_ASSET))
+
+    pickModel(CANON_PRINTER_LABEL)
+    fireEvent.change(fieldControl('Internal Finisher', 'input[role="combobox"]'), {
+      target: { value: 'FINISHER' },
+    })
+    fireEvent.click(screen.getByRole('option', { name: CANON_FINISHER.name }))
+    expect(screen.getByRole('button', { name: 'Clear internal finisher' })).toBeVisible()
+
+    pickModel(RICOH_PRINTER_LABEL)
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: 'Clear internal finisher' }),
       ).not.toBeInTheDocument(),
     )
   })

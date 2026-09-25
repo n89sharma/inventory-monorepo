@@ -162,6 +162,11 @@ const BrandsSettingsPage = lazy(() =>
     default: m.BrandsSettingsPage,
   })),
 )
+const ComponentsSettingsPage = lazy(() =>
+  import('./components/settings/components-settings-page').then((m) => ({
+    default: m.ComponentsSettingsPage,
+  })),
+)
 const TransferCostsSettingsPage = lazy(() =>
   import('./components/settings/transfer-costs-settings-page').then((m) => ({
     default: m.TransferCostsSettingsPage,
@@ -496,6 +501,14 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="update_settings">
                           <BrandsSettingsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/components"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <ComponentsSettingsPage />
                         </PermissionRoute>
                       }
                     />

@@ -10,6 +10,7 @@ import adminRoutes from './routes/adminRoutes.js'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
 import brandRoutes from './routes/brandRoutes.js'
+import componentRoutes from './routes/componentRoutes.js'
 import departureRoutes from './routes/depatureRoutes.js'
 import holdRoutes from './routes/holdRoutes.js'
 import invoiceRoutes from './routes/invoiceRoutes.js'
@@ -141,6 +142,7 @@ app.use('/holds', holdRoutes)
 app.use('/invoices', invoiceRoutes)
 app.use('/locations', locationRoutes)
 app.use('/models', modelRoutes)
+app.use('/components', componentRoutes)
 app.use('/organizations', organizationRoutes)
 app.use('/users', userRoutes)
 app.use('/roles', roleRoutes)

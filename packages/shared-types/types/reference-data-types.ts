@@ -105,6 +105,7 @@ export const ComponentSchema = z.object({
   brand_id: z.number(),
   brand_name: z.string(),
   name: z.string(),
+  is_active: z.boolean(),
 })
 
 export const ReferenceDataSchema = z.object({

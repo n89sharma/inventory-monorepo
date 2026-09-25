@@ -3990,7 +3990,8 @@ export type ModelScalarFieldEnum = (typeof ModelScalarFieldEnum)[keyof typeof Mo
 export const ComponentScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  brand_id: 'brand_id'
+  brand_id: 'brand_id',
+  is_active: 'is_active'
 } as const
 
 export type ComponentScalarFieldEnum = (typeof ComponentScalarFieldEnum)[keyof typeof ComponentScalarFieldEnum]

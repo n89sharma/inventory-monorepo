@@ -117,6 +117,7 @@ const SETTINGS_SUB_ITEMS = [
   { title: 'Release Notes', url: '/settings/releases' },
   { title: 'Models', url: '/settings/models' },
   { title: 'Brands', url: '/settings/brands' },
+  { title: 'Components', url: '/settings/components' },
   { title: 'Organizations', url: '/settings/organizations' },
   { title: 'Locations', url: '/settings/locations' },
   { title: 'Export Assets', url: '/settings/export-assets' },
