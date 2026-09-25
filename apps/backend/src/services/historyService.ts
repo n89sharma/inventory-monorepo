@@ -1,4 +1,13 @@
-import { CollectionHistory, CollectionHistoryRecord, COST_COMPONENT_FIELDS } from 'shared-types'
+import {
+  AssetHistoryRecord,
+  AssetUpdateDiff,
+  CollectionHistory,
+  CollectionHistoryRecord,
+  COST_COMPONENT_FIELDS,
+  LocationParts,
+  PartAdded,
+  PartHarvested,
+} from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
 import { logger } from '../lib/logger.js'
 import { prisma } from '../prisma.js'
@@ -66,6 +75,7 @@ type AssetUpdateFields = Partial<{
   hold_id: number | null
   purchase_invoice_id: number | null
   sales_invoice_id: number | null
+  transfer_id: number | null
   location_id: number | null
   model_id: number
   serial_number: string
@@ -96,7 +106,6 @@ type AssetUpdateFields = Partial<{
   parts_cost: number | null
   total_cost: number | null
   sale_price: number | null
-  error_ids: number[]
 }>
 
 const PURCHASE_COST_FIELDS = [...COST_COMPONENT_FIELDS, 'total_cost'] as const
@@ -199,6 +208,19 @@ const RESOLVERS = {
       }),
     (r) => r.invoice_reference,
   ),
+  transfer: foreignKeyResolver(
+    (ids) =>
+      prisma.transfer.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, transfer_number: true },
+      }),
+    (r) => r.transfer_number,
+  ),
+  error: foreignKeyResolver(
+    (ids) =>
+      prisma.error.findMany({ where: { id: { in: ids } }, select: { id: true, code: true } }),
+    (r) => r.code,
+  ),
   organization: foreignKeyResolver(
     (ids) =>
       prisma.organization.findMany({
@@ -253,32 +275,36 @@ const RESOLVERS = {
 
 type ResolverKey = keyof typeof RESOLVERS
 
-type LocationParts = { warehouse: string | null; zone: string | null; bin: string | null }
+const NO_LOCATION: LocationParts = { warehouse: null, zone: null, bin: null }
 
-async function resolveLocationParts(id: number | null | undefined): Promise<LocationParts> {
-  if (!id) return { warehouse: null, zone: null, bin: null }
-  const r = await prisma.location.findUnique({
-    where: { id },
+async function resolveLocations(
+  ids: Array<number | null | undefined>,
+): Promise<Map<number, LocationParts>> {
+  const unique = [...new Set(ids.filter((x): x is number => x != null))]
+  if (unique.length === 0) return new Map()
+  const rows = await prisma.location.findMany({
+    where: { id: { in: unique } },
     select: {
+      id: true,
       bin: true,
       warehouse: { select: { city_code: true } },
       zone: { select: { zone: true } },
     },
   })
-  if (!r) return { warehouse: null, zone: null, bin: null }
-  return {
-    warehouse: r.warehouse?.city_code ?? null,
-    zone: r.zone?.zone ?? null,
-    bin: r.bin ?? null,
-  }
+  return new Map(
+    rows.map((r) => [
+      r.id,
+      { warehouse: r.warehouse?.city_code ?? null, zone: r.zone?.zone ?? null, bin: r.bin ?? null },
+    ]),
+  )
 }
 
-async function resolveErrorCodes(ids: number[] | undefined): Promise<string[]> {
-  const rows = await prisma.error.findMany({
-    where: { id: { in: ids ?? [] } },
-    select: { code: true },
-  })
-  return rows.map((e) => e.code)
+function locationPartsOf(
+  locations: Map<number, LocationParts>,
+  id: number | null | undefined,
+): LocationParts {
+  if (id == null) return NO_LOCATION
+  return locations.get(id) ?? NO_LOCATION
 }
 
 // ─── UPDATE engine ────────────────────────────────────────────────────────────
@@ -293,7 +319,6 @@ type FieldSpec = {
   out?: string // output label; defaults to `field`
   resolve?: ResolverKey // FK → human label
   expand?: 'location' // one id → warehouse/zone/bin
-  array?: 'errorCodes' // error_ids → error_codes
   bothRequired?: boolean // only record when before & after both truthy
   channel?: Channel // default 'asset'
 }
@@ -315,10 +340,11 @@ function emptyBuckets(): Record<Channel, Bucket> {
 
 async function applyLocationExpand(before: unknown, after: unknown, bucket: Bucket): Promise<void> {
   if (before === after) return
-  const [bp, ap] = await Promise.all([
-    resolveLocationParts(before as number | null | undefined),
-    resolveLocationParts(after as number | null | undefined),
-  ])
+  const beforeId = before as number | null | undefined
+  const afterId = after as number | null | undefined
+  const locations = await resolveLocations([beforeId, afterId])
+  const bp = locationPartsOf(locations, beforeId)
+  const ap = locationPartsOf(locations, afterId)
   if (bp.warehouse !== ap.warehouse) {
     bucket.before.warehouse = bp.warehouse
     bucket.after.warehouse = ap.warehouse
@@ -333,21 +359,6 @@ async function applyLocationExpand(before: unknown, after: unknown, bucket: Buck
   }
 }
 
-async function applyErrorCodesArray(
-  spec: FieldSpec,
-  before: unknown,
-  after: unknown,
-  bucket: Bucket,
-): Promise<void> {
-  if (JSON.stringify(before) === JSON.stringify(after)) return
-  const [bc, ac] = await Promise.all([
-    resolveErrorCodes(before as number[] | undefined),
-    resolveErrorCodes(after as number[] | undefined),
-  ])
-  bucket.before[spec.out ?? spec.field] = bc
-  bucket.after[spec.out ?? spec.field] = ac
-}
-
 async function applySpec(
   spec: FieldSpec,
   before: Record<string, unknown>,
@@ -359,7 +370,6 @@ async function applySpec(
   const a = after[spec.field]
 
   if (spec.expand === 'location') return applyLocationExpand(b, a, bucket)
-  if (spec.array === 'errorCodes') return applyErrorCodesArray(spec, b, a, bucket)
 
   if (b === a) return
   if (spec.bothRequired && (!b || !a)) return
@@ -453,7 +463,12 @@ async function recordCreate<S>(
 
 // ─── Per-entity field specs ───────────────────────────────────────────────────
 
-const ASSET_PLAIN_FIELDS = [
+type AssetDiffKey = keyof AssetUpdateDiff
+
+type AssetFieldSpec = FieldSpec &
+  ({ out: AssetDiffKey } | { field: AssetDiffKey; out?: undefined } | { expand: 'location' })
+
+const ASSET_PLAIN_FIELDS: AssetDiffKey[] = [
   'serial_number',
   'manufactured_year',
   'meter_black',
@@ -472,10 +487,11 @@ const ASSET_PLAIN_FIELDS = [
   'damage_notes',
 ]
 
-const ASSET_UPDATE_SPEC: FieldSpec[] = [
+const ASSET_UPDATE_SPEC: AssetFieldSpec[] = [
   { field: 'arrival_id', out: 'arrival_number', resolve: 'arrival' },
   { field: 'departure_id', out: 'departure_number', resolve: 'departure' },
   { field: 'hold_id', out: 'hold_number', resolve: 'hold' },
+  { field: 'transfer_id', out: 'transfer_number', resolve: 'transfer' },
   { field: 'purchase_invoice_id', out: 'purchase_invoice_reference', resolve: 'invoice' },
   { field: 'sales_invoice_id', out: 'sales_invoice_reference', resolve: 'invoice' },
   { field: 'location_id', expand: 'location' },
@@ -484,9 +500,8 @@ const ASSET_UPDATE_SPEC: FieldSpec[] = [
   { field: 'readiness_id', out: 'readiness', resolve: 'readiness' },
   { field: 'country_of_origin_id', out: 'country_of_origin', resolve: 'country' },
   { field: 'component_id', out: 'internal_finisher', resolve: 'component' },
-  ...ASSET_PLAIN_FIELDS.map((field): FieldSpec => ({ field })),
-  { field: 'error_ids', out: 'error_codes', array: 'errorCodes' },
-  ...PURCHASE_COST_FIELDS.map((field): FieldSpec => ({ field, channel: 'purchaseCost' })),
+  ...ASSET_PLAIN_FIELDS.map((field): AssetFieldSpec => ({ field })),
+  ...PURCHASE_COST_FIELDS.map((field): AssetFieldSpec => ({ field, channel: 'purchaseCost' })),
   { field: 'sale_price', channel: 'salePrice' },
 ]
 
@@ -836,21 +851,128 @@ export async function recordAssetStatusChange(
   }
 }
 
-// Records a location move for a set of assets that share one new location but may have had
-// different prior locations. Best-effort, call outside the transaction.
-export async function recordAssetLocationChange(
+export type AssetErrorIdChanges = {
+  added: number[]
+  fixed: number[]
+  reopened: number[]
+  removed: number[]
+}
+
+export async function recordAssetErrorsChange(
+  assetId: number,
+  changes: AssetErrorIdChanges,
+  userId: number,
+): Promise<void> {
+  const { added, fixed, reopened, removed } = changes
+  if (added.length + fixed.length + reopened.length + removed.length === 0) return
+  try {
+    const codes = await RESOLVERS.error([...added, ...fixed, ...reopened, ...removed])
+    const toCodes = (ids: number[]) =>
+      ids
+        .map((id) => codes.get(id))
+        .filter((code): code is string => code != null)
+        .sort()
+    await recordHistory('Asset', assetId, 'ERRORS_CHANGED', userId, {
+      added: toCodes(added),
+      fixed: toCodes(fixed),
+      reopened: toCodes(reopened),
+      removed: toCodes(removed),
+    })
+  } catch (error) {
+    logger.error(`History write failed [ERRORS_CHANGED Asset ${assetId}]`, { error })
+  }
+}
+
+export async function recordAssetPartAdded(
+  assetId: number,
+  part: PartAdded,
+  userId: number,
+): Promise<void> {
+  await recordHistory('Asset', assetId, 'PART_ADDED', userId, part)
+}
+
+export async function recordAssetPartHarvested(
+  recipient: { id: number; barcode: string },
+  donor: { id: number; barcode: string },
+  part: string,
+  isExchange: boolean,
+  userId: number,
+): Promise<void> {
+  try {
+    const now = new Date()
+    await prisma.history.createMany({
+      data: [
+        {
+          entity_type: 'Asset',
+          entity_id: recipient.id,
+          action_type: 'PART_ADDED',
+          user_id: userId,
+          changed_on: now,
+          changes: {
+            source: 'harvested',
+            part,
+            donor_barcode: donor.barcode,
+            is_exchange: isExchange,
+          } satisfies PartAdded,
+        },
+        {
+          entity_type: 'Asset',
+          entity_id: donor.id,
+          action_type: 'PART_HARVESTED',
+          user_id: userId,
+          changed_on: now,
+          changes: {
+            part,
+            recipient_barcode: recipient.barcode,
+            is_exchange: isExchange,
+          } satisfies PartHarvested,
+        },
+      ],
+    })
+  } catch (error) {
+    logger.error(`History write failed [PART_HARVESTED Asset ${donor.id}]`, { error })
+  }
+}
+
+type TransferMovementAction = Extract<AssetHistoryRecord['action_type'], `TRANSFER_${string}`>
+
+type TransferRoute = {
+  transfer_number: string
+  origin_city_code: string
+  destination_city_code: string
+}
+
+export async function recordAssetTransferMovement(
+  actionType: TransferMovementAction,
+  route: TransferRoute,
   priorAssets: Array<{ id: number; location_id: number | null }>,
   newLocationId: number | null,
   userId: number,
 ): Promise<void> {
-  const assetIdsByPriorLocation = new Map<number | null, number[]>()
-  for (const asset of priorAssets) {
-    const assetIds = assetIdsByPriorLocation.get(asset.location_id)
-    if (assetIds) assetIds.push(asset.id)
-    else assetIdsByPriorLocation.set(asset.location_id, [asset.id])
-  }
-  for (const [priorLocationId, assetIds] of assetIdsByPriorLocation) {
-    await recordBatchAssetUpdate(assetIds, 'location_id', priorLocationId, newLocationId, userId)
+  if (priorAssets.length === 0) return
+  try {
+    const locations = await resolveLocations([
+      ...priorAssets.map((asset) => asset.location_id),
+      newLocationId,
+    ])
+    const after = locationPartsOf(locations, newLocationId)
+    const now = new Date()
+    await prisma.history.createMany({
+      data: priorAssets.map((asset) => ({
+        entity_type: 'Asset',
+        entity_id: asset.id,
+        action_type: actionType,
+        user_id: userId,
+        changed_on: now,
+        changes: {
+          ...route,
+          before: locationPartsOf(locations, asset.location_id),
+          after,
+        } as Prisma.InputJsonValue,
+      })),
+    })
+  } catch (error) {
+    logger.error(`History batch write failed [${actionType} ${route.transfer_number}]`, { error })
   }
 }
 

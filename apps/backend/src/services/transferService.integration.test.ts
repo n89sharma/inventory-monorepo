@@ -17,7 +17,7 @@ import {
   SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
-import type { TransferCosts } from 'shared-types'
+import type { LocationParts, TransferCosts } from 'shared-types'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
@@ -98,17 +98,50 @@ async function getMaxHistoryId(): Promise<number> {
   return _max.id ?? 0
 }
 
-type LocationParts = { warehouse?: string | null; zone?: string | null; bin?: string | null }
+type TransferMovementChanges = {
+  transfer_number: string
+  origin_city_code: string
+  destination_city_code: string
+  before: LocationParts
+  after: LocationParts
+}
 
-// A location move is recorded expanded into warehouse / zone / bin, not as the raw id.
-function assetLocationChange(
+function assetMovement(
   rows: History[],
   assetId: number,
-): { before: LocationParts; after: LocationParts } | undefined {
-  return rows
-    .filter((r) => r.entity_type === 'Asset' && r.entity_id === assetId)
-    .map((r) => r.changes as { before: LocationParts; after: LocationParts })
-    .find((c) => 'warehouse' in c.after || 'zone' in c.after || 'bin' in c.after)
+  actionType: string,
+): TransferMovementChanges | undefined {
+  const row = rows.find(
+    (r) => r.entity_type === 'Asset' && r.entity_id === assetId && r.action_type === actionType,
+  )
+  return row?.changes as TransferMovementChanges | undefined
+}
+
+function assetTransferNumberChange(
+  rows: History[],
+  assetId: number,
+): { before: { transfer_number?: string | null }; after: { transfer_number?: string | null } } {
+  const row = rows.find(
+    (r) =>
+      r.entity_type === 'Asset' &&
+      r.entity_id === assetId &&
+      r.action_type === 'UPDATE' &&
+      'transfer_number' in (r.changes as { after: object }).after,
+  )
+  return row?.changes as {
+    before: { transfer_number?: string | null }
+    after: { transfer_number?: string | null }
+  }
+}
+
+function hasAssetLocationEdit(rows: History[], assetId: number): boolean {
+  return rows.some(
+    (r) =>
+      r.entity_type === 'Asset' &&
+      r.entity_id === assetId &&
+      r.action_type === 'UPDATE' &&
+      'warehouse' in (r.changes as { after: object }).after,
+  )
 }
 
 function transferStatusAfter(row: History): string | undefined {
@@ -599,7 +632,39 @@ describe('transferService', () => {
     expect(lastRows.some((r) => transferStatusAfter(r) === 'DRAFT')).toBe(true)
   })
 
-  it('records the location move on each asset when dispatching', async () => {
+  it('records the transfer number on each asset when creating a transfer', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const sinceId = await getMaxHistoryId()
+
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    const change = assetTransferNumberChange(rows, asset.id)
+    expect(change.before.transfer_number).toBeNull()
+    expect(change.after.transfer_number).toBe(transferNumber)
+  })
+
+  it('records the transfer number going to none when removing an asset from a draft', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await patchTransferAssets(
+      transferNumber,
+      { assetIdsToAdd: [], assetIdsToRemove: [assets[0].id] },
+      refs.userId,
+    )
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    const change = assetTransferNumberChange(rows, assets[0].id)
+    expect(change.before.transfer_number).toBe(transferNumber)
+    expect(change.after.transfer_number).toBeNull()
+  })
+
+  it('records a dispatch on each asset with its previous location and no new location', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
       buildCreateTransferInput(refs, [asset]),
@@ -610,10 +675,31 @@ describe('transferService', () => {
     await dispatchTransfer(transferNumber, refs.userId, null)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
-    expect(assetLocationChange(rows, asset.id)?.after.warehouse).toBeNull()
+    const movement = assetMovement(rows, asset.id, 'TRANSFER_DISPATCHED')
+    expect(movement).toMatchObject({
+      transfer_number: transferNumber,
+      origin_city_code: refs.warehouse.city_code,
+      destination_city_code: refs.warehouse2.city_code,
+      after: { warehouse: null, zone: null, bin: null },
+    })
+    expect(movement?.before.warehouse).toBe(refs.warehouse.city_code)
   })
 
-  it('records the location move on each asset when receiving', async () => {
+  it('does not record a separate location edit when dispatching', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    const sinceId = await getMaxHistoryId()
+
+    await dispatchTransfer(transferNumber, refs.userId, null)
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(hasAssetLocationEdit(rows, asset.id)).toBe(false)
+  })
+
+  it('records a receipt at the destination shipping & receiving location', async () => {
     await seedShippingAndReceivingLocation(refs.warehouse2.id)
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
@@ -626,12 +712,14 @@ describe('transferService', () => {
     await receiveTransfer(transferNumber, refs.userId)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
-    const change = assetLocationChange(rows, asset.id)
-    expect(change?.after.warehouse).toBe(refs.warehouse2.city_code)
-    expect(change?.after.zone).toBe('SHIPPING_AND_RECEIVING')
+    const movement = assetMovement(rows, asset.id, 'TRANSFER_RECEIVED')
+    expect(movement?.transfer_number).toBe(transferNumber)
+    expect(movement?.before).toEqual({ warehouse: null, zone: null, bin: null })
+    expect(movement?.after.warehouse).toBe(refs.warehouse2.city_code)
+    expect(movement?.after.zone).toBe('SHIPPING_AND_RECEIVING')
   })
 
-  it('records the location move on each asset when returning to origin', async () => {
+  it('records a return at the origin shipping & receiving location', async () => {
     await seedShippingAndReceivingLocation(refs.warehouse.id)
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
@@ -644,9 +732,10 @@ describe('transferService', () => {
     await returnTransferAssetsToOrigin(transferNumber, [asset.id], refs.userId)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
-    const change = assetLocationChange(rows, asset.id)
-    expect(change?.after.warehouse).toBe(refs.warehouse.city_code)
-    expect(change?.after.zone).toBe('SHIPPING_AND_RECEIVING')
+    const movement = assetMovement(rows, asset.id, 'TRANSFER_RETURNED')
+    expect(movement?.transfer_number).toBe(transferNumber)
+    expect(movement?.after.warehouse).toBe(refs.warehouse.city_code)
+    expect(movement?.after.zone).toBe('SHIPPING_AND_RECEIVING')
   })
 })
 

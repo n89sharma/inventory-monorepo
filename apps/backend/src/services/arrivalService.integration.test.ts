@@ -13,6 +13,7 @@ import {
   REDACTED_ASSET_COST,
   seedArrivalTestData,
   seedAssetCost,
+  seedError,
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -21,8 +22,10 @@ import {
   createArrival,
   deleteArrival,
   getArrival,
+  getArrivalAssetForUpdate,
   moveAssetsToArrival,
   splitArrival,
+  updateArrivalAsset,
 } from './arrivalService.js'
 import { deleteAsset } from './assetDeleteService.js'
 import { createInvoice } from './invoiceService.js'
@@ -284,6 +287,44 @@ describe('splitArrival', () => {
       assetIds,
     }
   }
+})
+
+describe('updateArrivalAsset', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('records the errors added while editing the asset', async () => {
+    const arrivalNumber = await createArrival(buildCreateArrivalInput(refs), refs.userId)
+    const [assetId] = await getArrivalAssetIds(arrivalNumber)
+    const errorId = await seedError(refs.brandId, 'E100')
+    const editable = await getArrivalAssetForUpdate(arrivalNumber, assetId!)
+    const sinceId = await getMaxHistoryId()
+
+    await updateArrivalAsset(
+      arrivalNumber,
+      assetId!,
+      { ...editable, errors: [{ error_id: errorId, is_fixed: false }] },
+      refs.userId,
+    )
+
+    const rows = await prisma.history.findMany({
+      where: { id: { gt: sinceId }, entity_id: assetId, action_type: 'ERRORS_CHANGED' },
+    })
+    expect(rows.map((row) => row.changes)).toEqual([
+      { added: ['E100'], fixed: [], reopened: [], removed: [] },
+    ])
+  })
 })
 
 describe('getArrival', () => {

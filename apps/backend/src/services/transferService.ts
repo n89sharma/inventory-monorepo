@@ -20,9 +20,10 @@ import { pluralize } from '../lib/pluralize.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
-  recordAssetLocationChange,
+  recordAssetTransferMovement,
   recordAssetUpdate,
   recordAssetUpdateOnCollection,
+  recordCollectionUpdateOnAssets,
   recordTransferCreate,
   recordTransferUpdate,
 } from './historyService.js'
@@ -57,6 +58,22 @@ export async function getTransfer(
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
     assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
+  }
+}
+
+const TRANSFER_ROUTE_SELECT = {
+  origin: { select: { city_code: true } },
+  destination: { select: { city_code: true } },
+} as const
+
+function transferRoute(
+  transferNumber: string,
+  transfer: { origin: { city_code: string }; destination: { city_code: string } },
+) {
+  return {
+    transfer_number: transferNumber,
+    origin_city_code: transfer.origin.city_code,
+    destination_city_code: transfer.destination.city_code,
   }
 }
 
@@ -97,6 +114,7 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
   )
 
   await recordAssetUpdateOnCollection('Transfer', newTransferId, assetIds, [], userId)
+  await recordCollectionUpdateOnAssets([], assetIds, 'transfer_id', newTransferId, userId)
 
   return transferNumber
 }
@@ -191,6 +209,13 @@ export async function patchTransferAssets(
     delta.assetIdsToRemove,
     userId,
   )
+  await recordCollectionUpdateOnAssets(
+    delta.assetIdsToRemove,
+    delta.assetIdsToAdd,
+    'transfer_id',
+    transferId,
+    userId,
+  )
 }
 
 function toCostDecimals(costs: TransferCosts): TransferCostDecimals {
@@ -272,13 +297,14 @@ export async function dispatchTransfer(
   userId: number,
   costs: TransferCosts | null,
 ): Promise<void> {
-  const { transferId, costChanges, priorAssets } = await prisma.$transaction(async (tx) => {
+  const { transferId, route, costChanges, priorAssets } = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
       select: {
         id: true,
         status: true,
         origin_id: true,
+        ...TRANSFER_ROUTE_SELECT,
         asset_transfers: { select: { asset_id: true } },
       },
     })
@@ -308,7 +334,12 @@ export async function dispatchTransfer(
       data: { location_id: null, is_in_transit: true },
     })
     const costChanges = await applyTransferCostsToAssets(tx, assetIds, appliedCosts)
-    return { transferId: transfer.id, costChanges, priorAssets }
+    return {
+      transferId: transfer.id,
+      route: transferRoute(transferNumber, transfer),
+      costChanges,
+      priorAssets,
+    }
   })
 
   await recordTransferUpdate(
@@ -317,7 +348,7 @@ export async function dispatchTransfer(
     { status: TRANSFER_STATUS.IN_TRANSIT },
     userId,
   )
-  await recordAssetLocationChange(priorAssets, null, userId)
+  await recordAssetTransferMovement('TRANSFER_DISPATCHED', route, priorAssets, null, userId)
   await Promise.all(
     costChanges.map(({ assetId, prevCost, newCost }) =>
       recordAssetUpdate(assetId, prevCost, newCost, userId),
@@ -326,13 +357,14 @@ export async function dispatchTransfer(
 }
 
 export async function receiveTransfer(transferNumber: string, userId: number): Promise<void> {
-  const { transferId, locationId, priorAssets } = await prisma.$transaction(async (tx) => {
+  const { transferId, route, locationId, priorAssets } = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
       select: {
         id: true,
         status: true,
         destination_id: true,
+        ...TRANSFER_ROUTE_SELECT,
         asset_transfers: { select: { asset_id: true } },
       },
     })
@@ -354,7 +386,12 @@ export async function receiveTransfer(transferNumber: string, userId: number): P
       where: { id: { in: assetIds } },
       data: { location_id: locationId, is_in_transit: false },
     })
-    return { transferId: transfer.id, locationId, priorAssets }
+    return {
+      transferId: transfer.id,
+      route: transferRoute(transferNumber, transfer),
+      locationId,
+      priorAssets,
+    }
   })
 
   await recordTransferUpdate(
@@ -363,7 +400,7 @@ export async function receiveTransfer(transferNumber: string, userId: number): P
     { status: TRANSFER_STATUS.COMPLETE },
     userId,
   )
-  await recordAssetLocationChange(priorAssets, locationId, userId)
+  await recordAssetTransferMovement('TRANSFER_RECEIVED', route, priorAssets, locationId, userId)
 }
 
 export async function returnTransferAssetsToOrigin(
@@ -378,6 +415,7 @@ export async function returnTransferAssetsToOrigin(
         id: true,
         status: true,
         origin_id: true,
+        ...TRANSFER_ROUTE_SELECT,
         asset_transfers: { select: { asset_id: true } },
       },
     })
@@ -410,12 +448,18 @@ export async function returnTransferAssetsToOrigin(
         data: { status: TRANSFER_STATUS.DRAFT },
       })
     }
-    return { transferId: transfer.id, revertedToDraft, locationId, priorAssets }
+    return {
+      transferId: transfer.id,
+      route: transferRoute(transferNumber, transfer),
+      revertedToDraft,
+      locationId,
+      priorAssets,
+    }
   })
-  const { transferId, revertedToDraft, locationId, priorAssets } = returnResult
+  const { transferId, route, revertedToDraft, locationId, priorAssets } = returnResult
 
   await recordAssetUpdateOnCollection('Transfer', transferId, [], assetIds, userId)
-  await recordAssetLocationChange(priorAssets, locationId, userId)
+  await recordAssetTransferMovement('TRANSFER_RETURNED', route, priorAssets, locationId, userId)
   if (revertedToDraft) {
     await recordTransferUpdate(
       transferId,

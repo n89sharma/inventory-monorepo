@@ -3,7 +3,11 @@ import type { Prisma } from '../../generated/prisma/client.js'
 import { validateErrorBrands } from '../lib/asset-error-validation.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { recordAssetUpdate } from './historyService.js'
+import {
+  AssetErrorIdChanges,
+  recordAssetErrorsChange,
+  recordAssetUpdate,
+} from './historyService.js'
 
 // Readiness follows the asset's errors: any open (unfixed) error forces HAS_ERRORS,
 // which is locked and never set by hand. Clearing the last open error releases the
@@ -15,8 +19,8 @@ const PP_OK_READINESS = 'PP_OK'
 /**
  * Diff the asset's current AssetError rows against the desired `newErrors` set,
  * then delete/create/update accordingly. Caller is responsible for having already
- * verified the error ids via validateErrorIdsForBrand. Returns the sorted
- * id lists for history recording.
+ * verified the error ids via validateErrorIdsForBrand. Returns the ids added,
+ * fixed, reopened and removed, for history recording.
  */
 export async function reconcileAssetErrors(
   tx: Prisma.TransactionClient,
@@ -24,7 +28,7 @@ export async function reconcileAssetErrors(
   newErrors: UpdateError[],
   userId: number,
   now: Date = new Date(),
-): Promise<{ prevErrorIds: number[]; newErrorIds: number[] }> {
+): Promise<AssetErrorIdChanges> {
   const currentRows = await tx.assetError.findMany({
     where: { asset_id: assetId },
     select: { error_id: true, is_fixed: true },
@@ -56,22 +60,28 @@ export async function reconcileAssetErrors(
     await tx.assetError.createMany({ data: rowsToCreate })
   }
 
-  for (const [errorId, is_fixed] of inputIdMap.entries()) {
-    if (currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed) {
-      await tx.assetError.update({
-        where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
-        data: {
-          is_fixed,
-          fixed_at: is_fixed ? now : null,
-          fixed_by: is_fixed ? userId : null,
-        },
-      })
-    }
+  const flippedRows = [...inputIdMap.entries()].filter(
+    ([errorId, is_fixed]) => currentIdMap.has(errorId) && currentIdMap.get(errorId) !== is_fixed,
+  )
+  for (const [errorId, is_fixed] of flippedRows) {
+    await tx.assetError.update({
+      where: { asset_id_error_id: { asset_id: assetId, error_id: errorId } },
+      data: {
+        is_fixed,
+        fixed_at: is_fixed ? now : null,
+        fixed_by: is_fixed ? userId : null,
+      },
+    })
   }
 
   return {
-    prevErrorIds: currentRows.map((r) => r.error_id).sort(),
-    newErrorIds: [...inputIdMap.keys()].sort(),
+    added: rowsToCreate.map((row) => row.error_id),
+    fixed: [
+      ...rowsToCreate.filter((row) => row.is_fixed).map((row) => row.error_id),
+      ...flippedRows.filter(([, is_fixed]) => is_fixed).map(([errorId]) => errorId),
+    ],
+    reopened: flippedRows.filter(([, is_fixed]) => !is_fixed).map(([errorId]) => errorId),
+    removed: errorIdsToDelete,
   }
 }
 
@@ -85,8 +95,8 @@ export async function updateAssetErrors(
   const hasErrorsReadinessId = readinessIdByStatus.get(HAS_ERRORS_READINESS)!
   const ppOkReadinessId = readinessIdByStatus.get(PP_OK_READINESS)!
 
-  const { assetId, prevErrorIds, newErrorIds, prevReadinessId, newReadinessId } =
-    await prisma.$transaction(async (tx) => {
+  const { assetId, errorChanges, prevReadinessId, newReadinessId } = await prisma.$transaction(
+    async (tx) => {
       const asset = await tx.asset.findUnique({
         where: { barcode },
         select: { id: true, readiness_id: true, model: { select: { brand_id: true } } },
@@ -97,12 +107,7 @@ export async function updateAssetErrors(
         tx,
         data.errors.map((e) => ({ errorId: e.error_id, expectedBrandId: asset.model.brand_id })),
       )
-      const { prevErrorIds, newErrorIds } = await reconcileAssetErrors(
-        tx,
-        asset.id,
-        data.errors,
-        userId,
-      )
+      const errorChanges = await reconcileAssetErrors(tx, asset.id, data.errors, userId)
 
       // Readiness only moves in two cases: an open error forces HAS_ERRORS, or
       // clearing the last open error releases HAS_ERRORS to PP_OK. A null means no
@@ -120,17 +125,18 @@ export async function updateAssetErrors(
 
       return {
         assetId: asset.id,
-        prevErrorIds,
-        newErrorIds,
+        errorChanges,
         prevReadinessId: asset.readiness_id,
         newReadinessId,
       }
-    })
+    },
+  )
 
+  await recordAssetErrorsChange(assetId, errorChanges, userId)
   await recordAssetUpdate(
     assetId,
-    { error_ids: prevErrorIds, readiness_id: prevReadinessId },
-    { error_ids: newErrorIds, readiness_id: newReadinessId ?? prevReadinessId },
+    { readiness_id: prevReadinessId },
+    { readiness_id: newReadinessId ?? prevReadinessId },
     userId,
   )
 }

@@ -68,11 +68,13 @@ export const useAssetStore = create<AssetStore>(() => ({
   createAssetHarvestedPart: async (barcode, data) => {
     await createAssetHarvestedPartApi(barcode, data)
     invalidateAssetDetails([barcode, data.donor_barcode])
+    invalidateAssetHistory([barcode, data.donor_barcode])
   },
 
   addStorePartToAsset: async (barcode, form) => {
     const result = await addStorePartToAssetApi(barcode, form)
     invalidateAssetDetails([barcode])
+    invalidateAssetHistory([barcode])
     invalidateStorePartLists()
     mutate(storePartDetailKey(result.store_part_id))
     return result

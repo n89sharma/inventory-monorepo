@@ -313,7 +313,7 @@ export async function getAssetHistory(
   return rows.map(
     (row) =>
       ({
-        action_type: row.action_type as 'CREATE' | 'UPDATE',
+        action_type: row.action_type as AssetHistoryRecord['action_type'],
         user_name: row.user.name,
         changed_on: row.changed_on,
         changes: row.changes as AssetHistoryRecord['changes'],

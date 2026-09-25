@@ -301,10 +301,17 @@ describe('assetSpecsService', () => {
     const remaining = await prisma.assetError.findMany({ where: { asset_id: asset.id } })
     expect(remaining).toHaveLength(0)
 
-    const changes = await assetUpdateChangesSince(sinceId, asset.id)
-    const errorChange = changes.find((c) => c.after?.error_codes !== undefined)
-    expect(errorChange?.before?.error_codes).toEqual(['E100'])
-    expect(errorChange?.after?.error_codes).toEqual([])
+    const errorRows = await prisma.history.findMany({
+      where: {
+        id: { gt: sinceId },
+        entity_type: 'Asset',
+        entity_id: asset.id,
+        action_type: 'ERRORS_CHANGED',
+      },
+    })
+    expect(errorRows.map((row) => row.changes)).toEqual([
+      { added: [], fixed: [], reopened: [], removed: ['E100'] },
+    ])
   })
 
   it('releases Has Errors to Untested when the model moves to another brand', async () => {

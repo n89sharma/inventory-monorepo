@@ -12,7 +12,7 @@ import {
   reconcileAssetErrors,
   resolveReadinessIds,
 } from './assetErrorService.js'
-import { recordAssetUpdate } from './historyService.js'
+import { recordAssetErrorsChange, recordAssetUpdate } from './historyService.js'
 
 const UNTESTED_READINESS = 'UNTESTED'
 
@@ -135,7 +135,7 @@ export async function updateAssetSpecs(
     acknowledged: specs.duplicate_serial_acknowledged,
   })
 
-  const prevErrorIds = await prisma.$transaction(async (tx) => {
+  const clearedErrors = await prisma.$transaction(async (tx) => {
     await assertSerialDuplicatesAllowed(tx, serialCandidates)
     await tx.asset.update({
       where: { id: asset.id },
@@ -190,17 +190,17 @@ export async function updateAssetSpecs(
       })),
     })
 
-    if (!brandChanged) return []
-    const { prevErrorIds } = await reconcileAssetErrors(tx, asset.id, [], userId)
-    return prevErrorIds
+    if (!brandChanged) return null
+    return reconcileAssetErrors(tx, asset.id, [], userId)
   })
+
+  if (clearedErrors !== null) await recordAssetErrorsChange(asset.id, clearedErrors, userId)
 
   await recordAssetUpdate(
     asset.id,
     {
       model_id: asset.model.id,
       serial_number: asset.serial_number,
-      ...(brandChanged ? { error_ids: prevErrorIds } : {}),
       readiness_id: asset.readiness_id,
       country_of_origin_id: asset.country_of_origin_id,
       manufactured_year: asset.manufactured_year,
@@ -223,7 +223,6 @@ export async function updateAssetSpecs(
     {
       model_id: specs.model_id,
       serial_number: specs.serial_number,
-      ...(brandChanged ? { error_ids: [] } : {}),
       readiness_id: specs.readiness_id,
       country_of_origin_id: specs.country_of_origin_id,
       manufactured_year: specs.manufactured_year,

@@ -128,6 +128,55 @@ describe('storePartService', () => {
     expect(cost?.total_cost).toBe(SEEDED_ASSET_COST.total_cost! + 15)
   })
 
+  describe('history', () => {
+    async function consumeOntoSeededAsset(quantity: number) {
+      const storePartId = await purchaseNewPart(10, 5)
+      const [asset] = await createArrivedAssets(refs, 1)
+      await seedAssetCost(asset.id)
+      const { _max } = await prisma.history.aggregate({ _max: { id: true } })
+      const result = await addStorePartToAsset(
+        asset.barcode,
+        { store_part_id: storePartId, warehouse_id: refs.warehouse.id, quantity },
+        refs.userId,
+      )
+      const rows = await prisma.history.findMany({
+        where: { id: { gt: _max.id ?? 0 }, entity_id: asset.id },
+      })
+      return { rows, partNumber: result.part_number }
+    }
+
+    it('records the part number and quantity added to the asset', async () => {
+      const { rows, partNumber } = await consumeOntoSeededAsset(3)
+
+      const partRow = rows.find((r) => r.action_type === 'PART_ADDED')
+      expect(partRow?.entity_type).toBe('Asset')
+      expect(partRow?.changes).toEqual({ source: 'store', part_number: partNumber, quantity: 3 })
+    })
+
+    it('records the parts and total cost change on the purchase-cost channel', async () => {
+      const { rows } = await consumeOntoSeededAsset(3)
+
+      const costRow = rows.find((r) => r.entity_type === 'AssetPurchaseCost')
+      expect(costRow?.changes).toEqual({
+        before: {
+          parts_cost: SEEDED_ASSET_COST.parts_cost,
+          total_cost: SEEDED_ASSET_COST.total_cost,
+        },
+        after: {
+          parts_cost: SEEDED_ASSET_COST.parts_cost! + 15,
+          total_cost: SEEDED_ASSET_COST.total_cost! + 15,
+        },
+      })
+    })
+
+    it('keeps the cost off the part-added row', async () => {
+      const { rows } = await consumeOntoSeededAsset(3)
+
+      const assetRows = rows.filter((r) => r.entity_type === 'Asset')
+      expect(assetRows.map((r) => r.action_type)).toEqual(['PART_ADDED'])
+    })
+  })
+
   it('rejects consuming more of a part than is on hand', async () => {
     const storePartId = await purchaseNewPart(1, 5)
     const [asset] = await createArrivedAssets(refs, 1)

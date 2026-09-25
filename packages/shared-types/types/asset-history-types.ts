@@ -17,9 +17,13 @@ export const AssetUpdateDiffSchema = z.object({
   warehouse: z.string().nullable().optional(),
   zone: z.string().nullable().optional(),
   bin: z.string().nullable().optional(),
+  transfer_number: z.string().nullable().optional(),
   model_name: z.string().optional(),
+  status: z.string().nullable().optional(),
   readiness: z.string().nullable().optional(),
   serial_number: z.string().optional(),
+  manufactured_year: z.number().nullable().optional(),
+  country_of_origin: z.string().nullable().optional(),
   meter_black: z.number().nullable().optional(),
   meter_colour: z.number().nullable().optional(),
   meter_total: z.number().nullable().optional(),
@@ -46,6 +50,43 @@ export const AssetUpdateDiffSchema = z.object({
   error_codes: z.array(z.string()).optional(),
 })
 
+const LocationPartsSchema = z.object({
+  warehouse: z.string().nullable(),
+  zone: z.string().nullable(),
+  bin: z.string().nullable(),
+})
+
+const TransferMovementSchema = z.object({
+  transfer_number: z.string(),
+  origin_city_code: z.string(),
+  destination_city_code: z.string(),
+  before: LocationPartsSchema,
+  after: LocationPartsSchema,
+})
+
+const ErrorsChangedSchema = z.object({
+  added: z.array(z.string()),
+  fixed: z.array(z.string()),
+  reopened: z.array(z.string()),
+  removed: z.array(z.string()),
+})
+
+const PartAddedSchema = z.discriminatedUnion('source', [
+  z.object({ source: z.literal('store'), part_number: z.string(), quantity: z.number() }),
+  z.object({
+    source: z.literal('harvested'),
+    part: z.string(),
+    donor_barcode: z.string(),
+    is_exchange: z.boolean(),
+  }),
+])
+
+const PartHarvestedSchema = z.object({
+  part: z.string(),
+  recipient_barcode: z.string(),
+  is_exchange: z.boolean(),
+})
+
 const AssetRecordBase = {
   user_name: z.string(),
   changed_on: z.coerce.date(),
@@ -62,11 +103,45 @@ export const AssetHistoryRecordSchema = z.discriminatedUnion('action_type', [
     ...AssetRecordBase,
     changes: z.object({ before: AssetUpdateDiffSchema, after: AssetUpdateDiffSchema }),
   }),
+  z.object({
+    action_type: z.literal('ERRORS_CHANGED'),
+    ...AssetRecordBase,
+    changes: ErrorsChangedSchema,
+  }),
+  z.object({
+    action_type: z.literal('PART_ADDED'),
+    ...AssetRecordBase,
+    changes: PartAddedSchema,
+  }),
+  z.object({
+    action_type: z.literal('PART_HARVESTED'),
+    ...AssetRecordBase,
+    changes: PartHarvestedSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_DISPATCHED'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_RECEIVED'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_RETURNED'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
 ])
 
 export const AssetHistorySchema = z.array(AssetHistoryRecordSchema)
 
 export type AssetCreateSnapshot = z.infer<typeof AssetCreateSnapshotSchema>
 export type AssetUpdateDiff = z.infer<typeof AssetUpdateDiffSchema>
+export type LocationParts = z.infer<typeof LocationPartsSchema>
+export type ErrorsChanged = z.infer<typeof ErrorsChangedSchema>
+export type PartAdded = z.infer<typeof PartAddedSchema>
+export type PartHarvested = z.infer<typeof PartHarvestedSchema>
 export type AssetHistoryRecord = z.infer<typeof AssetHistoryRecordSchema>
 export type AssetHistory = z.infer<typeof AssetHistorySchema>

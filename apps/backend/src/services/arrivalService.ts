@@ -44,6 +44,7 @@ import { reconcileAssetErrors } from './assetErrorService.js'
 import {
   recordArrivalCreate,
   recordArrivalUpdate,
+  recordAssetErrorsChange,
   recordAssetUpdate,
   recordAssetUpdateOnCollection,
   recordBatchAssetCreate,
@@ -652,7 +653,7 @@ export async function updateArrivalAsset(
     acknowledged: asset.duplicateSerialAcknowledged,
   })
 
-  await prisma.$transaction(async (tx) => {
+  const errorChanges = await prisma.$transaction(async (tx) => {
     await validateErrorBrands(tx, buildErrorBrandPairs([asset], brandIdByModelId))
     await validateComponentBrands(tx, buildComponentBrandPairs([asset], brandIdByModelId))
     await assertSerialDuplicatesAllowed(tx, serialCandidates)
@@ -663,8 +664,8 @@ export async function updateArrivalAsset(
         data: asset.coreFunctions.map((cf) => ({ asset_id: assetId, accessory_id: cf.id })),
       })
     }
-    await reconcileAssetErrors(tx, assetId, asset.errors ?? [], userId)
     await upsertLatestComment(tx, assetId, asset.comment ?? null, userId)
+    return reconcileAssetErrors(tx, assetId, asset.errors ?? [], userId)
   })
 
   await recordAssetUpdate(
@@ -712,6 +713,7 @@ export async function updateArrivalAsset(
     },
     userId,
   )
+  await recordAssetErrorsChange(assetId, errorChanges, userId)
 
   const [summary] = await prisma.$queryRawTyped(getAssetByBarcode(existing.barcode))
   if (!summary) throw new NotFoundError(`Asset ${existing.barcode} not found after update`)

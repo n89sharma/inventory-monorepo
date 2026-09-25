@@ -12,6 +12,31 @@ import { prisma } from '../prisma.js'
 import { updateAssetErrors } from './assetErrorService.js'
 
 const MISSING_ID = 999999
+const OPEN = false
+const FIXED = true
+
+type ErrorsChangedRow = { added: string[]; fixed: string[]; reopened: string[]; removed: string[] }
+
+async function getMaxHistoryId(): Promise<number> {
+  const { _max } = await prisma.history.aggregate({ _max: { id: true } })
+  return _max.id ?? 0
+}
+
+async function assetHistorySince(sinceId: number, assetId: number, actionType: string) {
+  return prisma.history.findMany({
+    where: {
+      id: { gt: sinceId },
+      entity_type: 'Asset',
+      entity_id: assetId,
+      action_type: actionType,
+    },
+  })
+}
+
+async function errorsChangedSince(sinceId: number, assetId: number): Promise<ErrorsChangedRow[]> {
+  const rows = await assetHistorySince(sinceId, assetId, 'ERRORS_CHANGED')
+  return rows.map((row) => row.changes as ErrorsChangedRow)
+}
 
 describe('assetErrorService', () => {
   let refs: ArrivalTestData
@@ -107,5 +132,128 @@ describe('assetErrorService', () => {
         refs.userId,
       ),
     ).rejects.toThrow(ValidationError)
+  })
+
+  describe('history', () => {
+    it('records an added open error under added only', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: OPEN }] },
+        refs.userId,
+      )
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toEqual([
+        { added: ['E100'], fixed: [], reopened: [], removed: [] },
+      ])
+    })
+
+    it('records marking an existing error fixed under fixed only', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      const otherErrorId = await seedError(refs.brandId, 'E200')
+      await updateAssetErrors(
+        asset.barcode,
+        {
+          errors: [
+            { error_id: errorId, is_fixed: OPEN },
+            { error_id: otherErrorId, is_fixed: OPEN },
+          ],
+        },
+        refs.userId,
+      )
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(
+        asset.barcode,
+        {
+          errors: [
+            { error_id: errorId, is_fixed: FIXED },
+            { error_id: otherErrorId, is_fixed: OPEN },
+          ],
+        },
+        refs.userId,
+      )
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toEqual([
+        { added: [], fixed: ['E100'], reopened: [], removed: [] },
+      ])
+    })
+
+    it('records reopening a fixed error under reopened', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: FIXED }] },
+        refs.userId,
+      )
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: OPEN }] },
+        refs.userId,
+      )
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toEqual([
+        { added: [], fixed: [], reopened: ['E100'], removed: [] },
+      ])
+    })
+
+    it('records deleting an error under removed', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: OPEN }] },
+        refs.userId,
+      )
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(asset.barcode, { errors: [] }, refs.userId)
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toEqual([
+        { added: [], fixed: [], reopened: [], removed: ['E100'] },
+      ])
+    })
+
+    it('writes no errors row when nothing changed', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      const errors = [{ error_id: errorId, is_fixed: OPEN }]
+      await updateAssetErrors(asset.barcode, { errors }, refs.userId)
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(asset.barcode, { errors }, refs.userId)
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toEqual([])
+    })
+
+    it('records the readiness release alongside fixing the last open error', async () => {
+      const [asset] = await createArrivedAssets(refs, 1)
+      const errorId = await seedError(refs.brandId, 'E100')
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: OPEN }] },
+        refs.userId,
+      )
+      const sinceId = await getMaxHistoryId()
+
+      await updateAssetErrors(
+        asset.barcode,
+        { errors: [{ error_id: errorId, is_fixed: FIXED }] },
+        refs.userId,
+      )
+
+      expect(await errorsChangedSince(sinceId, asset.id)).toHaveLength(1)
+      const updates = await assetHistorySince(sinceId, asset.id, 'UPDATE')
+      expect(updates.map((row) => row.changes)).toEqual([
+        { before: { readiness: 'HAS_ERRORS' }, after: { readiness: 'PP_OK' } },
+      ])
+    })
   })
 })

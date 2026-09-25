@@ -26,6 +26,7 @@ import {
   type StockLayer,
 } from '../lib/store-part-fifo.js'
 import { prisma } from '../prisma.js'
+import { recordAssetPartAdded, recordAssetUpdate } from './historyService.js'
 
 const USED_TYPE = 'USED'
 const REVALUATION_OUT_TYPE = 'REVALUATION_OUT'
@@ -267,7 +268,7 @@ export async function addStorePartToAsset(
   const storeTransactionNumber = await getNewStoreTransactionNumber()
   const now = new Date()
 
-  return prisma.$transaction(async (tx) => {
+  const { response, prevCost, newCost } = await prisma.$transaction(async (tx) => {
     const [onHandRow] = await tx.$queryRawTyped(
       getStorePartOnHandDb(data.store_part_id, data.warehouse_id),
     )
@@ -324,6 +325,7 @@ export async function addStorePartToAsset(
         processing_cost: true,
         other_cost: true,
         parts_cost: true,
+        total_cost: true,
       },
     })
     const parts_cost = (currentCost?.parts_cost ?? ZERO_COST).add(addedCost)
@@ -336,9 +338,25 @@ export async function addStorePartToAsset(
     })
 
     return {
-      store_transaction_number: storeTransactionNumber,
-      store_part_id: data.store_part_id,
-      part_number: part.part_number,
+      response: {
+        store_transaction_number: storeTransactionNumber,
+        store_part_id: data.store_part_id,
+        part_number: part.part_number,
+      },
+      prevCost: {
+        parts_cost: decimalToNumber(currentCost?.parts_cost ?? null),
+        total_cost: decimalToNumber(currentCost?.total_cost ?? null),
+      },
+      newCost: { parts_cost: parts_cost.toNumber(), total_cost: total_cost.toNumber() },
     }
   })
+
+  await recordAssetPartAdded(
+    asset.id,
+    { source: 'store', part_number: response.part_number, quantity: data.quantity },
+    userId,
+  )
+  await recordAssetUpdate(asset.id, prevCost, newCost, userId)
+
+  return response
 }

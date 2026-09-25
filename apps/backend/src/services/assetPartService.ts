@@ -1,6 +1,7 @@
 import { CreateSalvagedPart } from 'shared-types'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { recordAssetPartHarvested } from './historyService.js'
 
 export async function createAssetSalvagedPart(
   recipientBarcode: string,
@@ -12,13 +13,13 @@ export async function createAssetSalvagedPart(
   }
   const recipient = await prisma.asset.findUnique({
     where: { barcode: recipientBarcode },
-    select: { id: true },
+    select: { id: true, barcode: true },
   })
   if (!recipient) throw new NotFoundError(`Asset ${recipientBarcode} not found`)
 
   const donor = await prisma.asset.findUnique({
     where: { barcode: data.donor_barcode },
-    select: { id: true },
+    select: { id: true, barcode: true },
   })
   if (!donor) throw new NotFoundError(`Donor asset ${data.donor_barcode} not found`)
 
@@ -33,4 +34,6 @@ export async function createAssetSalvagedPart(
       fixed_by: userId,
     },
   })
+
+  await recordAssetPartHarvested(recipient, donor, data.part, data.is_exchange, userId)
 }

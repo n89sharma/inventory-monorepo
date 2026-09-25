@@ -1,4 +1,4 @@
-import { ASSET_STATUS } from 'shared-types'
+import { ASSET_STATUS, AssetUpdateDiffSchema } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
@@ -232,6 +232,26 @@ describe('holdService', () => {
     await moveAssetsToHold(source, destination, [a0.id], refs.userId)
 
     expect(await getHoldArchivedAt(source)).toBeNull()
+  })
+
+  it('records the release status change under a key the asset history schema defines', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [asset]), refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await archiveHold(holdNumber, refs.userId)
+
+    const rows = await prisma.history.findMany({
+      where: { id: { gt: sinceId }, entity_type: 'Asset', entity_id: asset.id },
+    })
+    const statusChange = rows
+      .map((r) => r.changes as { before: Record<string, unknown>; after: Record<string, unknown> })
+      .find((c) => 'status' in c.after)
+    expect(statusChange).toEqual({
+      before: { status: ASSET_STATUS.HELD },
+      after: { status: ASSET_STATUS.IN_STOCK },
+    })
+    expect(AssetUpdateDiffSchema.strict().safeParse(statusChange?.after).success).toBe(true)
   })
 
   it('records the move as a single hold_number change with no status change', async () => {
