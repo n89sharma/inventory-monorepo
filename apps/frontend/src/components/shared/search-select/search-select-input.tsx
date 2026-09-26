@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils'
-import { rankMatches } from '@/lib/rank-matches'
 import { XIcon } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import { Badge } from '@/components/shadcn/badge'
@@ -11,9 +10,9 @@ import {
   InputGroupInput,
 } from '@/components/shadcn/input-group'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
-
-const DISALLOWED_CHARS_PATTERN = /[^a-zA-Z0-9\s\-_.]/g
-const SUGGESTION_LIMIT = 10
+import { useListKeyboardNavigation } from '@/hooks/use-list-keyboard-navigation'
+import { NoResults, SuggestionList } from './search-suggestions'
+import { rankSuggestions, stripDisallowedChars } from './suggestion-matches'
 
 export type SearchSelectInputProps<T> = {
   selection: T | null
@@ -37,10 +36,6 @@ export type SearchSelectInputProps<T> = {
 
 const defaultCreateLabel = (query: string): string => `Create "${query}"`
 
-function stripDisallowedChars(raw: string): string {
-  return raw.replace(DISALLOWED_CHARS_PATTERN, '')
-}
-
 export function SearchSelectInput<T>({
   selection,
   query,
@@ -62,7 +57,11 @@ export function SearchSelectInput<T>({
 }: SearchSelectInputProps<T>): React.JSX.Element {
   const [matches, setMatches] = useState<T[]>([])
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const { highlightedIndex, onKeyDown, resetHighlight } = useListKeyboardNavigation({
+    items: matches,
+    onSelect: handleSelect,
+    onDismiss: dismissSuggestions,
+  })
   const inputRef = useRef<HTMLInputElement>(null)
   const [focusInputOnAttach, setFocusInputOnAttach] = useState(false)
 
@@ -76,21 +75,21 @@ export function SearchSelectInput<T>({
   function updateSearch(rawInput: string) {
     const clean = sanitize(rawInput)
     onQueryChange(clean)
-    if (!clean.trim()) {
-      setMatches([])
-      setPopoverOpen(false)
-      setHighlightedIndex(-1)
-      return
-    }
-    const ranked = rankMatches(options, clean, getSearchText)
-    setMatches(ranked.slice(0, SUGGESTION_LIMIT))
-    setPopoverOpen(true)
+    const hasQuery = clean.trim().length > 0
+    setMatches(rankSuggestions(options, clean, getSearchText))
+    setPopoverOpen(hasQuery)
+    if (!hasQuery) resetHighlight()
+  }
+
+  function dismissSuggestions() {
+    setPopoverOpen(false)
+    resetHighlight()
   }
 
   function resetSuggestions() {
     setPopoverOpen(false)
     setMatches([])
-    setHighlightedIndex(-1)
+    resetHighlight()
   }
 
   function handleSelect(item: T) {
@@ -119,29 +118,12 @@ export function SearchSelectInput<T>({
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        setHighlightedIndex((prev) => (prev < matches.length - 1 ? prev + 1 : prev))
-        break
-      case 'ArrowUp':
-        e.preventDefault()
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1))
-        break
-      case 'Enter':
-        if (highlightedIndex >= 0 && highlightedIndex < matches.length) {
-          e.preventDefault()
-          handleSelect(matches[highlightedIndex])
-        } else if (matches.length === 0 && onCreateOption && query.trim()) {
-          e.preventDefault()
-          handleCreate()
-        }
-        break
-      case 'Escape':
-      case 'Tab':
-        setPopoverOpen(false)
-        setHighlightedIndex(-1)
-        break
+    onKeyDown(e)
+    if (e.key === 'Enter' && matches.length === 0 && onCreateOption && query.trim()) {
+      e.preventDefault()
+      handleCreate()
+    } else if (e.key === 'Tab') {
+      dismissSuggestions()
     }
   }
 
@@ -218,47 +200,21 @@ export function SearchSelectInput<T>({
           className="w-max min-w-45 max-w-md p-1"
         >
           <div className="max-h-72 overflow-y-auto">
-            {matches.map((m, i) => (
-              <button
-                key={`${getLabel(m)}-${i}`}
-                type="button"
-                role="option"
-                aria-selected={highlightedIndex === i}
-                onClick={() => handleSelect(m)}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleSelect(m)
-                  }
-                }}
-                className={cn(
-                  'block w-full text-left px-2 py-1 cursor-pointer rounded-sm whitespace-nowrap',
-                  highlightedIndex === i
-                    ? 'bg-accent text-accent-foreground'
-                    : 'hover:bg-accent/50',
-                )}
-              >
-                {getColumns ? <SuggestionColumns columns={getColumns(m)} /> : getLabel(m)}
-              </button>
-            ))}
-            {matches.length === 0 && onCreateOption && query.trim() && (
-              <button
-                type="button"
-                onClick={handleCreate}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                }}
-                className="block w-full cursor-pointer rounded-sm px-2 py-1 text-left whitespace-nowrap hover:bg-accent/50"
-              >
-                {createLabel(query.trim())}
-              </button>
-            )}
-            {matches.length === 0 && !onCreateOption && query.trim() && (
-              <p className="px-2 py-1 text-sm text-muted-foreground">No results found</p>
-            )}
+            <SuggestionList
+              matches={matches}
+              highlightedIndex={highlightedIndex}
+              getLabel={getLabel}
+              getColumns={getColumns}
+              onSelect={handleSelect}
+              empty={
+                query.trim() && (
+                  <EmptySuggestions
+                    onCreate={onCreateOption && handleCreate}
+                    createLabel={createLabel(query.trim())}
+                  />
+                )
+              }
+            />
           </div>
         </PopoverContent>
       </Popover>
@@ -266,16 +222,24 @@ export function SearchSelectInput<T>({
   )
 }
 
-function SuggestionColumns({ columns }: { columns: string[] }): React.JSX.Element {
-  const [identifier, ...rest] = columns
+function EmptySuggestions({
+  onCreate,
+  createLabel,
+}: {
+  onCreate?: () => void
+  createLabel: string
+}): React.JSX.Element {
+  if (!onCreate) return <NoResults />
   return (
-    <span className="flex items-center gap-3">
-      <span className="font-mono font-medium">{identifier}</span>
-      {rest.map((col, i) => (
-        <span key={i} className="text-muted-foreground text-xs">
-          {col}
-        </span>
-      ))}
-    </span>
+    <button
+      type="button"
+      onClick={onCreate}
+      onMouseDown={(e) => {
+        e.preventDefault()
+      }}
+      className="block w-full cursor-pointer rounded-sm px-2 py-1 text-left whitespace-nowrap hover:bg-accent/50"
+    >
+      {createLabel}
+    </button>
   )
 }
