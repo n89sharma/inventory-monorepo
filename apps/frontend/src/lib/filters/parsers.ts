@@ -67,6 +67,7 @@ const parseAsSort = createParser<{ id: string; desc: boolean }>({
 export const FILTER_PARSERS = {
   wh: parseAsIdList,
   model: parseAsInteger,
+  models: parseAsIdList,
   q: parseAsString,
   readiness: parseAsIdList,
   meter_min: parseAsNonNegativeInt,

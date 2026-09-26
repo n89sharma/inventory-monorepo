@@ -1,4 +1,7 @@
+import { Badge } from '@/components/shadcn/badge'
+import { Field } from '@/components/shadcn/field'
 import { cn } from '@/lib/utils'
+import { XIcon } from '@phosphor-icons/react'
 
 export function SuggestionList<T>({
   matches,
@@ -43,6 +46,54 @@ export function SuggestionList<T>({
       ))}
       {matches.length === 0 && empty}
     </>
+  )
+}
+
+export function SelectionChip({
+  label,
+  clearLabel,
+  onClear,
+  error,
+}: {
+  label: React.ReactNode
+  clearLabel: string
+  onClear: () => void
+  error?: boolean
+}): React.JSX.Element {
+  return (
+    <Field data-invalid={error}>
+      <div
+        data-slot="search-select-selection"
+        className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5"
+      >
+        <Badge variant="secondary" className="min-w-0 max-w-full gap-1 pr-0.5">
+          {label}
+          <RemoveButton label={clearLabel} onClick={onClear} />
+        </Badge>
+      </div>
+    </Field>
+  )
+}
+
+export function RemoveButton({
+  label,
+  onClick,
+}: {
+  label: string
+  onClick: () => void
+}): React.JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={cn(
+        'ml-0.5 inline-flex size-4 shrink-0 items-center justify-center',
+        'rounded-full hover:bg-foreground/10',
+      )}
+    >
+      <XIcon aria-hidden="true" />
+    </button>
   )
 }
 

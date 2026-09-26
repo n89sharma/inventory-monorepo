@@ -3,7 +3,7 @@ import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { CassettesFilter } from '@/components/shared/filters/cassettes-filter'
 import { InternalFinisherFilter } from '@/components/shared/filters/internal-finisher-filter'
 import { MeterRangeInput } from '@/components/shared/filters/meter-range-input'
-import { ModelFilter } from '@/components/shared/filters/model-filter'
+import { ModelsFilter } from '@/components/shared/filters/models-filter'
 import { ReadinessFilter } from '@/components/shared/filters/readiness-filter'
 import { FilterRow } from '@/components/shared/filter-row'
 import {
@@ -12,7 +12,7 @@ import {
   useCassettesParam,
   useInternalFinisherParam,
   useMeterRangeParam,
-  useModelParam,
+  useModelsParam,
   useReadinessesParam,
 } from '@/lib/filters/hooks'
 import { memo } from 'react'
@@ -30,7 +30,7 @@ export const AssetFilterBar = memo(function AssetFilterBar({
 }): React.JSX.Element {
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
-  const { model, modelQuery, setModel, setModelQuery, clear } = useModelParam()
+  const { models, modelQuery, setModels, setModelQuery, clear } = useModelsParam()
   const [readinesses, setReadinesses] = useReadinessesParam()
   const { min, max, setMin, setMax } = useMeterRangeParam()
   const [cassettes, setCassettes] = useCassettesParam()
@@ -49,10 +49,10 @@ export const AssetFilterBar = memo(function AssetFilterBar({
 
         <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
 
-        <ModelFilter
-          selection={model}
+        <ModelsFilter
+          selection={models}
           query={modelQuery}
-          onSelectionChange={setModel}
+          onSelectionChange={setModels}
           onQueryChange={setModelQuery}
           onClear={clear}
           placeholder={modelPlaceholder}

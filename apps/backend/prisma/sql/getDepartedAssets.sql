@@ -137,4 +137,5 @@ where ($3 = '' or m."name" ilike '%' || $3 || '%')
   and (array_length($12::int[], 1) is null or at.id = any($12::int[]))
   and ($13 = -1 or do_.id = $13)
   and ($14 = '' or si.invoice_reference_normalized like '%' || $14 || '%')
+  and (array_length($16::int[], 1) is null or m.id = any($16::int[]))
 order by d.created_at desc

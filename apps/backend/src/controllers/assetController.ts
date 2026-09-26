@@ -8,6 +8,7 @@ import {
   BulkUpdateAssetLocationSchema,
   BulkUpdateAssetPricingSchema,
   MAX_DEPARTED_WINDOW_MONTHS,
+  MAX_MODEL_FILTER_COUNT,
   PatchAssetPricingSchema,
   CreateCommentSchema,
   CreateSalvagedPartSchema,
@@ -88,6 +89,10 @@ export const AssetQuerySchema = z.object({
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
+  modelIds: z.preprocess(
+    toNumberArray,
+    z.array(z.string().transform(Number)).max(MAX_MODEL_FILTER_COUNT),
+  ),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -120,6 +125,7 @@ function resolveDepartedRange(
 export const getAssets = asyncHandler(async (req, res) => {
   const {
     model,
+    modelIds,
     statusIds,
     readinessIds,
     warehouseIds,
@@ -136,6 +142,7 @@ export const getAssets = asyncHandler(async (req, res) => {
   const { departedFrom, departedTo } = resolveDepartedRange(fromDate, toDate)
   const data = await getAssetsSer(
     model ?? '',
+    modelIds,
     statusIds,
     readinessIds,
     warehouseIds,
@@ -164,6 +171,10 @@ export const DepartedAssetQuerySchema = z.object({
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
+  modelIds: z.preprocess(
+    toNumberArray,
+    z.array(z.string().transform(Number)).max(MAX_MODEL_FILTER_COUNT),
+  ),
   statusIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   readinessIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
   warehouseIds: z.preprocess(toNumberArray, z.array(z.string().transform(Number))),
@@ -201,6 +212,7 @@ function resolveDepartedSearchRange(
 export const getDepartedAssets = asyncHandler(async (req, res) => {
   const {
     model,
+    modelIds,
     statusIds,
     readinessIds,
     warehouseIds,
@@ -219,6 +231,7 @@ export const getDepartedAssets = asyncHandler(async (req, res) => {
   const { departedFrom, departedTo } = resolveDepartedSearchRange(fromDate, toDate)
   const data = await getDepartedAssetsSer(
     model ?? '',
+    modelIds,
     statusIds,
     readinessIds,
     warehouseIds,
@@ -251,6 +264,10 @@ export const SearchOnHandQuerySchema = z.object({
     .max(100)
     .regex(/^[a-zA-Z0-9\s\-_.]+$/)
     .optional(),
+  modelIds: z.preprocess(
+    toNumberArray,
+    z.array(z.string().transform(Number)).max(MAX_MODEL_FILTER_COUNT),
+  ),
   meterMin: z.string().optional().transform(Number),
   meterMax: z.string().optional().transform(Number),
   cassettes: z.string().optional().transform(Number),
@@ -267,6 +284,7 @@ export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
     assetTypeIds,
     readinessIds,
     model,
+    modelIds,
     meterMin,
     meterMax,
     cassettes,
@@ -281,6 +299,7 @@ export const getAssetsForSearchOnHand = asyncHandler(async (req, res) => {
     assetTypeIds,
     readinessIds,
     model ?? '',
+    modelIds,
     isNaN(meterMin) ? -1 : meterMin,
     isNaN(meterMax) ? -1 : meterMax,
     isNaN(cassettes) ? -1 : cassettes,

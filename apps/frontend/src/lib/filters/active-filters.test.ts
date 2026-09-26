@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { countActiveFilterGroups, type FilterParamGroups } from './hooks'
 
 const METER_RANGE_GROUPS = [['meter_min', 'meter_max']] as const satisfies FilterParamGroups
-const MODEL_GROUPS = [['model', 'q']] as const satisfies FilterParamGroups
+const MODEL_GROUPS = [['models', 'q']] as const satisfies FilterParamGroups
 const SCOPE_GROUPS = [['wh'], ['pricecheck'], ['brand']] as const satisfies FilterParamGroups
 
 describe('countActiveFilterGroups', () => {
@@ -16,7 +16,7 @@ describe('countActiveFilterGroups', () => {
   it('counts a two-param control once', () => {
     expect(countActiveFilterGroups(METER_RANGE_GROUPS, { meter_min: 100, meter_max: null })).toBe(1)
     expect(countActiveFilterGroups(METER_RANGE_GROUPS, { meter_min: 100, meter_max: 900 })).toBe(1)
-    expect(countActiveFilterGroups(MODEL_GROUPS, { model: null, q: 'ir-2020' })).toBe(1)
+    expect(countActiveFilterGroups(MODEL_GROUPS, { models: null, q: 'ir-2020' })).toBe(1)
   })
 
   it('counts each populated control separately', () => {

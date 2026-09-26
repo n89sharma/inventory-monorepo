@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+export const MAX_MODEL_FILTER_COUNT = 10
+
 export const ModelSummarySchema = z.object({
   id: z.number(),
   brand_id: z.number(),

@@ -1,7 +1,7 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
-import { ModelFilter } from '@/components/shared/filters/model-filter'
+import { ModelsFilter } from '@/components/shared/filters/models-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { FilterRow } from '@/components/shared/filter-row'
 import { IN_STOCK_SUMMARY_COLUMNS } from './in-stock-summary-table-columns'
@@ -13,7 +13,7 @@ import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
 import {
   useAssetTypesParam,
   useBrandParam,
-  useModelParam,
+  useModelsParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
 import { inStockDrilldownHref } from '@/lib/filters/serializers'
@@ -37,7 +37,7 @@ type InStockSummaryFilters = {
   warehouses: Warehouse[]
   brand: Brand | null
   assetTypes: AssetType[]
-  model: ModelSummary | null
+  models: ModelSummary[]
 }
 
 function buildFilteredGroups(
@@ -46,12 +46,13 @@ function buildFilteredGroups(
 ): InStockSummaryTableRow[] {
   const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
   const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
+  const modelIds = new Set(filters.models.map((m) => m.id))
   const filtered = rows.filter(
     (row) =>
       (warehouseIds.size === 0 || warehouseIds.has(row.warehouse_id)) &&
       (filters.brand === null || row.brand_id === filters.brand.id) &&
       (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
-      (filters.model === null || row.model_id === filters.model.id),
+      (modelIds.size === 0 || modelIds.has(row.model_id)),
   )
   return buildInStockSummaryGroups(filtered)
 }
@@ -117,12 +118,12 @@ export function InStockSummaryReportPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
-  const { model, modelQuery, setModel, setModelQuery, clear: clearModel } = useModelParam()
+  const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
   const { data: rows = EMPTY_ROWS, isLoading } = useInStockSummaryReport()
   const visibleRows = useMemo(
-    () => buildFilteredGroups(rows, { warehouses, brand, assetTypes, model }),
-    [rows, warehouses, brand, assetTypes, model],
+    () => buildFilteredGroups(rows, { warehouses, brand, assetTypes, models }),
+    [rows, warehouses, brand, assetTypes, models],
   )
 
   const canViewPurchase = useCan('view_purchase_price')
@@ -156,12 +157,12 @@ export function InStockSummaryReportPage(): React.JSX.Element {
               onClear={() => setBrand(null)}
             />
             <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
-            <ModelFilter
-              selection={model}
+            <ModelsFilter
+              selection={models}
               query={modelQuery}
-              onSelectionChange={setModel}
+              onSelectionChange={setModels}
               onQueryChange={setModelQuery}
-              onClear={clearModel}
+              onClear={clearModels}
             />
           </FilterRow>
         </form>

@@ -50,13 +50,14 @@ export type PriceHistoryRange = 6 | 12
 const DEFAULT_PRICE_HISTORY_RANGE: PriceHistoryRange = 6
 
 const ID_LIST_DEFAULT: number[] = []
+const NO_MODELS: ModelSummary[] = []
 const idListParser = parseAsIdList.withDefault(ID_LIST_DEFAULT)
 const priceCheckParser = FILTER_PARSERS.pricecheck.withDefault(false)
 const showOtherParser = FILTER_PARSERS.other.withDefault(false)
 const specsParser = FILTER_PARSERS.specs.withDefault(false)
 const searchParser = FILTER_PARSERS.search.withDefault('')
 const invoiceRefParser = FILTER_PARSERS.invoiceref.withDefault('')
-const MODEL_PARSERS = { model: FILTER_PARSERS.model, q: FILTER_PARSERS.q }
+const MODELS_PARSERS = { models: idListParser, q: FILTER_PARSERS.q }
 
 function resolveOne<T extends { id: number }>(id: number | null, list: T[]): T | null {
   return id === null ? null : (list.find((item) => item.id === id) ?? null)
@@ -198,7 +199,7 @@ export function useWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void]
 export type AssetFilters = {
   brand: Brand | null
   assetTypes: AssetType[]
-  model: ModelSummary | null
+  models: ModelSummary[]
   modelQuery: string | null
   readinesses: Status[]
   meterMin: number | null
@@ -213,7 +214,7 @@ export type AssetFilters = {
 export function useAssetFilters(): AssetFilters {
   const [brand] = useBrandParam()
   const [assetTypes] = useAssetTypesParam()
-  const { model, modelQuery } = useModelParam()
+  const { models, modelQuery } = useModelsParam()
   const [readinesses] = useReadinessesParam()
   const { min, max } = useMeterRangeParam()
   const [cassettes] = useCassettesParam()
@@ -222,7 +223,7 @@ export function useAssetFilters(): AssetFilters {
     () => ({
       brand,
       assetTypes,
-      model,
+      models,
       modelQuery: toCommittedQuery(modelQuery) || null,
       readinesses,
       meterMin: min,
@@ -230,7 +231,7 @@ export function useAssetFilters(): AssetFilters {
       cassettes,
       internalFinisher,
     }),
-    [brand, assetTypes, model, modelQuery, readinesses, min, max, cassettes, internalFinisher],
+    [brand, assetTypes, models, modelQuery, readinesses, min, max, cassettes, internalFinisher],
   )
 }
 
@@ -346,20 +347,31 @@ export function useMeterRangeParam(): {
   return { min, max, setMin, setMax }
 }
 
-export function useModelParam(): {
-  model: ModelSummary | null
+export function useModelParam(): [ModelSummary | null, (next: ModelSummary | null) => void] {
+  const models = useModels()
+  return useIdParam('model', models)
+}
+
+export function useModelsParam(): {
+  models: ModelSummary[]
   modelQuery: string
-  setModel: (next: ModelSummary | null) => void
+  setModels: (next: ModelSummary[]) => void
   setModelQuery: (text: string) => void
   clear: () => void
 } {
-  const models = useModels()
-  const [{ model: modelId, q }, setModelState] = useQueryStates(MODEL_PARSERS)
-  const model = useMemo(() => resolveOne(modelId, models), [modelId, models])
-  const committedQuery = model ? '' : (q ?? '')
+  const allModels = useModels()
+  const [{ models: modelIds, q }, setModelState] = useQueryStates(MODELS_PARSERS)
+  const committedModels = useMemo(() => resolveMany(modelIds, allModels), [modelIds, allModels])
+  const committedQuery = committedModels.length > 0 ? '' : (q ?? '')
   const commitQuery = useCallback(
     (text: string) => {
-      void setModelState({ model: null, q: toCommittedQuery(text) || null })
+      void setModelState({ models: null, q: toCommittedQuery(text) || null })
+    },
+    [setModelState],
+  )
+  const commitModels = useCallback(
+    (next: ModelSummary[]) => {
+      void setModelState({ models: next.length > 0 ? next.map((m) => m.id) : null, q: null })
     },
     [setModelState],
   )
@@ -368,18 +380,20 @@ export function useModelParam(): {
     commitQuery,
     toCommittedQuery,
   )
-  const setModel = useCallback(
-    (next: ModelSummary | null) => {
+  const [models, setModelsDraft, resetModels] = useDebouncedParam(committedModels, commitModels)
+  const setModels = useCallback(
+    (next: ModelSummary[]) => {
       resetQuery('')
-      void setModelState({ model: next?.id ?? null, q: null })
+      setModelsDraft(next)
     },
-    [resetQuery, setModelState],
+    [resetQuery, setModelsDraft],
   )
   const clear = useCallback(() => {
     resetQuery('')
-    void setModelState({ model: null, q: null })
-  }, [resetQuery, setModelState])
-  return { model, modelQuery, setModel, setModelQuery, clear }
+    resetModels(NO_MODELS)
+    void setModelState({ models: null, q: null })
+  }, [resetQuery, resetModels, setModelState])
+  return { models, modelQuery, setModels, setModelQuery, clear }
 }
 
 export function usePriceCheckParam(): [boolean, (next: boolean) => void] {

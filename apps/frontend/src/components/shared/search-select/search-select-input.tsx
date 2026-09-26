@@ -1,7 +1,5 @@
-import { cn } from '@/lib/utils'
 import { XIcon } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
-import { Badge } from '@/components/shadcn/badge'
 import { Field } from '@/components/shadcn/field'
 import {
   InputGroup,
@@ -11,7 +9,7 @@ import {
 } from '@/components/shadcn/input-group'
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import { useListKeyboardNavigation } from '@/hooks/use-list-keyboard-navigation'
-import { NoResults, SuggestionList } from './search-suggestions'
+import { NoResults, SelectionChip, SuggestionList } from './search-suggestions'
 import { rankSuggestions, stripDisallowedChars } from './suggestion-matches'
 
 export type SearchSelectInputProps<T> = {
@@ -130,27 +128,12 @@ export function SearchSelectInput<T>({
   if (selection) {
     return (
       <div className={className}>
-        <Field data-invalid={error}>
-          <div
-            data-slot="search-select-selection"
-            className="flex h-8 min-w-0 items-center rounded-lg border border-input bg-input/30 px-1.5"
-          >
-            <Badge variant="secondary" className="min-w-0 max-w-full gap-1 pr-0.5">
-              <span className="truncate">{getLabel(selection)}</span>
-              <button
-                type="button"
-                onClick={clearSelection}
-                aria-label={clearLabel}
-                className={cn(
-                  'ml-0.5 inline-flex size-4 shrink-0 items-center justify-center',
-                  'rounded-full hover:bg-foreground/10',
-                )}
-              >
-                <XIcon aria-hidden="true" />
-              </button>
-            </Badge>
-          </div>
-        </Field>
+        <SelectionChip
+          label={<span className="truncate">{getLabel(selection)}</span>}
+          clearLabel={clearLabel}
+          onClear={clearSelection}
+          error={error}
+        />
       </div>
     )
   }

@@ -40,6 +40,7 @@ const NO_DATE_UPPER_BOUND = new Date('9999-12-31T00:00:00.000Z')
 
 export async function getAssets(
   model: string,
+  modelIds: number[],
   statusIds: number[],
   readinessIds: number[],
   warehouseIds: number[],
@@ -77,6 +78,7 @@ export async function getAssets(
       heldForIdParam,
       holdCustomerIdParam,
       daysHeldMinParam,
+      modelIds,
     ),
   )
   return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, permissions))
@@ -147,6 +149,7 @@ export async function getSerialNumberMatches(
 
 export async function getDepartedAssets(
   model: string,
+  modelIds: number[],
   statusIds: number[],
   readinessIds: number[],
   warehouseIds: number[],
@@ -180,6 +183,7 @@ export async function getDepartedAssets(
       customerIdParam,
       normalizeForSearch(invoiceReference),
       salespersonIdParam,
+      modelIds,
     ),
   )
   return rows.map(mapAssetSearchRow).map((r) => redactSearchRowCost(r, permissions))
@@ -191,6 +195,7 @@ export async function getAssetsForSearchOnHand(
   assetTypeIds: number[],
   readinessIds: number[],
   model: string,
+  modelIds: number[],
   meterMinParam: number,
   meterMaxParam: number,
   cassettesParam: number,
@@ -206,6 +211,7 @@ export async function getAssetsForSearchOnHand(
   })
   return getAssets(
     model,
+    modelIds,
     statuses.map((s) => s.id),
     readinessIds,
     warehouseIds,

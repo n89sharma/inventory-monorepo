@@ -199,7 +199,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
   const searchParams = useOptimisticSearchParams()
   const [modelQuery, setModelQuery] = useState('')
 
-  const { model, setModel, clear } = useModelParam()
+  const [model, setModel] = useModelParam()
   const [range, setRange] = usePriceHistoryRangeParam()
   const [specsVisible, setSpecsVisible] = useSpecsVisibleParam()
 
@@ -255,7 +255,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
               onQueryChange={setModelQuery}
               onClear={() => {
                 setModelQuery('')
-                clear()
+                setModel(null)
               }}
               placeholder="Model *"
             />

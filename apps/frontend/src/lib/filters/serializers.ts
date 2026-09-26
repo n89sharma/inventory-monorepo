@@ -58,7 +58,7 @@ const serializeDrilldown = createSerializer({
   wh: FILTER_PARSERS.wh,
   brand: FILTER_PARSERS.brand,
   type: FILTER_PARSERS.type,
-  model: FILTER_PARSERS.model,
+  models: FILTER_PARSERS.models,
   meter_min: FILTER_PARSERS.meter_min,
   meter_max: FILTER_PARSERS.meter_max,
 })
@@ -82,6 +82,7 @@ const serializeProfitability = createSerializer({
   year: FILTER_PARSERS.year,
 })
 const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
+const serializeModels = createSerializer({ models: FILTER_PARSERS.models })
 const serializeHeld = createSerializer({
   heldfor: FILTER_PARSERS.heldfor,
   holdcustomer: FILTER_PARSERS.holdcustomer,
@@ -123,7 +124,7 @@ export function inStockDrilldownHref(row: InStockSummaryRow): string {
     wh: [row.warehouse_id],
     brand: row.brand_id,
     type: [row.asset_type_id],
-    model: row.model_id,
+    models: [row.model_id],
     meter_min: bounds?.min ?? null,
     meter_max: bounds?.max ?? null,
   })
@@ -155,7 +156,7 @@ export function modelPriceHistoryHref(modelId: number): string {
 }
 
 export function buildOnHandModelPath(modelId: number): string {
-  return serializeModel(ONHAND_PATH, { model: modelId })
+  return serializeModels(ONHAND_PATH, { models: [modelId] })
 }
 
 export function buildSearchOnHandUrl(selection: {
