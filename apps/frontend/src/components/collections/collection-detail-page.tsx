@@ -35,7 +35,7 @@ import {
   type AssetTypeFilter,
 } from '@/lib/asset-type-filter'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
-import { BulkEditBar, type BulkExtraActionGroup } from './bulk-edit-bar'
+import { BulkEditBar, type RenderBulkExtraActions } from './bulk-edit-bar'
 import { CollectionAssetsToolbar } from './collection-assets-toolbar'
 import { CollectionEditBar, type CollectionMenuAction } from './collection-edit-bar'
 
@@ -90,10 +90,7 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   ) => React.ReactNode
   renderAddAssetBar?: (entity: TEntity) => React.ReactNode
   renderHeaderActions?: (entity: TEntity) => React.ReactNode
-  renderBulkExtraActions?: (args: {
-    selectedAssets: AssetSearchRow[]
-    clearSelection: () => void
-  }) => { groups: BulkExtraActionGroup[]; dialogs: React.ReactNode } | null
+  renderBulkExtraActions?: RenderBulkExtraActions
   onRelease?: () => void
   onDelete?: () => void
 }

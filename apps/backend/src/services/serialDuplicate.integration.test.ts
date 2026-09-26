@@ -18,6 +18,7 @@ import {
   getArrivalAssetForUpdate,
   updateArrivalAsset,
 } from './arrivalService.js'
+import { harvestAssets } from './assetHarvestService.js'
 import { getSerialNumberMatches } from './assetReadService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
 import { createDeparture } from './departureService.js'
@@ -214,16 +215,10 @@ describe('duplicate serial numbers', () => {
       )
     })
 
-    // Harvested and scrapped machines departed too, but they were never sold, so their serials
-    // stay spoken for.
+    // Harvested machines were never sold, so their serials stay spoken for.
     it('rejects an acknowledged duplicate of a harvested asset', async () => {
       const { assetId } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
-      await createDeparture(
-        buildCreateDepartureInput(refs, [
-          { id: assetId, outgoing_status: OUTGOING_STATUS.HARVESTED },
-        ]),
-        refs.userId,
-      )
+      await harvestAssets([assetId], refs.userId)
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
       const [asset] = arrivalWithSerials(refs, [
         { serialNumber: EXISTING_SERIAL, duplicateSerialAcknowledged: true },

@@ -20,13 +20,13 @@ export const StatusSchema = z.object({
 
 // Mirror of the seeded `Status` lookup table (prisma seed). Keep in sync with the seed.
 // DB is authoritative at runtime; this is the compile-time symbol for code that names a status.
-const OUTGOING_STATUS_VALUES = ['SOLD', 'HARVESTED', 'SCRAPPED'] as const
+const OUTGOING_STATUS_VALUES = ['SOLD', 'SCRAPPED', 'RETURNED'] as const
 const IN_HOUSE_STATUS_VALUES = [
   'UNKNOWN',
   'ON_ORDER',
   'IN_STOCK',
   'HELD',
-  'RETURNED',
+  'HARVESTED',
   'MISSING',
   'LEASED',
 ] as const
@@ -46,8 +46,8 @@ export const DEFAULT_OUTGOING_STATUS: OutgoingStatus = OUTGOING_STATUS.SOLD
 
 export const OUTGOING_STATUS_LABELS = {
   SOLD: 'Sold',
-  HARVESTED: 'Harvested',
   SCRAPPED: 'Scrapped',
+  RETURNED: 'Returned',
 } as const satisfies Record<OutgoingStatus, string>
 const InvoiceTypeSchema = z.object({
   id: z.number(),

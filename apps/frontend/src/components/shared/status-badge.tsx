@@ -17,6 +17,8 @@ function getBadgeClass(status: string): string {
       return 'bg-amber-200 text-gray-700'
     case ASSET_STATUS.SCRAPPED:
       return 'bg-rose-300 text-gray-700'
+    case ASSET_STATUS.RETURNED:
+      return 'bg-violet-200 text-gray-700'
     default:
       return 'bg-rose-300 text-gray-700'
   }

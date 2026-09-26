@@ -1,3 +1,7 @@
+import {
+  HarvestAssetsDialog,
+  ReturnHarvestedToStockDialog,
+} from '@/components/asset-harvest/harvest-dialogs'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
@@ -9,9 +13,11 @@ import {
   PlusIcon,
   PrinterIcon,
   TrashIcon,
+  WrenchIcon,
 } from '@phosphor-icons/react'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
+import { isHarvestable, isUnharvestable } from '@/lib/asset-harvest'
 import { useState } from 'react'
 import { assetDetailsToSummary, type Permission } from 'shared-types'
 import { toast } from 'sonner'
@@ -44,6 +50,8 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [editLocationOpen, setEditLocationOpen] = useState(false)
   const [addToCollectionOpen, setAddToCollectionOpen] = useState(false)
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
+  const [harvestOpen, setHarvestOpen] = useState(false)
+  const [returnHarvestedOpen, setReturnHarvestedOpen] = useState(false)
 
   const mutations = useDepartureMutations()
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
@@ -83,6 +91,15 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p))
   const canDelete = can('delete_asset')
   const showReturnToStock = can('return_to_stock') && departureNumber !== null
+  const canHarvest = can('harvest_asset') && assetDetails !== null
+  const showMarkHarvested =
+    canHarvest &&
+    isHarvestable(assetDetails.status, assetDetails.is_in_transit) &&
+    departureNumber === null
+  const showReturnHarvested = canHarvest && isUnharvestable(assetDetails.status, departureNumber)
+  const harvestTargets = assetDetails
+    ? [{ id: assetDetails.id, barcode: assetDetails.barcode }]
+    : []
 
   return (
     <div className="flex gap-2 print:hidden">
@@ -117,7 +134,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           Collection
         </Button>
       )}
-      {(showReturnToStock || canDelete) && (
+      {(showReturnToStock || showMarkHarvested || showReturnHarvested || canDelete) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
@@ -125,6 +142,18 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            {showMarkHarvested && (
+              <DropdownMenuItem onSelect={() => setHarvestOpen(true)}>
+                <WrenchIcon />
+                Mark Harvested
+              </DropdownMenuItem>
+            )}
+            {showReturnHarvested && (
+              <DropdownMenuItem onSelect={() => setReturnHarvestedOpen(true)}>
+                <ArrowUUpLeftIcon />
+                Return to Stock
+              </DropdownMenuItem>
+            )}
             {showReturnToStock && (
               <DropdownMenuItem onSelect={() => setReturnToStockOpen(true)}>
                 <ArrowUUpLeftIcon />
@@ -159,6 +188,18 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         open={returnToStockOpen}
         onOpenChange={setReturnToStockOpen}
         onConfirm={handleReturnToStock}
+      />
+
+      <HarvestAssetsDialog
+        assets={harvestTargets}
+        open={harvestOpen}
+        onOpenChange={setHarvestOpen}
+      />
+
+      <ReturnHarvestedToStockDialog
+        assets={harvestTargets}
+        open={returnHarvestedOpen}
+        onOpenChange={setReturnHarvestedOpen}
       />
 
       <DeleteEntityDialog

@@ -3,7 +3,7 @@ import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { CaretDownIcon, TrashIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { AssetSummary } from 'shared-types'
+import type { AssetSearchRow, AssetSummary } from 'shared-types'
 import { BulkEditPricingModal } from './bulk-edit-pricing-modal'
 import { Button } from '../shadcn/button'
 import { Separator } from '../shadcn/separator'
@@ -40,6 +40,11 @@ export type BulkExtraActionGroup = {
   heading?: string
   actions: BulkExtraAction[]
 }
+
+export type RenderBulkExtraActions = (args: {
+  selectedAssets: AssetSearchRow[]
+  clearSelection: () => void
+}) => { groups: BulkExtraActionGroup[]; dialogs: React.ReactNode } | null
 
 // The bar clears the selection on a window-level Escape; without this, dismissing a menu would
 // also discard what the user just selected.

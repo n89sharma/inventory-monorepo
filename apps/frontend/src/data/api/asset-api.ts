@@ -16,6 +16,7 @@ import type {
   AssetTransfer,
   AssetType,
   Brand,
+  BulkAssetIds,
   BulkUpdateAssetLocation,
   BulkUpdateAssetPricing,
   Component,
@@ -47,6 +48,7 @@ import {
   AssetsBySerialNumberRequestSchema,
   AssetsBySerialNumberResultSchema,
   AssetTransferSchema,
+  BulkAssetIdsSchema,
   BulkUpdateAssetLocationSchema,
   BulkUpdateAssetPricingSchema,
   CommentSchema,
@@ -153,6 +155,18 @@ export async function bulkUpdateAssetLocation(data: BulkUpdateAssetLocation): Pr
     data satisfies BulkUpdateAssetLocation,
   )
   await api.put('/assets/bulk/location', bulkUpdateAssetLocationBody)
+}
+
+export async function harvestAssets(assetIds: number[]): Promise<void> {
+  const harvestAssetsBody = BulkAssetIdsSchema.parse({ assetIds } satisfies BulkAssetIds)
+  await api.post('/assets/bulk/harvest', harvestAssetsBody)
+}
+
+export async function returnHarvestedAssetsToStock(assetIds: number[]): Promise<void> {
+  const returnHarvestedAssetsToStockBody = BulkAssetIdsSchema.parse({
+    assetIds,
+  } satisfies BulkAssetIds)
+  await api.post('/assets/bulk/return-to-stock', returnHarvestedAssetsToStockBody)
 }
 
 export async function postComment(barcode: string, data: CreateComment): Promise<void> {

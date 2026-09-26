@@ -1,5 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
+import type { RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
 import { AssetResultsTable } from '@/components/shared/asset-results-table'
 import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
@@ -30,6 +31,7 @@ export function AssetSearchPage({
   getRowClassName,
   forceVisibleColumnIds,
   summaryStrip,
+  renderBulkExtraActions,
   children,
 }: {
   title: string
@@ -42,6 +44,7 @@ export function AssetSearchPage({
   getRowClassName?: (asset: AssetSearchRow) => string | undefined
   forceVisibleColumnIds?: readonly AssetColumnId[]
   summaryStrip?: React.ReactNode
+  renderBulkExtraActions?: RenderBulkExtraActions
   children: React.ReactNode
 }): React.JSX.Element {
   const searchParams = useOptimisticSearchParams()
@@ -113,6 +116,7 @@ export function AssetSearchPage({
           visibleColumns={visibleColumns}
           onVisibleColumnsChange={setVisibleColumns}
           onResetColumns={resetColumns}
+          renderBulkExtraActions={renderBulkExtraActions}
         />
       </div>
     </GridPageContent>

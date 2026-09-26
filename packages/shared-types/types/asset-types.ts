@@ -500,3 +500,16 @@ export const BulkUpdateAssetLocationSchema = UpdateAssetLocationSchema.extend({
 })
 
 export type BulkUpdateAssetLocation = z.infer<typeof BulkUpdateAssetLocationSchema>
+
+const MAX_BULK_STATUS_ASSETS = 2000
+
+// POST /assets/bulk/harvest, POST /assets/bulk/return-to-stock
+export const BulkAssetIdsSchema = z.object({
+  assetIds: z
+    .array(z.number().int())
+    .min(1)
+    .max(MAX_BULK_STATUS_ASSETS)
+    .refine((assetIds) => new Set(assetIds).size === assetIds.length, 'Duplicate asset ids'),
+})
+
+export type BulkAssetIds = z.infer<typeof BulkAssetIdsSchema>

@@ -642,6 +642,7 @@ const HARVESTED_DEFAULT_COLUMN_IDS = [
   'specs_meter_total',
   'status',
   'location',
+  'stock_days',
   'latest_comment',
 ] as const satisfies readonly AssetColumnId[]
 

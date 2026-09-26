@@ -119,24 +119,24 @@ describe('departureService', () => {
   })
 
   it('applies each asset its own outgoing status on creation', async () => {
-    const [sold, harvested] = await createArrivedAssets(refs, 2)
+    const [sold, returned] = await createArrivedAssets(refs, 2)
     await createDeparture(
       buildCreateDepartureInput(refs, [
         { id: sold.id, outgoing_status: OUTGOING_STATUS.SOLD },
-        { id: harvested.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+        { id: returned.id, outgoing_status: OUTGOING_STATUS.RETURNED },
       ]),
       refs.userId,
     )
 
     expect(await getAssetStatus(sold.id)).toBe(OUTGOING_STATUS.SOLD)
-    expect(await getAssetStatus(harvested.id)).toBe(OUTGOING_STATUS.HARVESTED)
+    expect(await getAssetStatus(returned.id)).toBe(OUTGOING_STATUS.RETURNED)
   })
 
   it('applies the default outgoing status when adding to an existing departure', async () => {
     const [first] = await createArrivedAssets(refs, 1)
     const departureNumber = await createDeparture(
       buildCreateDepartureInput(refs, [
-        { id: first.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+        { id: first.id, outgoing_status: OUTGOING_STATUS.RETURNED },
       ]),
       refs.userId,
     )
@@ -245,7 +245,7 @@ describe('departureService', () => {
     await createDeparture(
       buildCreateDepartureInput(refs, [
         { id: first.id, outgoing_status: OUTGOING_STATUS.SOLD },
-        { id: second.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+        { id: second.id, outgoing_status: OUTGOING_STATUS.RETURNED },
       ]),
       refs.userId,
     )
@@ -315,7 +315,7 @@ describe('departureService', () => {
     await seedAssetCost(stranger.id)
     const strangerDeparture = await createDeparture(
       buildCreateDepartureInput(refs, [
-        { id: stranger.id, outgoing_status: OUTGOING_STATUS.HARVESTED },
+        { id: stranger.id, outgoing_status: OUTGOING_STATUS.RETURNED },
       ]),
       refs.userId,
     )
@@ -324,7 +324,7 @@ describe('departureService', () => {
       returnDepartureAssetsToStock(departureNumber, [stranger.id], refs.userId),
     ).rejects.toThrow(ConflictError)
 
-    expect(await getAssetStatus(stranger.id)).toBe(OUTGOING_STATUS.HARVESTED)
+    expect(await getAssetStatus(stranger.id)).toBe(OUTGOING_STATUS.RETURNED)
     expect(await getAssetCost(stranger.id)).toEqual(SEEDED_ASSET_COST)
     expect(strangerDeparture).not.toBe(departureNumber)
   })

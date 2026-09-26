@@ -1,13 +1,24 @@
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
+import { ReturnHarvestedToStockDialog } from '@/components/asset-harvest/harvest-dialogs'
+import type { RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
+import { useCan } from '@/hooks/use-can'
 import { useSearchHarvested } from '@/hooks/use-search-harvested'
+import { isUnharvestable } from '@/lib/asset-harvest'
 import { useAssetFilters, useWarehousesParam } from '@/lib/filters/hooks'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
-const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true } as const
+const RETURN_TO_STOCK_LABEL = 'Return to stock'
+
+function returnToStockBlockedReason(assets: AssetSearchRow[]): string | undefined {
+  const blockedCount = assets.filter((a) => !isUnharvestable(a.status, a.departure_number)).length
+  if (blockedCount === 0) return undefined
+  if (blockedCount === 1) return '1 selected asset is on a departure'
+  return `${blockedCount} selected assets are on a departure`
+}
 
 export function SearchHarvestedPage(): React.JSX.Element {
   const assetFilters = useAssetFilters()
@@ -27,6 +38,37 @@ export function SearchHarvestedPage(): React.JSX.Element {
     mutate()
   }, [mutate])
 
+  const canHarvest = useCan('harvest_asset')
+  const [returnToStockOpen, setReturnToStockOpen] = useState(false)
+
+  const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(
+    ({ selectedAssets, clearSelection }) => {
+      if (!canHarvest) return null
+      return {
+        groups: [
+          {
+            actions: [
+              {
+                label: RETURN_TO_STOCK_LABEL,
+                onSelect: () => setReturnToStockOpen(true),
+                blockedReason: returnToStockBlockedReason(selectedAssets),
+              },
+            ],
+          },
+        ],
+        dialogs: (
+          <ReturnHarvestedToStockDialog
+            assets={selectedAssets}
+            open={returnToStockOpen}
+            onOpenChange={setReturnToStockOpen}
+            onSuccess={clearSelection}
+          />
+        ),
+      }
+    },
+    [canHarvest, returnToStockOpen],
+  )
+
   return (
     <AssetSearchPage
       title="Harvested"
@@ -35,7 +77,7 @@ export function SearchHarvestedPage(): React.JSX.Element {
       assets={assets}
       isLoading={isLoading}
       onBulkPriceSave={handleBulkPriceSave}
-      defaultSort={DEPARTED_AT_DESC_SORT}
+      renderBulkExtraActions={renderBulkExtraActions}
     >
       <AssetFilterBar scopeFilters={scopeFilters} />
     </AssetSearchPage>

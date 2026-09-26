@@ -7,7 +7,7 @@ import {
 } from '@/lib/filters/hooks'
 import { useStatuses } from '@/hooks/use-reference-data'
 import type { AssetSearchRow, Warehouse } from 'shared-types'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 export type SearchHarvestedFilters = AssetFilters & {
   warehouses: Warehouse[]
@@ -55,4 +55,10 @@ export function useSearchHarvested(filters: SearchHarvestedFilters) {
       revalidateOnReconnect: false,
     },
   )
+}
+
+export function invalidateSearchHarvested() {
+  return mutate((key) => Array.isArray(key) && key[0] === SEARCH_HARVESTED_KEY, undefined, {
+    revalidate: true,
+  })
 }

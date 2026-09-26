@@ -1,5 +1,7 @@
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
+import { HarvestAssetsDialog } from '@/components/asset-harvest/harvest-dialogs'
+import type { RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
 import { Toggle } from '@/components/shadcn/toggle'
 import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
 import { ExclusiveOptionsFilter } from '@/components/shared/filters/exclusive-options-filter'
@@ -20,8 +22,9 @@ import {
   useStatusesParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
+import { isHarvestable } from '@/lib/asset-harvest'
 import { formatTitleCase } from '@/lib/formatters'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ON_HAND_STATUS_VALUES, type AssetSearchRow, type Status } from 'shared-types'
 
 const EMPTY_ASSETS: AssetSearchRow[] = []
@@ -32,12 +35,20 @@ const DAYS_HELD_WARNING_THRESHOLD = 30
 const ROW_WARNING_CLASS = 'data-row-warning'
 const ALL_STATUSES_LABEL = 'All'
 const STATUS_GROUP_LABEL = 'Filter by status'
+const MARK_HARVESTED_LABEL = 'Mark harvested'
 
 const statusLabel = (status: Status) => formatTitleCase(status.status)
 
 function heldRowClassName(asset: AssetSearchRow): string | undefined {
   const days = daysHeld(asset.hold_created_at)
   return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
+}
+
+function harvestBlockedReason(assets: AssetSearchRow[]): string | undefined {
+  const blockedCount = assets.filter((a) => !isHarvestable(a.status, a.is_in_transit)).length
+  if (blockedCount === 0) return undefined
+  if (blockedCount === 1) return '1 selected asset is held or in transit'
+  return `${blockedCount} selected assets are held or in transit`
 }
 
 // Ordered by ON_HAND_STATUS_VALUES rather than by the reference-data store.
@@ -78,6 +89,36 @@ export function SearchOnHandPage(): React.JSX.Element {
   )
 
   const canViewPurchasePrice = useCan('view_purchase_price')
+  const canHarvest = useCan('harvest_asset')
+  const [harvestOpen, setHarvestOpen] = useState(false)
+
+  const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(
+    ({ selectedAssets, clearSelection }) => {
+      if (!canHarvest) return null
+      return {
+        groups: [
+          {
+            actions: [
+              {
+                label: MARK_HARVESTED_LABEL,
+                onSelect: () => setHarvestOpen(true),
+                blockedReason: harvestBlockedReason(selectedAssets),
+              },
+            ],
+          },
+        ],
+        dialogs: (
+          <HarvestAssetsDialog
+            assets={selectedAssets}
+            open={harvestOpen}
+            onOpenChange={setHarvestOpen}
+            onSuccess={clearSelection}
+          />
+        ),
+      }
+    },
+    [canHarvest, harvestOpen],
+  )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchOnHand(filters)
   const handleBulkPriceSave = useCallback(() => {
@@ -177,6 +218,7 @@ export function SearchOnHandPage(): React.JSX.Element {
       defaultSort={CREATED_AT_DESC_SORT}
       getRowClassName={heldRowClassName}
       forceVisibleColumnIds={priceCheck ? PRICE_CHECK_COLUMN_IDS : undefined}
+      renderBulkExtraActions={renderBulkExtraActions}
     >
       <AssetFilterBar scopeFilters={scopeFilters} />
     </AssetSearchPage>

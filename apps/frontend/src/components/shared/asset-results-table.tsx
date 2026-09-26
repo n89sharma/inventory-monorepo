@@ -5,7 +5,7 @@ import {
 } from '@/components/table-columns/column-primitives'
 import { AssetResultsToolbar } from '@/components/shared/asset-results-toolbar'
 import { DataGridWithoutResultCount } from '@/components/shared/data-table'
-import { BulkEditBar } from '@/components/collections/bulk-edit-bar'
+import { BulkEditBar, type RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
 import { useCan } from '@/hooks/use-can'
 import type {
   ColumnOrderState,
@@ -39,6 +39,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   visibleColumns,
   onVisibleColumnsChange,
   onResetColumns,
+  renderBulkExtraActions,
 }: {
   assets: AssetSearchRow[]
   rowSelection: RowSelectionState
@@ -56,6 +57,7 @@ export const AssetResultsTable = memo(function AssetResultsTable({
   visibleColumns: Set<string>
   onVisibleColumnsChange: (next: Set<string>) => void
   onResetColumns: () => void
+  renderBulkExtraActions?: RenderBulkExtraActions
 }) {
   const can = useCan()
   const columns = useMemo(
@@ -63,9 +65,10 @@ export const AssetResultsTable = memo(function AssetResultsTable({
     [getRowHref, can],
   )
 
-  const selectedAssets: AssetSummary[] = assets
-    .filter((a) => rowSelection[a.barcode])
-    .map(searchRowToAssetSummary)
+  const selectedRows = assets.filter((a) => rowSelection[a.barcode])
+  const selectedAssets: AssetSummary[] = selectedRows.map(searchRowToAssetSummary)
+  const clearSelection = () => onRowSelectionChange({})
+  const extraActions = renderBulkExtraActions?.({ selectedAssets: selectedRows, clearSelection })
 
   function selectAllAssets() {
     const all: RowSelectionState = {}
@@ -77,10 +80,12 @@ export const AssetResultsTable = memo(function AssetResultsTable({
     <>
       <BulkEditBar
         selectedAssets={selectedAssets}
-        onClear={() => onRowSelectionChange({})}
+        onClear={clearSelection}
         onPriceSaveSuccess={onBulkPriceSave}
         totalCount={assets.length}
         onSelectAll={selectAllAssets}
+        extraActionGroups={extraActions?.groups}
+        extraDialogs={extraActions?.dialogs}
       />
       <DataGridWithoutResultCount
         label={TABLE_LABEL}

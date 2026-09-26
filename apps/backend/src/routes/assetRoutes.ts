@@ -21,8 +21,10 @@ import {
   getLocationsByWarehouse,
   getDepartedAssets,
   getSerialNumberMatches,
+  harvestAssets,
   patchAssetPricing,
   printAssetBarcodes,
+  returnHarvestedAssetsToStock,
   updateAssetErrors,
   updateAssetLocation,
   updateAssetPricing,
@@ -44,6 +46,12 @@ router.get(
   getDepartedAssets,
 )
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
+router.post('/bulk/harvest', requirePermission('harvest_asset'), harvestAssets)
+router.post(
+  '/bulk/return-to-stock',
+  requirePermission('harvest_asset'),
+  returnHarvestedAssetsToStock,
+)
 router.get(
   '/locations',
   requirePermission('view_asset'),

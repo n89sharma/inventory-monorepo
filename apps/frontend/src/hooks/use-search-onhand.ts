@@ -2,7 +2,7 @@ import { getAssetsForSearchOnHand } from '@/data/api/asset-api'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { resolveWarehouseScope, type AssetFilters } from '@/lib/filters/hooks'
 import type { AssetSearchRow, OrgDetail, User, Warehouse } from 'shared-types'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 export type SearchOnHandFilters = AssetFilters & {
   warehouses: Warehouse[]
@@ -56,4 +56,10 @@ export function useSearchOnHand(filters: SearchOnHandFilters) {
       revalidateOnReconnect: false,
     },
   )
+}
+
+export function invalidateSearchOnHand() {
+  return mutate((key) => Array.isArray(key) && key[0] === SEARCH_ONHAND_KEY, undefined, {
+    revalidate: true,
+  })
 }

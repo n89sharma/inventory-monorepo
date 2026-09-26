@@ -23,9 +23,20 @@ import {
 } from './historyService.js'
 import {
   addRemoveCollectionFromAssets,
+  assertAssetsNotInCollection,
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
+
+const HARVESTED_ASSET_WHERE = {
+  status: { status: ASSET_STATUS.HARVESTED },
+} satisfies Prisma.AssetWhereInput
+
+const HARVESTED_ASSETS_MESSAGE = 'Harvested assets cannot be put on hold:'
+
+function harvestedAssetsError(barcodes: string[]): ConflictError {
+  return new ConflictError(`${HARVESTED_ASSETS_MESSAGE} ${barcodes.join(', ')}`)
+}
 
 export async function createHold(data: CreateHold, userId: number): Promise<string> {
   const assetIds = data.assets.map((a) => a.id)
@@ -58,6 +69,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
       select: { id: true, status_id: true },
     })
 
+    await assertAssetsNotInCollection(tx, assetIds, HARVESTED_ASSET_WHERE, harvestedAssetsError)
     await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: assetIds,
       assetsToRemove: [],
@@ -216,6 +228,12 @@ export async function addRemoveCollectionFromAssetsAndRecord(
           select: { id: true, status_id: true },
         }),
       ])
+      await assertAssetsNotInCollection(
+        tx,
+        delta.assetIdsToAdd,
+        HARVESTED_ASSET_WHERE,
+        harvestedAssetsError,
+      )
       await addRemoveCollectionFromAssets(tx, {
         assetsToAdd: delta.assetIdsToAdd,
         assetsToRemove: delta.assetIdsToRemove,

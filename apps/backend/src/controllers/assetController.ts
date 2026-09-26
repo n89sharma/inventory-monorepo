@@ -4,6 +4,7 @@ import {
   ApiResponse,
   AssetsBySerialNumberRequestSchema,
   AssetSummary,
+  BulkAssetIdsSchema,
   BulkUpdateAssetLocationSchema,
   BulkUpdateAssetPricingSchema,
   MAX_DEPARTED_WINDOW_MONTHS,
@@ -57,6 +58,10 @@ import {
 import { updateAssetSpecs as updateAssetSpecsSer } from '../services/assetSpecsService.js'
 import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../services/assetPartService.js'
 import { deleteAsset as deleteAssetSer } from '../services/assetDeleteService.js'
+import {
+  harvestAssets as harvestAssetsSer,
+  returnHarvestedAssetsToStock as returnHarvestedAssetsToStockSer,
+} from '../services/assetHarvestService.js'
 
 export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number),
@@ -423,6 +428,18 @@ export const updateAssetLocation = asyncHandler(async (req, res) => {
 export const bulkUpdateAssetLocation = asyncHandler(async (req, res) => {
   const validated = BulkUpdateAssetLocationSchema.parse(req.body)
   await bulkUpdateAssetLocationSer(validated, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
+
+export const harvestAssets = asyncHandler(async (req, res) => {
+  const { assetIds } = BulkAssetIdsSchema.parse(req.body)
+  await harvestAssetsSer(assetIds, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
+
+export const returnHarvestedAssetsToStock = asyncHandler(async (req, res) => {
+  const { assetIds } = BulkAssetIdsSchema.parse(req.body)
+  await returnHarvestedAssetsToStockSer(assetIds, res.locals.dbUserId)
   res.json(successResponse(null))
 })
 
