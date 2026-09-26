@@ -15,7 +15,7 @@ import {
   getDefaultFromDate,
   getToday,
 } from '@/lib/filters/defaults'
-import { FILTER_PARSERS, parseAsIdList } from '@/lib/filters/parsers'
+import { FILTER_PARSERS, parseAsIdList, type MonthEndReportView } from '@/lib/filters/parsers'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import {
   ANY_OPTION,
@@ -31,7 +31,9 @@ import {
   INVOICE_TYPE,
   MAX_DEPARTED_WINDOW_MONTHS,
   OUTGOING_STATUS,
+  type AssetGroup,
   type AssetType,
+  type BrandGroup,
   type Brand,
   type Component,
   type ModelSummary,
@@ -488,6 +490,33 @@ export function useInvoiceTypeParam(): [InvoiceTypeFilter, (next: InvoiceTypeFil
     [setRaw],
   )
   return [invoiceType, setInvoiceType]
+}
+
+export function useBrandGroupParam(): [BrandGroup | null, (next: BrandGroup | null) => void] {
+  const [brandGroup, setRaw] = useQueryState('brandgroup', FILTER_PARSERS.brandgroup)
+  const setBrandGroup = useCallback((next: BrandGroup | null) => void setRaw(next), [setRaw])
+  return [brandGroup, setBrandGroup]
+}
+
+export function useAssetGroupParam(): [AssetGroup | null, (next: AssetGroup | null) => void] {
+  const [assetGroup, setRaw] = useQueryState('assetgroup', FILTER_PARSERS.assetgroup)
+  const setAssetGroup = useCallback((next: AssetGroup | null) => void setRaw(next), [setRaw])
+  return [assetGroup, setAssetGroup]
+}
+
+const DEFAULT_MONTH_END_REPORT_VIEW: MonthEndReportView = 'summary'
+
+export function useMonthEndReportViewParam(): [
+  MonthEndReportView,
+  (next: MonthEndReportView) => void,
+] {
+  const [raw, setRaw] = useQueryState('view', FILTER_PARSERS.view)
+  const view = raw ?? DEFAULT_MONTH_END_REPORT_VIEW
+  const setView = useCallback(
+    (next: MonthEndReportView) => void setRaw(next === DEFAULT_MONTH_END_REPORT_VIEW ? null : next),
+    [setRaw],
+  )
+  return [view, setView]
 }
 
 export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void] {

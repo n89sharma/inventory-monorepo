@@ -593,6 +593,7 @@ export async function setAssetReadiness(assetId: number, status: string): Promis
 }
 
 export async function cleanupTransactionalData(): Promise<void> {
+  await prisma.monthEndReport.deleteMany()
   await prisma.release.deleteMany()
   await prisma.warehouseTransferCost.deleteMany()
   await prisma.savedView.deleteMany()

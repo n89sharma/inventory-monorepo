@@ -43,10 +43,10 @@ function stockLayerKey(storePartId: number, warehouseId: number): string {
   return `${storePartId}:${warehouseId}`
 }
 
-export async function getStoreParts(canViewCost: boolean) {
+async function getValuedStoreParts(db: Prisma.TransactionClient) {
   const [rows, layerRows] = await Promise.all([
-    prisma.$queryRawTyped(getStorePartsDb()),
-    prisma.$queryRawTyped(getStoreStockLayersDb()),
+    db.$queryRawTyped(getStorePartsDb()),
+    db.$queryRawTyped(getStoreStockLayersDb()),
   ])
 
   const layersByPartWarehouse = new Map<string, StockLayer[]>()
@@ -59,11 +59,35 @@ export async function getStoreParts(canViewCost: boolean) {
 
   return rows.map((row) => {
     const layers = layersByPartWarehouse.get(stockLayerKey(row.id, row.warehouse_id)) ?? []
-    return {
-      ...row,
-      stock_value: canViewCost ? stockValue(layers, row.on_hand ?? 0).toNumber() : null,
-    }
+    return { ...row, stock_value: stockValue(layers, row.on_hand ?? 0) }
   })
+}
+
+export async function getStoreParts(canViewCost: boolean) {
+  const rows = await getValuedStoreParts(prisma)
+  return rows.map((row) => ({
+    ...row,
+    stock_value: canViewCost ? row.stock_value.toNumber() : null,
+  }))
+}
+
+export async function getStoreValueByWarehouse(
+  db: Prisma.TransactionClient,
+  warehouseIds: number[],
+) {
+  const rows = await getValuedStoreParts(db)
+  const byWarehouse = new Map<number, { city_code: string; stock_value: Prisma.Decimal }>()
+  for (const row of rows) {
+    if (!warehouseIds.includes(row.warehouse_id)) continue
+    const entry = byWarehouse.get(row.warehouse_id)
+    if (entry) entry.stock_value = entry.stock_value.add(row.stock_value)
+    else
+      byWarehouse.set(row.warehouse_id, {
+        city_code: row.warehouse_code,
+        stock_value: row.stock_value,
+      })
+  }
+  return [...byWarehouse].map(([warehouseId, entry]) => ({ warehouse_id: warehouseId, ...entry }))
 }
 
 export async function getStorePart(partId: number, canViewCost: boolean): Promise<StorePartDetail> {

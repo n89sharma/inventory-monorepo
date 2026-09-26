@@ -2,11 +2,18 @@ import express from 'express'
 import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
   ModelPriceHistoryQuerySchema,
+  MonthEndReportQuerySchema,
   ProfitabilityReportQuerySchema,
+  createMonthEndReport,
+  deleteMonthEndReports,
   getHeldReport,
   getInStockSummaryReport,
   getModelPriceHistory,
+  getMonthEndReport,
+  getMonthEndReports,
+  getMonthEndSchedule,
   getProfitabilityReport,
+  updateMonthEndSchedule,
 } from '../controllers/reportController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -28,6 +35,27 @@ router.get(
 router.get('/held', requirePermission('view_reports'), getHeldReport)
 
 router.get('/in-stock-summary', requirePermission('view_reports'), getInStockSummaryReport)
+
+router.get('/month-end', requirePermission('view_month_end_report'), getMonthEndReports)
+
+router.post('/month-end', requirePermission('generate_month_end_report'), createMonthEndReport)
+
+router.post(
+  '/month-end/bulk-delete',
+  requirePermission('delete_month_end_report'),
+  deleteMonthEndReports,
+)
+
+router.get('/month-end/schedule', requirePermission('view_month_end_report'), getMonthEndSchedule)
+
+router.put('/month-end/schedule', requirePermission('update_settings'), updateMonthEndSchedule)
+
+router.get(
+  '/month-end/:id',
+  requirePermission('view_month_end_report'),
+  validateQuery(MonthEndReportQuerySchema),
+  getMonthEndReport,
+)
 
 router.get(
   '/model-price-history',

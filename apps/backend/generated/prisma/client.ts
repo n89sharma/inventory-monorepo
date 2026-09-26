@@ -247,6 +247,26 @@ export type SavedView = Prisma.SavedViewModel
  */
 export type Organization = Prisma.OrganizationModel
 /**
+ * Model MonthEndSchedule
+ * 
+ */
+export type MonthEndSchedule = Prisma.MonthEndScheduleModel
+/**
+ * Model MonthEndReport
+ * 
+ */
+export type MonthEndReport = Prisma.MonthEndReportModel
+/**
+ * Model MonthEndReportAsset
+ * 
+ */
+export type MonthEndReportAsset = Prisma.MonthEndReportAssetModel
+/**
+ * Model MonthEndReportPart
+ * 
+ */
+export type MonthEndReportPart = Prisma.MonthEndReportPartModel
+/**
  * Model History
  * 
  */

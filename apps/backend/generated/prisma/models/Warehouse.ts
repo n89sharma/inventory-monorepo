@@ -216,6 +216,8 @@ export type WarehouseWhereInput = {
   users?: Prisma.UserListRelationFilter
   storeTransactions?: Prisma.StoreTransactionListRelationFilter
   transfer_costs?: Prisma.XOR<Prisma.WarehouseTransferCostNullableScalarRelationFilter, Prisma.WarehouseTransferCostWhereInput> | null
+  month_end_assets?: Prisma.MonthEndReportAssetListRelationFilter
+  month_end_parts?: Prisma.MonthEndReportPartListRelationFilter
 }
 
 export type WarehouseOrderByWithRelationInput = {
@@ -231,6 +233,8 @@ export type WarehouseOrderByWithRelationInput = {
   users?: Prisma.UserOrderByRelationAggregateInput
   storeTransactions?: Prisma.StoreTransactionOrderByRelationAggregateInput
   transfer_costs?: Prisma.WarehouseTransferCostOrderByWithRelationInput
+  month_end_assets?: Prisma.MonthEndReportAssetOrderByRelationAggregateInput
+  month_end_parts?: Prisma.MonthEndReportPartOrderByRelationAggregateInput
 }
 
 export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
@@ -250,6 +254,8 @@ export type WarehouseWhereUniqueInput = Prisma.AtLeast<{
   users?: Prisma.UserListRelationFilter
   storeTransactions?: Prisma.StoreTransactionListRelationFilter
   transfer_costs?: Prisma.XOR<Prisma.WarehouseTransferCostNullableScalarRelationFilter, Prisma.WarehouseTransferCostWhereInput> | null
+  month_end_assets?: Prisma.MonthEndReportAssetListRelationFilter
+  month_end_parts?: Prisma.MonthEndReportPartListRelationFilter
 }, "id" | "city_code_street">
 
 export type WarehouseOrderByWithAggregationInput = {
@@ -286,6 +292,8 @@ export type WarehouseCreateInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateInput = {
@@ -301,6 +309,8 @@ export type WarehouseUncheckedCreateInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUpdateInput = {
@@ -315,6 +325,8 @@ export type WarehouseUpdateInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateInput = {
@@ -330,6 +342,8 @@ export type WarehouseUncheckedUpdateInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateManyInput = {
@@ -510,6 +524,34 @@ export type WarehouseUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutUsersInput, Prisma.WarehouseUpdateWithoutUsersInput>, Prisma.WarehouseUncheckedUpdateWithoutUsersInput>
 }
 
+export type WarehouseCreateNestedOneWithoutMonth_end_assetsInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_assetsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutMonth_end_assetsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneRequiredWithoutMonth_end_assetsNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_assetsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutMonth_end_assetsInput
+  upsert?: Prisma.WarehouseUpsertWithoutMonth_end_assetsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutMonth_end_assetsInput, Prisma.WarehouseUpdateWithoutMonth_end_assetsInput>, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_assetsInput>
+}
+
+export type WarehouseCreateNestedOneWithoutMonth_end_partsInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_partsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutMonth_end_partsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+}
+
+export type WarehouseUpdateOneRequiredWithoutMonth_end_partsNestedInput = {
+  create?: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_partsInput>
+  connectOrCreate?: Prisma.WarehouseCreateOrConnectWithoutMonth_end_partsInput
+  upsert?: Prisma.WarehouseUpsertWithoutMonth_end_partsInput
+  connect?: Prisma.WarehouseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WarehouseUpdateToOneWithWhereWithoutMonth_end_partsInput, Prisma.WarehouseUpdateWithoutMonth_end_partsInput>, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_partsInput>
+}
+
 export type WarehouseCreateWithoutStoreTransactionsInput = {
   city_code: string
   street: string
@@ -521,6 +563,8 @@ export type WarehouseCreateWithoutStoreTransactionsInput = {
   locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutStoreTransactionsInput = {
@@ -535,6 +579,8 @@ export type WarehouseUncheckedCreateWithoutStoreTransactionsInput = {
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutStoreTransactionsInput = {
@@ -564,6 +610,8 @@ export type WarehouseUpdateWithoutStoreTransactionsInput = {
   locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutStoreTransactionsInput = {
@@ -578,6 +626,8 @@ export type WarehouseUncheckedUpdateWithoutStoreTransactionsInput = {
   locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutOrigin_transfersInput = {
@@ -591,6 +641,8 @@ export type WarehouseCreateWithoutOrigin_transfersInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutOrigin_transfersInput = {
@@ -605,6 +657,8 @@ export type WarehouseUncheckedCreateWithoutOrigin_transfersInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutOrigin_transfersInput = {
@@ -623,6 +677,8 @@ export type WarehouseCreateWithoutDestination_transfersInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDestination_transfersInput = {
@@ -637,6 +693,8 @@ export type WarehouseUncheckedCreateWithoutDestination_transfersInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDestination_transfersInput = {
@@ -666,6 +724,8 @@ export type WarehouseUpdateWithoutOrigin_transfersInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutOrigin_transfersInput = {
@@ -680,6 +740,8 @@ export type WarehouseUncheckedUpdateWithoutOrigin_transfersInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUpsertWithoutDestination_transfersInput = {
@@ -704,6 +766,8 @@ export type WarehouseUpdateWithoutDestination_transfersInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDestination_transfersInput = {
@@ -718,6 +782,8 @@ export type WarehouseUncheckedUpdateWithoutDestination_transfersInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutArrivalsInput = {
@@ -731,6 +797,8 @@ export type WarehouseCreateWithoutArrivalsInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutArrivalsInput = {
@@ -745,6 +813,8 @@ export type WarehouseUncheckedCreateWithoutArrivalsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutArrivalsInput = {
@@ -774,6 +844,8 @@ export type WarehouseUpdateWithoutArrivalsInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutArrivalsInput = {
@@ -788,6 +860,8 @@ export type WarehouseUncheckedUpdateWithoutArrivalsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutDeparturesInput = {
@@ -801,6 +875,8 @@ export type WarehouseCreateWithoutDeparturesInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutDeparturesInput = {
@@ -815,6 +891,8 @@ export type WarehouseUncheckedCreateWithoutDeparturesInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutDeparturesInput = {
@@ -844,6 +922,8 @@ export type WarehouseUpdateWithoutDeparturesInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutDeparturesInput = {
@@ -858,6 +938,8 @@ export type WarehouseUncheckedUpdateWithoutDeparturesInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutLocationsInput = {
@@ -871,6 +953,8 @@ export type WarehouseCreateWithoutLocationsInput = {
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutLocationsInput = {
@@ -885,6 +969,8 @@ export type WarehouseUncheckedCreateWithoutLocationsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutLocationsInput = {
@@ -914,6 +1000,8 @@ export type WarehouseUpdateWithoutLocationsInput = {
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutLocationsInput = {
@@ -928,6 +1016,8 @@ export type WarehouseUncheckedUpdateWithoutLocationsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutTransfer_costsInput = {
@@ -941,6 +1031,8 @@ export type WarehouseCreateWithoutTransfer_costsInput = {
   locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutTransfer_costsInput = {
@@ -955,6 +1047,8 @@ export type WarehouseUncheckedCreateWithoutTransfer_costsInput = {
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutTransfer_costsInput = {
@@ -984,6 +1078,8 @@ export type WarehouseUpdateWithoutTransfer_costsInput = {
   locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutTransfer_costsInput = {
@@ -998,6 +1094,8 @@ export type WarehouseUncheckedUpdateWithoutTransfer_costsInput = {
   locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseCreateWithoutUsersInput = {
@@ -1011,6 +1109,8 @@ export type WarehouseCreateWithoutUsersInput = {
   locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
   storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseUncheckedCreateWithoutUsersInput = {
@@ -1025,6 +1125,8 @@ export type WarehouseUncheckedCreateWithoutUsersInput = {
   locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
   storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
 }
 
 export type WarehouseCreateOrConnectWithoutUsersInput = {
@@ -1054,6 +1156,8 @@ export type WarehouseUpdateWithoutUsersInput = {
   locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
 }
 
 export type WarehouseUncheckedUpdateWithoutUsersInput = {
@@ -1068,6 +1172,164 @@ export type WarehouseUncheckedUpdateWithoutUsersInput = {
   locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
   storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
   transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseCreateWithoutMonth_end_assetsInput = {
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
+  transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutMonth_end_assetsInput = {
+  id?: number
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
+  transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutMonth_end_assetsInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_assetsInput>
+}
+
+export type WarehouseUpsertWithoutMonth_end_assetsInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_assetsInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_assetsInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutMonth_end_assetsInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutMonth_end_assetsInput, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_assetsInput>
+}
+
+export type WarehouseUpdateWithoutMonth_end_assetsInput = {
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
+  transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutMonth_end_assetsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
+  transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_parts?: Prisma.MonthEndReportPartUncheckedUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseCreateWithoutMonth_end_partsInput = {
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionCreateNestedManyWithoutWarehouseInput
+  transfer_costs?: Prisma.WarehouseTransferCostCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseUncheckedCreateWithoutMonth_end_partsInput = {
+  id?: number
+  city_code: string
+  street: string
+  is_active?: boolean
+  origin_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutOriginInput
+  destination_transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutDestinationInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutOriginInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutDestinationInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutWarehouseInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutDefault_warehouseInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutWarehouseInput
+  transfer_costs?: Prisma.WarehouseTransferCostUncheckedCreateNestedOneWithoutWarehouseInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedCreateNestedManyWithoutWarehouseInput
+}
+
+export type WarehouseCreateOrConnectWithoutMonth_end_partsInput = {
+  where: Prisma.WarehouseWhereUniqueInput
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_partsInput>
+}
+
+export type WarehouseUpsertWithoutMonth_end_partsInput = {
+  update: Prisma.XOR<Prisma.WarehouseUpdateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_partsInput>
+  create: Prisma.XOR<Prisma.WarehouseCreateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedCreateWithoutMonth_end_partsInput>
+  where?: Prisma.WarehouseWhereInput
+}
+
+export type WarehouseUpdateToOneWithWhereWithoutMonth_end_partsInput = {
+  where?: Prisma.WarehouseWhereInput
+  data: Prisma.XOR<Prisma.WarehouseUpdateWithoutMonth_end_partsInput, Prisma.WarehouseUncheckedUpdateWithoutMonth_end_partsInput>
+}
+
+export type WarehouseUpdateWithoutMonth_end_partsInput = {
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUpdateManyWithoutWarehouseNestedInput
+  transfer_costs?: Prisma.WarehouseTransferCostUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUpdateManyWithoutWarehouseNestedInput
+}
+
+export type WarehouseUncheckedUpdateWithoutMonth_end_partsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  city_code?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  origin_transfers?: Prisma.TransferUncheckedUpdateManyWithoutOriginNestedInput
+  destination_transfers?: Prisma.TransferUncheckedUpdateManyWithoutDestinationNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutOriginNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutDestinationNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutWarehouseNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutDefault_warehouseNestedInput
+  storeTransactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutWarehouseNestedInput
+  transfer_costs?: Prisma.WarehouseTransferCostUncheckedUpdateOneWithoutWarehouseNestedInput
+  month_end_assets?: Prisma.MonthEndReportAssetUncheckedUpdateManyWithoutWarehouseNestedInput
 }
 
 
@@ -1083,6 +1345,8 @@ export type WarehouseCountOutputType = {
   locations: number
   users: number
   storeTransactions: number
+  month_end_assets: number
+  month_end_parts: number
 }
 
 export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1093,6 +1357,8 @@ export type WarehouseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   locations?: boolean | WarehouseCountOutputTypeCountLocationsArgs
   users?: boolean | WarehouseCountOutputTypeCountUsersArgs
   storeTransactions?: boolean | WarehouseCountOutputTypeCountStoreTransactionsArgs
+  month_end_assets?: boolean | WarehouseCountOutputTypeCountMonth_end_assetsArgs
+  month_end_parts?: boolean | WarehouseCountOutputTypeCountMonth_end_partsArgs
 }
 
 /**
@@ -1154,6 +1420,20 @@ export type WarehouseCountOutputTypeCountStoreTransactionsArgs<ExtArgs extends r
   where?: Prisma.StoreTransactionWhereInput
 }
 
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountMonth_end_assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MonthEndReportAssetWhereInput
+}
+
+/**
+ * WarehouseCountOutputType without action
+ */
+export type WarehouseCountOutputTypeCountMonth_end_partsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MonthEndReportPartWhereInput
+}
+
 
 export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1168,6 +1448,8 @@ export type WarehouseSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   storeTransactions?: boolean | Prisma.Warehouse$storeTransactionsArgs<ExtArgs>
   transfer_costs?: boolean | Prisma.Warehouse$transfer_costsArgs<ExtArgs>
+  month_end_assets?: boolean | Prisma.Warehouse$month_end_assetsArgs<ExtArgs>
+  month_end_parts?: boolean | Prisma.Warehouse$month_end_partsArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["warehouse"]>
 
@@ -1202,6 +1484,8 @@ export type WarehouseInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   users?: boolean | Prisma.Warehouse$usersArgs<ExtArgs>
   storeTransactions?: boolean | Prisma.Warehouse$storeTransactionsArgs<ExtArgs>
   transfer_costs?: boolean | Prisma.Warehouse$transfer_costsArgs<ExtArgs>
+  month_end_assets?: boolean | Prisma.Warehouse$month_end_assetsArgs<ExtArgs>
+  month_end_parts?: boolean | Prisma.Warehouse$month_end_partsArgs<ExtArgs>
   _count?: boolean | Prisma.WarehouseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WarehouseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1218,6 +1502,8 @@ export type $WarehousePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     users: Prisma.$UserPayload<ExtArgs>[]
     storeTransactions: Prisma.$StoreTransactionPayload<ExtArgs>[]
     transfer_costs: Prisma.$WarehouseTransferCostPayload<ExtArgs> | null
+    month_end_assets: Prisma.$MonthEndReportAssetPayload<ExtArgs>[]
+    month_end_parts: Prisma.$MonthEndReportPartPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1626,6 +1912,8 @@ export interface Prisma__WarehouseClient<T, Null = never, ExtArgs extends runtim
   users<T extends Prisma.Warehouse$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   storeTransactions<T extends Prisma.Warehouse$storeTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$storeTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StoreTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   transfer_costs<T extends Prisma.Warehouse$transfer_costsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$transfer_costsArgs<ExtArgs>>): Prisma.Prisma__WarehouseTransferCostClient<runtime.Types.Result.GetResult<Prisma.$WarehouseTransferCostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  month_end_assets<T extends Prisma.Warehouse$month_end_assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$month_end_assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthEndReportAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  month_end_parts<T extends Prisma.Warehouse$month_end_partsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Warehouse$month_end_partsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthEndReportPartPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2236,6 +2524,54 @@ export type Warehouse$transfer_costsArgs<ExtArgs extends runtime.Types.Extension
    */
   include?: Prisma.WarehouseTransferCostInclude<ExtArgs> | null
   where?: Prisma.WarehouseTransferCostWhereInput
+}
+
+/**
+ * Warehouse.month_end_assets
+ */
+export type Warehouse$month_end_assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MonthEndReportAsset
+   */
+  select?: Prisma.MonthEndReportAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MonthEndReportAsset
+   */
+  omit?: Prisma.MonthEndReportAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MonthEndReportAssetInclude<ExtArgs> | null
+  where?: Prisma.MonthEndReportAssetWhereInput
+  orderBy?: Prisma.MonthEndReportAssetOrderByWithRelationInput | Prisma.MonthEndReportAssetOrderByWithRelationInput[]
+  cursor?: Prisma.MonthEndReportAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MonthEndReportAssetScalarFieldEnum | Prisma.MonthEndReportAssetScalarFieldEnum[]
+}
+
+/**
+ * Warehouse.month_end_parts
+ */
+export type Warehouse$month_end_partsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MonthEndReportPart
+   */
+  select?: Prisma.MonthEndReportPartSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MonthEndReportPart
+   */
+  omit?: Prisma.MonthEndReportPartOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MonthEndReportPartInclude<ExtArgs> | null
+  where?: Prisma.MonthEndReportPartWhereInput
+  orderBy?: Prisma.MonthEndReportPartOrderByWithRelationInput | Prisma.MonthEndReportPartOrderByWithRelationInput[]
+  cursor?: Prisma.MonthEndReportPartWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MonthEndReportPartScalarFieldEnum | Prisma.MonthEndReportPartScalarFieldEnum[]
 }
 
 /**

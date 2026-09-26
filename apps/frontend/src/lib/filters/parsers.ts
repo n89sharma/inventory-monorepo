@@ -8,7 +8,7 @@ import {
   parseAsString,
   parseAsStringLiteral,
 } from 'nuqs'
-import { INVOICE_TYPE } from 'shared-types'
+import { AssetGroupSchema, BrandGroupSchema, INVOICE_TYPE } from 'shared-types'
 
 const FLAG_ON = '1'
 
@@ -18,6 +18,9 @@ export const parseAsIdList = parseAsArrayOf(parseAsInteger, ',')
 const parseAsStringList = parseAsArrayOf(parseAsString, ',')
 
 export const COLS_PARAM_KEY = 'cols'
+
+const MONTH_END_REPORT_VIEWS = ['summary', 'assets'] as const
+export type MonthEndReportView = (typeof MONTH_END_REPORT_VIEWS)[number]
 
 // Non-negative integer; anything negative or unparseable clears the param.
 const parseAsNonNegativeInt = createParser<number>({
@@ -99,4 +102,7 @@ export const FILTER_PARSERS = {
   range: parseAsInteger,
   specs: parseAsOnFlag,
   asset_type: parseAsStringLiteral(ASSET_TYPE_FILTER_VALUES),
+  brandgroup: parseAsStringLiteral(BrandGroupSchema.options),
+  assetgroup: parseAsStringLiteral(AssetGroupSchema.options),
+  view: parseAsStringLiteral(MONTH_END_REPORT_VIEWS),
 }

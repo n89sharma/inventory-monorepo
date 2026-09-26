@@ -53,6 +53,7 @@ import { Link, useLocation } from 'react-router-dom'
 const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
 const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
+const MONTH_END_PATH = '/reports/month-end'
 const DEFAULT_BRAND_NAME = 'Canon'
 
 type SidebarPermission = 'view_collections' | 'view_store'
@@ -121,18 +122,26 @@ const SETTINGS_SUB_ITEMS = [
   { title: 'Organizations', url: '/settings/organizations' },
   { title: 'Locations', url: '/settings/locations' },
   { title: 'Export Assets', url: '/settings/export-assets' },
+  { title: 'Month End Schedule', url: '/settings/month-end-schedule' },
 ]
 
 const HELD_REPORT_PATH = '/reports/held'
 
-type ReportPermission = 'view_reports' | 'view_sale_price' | 'view_profitability_report'
+type ReportPermission =
+  | 'view_reports'
+  | 'view_sale_price'
+  | 'view_profitability_report'
+  | 'view_month_end_report'
 
 const REPORTS_SUB_ITEMS = [
   { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
   { title: 'Held', url: HELD_REPORT_PATH, permission: 'view_reports' },
   { title: 'Price History', url: MODEL_PRICE_HISTORY_PATH, permission: 'view_sale_price' },
   { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_profitability_report' },
+  { title: 'Month End', url: MONTH_END_PATH, permission: 'view_month_end_report' },
 ] as const satisfies readonly { title: string; url: string; permission: ReportPermission }[]
+
+const PREFIX_MATCHED_REPORT_URLS: readonly string[] = [MODEL_PRICE_HISTORY_PATH, MONTH_END_PATH]
 
 const TRANSFER_COSTS_ITEM = { title: 'Transfer Costs', url: '/settings/transfer-costs' }
 const USER_PERMISSIONS_ITEM = { title: 'User Management', url: '/settings/user-permissions' }
@@ -198,6 +207,7 @@ export function AppSidebar(): React.JSX.Element {
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
   const canViewProfitabilityReport = useCan('view_profitability_report')
+  const canViewMonthEndReport = useCan('view_month_end_report')
   const canPutAway = useCan('update_location')
   const canViewCollections = useCan('view_collections')
   const canViewStore = useCan('view_store')
@@ -214,6 +224,7 @@ export function AppSidebar(): React.JSX.Element {
     view_reports: canViewReports,
     view_sale_price: canViewSalePrice,
     view_profitability_report: canViewProfitabilityReport,
+    view_month_end_report: canViewMonthEndReport,
   }
 
   const isReportsActive = location.pathname.startsWith('/reports')
@@ -300,7 +311,7 @@ export function AppSidebar(): React.JSX.Element {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
-              {(canViewReports || canViewSalePrice) && (
+              {(canViewReports || canViewSalePrice || canViewMonthEndReport) && (
                 <Collapsible
                   open={reportsOpen}
                   onOpenChange={setReportsOpen}
@@ -320,10 +331,9 @@ export function AppSidebar(): React.JSX.Element {
                         {REPORTS_SUB_ITEMS.filter((item) => reportItemVisible[item.permission]).map(
                           (item) => {
                             const to = reportItemPath(item.url)
-                            const isActive =
-                              item.url === MODEL_PRICE_HISTORY_PATH
-                                ? location.pathname.startsWith(item.url)
-                                : location.pathname === item.url
+                            const isActive = PREFIX_MATCHED_REPORT_URLS.includes(item.url)
+                              ? location.pathname.startsWith(item.url)
+                              : location.pathname === item.url
                             return (
                               <SidebarMenuSubItem key={item.title}>
                                 <SidebarMenuSubButton

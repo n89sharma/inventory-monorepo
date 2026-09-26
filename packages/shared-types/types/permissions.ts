@@ -27,6 +27,9 @@ export const PERMISSIONS = [
   'update_user_roles',
   'delete_asset',
   'delete_collection',
+  'view_month_end_report',
+  'generate_month_end_report',
+  'delete_month_end_report',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]

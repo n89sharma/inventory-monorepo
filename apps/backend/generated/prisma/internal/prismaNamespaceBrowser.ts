@@ -92,6 +92,10 @@ export const ModelName = {
   ReleaseNote: 'ReleaseNote',
   SavedView: 'SavedView',
   Organization: 'Organization',
+  MonthEndSchedule: 'MonthEndSchedule',
+  MonthEndReport: 'MonthEndReport',
+  MonthEndReportAsset: 'MonthEndReportAsset',
+  MonthEndReportPart: 'MonthEndReportPart',
   History: 'History'
 } as const
 
@@ -610,6 +614,73 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const MonthEndScheduleScalarFieldEnum = {
+  id: 'id',
+  day_of_month: 'day_of_month',
+  updated_at: 'updated_at',
+  updated_by_id: 'updated_by_id'
+} as const
+
+export type MonthEndScheduleScalarFieldEnum = (typeof MonthEndScheduleScalarFieldEnum)[keyof typeof MonthEndScheduleScalarFieldEnum]
+
+
+export const MonthEndReportScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  period: 'period',
+  captured_at: 'captured_at',
+  created_by_id: 'created_by_id'
+} as const
+
+export type MonthEndReportScalarFieldEnum = (typeof MonthEndReportScalarFieldEnum)[keyof typeof MonthEndReportScalarFieldEnum]
+
+
+export const MonthEndReportAssetScalarFieldEnum = {
+  id: 'id',
+  report_id: 'report_id',
+  warehouse_id: 'warehouse_id',
+  city_code: 'city_code',
+  is_in_transit: 'is_in_transit',
+  brand_group: 'brand_group',
+  barcode: 'barcode',
+  brand_name: 'brand_name',
+  model_name: 'model_name',
+  asset_type: 'asset_type',
+  serial_number: 'serial_number',
+  meter_total: 'meter_total',
+  purchase_cost: 'purchase_cost',
+  transport_cost: 'transport_cost',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost',
+  parts_cost: 'parts_cost',
+  total_cost: 'total_cost',
+  stock_date: 'stock_date',
+  vendor_name: 'vendor_name',
+  accessories: 'accessories',
+  cassettes: 'cassettes',
+  readiness: 'readiness',
+  status: 'status',
+  hold_number: 'hold_number',
+  arrival_number: 'arrival_number',
+  purchase_invoice_number: 'purchase_invoice_number',
+  transfer_number: 'transfer_number'
+} as const
+
+export type MonthEndReportAssetScalarFieldEnum = (typeof MonthEndReportAssetScalarFieldEnum)[keyof typeof MonthEndReportAssetScalarFieldEnum]
+
+
+export const MonthEndReportPartScalarFieldEnum = {
+  id: 'id',
+  report_id: 'report_id',
+  warehouse_id: 'warehouse_id',
+  city_code: 'city_code',
+  stock_value: 'stock_value'
+} as const
+
+export type MonthEndReportPartScalarFieldEnum = (typeof MonthEndReportPartScalarFieldEnum)[keyof typeof MonthEndReportPartScalarFieldEnum]
 
 
 export const HistoryScalarFieldEnum = {

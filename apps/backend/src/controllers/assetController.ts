@@ -22,6 +22,7 @@ import {
 import { z } from 'zod'
 import { getAssetByBarcode } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
+import { toNumberArray } from '../lib/query-params.js'
 import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError, ValidationError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -76,11 +77,6 @@ export const SerialCheckQuerySchema = z.object({
   serialNumber: z.string().min(1).max(50).regex(SERIAL_NUMBER_PATTERN),
   excludeBarcode: z.string().max(50).regex(SERIAL_NUMBER_PATTERN).optional(),
 })
-
-const toNumberArray = (val: unknown) => {
-  if (val === undefined) return []
-  return Array.isArray(val) ? val : [val]
-}
 
 export const AssetQuerySchema = z.object({
   model: z

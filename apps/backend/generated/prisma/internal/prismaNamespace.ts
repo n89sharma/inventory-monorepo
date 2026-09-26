@@ -425,6 +425,10 @@ export const ModelName = {
   ReleaseNote: 'ReleaseNote',
   SavedView: 'SavedView',
   Organization: 'Organization',
+  MonthEndSchedule: 'MonthEndSchedule',
+  MonthEndReport: 'MonthEndReport',
+  MonthEndReportAsset: 'MonthEndReportAsset',
+  MonthEndReportPart: 'MonthEndReportPart',
   History: 'History'
 } as const
 
@@ -441,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3479,6 +3483,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MonthEndSchedule: {
+      payload: Prisma.$MonthEndSchedulePayload<ExtArgs>
+      fields: Prisma.MonthEndScheduleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthEndScheduleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthEndScheduleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        findFirst: {
+          args: Prisma.MonthEndScheduleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthEndScheduleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        findMany: {
+          args: Prisma.MonthEndScheduleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>[]
+        }
+        create: {
+          args: Prisma.MonthEndScheduleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        createMany: {
+          args: Prisma.MonthEndScheduleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthEndScheduleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>[]
+        }
+        delete: {
+          args: Prisma.MonthEndScheduleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        update: {
+          args: Prisma.MonthEndScheduleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthEndScheduleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthEndScheduleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthEndScheduleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthEndScheduleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndSchedulePayload>
+        }
+        aggregate: {
+          args: Prisma.MonthEndScheduleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthEndSchedule>
+        }
+        groupBy: {
+          args: Prisma.MonthEndScheduleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndScheduleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthEndScheduleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndScheduleCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthEndReport: {
+      payload: Prisma.$MonthEndReportPayload<ExtArgs>
+      fields: Prisma.MonthEndReportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthEndReportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthEndReportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthEndReportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthEndReportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        findMany: {
+          args: Prisma.MonthEndReportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>[]
+        }
+        create: {
+          args: Prisma.MonthEndReportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        createMany: {
+          args: Prisma.MonthEndReportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthEndReportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthEndReportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        update: {
+          args: Prisma.MonthEndReportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthEndReportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthEndReportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthEndReportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthEndReportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthEndReportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthEndReport>
+        }
+        groupBy: {
+          args: Prisma.MonthEndReportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthEndReportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthEndReportAsset: {
+      payload: Prisma.$MonthEndReportAssetPayload<ExtArgs>
+      fields: Prisma.MonthEndReportAssetFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthEndReportAssetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthEndReportAssetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthEndReportAssetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthEndReportAssetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        findMany: {
+          args: Prisma.MonthEndReportAssetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>[]
+        }
+        create: {
+          args: Prisma.MonthEndReportAssetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        createMany: {
+          args: Prisma.MonthEndReportAssetCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthEndReportAssetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthEndReportAssetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        update: {
+          args: Prisma.MonthEndReportAssetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthEndReportAssetDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthEndReportAssetUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthEndReportAssetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthEndReportAssetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportAssetPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthEndReportAssetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthEndReportAsset>
+        }
+        groupBy: {
+          args: Prisma.MonthEndReportAssetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportAssetGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthEndReportAssetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportAssetCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthEndReportPart: {
+      payload: Prisma.$MonthEndReportPartPayload<ExtArgs>
+      fields: Prisma.MonthEndReportPartFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthEndReportPartFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthEndReportPartFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthEndReportPartFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthEndReportPartFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        findMany: {
+          args: Prisma.MonthEndReportPartFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>[]
+        }
+        create: {
+          args: Prisma.MonthEndReportPartCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        createMany: {
+          args: Prisma.MonthEndReportPartCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthEndReportPartCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthEndReportPartDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        update: {
+          args: Prisma.MonthEndReportPartUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthEndReportPartDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthEndReportPartUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthEndReportPartUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthEndReportPartUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthEndReportPartPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthEndReportPartAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthEndReportPart>
+        }
+        groupBy: {
+          args: Prisma.MonthEndReportPartGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportPartGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthEndReportPartCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthEndReportPartCountAggregateOutputType> | number
+        }
+      }
+    }
     History: {
       payload: Prisma.$HistoryPayload<ExtArgs>
       fields: Prisma.HistoryFieldRefs
@@ -4097,6 +4397,73 @@ export const OrganizationScalarFieldEnum = {
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
 
 
+export const MonthEndScheduleScalarFieldEnum = {
+  id: 'id',
+  day_of_month: 'day_of_month',
+  updated_at: 'updated_at',
+  updated_by_id: 'updated_by_id'
+} as const
+
+export type MonthEndScheduleScalarFieldEnum = (typeof MonthEndScheduleScalarFieldEnum)[keyof typeof MonthEndScheduleScalarFieldEnum]
+
+
+export const MonthEndReportScalarFieldEnum = {
+  id: 'id',
+  kind: 'kind',
+  period: 'period',
+  captured_at: 'captured_at',
+  created_by_id: 'created_by_id'
+} as const
+
+export type MonthEndReportScalarFieldEnum = (typeof MonthEndReportScalarFieldEnum)[keyof typeof MonthEndReportScalarFieldEnum]
+
+
+export const MonthEndReportAssetScalarFieldEnum = {
+  id: 'id',
+  report_id: 'report_id',
+  warehouse_id: 'warehouse_id',
+  city_code: 'city_code',
+  is_in_transit: 'is_in_transit',
+  brand_group: 'brand_group',
+  barcode: 'barcode',
+  brand_name: 'brand_name',
+  model_name: 'model_name',
+  asset_type: 'asset_type',
+  serial_number: 'serial_number',
+  meter_total: 'meter_total',
+  purchase_cost: 'purchase_cost',
+  transport_cost: 'transport_cost',
+  transfer_cost: 'transfer_cost',
+  processing_cost: 'processing_cost',
+  other_cost: 'other_cost',
+  parts_cost: 'parts_cost',
+  total_cost: 'total_cost',
+  stock_date: 'stock_date',
+  vendor_name: 'vendor_name',
+  accessories: 'accessories',
+  cassettes: 'cassettes',
+  readiness: 'readiness',
+  status: 'status',
+  hold_number: 'hold_number',
+  arrival_number: 'arrival_number',
+  purchase_invoice_number: 'purchase_invoice_number',
+  transfer_number: 'transfer_number'
+} as const
+
+export type MonthEndReportAssetScalarFieldEnum = (typeof MonthEndReportAssetScalarFieldEnum)[keyof typeof MonthEndReportAssetScalarFieldEnum]
+
+
+export const MonthEndReportPartScalarFieldEnum = {
+  id: 'id',
+  report_id: 'report_id',
+  warehouse_id: 'warehouse_id',
+  city_code: 'city_code',
+  stock_value: 'stock_value'
+} as const
+
+export type MonthEndReportPartScalarFieldEnum = (typeof MonthEndReportPartScalarFieldEnum)[keyof typeof MonthEndReportPartScalarFieldEnum]
+
+
 export const HistoryScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
@@ -4411,6 +4778,10 @@ export type GlobalOmitConfig = {
   releaseNote?: Prisma.ReleaseNoteOmit
   savedView?: Prisma.SavedViewOmit
   organization?: Prisma.OrganizationOmit
+  monthEndSchedule?: Prisma.MonthEndScheduleOmit
+  monthEndReport?: Prisma.MonthEndReportOmit
+  monthEndReportAsset?: Prisma.MonthEndReportAssetOmit
+  monthEndReportPart?: Prisma.MonthEndReportPartOmit
   history?: Prisma.HistoryOmit
 }
 

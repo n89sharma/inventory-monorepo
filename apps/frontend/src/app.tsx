@@ -137,6 +137,21 @@ const InStockSummaryReportPage = lazy(() =>
     default: m.InStockSummaryReportPage,
   })),
 )
+const MonthEndReportsPage = lazy(() =>
+  import('./components/reports/month-end-reports-page').then((m) => ({
+    default: m.MonthEndReportsPage,
+  })),
+)
+const MonthEndReportPage = lazy(() =>
+  import('./components/reports/month-end-report-page').then((m) => ({
+    default: m.MonthEndReportPage,
+  })),
+)
+const MonthEndSchedulePage = lazy(() =>
+  import('./components/settings/month-end-schedule-page').then((m) => ({
+    default: m.MonthEndSchedulePage,
+  })),
+)
 const ExportAssetsPage = lazy(() =>
   import('./components/reports/export-assets-page').then((m) => ({
     default: m.ExportAssetsPage,
@@ -388,6 +403,22 @@ function AppRoutes() {
                       }
                     />
                     <Route
+                      path="/reports/month-end"
+                      element={
+                        <PermissionRoute permission="view_month_end_report">
+                          <MonthEndReportsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/reports/month-end/:reportId"
+                      element={
+                        <PermissionRoute permission="view_month_end_report">
+                          <MonthEndReportPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
                       path="/reports/held"
                       element={
                         <PermissionRoute permission="view_reports">
@@ -568,6 +599,14 @@ function AppRoutes() {
                       element={
                         <PermissionRoute permission="update_user_roles">
                           <RolesSettingsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings/month-end-schedule"
+                      element={
+                        <PermissionRoute permission="update_settings">
+                          <MonthEndSchedulePage />
                         </PermissionRoute>
                       }
                     />
