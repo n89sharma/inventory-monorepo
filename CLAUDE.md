@@ -10,6 +10,14 @@ Tell me when my ideas are flawed, incomplete, or poorly thought through.
 Always be professional. Take the tone of a professional in an office.
 Focus on practical problems and realistic solutions rather than being overly positive or encouraging.
 
+**Output contract.** Terse and direct. No preamble, no restating my request, no summary of what
+you're about to do. Lead with the answer or the diff.
+
+**Explain in plain language.** Answer a technical question in one short paragraph a non-developer
+could follow — no jargon, no code identifiers. Name the mechanism, files, or code only if I ask, or
+if they change what I should do next. When the turn asks for a change, the diff leads and this rule
+doesn't apply.
+
 ## Project
 
 **Loon** — lightweight real-time inventory management for small businesses.
@@ -30,24 +38,22 @@ you read files in each tree: `apps/backend/`, `apps/frontend/`, `packages/shared
   fits. Duplication is a defect, not a style choice.
 - **Challenge the framing.** Treat my technical decisions as proposals, not constraints.
   Before implementing, name any assumption in my request that may be suboptimal — including
-  known antipatterns — and say so. Proceed only after flagging. (Stack-specific antipatterns
-  live in the nested files.)
+  known antipatterns — and say so. Flag it in the same message, then proceed unless the flag
+  changes what I asked for. Once I've made an explicit decision, implement it — state any
+  remaining concern in one line and move on, don't re-argue. (Stack-specific antipatterns live in
+  the nested files.)
 - **Diverge before converging.** For design / product / architecture questions, propose 2–3
   structurally different approaches with tradeoffs before recommending one. Don't clone the
-  modal solution from a known product.
+  modal solution from a known product. Skip this when the change is mechanical or only one
+  approach is viable — say so in a line instead.
 - **No fabrication.** Never invent versions, APIs, file contents, benchmarks, or paths.
   Verify by reading the file or the docs. If something is unverified, say so.
 - **Competitor claims need a link, always.** Any claim about another product (UI placement, behavior,
   which apps do X) must be verified this session and shown with a working link — never from memory.
   No source, no claim.
-- **Output contract.** Terse and direct. No preamble, no restating my request, no summary of
-  what you're about to do. Lead with the answer or the diff.
-- **Simplest sufficient solution.** No abstraction, config, or generality that wasn't asked for.
-- **Inject typed values; never pass a discriminator a helper branches on or rebuilds types from.**
-  A shared helper takes caller-built, fully-typed values (e.g. a `Prisma.AssetWhereInput`, an error
-  factory, a `data` clause) and runs the generic algorithm over the shared operand type; the caller
-  owns entity-specifics. If a helper needs a string key/enum to reconstruct typed objects (computed
-  keys, `Pick<…, K>`, `as`), that's the smell — invert it and pass the literal.
+- **Simplest sufficient solution.** No abstraction, config, or generality that wasn't asked for,
+  and no extra filters, actions, or UI affordances. If scope should expand, ask in one short
+  question first.
 - **Rename as its own step.** When a refactor includes a naming change, do the rename first as a
   standalone, behavior-preserving commit — verify it builds/works — _then_ make functional changes.
   Always present the rename as a separate step. Never mix renames with logic changes in one commit.
@@ -58,8 +64,9 @@ Write plans in this structure, always: **Context**, **Decisions & risks**, numbe
 sections **split Backend / Frontend with `###` subheadings**, **Naming review** (only when something
 is renamed), **Tests**. No **Out of scope** section — a scope cut is a decision, state it in
 **Decisions & risks**. Blank line between every bullet, subheadings within any long section; scannability
-over completeness. Nowhere in a plan: file paths, line numbers, or code snippets (the Zod schema in
-Shared types is the one exception).
+over completeness. Nowhere in a plan: full paths, line numbers, or code snippets (the Zod schema in
+Shared types is the one exception) — bare file names in the `Name (file-name.ts)` form below are
+required.
 
 **Context**: 4-6 short bullets, plain business language a non-developer can follow, no code
 identifiers. Don't restate my prompt — state the problem, why it can't be solved today, any
@@ -109,45 +116,42 @@ the user's steps then the full expected end state; say when one builds on the pr
 Don't add meta/attribution trailers to commit messages (e.g. "Generated with Claude",
 "Co-Authored-By: Claude"). Write the message as if authored by the developer.
 
+Write the message to a temp file and use `git commit -F <file>`. Multi-line messages passed
+inline through the PowerShell tool leak literal `@` characters.
+
 ## Commands
 
-Run from the **repo root** after every code change; summarize and fix any errors before
-considering the task complete. **Lint first, then knip, then build, then test** — never run a
-later stage before the earlier one:
+Run from the **repo root** after every code change. `npm run verify` sequences its own stages;
+when running stages by hand, **lint, then knip, then build, then test** — never a later stage
+before an earlier one.
 
 ```bash
-npm run verify                   # lint + knip + typecheck, all workspaces (the gate; pre-push + CI run this)
+npm run verify                   # lint + knip + typecheck + build, all workspaces (the gate; pre-push + CI run this)
 npm test                         # full Vitest suite, both workspaces (btest + ftest) — run after verify
 # or run stages individually:
 npm run tlint                    # lint shared-types (also run for any shared-types change)
 npm run blint && npm run bbuild  # backend: lint, then build
 npm run flint && npm run fbuild  # frontend: lint, then build (fbuild compiles shared-types first)
 npm run knip                     # dead-code check across all workspaces
-npm run btest && npm run ftest   # tests: backend (needs Postgres up), then frontend
+npm run btest && npm run ftest   # tests: backend, then frontend
+npm run e2e                      # Playwright; starts the frontend itself, backend must be up
 ```
 
-**Under NO CIRCUMSTANCES** leave a code change without running the linter, and never build
-without linting first. Zero tolerance: **no errors and no warnings** may remain after a change —
-fix them (don't suppress) before the task is complete.
+**Zero tolerance, lint and tests alike:** no errors and no warnings may remain, and no test may be
+failing or unrun. Fix them — never suppress, never skip. A change is not complete otherwise, and
+never commit or push in that state. While iterating you may run one workspace's suite; the full
+`npm test` must pass before the task is done.
 
-**No code change may introduce dead code** — unused files, exports, types, or dependencies.
-Run `npm run knip` after linting and confirm it's clean (exit 0). A new unused export means
-either delete it or drop the `export` keyword if it's used only in-file; never leave it dangling.
+**No dead code** — no unused files, exports, types, or dependencies. `npm run knip` must exit 0.
+An unused export means delete it, or drop the `export` keyword if it's used only in-file.
+
+**Postgres:** backend tests need the local container — `docker compose up -d`; start it rather
+than skipping tests. They run against `loon_test`, never `loon_dev`: `apps/backend/.env.test` sets
+`DATABASE_URL`, Vitest `globalSetup` applies migrations to it, and a `setupFiles` guard aborts the
+run if `DATABASE_URL` doesn't target `loon_test`.
 
 Per-app (run inside the app dir): `npm run dev` (backend: tsx watch; frontend: Vite on 5173).
 Backend also: `npm run pgen` (`prisma generate --sql`) after any `.sql` change.
-
-**Tests:** Vitest (`npm test` per workspace; `vitest` for watch). Backend integration tests run
-against the `loon_test` database, never `loon_dev`: `apps/backend/.env.test` sets `DATABASE_URL`,
-Vitest `globalSetup` applies migrations to it, and a `setupFiles` guard aborts the run if
-`DATABASE_URL` doesn't target `loon_test`. Requires the local Postgres container (`docker compose up -d`).
-
-**Run the tests after every code change** — `npm test` from the repo root runs both workspaces
-(`btest` + `ftest`). Same zero-tolerance rule as lint: a change is not complete until the full
-suite passes. **Never commit or push with a failing or unrun test.** If a change touches only one
-workspace you may run that workspace's suite while iterating, but the full `npm test` must pass
-before the task is considered done. Backend tests need the Postgres container up (`docker compose
-up -d`); if it isn't running, start it — don't skip the tests.
 
 ## Using third-party libraries
 
@@ -173,10 +177,10 @@ A stale or unverified recommendation is worse than none.
 
 - **Formatting is owned by Prettier** (`.prettierrc`: no semicolons, single quotes, 100-col,
   trailing commas). A husky pre-commit hook formats staged files on commit; don't hand-format or
-  fight the formatter — the rules below are _semantic_, not layout. **Never run `npm run format`**
-  (it's `prettier --write .` across the whole repo): on this Windows checkout (`core.autocrlf=true`,
-  no `.gitattributes`) it rewrites ~200 files LF↔CRLF and floods `git status` with phantom changes.
-  Format only the files you touched: `npx prettier --write <file>…`.
+  fight the formatter — the rules below are _semantic_, not layout. Format only the files you
+  touched: `npx prettier --write <file>…`. **Never run Prettier across the whole repo** — on this
+  Windows checkout (`core.autocrlf=true`, no `.gitattributes`) it rewrites ~200 files LF↔CRLF and
+  floods `git status` with phantom changes.
 - **Static values as top-of-file `const`** — never inline magic strings, event names, or
   defaults. One place to change. e.g. `const DEFAULT_ROLE = 'member'`.
 - **Constant maps:** `const X = {...} as const satisfies Record<...>` with **no variable
@@ -190,6 +194,11 @@ A stale or unverified recommendation is worse than none.
   value. A ref holding the earlier value is `prevXRef`. e.g.
   `const prevBrandId = prevBrandIdRef.current` → `prevBrandIdRef.current = currBrandId` →
   `if (prevBrandId !== currBrandId)`.
+- **Inject typed values; never pass a discriminator a helper branches on or rebuilds types from.**
+  A shared helper takes caller-built, fully-typed values (e.g. a `Prisma.AssetWhereInput`, an error
+  factory, a `data` clause) and runs the generic algorithm over the shared operand type; the caller
+  owns entity-specifics. If a helper needs a string key/enum to reconstruct typed objects (computed
+  keys, `Pick<…, K>`, `as`), that's the smell — invert it and pass the literal.
 - **Name identifiers after the domain entity, not a UI consumer or render behavior.** The thing's
   durable noun outlives how any one screen uses it. `ASSET_TABLE_COLUMNS` not `PICKABLE_COLUMNS`
   (the picker is one consumer of three); `defaultColumn` not `defaultVisible` (anchor to the noun,

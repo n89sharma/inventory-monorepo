@@ -41,3 +41,6 @@ packages/*/package-lock.json
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Claude Code worktrees — full repo copies; keep them out of git and knip
+.claude/worktrees/

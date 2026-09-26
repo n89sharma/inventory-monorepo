@@ -25,7 +25,6 @@
     "btypecheck": "npm run typecheck -w apps/backend",
     "ftypecheck": "npm run typecheck -w apps/frontend",
     "verify": "concurrently --group npm:tlint npm:blint npm:flint npm:knip npm:tbuild && concurrently --group --names btypecheck+bbuild,ftypecheck \"npm run btypecheck && npm run bbuild\" npm:ftypecheck",
-    "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run btest && npm run ftest",
     "e2e": "playwright test",

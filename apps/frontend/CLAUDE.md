@@ -14,7 +14,7 @@ Root `CLAUDE.md` rules still apply.
 | -------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Form types     | `ui-types/entity-form-types.ts`          | Zod schema + inferred type for react-hook-form; UI shape (e.g. `SelectOption<User>`)                                                                                                                                           |
 | API            | `data/api/entity-api.ts`                 | Axios calls; maps form payload ↔ request body. No SWR, no cache logic                                                                                                                                                          |
-| Store          | `data/store/entity-store.ts`             | Zustand — **client state only** (filter selections, `hasSearched`, UI flags). ~30 lines                                                                                                                                        |
+| Filters        | `lib/filters/*.ts`                       | URL-backed page state on nuqs: `hooks.ts` (one `useXParam` per filter), `parsers.ts`, `serializers.ts`, `defaults.ts`                                                                                                          |
 | Query hooks    | `hooks/use-entity.ts`                    | SWR reads: `useXDetail`, `preloadXDetail`, `xDetailKey`, `useXsList`, `invalidateXLists`. List key returns `null` until `fromDate` is set; `invalidateXLists()` is a matcher revalidating every cached filter variant          |
 | Mutation hooks | `hooks/use-entity-mutations.ts`          | All writes for an entity (`create`, `addAsset`, `removeAsset`, `bulkRemoveAssets`, `updateMetadata`, `flushPending`…); returns a stable object. Imports keys/invalidators from `use-entity.ts` only — no cross-sibling imports |
 | Pages          | `components/entity/entity-form-page.tsx` | Form page holds all field UI; create/details pages are thin wrappers (config + navigation)                                                                                                                                     |
@@ -23,21 +23,26 @@ Root `CLAUDE.md` rules still apply.
 | Hooks          | `hooks/use-kebab-case.ts`                | Custom hooks (see below)                                                                                                                                                                                                       |
 | Lib            | `lib/*.ts`                               | Pure utils / cross-cutting helpers                                                                                                                                                                                             |
 
-Reading one file per layer for an existing entity (~9 files: form types, API, store, query hook,
+Reading one file per layer for an existing entity (~8 files: form types, API, query hook,
 mutations hook, form page, create page, details page, columns) gives the full end-to-end pattern.
+Entity directories under `components/` are singular for some entities (`hold/`, `departure/`,
+`transfer/`, `invoice/`, `store-part/`) and plural for others (`arrivals/`, `collections/`) —
+check before assuming.
 
-## Server vs client state — strict separation
+## Where state lives
 
-The reason Zustand is **not** a data layer here: copying server data into Zustand creates two
-sources of truth. Don't do it.
+Never copy server data into a client store — that creates two sources of truth.
 
 - **Server state → SWR.** Anything from the network is owned by an SWR hook; cache keys colocated
   with the hook.
-- **Client state → Zustand.** Filter selections, UI toggles, `hasSearched`. Stores never call
-  APIs and never call `mutate()`.
-- **Components never import `data/api/*` directly.** Allowed entry points: a Zustand store
-  (client state), a `useEntityDetail` / `useEntitiesList` hook (reads), or a `useEntityMutations`
-  hook (writes).
+- **Page state → the URL, via nuqs** (`lib/filters/`). Filters, toggles and ranges are URL search
+  params so views are shareable and survive back-navigation. One `useXParam` hook per filter.
+  Local `useState` only for transient state (typeahead text) — state the deviation explicitly.
+- **Zustand is legacy here.** One store remains, `data/store/asset-store.ts`, and it is a
+  write/action store: each action calls an API then invalidates SWR keys. Don't add stores; put
+  new writes in a `use-entity-mutations.ts` hook.
+- **Components never import `data/api/*` directly.** Allowed entry points: a `useEntityDetail` /
+  `useEntitiesList` hook (reads), a `useEntityMutations` hook (writes), or `useAssetStore`.
 - **Every mutation invalidates the caches it affects** — typically `mutate(entityDetailKey(id))`
   - `invalidateEntityLists()`. Optimistic: `mutate(key, updater, { revalidate: false })` then a
     final `mutate(key)` in `finally`.
@@ -89,10 +94,13 @@ prop before the condition), use `?.` inside children, not `!` — ref
 
 ## Patterns
 
+- **Fix cross-cutting behavior in the shared component**, so it applies app-wide — never patch a
+  single consumer when the root cause is in `components/shared/`. The exception is layout owned by
+  one screen: fix that at the page or wrapper, not on a shared shadcn primitive.
 - **Toasts:** always pass `{ position: 'top-center' }` to every `toast.error/success/warning`.
 - **Form page anatomy:** `FieldSet` + `FieldLegend` + `FieldGroup` wraps all fields; barcode
   scanner and asset table sit outside the `FieldSet`. Read an existing page (e.g.
-  `create-hold-page.tsx`) for the exact shape. Validation errors:
+  `components/hold/create-hold-page.tsx`) for the exact shape. Validation errors:
   `toast.error(flattenFieldErrors(errors, []))` in `onInvalid`. Asset errors: `<Controller
 name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
 - **Routing (`app.tsx`):** specific routes before param routes — `/holds/new` before
@@ -109,7 +117,7 @@ name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
   multiple selections. `DropdownMenu` + `DropdownMenuCheckboxItem`; keep open on select with
   `onSelect={e => e.preventDefault()}`; include "Select all" at top.
 - **Asset removal undo** (`lib/asset-removal-undo.ts`), shared across all 5 collection entities:
-  `scheduleAssetRemoval`, `scheduleBulkAssetRemoval`, `flushPendingRemovals`. Owns a module-level
+  `scheduleBulkAssetRemoval`, `flushPendingRemovals`. Owns a module-level
   `Map` so the 5s timer survives re-renders. Detail pages call `mutations.flushPending(id)` in
   their unmount effect.
 - **Catalog data:** users, orgs, models and the `/reference` payload are plain SWR reads
@@ -118,10 +126,7 @@ name='assets'>` renders `<FieldError>` when `fieldState.invalid`.
   no app-level preload. Each hook returns the domain array directly, backed by a frozen empty
   fallback. Reference data is one key with entity-named accessors (`useBrands`, `useWarehouses`,
   `useErrorCodes`, `useAssetComponents`, …). Writes go through `use-*-mutations.ts` and invalidate
-  the key. `useAutoSearch` pre-populates list pages on first visit.
-- **Page state lives in the URL** (`lib/search-*-params.ts` pattern: `filtersToParams` /
-  `paramsToFilters`) so views are shareable and survive back-navigation. Local `useState` only
-  for transient state (typeahead text) — state the deviation explicitly.
+  the key.
 - **Permission gating: check at the lowest layer that can compute it.** A component that can name
   its own RBAC permission calls `useCan` itself and hides its own actions (`BulkEditBar`). If the
   permission needs parent context (which entity, instance state), the parent computes the boolean

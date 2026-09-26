@@ -7,12 +7,12 @@ Loads when you work in this tree. Root `CLAUDE.md` rules still apply.
 
 | Layer        | Path                               | Responsibility                                                                                                                                                    |
 | ------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Server setup | `src/index.ts`                     | Express, CORS (`localhost:5173` dev, `instock.copierexports.com` prod — confirm this domain is current), middleware, route registration                           |
+| Server setup | `src/app.ts`                       | Express, CORS (origins from `ALLOWED_CORS_ORIGINS`, comma-separated), helmet, middleware, route registration. `src/index.ts` only listens                         |
 | DB schema    | `prisma/schema.prisma`             | Single source of truth for tables, relations, field types. Generated client: `generated/prisma`. Config: `prisma.config.ts`. Preview: `relationJoins`, `typedSql` |
 | Typed SQL    | `prisma/sql/getSomething.sql`      | Raw SQL for reads, camelCase names; run `npm run pgen` after any change                                                                                           |
 | Service      | `src/services/xyzService.ts`       | Pure DB logic — Prisma, conflict checks, business rules. No HTTP                                                                                                  |
 | Controller   | `src/controllers/xyzController.ts` | HTTP only — parse `req.body` with `XyzSchema.parse(...)`, call service, return status                                                                             |
-| Route        | `src/routes/xyzRoutes.ts`          | Wire paths to controllers; register in `src/index.ts`                                                                                                             |
+| Route        | `src/routes/xyzRoutes.ts`          | Wire paths to controllers; register in `src/app.ts`                                                                                                               |
 
 **Controller vs service:** controllers own HTTP only (parse params, call a service, set status).
 All DB logic lives in the service. Never call `prisma` directly from a controller.
@@ -55,13 +55,24 @@ array form when conditional logic is involved.
 
 - **All SQL lives in typed `.sql` files** called via `prisma.$queryRawTyped(...)` — even simple
   queries. Never inline SQL in services/controllers. Never use `$queryRaw`, `$queryRawUnsafe`,
-  `$executeRawUnsafe`, or `Prisma.raw()`.
+  `$executeRawUnsafe`, or `Prisma.raw()`. The one exception is `getNextSequence` in
+  `src/lib/db-utils.ts`, whose `nextval(...)` call can't be expressed as typed SQL — don't add
+  more.
 - **Text-search input safety:** any field feeding `~*`, `LIKE`, `ILIKE` must pass a Zod allowlist
   before the query, e.g. `z.string().max(100).regex(/^[a-zA-Z0-9\s\-_.]*$/)`. Parameterization
   stops SQL injection but not ReDoS — a bound param like `(a{1,50}){1,50}` is still run as a
   POSIX regex by Postgres.
 - After removing a feature/query: delete unused `.sql` files, run `npm run pgen`, and check for
   orphaned imports across controller, service, and API layers.
+
+## Database
+
+- **Schema and index changes go through `schema.prisma` + a Prisma migration** — declare indexes
+  with `@@index`, never hand-run `CREATE INDEX` / `ALTER TABLE` against the database. (Queries are
+  the opposite: hand-written typed `.sql` files, see above.) List the DB changes and wait — I run
+  the migrations myself.
+- **Never run a destructive or `UPDATE` statement until I've confirmed the `WHERE` clause.** Show
+  me the matching row count from a `SELECT` with the same predicate first, then wait.
 
 ## Conventions
 
@@ -72,7 +83,8 @@ array form when conditional logic is involved.
   `res.locals.dbUserId`; controllers pass it to services for `created_by` / `updated_by`. No
   hardcoded user IDs.
 - **Utilities:** `response400` / `response500` / `successResponse` from `shared-types`;
-  `getNextSequence(entityType, warehouseCode, date)` in `src/lib/db-utils.ts` produces numbers
-  like `H-260409-001`.
+  `getNextSequence(entityType)` in `src/lib/db-utils.ts` returns the next bare number from that
+  entity's Postgres sequence. Each service formats its own display number from it (hold:
+  `H-${String(sequence).padStart(7, '0')}`) — keep the formatting in the owning service.
 - POST validation is parsed inline in the controller (`XyzSchema.parse(req.body)`); a shared
   `validateBody` middleware is known tech debt.
