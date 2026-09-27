@@ -5,6 +5,7 @@ import type {
   ColumnFiltersState,
   ColumnOrderState,
   ColumnPinningState,
+  ColumnSizingState,
   ExpandedState,
   Header,
   OnChangeFn,
@@ -26,7 +27,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
+import { flushSync } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
@@ -189,24 +200,44 @@ const GRIP_ICON_SIZE = 14
 const GRIP_LABEL = 'Reorder column'
 const DRAGGING_HEAD_CLASS = 'opacity-40'
 // Only ever applied to unpinned headers, so it never collides with PIN_EDGE_SHADOW.
-const DROP_BEFORE_CLASS = 'shadow-[inset_2px_0_0_var(--color-primary)]'
-const DROP_AFTER_CLASS = 'shadow-[inset_-2px_0_0_var(--color-primary)]'
-// Cursors come from the --cursor-grab / --cursor-grabbing variables in global.css rather
-// than the bare grab/grabbing keywords, which Chrome draws from an unscaled bitmap.
+const DROP_BEFORE_CLASS = 'shadow-[inset_2px_0_0_var(--color-foreground)]'
+const DROP_AFTER_CLASS = 'shadow-[inset_-2px_0_0_var(--color-foreground)]'
+// Raised above the sort toggle's stretched hit area, so a press on the grip starts a drag
+// rather than a sort. Darkens with the label whenever the header is hovered. The padding
+// widens the hit area and the matching negative margin keeps it out of the layout.
 const GRIP_CLASS =
-  'absolute left-0.5 top-1/2 -translate-y-1/2 opacity-0 transition-opacity ' +
-  '[cursor:var(--cursor-grab)] active:[cursor:var(--cursor-grabbing)] ' +
-  'group-hover/head:opacity-60 focus-visible:opacity-100'
-// The grip is absolute, so it adds nothing to the column's measured width: a column whose
-// label and data are both narrow would size flush to the label and let the grip sit on top
-// of it. This clears the grip's lane (2px offset + a 14px icon) and mirrors it on the right
-// so the label stays centred over its data. Only the draggable headers carry a grip.
-const GRIP_LANE_CLASS = 'px-4.5'
-// Fills the cell so the whole header reads as the hit area, and reserves nothing for the
-// arrow: the column is sized to its content, which the arrow joins once a sort is applied.
+  'relative z-10 -mx-1 -my-1.5 shrink-0 px-1 py-1.5 transition-colors ' +
+  'cursor-grab active:cursor-grabbing ' +
+  'group-hover/head:text-foreground focus-visible:text-foreground'
+// The grip sits in flow a fixed gap before the label. The right padding mirrors the grip
+// and that gap (a 14px icon + 10px) so the label stays centred over its data. Only the
+// draggable headers carry a grip.
+const GRIP_GROUP_CLASS = 'flex min-w-0 items-center justify-center gap-2.5 pr-6'
+// Hugs its label, but its ::after stretches over the whole header cell, so the entire header
+// still reads as the hit area. Reserves nothing for the arrow: the column is sized to its
+// content, which the arrow joins once a sort is applied.
 const SORT_TOGGLE_CLASS =
-  'inline-flex w-full items-center justify-center gap-1 whitespace-normal ' +
-  'cursor-pointer select-none hover:text-foreground'
+  'inline-flex min-w-0 max-w-full items-center justify-center gap-1 ' +
+  'cursor-pointer select-none group-hover/head:text-foreground [&>svg]:shrink-0 ' +
+  'after:absolute after:inset-0'
+const HEADER_LABEL_CLASS = 'min-w-0 truncate'
+const PLAIN_HEADER_LABEL_CLASS = `block ${HEADER_LABEL_CLASS}`
+// A table opens sized to its content. The first resize freezes every column at its rendered
+// width and switches to fixed layout, where the header row alone decides the widths, so the
+// body rows never re-render for a drag. Cells then truncate rather than push a column open.
+const AUTO_LAYOUT_TABLE_CLASS = 'table-auto w-max min-w-full'
+const FIXED_LAYOUT_TABLE_CLASS =
+  'table-fixed min-w-full [&_th]:overflow-hidden [&_td]:overflow-hidden [&_td]:text-ellipsis'
+const MIN_COLUMN_WIDTH = 48
+const COLUMN_ID_ATTRIBUTE = 'data-column-id'
+// A wide hit area around a 1px rule drawn in the pinned edge's colour on the cell's right
+// edge. The rule takes the hovered header text's colour while pointed at or dragged.
+const RESIZE_HANDLE_CLASS =
+  'absolute right-0 top-0 h-full w-2 cursor-col-resize touch-none select-none ' +
+  'after:absolute after:inset-y-0 after:right-0 after:transition-colors'
+const RESTING_HANDLE_CLASS =
+  'after:w-px after:bg-border hover:after:w-0.5 hover:after:bg-foreground'
+const RESIZING_HANDLE_CLASS = 'after:w-0.5 after:bg-foreground'
 const DRAG_CHIP_CLASS =
   'flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-xs font-medium shadow-md'
 
@@ -214,7 +245,67 @@ const DRAG_CHIP_CLASS =
 // caller supplies the z-index that a pinned cell needs to win over its own layer.
 function pinnedLeftStyle<TData>(column: Column<TData>, zIndex: number): CSSProperties {
   if (column.getIsPinned() !== 'left') return {}
-  return { position: 'sticky', left: column.getStart('left'), zIndex }
+  return { position: 'sticky', left: `var(${pinStartProperty(column.id)})`, zIndex }
+}
+
+function pinStartProperty(columnId: string): string {
+  return `--pin-start-${columnId}`
+}
+
+// Published on the table rather than read per cell, so a resize moves the pinned body cells
+// without re-rendering the memoized rows that hold them.
+function pinStartProperties<TData>(table: ReactTableInstance<TData>): CSSProperties {
+  const properties: Record<string, string> = {}
+  for (const column of table.getLeftLeafColumns()) {
+    properties[pinStartProperty(column.id)] = `${column.getStart('left')}px`
+  }
+  return properties as CSSProperties
+}
+
+function headerCellsOf(table: HTMLTableElement): HTMLElement[] {
+  return Array.from(table.querySelectorAll<HTMLElement>(`thead th[${COLUMN_ID_ATTRIBUTE}]`))
+}
+
+function measureRenderedWidths(table: HTMLTableElement): ColumnSizingState {
+  const widths: ColumnSizingState = {}
+  for (const headerCell of headerCellsOf(table)) {
+    const columnId = headerCell.getAttribute(COLUMN_ID_ATTRIBUTE)
+    if (columnId) widths[columnId] = headerCell.getBoundingClientRect().width
+  }
+  return widths
+}
+
+// The width each column would take if the table were still sized to its content, over the
+// rows currently in the DOM. The table drops back to auto layout for one synchronous reflow
+// and is restored before the browser can paint, so nothing flashes.
+function measureContentWidths(
+  table: HTMLTableElement,
+  columnIds: readonly string[],
+): ColumnSizingState {
+  const targetCells = headerCellsOf(table).filter((headerCell) =>
+    columnIds.includes(headerCell.getAttribute(COLUMN_ID_ATTRIBUTE) ?? ''),
+  )
+  const prevTableStyle = table.style.cssText
+  const prevCellStyles = targetCells.map((headerCell) => headerCell.style.cssText)
+  table.style.tableLayout = 'auto'
+  table.style.width = 'max-content'
+  table.style.minWidth = '0'
+  for (const headerCell of targetCells) headerCell.style.width = ''
+  const widths: ColumnSizingState = {}
+  for (const headerCell of targetCells) {
+    const columnId = headerCell.getAttribute(COLUMN_ID_ATTRIBUTE) ?? ''
+    widths[columnId] = Math.max(MIN_COLUMN_WIDTH, headerCell.getBoundingClientRect().width)
+  }
+  table.style.cssText = prevTableStyle
+  targetCells.forEach((headerCell, index) => {
+    headerCell.style.cssText = prevCellStyles[index]
+  })
+  return widths
+}
+
+// Every rendered header carries a width once frozen, so an empty map means content sizing.
+function isFrozen(columnSizing: ColumnSizingState): boolean {
+  return Object.keys(columnSizing).length > 0
 }
 
 function pinEdgeClass<TData>(column: Column<TData>): string {
@@ -229,9 +320,9 @@ function isReorderable<TData>(column: Column<TData>): boolean {
   return column.columnDef.meta?.reorderable ?? true
 }
 
-function headerCellStyle<TData>(header: Header<TData, unknown>): CSSProperties {
+function headerCellStyle<TData>(header: Header<TData, unknown>, frozen: boolean): CSSProperties {
   return {
-    width: header.column.columnDef.size,
+    width: frozen ? header.getSize() : header.column.columnDef.size,
     position: 'sticky',
     top: 0,
     zIndex: HEADER_Z_INDEX,
@@ -259,16 +350,29 @@ function SortToggle<TData>({ header }: { header: Header<TData, unknown> }): Reac
       className={SORT_TOGGLE_CLASS}
       onClick={() => column.toggleSorting(direction === 'asc')}
     >
-      {flexRender(column.columnDef.header, header.getContext())}
+      <span className={HEADER_LABEL_CLASS} onPointerEnter={titleWhenTruncated}>
+        {flexRender(column.columnDef.header, header.getContext())}
+      </span>
       {direction && <SortDirectionIcon direction={direction} />}
     </button>
   )
 }
 
+// A label cut short by a narrowed column names itself in full on hover; one that fits gets
+// no title, so it never repeats what is already on screen.
+function titleWhenTruncated(event: React.PointerEvent<HTMLElement>) {
+  const label = event.currentTarget
+  label.title = label.scrollWidth > label.clientWidth ? label.innerText : ''
+}
+
 function headerContent<TData>(header: Header<TData, unknown>): React.ReactNode {
   if (header.isPlaceholder) return null
   if (!header.column.getCanSort()) {
-    return flexRender(header.column.columnDef.header, header.getContext())
+    return (
+      <span className={PLAIN_HEADER_LABEL_CLASS} onPointerEnter={titleWhenTruncated}>
+        {flexRender(header.column.columnDef.header, header.getContext())}
+      </span>
+    )
   }
   return <SortToggle header={header} />
 }
@@ -280,23 +384,31 @@ function ariaSort<TData>(column: Column<TData>): 'ascending' | 'descending' | un
   return undefined
 }
 
-function HeaderCell<TData>({ header }: { header: Header<TData, unknown> }): React.JSX.Element {
-  if (!isReorderable(header.column)) return <StaticHeaderCell header={header} />
-  return <SortableHeaderCell header={header} />
+type HeaderCellProps<TData> = {
+  header: Header<TData, unknown>
+  frozen: boolean
+  resizeHandle: React.ReactNode
+}
+
+function HeaderCell<TData>(props: HeaderCellProps<TData>): React.JSX.Element {
+  if (!isReorderable(props.header.column)) return <StaticHeaderCell {...props} />
+  return <SortableHeaderCell {...props} />
 }
 
 function StaticHeaderCell<TData>({
   header,
-}: {
-  header: Header<TData, unknown>
-}): React.JSX.Element {
+  frozen,
+  resizeHandle,
+}: HeaderCellProps<TData>): React.JSX.Element {
   return (
     <TableHead
+      data-column-id={header.column.id}
       aria-sort={ariaSort(header.column)}
-      style={headerCellStyle(header)}
-      className={headerCellClassName(header)}
+      style={headerCellStyle(header, frozen)}
+      className={`group/head ${headerCellClassName(header)}`}
     >
       {headerContent(header)}
+      {resizeHandle}
     </TableHead>
   )
 }
@@ -309,9 +421,9 @@ function dropIndicatorClass(isOver: boolean, activeIndex: number, index: number)
 
 function SortableHeaderCell<TData>({
   header,
-}: {
-  header: Header<TData, unknown>
-}): React.JSX.Element {
+  frozen,
+  resizeHandle,
+}: HeaderCellProps<TData>): React.JSX.Element {
   // The transform this returns is deliberately unused: shifting a header without shifting
   // the thousands of body cells below it would tear the column apart mid-drag.
   const { activeIndex, attributes, index, isDragging, isOver, listeners, setNodeRef } = useSortable(
@@ -320,23 +432,62 @@ function SortableHeaderCell<TData>({
   return (
     <TableHead
       ref={setNodeRef}
+      data-column-id={header.column.id}
       aria-sort={ariaSort(header.column)}
-      style={headerCellStyle(header)}
-      className={`group/head relative ${headerCellClassName(header)} ${GRIP_LANE_CLASS} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
+      style={headerCellStyle(header, frozen)}
+      className={`group/head relative ${headerCellClassName(header)} ${isDragging ? DRAGGING_HEAD_CLASS : ''} ${dropIndicatorClass(isOver, activeIndex, index)}`}
     >
-      {/* Labelled through aria-label rather than visually hidden text, which would land in
-          the innerText the drag chip reads back. */}
-      <button
-        type="button"
-        aria-label={GRIP_LABEL}
-        className={GRIP_CLASS}
-        {...attributes}
-        {...listeners}
-      >
-        <DotsSixVerticalIcon size={GRIP_ICON_SIZE} aria-hidden="true" />
-      </button>
-      {headerContent(header)}
+      <div className={GRIP_GROUP_CLASS}>
+        {/* Labelled through aria-label rather than visually hidden text, which would land in
+            the innerText the drag chip reads back. */}
+        <button
+          type="button"
+          aria-label={GRIP_LABEL}
+          className={GRIP_CLASS}
+          {...attributes}
+          {...listeners}
+        >
+          <DotsSixVerticalIcon size={GRIP_ICON_SIZE} aria-hidden="true" />
+        </button>
+        {headerContent(header)}
+      </div>
+      {resizeHandle}
     </TableHead>
+  )
+}
+
+// Pointer-only: the handle adds no tab stop, and a truncated label stays readable through its
+// title. A double-click fits the column to the rows currently rendered.
+function ColumnResizeHandle({
+  resizing,
+  onResizeStart,
+  onAutoFit,
+}: {
+  resizing: boolean
+  onResizeStart: (event: React.MouseEvent | React.TouchEvent) => void
+  onAutoFit: () => void
+}): React.JSX.Element {
+  return (
+    <div
+      data-slot="column-resize-handle"
+      aria-hidden="true"
+      className={`${RESIZE_HANDLE_CLASS} ${resizing ? RESIZING_HANDLE_CLASS : RESTING_HANDLE_CLASS}`}
+      onMouseDown={onResizeStart}
+      onTouchStart={onResizeStart}
+      onDoubleClick={onAutoFit}
+    />
+  )
+}
+
+// Soaks up whatever width the frozen columns leave, so the header band and row hover still
+// run to the edge of the grid.
+function FillerHeaderCell(): React.JSX.Element {
+  return (
+    <TableHead
+      aria-hidden="true"
+      style={{ position: 'sticky', top: 0, zIndex: HEADER_Z_INDEX }}
+      className={TABLE_HEAD_CLASS}
+    />
   )
 }
 
@@ -394,7 +545,9 @@ function DataTableBase<TData, TValue>({
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
   const [draggedColumnLabel, setDraggedColumnLabel] = useState('')
+  const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({})
   const scrollRegionRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
   const { pathname } = useLocation()
 
   const rowSelection = controlledRowSelection ?? internalRowSelection
@@ -420,7 +573,9 @@ function DataTableBase<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    defaultColumn: { size: undefined },
+    defaultColumn: { size: undefined, minSize: MIN_COLUMN_WIDTH },
+    columnResizeMode: 'onChange',
+    onColumnSizingChange: setColumnSizing,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange,
@@ -448,6 +603,7 @@ function DataTableBase<TData, TValue>({
       columnVisibility,
       columnOrder,
       columnPinning,
+      columnSizing,
       expanded,
     },
     initialState: {
@@ -496,6 +652,66 @@ function DataTableBase<TData, TValue>({
   const lastItem = virtualItems[virtualItems.length - 1]
   const paddingTop = firstItem ? firstItem.start : 0
   const paddingBottom = lastItem ? rowVirtualizer.getTotalSize() - lastItem.end : 0
+
+  const frozen = isFrozen(columnSizing)
+  const visibleColumnIds = table
+    .getVisibleLeafColumns()
+    .map((column) => column.id)
+    .join(',')
+
+  // A column shown after the freeze has no measured width yet. It is fitted to its content
+  // before paint, so it arrives at the width it would have had. A column hidden and shown
+  // again keeps the width it left with.
+  useLayoutEffect(() => {
+    const tableElement = tableRef.current
+    if (!frozen || !tableElement) return
+    const unsizedIds = visibleColumnIds.split(',').filter((id) => !(id in columnSizing))
+    if (unsizedIds.length === 0) return
+    const widths = measureContentWidths(tableElement, unsizedIds)
+    setColumnSizing((prevSizing) => ({ ...prevSizing, ...widths }))
+  }, [frozen, visibleColumnIds, columnSizing])
+
+  // Commits synchronously: the resize handler reads the column's start width the moment the
+  // drag begins, and would read the unfrozen default if the snapshot were still pending.
+  function freezeColumnWidths() {
+    const tableElement = tableRef.current
+    if (frozen || !tableElement) return
+    const renderedWidths = measureRenderedWidths(tableElement)
+    flushSync(() => setColumnSizing(renderedWidths))
+  }
+
+  function startColumnResize(
+    header: Header<TData, unknown>,
+    event: React.MouseEvent | React.TouchEvent,
+  ) {
+    freezeColumnWidths()
+    header.getResizeHandler()(event)
+  }
+
+  function autoFitColumn(columnId: string) {
+    freezeColumnWidths()
+    const tableElement = tableRef.current
+    if (!tableElement) return
+    const widths = measureContentWidths(tableElement, [columnId])
+    setColumnSizing((prevSizing) => ({ ...prevSizing, ...widths }))
+  }
+
+  function resizeHandleFor(header: Header<TData, unknown>): React.ReactNode {
+    if (!header.column.getCanResize()) return null
+    return (
+      <ColumnResizeHandle
+        resizing={header.column.getIsResizing()}
+        onResizeStart={(event) => startColumnResize(header, event)}
+        onAutoFit={() => autoFitColumn(header.column.id)}
+      />
+    )
+  }
+
+  const tableClassName = frozen ? FIXED_LAYOUT_TABLE_CLASS : AUTO_LAYOUT_TABLE_CLASS
+  const tableStyle: CSSProperties = {
+    ...pinStartProperties(table),
+    width: frozen ? table.getTotalSize() : undefined,
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
@@ -557,13 +773,24 @@ function DataTableBase<TData, TValue>({
               tabIndex={0}
               className={frame.scrollRegion}
             >
-              <Table aria-label={label} className="table-auto w-max min-w-full">
+              <Table
+                ref={tableRef}
+                aria-label={label}
+                className={tableClassName}
+                style={tableStyle}
+              >
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
-                        <HeaderCell key={header.id} header={header} />
+                        <HeaderCell
+                          key={header.id}
+                          header={header}
+                          frozen={frozen}
+                          resizeHandle={resizeHandleFor(header)}
+                        />
                       ))}
+                      {frozen && <FillerHeaderCell />}
                     </TableRow>
                   ))}
                 </TableHeader>
@@ -581,12 +808,13 @@ function DataTableBase<TData, TValue>({
                         getRowHref={getRowHref}
                         getRowClassName={getRowClassName}
                         cells={row.getVisibleCells()}
+                        hasFillerCell={frozen}
                       />
                     ))
                   ) : (
                     <TableRow role="status" aria-live="polite">
                       <TableCell
-                        colSpan={table.getVisibleLeafColumns().length}
+                        colSpan={table.getVisibleLeafColumns().length + (frozen ? 1 : 0)}
                         className="h-24 text-center"
                       >
                         No results.
@@ -613,6 +841,9 @@ function DataTableBase<TData, TValue>({
                               : flexRender(footer.column.columnDef.footer, footer.getContext())}
                           </TableCell>
                         ))}
+                        {frozen && (
+                          <TableCell aria-hidden="true" className={TABLE_FOOT_CELL_CLASS} />
+                        )}
                       </TableRow>
                     ))}
                   </TableFooter>
@@ -709,10 +940,12 @@ function DataRowImpl<TData>({
   onRowMouseEnter,
   getRowHref,
   getRowClassName,
+  hasFillerCell,
 }: {
   row: Row<TData>
   rowPosition: number
   cells: Cell<TData, unknown>[]
+  hasFillerCell: boolean
   isSelected: boolean
   isExpanded?: boolean
   onRowMouseEnter?: (row: TData) => void
@@ -758,6 +991,7 @@ function DataRowImpl<TData>({
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}
+      {hasFillerCell && <TableCell aria-hidden="true" className={CELL_BG} />}
     </TableRow>
   )
 }

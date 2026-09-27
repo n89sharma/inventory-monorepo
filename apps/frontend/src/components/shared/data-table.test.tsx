@@ -170,6 +170,86 @@ describe('table text search', () => {
   })
 })
 
+const RESIZE_HANDLE = '[data-slot="column-resize-handle"]'
+const DRAG_DISTANCE = 120
+// jsdom has no layout, so every measured width is 0 and clamps to the column minimum.
+const MIN_COLUMN_WIDTH = 48
+
+type Gadget = { id: number; name: string; note: string }
+
+const RESIZABLE_COLUMNS: ColumnDef<Gadget, unknown>[] = [
+  { id: 'name', accessorKey: 'name', header: 'Name' },
+  { id: 'note', accessorKey: 'note', header: 'Note' },
+  { id: 'edit', header: 'Edit', enableResizing: false },
+]
+
+const GADGETS: Gadget[] = [{ id: 1, name: 'Gadget', note: 'Spare' }]
+
+function renderResizableTable() {
+  return renderInRouter(
+    <DataTable label={TABLE_LABEL} columns={RESIZABLE_COLUMNS} data={GADGETS} />,
+  )
+}
+
+function headerCell(name: string): HTMLElement {
+  const cell = screen.getByRole('columnheader', { name }).closest('th')
+  if (!cell) throw new Error(`Expected a header cell named ${name}`)
+  return cell
+}
+
+function resizeHandleOf(name: string): HTMLElement {
+  const handle = headerCell(name).querySelector(RESIZE_HANDLE)
+  if (!(handle instanceof HTMLElement)) throw new Error(`Expected a resize handle on ${name}`)
+  return handle
+}
+
+function headerRowCellCount(): number {
+  return screen.getByRole('table').querySelectorAll('thead th').length
+}
+
+describe('column resizing', () => {
+  it('offers a handle on every column except those that opt out', () => {
+    renderResizableTable()
+    expect(headerCell('Name').querySelector(RESIZE_HANDLE)).not.toBeNull()
+    expect(headerCell('Note').querySelector(RESIZE_HANDLE)).not.toBeNull()
+    expect(headerCell('Edit').querySelector(RESIZE_HANDLE)).toBeNull()
+  })
+
+  it('opens sized to content, with no filler column', () => {
+    renderResizableTable()
+    expect(headerCell('Name').style.width).toBe('')
+    expect(headerRowCellCount()).toBe(RESIZABLE_COLUMNS.length)
+  })
+
+  it('follows the pointer while dragging and adds a filler column once frozen', () => {
+    renderResizableTable()
+    fireEvent.mouseDown(resizeHandleOf('Name'), { clientX: 0 })
+    fireEvent.mouseMove(document, { clientX: DRAG_DISTANCE })
+    fireEvent.mouseUp(document, { clientX: DRAG_DISTANCE })
+    expect(headerCell('Name').style.width).toBe(`${MIN_COLUMN_WIDTH + DRAG_DISTANCE}px`)
+    expect(headerCell('Note').style.width).toBe(`${MIN_COLUMN_WIDTH}px`)
+    expect(headerRowCellCount()).toBe(RESIZABLE_COLUMNS.length + 1)
+  })
+
+  it('fits a column to its content on double-click', () => {
+    renderResizableTable()
+    fireEvent.mouseDown(resizeHandleOf('Name'), { clientX: 0 })
+    fireEvent.mouseMove(document, { clientX: DRAG_DISTANCE })
+    fireEvent.mouseUp(document, { clientX: DRAG_DISTANCE })
+    fireEvent.doubleClick(resizeHandleOf('Name'))
+    expect(headerCell('Name').style.width).toBe(`${MIN_COLUMN_WIDTH}px`)
+  })
+
+  it('never sorts the column it resizes', () => {
+    renderResizableTable()
+    const handle = resizeHandleOf('Name')
+    fireEvent.mouseDown(handle, { clientX: 0 })
+    fireEvent.mouseUp(document, { clientX: 0 })
+    fireEvent.click(handle)
+    expect(headerCell('Name')).not.toHaveAttribute('aria-sort')
+  })
+})
+
 describe('DataTable', () => {
   it('keeps the pager for a table that sits in flow', () => {
     renderInRouter(<DataTable label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)

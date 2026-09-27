@@ -70,6 +70,7 @@ export function createUserPermissionTableColumns(
     {
       id: 'actions',
       header: 'Actions',
+      enableResizing: false,
       meta: { reorderable: false },
       cell: ({ row }) => {
         const user = row.original

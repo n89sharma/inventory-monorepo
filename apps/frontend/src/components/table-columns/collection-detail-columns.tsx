@@ -75,6 +75,7 @@ function actionColumns(
   return [
     {
       id: 'edit',
+      enableResizing: false,
       meta: { reorderable: false, cellClassName: 'py-0' },
       cell: ({ row }) => (
         <Button

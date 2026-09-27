@@ -51,8 +51,10 @@ export function createSelectColumn<TData>(): ColumnDef<TData> {
   return {
     id: 'select',
     size: SELECT_COLUMN_SIZE,
+    minSize: SELECT_COLUMN_SIZE,
     enableSorting: false,
     enableHiding: false,
+    enableResizing: false,
     meta: { cellClassName: 'p-0', reorderable: false },
     header: ({ table }) => (
       <SelectHitArea
@@ -110,6 +112,7 @@ export function createEditColumn<TData>(
     id: 'edit',
     header: 'Edit',
     enableSorting: false,
+    enableResizing: false,
     meta: { reorderable: false },
     cell: ({ row }) => (
       <div className="flex justify-center">

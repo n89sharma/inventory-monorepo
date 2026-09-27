@@ -54,6 +54,7 @@ function getLocationColumn<T extends AssetSummary>(): ColumnDef<T> {
 function getDeleteColumn<T>(onDelete: (index: number) => void): ColumnDef<T> {
   return {
     id: 'delete',
+    enableResizing: false,
     meta: { reorderable: false },
     cell: ({ row }) => (
       <Button
