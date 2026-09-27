@@ -15,7 +15,7 @@ import {
 } from '@/components/shadcn/select'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataGrid } from '@/components/shared/data-table'
-import { MetricCard } from './metric-card'
+import { MetricCard, MetricCardRow } from './metric-card'
 import {
   createProfitabilityColumns,
   formatMarginPct,
@@ -142,7 +142,7 @@ function ProfitabilitySummaryCards({
 }): React.JSX.Element {
   const marginClass = totals.gross_margin < 0 ? NEGATIVE_CLASS : undefined
   return (
-    <div className="flex flex-wrap gap-3">
+    <MetricCardRow>
       <MetricCard label="Gross Revenue" value={formatUSDWithSymbol(totals.gross_revenue)} />
       <MetricCard
         label="Gross Margin"
@@ -154,7 +154,7 @@ function ProfitabilitySummaryCards({
         value={formatMarginPct(totals.gross_revenue, totals.gross_margin)}
         valueClassName={marginClass}
       />
-    </div>
+    </MetricCardRow>
   )
 }
 
@@ -181,7 +181,11 @@ function ProfitabilityReportBody({
       </div>
     )
   }
-  return <DataGrid label={TABLE_LABEL} columns={columns} data={months} />
+  return (
+    <div className="mx-auto mt-px flex min-h-0 w-fit max-w-full flex-col border-x">
+      <DataGrid label={TABLE_LABEL} columns={columns} data={months} />
+    </div>
+  )
 }
 
 export function ProfitabilityReportPage(): React.JSX.Element {
@@ -254,12 +258,9 @@ export function ProfitabilityReportPage(): React.JSX.Element {
         <ProfitabilityFilterBar />
       </GridPageHeader>
       <div
-        className={cn(
-          'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',
-          isLoading && 'opacity-50',
-        )}
+        className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
-        <PageSection>
+        <PageSection className="py-4">
           <ProfitabilitySummaryCards totals={table.totals} />
         </PageSection>
         <ProfitabilityReportBody

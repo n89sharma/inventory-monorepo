@@ -62,7 +62,7 @@ function formatDays(value: number): string {
 function LabelCell({ row }: { row: Row<HeldReportTableRow> }): React.JSX.Element {
   return (
     <div
-      className="flex min-w-0 items-center gap-1"
+      className="flex w-80 min-w-0 items-center gap-1"
       style={{ paddingLeft: `${row.depth * INDENT_PER_DEPTH_REM}rem` }}
     >
       {row.getCanExpand() ? (
@@ -94,24 +94,24 @@ export const HELD_REPORT_COLUMNS: ColumnDef<HeldReportTableRow>[] = [
     id: 'label',
     header: 'Salesperson / Customer',
     cell: ({ row }) => <LabelCell row={row} />,
-    meta: { cellClassName: 'text-left' },
+    meta: { cellClassName: 'px-4 text-left' },
   },
   {
     id: 'assetCount',
     header: 'Assets',
     cell: ({ row }) => row.original.assetCount,
-    meta: { cellClassName: 'text-center tabular-nums' },
+    meta: { cellClassName: 'px-4 tabular-nums' },
   },
   {
     id: 'holdCount',
     header: 'Holds',
     cell: ({ row }) => row.original.holdCount,
-    meta: { cellClassName: 'text-center tabular-nums' },
+    meta: { cellClassName: 'px-4 tabular-nums' },
   },
   {
     id: 'maxHeldDays',
     header: 'Max Held Days',
     cell: ({ row }) => formatDays(row.original.maxHeldDays),
-    meta: { cellClassName: 'text-center tabular-nums' },
+    meta: { cellClassName: 'px-4 tabular-nums' },
   },
 ]

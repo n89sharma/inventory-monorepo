@@ -17,3 +17,7 @@ export function MetricCard({
     </Card>
   )
 }
+
+export function MetricCardRow({ children }: { children: React.ReactNode }): React.JSX.Element {
+  return <div className="mx-auto flex max-w-3xl flex-wrap gap-3">{children}</div>
+}

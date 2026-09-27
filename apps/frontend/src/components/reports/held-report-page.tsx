@@ -8,7 +8,7 @@ import {
 } from './held-report-table-columns'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { DataGrid } from '@/components/shared/data-table'
-import { MetricCard } from './metric-card'
+import { MetricCard, MetricCardRow } from './metric-card'
 import { ShareButton } from '@/components/shared/share-button'
 import { useHeldReport } from '@/hooks/use-held-report'
 import { aggregateHeldReport, type HeldReportSummary } from '@/lib/held-report-aggregate'
@@ -35,12 +35,12 @@ function HeldReportSummaryCards({
   totals: HeldReportSummary['totals']
 }): React.JSX.Element {
   return (
-    <div className="flex flex-wrap gap-3">
+    <MetricCardRow>
       <MetricCard label="Assets Held" value={String(totals.assetCount)} />
       <MetricCard label="Total Holds" value={String(totals.holdCount)} />
       <MetricCard label="Salespeople with Holds" value={String(totals.salespersonCount)} />
       <MetricCard label="Max Held Days" value={formatDays(totals.maxHeldDays)} />
-    </div>
+    </MetricCardRow>
   )
 }
 
@@ -59,14 +59,16 @@ function HeldReportBody({ table }: { table: HeldReportSummary }): React.JSX.Elem
   }
 
   return (
-    <DataGrid
-      label={TABLE_LABEL}
-      columns={HELD_REPORT_COLUMNS}
-      data={rows}
-      getRowId={getHeldReportRowId}
-      getSubRows={getHeldReportSubRows}
-      getRowClassName={getHeldReportRowClassName}
-    />
+    <div className="mx-auto mt-px flex min-h-0 w-fit max-w-full flex-col border-x">
+      <DataGrid
+        label={TABLE_LABEL}
+        columns={HELD_REPORT_COLUMNS}
+        data={rows}
+        getRowId={getHeldReportRowId}
+        getSubRows={getHeldReportSubRows}
+        getRowClassName={getHeldReportRowClassName}
+      />
+    </div>
   )
 }
 
@@ -92,12 +94,9 @@ export function HeldReportPage(): React.JSX.Element {
         </div>
       </GridPageHeader>
       <div
-        className={cn(
-          'flex min-h-0 flex-1 flex-col gap-4 transition-opacity',
-          isLoading && 'opacity-50',
-        )}
+        className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
-        <PageSection>
+        <PageSection className="py-4">
           <HeldReportSummaryCards totals={table.totals} />
         </PageSection>
         <HeldReportBody table={table} />

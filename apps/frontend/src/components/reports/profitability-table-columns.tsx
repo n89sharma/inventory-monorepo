@@ -14,8 +14,8 @@ const OUT_OF_WINDOW_MESSAGE = `Asset details are only kept for the last ${MAX_DE
 const MARGIN_PCT_HEADER = 'Margin %'
 const MARGIN_PCT_FRACTION_DIGITS = 1
 export const NEGATIVE_CLASS = 'text-destructive'
-const MONTH_CELL_CLASS = 'text-left font-medium'
-const METRIC_CELL_CLASS = 'text-right tabular-nums'
+const MONTH_CELL_CLASS = 'px-4 font-medium'
+const METRIC_CELL_CLASS = 'px-4 tabular-nums'
 
 const MONTH_LABELS = [
   'January',
