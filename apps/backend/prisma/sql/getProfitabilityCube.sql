@@ -13,6 +13,7 @@ select
   extract(month from dep.created_at)::int                   as month,
   count(*)::int                                             as asset_count,
 
+  coalesce(sum(coalesce(c.purchase_cost, 0)), 0)::float8           as base_cogs,
   coalesce(sum(coalesce(c.total_cost, 0)), 0)::float8              as cogs,
   coalesce(sum(c.sale_price), 0)::float8                          as gross_revenue,
   coalesce(sum(c.sale_price - coalesce(c.total_cost, 0)), 0)::float8 as gross_margin

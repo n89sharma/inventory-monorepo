@@ -193,7 +193,7 @@ export function AppSidebar(): React.JSX.Element {
   }
 
   function reportItemPath(url: string): string {
-    if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath(defaultWarehouse)
+    if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath()
     if (url === IN_STOCK_SUMMARY_PATH) {
       return buildInStockSummaryPath(defaultBrand, defaultAssetType)
     }

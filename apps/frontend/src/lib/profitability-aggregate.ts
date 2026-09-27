@@ -14,6 +14,7 @@ export type ProfitabilityFilters = {
 export type ProfitabilityMetrics = {
   asset_count: number
   gross_revenue: number
+  base_cogs: number
   cogs: number
   gross_margin: number
 }
@@ -29,6 +30,7 @@ function zeroMetrics(): ProfitabilityMetrics {
   return {
     asset_count: 0,
     gross_revenue: 0,
+    base_cogs: 0,
     cogs: 0,
     gross_margin: 0,
   }
@@ -37,6 +39,7 @@ function zeroMetrics(): ProfitabilityMetrics {
 function addMetrics(target: ProfitabilityMetrics, row: ProfitabilityCubeRow): void {
   target.asset_count += row.asset_count
   target.gross_revenue += row.gross_revenue
+  target.base_cogs += row.base_cogs
   target.cogs += row.cogs
   target.gross_margin += row.gross_margin
 }

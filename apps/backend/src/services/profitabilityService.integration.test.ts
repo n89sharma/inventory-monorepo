@@ -42,6 +42,7 @@ async function cubeTotals() {
   return {
     assets: rows.reduce((sum, r) => sum + (r.asset_count ?? 0), 0),
     revenue: rows.reduce((sum, r) => sum + (r.gross_revenue ?? 0), 0),
+    baseCogs: rows.reduce((sum, r) => sum + (r.base_cogs ?? 0), 0),
     cogs: rows.reduce((sum, r) => sum + (r.cogs ?? 0), 0),
     margin: rows.reduce((sum, r) => sum + (r.gross_margin ?? 0), 0),
   }
@@ -68,6 +69,7 @@ describe('getProfitabilityCube', () => {
     expect(await cubeTotals()).toEqual({
       assets: 1,
       revenue: SEEDED_ASSET_COST.sale_price,
+      baseCogs: SEEDED_ASSET_COST.purchase_cost,
       cogs: SEEDED_ASSET_COST.total_cost,
       margin: SEEDED_ASSET_COST.sale_price! - SEEDED_ASSET_COST.total_cost!,
     })
@@ -78,7 +80,13 @@ describe('getProfitabilityCube', () => {
   it('counts a sale recorded against a zero cost as pure margin', async () => {
     await departSoldAsset(refs, { ...NO_COST, total_cost: 0, sale_price: 500 })
 
-    expect(await cubeTotals()).toEqual({ assets: 1, revenue: 500, cogs: 0, margin: 500 })
+    expect(await cubeTotals()).toEqual({
+      assets: 1,
+      revenue: 500,
+      baseCogs: 0,
+      cogs: 0,
+      margin: 500,
+    })
   })
 
   // Nothing writes a sale price without a total, but the sums must not drop a row from the
@@ -87,13 +95,13 @@ describe('getProfitabilityCube', () => {
     await departSoldAsset(refs, { ...NO_COST, sale_price: 900 })
 
     const totals = await cubeTotals()
-    expect(totals).toEqual({ assets: 1, revenue: 900, cogs: 0, margin: 900 })
+    expect(totals).toEqual({ assets: 1, revenue: 900, baseCogs: 0, cogs: 0, margin: 900 })
     expect(totals.margin).toBe(totals.revenue - totals.cogs)
   })
 
   it('ignores a departed asset that was never given a sale price', async () => {
     await departSoldAsset(refs, { ...NO_COST, purchase_cost: 300, total_cost: 300 })
 
-    expect(await cubeTotals()).toEqual({ assets: 0, revenue: 0, cogs: 0, margin: 0 })
+    expect(await cubeTotals()).toEqual({ assets: 0, revenue: 0, baseCogs: 0, cogs: 0, margin: 0 })
   })
 })

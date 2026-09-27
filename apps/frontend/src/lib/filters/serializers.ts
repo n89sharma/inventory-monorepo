@@ -70,7 +70,6 @@ const serializeDepartedSearch = createSerializer({
 })
 const serializeDateRange = createSerializer({ from: FILTER_PARSERS.from, to: FILTER_PARSERS.to })
 const serializeProfitability = createSerializer({
-  wh: FILTER_PARSERS.wh,
   year: FILTER_PARSERS.year,
 })
 const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
@@ -163,9 +162,8 @@ export function buildSearchOnHandUrl(selection: {
   })
 }
 
-export function buildProfitabilityReportPath(warehouse: Warehouse | null): string {
+export function buildProfitabilityReportPath(): string {
   return serializeProfitability(PROFITABILITY_REPORT_PATH, {
-    wh: warehouse ? [warehouse.id] : null,
     year: getDefaultYear(),
   })
 }

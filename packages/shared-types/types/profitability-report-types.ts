@@ -11,6 +11,7 @@ export const ProfitabilityCubeRowSchema = z.object({
   brand_id: z.number().int(),
   month: z.number().int().min(MIN_MONTH).max(MAX_MONTH),
   asset_count: z.number().int(),
+  base_cogs: z.number(),
   cogs: z.number(),
   gross_revenue: z.number(),
   gross_margin: z.number(),

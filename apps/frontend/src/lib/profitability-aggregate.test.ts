@@ -20,6 +20,7 @@ type Sale = {
   brand: number
   units: number
   revenue: number
+  baseCost: number
   cost: number
   salesRep?: number | null
 }
@@ -30,6 +31,7 @@ function sold({
   brand,
   units,
   revenue,
+  baseCost,
   cost,
   salesRep = DANA,
 }: Sale): ProfitabilityCubeRow {
@@ -41,6 +43,7 @@ function sold({
     brand_id: brand,
     month,
     asset_count: units,
+    base_cogs: baseCost,
     cogs: cost,
     gross_revenue: revenue,
     gross_margin: revenue - cost,
@@ -49,14 +52,31 @@ function sold({
 
 // Everything that departed in 2025, in the order it happened.
 const LEDGER: ProfitabilityCubeRow[] = [
-  sold({ month: MARCH, customer: ACME, brand: CANON, units: 2, revenue: 5000, cost: 3000 }),
-  sold({ month: MARCH, customer: GLOBEX, brand: CANON, units: 1, revenue: 4000, cost: 2500 }),
+  sold({
+    month: MARCH,
+    customer: ACME,
+    brand: CANON,
+    units: 2,
+    revenue: 5000,
+    baseCost: 2400,
+    cost: 3000,
+  }),
+  sold({
+    month: MARCH,
+    customer: GLOBEX,
+    brand: CANON,
+    units: 1,
+    revenue: 4000,
+    baseCost: 2000,
+    cost: 2500,
+  }),
   sold({
     month: JULY,
     customer: ACME,
     brand: RICOH,
     units: 3,
     revenue: 9000,
+    baseCost: 5000,
     cost: 6000,
     salesRep: null,
   }),
@@ -82,6 +102,7 @@ describe('aggregateCube', () => {
     expect(table.totals).toEqual({
       asset_count: 6,
       gross_revenue: 18000,
+      base_cogs: 9400,
       cogs: 11500,
       gross_margin: 6500,
     })
@@ -100,6 +121,7 @@ describe('aggregateCube', () => {
       month: 1,
       asset_count: 0,
       gross_revenue: 0,
+      base_cogs: 0,
       cogs: 0,
       gross_margin: 0,
     })
@@ -111,6 +133,7 @@ describe('aggregateCube', () => {
     expect(table.totals).toEqual({
       asset_count: 5,
       gross_revenue: 14000,
+      base_cogs: 7400,
       cogs: 9000,
       gross_margin: 5000,
     })
@@ -128,7 +151,13 @@ describe('aggregateCube', () => {
   it('reports an empty year for a customer that bought nothing', () => {
     const table = aggregateCube(LEDGER, { ...NO_FILTERS, customerId: 999 })
 
-    expect(table.totals).toEqual({ asset_count: 0, gross_revenue: 0, cogs: 0, gross_margin: 0 })
+    expect(table.totals).toEqual({
+      asset_count: 0,
+      gross_revenue: 0,
+      base_cogs: 0,
+      cogs: 0,
+      gross_margin: 0,
+    })
     expect(table.months.every((month) => month.asset_count === 0)).toBe(true)
   })
 
