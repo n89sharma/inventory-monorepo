@@ -8,8 +8,7 @@ import {
 
 const GROUP_LABEL = 'Asset type'
 
-const ITEM_CLASS =
-  'whitespace-nowrap bg-background data-[state=on]:border-secondary data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground data-[state=on]:hover:bg-secondary/80'
+const ITEM_CLASS = 'whitespace-nowrap bg-background'
 
 function isAssetTypeFilter(value: string): value is AssetTypeFilter {
   return ASSET_TYPE_FILTER_VALUES.some((filter) => filter === value)

@@ -37,12 +37,7 @@ export function ReadinessPicker({
           <ToggleGroupItem
             value={String(opt.id)}
             disabled={disabled.has(opt.status)}
-            className={cn(
-              readinessPillClasses,
-              'h-7 gap-1.5 px-3 [&_svg]:size-3.5',
-              'data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground',
-              'data-[state=on]:border-secondary data-[state=on]:hover:bg-secondary/80',
-            )}
+            className={cn(readinessPillClasses, 'h-7 gap-1.5 px-3 [&_svg]:size-3.5')}
           >
             <ReadinessPillContent status={opt.status} />
           </ToggleGroupItem>
