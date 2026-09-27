@@ -1,66 +1,70 @@
-import type { InStockSummaryRow, MeterBand } from 'shared-types'
+import type { InStockSummaryRow } from 'shared-types'
 
-const BAND_DISPLAY_ORDER = [
-  'LOW',
-  'MEDIUM',
-  'HIGH',
-  'UNKNOWN',
-] as const satisfies readonly MeterBand[]
-const BAND_SORT_INDEX = Object.fromEntries(
-  BAND_DISPLAY_ORDER.map((band, index) => [band, index]),
-) as Record<MeterBand, number>
-
-type CostField = 'avg_purchase_cost' | 'avg_total_cost'
-
-export type InStockSummaryModelRow = Omit<InStockSummaryRow, 'meter_band'> & {
-  subRows: InStockSummaryRow[]
+type CostTotals = {
+  purchase_cost_sum: number | null
+  purchase_cost_count: number
+  total_cost_sum: number | null
+  total_cost_count: number
 }
 
-export type InStockSummaryTableRow = InStockSummaryModelRow | InStockSummaryRow
-
-function groupKey(row: InStockSummaryRow): string {
-  return `${row.warehouse_id}|${row.brand_id}|${row.asset_type_id}|${row.model_id}`
+export type InStockSummaryModelRow = Pick<
+  InStockSummaryRow,
+  'brand_id' | 'brand_name' | 'asset_type_id' | 'asset_type' | 'model_id' | 'model_name'
+> & {
+  asset_count: number
+  avg_purchase_cost: number | null
+  avg_total_cost: number | null
 }
 
-function weightedAverage(bands: InStockSummaryRow[], field: CostField): number | null {
-  let weightedSum = 0
-  let weight = 0
-  for (const band of bands) {
-    const value = band[field]
-    if (value === null) continue
-    weightedSum += value * band.asset_count
-    weight += band.asset_count
-  }
-  return weight === 0 ? null : weightedSum / weight
+type ModelAccumulator = Omit<InStockSummaryModelRow, 'avg_purchase_cost' | 'avg_total_cost'> &
+  CostTotals
+
+function addNullable(total: number | null, value: number | null): number | null {
+  if (value === null) return total
+  return (total ?? 0) + value
+}
+
+function average(sum: number | null, count: number): number | null {
+  if (sum === null || count === 0) return null
+  return sum / count
 }
 
 export function buildInStockSummaryGroups(rows: InStockSummaryRow[]): InStockSummaryModelRow[] {
-  const groups = new Map<string, InStockSummaryRow[]>()
+  const groups = new Map<number, ModelAccumulator>()
   for (const row of rows) {
-    const key = groupKey(row)
-    const existing = groups.get(key)
-    if (existing) existing.push(row)
-    else groups.set(key, [row])
+    const existing = groups.get(row.model_id)
+    if (existing) {
+      existing.asset_count += row.asset_count
+      existing.purchase_cost_sum = addNullable(existing.purchase_cost_sum, row.purchase_cost_sum)
+      existing.purchase_cost_count += row.purchase_cost_count
+      existing.total_cost_sum = addNullable(existing.total_cost_sum, row.total_cost_sum)
+      existing.total_cost_count += row.total_cost_count
+    } else {
+      groups.set(row.model_id, {
+        brand_id: row.brand_id,
+        brand_name: row.brand_name,
+        asset_type_id: row.asset_type_id,
+        asset_type: row.asset_type,
+        model_id: row.model_id,
+        model_name: row.model_name,
+        asset_count: row.asset_count,
+        purchase_cost_sum: row.purchase_cost_sum,
+        purchase_cost_count: row.purchase_cost_count,
+        total_cost_sum: row.total_cost_sum,
+        total_cost_count: row.total_cost_count,
+      })
+    }
   }
 
-  return Array.from(groups.values()).map((bands) => {
-    const subRows = [...bands].sort(
-      (a, b) => BAND_SORT_INDEX[a.meter_band] - BAND_SORT_INDEX[b.meter_band],
-    )
-    const first = subRows[0]
-    return {
-      warehouse_id: first.warehouse_id,
-      city_code: first.city_code,
-      brand_id: first.brand_id,
-      brand_name: first.brand_name,
-      asset_type_id: first.asset_type_id,
-      asset_type: first.asset_type,
-      model_id: first.model_id,
-      model_name: first.model_name,
-      avg_purchase_cost: weightedAverage(subRows, 'avg_purchase_cost'),
-      avg_total_cost: weightedAverage(subRows, 'avg_total_cost'),
-      asset_count: subRows.reduce((total, band) => total + band.asset_count, 0),
-      subRows,
-    }
-  })
+  return Array.from(groups.values(), (group) => ({
+    brand_id: group.brand_id,
+    brand_name: group.brand_name,
+    asset_type_id: group.asset_type_id,
+    asset_type: group.asset_type,
+    model_id: group.model_id,
+    model_name: group.model_name,
+    asset_count: group.asset_count,
+    avg_purchase_cost: average(group.purchase_cost_sum, group.purchase_cost_count),
+    avg_total_cost: average(group.total_cost_sum, group.total_cost_count),
+  }))
 }

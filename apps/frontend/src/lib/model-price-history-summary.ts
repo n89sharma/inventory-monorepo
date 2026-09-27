@@ -5,7 +5,7 @@ import type { ModelPriceHistoryRow } from 'shared-types'
 export const METER_BANDS = [
   { name: 'Low count', label: '<70K', min: null, max: 70_000 },
   { name: 'Med count', label: '70-210K', min: 70_000, max: 210_000 },
-  { name: 'High count', label: '>210K', min: 210_000, max: null },
+  { name: 'High count', label: '210K+', min: 210_000, max: null },
 ] as const satisfies readonly {
   name: string
   label: string

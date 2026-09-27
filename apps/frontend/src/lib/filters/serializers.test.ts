@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { Brand, OrgDetail, User, Warehouse } from 'shared-types'
-import { departedDrilldownHref } from './serializers'
+import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
+import { METER_BANDS } from '@/lib/model-price-history-summary'
+import { buildInStockSummaryPath, departedDrilldownHref, inStockDrilldownHref } from './serializers'
 
 const ORIGIN = 'https://loon.test'
 
@@ -101,5 +103,59 @@ describe('departedDrilldownHref', () => {
     const withNeither = parse(departedDrilldownHref(NOTHING_SELECTED)).searchParams
     expect(withNeither.has('customer')).toBe(false)
     expect(withNeither.has('sp')).toBe(false)
+  })
+})
+
+const IRADX_ROW: InStockSummaryModelRow = {
+  brand_id: 7,
+  brand_name: 'Canon',
+  asset_type_id: 4,
+  asset_type: 'COPIER',
+  model_id: 90,
+  model_name: 'IRADX4745i',
+  asset_count: 3,
+  avg_purchase_cost: null,
+  avg_total_cost: null,
+}
+
+describe('inStockDrilldownHref', () => {
+  it('carries the selected warehouse', () => {
+    const params = parse(
+      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [warehouse(3)], band: null }),
+    ).searchParams
+    expect(params.get('wh')).toBe('3')
+  })
+
+  it('omits the warehouse param when all warehouses are selected', () => {
+    const params = parse(
+      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band: null }),
+    ).searchParams
+    expect(params.has('wh')).toBe(false)
+  })
+
+  it("carries the selected band's meter range", () => {
+    const params = parse(
+      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band: 'MEDIUM' }),
+    ).searchParams
+    expect(params.get('meter_min')).toBe(String(METER_BANDS[1].min))
+    expect(params.get('meter_max')).toBe(String(METER_BANDS[1].max))
+  })
+
+  it('carries no meter range for all bands or the unknown band', () => {
+    for (const band of [null, 'UNKNOWN'] as const) {
+      const params = parse(
+        inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band }),
+      ).searchParams
+      expect(params.has('meter_min')).toBe(false)
+      expect(params.has('meter_max')).toBe(false)
+    }
+  })
+})
+
+describe('buildInStockSummaryPath', () => {
+  it('opens the report on all warehouses', () => {
+    const params = parse(buildInStockSummaryPath(CANON, null)).searchParams
+    expect(params.has('wh')).toBe(false)
+    expect(params.get('brand')).toBe('7')
   })
 })

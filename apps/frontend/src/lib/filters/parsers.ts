@@ -8,7 +8,7 @@ import {
   parseAsString,
   parseAsStringLiteral,
 } from 'nuqs'
-import { AssetGroupSchema, BrandGroupSchema, INVOICE_TYPE } from 'shared-types'
+import { AssetGroupSchema, BrandGroupSchema, INVOICE_TYPE, METER_BAND } from 'shared-types'
 
 const FLAG_ON = '1'
 
@@ -75,6 +75,7 @@ export const FILTER_PARSERS = {
   readiness: parseAsIdList,
   meter_min: parseAsNonNegativeInt,
   meter_max: parseAsNonNegativeInt,
+  band: parseAsStringLiteral(METER_BAND),
   cas: parseAsNonNegativeInt,
   fin: parseAsInteger,
   brand: parseAsInteger,

@@ -2,7 +2,6 @@
 -- (apps/frontend/src/lib/model-price-history-summary.ts): max is exclusive.
 select
   w.id                          as warehouse_id,
-  w.city_code                   as city_code,
   b.id                          as brand_id,
   b."name"                      as brand_name,
   t.id                          as asset_type_id,
@@ -15,8 +14,10 @@ select
     when h.meter_total < 210000  then 'MEDIUM'
     else 'HIGH'
   end                           as meter_band,
-  avg(c.purchase_cost)::float8  as avg_purchase_cost,
-  avg(c.total_cost)::float8     as avg_total_cost,
+  sum(c.purchase_cost)::float8  as purchase_cost_sum,
+  count(c.purchase_cost)::int   as purchase_cost_count,
+  sum(c.total_cost)::float8     as total_cost_sum,
+  count(c.total_cost)::int      as total_cost_count,
   count(*)::int                 as asset_count
 from "Asset" a
 join "Status" s    on s.id = a.status_id and s.id = any($1::int[])
@@ -27,5 +28,5 @@ join "Location" l  on l.id = a.location_id
 join "Warehouse" w on w.id = l.warehouse_id and w.is_active is true
 left join "Cost" c                   on c.asset_id = a.id
 left join "TechnicalSpecification" h on h.asset_id = a.id
-group by w.id, w.city_code, b.id, b."name", t.id, t.asset_type, m.id, m."name", meter_band
-order by count(*) desc, w.city_code, b."name", t.asset_type, m."name"
+group by w.id, b.id, b."name", t.id, t.asset_type, m.id, m."name", meter_band
+order by count(*) desc, w.id, b."name", t.asset_type, m."name"

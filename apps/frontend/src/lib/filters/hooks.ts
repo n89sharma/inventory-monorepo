@@ -36,6 +36,7 @@ import {
   type BrandGroup,
   type Brand,
   type Component,
+  type MeterBand,
   type ModelSummary,
   type OrgDetail,
   type Status,
@@ -336,6 +337,12 @@ export function useHeldForOptionParam(): [SelectOption<User>, (next: SelectOptio
 
 export function useCassettesParam(): [number | null, (next: number | null) => void] {
   return useDebouncedNumberParam('cas')
+}
+
+export function useMeterBandParam(): [MeterBand | null, (next: MeterBand | null) => void] {
+  const [band, setBand] = useQueryState('band', FILTER_PARSERS.band)
+  const setMeterBand = useCallback((next: MeterBand | null) => void setBand(next), [setBand])
+  return [band, setMeterBand]
 }
 
 export function useMeterRangeParam(): {

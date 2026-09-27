@@ -1,64 +1,26 @@
-import type {
-  InStockSummaryModelRow,
-  InStockSummaryTableRow,
-} from '@/lib/in-stock-summary-grouping'
+import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
 import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
-import { METER_BAND_LABELS } from '@/lib/meter-band-display'
 import { modelPriceHistoryHref } from '@/lib/filters/serializers'
-import { ArrowSquareOutIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react'
+import { ArrowSquareOutIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
 import { Link } from 'react-router-dom'
-
-function isModelRow(row: InStockSummaryTableRow): row is InStockSummaryModelRow {
-  return 'subRows' in row
-}
-
-// Sorts model rows by `compare`; band sub-rows always return 0 so they keep
-// their fixed Low → Medium → High → Unknown order under any active sort.
-function modelRowSorter(
-  compare: (a: InStockSummaryModelRow, b: InStockSummaryModelRow) => number,
-): SortingFn<InStockSummaryTableRow> {
-  return (a, b) => {
-    if (!isModelRow(a.original) || !isModelRow(b.original)) return 0
-    return compare(a.original, b.original)
-  }
-}
 
 function nullsLow(value: number | null): number {
   return value ?? Number.NEGATIVE_INFINITY
 }
 
-const sortByCityCode = modelRowSorter((a, b) => a.city_code.localeCompare(b.city_code))
-const sortByBrandName = modelRowSorter((a, b) => a.brand_name.localeCompare(b.brand_name))
-const sortByAssetType = modelRowSorter((a, b) => a.asset_type.localeCompare(b.asset_type))
-const sortByModelCount = modelRowSorter((a, b) => a.asset_count - b.asset_count)
-const sortByModelName = modelRowSorter((a, b) => a.model_name.localeCompare(b.model_name))
-const sortByPurchaseCost = modelRowSorter(
+function rowSorter(
+  compare: (a: InStockSummaryModelRow, b: InStockSummaryModelRow) => number,
+): SortingFn<InStockSummaryModelRow> {
+  return (a, b) => compare(a.original, b.original)
+}
+
+const sortByPurchaseCost = rowSorter(
   (a, b) => nullsLow(a.avg_purchase_cost) - nullsLow(b.avg_purchase_cost),
 )
-const sortByTotalCost = modelRowSorter(
-  (a, b) => nullsLow(a.avg_total_cost) - nullsLow(b.avg_total_cost),
-)
+const sortByTotalCost = rowSorter((a, b) => nullsLow(a.avg_total_cost) - nullsLow(b.avg_total_cost))
 
-function ExpanderCell({ row }: { row: Row<InStockSummaryTableRow> }): React.JSX.Element | null {
-  if (!isModelRow(row.original)) return null
-  const CaretIcon = row.getIsExpanded() ? CaretDownIcon : CaretRightIcon
-  return <CaretIcon className="size-4 text-muted-foreground" aria-hidden="true" />
-}
-
-function ModelCell({ row }: { row: Row<InStockSummaryTableRow> }): React.JSX.Element | null {
-  if (!isModelRow(row.original)) return null
-  return <span className="font-medium text-foreground">{row.original.model_name}</span>
-}
-
-function meterBandCell(row: Row<InStockSummaryTableRow>): string {
-  const bandRow = row.original
-  if (isModelRow(bandRow)) return ''
-  return METER_BAND_LABELS[bandRow.meter_band]
-}
-
-function PriceHistoryCell({ row }: { row: Row<InStockSummaryTableRow> }): React.JSX.Element | null {
-  if (!isModelRow(row.original)) return null
+function PriceHistoryCell({ row }: { row: Row<InStockSummaryModelRow> }): React.JSX.Element {
   const { model_id, model_name } = row.original
   return (
     <Link
@@ -71,50 +33,22 @@ function PriceHistoryCell({ row }: { row: Row<InStockSummaryTableRow> }): React.
   )
 }
 
-function scopeCell(
-  row: Row<InStockSummaryTableRow>,
-  value: (row: InStockSummaryModelRow) => string,
-) {
-  if (isModelRow(row.original)) return value(row.original)
-  return ''
-}
-
-export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
-  {
-    id: 'expander',
-    header: '',
-    enableSorting: false,
-    meta: { reorderable: false },
-    cell: ({ row }) => <ExpanderCell row={row} />,
-  },
-  {
-    accessorKey: 'city_code',
-    header: 'Warehouse',
-    cell: ({ row }) => scopeCell(row, (r) => r.city_code),
-    sortingFn: sortByCityCode,
-  },
+export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
   {
     accessorKey: 'brand_name',
     header: 'Brand',
-    cell: ({ row }) => scopeCell(row, (r) => r.brand_name),
-    sortingFn: sortByBrandName,
   },
   {
     accessorKey: 'asset_type',
     header: 'Asset Type',
-    cell: ({ row }) => scopeCell(row, (r) => formatTitleCase(r.asset_type)),
-    sortingFn: sortByAssetType,
+    cell: ({ row }) => formatTitleCase(row.original.asset_type),
   },
   {
     accessorKey: 'model_name',
     header: 'Model',
-    cell: ({ row }) => <ModelCell row={row} />,
-    sortingFn: sortByModelName,
-  },
-  {
-    id: 'meter_band',
-    header: 'Meter Band',
-    cell: ({ row }) => meterBandCell(row),
+    cell: ({ row }) => (
+      <span className="font-medium text-foreground">{row.original.model_name}</span>
+    ),
   },
   {
     accessorKey: 'avg_purchase_cost',
@@ -133,8 +67,6 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryTableRow>[] = [
   {
     accessorKey: 'asset_count',
     header: 'Count',
-    cell: ({ row }) => row.original.asset_count,
-    sortingFn: sortByModelCount,
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {

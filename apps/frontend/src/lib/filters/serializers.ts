@@ -9,15 +9,8 @@ import {
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
-import type {
-  AssetType,
-  Brand,
-  InStockSummaryRow,
-  MeterBand,
-  OrgDetail,
-  User,
-  Warehouse,
-} from 'shared-types'
+import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
+import type { AssetType, Brand, MeterBand, OrgDetail, User, Warehouse } from 'shared-types'
 
 const HELD_DRILLDOWN_COLUMN_IDS = [
   'serial_number',
@@ -50,7 +43,6 @@ const BAND_BOUNDS = {
 const serializeWarehouse = createSerializer({ warehouse: FILTER_PARSERS.warehouse })
 const serializeAssetSearch = createSerializer({ wh: FILTER_PARSERS.wh, type: FILTER_PARSERS.type })
 const serializeInStockSummary = createSerializer({
-  wh: FILTER_PARSERS.wh,
   brand: FILTER_PARSERS.brand,
   type: FILTER_PARSERS.type,
 })
@@ -106,22 +98,22 @@ export function buildStorePartPath(partId: number, warehouseId: number | null): 
   return serializeWarehouse(path, { warehouse: [warehouseId] })
 }
 
-export function buildInStockSummaryPath(
-  warehouse: Warehouse | null,
-  brand: Brand | null,
-  assetType: AssetType | null,
-): string {
+export function buildInStockSummaryPath(brand: Brand | null, assetType: AssetType | null): string {
   return serializeInStockSummary(IN_STOCK_SUMMARY_PATH, {
-    wh: warehouse ? [warehouse.id] : null,
     brand: brand?.id ?? null,
     type: assetType ? [assetType.id] : null,
   })
 }
 
-export function inStockDrilldownHref(row: InStockSummaryRow): string {
-  const bounds = row.meter_band === 'UNKNOWN' ? null : BAND_BOUNDS[row.meter_band]
+export function inStockDrilldownHref(params: {
+  row: InStockSummaryModelRow
+  warehouses: Warehouse[]
+  band: MeterBand | null
+}): string {
+  const { row, warehouses, band } = params
+  const bounds = band === null || band === 'UNKNOWN' ? null : BAND_BOUNDS[band]
   return serializeDrilldown(ONHAND_PATH, {
-    wh: [row.warehouse_id],
+    wh: warehouses.length > 0 ? warehouses.map((warehouse) => warehouse.id) : null,
     brand: row.brand_id,
     type: [row.asset_type_id],
     models: [row.model_id],

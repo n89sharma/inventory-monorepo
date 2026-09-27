@@ -96,6 +96,6 @@ export const getHeldReport = asyncHandler(async (req, res) => {
 })
 
 export const getInStockSummaryReport = asyncHandler(async (req, res) => {
-  const data = await getInStockSummaryReportSer()
+  const data = await getInStockSummaryReportSer(res.locals.permissions)
   res.json(successResponse(data))
 })

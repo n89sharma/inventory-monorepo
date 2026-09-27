@@ -5,7 +5,6 @@ export type MeterBand = (typeof METER_BAND)[number]
 
 export const InStockSummaryRowSchema = z.object({
   warehouse_id: z.number().int(),
-  city_code: z.string(),
   brand_id: z.number().int(),
   brand_name: z.string(),
   asset_type_id: z.number().int(),
@@ -13,8 +12,10 @@ export const InStockSummaryRowSchema = z.object({
   model_id: z.number().int(),
   model_name: z.string(),
   meter_band: z.enum(METER_BAND),
-  avg_purchase_cost: z.number().nullable(),
-  avg_total_cost: z.number().nullable(),
+  purchase_cost_sum: z.number().nullable(),
+  purchase_cost_count: z.number().int(),
+  total_cost_sum: z.number().nullable(),
+  total_cost_count: z.number().int(),
   asset_count: z.number().int(),
 })
 export type InStockSummaryRow = z.infer<typeof InStockSummaryRowSchema>

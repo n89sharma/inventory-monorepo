@@ -8,13 +8,12 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param _int4
  */
-export const getInStockSummary = $runtime.makeTypedQueryFactory("select\nw.id                          as warehouse_id,\nw.city_code                   as city_code,\nb.id                          as brand_id,\nb.\"name\"                      as brand_name,\nt.id                          as asset_type_id,\nt.asset_type                  as asset_type,\nm.id                          as model_id,\nm.\"name\"                      as model_name,\ncase\nwhen h.meter_total is null   then 'UNKNOWN'\nwhen h.meter_total < 70000   then 'LOW'\nwhen h.meter_total < 210000  then 'MEDIUM'\nelse 'HIGH'\nend                           as meter_band,\navg(c.purchase_cost)::float8  as avg_purchase_cost,\navg(c.total_cost)::float8     as avg_total_cost,\ncount(*)::int                 as asset_count\nfrom \"Asset\" a\njoin \"Status\" s    on s.id = a.status_id and s.id = any($1::int[])\njoin \"Model\" m     on m.id = a.model_id\njoin \"AssetType\" t on t.id = m.asset_type_id\njoin \"Brand\" b     on b.id = m.brand_id\njoin \"Location\" l  on l.id = a.location_id\njoin \"Warehouse\" w on w.id = l.warehouse_id and w.is_active is true\nleft join \"Cost\" c                   on c.asset_id = a.id\nleft join \"TechnicalSpecification\" h on h.asset_id = a.id\ngroup by w.id, w.city_code, b.id, b.\"name\", t.id, t.asset_type, m.id, m.\"name\", meter_band\norder by count(*) desc, w.city_code, b.\"name\", t.asset_type, m.\"name\"") as (_int4: number[]) => $runtime.TypedSql<getInStockSummary.Parameters, getInStockSummary.Result>
+export const getInStockSummary = $runtime.makeTypedQueryFactory("select\nw.id                          as warehouse_id,\nb.id                          as brand_id,\nb.\"name\"                      as brand_name,\nt.id                          as asset_type_id,\nt.asset_type                  as asset_type,\nm.id                          as model_id,\nm.\"name\"                      as model_name,\ncase\nwhen h.meter_total is null   then 'UNKNOWN'\nwhen h.meter_total < 70000   then 'LOW'\nwhen h.meter_total < 210000  then 'MEDIUM'\nelse 'HIGH'\nend                           as meter_band,\nsum(c.purchase_cost)::float8  as purchase_cost_sum,\ncount(c.purchase_cost)::int   as purchase_cost_count,\nsum(c.total_cost)::float8     as total_cost_sum,\ncount(c.total_cost)::int      as total_cost_count,\ncount(*)::int                 as asset_count\nfrom \"Asset\" a\njoin \"Status\" s    on s.id = a.status_id and s.id = any($1::int[])\njoin \"Model\" m     on m.id = a.model_id\njoin \"AssetType\" t on t.id = m.asset_type_id\njoin \"Brand\" b     on b.id = m.brand_id\njoin \"Location\" l  on l.id = a.location_id\njoin \"Warehouse\" w on w.id = l.warehouse_id and w.is_active is true\nleft join \"Cost\" c                   on c.asset_id = a.id\nleft join \"TechnicalSpecification\" h on h.asset_id = a.id\ngroup by w.id, b.id, b.\"name\", t.id, t.asset_type, m.id, m.\"name\", meter_band\norder by count(*) desc, w.id, b.\"name\", t.asset_type, m.\"name\"") as (_int4: number[]) => $runtime.TypedSql<getInStockSummary.Parameters, getInStockSummary.Result>
 
 export namespace getInStockSummary {
   export type Parameters = [_int4: number[]]
   export type Result = {
     warehouse_id: number
-    city_code: string
     brand_id: number
     brand_name: string
     asset_type_id: number
@@ -22,8 +21,10 @@ export namespace getInStockSummary {
     model_id: number
     model_name: string
     meter_band: string | null
-    avg_purchase_cost: number | null
-    avg_total_cost: number | null
+    purchase_cost_sum: number | null
+    purchase_cost_count: number | null
+    total_cost_sum: number | null
+    total_cost_count: number | null
     asset_count: number | null
   }
 }

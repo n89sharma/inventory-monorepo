@@ -2,7 +2,7 @@ import { Toggle } from '@/components/shadcn/toggle'
 
 const EMPTY_SELECTION: never[] = []
 
-export function ExclusiveOptionsFilter<T extends { id: number }>({
+export function ExclusiveOptionsFilter<T extends { id: number | string }>({
   options,
   selection,
   onSelectionChange,
@@ -12,7 +12,7 @@ export function ExclusiveOptionsFilter<T extends { id: number }>({
   getOptionAriaLabel,
   allAriaLabel,
 }: {
-  options: T[]
+  options: readonly T[]
   selection: T[]
   onSelectionChange: (next: T[]) => void
   getLabel: (option: T) => string

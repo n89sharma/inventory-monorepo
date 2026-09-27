@@ -1,6 +1,7 @@
-import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
+import { GridPageContent } from '@/components/app-layout/page-content'
 import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
+import { MeterBandFilter } from '@/components/shared/filters/meter-band-filter'
 import { ModelsFilter } from '@/components/shared/filters/models-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { FilterRow } from '@/components/shared/filter-row'
@@ -13,20 +14,27 @@ import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
 import {
   useAssetTypesParam,
   useBrandParam,
+  useMeterBandParam,
   useModelsParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
 import { inStockDrilldownHref } from '@/lib/filters/serializers'
 import {
   buildInStockSummaryGroups,
-  type InStockSummaryTableRow,
+  type InStockSummaryModelRow,
 } from '@/lib/in-stock-summary-grouping'
-import { METER_BAND_LEGEND } from '@/lib/meter-band-display'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
-import { useMemo } from 'react'
-import type { AssetType, Brand, InStockSummaryReport, ModelSummary, Warehouse } from 'shared-types'
+import { useCallback, useMemo } from 'react'
+import type {
+  AssetType,
+  Brand,
+  InStockSummaryReport,
+  MeterBand,
+  ModelSummary,
+  Warehouse,
+} from 'shared-types'
 
 const TABLE_LABEL = 'In-stock summary'
 
@@ -35,6 +43,7 @@ const DEFAULT_SORT = { id: 'asset_count', desc: true }
 
 type InStockSummaryFilters = {
   warehouses: Warehouse[]
+  band: MeterBand | null
   brand: Brand | null
   assetTypes: AssetType[]
   models: ModelSummary[]
@@ -43,13 +52,14 @@ type InStockSummaryFilters = {
 function buildFilteredGroups(
   rows: InStockSummaryReport,
   filters: InStockSummaryFilters,
-): InStockSummaryTableRow[] {
+): InStockSummaryModelRow[] {
   const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
   const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
   const modelIds = new Set(filters.models.map((m) => m.id))
   const filtered = rows.filter(
     (row) =>
       (warehouseIds.size === 0 || warehouseIds.has(row.warehouse_id)) &&
+      (filters.band === null || row.meter_band === filters.band) &&
       (filters.brand === null || row.brand_id === filters.brand.id) &&
       (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
       (modelIds.size === 0 || modelIds.has(row.model_id)),
@@ -57,35 +67,16 @@ function buildFilteredGroups(
   return buildInStockSummaryGroups(filtered)
 }
 
-function MeterBandLegend(): React.JSX.Element {
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-      <span className="font-medium text-foreground">Meter band</span>
-      {METER_BAND_LEGEND.map((band) => (
-        <span key={band.label}>
-          {band.label} ({band.range})
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function getSubRows(row: InStockSummaryTableRow): InStockSummaryTableRow[] | undefined {
-  return 'subRows' in row ? row.subRows : undefined
-}
-
-function getRowHref(row: InStockSummaryTableRow): string {
-  return 'subRows' in row ? '' : inStockDrilldownHref(row)
-}
-
 function InStockSummaryBody({
   rows,
   isLoading,
   columnVisibility,
+  getRowHref,
 }: {
-  rows: InStockSummaryTableRow[]
+  rows: InStockSummaryModelRow[]
   isLoading: boolean
   columnVisibility: VisibilityState
+  getRowHref: (row: InStockSummaryModelRow) => string
 }): React.JSX.Element | null {
   if (rows.length === 0) {
     if (isLoading) return null
@@ -97,33 +88,32 @@ function InStockSummaryBody({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2">
-      <PageSection>
-        <MeterBandLegend />
-      </PageSection>
-      <DataGrid
-        label={TABLE_LABEL}
-        columns={IN_STOCK_SUMMARY_COLUMNS}
-        data={rows}
-        defaultSort={DEFAULT_SORT}
-        getSubRows={getSubRows}
-        getRowHref={getRowHref}
-        columnVisibility={columnVisibility}
-      />
-    </div>
+    <DataGrid
+      label={TABLE_LABEL}
+      columns={IN_STOCK_SUMMARY_COLUMNS}
+      data={rows}
+      defaultSort={DEFAULT_SORT}
+      getRowHref={getRowHref}
+      columnVisibility={columnVisibility}
+    />
   )
 }
 
 export function InStockSummaryReportPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
+  const [band, setBand] = useMeterBandParam()
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
   const { data: rows = EMPTY_ROWS, isLoading } = useInStockSummaryReport()
   const visibleRows = useMemo(
-    () => buildFilteredGroups(rows, { warehouses, brand, assetTypes, models }),
-    [rows, warehouses, brand, assetTypes, models],
+    () => buildFilteredGroups(rows, { warehouses, band, brand, assetTypes, models }),
+    [rows, warehouses, band, brand, assetTypes, models],
+  )
+  const getRowHref = useCallback(
+    (row: InStockSummaryModelRow) => inStockDrilldownHref({ row, warehouses, band }),
+    [warehouses, band],
   )
 
   const canViewPurchase = useCan('view_purchase_price')
@@ -151,6 +141,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
         <form onSubmit={(e) => e.preventDefault()}>
           <FilterRow>
             <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+            <MeterBandFilter selection={band} onSelectionChange={setBand} />
             <BrandFilter
               selection={brand}
               onSelectionChange={setBrand}
@@ -174,6 +165,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
           rows={visibleRows}
           isLoading={isLoading}
           columnVisibility={columnVisibility}
+          getRowHref={getRowHref}
         />
       </div>
     </GridPageContent>
