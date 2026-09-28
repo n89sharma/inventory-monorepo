@@ -31,12 +31,14 @@ import {
   startLoadingTransfer,
 } from './transferService.js'
 
+const TEST_TRANSFER_DATE = new Date().toISOString().slice(0, 10)
+
 async function departTransferWithAssets(
   transferNumber: string,
   assetIds: number[],
   userId: number,
 ): Promise<void> {
-  await scheduleTransfer(transferNumber, userId)
+  await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, userId)
   await startLoadingTransfer(transferNumber, userId)
   for (const assetId of assetIds) {
     await scanAssetLoadedSer(transferNumber, assetId, userId)

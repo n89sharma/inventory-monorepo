@@ -44,6 +44,9 @@ export const TransferMetadataFormSchema = z
     ),
     transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
     comment: z.string(),
+    // No past-date refine here: this field stays visible (but disabled) outside Scheduled, and a
+    // transfer's date can legitimately be in the past by then — see edit-transfer-metadata-modal.
+    transfer_date: z.date().nullable(),
   })
   .refine(
     (data) => {
@@ -60,7 +63,10 @@ export type TransferMetadataForm = {
   destination: SelectOption<Warehouse>
   transporter: OrgSummary | null
   comment: string
+  transfer_date: Date | null
 }
 
-export const TransferNotesFormSchema = z.object({ comment: z.string() })
-export type TransferNotesForm = z.infer<typeof TransferNotesFormSchema>
+export const TransferScheduleFormSchema = z.object({
+  transfer_date: z.date({ message: 'Transfer date is required' }),
+})
+export type TransferScheduleForm = z.infer<typeof TransferScheduleFormSchema>

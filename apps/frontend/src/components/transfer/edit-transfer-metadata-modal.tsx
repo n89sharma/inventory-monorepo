@@ -1,6 +1,7 @@
 import { useOrgs } from '@/hooks/use-org'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { formatDateParam } from '@/lib/date-param'
 import { flattenFieldErrors } from '@/lib/utils'
 import { getSelectOption } from '@/ui-types/select-option-types'
 import {
@@ -8,14 +9,16 @@ import {
   type TransferMetadataForm,
 } from '@/ui-types/transfer-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
-import type { TransferDetail } from 'shared-types'
+import { TRANSFER_STATUS, type TransferDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
+import { ControlledDatePickerField } from '../shared/date-picker'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { SelectOptions } from '../shared/search-select/select-options'
 import { UnsavedChangesDialog } from '../shared/unsaved-changes-dialog'
@@ -24,18 +27,25 @@ interface EditTransferMetadataModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   transfer: TransferDetail
-  onSave: (metadata: TransferMetadataForm) => Promise<void>
+  onSaveMetadata: (metadata: TransferMetadataForm) => Promise<void>
+  onSaveNotes: (comment: string) => Promise<void>
+  onSaveDate: (transferDate: string) => Promise<void>
 }
 
 export function EditTransferMetadataModal({
   open,
   onOpenChange,
   transfer,
-  onSave,
+  onSaveMetadata,
+  onSaveNotes,
+  onSaveDate,
 }: EditTransferMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
   const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const today = startOfDay(new Date())
+  const canEditMetadata = transfer.status === TRANSFER_STATUS.DRAFT
+  const canEditDate = transfer.status === TRANSFER_STATUS.SCHEDULED
 
   const values = useMemo(() => toFormValues(transfer), [transfer])
   const form = useForm<TransferMetadataForm>({
@@ -48,7 +58,17 @@ export function EditTransferMetadataModal({
   async function onValid(values: TransferMetadataForm) {
     setIsSubmitting(true)
     try {
-      await onSave(values)
+      const { dirtyFields } = form.formState
+      const saves: Promise<void>[] = []
+      if (canEditMetadata) {
+        saves.push(onSaveMetadata(values))
+      } else if (dirtyFields.comment) {
+        saves.push(onSaveNotes(values.comment))
+      }
+      if (canEditDate && dirtyFields.transfer_date && values.transfer_date) {
+        saves.push(onSaveDate(formatDateParam(values.transfer_date)))
+      }
+      await Promise.all(saves)
       form.reset(values)
       onOpenChange(false)
     } catch {
@@ -74,45 +94,55 @@ export function EditTransferMetadataModal({
         </DialogHeader>
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <Controller
+            <fieldset disabled={!canEditMetadata} className="contents">
+              <Controller
+                control={form.control}
+                name="origin"
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <SelectOptions
+                    selection={value}
+                    onSelectionChange={onChange}
+                    options={activeWarehouses}
+                    getLabel={(w) => w.city_code}
+                    fieldLabel="Origin"
+                    anyAllowed={false}
+                    fieldRequired={true}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="destination"
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <SelectOptions
+                    selection={value}
+                    onSelectionChange={onChange}
+                    options={activeWarehouses}
+                    getLabel={(w) => w.city_code}
+                    fieldLabel="Destination"
+                    anyAllowed={false}
+                    fieldRequired={true}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+              <ControlledSearchSelectInput
+                control={form.control}
+                name="transporter"
+                options={orgs}
+                getLabel={(o) => o.name}
+                fieldLabel="Transporter"
+                fieldRequired={true}
+              />
+            </fieldset>
+            <ControlledDatePickerField
               control={form.control}
-              name="origin"
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={activeWarehouses}
-                  getLabel={(w) => w.city_code}
-                  fieldLabel="Origin"
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="destination"
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={activeWarehouses}
-                  getLabel={(w) => w.city_code}
-                  fieldLabel="Destination"
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="transporter"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Transporter"
-              fieldRequired={true}
+              name="transfer_date"
+              label="Transfer Date"
+              className="self-end pb-0.5"
+              disabled={{ before: today }}
+              fieldDisabled={!canEditDate}
             />
             <Controller
               control={form.control}
@@ -159,5 +189,6 @@ function toFormValues(t: TransferDetail): TransferMetadataForm {
       name: t.transporter.name,
     },
     comment: t.notes ?? '',
+    transfer_date: t.transfer_date,
   }
 }

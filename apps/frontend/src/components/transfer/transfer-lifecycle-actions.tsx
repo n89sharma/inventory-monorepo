@@ -10,6 +10,7 @@ import {
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
 import { DepartTransferModal } from '@/components/transfer/depart-transfer-modal'
+import { ScheduleTransferModal } from '@/components/transfer/schedule-transfer-modal'
 import { useCan } from '@/hooks/use-can'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -69,6 +70,7 @@ type DepartActionProps = {
   originId: number
   assetCount: number
   testedCount: number
+  transferDate: Date | null
   pendingLoadCount: number
   onDepart: (costs: TransferCosts | null) => Promise<void>
 }
@@ -78,6 +80,7 @@ function DepartAction({
   originId,
   assetCount,
   testedCount,
+  transferDate,
   pendingLoadCount,
   onDepart,
 }: DepartActionProps): React.JSX.Element {
@@ -92,6 +95,7 @@ function DepartAction({
         originId={originId}
         assetCount={assetCount}
         testedCount={testedCount}
+        transferDate={transferDate}
         disabled={disabled}
         onDepart={onDepart}
       />
@@ -115,9 +119,10 @@ type TransferLifecycleActionsProps = {
   destinationCode: string
   assetCount: number
   testedCount: number
+  transferDate: Date | null
   pendingLoadCount: number
   pendingUnloadCount: number
-  onSchedule: () => Promise<void>
+  onSchedule: (transferDate: string) => Promise<void>
   onStartLoading: () => Promise<void>
   onDepart: (costs: TransferCosts | null) => Promise<void>
   onStartUnloading: () => Promise<void>
@@ -130,6 +135,7 @@ export function TransferLifecycleActions({
   destinationCode,
   assetCount,
   testedCount,
+  transferDate,
   pendingLoadCount,
   pendingUnloadCount,
   onSchedule,
@@ -142,14 +148,7 @@ export function TransferLifecycleActions({
   if (!canCreateEditTransfer) return null
 
   if (status === TRANSFER_STATUS.DRAFT) {
-    return (
-      <LifecycleButton
-        label="Schedule"
-        title="Schedule this transfer?"
-        description="Lock the transfer and queues it for loading"
-        onConfirm={onSchedule}
-      />
-    )
+    return <ScheduleTransferModal onSchedule={onSchedule} />
   }
 
   if (status === TRANSFER_STATUS.SCHEDULED) {
@@ -168,6 +167,7 @@ export function TransferLifecycleActions({
         originId={originId}
         assetCount={assetCount}
         testedCount={testedCount}
+        transferDate={transferDate}
         pendingLoadCount={pendingLoadCount}
         onDepart={onDepart}
       />

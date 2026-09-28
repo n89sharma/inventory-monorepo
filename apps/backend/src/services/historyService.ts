@@ -134,6 +134,7 @@ type TransferUpdateFields = Partial<{
   origin_id: number
   destination_id: number
   transporter_id: number
+  transfer_date: string | null
 }>
 
 // ─── Base utility ─────────────────────────────────────────────────────────────
@@ -550,6 +551,7 @@ const TRANSFER_UPDATE_SPEC: FieldSpec[] = [
     bothRequired: true,
   },
   { field: 'transporter_id', out: 'transporter_name', resolve: 'organization', bothRequired: true },
+  { field: 'transfer_date' },
 ]
 
 const ARRIVAL_CREATE_SPEC: CreateFieldSpec<ArrivalCreateState>[] = [

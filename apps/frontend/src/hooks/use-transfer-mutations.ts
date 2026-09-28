@@ -15,6 +15,7 @@ import {
   startUnloadingTransfer,
   undoTransferAssetLoad,
   undoTransferAssetUnload,
+  updateTransferDate,
   updateTransferMetadata,
   updateTransferNotes,
 } from '@/data/api/transfer-api'
@@ -112,8 +113,14 @@ async function updateNotes(transferNumber: string, comment: string) {
   invalidateTransferLists()
 }
 
-async function schedule(transferNumber: string) {
-  await scheduleTransfer(transferNumber)
+async function schedule(transferNumber: string, transferDate: string) {
+  await scheduleTransfer(transferNumber, transferDate)
+  mutate(transferDetailKey(transferNumber))
+  invalidateTransferLists()
+}
+
+async function updateDate(transferNumber: string, transferDate: string) {
+  await updateTransferDate(transferNumber, transferDate)
   mutate(transferDetailKey(transferNumber))
   invalidateTransferLists()
 }
@@ -246,6 +253,7 @@ const mutations = {
   addAssetBatch,
   updateMetadata,
   updateNotes,
+  updateDate,
   schedule,
   startLoading,
   depart,

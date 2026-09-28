@@ -11,6 +11,7 @@ import {
   markTransferAssetMissingAtLoad,
   markTransferAssetMissingAtUnload,
   patchTransferAssets,
+  patchTransferDate,
   patchTransferMetadata,
   patchTransferNotes,
   returnTransferAssetsToOrigin,
@@ -54,6 +55,11 @@ router.patch(
   '/:transferNumber/notes',
   requirePermission('create_update_transfer'),
   patchTransferNotes,
+)
+router.patch(
+  '/:transferNumber/transfer-date',
+  requirePermission('create_update_transfer'),
+  patchTransferDate,
 )
 router.post(
   '/:transferNumber/schedule',

@@ -3,6 +3,7 @@ select
 	t.transfer_number as transfer_number,
 	t.status as status,
 	t.created_at as created_at,
+	t.transfer_date as transfer_date,
 	wo.city_code as origin_code,
 	wo.street as origin_street,
 	wd.city_code as destination_code,

@@ -5,6 +5,15 @@ import { WarehouseSchema } from '../reference-data-types.js'
 import { TransferCostsSchema } from '../transfer-cost-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
 
+const TRANSFER_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+
+const todayYmd = (): string => new Date().toISOString().slice(0, 10)
+
+export const TransferDateSchema = z
+  .string()
+  .regex(TRANSFER_DATE_PATTERN, 'Transfer date must be YYYY-MM-DD')
+  .refine((value) => value >= todayYmd(), 'Transfer date cannot be in the past')
+
 // Transfer lifecycle. DB stores the raw string (Transfer.status); this is the compile-time
 // symbol for code that names a state. Wire fields stay z.string() like AssetSummary.status.
 export const TransferStatusSchema = z.enum([
@@ -47,6 +56,7 @@ export const TransferSummarySchema = CollectionSummarySchema.extend({
   destination_code: z.string(),
   destination_street: z.string(),
   transporter: z.string(),
+  transfer_date: z.coerce.date().nullable(),
 })
 export type TransferSummary = z.infer<typeof TransferSummarySchema>
 
@@ -60,6 +70,7 @@ export const TransferDetailSchema = z.object({
   notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
+  transfer_date: z.coerce.date().nullable(),
   assets: z.array(TransferAssetRowSchema),
 })
 export type TransferDetail = z.infer<typeof TransferDetailSchema>
@@ -92,6 +103,18 @@ export const UpdateTransferMetadataSchema = z
     path: ['destination'],
   })
 export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema>
+
+// POST /transfers/:transferNumber/schedule
+export const ScheduleTransferSchema = z.object({
+  transfer_date: TransferDateSchema,
+})
+export type ScheduleTransfer = z.infer<typeof ScheduleTransferSchema>
+
+// PATCH /transfers/:transferNumber/transfer-date
+export const UpdateTransferDateSchema = z.object({
+  transfer_date: TransferDateSchema,
+})
+export type UpdateTransferDate = z.infer<typeof UpdateTransferDateSchema>
 
 // POST /transfers/:transferNumber/depart — null costs means the origin warehouse defaults.
 export const DepartTransferSchema = z.object({

@@ -163,6 +163,7 @@ function makeDetail(status: string): TransferDetail {
     notes: null,
     created_at: new Date('2026-01-01'),
     created_by: 'Test User',
+    transfer_date: null,
     assets: [makeAsset({})],
   }
 }

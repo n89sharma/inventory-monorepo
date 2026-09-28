@@ -1,10 +1,10 @@
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
   assetCountColumnDef,
-  createdAtColumnDef,
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
+import { formatDate } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { TransferSummary } from 'shared-types'
 
@@ -23,7 +23,14 @@ export function transferTableColumns(
       header: 'Status',
       cell: ({ row }) => <TransferStatusBadge status={row.original.status} />,
     },
-    createdAtColumnDef as ColumnDef<TransferSummary>,
+    {
+      id: 'transfer_date',
+      header: 'Date',
+      cell: ({ row }) => {
+        const date = row.original.transfer_date ?? row.original.created_at
+        return date ? formatDate(date) : '-'
+      },
+    },
     { accessorKey: 'origin_code', header: 'Origin' },
     { accessorKey: 'destination_code', header: 'Destination' },
     {

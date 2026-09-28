@@ -5,6 +5,7 @@ const BARCODE = 'YYZ-0000001'
 
 const mocks = vi.hoisted(() => ({
   scheduleTransfer: vi.fn(),
+  updateTransferDate: vi.fn(),
   startLoadingTransfer: vi.fn(),
   departTransfer: vi.fn(),
   startUnloadingTransfer: vi.fn(),
@@ -27,6 +28,7 @@ vi.mock('@/data/api/transfer-api', () => ({
   updateTransferMetadata: vi.fn(),
   updateTransferNotes: vi.fn(),
   scheduleTransfer: mocks.scheduleTransfer,
+  updateTransferDate: mocks.updateTransferDate,
   startLoadingTransfer: mocks.startLoadingTransfer,
   departTransfer: mocks.departTransfer,
   startUnloadingTransfer: mocks.startUnloadingTransfer,
@@ -72,9 +74,19 @@ describe('use-transfer-mutations invalidation', () => {
 
   it('schedule invalidates transfer detail and lists, not asset details', async () => {
     const mutations = await loadMutations()
-    await mutations.schedule(TRANSFER_NUMBER)
+    await mutations.schedule(TRANSFER_NUMBER, '2026-01-01')
 
-    expect(mocks.scheduleTransfer).toHaveBeenCalledWith(TRANSFER_NUMBER)
+    expect(mocks.scheduleTransfer).toHaveBeenCalledWith(TRANSFER_NUMBER, '2026-01-01')
+    expect(mocks.mutate).toHaveBeenCalledWith(`transfer:${TRANSFER_NUMBER}`)
+    expect(mocks.invalidateTransferLists).toHaveBeenCalledOnce()
+    expect(mocks.invalidateAssetDetails).not.toHaveBeenCalled()
+  })
+
+  it('updateDate invalidates transfer detail and lists, not asset details', async () => {
+    const mutations = await loadMutations()
+    await mutations.updateDate(TRANSFER_NUMBER, '2026-01-02')
+
+    expect(mocks.updateTransferDate).toHaveBeenCalledWith(TRANSFER_NUMBER, '2026-01-02')
     expect(mocks.mutate).toHaveBeenCalledWith(`transfer:${TRANSFER_NUMBER}`)
     expect(mocks.invalidateTransferLists).toHaveBeenCalledOnce()
     expect(mocks.invalidateAssetDetails).not.toHaveBeenCalled()

@@ -60,6 +60,7 @@ export type TransferMinAggregateOutputType = {
   created_by_id: number | null
   notes: string | null
   created_at: Date | null
+  transfer_date: Date | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   tested_processing_cost: runtime.Decimal | null
@@ -76,6 +77,7 @@ export type TransferMaxAggregateOutputType = {
   created_by_id: number | null
   notes: string | null
   created_at: Date | null
+  transfer_date: Date | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   tested_processing_cost: runtime.Decimal | null
@@ -92,6 +94,7 @@ export type TransferCountAggregateOutputType = {
   created_by_id: number
   notes: number
   created_at: number
+  transfer_date: number
   transfer_cost: number
   processing_cost: number
   tested_processing_cost: number
@@ -134,6 +137,7 @@ export type TransferMinAggregateInputType = {
   created_by_id?: true
   notes?: true
   created_at?: true
+  transfer_date?: true
   transfer_cost?: true
   processing_cost?: true
   tested_processing_cost?: true
@@ -150,6 +154,7 @@ export type TransferMaxAggregateInputType = {
   created_by_id?: true
   notes?: true
   created_at?: true
+  transfer_date?: true
   transfer_cost?: true
   processing_cost?: true
   tested_processing_cost?: true
@@ -166,6 +171,7 @@ export type TransferCountAggregateInputType = {
   created_by_id?: true
   notes?: true
   created_at?: true
+  transfer_date?: true
   transfer_cost?: true
   processing_cost?: true
   tested_processing_cost?: true
@@ -269,6 +275,7 @@ export type TransferGroupByOutputType = {
   created_by_id: number
   notes: string | null
   created_at: Date
+  transfer_date: Date | null
   transfer_cost: runtime.Decimal | null
   processing_cost: runtime.Decimal | null
   tested_processing_cost: runtime.Decimal | null
@@ -308,6 +315,7 @@ export type TransferWhereInput = {
   created_by_id?: Prisma.IntFilter<"Transfer"> | number
   notes?: Prisma.StringNullableFilter<"Transfer"> | string | null
   created_at?: Prisma.DateTimeFilter<"Transfer"> | Date | string
+  transfer_date?: Prisma.DateTimeNullableFilter<"Transfer"> | Date | string | null
   transfer_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -329,6 +337,7 @@ export type TransferOrderByWithRelationInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  transfer_date?: Prisma.SortOrderInput | Prisma.SortOrder
   transfer_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   tested_processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,6 +362,7 @@ export type TransferWhereUniqueInput = Prisma.AtLeast<{
   created_by_id?: Prisma.IntFilter<"Transfer"> | number
   notes?: Prisma.StringNullableFilter<"Transfer"> | string | null
   created_at?: Prisma.DateTimeFilter<"Transfer"> | Date | string
+  transfer_date?: Prisma.DateTimeNullableFilter<"Transfer"> | Date | string | null
   transfer_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -374,6 +384,7 @@ export type TransferOrderByWithAggregationInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  transfer_date?: Prisma.SortOrderInput | Prisma.SortOrder
   transfer_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
   tested_processing_cost?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -398,6 +409,7 @@ export type TransferScalarWhereWithAggregatesInput = {
   created_by_id?: Prisma.IntWithAggregatesFilter<"Transfer"> | number
   notes?: Prisma.StringNullableWithAggregatesFilter<"Transfer"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Transfer"> | Date | string
+  transfer_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Transfer"> | Date | string | null
   transfer_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.DecimalNullableWithAggregatesFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -409,6 +421,7 @@ export type TransferCreateInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -430,6 +443,7 @@ export type TransferUncheckedCreateInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -442,6 +456,7 @@ export type TransferUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -463,6 +478,7 @@ export type TransferUncheckedUpdateInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -480,6 +496,7 @@ export type TransferCreateManyInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -491,6 +508,7 @@ export type TransferUpdateManyMutationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -507,6 +525,7 @@ export type TransferUncheckedUpdateManyInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -523,6 +542,7 @@ export type TransferCountOrderByAggregateInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  transfer_date?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   tested_processing_cost?: Prisma.SortOrder
@@ -551,6 +571,7 @@ export type TransferMaxOrderByAggregateInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  transfer_date?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   tested_processing_cost?: Prisma.SortOrder
@@ -567,6 +588,7 @@ export type TransferMinOrderByAggregateInput = {
   created_by_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  transfer_date?: Prisma.SortOrder
   transfer_cost?: Prisma.SortOrder
   processing_cost?: Prisma.SortOrder
   tested_processing_cost?: Prisma.SortOrder
@@ -787,6 +809,7 @@ export type TransferCreateWithoutAsset_transfersInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -807,6 +830,7 @@ export type TransferUncheckedCreateWithoutAsset_transfersInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -834,6 +858,7 @@ export type TransferUpdateWithoutAsset_transfersInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -854,6 +879,7 @@ export type TransferUncheckedUpdateWithoutAsset_transfersInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -865,6 +891,7 @@ export type TransferCreateWithoutOriginInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -884,6 +911,7 @@ export type TransferUncheckedCreateWithoutOriginInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -906,6 +934,7 @@ export type TransferCreateWithoutDestinationInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -925,6 +954,7 @@ export type TransferUncheckedCreateWithoutDestinationInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -971,6 +1001,7 @@ export type TransferScalarWhereInput = {
   created_by_id?: Prisma.IntFilter<"Transfer"> | number
   notes?: Prisma.StringNullableFilter<"Transfer"> | string | null
   created_at?: Prisma.DateTimeFilter<"Transfer"> | Date | string
+  transfer_date?: Prisma.DateTimeNullableFilter<"Transfer"> | Date | string | null
   transfer_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.DecimalNullableFilter<"Transfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -998,6 +1029,7 @@ export type TransferCreateWithoutCreated_byInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1017,6 +1049,7 @@ export type TransferUncheckedCreateWithoutCreated_byInput = {
   transporter_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1055,6 +1088,7 @@ export type TransferCreateWithoutTransporterInput = {
   status?: string
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1074,6 +1108,7 @@ export type TransferUncheckedCreateWithoutTransporterInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1116,6 +1151,7 @@ export type TransferCreateManyOriginInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1131,6 +1167,7 @@ export type TransferCreateManyDestinationInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1142,6 +1179,7 @@ export type TransferUpdateWithoutOriginInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1161,6 +1199,7 @@ export type TransferUncheckedUpdateWithoutOriginInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1177,6 +1216,7 @@ export type TransferUncheckedUpdateManyWithoutOriginInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1188,6 +1228,7 @@ export type TransferUpdateWithoutDestinationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1207,6 +1248,7 @@ export type TransferUncheckedUpdateWithoutDestinationInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1223,6 +1265,7 @@ export type TransferUncheckedUpdateManyWithoutDestinationInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1238,6 +1281,7 @@ export type TransferCreateManyCreated_byInput = {
   transporter_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1249,6 +1293,7 @@ export type TransferUpdateWithoutCreated_byInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1268,6 +1313,7 @@ export type TransferUncheckedUpdateWithoutCreated_byInput = {
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1284,6 +1330,7 @@ export type TransferUncheckedUpdateManyWithoutCreated_byInput = {
   transporter_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1299,6 +1346,7 @@ export type TransferCreateManyTransporterInput = {
   created_by_id: number
   notes?: string | null
   created_at: Date | string
+  transfer_date?: Date | string | null
   transfer_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1310,6 +1358,7 @@ export type TransferUpdateWithoutTransporterInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1329,6 +1378,7 @@ export type TransferUncheckedUpdateWithoutTransporterInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1345,6 +1395,7 @@ export type TransferUncheckedUpdateManyWithoutTransporterInput = {
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transfer_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transfer_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   tested_processing_cost?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -1392,6 +1443,7 @@ export type TransferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
+  transfer_date?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
   tested_processing_cost?: boolean
@@ -1414,6 +1466,7 @@ export type TransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
+  transfer_date?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
   tested_processing_cost?: boolean
@@ -1434,6 +1487,7 @@ export type TransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
+  transfer_date?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
   tested_processing_cost?: boolean
@@ -1454,13 +1508,14 @@ export type TransferSelectScalar = {
   created_by_id?: boolean
   notes?: boolean
   created_at?: boolean
+  transfer_date?: boolean
   transfer_cost?: boolean
   processing_cost?: boolean
   tested_processing_cost?: boolean
   other_cost?: boolean
 }
 
-export type TransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transfer_number" | "status" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "notes" | "created_at" | "transfer_cost" | "processing_cost" | "tested_processing_cost" | "other_cost", ExtArgs["result"]["transfer"]>
+export type TransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "transfer_number" | "status" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "notes" | "created_at" | "transfer_date" | "transfer_cost" | "processing_cost" | "tested_processing_cost" | "other_cost", ExtArgs["result"]["transfer"]>
 export type TransferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
@@ -1501,6 +1556,7 @@ export type $TransferPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     created_by_id: number
     notes: string | null
     created_at: Date
+    transfer_date: Date | null
     transfer_cost: runtime.Decimal | null
     processing_cost: runtime.Decimal | null
     tested_processing_cost: runtime.Decimal | null
@@ -1942,6 +1998,7 @@ export interface TransferFieldRefs {
   readonly created_by_id: Prisma.FieldRef<"Transfer", 'Int'>
   readonly notes: Prisma.FieldRef<"Transfer", 'String'>
   readonly created_at: Prisma.FieldRef<"Transfer", 'DateTime'>
+  readonly transfer_date: Prisma.FieldRef<"Transfer", 'DateTime'>
   readonly transfer_cost: Prisma.FieldRef<"Transfer", 'Decimal'>
   readonly processing_cost: Prisma.FieldRef<"Transfer", 'Decimal'>
   readonly tested_processing_cost: Prisma.FieldRef<"Transfer", 'Decimal'>

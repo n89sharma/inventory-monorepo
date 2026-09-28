@@ -12,9 +12,11 @@ import type {
   CollectionHistory,
   CreateTransfer,
   DepartTransfer,
+  ScheduleTransfer,
   TransferCosts,
   TransferDetail,
   TransferSummary,
+  UpdateTransferDate,
   UpdateTransferMetadata,
   UpdateTransferNotes,
   Warehouse,
@@ -26,9 +28,11 @@ import {
   CreateTransferSchema,
   DepartTransferSchema,
   ReturnAssetsToOriginSchema,
+  ScheduleTransferSchema,
   TransferAssetIdSchema,
   TransferDetailSchema,
   TransferSummarySchema,
+  UpdateTransferDateSchema,
   UpdateTransferMetadataSchema,
   UpdateTransferNotesSchema,
 } from 'shared-types'
@@ -112,8 +116,24 @@ export async function patchTransferAssets(
   await api.patch(`/transfers/${transferNumber}/assets`, patchTransferAssetsBody)
 }
 
-export async function scheduleTransfer(transferNumber: string): Promise<void> {
-  await api.post(`/transfers/${transferNumber}/schedule`)
+export async function scheduleTransfer(
+  transferNumber: string,
+  transferDate: string,
+): Promise<void> {
+  const scheduleTransferBody = ScheduleTransferSchema.parse({
+    transfer_date: transferDate,
+  } satisfies ScheduleTransfer)
+  await api.post(`/transfers/${transferNumber}/schedule`, scheduleTransferBody)
+}
+
+export async function updateTransferDate(
+  transferNumber: string,
+  transferDate: string,
+): Promise<void> {
+  const updateTransferDateBody = UpdateTransferDateSchema.parse({
+    transfer_date: transferDate,
+  } satisfies UpdateTransferDate)
+  await api.patch(`/transfers/${transferNumber}/transfer-date`, updateTransferDateBody)
 }
 
 export async function startLoadingTransfer(transferNumber: string): Promise<void> {

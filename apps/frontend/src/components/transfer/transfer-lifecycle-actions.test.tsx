@@ -21,6 +21,7 @@ function renderActions(
       destinationCode="YYZ"
       assetCount={3}
       testedCount={1}
+      transferDate={null}
       pendingLoadCount={overrides.pendingLoadCount ?? 0}
       pendingUnloadCount={overrides.pendingUnloadCount ?? 0}
       onSchedule={NOOP_ASYNC}

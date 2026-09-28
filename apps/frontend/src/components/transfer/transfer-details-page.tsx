@@ -15,7 +15,6 @@ import { SummaryRoute } from '@/components/shared/cards/summary-route'
 import { SummaryValue } from '@/components/shared/cards/summary-value'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
-import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
 import { TransferLoadingPanel } from '@/components/transfer/transfer-loading-panel'
 import { TransferUnloadingPanel } from '@/components/transfer/transfer-unloading-panel'
@@ -35,9 +34,7 @@ import {
   type AssetSearchRow,
   type PatchAssetPricing,
   type TransferAssetRow,
-  type TransferDetail,
 } from 'shared-types'
-import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 
 const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
 const RETURN_TO_ORIGIN_LABEL = 'Return to origin'
@@ -174,9 +171,10 @@ export function TransferDetailsPage(): React.JSX.Element {
           destinationCode={transfer.destination.city_code}
           assetCount={transfer.assets.length}
           testedCount={transfer.assets.filter((a) => a.readiness !== UNTESTED_READINESS).length}
+          transferDate={transfer.transfer_date}
           pendingLoadCount={pendingLoadCountOf(transfer.assets)}
           pendingUnloadCount={pendingUnloadCountOf(transfer.assets)}
-          onSchedule={() => mutations.schedule(transferNumber)}
+          onSchedule={(transferDate) => mutations.schedule(transferNumber, transferDate)}
           onStartLoading={() => mutations.startLoading(transferNumber)}
           onDepart={(costs) =>
             mutations.depart(
@@ -218,7 +216,7 @@ export function TransferDetailsPage(): React.JSX.Element {
       })}
       renderSummaryStrip={(transfer) => (
         <>
-          <SummaryValue value={formatDate(transfer.created_at)} />
+          <SummaryValue value={formatDate(transfer.transfer_date ?? transfer.created_at)} />
           <SummaryRoute from={transfer.origin.city_code} to={transfer.destination.city_code} />
           <SummaryValue value={<OrgName name={transfer.transporter.name} />} />
           <AssetTotalsField assets={transfer.assets} />
@@ -226,11 +224,13 @@ export function TransferDetailsPage(): React.JSX.Element {
         </>
       )}
       renderMetadataModal={(transfer, control) => (
-        <TransferEditModal
+        <EditTransferMetadataModal
+          open={control.open}
+          onOpenChange={control.onOpenChange}
           transfer={transfer}
-          control={control}
           onSaveMetadata={(metadata) => mutations.updateMetadata(transferNumber, metadata)}
           onSaveNotes={(comment) => mutations.updateNotes(transferNumber, comment)}
+          onSaveDate={(transferDate) => mutations.updateDate(transferNumber, transferDate)}
         />
       )}
       renderAddAssetBar={(transfer) =>
@@ -266,39 +266,6 @@ export function TransferDetailsPage(): React.JSX.Element {
           ),
         }
       }}
-    />
-  )
-}
-
-interface TransferEditModalProps {
-  transfer: TransferDetail
-  control: { open: boolean; onOpenChange: (open: boolean) => void }
-  onSaveMetadata: (metadata: TransferMetadataForm) => Promise<void>
-  onSaveNotes: (comment: string) => Promise<void>
-}
-
-function TransferEditModal({
-  transfer,
-  control,
-  onSaveMetadata,
-  onSaveNotes,
-}: TransferEditModalProps): React.JSX.Element {
-  if (transfer.status === TRANSFER_STATUS.DRAFT) {
-    return (
-      <EditTransferMetadataModal
-        open={control.open}
-        onOpenChange={control.onOpenChange}
-        transfer={transfer}
-        onSave={onSaveMetadata}
-      />
-    )
-  }
-  return (
-    <EditTransferNotesModal
-      open={control.open}
-      onOpenChange={control.onOpenChange}
-      transfer={transfer}
-      onSave={onSaveNotes}
     />
   )
 }

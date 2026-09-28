@@ -5,9 +5,11 @@ import {
   AssetCost,
   AssetDelta,
   CreateTransfer,
+  ScheduleTransfer,
   TRANSFER_STATUS,
   TransferCosts,
   TransferDetail,
+  UpdateTransferDate,
   UpdateTransferMetadata,
   UpdateTransferNotes,
 } from 'shared-types'
@@ -39,6 +41,18 @@ import { prisma } from '../prisma.js'
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
 const UNTESTED_READINESS = 'UNTESTED'
 
+function toYmd(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
+function toYmdOrNull(date: Date | null): string | null {
+  return date === null ? null : toYmd(date)
+}
+
+function todayYmd(): string {
+  return toYmd(new Date())
+}
+
 export async function getTransfer(
   transferNumber: string,
   permissions: ReadonlySet<Permission>,
@@ -60,6 +74,7 @@ export async function getTransfer(
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
+    transfer_date: transfer.transfer_date,
     assets: assets.map((r) => ({
       ...redactSearchRowCost(mapAssetSearchRow(r), permissions),
       scan: { loaded: r.loaded, unloaded: r.unloaded },
@@ -226,7 +241,11 @@ export async function patchTransferAssets(
   )
 }
 
-export async function scheduleTransfer(transferNumber: string, userId: number): Promise<void> {
+export async function scheduleTransfer(
+  transferNumber: string,
+  schedule: ScheduleTransfer,
+  userId: number,
+): Promise<void> {
   const transferId = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
@@ -241,15 +260,44 @@ export async function scheduleTransfer(transferNumber: string, userId: number): 
     }
     await tx.transfer.update({
       where: { id: transfer.id },
-      data: { status: TRANSFER_STATUS.SCHEDULED },
+      data: { status: TRANSFER_STATUS.SCHEDULED, transfer_date: new Date(schedule.transfer_date) },
     })
     return transfer.id
   })
 
   await recordTransferUpdate(
     transferId,
-    { status: TRANSFER_STATUS.DRAFT },
-    { status: TRANSFER_STATUS.SCHEDULED },
+    { status: TRANSFER_STATUS.DRAFT, transfer_date: null },
+    { status: TRANSFER_STATUS.SCHEDULED, transfer_date: schedule.transfer_date },
+    userId,
+  )
+}
+
+export async function patchTransferDate(
+  transferNumber: string,
+  update: UpdateTransferDate,
+  userId: number,
+): Promise<void> {
+  const { transferId, previousDate } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, transfer_date: true },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.SCHEDULED) {
+      throw new ConflictError(`Transfer ${transferNumber} date can only be edited while scheduled`)
+    }
+    await tx.transfer.update({
+      where: { id: transfer.id },
+      data: { transfer_date: new Date(update.transfer_date) },
+    })
+    return { transferId: transfer.id, previousDate: toYmdOrNull(transfer.transfer_date) }
+  })
+
+  await recordTransferUpdate(
+    transferId,
+    { transfer_date: previousDate },
+    { transfer_date: update.transfer_date },
     userId,
   )
 }
@@ -535,68 +583,77 @@ export async function departTransfer(
   userId: number,
   costs: TransferCosts | null,
 ): Promise<void> {
-  const { transferId, route, costChanges, priorAssets } = await prisma.$transaction(async (tx) => {
-    const transfer = await tx.transfer.findUnique({
-      where: { transfer_number: transferNumber },
-      select: {
-        id: true,
-        status: true,
-        origin_id: true,
-        ...TRANSFER_ROUTE_SELECT,
-        asset_transfers: {
-          select: {
-            asset_id: true,
-            loaded: true,
-            asset: { select: { status: { select: { status: true } } } },
+  const { transferId, route, costChanges, priorAssets, previousDate, newTransferDate } =
+    await prisma.$transaction(async (tx) => {
+      const transfer = await tx.transfer.findUnique({
+        where: { transfer_number: transferNumber },
+        select: {
+          id: true,
+          status: true,
+          origin_id: true,
+          transfer_date: true,
+          ...TRANSFER_ROUTE_SELECT,
+          asset_transfers: {
+            select: {
+              asset_id: true,
+              loaded: true,
+              asset: { select: { status: { select: { status: true } } } },
+            },
           },
         },
-      },
-    })
-    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
-    if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
-      throw new ConflictError(`Transfer ${transferNumber} is not loading`)
-    }
-    const unresolved = transfer.asset_transfers.filter(
-      (at) => !at.loaded && at.asset.status.status !== ASSET_STATUS.MISSING,
-    )
-    if (unresolved.length > 0) {
-      throw new ConflictError(
-        `${pluralize(unresolved.length, 'asset')} not yet scanned or marked missing on transfer ${transferNumber}`,
+      })
+      if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+      if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+        throw new ConflictError(`Transfer ${transferNumber} is not loading`)
+      }
+      const unresolved = transfer.asset_transfers.filter(
+        (at) => !at.loaded && at.asset.status.status !== ASSET_STATUS.MISSING,
       )
-    }
-    const travelingAssetIds = transfer.asset_transfers
-      .filter((at) => at.loaded)
-      .map((at) => at.asset_id)
-    const appliedCosts =
-      costs === null
-        ? await getWarehouseTransferCostDecimals(tx, transfer.origin_id)
-        : toCostDecimals(costs)
+      if (unresolved.length > 0) {
+        throw new ConflictError(
+          `${pluralize(unresolved.length, 'asset')} not yet scanned or marked missing on transfer ${transferNumber}`,
+        )
+      }
+      const travelingAssetIds = transfer.asset_transfers
+        .filter((at) => at.loaded)
+        .map((at) => at.asset_id)
+      const appliedCosts =
+        costs === null
+          ? await getWarehouseTransferCostDecimals(tx, transfer.origin_id)
+          : toCostDecimals(costs)
+      const newTransferDate = todayYmd()
 
-    await tx.transfer.update({
-      where: { id: transfer.id },
-      data: { status: TRANSFER_STATUS.IN_TRANSIT, ...appliedCosts },
+      await tx.transfer.update({
+        where: { id: transfer.id },
+        data: {
+          status: TRANSFER_STATUS.IN_TRANSIT,
+          transfer_date: new Date(newTransferDate),
+          ...appliedCosts,
+        },
+      })
+      const priorAssets = await tx.asset.findMany({
+        where: { id: { in: travelingAssetIds } },
+        select: { id: true, location_id: true },
+      })
+      await tx.asset.updateMany({
+        where: { id: { in: travelingAssetIds } },
+        data: { location_id: null, is_in_transit: true },
+      })
+      const costChanges = await applyTransferCostsToAssets(tx, travelingAssetIds, appliedCosts)
+      return {
+        transferId: transfer.id,
+        route: transferRoute(transferNumber, transfer),
+        costChanges,
+        priorAssets,
+        previousDate: toYmdOrNull(transfer.transfer_date),
+        newTransferDate,
+      }
     })
-    const priorAssets = await tx.asset.findMany({
-      where: { id: { in: travelingAssetIds } },
-      select: { id: true, location_id: true },
-    })
-    await tx.asset.updateMany({
-      where: { id: { in: travelingAssetIds } },
-      data: { location_id: null, is_in_transit: true },
-    })
-    const costChanges = await applyTransferCostsToAssets(tx, travelingAssetIds, appliedCosts)
-    return {
-      transferId: transfer.id,
-      route: transferRoute(transferNumber, transfer),
-      costChanges,
-      priorAssets,
-    }
-  })
 
   await recordTransferUpdate(
     transferId,
-    { status: TRANSFER_STATUS.LOADING_IN_PROGRESS },
-    { status: TRANSFER_STATUS.IN_TRANSIT },
+    { status: TRANSFER_STATUS.LOADING_IN_PROGRESS, transfer_date: previousDate },
+    { status: TRANSFER_STATUS.IN_TRANSIT, transfer_date: newTransferDate },
     userId,
   )
   await recordAssetTransferMovement('TRANSFER_DISPATCHED', route, priorAssets, null, userId)

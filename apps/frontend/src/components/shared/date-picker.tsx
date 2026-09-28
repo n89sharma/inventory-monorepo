@@ -21,6 +21,9 @@ interface DatePickerFieldProps {
   id: string
   className?: string
   disabled?: Matcher | Matcher[]
+  // Disables the trigger button itself, so the field is fully locked rather than just showing
+  // an unselectable calendar — for a value that's read-only in the current context.
+  fieldDisabled?: boolean
   startMonth?: Date
   endMonth?: Date
 }
@@ -32,17 +35,19 @@ export function DatePickerFieldInline({
   id,
   className,
   disabled,
+  fieldDisabled,
   startMonth,
   endMonth,
 }: DatePickerFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const triggerLabel = isSelected(date) ? `${label}: ${formatDate(date.selected)}` : label
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open && !fieldDisabled} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           id={id}
+          disabled={fieldDisabled}
           className={`justify-start font-normal gap-2 ${className ?? ''}`}
         >
           {triggerLabel}
@@ -73,6 +78,7 @@ interface ControlledDatePickerFieldProps<TForm extends FieldValues> {
   label: string
   className?: string
   disabled?: Matcher | Matcher[]
+  fieldDisabled?: boolean
   startMonth?: Date
   endMonth?: Date
 }
@@ -83,6 +89,7 @@ export function ControlledDatePickerField<TForm extends FieldValues>({
   label,
   className,
   disabled,
+  fieldDisabled,
   startMonth,
   endMonth,
 }: ControlledDatePickerFieldProps<TForm>): React.JSX.Element {
@@ -97,6 +104,7 @@ export function ControlledDatePickerField<TForm extends FieldValues>({
         date={value ? getSelectOption(value) : UNSELECTED}
         setDate={(d) => field.onChange(getSelectedOrNull(d))}
         disabled={disabled}
+        fieldDisabled={fieldDisabled}
         startMonth={startMonth}
         endMonth={endMonth}
       />

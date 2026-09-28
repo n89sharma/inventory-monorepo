@@ -11,7 +11,7 @@ import {
 import { PriceField } from '@/components/shared/price-field'
 import { useWarehouseTransferCosts, warehouseCostsOf } from '@/hooks/use-transfer-costs'
 import { COST_FIELD_LABELS, TESTED_PROCESSING_COST_LABEL } from '@/lib/cost-fields'
-import { formatUSDWithSymbol } from '@/lib/formatters'
+import { formatDate, formatUSDWithSymbol } from '@/lib/formatters'
 import { flattenFieldErrors } from '@/lib/utils'
 import {
   TransferCostFormSchema,
@@ -21,6 +21,7 @@ import {
 } from '@/ui-types/transfer-cost-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
+import { isSameDay, startOfDay } from 'date-fns'
 import { useState } from 'react'
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import type { TransferCosts } from 'shared-types'
@@ -30,6 +31,7 @@ interface DepartTransferModalProps {
   originId: number
   assetCount: number
   testedCount: number
+  transferDate: Date | null
   disabled?: boolean
   onDepart: (costs: TransferCosts | null) => Promise<void>
 }
@@ -116,11 +118,14 @@ export function DepartTransferModal({
   originId,
   assetCount,
   testedCount,
+  transferDate,
   disabled,
   onDepart,
 }: DepartTransferModalProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const transferCosts = useWarehouseTransferCosts()
+  const today = startOfDay(new Date())
+  const dateWillChange = transferDate !== null && !isSameDay(transferDate, today)
 
   async function handleConfirm(costs: TransferCosts) {
     await onDepart(costs)
@@ -139,6 +144,11 @@ export function DepartTransferModal({
             All assets in the transfer will be marked as being in transit
           </DialogDescription>
         </DialogHeader>
+        {dateWillChange && (
+          <p className="text-muted-foreground text-sm">
+            Transfer date will change from {formatDate(transferDate)} to {formatDate(today)}
+          </p>
+        )}
         {transferCosts && (
           <DepartCostForm
             defaultCosts={warehouseCostsOf(transferCosts, originId)}

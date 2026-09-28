@@ -4144,6 +4144,7 @@ export const TransferScalarFieldEnum = {
   created_by_id: 'created_by_id',
   notes: 'notes',
   created_at: 'created_at',
+  transfer_date: 'transfer_date',
   transfer_cost: 'transfer_cost',
   processing_cost: 'processing_cost',
   tested_processing_cost: 'tested_processing_cost',

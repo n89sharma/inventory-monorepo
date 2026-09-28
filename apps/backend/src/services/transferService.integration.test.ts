@@ -31,6 +31,7 @@ import {
   markAssetMissingAtLoadSer,
   markAssetMissingAtUnloadSer,
   patchTransferAssets,
+  patchTransferDate,
   patchTransferMetadata,
   patchTransferNotes,
   returnTransferAssetsToOrigin,
@@ -44,8 +45,10 @@ import {
 } from './transferService.js'
 import type { History } from '../../generated/prisma/client.js'
 
+const TEST_TRANSFER_DATE = new Date().toISOString().slice(0, 10)
+
 async function scheduleAndStartLoading(transferNumber: string, userId: number): Promise<void> {
-  await scheduleTransfer(transferNumber, userId)
+  await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, userId)
   await startLoadingTransfer(transferNumber, userId)
 }
 
@@ -98,7 +101,7 @@ async function advanceToStatus(
   status: string,
 ): Promise<void> {
   if (status === 'SCHEDULED') {
-    await scheduleTransfer(transferNumber, userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, userId)
     return
   }
   if (status === 'LOADING_IN_PROGRESS') {
@@ -138,6 +141,14 @@ async function getTransferStatus(transferNumber: string): Promise<string> {
     select: { status: true },
   })
   return transfer.status
+}
+
+async function getTransferDate(transferNumber: string): Promise<string | null> {
+  const transfer = await prisma.transfer.findUniqueOrThrow({
+    where: { transfer_number: transferNumber },
+    select: { transfer_date: true },
+  })
+  return transfer.transfer_date === null ? null : transfer.transfer_date.toISOString().slice(0, 10)
 }
 
 type TransferCostRow = Record<keyof TransferCosts, number | null>
@@ -238,6 +249,13 @@ function transferStatusAfter(row: History): string | undefined {
   const changes = row.changes as { after?: Record<string, unknown> }
   const status = changes.after?.status
   return typeof status === 'string' ? status : undefined
+}
+
+function transferDateAfter(row: History): string | null | undefined {
+  if (row.entity_type !== 'Transfer') return undefined
+  const changes = row.changes as { after?: Record<string, unknown> }
+  if (!changes.after || !('transfer_date' in changes.after)) return undefined
+  return changes.after.transfer_date as string | null
 }
 
 describe('transferService', () => {
@@ -346,6 +364,42 @@ describe('transferService', () => {
       expect(state.is_in_transit).toBe(true)
       expect(state.location_id).toBeNull()
     }
+  })
+
+  it('depart snaps the transfer date to today when it was scheduled for the past', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const assetIds = assets.map((a) => a.id)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    const pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
+    await prisma.transfer.update({
+      where: { transfer_number: transferNumber },
+      data: { transfer_date: new Date(pastDate) },
+    })
+    await startLoadingTransfer(transferNumber, refs.userId)
+    await loadAssets(transferNumber, assetIds, refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await departTransfer(transferNumber, refs.userId, null)
+
+    expect(await getTransferDate(transferNumber)).toBe(TEST_TRANSFER_DATE)
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => transferDateAfter(r) === TEST_TRANSFER_DATE)).toBe(true)
+  })
+
+  it('depart leaves the transfer date unchanged, with no date history entry, when already today', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const assetIds = assets.map((a) => a.id)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await loadAssets(transferNumber, assetIds, refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await departTransfer(transferNumber, refs.userId, null)
+
+    expect(await getTransferDate(transferNumber)).toBe(TEST_TRANSFER_DATE)
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => transferDateAfter(r) !== undefined)).toBe(false)
   })
 
   it('depart with no saved warehouse defaults leaves each asset cost unchanged', async () => {
@@ -533,7 +587,7 @@ describe('transferService', () => {
   it('rejects editing metadata after scheduling', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
     await expect(
       patchTransferMetadata(
@@ -601,7 +655,7 @@ describe('transferService', () => {
   it('rejects editing assets on a transfer after scheduling', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
     const [added] = await createArrivedAssets(refs, 1)
     await expect(
@@ -625,9 +679,9 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await expect(scheduleTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
-      ConflictError,
-    )
+    await expect(
+      scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
   })
 
   it('returns a selected asset to the origin shipping & receiving and clears in transit', async () => {
@@ -994,23 +1048,48 @@ describe('transferService', () => {
   it('rejects scheduling a transfer that has already been scheduled', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
-    await expect(scheduleTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
-      ConflictError,
-    )
+    await expect(
+      scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
   })
 
-  it('moves a transfer from Draft to Scheduled and records the status change', async () => {
+  it('moves a transfer from Draft to Scheduled, sets the transfer date, and records both', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
     const sinceId = await getMaxHistoryId()
 
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
     expect(await getTransferStatus(transferNumber)).toBe('SCHEDULED')
+    expect(await getTransferDate(transferNumber)).toBe(TEST_TRANSFER_DATE)
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
     expect(rows.some((r) => transferStatusAfter(r) === 'SCHEDULED')).toBe(true)
+    expect(rows.some((r) => transferDateAfter(r) === TEST_TRANSFER_DATE)).toBe(true)
+  })
+
+  it('patchTransferDate rejects when the transfer is not Scheduled', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+
+    await expect(
+      patchTransferDate(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('patchTransferDate updates the date while Scheduled and records the change', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
+    const sinceId = await getMaxHistoryId()
+    const newDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+    await patchTransferDate(transferNumber, { transfer_date: newDate }, refs.userId)
+
+    expect(await getTransferDate(transferNumber)).toBe(newDate)
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => transferDateAfter(r) === newDate)).toBe(true)
   })
 
   it.each(['SCHEDULED', 'LOADING_IN_PROGRESS', 'IN_TRANSIT', 'UNLOADING_IN_PROGRESS', 'COMPLETE'])(
@@ -1063,7 +1142,7 @@ describe('transferService', () => {
   it('rejects scanning an asset loaded on a transfer that is not loading', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
     await expect(
       scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId),
@@ -1284,7 +1363,7 @@ describe('transferService', () => {
   it('halts loading and stays Scheduled if an asset is no longer on hand', async () => {
     const assets = await createArrivedAssets(refs, 2)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
     // Simulates the asset being picked up by another process (e.g. a departure) after scheduling.
     await setAssetStatus(assets[0].id, ASSET_STATUS.SOLD)
 
@@ -1449,7 +1528,7 @@ describe('deleteTransfer', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await scheduleTransfer(transferNumber, refs.userId)
+    await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, refs.userId)
 
     await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(
       new ConflictError(`Transfer ${transferNumber} cannot be deleted after dispatch`),

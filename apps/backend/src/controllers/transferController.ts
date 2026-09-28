@@ -7,11 +7,13 @@ import {
   CreateTransferSchema,
   DepartTransferSchema,
   ReturnAssetsToOriginSchema,
+  ScheduleTransferSchema,
   TransferAssetIdSchema,
   TransferCostsSchema,
   TransferDetail,
   TransferSummary,
   WarehouseTransferCost,
+  UpdateTransferDateSchema,
   UpdateTransferMetadataSchema,
   UpdateTransferNotesSchema,
   response403,
@@ -32,6 +34,7 @@ import {
   markAssetMissingAtLoadSer,
   markAssetMissingAtUnloadSer,
   patchTransferAssets as patchTransferAssetsSer,
+  patchTransferDate as patchTransferDateSer,
   patchTransferMetadata as patchTransferMetadataSer,
   patchTransferNotes as patchTransferNotesSer,
   returnTransferAssetsToOrigin as returnTransferAssetsToOriginSer,
@@ -115,7 +118,14 @@ export const patchTransferAssets = asyncHandler(async (req, res) => {
 })
 
 export const scheduleTransfer = asyncHandler(async (req, res) => {
-  await scheduleTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  const schedule = ScheduleTransferSchema.parse(req.body)
+  await scheduleTransferSer(req.params.transferNumber, schedule, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const patchTransferDate = asyncHandler(async (req, res) => {
+  const update = UpdateTransferDateSchema.parse(req.body)
+  await patchTransferDateSer(req.params.transferNumber, update, res.locals.dbUserId)
   res.status(204).send()
 })
 
