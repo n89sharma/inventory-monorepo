@@ -1,4 +1,6 @@
 import {
+  ASSET_STATUS,
+  ON_HAND_STATUS_VALUES,
   Permission,
   AssetCost,
   AssetDelta,
@@ -20,6 +22,7 @@ import { pluralize } from '../lib/pluralize.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
+  recordAssetStatusChange,
   recordAssetTransferMovement,
   recordAssetUpdate,
   recordAssetUpdateOnCollection,
@@ -57,7 +60,10 @@ export async function getTransfer(
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
+    assets: assets.map((r) => ({
+      ...redactSearchRowCost(mapAssetSearchRow(r), permissions),
+      scan: { loaded: r.loaded, unloaded: r.unloaded },
+    })),
   }
 }
 
@@ -85,6 +91,7 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
 
   const newTransferId = await prisma.$transaction(async (tx) => {
     await assertAssetsNotOnOpenTransfer(tx, assetIds)
+    await assertAssetsOnHand(tx, assetIds)
     const created = await tx.transfer.create({
       data: {
         transfer_number: transferNumber,
@@ -198,6 +205,7 @@ export async function patchTransferAssets(
       throw new ConflictError(`Transfer ${transferNumber} cannot be edited after dispatch`)
     }
     await assertAssetsNotOnOpenTransfer(tx, delta.assetIdsToAdd, transfer.id)
+    await assertAssetsOnHand(tx, delta.assetIdsToAdd)
     await applyTransferAssetDelta(tx, transfer.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
     return transfer.id
   })
@@ -214,6 +222,236 @@ export async function patchTransferAssets(
     delta.assetIdsToAdd,
     'transfer_id',
     transferId,
+    userId,
+  )
+}
+
+export async function scheduleTransfer(transferNumber: string, userId: number): Promise<void> {
+  const transferId = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, _count: { select: { asset_transfers: true } } },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.DRAFT) {
+      throw new ConflictError(`Transfer ${transferNumber} has already been scheduled`)
+    }
+    if (transfer._count.asset_transfers === 0) {
+      throw new ConflictError(`Transfer ${transferNumber} has no assets to schedule`)
+    }
+    await tx.transfer.update({
+      where: { id: transfer.id },
+      data: { status: TRANSFER_STATUS.SCHEDULED },
+    })
+    return transfer.id
+  })
+
+  await recordTransferUpdate(
+    transferId,
+    { status: TRANSFER_STATUS.DRAFT },
+    { status: TRANSFER_STATUS.SCHEDULED },
+    userId,
+  )
+}
+
+export async function startLoadingTransfer(transferNumber: string, userId: number): Promise<void> {
+  const transferId = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, asset_transfers: { select: { asset_id: true } } },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.SCHEDULED) {
+      throw new ConflictError(`Transfer ${transferNumber} is not scheduled`)
+    }
+    // Re-check on hand: an asset's status can change after scheduling (e.g. picked up by a
+    // departure elsewhere), and loading must halt rather than load a no-longer-available asset.
+    await assertAssetsOnHand(
+      tx,
+      transfer.asset_transfers.map((at) => at.asset_id),
+    )
+    await tx.transfer.update({
+      where: { id: transfer.id },
+      data: { status: TRANSFER_STATUS.LOADING_IN_PROGRESS },
+    })
+    return transfer.id
+  })
+
+  await recordTransferUpdate(
+    transferId,
+    { status: TRANSFER_STATUS.SCHEDULED },
+    { status: TRANSFER_STATUS.LOADING_IN_PROGRESS },
+    userId,
+  )
+}
+
+export async function startUnloadingTransfer(
+  transferNumber: string,
+  userId: number,
+): Promise<void> {
+  const transferId = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.IN_TRANSIT) {
+      throw new ConflictError(`Transfer ${transferNumber} is not in transit`)
+    }
+    await tx.transfer.update({
+      where: { id: transfer.id },
+      data: { status: TRANSFER_STATUS.UNLOADING_IN_PROGRESS },
+    })
+    return transfer.id
+  })
+
+  await recordTransferUpdate(
+    transferId,
+    { status: TRANSFER_STATUS.IN_TRANSIT },
+    { status: TRANSFER_STATUS.UNLOADING_IN_PROGRESS },
+    userId,
+  )
+}
+
+export async function scanAssetLoadedSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, ...TRANSFER_ROUTE_SELECT },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not loading`)
+    }
+    const asset = await tx.asset.findUnique({
+      where: { id: assetId },
+      select: { id: true, barcode: true, location_id: true, status: { select: { status: true } } },
+    })
+    if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+    const assetTransfer = await tx.assetTransfer.findUnique({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      select: { asset_id: true },
+    })
+    if (!assetTransfer) {
+      throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+    }
+    if (asset.status.status === ASSET_STATUS.MISSING) {
+      throw new ConflictError(`Asset ${asset.barcode} is already marked missing`)
+    }
+    await tx.assetTransfer.update({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      data: { loaded: true },
+    })
+    return {
+      route: transferRoute(transferNumber, transfer),
+      priorAsset: { id: asset.id, location_id: asset.location_id },
+    }
+  })
+
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_LOADED',
+    route,
+    [priorAsset],
+    priorAsset.location_id,
+    userId,
+  )
+}
+
+export async function markAssetMissingAtLoadSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset, missingStatusId } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, ...TRANSFER_ROUTE_SELECT },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not loading`)
+    }
+    const asset = await tx.asset.findUnique({
+      where: { id: assetId },
+      select: { id: true, barcode: true, status_id: true, location_id: true },
+    })
+    if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+    const assetTransfer = await tx.assetTransfer.findUnique({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      select: { loaded: true },
+    })
+    if (!assetTransfer) {
+      throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+    }
+    if (assetTransfer.loaded) {
+      throw new ConflictError(`Asset ${asset.barcode} is already loaded`)
+    }
+    const missingStatus = await tx.status.findUnique({ where: { status: ASSET_STATUS.MISSING } })
+    if (!missingStatus) throw new Error(`Status ${ASSET_STATUS.MISSING} not seeded in DB`)
+    await tx.asset.update({ where: { id: assetId }, data: { status_id: missingStatus.id } })
+    return {
+      route: transferRoute(transferNumber, transfer),
+      priorAsset: asset,
+      missingStatusId: missingStatus.id,
+    }
+  })
+
+  await recordAssetStatusChange([priorAsset], missingStatusId, userId)
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_MARKED_MISSING',
+    route,
+    [priorAsset],
+    priorAsset.location_id,
+    userId,
+  )
+}
+
+// Corrects a mis-scan during Loading In Progress: puts the asset back in the Pending pane.
+export async function undoAssetLoadSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, ...TRANSFER_ROUTE_SELECT },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not loading`)
+    }
+    const asset = await tx.asset.findUnique({
+      where: { id: assetId },
+      select: { id: true, barcode: true, location_id: true },
+    })
+    if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+    const assetTransfer = await tx.assetTransfer.findUnique({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      select: { loaded: true },
+    })
+    if (!assetTransfer) {
+      throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+    }
+    if (!assetTransfer.loaded) {
+      throw new ConflictError(`Asset ${asset.barcode} is not loaded`)
+    }
+    await tx.assetTransfer.update({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      data: { loaded: false },
+    })
+    return { route: transferRoute(transferNumber, transfer), priorAsset: asset }
+  })
+
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_LOAD_UNDONE',
+    route,
+    [priorAsset],
+    priorAsset.location_id,
     userId,
   )
 }
@@ -292,7 +530,7 @@ async function applyTransferCostsToAssets(
   return changes
 }
 
-export async function dispatchTransfer(
+export async function departTransfer(
   transferNumber: string,
   userId: number,
   costs: TransferCosts | null,
@@ -305,17 +543,30 @@ export async function dispatchTransfer(
         status: true,
         origin_id: true,
         ...TRANSFER_ROUTE_SELECT,
-        asset_transfers: { select: { asset_id: true } },
+        asset_transfers: {
+          select: {
+            asset_id: true,
+            loaded: true,
+            asset: { select: { status: { select: { status: true } } } },
+          },
+        },
       },
     })
     if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
-    if (transfer.status !== TRANSFER_STATUS.DRAFT) {
-      throw new ConflictError(`Transfer ${transferNumber} has already been dispatched`)
+    if (transfer.status !== TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not loading`)
     }
-    const assetIds = transfer.asset_transfers.map((a) => a.asset_id)
-    if (assetIds.length === 0) {
-      throw new ConflictError(`Transfer ${transferNumber} has no assets to dispatch`)
+    const unresolved = transfer.asset_transfers.filter(
+      (at) => !at.loaded && at.asset.status.status !== ASSET_STATUS.MISSING,
+    )
+    if (unresolved.length > 0) {
+      throw new ConflictError(
+        `${pluralize(unresolved.length, 'asset')} not yet scanned or marked missing on transfer ${transferNumber}`,
+      )
     }
+    const travelingAssetIds = transfer.asset_transfers
+      .filter((at) => at.loaded)
+      .map((at) => at.asset_id)
     const appliedCosts =
       costs === null
         ? await getWarehouseTransferCostDecimals(tx, transfer.origin_id)
@@ -326,14 +577,14 @@ export async function dispatchTransfer(
       data: { status: TRANSFER_STATUS.IN_TRANSIT, ...appliedCosts },
     })
     const priorAssets = await tx.asset.findMany({
-      where: { id: { in: assetIds } },
+      where: { id: { in: travelingAssetIds } },
       select: { id: true, location_id: true },
     })
     await tx.asset.updateMany({
-      where: { id: { in: assetIds } },
+      where: { id: { in: travelingAssetIds } },
       data: { location_id: null, is_in_transit: true },
     })
-    const costChanges = await applyTransferCostsToAssets(tx, assetIds, appliedCosts)
+    const costChanges = await applyTransferCostsToAssets(tx, travelingAssetIds, appliedCosts)
     return {
       transferId: transfer.id,
       route: transferRoute(transferNumber, transfer),
@@ -344,7 +595,7 @@ export async function dispatchTransfer(
 
   await recordTransferUpdate(
     transferId,
-    { status: TRANSFER_STATUS.DRAFT },
+    { status: TRANSFER_STATUS.LOADING_IN_PROGRESS },
     { status: TRANSFER_STATUS.IN_TRANSIT },
     userId,
   )
@@ -356,51 +607,216 @@ export async function dispatchTransfer(
   )
 }
 
-export async function receiveTransfer(transferNumber: string, userId: number): Promise<void> {
-  const { transferId, route, locationId, priorAssets } = await prisma.$transaction(async (tx) => {
+export async function scanAssetUnloadedSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset, locationId } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, destination_id: true, ...TRANSFER_ROUTE_SELECT },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not unloading`)
+    }
+    const asset = await tx.asset.findUnique({
+      where: { id: assetId },
+      select: { id: true, barcode: true, location_id: true, status: { select: { status: true } } },
+    })
+    if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+    const assetTransfer = await tx.assetTransfer.findUnique({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      select: { loaded: true, unloaded: true },
+    })
+    if (!assetTransfer) {
+      throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+    }
+    if (!assetTransfer.loaded) {
+      throw new ConflictError(`Asset ${asset.barcode} never traveled on transfer ${transferNumber}`)
+    }
+    if (assetTransfer.unloaded || asset.status.status === ASSET_STATUS.MISSING) {
+      throw new ConflictError(`Asset ${asset.barcode} is already resolved`)
+    }
+    const locationId = await resolveShippingAndReceivingLocationId(tx, transfer.destination_id)
+    await tx.asset.update({
+      where: { id: assetId },
+      data: { location_id: locationId, is_in_transit: false },
+    })
+    await tx.assetTransfer.update({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      data: { unloaded: true },
+    })
+    return {
+      route: transferRoute(transferNumber, transfer),
+      priorAsset: { id: asset.id, location_id: asset.location_id },
+      locationId,
+    }
+  })
+
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_UNLOADED',
+    route,
+    [priorAsset],
+    locationId,
+    userId,
+  )
+}
+
+export async function markAssetMissingAtUnloadSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset, missingStatusId, locationId } = await prisma.$transaction(
+    async (tx) => {
+      const transfer = await tx.transfer.findUnique({
+        where: { transfer_number: transferNumber },
+        select: { id: true, status: true, destination_id: true, ...TRANSFER_ROUTE_SELECT },
+      })
+      if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+      if (transfer.status !== TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+        throw new ConflictError(`Transfer ${transferNumber} is not unloading`)
+      }
+      const asset = await tx.asset.findUnique({
+        where: { id: assetId },
+        select: { id: true, barcode: true, status_id: true, location_id: true },
+      })
+      if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+      const assetTransfer = await tx.assetTransfer.findUnique({
+        where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+        select: { loaded: true, unloaded: true },
+      })
+      if (!assetTransfer) {
+        throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+      }
+      if (!assetTransfer.loaded) {
+        throw new ConflictError(
+          `Asset ${asset.barcode} never traveled on transfer ${transferNumber}`,
+        )
+      }
+      if (assetTransfer.unloaded) {
+        throw new ConflictError(`Asset ${asset.barcode} is already unloaded`)
+      }
+      const locationId = await resolveShippingAndReceivingLocationId(tx, transfer.destination_id)
+      const missingStatus = await tx.status.findUnique({ where: { status: ASSET_STATUS.MISSING } })
+      if (!missingStatus) throw new Error(`Status ${ASSET_STATUS.MISSING} not seeded in DB`)
+      await tx.asset.update({
+        where: { id: assetId },
+        data: { location_id: locationId, is_in_transit: false, status_id: missingStatus.id },
+      })
+      return {
+        route: transferRoute(transferNumber, transfer),
+        priorAsset: asset,
+        missingStatusId: missingStatus.id,
+        locationId,
+      }
+    },
+  )
+
+  await recordAssetStatusChange([priorAsset], missingStatusId, userId)
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_MARKED_MISSING',
+    route,
+    [priorAsset],
+    locationId,
+    userId,
+  )
+}
+
+// Corrects a mis-scan during Unloading In Progress: restores the in-transit state and puts the
+// asset back in the Pending pane.
+export async function undoAssetUnloadSer(
+  transferNumber: string,
+  assetId: number,
+  userId: number,
+): Promise<void> {
+  const { route, priorAsset } = await prisma.$transaction(async (tx) => {
+    const transfer = await tx.transfer.findUnique({
+      where: { transfer_number: transferNumber },
+      select: { id: true, status: true, ...TRANSFER_ROUTE_SELECT },
+    })
+    if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
+    if (transfer.status !== TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not unloading`)
+    }
+    const asset = await tx.asset.findUnique({
+      where: { id: assetId },
+      select: { id: true, barcode: true, location_id: true },
+    })
+    if (!asset) throw new NotFoundError(`Asset ${assetId} not found`)
+    const assetTransfer = await tx.assetTransfer.findUnique({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      select: { unloaded: true },
+    })
+    if (!assetTransfer) {
+      throw new NotFoundError(`Asset ${asset.barcode} not found on transfer ${transferNumber}`)
+    }
+    if (!assetTransfer.unloaded) {
+      throw new ConflictError(`Asset ${asset.barcode} is not unloaded`)
+    }
+    await tx.asset.update({
+      where: { id: assetId },
+      data: { location_id: null, is_in_transit: true },
+    })
+    await tx.assetTransfer.update({
+      where: { asset_id_transfer_id: { asset_id: assetId, transfer_id: transfer.id } },
+      data: { unloaded: false },
+    })
+    return { route: transferRoute(transferNumber, transfer), priorAsset: asset }
+  })
+
+  await recordAssetTransferMovement(
+    'TRANSFER_ASSET_UNLOAD_UNDONE',
+    route,
+    [priorAsset],
+    null,
+    userId,
+  )
+}
+
+export async function completeTransfer(transferNumber: string, userId: number): Promise<void> {
+  const transferId = await prisma.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
       where: { transfer_number: transferNumber },
       select: {
         id: true,
         status: true,
-        destination_id: true,
-        ...TRANSFER_ROUTE_SELECT,
-        asset_transfers: { select: { asset_id: true } },
+        asset_transfers: {
+          select: {
+            loaded: true,
+            unloaded: true,
+            asset: { select: { status: { select: { status: true } } } },
+          },
+        },
       },
     })
     if (!transfer) throw new NotFoundError(`Transfer ${transferNumber} not found`)
-    if (transfer.status !== TRANSFER_STATUS.IN_TRANSIT) {
-      throw new ConflictError(`Transfer ${transferNumber} is not in transit`)
+    if (transfer.status !== TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+      throw new ConflictError(`Transfer ${transferNumber} is not unloading`)
     }
-    const locationId = await resolveShippingAndReceivingLocationId(tx, transfer.destination_id)
-    const assetIds = transfer.asset_transfers.map((a) => a.asset_id)
-    const priorAssets = await tx.asset.findMany({
-      where: { id: { in: assetIds } },
-      select: { id: true, location_id: true },
-    })
+    const unresolved = transfer.asset_transfers.filter(
+      (at) => at.loaded && !at.unloaded && at.asset.status.status !== ASSET_STATUS.MISSING,
+    )
+    if (unresolved.length > 0) {
+      throw new ConflictError(
+        `${pluralize(unresolved.length, 'asset')} not yet scanned or marked missing on transfer ${transferNumber}`,
+      )
+    }
     await tx.transfer.update({
       where: { id: transfer.id },
       data: { status: TRANSFER_STATUS.COMPLETE },
     })
-    await tx.asset.updateMany({
-      where: { id: { in: assetIds } },
-      data: { location_id: locationId, is_in_transit: false },
-    })
-    return {
-      transferId: transfer.id,
-      route: transferRoute(transferNumber, transfer),
-      locationId,
-      priorAssets,
-    }
+    return transfer.id
   })
 
   await recordTransferUpdate(
     transferId,
-    { status: TRANSFER_STATUS.IN_TRANSIT },
+    { status: TRANSFER_STATUS.UNLOADING_IN_PROGRESS },
     { status: TRANSFER_STATUS.COMPLETE },
     userId,
   )
-  await recordAssetTransferMovement('TRANSFER_RECEIVED', route, priorAssets, locationId, userId)
 }
 
 export async function returnTransferAssetsToOrigin(
@@ -517,6 +933,21 @@ async function assertAssetsNotOnOpenTransfer(
       .map((c) => `${c.asset.barcode} (on ${c.transfer.transfer_number})`)
       .join(', ')
     throw new ConflictError(`Already on an open transfer: ${detail}`)
+  }
+}
+
+const ON_HAND_STATUSES: readonly string[] = ON_HAND_STATUS_VALUES
+
+async function assertAssetsOnHand(tx: Prisma.TransactionClient, assetIds: number[]): Promise<void> {
+  if (assetIds.length === 0) return
+  const assets = await tx.asset.findMany({
+    where: { id: { in: assetIds } },
+    select: { barcode: true, status: { select: { status: true } } },
+  })
+  const notOnHand = assets.filter((asset) => !ON_HAND_STATUSES.includes(asset.status.status))
+  if (notOnHand.length > 0) {
+    const detail = notOnHand.map((asset) => `${asset.barcode} (${asset.status.status})`).join(', ')
+    throw new ConflictError(`Not in stock or held, cannot be on a transfer: ${detail}`)
   }
 }
 

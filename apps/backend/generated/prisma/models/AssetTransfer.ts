@@ -39,16 +39,22 @@ export type AssetTransferSumAggregateOutputType = {
 export type AssetTransferMinAggregateOutputType = {
   asset_id: number | null
   transfer_id: number | null
+  loaded: boolean | null
+  unloaded: boolean | null
 }
 
 export type AssetTransferMaxAggregateOutputType = {
   asset_id: number | null
   transfer_id: number | null
+  loaded: boolean | null
+  unloaded: boolean | null
 }
 
 export type AssetTransferCountAggregateOutputType = {
   asset_id: number
   transfer_id: number
+  loaded: number
+  unloaded: number
   _all: number
 }
 
@@ -66,16 +72,22 @@ export type AssetTransferSumAggregateInputType = {
 export type AssetTransferMinAggregateInputType = {
   asset_id?: true
   transfer_id?: true
+  loaded?: true
+  unloaded?: true
 }
 
 export type AssetTransferMaxAggregateInputType = {
   asset_id?: true
   transfer_id?: true
+  loaded?: true
+  unloaded?: true
 }
 
 export type AssetTransferCountAggregateInputType = {
   asset_id?: true
   transfer_id?: true
+  loaded?: true
+  unloaded?: true
   _all?: true
 }
 
@@ -168,6 +180,8 @@ export type AssetTransferGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type AssetTransferGroupByOutputType = {
   asset_id: number
   transfer_id: number
+  loaded: boolean
+  unloaded: boolean
   _count: AssetTransferCountAggregateOutputType | null
   _avg: AssetTransferAvgAggregateOutputType | null
   _sum: AssetTransferSumAggregateOutputType | null
@@ -196,6 +210,8 @@ export type AssetTransferWhereInput = {
   NOT?: Prisma.AssetTransferWhereInput | Prisma.AssetTransferWhereInput[]
   asset_id?: Prisma.IntFilter<"AssetTransfer"> | number
   transfer_id?: Prisma.IntFilter<"AssetTransfer"> | number
+  loaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
+  unloaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
   transfer?: Prisma.XOR<Prisma.TransferScalarRelationFilter, Prisma.TransferWhereInput>
 }
@@ -203,6 +219,8 @@ export type AssetTransferWhereInput = {
 export type AssetTransferOrderByWithRelationInput = {
   asset_id?: Prisma.SortOrder
   transfer_id?: Prisma.SortOrder
+  loaded?: Prisma.SortOrder
+  unloaded?: Prisma.SortOrder
   asset?: Prisma.AssetOrderByWithRelationInput
   transfer?: Prisma.TransferOrderByWithRelationInput
 }
@@ -214,6 +232,8 @@ export type AssetTransferWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AssetTransferWhereInput | Prisma.AssetTransferWhereInput[]
   asset_id?: Prisma.IntFilter<"AssetTransfer"> | number
   transfer_id?: Prisma.IntFilter<"AssetTransfer"> | number
+  loaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
+  unloaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
   asset?: Prisma.XOR<Prisma.AssetScalarRelationFilter, Prisma.AssetWhereInput>
   transfer?: Prisma.XOR<Prisma.TransferScalarRelationFilter, Prisma.TransferWhereInput>
 }, "asset_id_transfer_id">
@@ -221,6 +241,8 @@ export type AssetTransferWhereUniqueInput = Prisma.AtLeast<{
 export type AssetTransferOrderByWithAggregationInput = {
   asset_id?: Prisma.SortOrder
   transfer_id?: Prisma.SortOrder
+  loaded?: Prisma.SortOrder
+  unloaded?: Prisma.SortOrder
   _count?: Prisma.AssetTransferCountOrderByAggregateInput
   _avg?: Prisma.AssetTransferAvgOrderByAggregateInput
   _max?: Prisma.AssetTransferMaxOrderByAggregateInput
@@ -234,9 +256,13 @@ export type AssetTransferScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AssetTransferScalarWhereWithAggregatesInput | Prisma.AssetTransferScalarWhereWithAggregatesInput[]
   asset_id?: Prisma.IntWithAggregatesFilter<"AssetTransfer"> | number
   transfer_id?: Prisma.IntWithAggregatesFilter<"AssetTransfer"> | number
+  loaded?: Prisma.BoolWithAggregatesFilter<"AssetTransfer"> | boolean
+  unloaded?: Prisma.BoolWithAggregatesFilter<"AssetTransfer"> | boolean
 }
 
 export type AssetTransferCreateInput = {
+  loaded?: boolean
+  unloaded?: boolean
   asset: Prisma.AssetCreateNestedOneWithoutAsset_transfersInput
   transfer: Prisma.TransferCreateNestedOneWithoutAsset_transfersInput
 }
@@ -244,9 +270,13 @@ export type AssetTransferCreateInput = {
 export type AssetTransferUncheckedCreateInput = {
   asset_id: number
   transfer_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferUpdateInput = {
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_transfersNestedInput
   transfer?: Prisma.TransferUpdateOneRequiredWithoutAsset_transfersNestedInput
 }
@@ -254,20 +284,27 @@ export type AssetTransferUpdateInput = {
 export type AssetTransferUncheckedUpdateInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferCreateManyInput = {
   asset_id: number
   transfer_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferUpdateManyMutationInput = {
-
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferUncheckedUpdateManyInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
   transfer_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferListRelationFilter = {
@@ -288,6 +325,8 @@ export type AssetTransferAsset_idTransfer_idCompoundUniqueInput = {
 export type AssetTransferCountOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   transfer_id?: Prisma.SortOrder
+  loaded?: Prisma.SortOrder
+  unloaded?: Prisma.SortOrder
 }
 
 export type AssetTransferAvgOrderByAggregateInput = {
@@ -298,11 +337,15 @@ export type AssetTransferAvgOrderByAggregateInput = {
 export type AssetTransferMaxOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   transfer_id?: Prisma.SortOrder
+  loaded?: Prisma.SortOrder
+  unloaded?: Prisma.SortOrder
 }
 
 export type AssetTransferMinOrderByAggregateInput = {
   asset_id?: Prisma.SortOrder
   transfer_id?: Prisma.SortOrder
+  loaded?: Prisma.SortOrder
+  unloaded?: Prisma.SortOrder
 }
 
 export type AssetTransferSumOrderByAggregateInput = {
@@ -395,11 +438,15 @@ export type AssetTransferUncheckedUpdateManyWithoutTransferNestedInput = {
 }
 
 export type AssetTransferCreateWithoutAssetInput = {
+  loaded?: boolean
+  unloaded?: boolean
   transfer: Prisma.TransferCreateNestedOneWithoutAsset_transfersInput
 }
 
 export type AssetTransferUncheckedCreateWithoutAssetInput = {
   transfer_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferCreateOrConnectWithoutAssetInput = {
@@ -434,14 +481,20 @@ export type AssetTransferScalarWhereInput = {
   NOT?: Prisma.AssetTransferScalarWhereInput | Prisma.AssetTransferScalarWhereInput[]
   asset_id?: Prisma.IntFilter<"AssetTransfer"> | number
   transfer_id?: Prisma.IntFilter<"AssetTransfer"> | number
+  loaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
+  unloaded?: Prisma.BoolFilter<"AssetTransfer"> | boolean
 }
 
 export type AssetTransferCreateWithoutTransferInput = {
+  loaded?: boolean
+  unloaded?: boolean
   asset: Prisma.AssetCreateNestedOneWithoutAsset_transfersInput
 }
 
 export type AssetTransferUncheckedCreateWithoutTransferInput = {
   asset_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferCreateOrConnectWithoutTransferInput = {
@@ -472,34 +525,50 @@ export type AssetTransferUpdateManyWithWhereWithoutTransferInput = {
 
 export type AssetTransferCreateManyAssetInput = {
   transfer_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferUpdateWithoutAssetInput = {
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transfer?: Prisma.TransferUpdateOneRequiredWithoutAsset_transfersNestedInput
 }
 
 export type AssetTransferUncheckedUpdateWithoutAssetInput = {
   transfer_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferUncheckedUpdateManyWithoutAssetInput = {
   transfer_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferCreateManyTransferInput = {
   asset_id: number
+  loaded?: boolean
+  unloaded?: boolean
 }
 
 export type AssetTransferUpdateWithoutTransferInput = {
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   asset?: Prisma.AssetUpdateOneRequiredWithoutAsset_transfersNestedInput
 }
 
 export type AssetTransferUncheckedUpdateWithoutTransferInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type AssetTransferUncheckedUpdateManyWithoutTransferInput = {
   asset_id?: Prisma.IntFieldUpdateOperationsInput | number
+  loaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  unloaded?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -507,6 +576,8 @@ export type AssetTransferUncheckedUpdateManyWithoutTransferInput = {
 export type AssetTransferSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   asset_id?: boolean
   transfer_id?: boolean
+  loaded?: boolean
+  unloaded?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   transfer?: boolean | Prisma.TransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetTransfer"]>
@@ -514,6 +585,8 @@ export type AssetTransferSelect<ExtArgs extends runtime.Types.Extensions.Interna
 export type AssetTransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   asset_id?: boolean
   transfer_id?: boolean
+  loaded?: boolean
+  unloaded?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   transfer?: boolean | Prisma.TransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetTransfer"]>
@@ -521,6 +594,8 @@ export type AssetTransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types
 export type AssetTransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   asset_id?: boolean
   transfer_id?: boolean
+  loaded?: boolean
+  unloaded?: boolean
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   transfer?: boolean | Prisma.TransferDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assetTransfer"]>
@@ -528,9 +603,11 @@ export type AssetTransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type AssetTransferSelectScalar = {
   asset_id?: boolean
   transfer_id?: boolean
+  loaded?: boolean
+  unloaded?: boolean
 }
 
-export type AssetTransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"asset_id" | "transfer_id", ExtArgs["result"]["assetTransfer"]>
+export type AssetTransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"asset_id" | "transfer_id" | "loaded" | "unloaded", ExtArgs["result"]["assetTransfer"]>
 export type AssetTransferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   asset?: boolean | Prisma.AssetDefaultArgs<ExtArgs>
   transfer?: boolean | Prisma.TransferDefaultArgs<ExtArgs>
@@ -553,6 +630,8 @@ export type $AssetTransferPayload<ExtArgs extends runtime.Types.Extensions.Inter
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     asset_id: number
     transfer_id: number
+    loaded: boolean
+    unloaded: boolean
   }, ExtArgs["result"]["assetTransfer"]>
   composites: {}
 }
@@ -980,6 +1059,8 @@ export interface Prisma__AssetTransferClient<T, Null = never, ExtArgs extends ru
 export interface AssetTransferFieldRefs {
   readonly asset_id: Prisma.FieldRef<"AssetTransfer", 'Int'>
   readonly transfer_id: Prisma.FieldRef<"AssetTransfer", 'Int'>
+  readonly loaded: Prisma.FieldRef<"AssetTransfer", 'Boolean'>
+  readonly unloaded: Prisma.FieldRef<"AssetTransfer", 'Boolean'>
 }
     
 

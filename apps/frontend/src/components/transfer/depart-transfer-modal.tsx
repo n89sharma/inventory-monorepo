@@ -26,18 +26,19 @@ import { useForm, useWatch, type FieldErrors } from 'react-hook-form'
 import type { TransferCosts } from 'shared-types'
 import { toast } from 'sonner'
 
-interface DispatchTransferModalProps {
+interface DepartTransferModalProps {
   originId: number
   assetCount: number
   testedCount: number
-  onDispatch: (costs: TransferCosts | null) => Promise<void>
+  disabled?: boolean
+  onDepart: (costs: TransferCosts | null) => Promise<void>
 }
 
 function amountOf(value: string | undefined): number {
   return parseFloat(value ?? '') || 0
 }
 
-interface DispatchCostFormProps {
+interface DepartCostFormProps {
   defaultCosts: TransferCosts
   assetCount: number
   testedCount: number
@@ -45,13 +46,13 @@ interface DispatchCostFormProps {
   onCancel: () => void
 }
 
-function DispatchCostForm({
+function DepartCostForm({
   defaultCosts,
   assetCount,
   testedCount,
   onConfirm,
   onCancel,
-}: DispatchCostFormProps): React.JSX.Element {
+}: DepartCostFormProps): React.JSX.Element {
   const form = useForm<TransferCostForm>({
     resolver: zodResolver(TransferCostFormSchema),
     defaultValues: toTransferCostForm(defaultCosts),
@@ -100,7 +101,7 @@ function DispatchCostForm({
       <DialogFooter>
         <Button onClick={submitForm} disabled={isSubmitting} type="button">
           {isSubmitting && <SpinnerGapIcon className="animate-spin" />}
-          Dispatch
+          Depart
         </Button>
         <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmitting}>
           Cancel
@@ -111,36 +112,35 @@ function DispatchCostForm({
 }
 
 // The defaults have to be loaded before the form mounts, so they can seed defaultValues.
-export function DispatchTransferModal({
+export function DepartTransferModal({
   originId,
   assetCount,
   testedCount,
-  onDispatch,
-}: DispatchTransferModalProps): React.JSX.Element {
+  disabled,
+  onDepart,
+}: DepartTransferModalProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const transferCosts = useWarehouseTransferCosts()
 
   async function handleConfirm(costs: TransferCosts) {
-    await onDispatch(costs)
+    await onDepart(costs)
     setOpen(false)
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Dispatch</Button>
+        <Button disabled={disabled}>Depart</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Dispatch this transfer?</DialogTitle>
+          <DialogTitle>Depart this transfer?</DialogTitle>
           <DialogDescription>
-            This marks {assetCount} machine(s) as in transit and clears their location. The transfer
-            can&apos;t be edited after dispatch. These costs are added to each machine, and the
-            tested amount only to machines that are no longer untested.
+            All assets in the transfer will be marked as being in transit
           </DialogDescription>
         </DialogHeader>
         {transferCosts && (
-          <DispatchCostForm
+          <DepartCostForm
             defaultCosts={warehouseCostsOf(transferCosts, originId)}
             assetCount={assetCount}
             testedCount={testedCount}

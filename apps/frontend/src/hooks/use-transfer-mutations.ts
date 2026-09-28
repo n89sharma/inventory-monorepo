@@ -1,11 +1,20 @@
 import {
+  completeTransfer,
   createTransfer,
   deleteTransfer,
-  dispatchTransfer,
+  departTransfer,
   getTransferDetail,
+  markTransferAssetMissingAtLoad,
+  markTransferAssetMissingAtUnload,
   patchTransferAssets,
-  receiveTransfer,
   returnTransferAssetsToOrigin,
+  scanTransferAssetLoaded,
+  scanTransferAssetUnloaded,
+  scheduleTransfer,
+  startLoadingTransfer,
+  startUnloadingTransfer,
+  undoTransferAssetLoad,
+  undoTransferAssetUnload,
   updateTransferMetadata,
   updateTransferNotes,
 } from '@/data/api/transfer-api'
@@ -103,17 +112,77 @@ async function updateNotes(transferNumber: string, comment: string) {
   invalidateTransferLists()
 }
 
-async function dispatch(transferNumber: string, barcodes: string[], costs: TransferCosts | null) {
-  await dispatchTransfer(transferNumber, costs)
+async function schedule(transferNumber: string) {
+  await scheduleTransfer(transferNumber)
+  mutate(transferDetailKey(transferNumber))
+  invalidateTransferLists()
+}
+
+async function startLoading(transferNumber: string) {
+  await startLoadingTransfer(transferNumber)
+  mutate(transferDetailKey(transferNumber))
+  invalidateTransferLists()
+}
+
+async function depart(transferNumber: string, barcodes: string[], costs: TransferCosts | null) {
+  await departTransfer(transferNumber, costs)
   mutate(transferDetailKey(transferNumber))
   invalidateAssetDetails(barcodes)
   invalidateTransferLists()
 }
 
-async function receive(transferNumber: string, barcodes: string[]) {
-  await receiveTransfer(transferNumber)
+async function startUnloading(transferNumber: string) {
+  await startUnloadingTransfer(transferNumber)
+  mutate(transferDetailKey(transferNumber))
+  invalidateTransferLists()
+}
+
+async function complete(transferNumber: string, barcodes: string[]) {
+  await completeTransfer(transferNumber)
   mutate(transferDetailKey(transferNumber))
   invalidateAssetDetails(barcodes)
+  invalidateTransferLists()
+}
+
+async function scanLoaded(transferNumber: string, assetId: number, barcode: string) {
+  await scanTransferAssetLoaded(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
+  invalidateTransferLists()
+}
+
+async function scanUnloaded(transferNumber: string, assetId: number, barcode: string) {
+  await scanTransferAssetUnloaded(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
+  invalidateTransferLists()
+}
+
+async function markMissingAtLoad(transferNumber: string, assetId: number, barcode: string) {
+  await markTransferAssetMissingAtLoad(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
+  invalidateTransferLists()
+}
+
+async function markMissingAtUnload(transferNumber: string, assetId: number, barcode: string) {
+  await markTransferAssetMissingAtUnload(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
+  invalidateTransferLists()
+}
+
+async function undoLoad(transferNumber: string, assetId: number, barcode: string) {
+  await undoTransferAssetLoad(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
+  invalidateTransferLists()
+}
+
+async function undoUnload(transferNumber: string, assetId: number, barcode: string) {
+  await undoTransferAssetUnload(transferNumber, assetId)
+  mutate(transferDetailKey(transferNumber))
+  invalidateAssetDetails([barcode])
   invalidateTransferLists()
 }
 
@@ -177,8 +246,17 @@ const mutations = {
   addAssetBatch,
   updateMetadata,
   updateNotes,
-  dispatch,
-  receive,
+  schedule,
+  startLoading,
+  depart,
+  startUnloading,
+  complete,
+  scanLoaded,
+  scanUnloaded,
+  markMissingAtLoad,
+  markMissingAtUnload,
+  undoLoad,
+  undoUnload,
   returnToOrigin,
   updatePrice,
   bulkRemoveAssets,

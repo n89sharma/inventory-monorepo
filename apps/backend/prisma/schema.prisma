@@ -318,7 +318,7 @@ model AssetSalvagedPart {
 model Transfer {
   id              Int      @id @default(autoincrement())
   transfer_number String   @unique @db.VarChar(50)
-  status          String   @default("DRAFT") @db.VarChar(20)
+  status          String   @default("DRAFT") @db.VarChar(30)
   origin_id       Int
   destination_id  Int
   transporter_id  Int
@@ -345,6 +345,8 @@ model Transfer {
 model AssetTransfer {
   asset_id    Int
   transfer_id Int
+  loaded      Boolean @default(false)
+  unloaded    Boolean @default(false)
 
   asset    Asset    @relation(fields: [asset_id], references: [id])
   transfer Transfer @relation(fields: [transfer_id], references: [id])

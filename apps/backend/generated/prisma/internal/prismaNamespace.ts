@@ -4155,7 +4155,9 @@ export type TransferScalarFieldEnum = (typeof TransferScalarFieldEnum)[keyof typ
 
 export const AssetTransferScalarFieldEnum = {
   asset_id: 'asset_id',
-  transfer_id: 'transfer_id'
+  transfer_id: 'transfer_id',
+  loaded: 'loaded',
+  unloaded: 'unloaded'
 } as const
 
 export type AssetTransferScalarFieldEnum = (typeof AssetTransferScalarFieldEnum)[keyof typeof AssetTransferScalarFieldEnum]

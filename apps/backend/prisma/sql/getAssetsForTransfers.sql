@@ -1,5 +1,7 @@
 select
   a.id,
+  tt.loaded as loaded,
+  tt.unloaded as unloaded,
   b."name" as brand,
   m."name" as model,
   at.asset_type,

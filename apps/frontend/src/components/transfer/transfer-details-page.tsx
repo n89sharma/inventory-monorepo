@@ -4,7 +4,11 @@ import { CreatedByField } from '@/components/shared/cards/created-by-field'
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
-import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
+import {
+  COLLECTION_DETAILS_TAB,
+  CollectionDetailPage,
+  type CollectionExtraTab,
+} from '@/components/collections/collection-detail-page'
 import type { BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
 import { SummaryRoute } from '@/components/shared/cards/summary-route'
@@ -13,6 +17,8 @@ import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge
 import { EditTransferMetadataModal } from '@/components/transfer/edit-transfer-metadata-modal'
 import { EditTransferNotesModal } from '@/components/transfer/edit-transfer-notes-modal'
 import { TransferLifecycleActions } from '@/components/transfer/transfer-lifecycle-actions'
+import { TransferLoadingPanel } from '@/components/transfer/transfer-loading-panel'
+import { TransferUnloadingPanel } from '@/components/transfer/transfer-unloading-panel'
 import { ReturnToOriginDialog } from '@/components/transfer/return-to-origin-dialog'
 import { getTransferHistory } from '@/data/api/transfer-api'
 import { transferDetailKey, useTransferDetail } from '@/hooks/use-transfer'
@@ -21,12 +27,14 @@ import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
+  ASSET_STATUS,
   TRANSFER_STATUS,
   type AssetSearchRow,
   type PatchAssetPricing,
+  type TransferAssetRow,
   type TransferDetail,
 } from 'shared-types'
 import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
@@ -34,6 +42,26 @@ import type { TransferMetadataForm } from '@/ui-types/transfer-form-types'
 const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
 const RETURN_TO_ORIGIN_LABEL = 'Return to origin'
 const UNTESTED_READINESS = 'UNTESTED'
+
+const LOADING_TAB = 'loading'
+const UNLOADING_TAB = 'unloading'
+
+function pendingLoadCountOf(assets: TransferAssetRow[]): number {
+  return assets.filter((asset) => !asset.scan.loaded && asset.status !== ASSET_STATUS.MISSING)
+    .length
+}
+
+function pendingUnloadCountOf(assets: TransferAssetRow[]): number {
+  return assets.filter(
+    (asset) => asset.scan.loaded && !asset.scan.unloaded && asset.status !== ASSET_STATUS.MISSING,
+  ).length
+}
+
+function tabForStatus(status: string): string {
+  if (status === TRANSFER_STATUS.LOADING_IN_PROGRESS) return LOADING_TAB
+  if (status === TRANSFER_STATUS.UNLOADING_IN_PROGRESS) return UNLOADING_TAB
+  return COLLECTION_DETAILS_TAB
+}
 
 export function TransferDetailsPage(): React.JSX.Element {
   const { collectionId: transferNumber } = useParams<{ collectionId: string }>()
@@ -48,6 +76,27 @@ export function TransferDetailsPage(): React.JSX.Element {
   const canEditAssets = canCreateEditTransfer && isDraft
   const canReturnToOrigin = canCreateEditTransfer && isInTransit
   const [returnToOriginOpen, setReturnToOriginOpen] = useState(false)
+
+  const [activeTab, setActiveTab] = useState<string>(COLLECTION_DETAILS_TAB)
+  const prevStatusRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    const currStatus = detail.data?.status
+    if (currStatus === undefined) return
+    const prevStatus = prevStatusRef.current
+    prevStatusRef.current = currStatus
+    if (prevStatus !== currStatus) setActiveTab(tabForStatus(currStatus))
+  }, [detail.data?.status])
+
+  // Bumped every time the active tab changes (by user click or the auto-switch above), so the
+  // Loading/Unloading scan input remounts and reliably grabs focus each time its tab is entered
+  // — including re-entering the same tab after visiting another one. Adjusting state during
+  // render (not in an effect) per https://react.dev/learn/you-might-not-need-an-effect.
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
+  const [focusNonce, setFocusNonce] = useState(0)
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab)
+    setFocusNonce((n) => n + 1)
+  }
 
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
@@ -68,6 +117,14 @@ export function TransferDetailsPage(): React.JSX.Element {
     [can, priceEditorRegistry],
   )
 
+  const transferTabs: CollectionExtraTab[] = []
+  if (detail.data?.status === TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+    transferTabs.push({ value: LOADING_TAB, label: 'Loading' })
+  }
+  if (detail.data?.status === TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+    transferTabs.push({ value: UNLOADING_TAB, label: 'Unloading' })
+  }
+
   return (
     <CollectionDetailPage
       section="transfers"
@@ -79,6 +136,30 @@ export function TransferDetailsPage(): React.JSX.Element {
       refreshKey={transferDetailKey(transferNumber)}
       historyCacheKey={`transfer-history:${transferNumber}`}
       historyFetcher={() => getTransferHistory(transferNumber)}
+      tabs={transferTabs}
+      activeTab={activeTab}
+      onActiveTabChange={setActiveTab}
+      renderTabContent={(tabValue, transfer) => {
+        if (tabValue === LOADING_TAB) {
+          return (
+            <TransferLoadingPanel
+              transferNumber={transferNumber}
+              assets={transfer.assets}
+              focusKey={focusNonce}
+            />
+          )
+        }
+        if (tabValue === UNLOADING_TAB) {
+          return (
+            <TransferUnloadingPanel
+              transferNumber={transferNumber}
+              assets={transfer.assets}
+              focusKey={focusNonce}
+            />
+          )
+        }
+        return null
+      }}
       onBulkRemove={
         canEditAssets ? (assets) => mutations.bulkRemoveAssets(transferNumber, assets) : undefined
       }
@@ -90,17 +171,23 @@ export function TransferDetailsPage(): React.JSX.Element {
         <TransferLifecycleActions
           status={transfer.status}
           originId={transfer.origin.id}
+          destinationCode={transfer.destination.city_code}
           assetCount={transfer.assets.length}
           testedCount={transfer.assets.filter((a) => a.readiness !== UNTESTED_READINESS).length}
-          onDispatch={(costs) =>
-            mutations.dispatch(
+          pendingLoadCount={pendingLoadCountOf(transfer.assets)}
+          pendingUnloadCount={pendingUnloadCountOf(transfer.assets)}
+          onSchedule={() => mutations.schedule(transferNumber)}
+          onStartLoading={() => mutations.startLoading(transferNumber)}
+          onDepart={(costs) =>
+            mutations.depart(
               transferNumber,
               transfer.assets.map((a) => a.barcode),
               costs,
             )
           }
-          onReceive={() =>
-            mutations.receive(
+          onStartUnloading={() => mutations.startUnloading(transferNumber)}
+          onComplete={() =>
+            mutations.complete(
               transferNumber,
               transfer.assets.map((a) => a.barcode),
             )

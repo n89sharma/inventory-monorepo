@@ -5,8 +5,9 @@ import {
   AssetDeltaSchema,
   CollectionHistory,
   CreateTransferSchema,
-  DispatchTransferSchema,
+  DepartTransferSchema,
   ReturnAssetsToOriginSchema,
+  TransferAssetIdSchema,
   TransferCostsSchema,
   TransferDetail,
   TransferSummary,
@@ -23,15 +24,24 @@ import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
+  completeTransfer as completeTransferSer,
   createTransfer as createTransferSer,
   deleteTransfer as deleteTransferSer,
-  dispatchTransfer as dispatchTransferSer,
+  departTransfer as departTransferSer,
   getTransfer as getTransferSer,
+  markAssetMissingAtLoadSer,
+  markAssetMissingAtUnloadSer,
   patchTransferAssets as patchTransferAssetsSer,
   patchTransferMetadata as patchTransferMetadataSer,
   patchTransferNotes as patchTransferNotesSer,
-  receiveTransfer as receiveTransferSer,
   returnTransferAssetsToOrigin as returnTransferAssetsToOriginSer,
+  scanAssetLoadedSer,
+  scanAssetUnloadedSer,
+  scheduleTransfer as scheduleTransferSer,
+  startLoadingTransfer as startLoadingTransferSer,
+  startUnloadingTransfer as startUnloadingTransferSer,
+  undoAssetLoadSer,
+  undoAssetUnloadSer,
 } from '../services/transferService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 import {
@@ -104,18 +114,69 @@ export const patchTransferAssets = asyncHandler(async (req, res) => {
   res.status(204).send()
 })
 
-export const dispatchTransfer = asyncHandler(async (req, res) => {
-  const { costs } = DispatchTransferSchema.parse(req.body)
+export const scheduleTransfer = asyncHandler(async (req, res) => {
+  await scheduleTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const startLoadingTransfer = asyncHandler(async (req, res) => {
+  await startLoadingTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const departTransfer = asyncHandler(async (req, res) => {
+  const { costs } = DepartTransferSchema.parse(req.body)
   if (costs !== null && !res.locals.permissions.has(EDIT_COST_PERMISSION)) {
     res.status(403).json(response403('Forbidden: insufficient permissions'))
     return
   }
-  await dispatchTransferSer(req.params.transferNumber, res.locals.dbUserId, costs)
+  await departTransferSer(req.params.transferNumber, res.locals.dbUserId, costs)
   res.status(204).send()
 })
 
-export const receiveTransfer = asyncHandler(async (req, res) => {
-  await receiveTransferSer(req.params.transferNumber, res.locals.dbUserId)
+export const startUnloadingTransfer = asyncHandler(async (req, res) => {
+  await startUnloadingTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const completeTransfer = asyncHandler(async (req, res) => {
+  await completeTransferSer(req.params.transferNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const scanTransferAssetLoaded = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await scanAssetLoadedSer(req.params.transferNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const scanTransferAssetUnloaded = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await scanAssetUnloadedSer(req.params.transferNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const markTransferAssetMissingAtLoad = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await markAssetMissingAtLoadSer(req.params.transferNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const markTransferAssetMissingAtUnload = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await markAssetMissingAtUnloadSer(req.params.transferNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const undoTransferAssetLoad = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await undoAssetLoadSer(req.params.transferNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const undoTransferAssetUnload = asyncHandler(async (req, res) => {
+  const { assetId } = TransferAssetIdSchema.parse(req.body)
+  await undoAssetUnloadSer(req.params.transferNumber, assetId, res.locals.dbUserId)
   res.status(204).send()
 })
 

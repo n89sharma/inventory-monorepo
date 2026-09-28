@@ -35,11 +35,20 @@ import {
   type AssetTypeFilter,
 } from '@/lib/asset-type-filter'
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { BulkEditBar, type RenderBulkExtraActions } from './bulk-edit-bar'
 import { CollectionAssetsToolbar } from './collection-assets-toolbar'
 import { CollectionEditBar, type CollectionMenuAction } from './collection-edit-bar'
 
 const TABLE_LABEL = 'Collection assets'
+
+// The default tab holding the asset table, when a caller opts into extra tabs via `tabs`.
+export const COLLECTION_DETAILS_TAB = 'details'
+
+export interface CollectionExtraTab {
+  value: string
+  label: string
+}
 
 const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
@@ -93,6 +102,12 @@ interface CollectionDetailPageProps<TEntity extends { assets: AssetSearchRow[] }
   renderBulkExtraActions?: RenderBulkExtraActions
   onRelease?: () => void
   onDelete?: () => void
+  // Extra tabs beyond the asset table (COLLECTION_DETAILS_TAB), rendered below the sticky header
+  // so the header stays visible across every tab. Omit for the plain, untabbed layout.
+  tabs?: CollectionExtraTab[]
+  activeTab?: string
+  onActiveTabChange?: (value: string) => void
+  renderTabContent?: (tabValue: string, entity: TEntity) => React.ReactNode
 }
 
 export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] }>({
@@ -122,6 +137,10 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   renderBulkExtraActions,
   onRelease,
   onDelete,
+  tabs,
+  activeTab,
+  onActiveTabChange,
+  renderTabContent,
 }: CollectionDetailPageProps<TEntity>): React.JSX.Element {
   // nuqs writes the cols param shallowly, so useLocation would not see it.
   const searchParams = useOptimisticSearchParams()
@@ -192,52 +211,14 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
     ? renderTitle(entity)
     : { title: `${titleLabel} ${collectionId}`, copyValue: collectionId }
 
-  return (
-    <GridPageContent className={selectedAssets.length > 0 ? 'pb-24' : ''}>
-      <GridDetailsPageHeader
-        breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
-        title={header.title}
-        copyValue={header.copyValue}
-        titleBadge={renderTitleBadge?.(entity)}
-        actions={
-          <div className="flex items-center gap-2">
-            {renderHeaderActions?.(entity)}
-            <CollectionEditBar
-              section={section}
-              collectionId={collectionId}
-              displayId={header.copyValue}
-              canCreateEditEntity={canCreateEditEntity}
-              assets={entity.assets}
-              selectedAssets={selectedAssets}
-              displayOrder={displayOrder}
-              note={getNote?.(entity)}
-              menuActions={menuActions?.actions}
-              historyCacheKey={historyCacheKey}
-              historyFetcher={historyFetcher}
-              onEdit={() => setIsMetadataModalOpen(true)}
-              onRelease={onRelease}
-              onDelete={onDelete}
-            />
-          </div>
-        }
-        subtitle={
-          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            {renderSummaryStrip(entity)}
-          </div>
-        }
-      />
+  const assetTableBody = (
+    <>
       <CostSummaryStrip assets={entity.assets} />
       {counterpartyWarning ? (
         <PageSection className="pt-0">
           <CounterpartyMismatchCallout warning={counterpartyWarning} />
         </PageSection>
       ) : null}
-      {menuActions?.dialogs}
-      {renderMetadataModal(entity, {
-        open: isMetadataModalOpen,
-        onOpenChange: setIsMetadataModalOpen,
-      })}
-
       <DataGridWithoutResultCount
         label={TABLE_LABEL}
         columns={columns}
@@ -288,6 +269,70 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
         onColumnOrderChange={onColumnOrderChange}
         meta={tableMeta}
       />
+    </>
+  )
+
+  return (
+    <GridPageContent className={selectedAssets.length > 0 ? 'pb-24' : ''}>
+      <GridDetailsPageHeader
+        breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
+        title={header.title}
+        copyValue={header.copyValue}
+        titleBadge={renderTitleBadge?.(entity)}
+        actions={
+          <div className="flex items-center gap-2">
+            {renderHeaderActions?.(entity)}
+            <CollectionEditBar
+              section={section}
+              collectionId={collectionId}
+              displayId={header.copyValue}
+              canCreateEditEntity={canCreateEditEntity}
+              assets={entity.assets}
+              selectedAssets={selectedAssets}
+              displayOrder={displayOrder}
+              note={getNote?.(entity)}
+              menuActions={menuActions?.actions}
+              historyCacheKey={historyCacheKey}
+              historyFetcher={historyFetcher}
+              onEdit={() => setIsMetadataModalOpen(true)}
+              onRelease={onRelease}
+              onDelete={onDelete}
+            />
+          </div>
+        }
+        subtitle={
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+            {renderSummaryStrip(entity)}
+          </div>
+        }
+      />
+      {menuActions?.dialogs}
+      {renderMetadataModal(entity, {
+        open: isMetadataModalOpen,
+        onOpenChange: setIsMetadataModalOpen,
+      })}
+      {tabs && tabs.length > 0 ? (
+        <Tabs value={activeTab} onValueChange={onActiveTabChange} className="min-h-0 flex-1">
+          <TabsList variant="line">
+            <TabsTrigger value={COLLECTION_DETAILS_TAB}>Details</TabsTrigger>
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value={COLLECTION_DETAILS_TAB} className="min-h-0 flex-1">
+            {assetTableBody}
+          </TabsContent>
+          {tabs.map((tab) => (
+            <TabsContent key={tab.value} value={tab.value} className="min-h-0 flex-1">
+              {renderTabContent?.(tab.value, entity)}
+            </TabsContent>
+          ))}
+        </Tabs>
+      ) : (
+        assetTableBody
+      )}
     </GridPageContent>
   )
 }

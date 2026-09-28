@@ -13,6 +13,9 @@ import type { ComponentProps, ReactNode } from 'react'
 
 type ButtonVariant = ComponentProps<typeof Button>['variant']
 
+const DESTRUCTIVE_MEDIA_CLASS =
+  'bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive'
+
 type ConfirmActionDialogProps = {
   title: string
   confirmLabel: string
@@ -21,6 +24,7 @@ type ConfirmActionDialogProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   confirmVariant?: ButtonVariant
+  size?: 'default' | 'sm'
   children?: ReactNode
 }
 
@@ -32,16 +36,21 @@ export function ConfirmActionDialog({
   open,
   onOpenChange,
   confirmVariant = 'default',
+  size = 'sm',
   children,
 }: ConfirmActionDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent size="sm">
+      <AlertDialogContent size={size}>
         <AlertDialogHeader>
-          <AlertDialogMedia>{icon}</AlertDialogMedia>
+          <AlertDialogMedia
+            className={confirmVariant === 'destructive' ? DESTRUCTIVE_MEDIA_CLASS : undefined}
+          >
+            {icon}
+          </AlertDialogMedia>
           <AlertDialogTitle>{title}</AlertDialogTitle>
+          {children}
         </AlertDialogHeader>
-        {children}
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
           <AlertDialogAction variant={confirmVariant} onClick={onConfirm}>

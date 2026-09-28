@@ -91,6 +91,8 @@
   --sidebar-ring: oklch(0.708 0 0);
   --row-warning: oklch(0.95 0.04 85);
   --row-warning-hover: oklch(0.91 0.06 85);
+  --row-success: oklch(0.95 0.04 145);
+  --row-success-hover: oklch(0.91 0.06 145);
 }
 
 .dark {
@@ -128,12 +130,19 @@
   --sidebar-ring: oklch(0.556 0 0);
   --row-warning: oklch(0.32 0.05 85);
   --row-warning-hover: oklch(0.38 0.06 85);
+  --row-success: oklch(0.32 0.05 145);
+  --row-success-hover: oklch(0.38 0.06 145);
 }
 
 @layer components {
   .data-row-warning {
     --row-bg: var(--row-warning);
     --row-bg-hover: var(--row-warning-hover);
+  }
+
+  .data-row-success {
+    --row-bg: var(--row-success);
+    --row-bg-hover: var(--row-success-hover);
   }
 }
 

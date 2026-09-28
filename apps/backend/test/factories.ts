@@ -592,6 +592,13 @@ export async function setAssetReadiness(assetId: number, status: string): Promis
   await prisma.asset.update({ where: { id: assetId }, data: { readiness_id: readiness.id } })
 }
 
+// Force an asset's status directly (e.g. simulating it being sold elsewhere between two
+// steps of a transfer), bypassing whichever service would normally own that transition.
+export async function setAssetStatus(assetId: number, status: string): Promise<void> {
+  const assetStatus = await prisma.status.findUniqueOrThrow({ where: { status } })
+  await prisma.asset.update({ where: { id: assetId }, data: { status_id: assetStatus.id } })
+}
+
 export async function cleanupTransactionalData(): Promise<void> {
   await prisma.monthEndReport.deleteMany()
   await prisma.release.deleteMany()

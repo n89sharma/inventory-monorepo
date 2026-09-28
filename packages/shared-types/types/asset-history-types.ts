@@ -133,6 +133,31 @@ export const AssetHistoryRecordSchema = z.discriminatedUnion('action_type', [
     ...AssetRecordBase,
     changes: TransferMovementSchema,
   }),
+  z.object({
+    action_type: z.literal('TRANSFER_ASSET_LOADED'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_ASSET_UNLOADED'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_ASSET_MARKED_MISSING'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_ASSET_LOAD_UNDONE'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
+  z.object({
+    action_type: z.literal('TRANSFER_ASSET_UNLOAD_UNDONE'),
+    ...AssetRecordBase,
+    changes: TransferMovementSchema,
+  }),
 ])
 
 export const AssetHistorySchema = z.array(AssetHistoryRecordSchema)

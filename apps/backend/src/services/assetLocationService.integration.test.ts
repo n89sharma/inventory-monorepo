@@ -6,10 +6,29 @@ import {
   createArrivedAssets,
   seedArrivalTestData,
 } from '../../test/factories.js'
-import { createTransfer, dispatchTransfer } from './transferService.js'
+import {
+  createTransfer,
+  departTransfer,
+  scanAssetLoadedSer,
+  scheduleTransfer,
+  startLoadingTransfer,
+} from './transferService.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { bulkUpdateAssetLocation, updateAssetLocation } from './assetLocationService.js'
+
+async function departTransferWithAssets(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  await scheduleTransfer(transferNumber, userId)
+  await startLoadingTransfer(transferNumber, userId)
+  for (const assetId of assetIds) {
+    await scanAssetLoadedSer(transferNumber, assetId, userId)
+  }
+  await departTransfer(transferNumber, userId, null)
+}
 
 const MISSING_ID = 999999
 
@@ -138,7 +157,7 @@ describe('assetLocationService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departTransferWithAssets(transferNumber, [asset.id], refs.userId)
 
     await expect(
       updateAssetLocation(asset.barcode, shelf(refs, 'A1'), refs.userId),
@@ -183,7 +202,7 @@ describe('assetLocationService', () => {
         buildCreateTransferInput(refs, [assets[1]]),
         refs.userId,
       )
-      await dispatchTransfer(transferNumber, refs.userId, null)
+      await departTransferWithAssets(transferNumber, [assets[1].id], refs.userId)
 
       await expect(
         bulkUpdateAssetLocation(

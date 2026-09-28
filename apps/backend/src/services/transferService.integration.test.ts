@@ -12,26 +12,115 @@ import {
   seedArrivalTestData,
   seedAssetCost,
   getAssetCost,
+  getAssetStatus,
   seedWarehouseTransferCost,
   setAssetReadiness,
+  setAssetStatus,
   SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
-import type { LocationParts, TransferCosts } from 'shared-types'
+import { ASSET_STATUS, type LocationParts, type TransferCosts } from 'shared-types'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
+  completeTransfer,
   createTransfer,
   deleteTransfer,
-  dispatchTransfer,
+  departTransfer,
   getTransfer,
+  markAssetMissingAtLoadSer,
+  markAssetMissingAtUnloadSer,
   patchTransferAssets,
   patchTransferMetadata,
   patchTransferNotes,
-  receiveTransfer,
   returnTransferAssetsToOrigin,
+  scanAssetLoadedSer,
+  scanAssetUnloadedSer,
+  scheduleTransfer,
+  startLoadingTransfer,
+  startUnloadingTransfer,
+  undoAssetLoadSer,
+  undoAssetUnloadSer,
 } from './transferService.js'
 import type { History } from '../../generated/prisma/client.js'
+
+async function scheduleAndStartLoading(transferNumber: string, userId: number): Promise<void> {
+  await scheduleTransfer(transferNumber, userId)
+  await startLoadingTransfer(transferNumber, userId)
+}
+
+async function loadAssets(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  for (const assetId of assetIds) {
+    await scanAssetLoadedSer(transferNumber, assetId, userId)
+  }
+}
+
+async function departFromDraft(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+  costs: TransferCosts | null,
+): Promise<void> {
+  await scheduleAndStartLoading(transferNumber, userId)
+  await loadAssets(transferNumber, assetIds, userId)
+  await departTransfer(transferNumber, userId, costs)
+}
+
+async function unloadAssets(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  for (const assetId of assetIds) {
+    await scanAssetUnloadedSer(transferNumber, assetId, userId)
+  }
+}
+
+async function completeFromInTransit(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  await startUnloadingTransfer(transferNumber, userId)
+  await unloadAssets(transferNumber, assetIds, userId)
+  await completeTransfer(transferNumber, userId)
+}
+
+// Drives a freshly created transfer to the given non-DRAFT status, for parameterized guard tests.
+async function advanceToStatus(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+  status: string,
+): Promise<void> {
+  if (status === 'SCHEDULED') {
+    await scheduleTransfer(transferNumber, userId)
+    return
+  }
+  if (status === 'LOADING_IN_PROGRESS') {
+    await scheduleAndStartLoading(transferNumber, userId)
+    return
+  }
+  if (status === 'IN_TRANSIT') {
+    await departFromDraft(transferNumber, assetIds, userId, null)
+    return
+  }
+  if (status === 'UNLOADING_IN_PROGRESS') {
+    await departFromDraft(transferNumber, assetIds, userId, null)
+    await startUnloadingTransfer(transferNumber, userId)
+    return
+  }
+  if (status === 'COMPLETE') {
+    await departFromDraft(transferNumber, assetIds, userId, null)
+    await completeFromInTransit(transferNumber, assetIds, userId)
+    return
+  }
+  throw new Error(`advanceToStatus: unsupported status ${status}`)
+}
 
 const TESTED_READINESS = 'PP_OK'
 
@@ -240,11 +329,16 @@ describe('transferService', () => {
     expect(transferNumber).toMatch(/^T-YYZ-\d{7}$/)
   })
 
-  it('dispatch clears each asset location and sets it in transit', async () => {
+  it('depart clears each asset location and sets it in transit', async () => {
     const assets = await createArrivedAssets(refs, 2)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     expect(await getTransferStatus(transferNumber)).toBe('IN_TRANSIT')
     for (const asset of assets) {
@@ -254,7 +348,7 @@ describe('transferService', () => {
     }
   })
 
-  it('dispatch with no saved warehouse defaults leaves each asset cost unchanged', async () => {
+  it('depart with no saved warehouse defaults leaves each asset cost unchanged', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await seedAssetCost(asset.id)
     const transferNumber = await createTransfer(
@@ -262,7 +356,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
 
     expect(await getAssetCost(asset.id)).toEqual(SEEDED_ASSET_COST)
     expect(await getTransferCosts(transferNumber)).toEqual({
@@ -273,7 +367,7 @@ describe('transferService', () => {
     })
   })
 
-  it('dispatch adds the origin warehouse defaults to every asset on the transfer', async () => {
+  it('depart adds the origin warehouse defaults to every asset on the transfer', async () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
@@ -284,7 +378,12 @@ describe('transferService', () => {
     for (const asset of assets) await seedAssetCost(asset.id)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     for (const asset of assets) {
       expect(await getAssetCost(asset.id)).toEqual({
@@ -304,7 +403,7 @@ describe('transferService', () => {
     })
   })
 
-  it('dispatch costs passed by the caller override the warehouse defaults', async () => {
+  it('depart costs passed by the caller override the warehouse defaults', async () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
@@ -318,7 +417,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await dispatchTransfer(transferNumber, refs.userId, {
+    await departFromDraft(transferNumber, [asset.id], refs.userId, {
       transfer_cost: 50,
       processing_cost: 0,
       tested_processing_cost: 0,
@@ -340,7 +439,7 @@ describe('transferService', () => {
     })
   })
 
-  it('dispatch adds the tested processing cost only to machines that are not untested', async () => {
+  it('depart adds the tested processing cost only to machines that are not untested', async () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
@@ -355,7 +454,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(transferNumber, [untested.id, tested.id], refs.userId, null)
 
     expect(await getAssetCost(untested.id)).toEqual({
       ...SEEDED_ASSET_COST,
@@ -373,7 +472,7 @@ describe('transferService', () => {
     })
   })
 
-  it('dispatch creates a cost row for an asset that has none', async () => {
+  it('depart creates a cost row for an asset that has none', async () => {
     await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
       transfer_cost: 10,
       processing_cost: 4,
@@ -386,7 +485,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
 
     expect(await getAssetCost(asset.id)).toEqual({
       purchase_cost: null,
@@ -400,13 +499,14 @@ describe('transferService', () => {
     })
   })
 
-  it('receive moves each asset to the destination shipping & receiving and completes', async () => {
+  it('complete moves each asset to the destination shipping & receiving', async () => {
     const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse2.id)
     const assets = await createArrivedAssets(refs, 2)
+    const assetIds = assets.map((a) => a.id)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
-    await receiveTransfer(transferNumber, refs.userId)
+    await departFromDraft(transferNumber, assetIds, refs.userId, null)
+    await completeFromInTransit(transferNumber, assetIds, refs.userId)
 
     expect(await getTransferStatus(transferNumber)).toBe('COMPLETE')
     for (const asset of assets) {
@@ -419,9 +519,10 @@ describe('transferService', () => {
   it('updates notes on a completed transfer', async () => {
     await seedShippingAndReceivingLocation(refs.warehouse2.id)
     const assets = await createArrivedAssets(refs, 1)
+    const assetIds = assets.map((a) => a.id)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
-    await receiveTransfer(transferNumber, refs.userId)
+    await departFromDraft(transferNumber, assetIds, refs.userId, null)
+    await completeFromInTransit(transferNumber, assetIds, refs.userId)
 
     await patchTransferNotes(transferNumber, { comment: 'delivered with damage' })
 
@@ -429,10 +530,10 @@ describe('transferService', () => {
     expect(await getTransferNotes(transferNumber)).toBe('delivered with damage')
   })
 
-  it('rejects editing metadata after dispatch', async () => {
+  it('rejects editing metadata after scheduling', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await scheduleTransfer(transferNumber, refs.userId)
 
     await expect(
       patchTransferMetadata(
@@ -448,29 +549,44 @@ describe('transferService', () => {
     ).rejects.toBeInstanceOf(ConflictError)
   })
 
-  it('rejects dispatching a transfer that is already in transit', async () => {
+  it('rejects departing a transfer that is not loading', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
-    await expect(dispatchTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
+    await expect(departTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
       ConflictError,
     )
   })
 
-  it('rejects receiving a transfer that is not in transit', async () => {
+  it('rejects completing a transfer that is not unloading', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
 
-    await expect(receiveTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(ConflictError)
+    await expect(completeTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
   })
 
-  it('rejects receiving when the destination has no shipping & receiving location', async () => {
+  it('rejects unloading when the destination has no shipping & receiving location', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
+    await startUnloadingTransfer(transferNumber, refs.userId)
 
-    await expect(receiveTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(NotFoundError)
+    await expect(
+      scanAssetUnloadedSer(transferNumber, assets[0].id, refs.userId),
+    ).rejects.toBeInstanceOf(NotFoundError)
   })
 
   it('rejects adding an asset that is already on another open transfer', async () => {
@@ -482,10 +598,10 @@ describe('transferService', () => {
     ).rejects.toBeInstanceOf(ConflictError)
   })
 
-  it('rejects editing assets on a transfer after dispatch', async () => {
+  it('rejects editing assets on a transfer after scheduling', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await scheduleTransfer(transferNumber, refs.userId)
 
     const [added] = await createArrivedAssets(refs, 1)
     await expect(
@@ -497,7 +613,7 @@ describe('transferService', () => {
     ).rejects.toBeInstanceOf(ConflictError)
   })
 
-  it('rejects dispatching a transfer with no assets', async () => {
+  it('rejects scheduling a transfer with no assets', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
       buildCreateTransferInput(refs, [asset]),
@@ -509,7 +625,7 @@ describe('transferService', () => {
       refs.userId,
     )
 
-    await expect(dispatchTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
+    await expect(scheduleTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
       ConflictError,
     )
   })
@@ -518,7 +634,12 @@ describe('transferService', () => {
     const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse.id)
     const assets = await createArrivedAssets(refs, 2)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
 
@@ -541,19 +662,24 @@ describe('transferService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
-    const dispatchedCost = await getAssetCost(asset.id)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    const departedCost = await getAssetCost(asset.id)
 
     await returnTransferAssetsToOrigin(transferNumber, [asset.id], refs.userId)
 
-    expect(await getAssetCost(asset.id)).toEqual(dispatchedCost)
+    expect(await getAssetCost(asset.id)).toEqual(departedCost)
   })
 
   it('removes only the returned asset, leaving the rest of the transfer in transit', async () => {
     await seedShippingAndReceivingLocation(refs.warehouse.id)
     const assets = await createArrivedAssets(refs, 2)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
 
@@ -568,7 +694,12 @@ describe('transferService', () => {
     await seedShippingAndReceivingLocation(refs.warehouse.id)
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
 
@@ -590,7 +721,12 @@ describe('transferService', () => {
     await seedShippingAndReceivingLocation(refs.warehouse.id)
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
     const [stranger] = await createArrivedAssets(refs, 1)
 
     await expect(
@@ -605,7 +741,12 @@ describe('transferService', () => {
   it('rejects returning when the origin has no shipping & receiving location', async () => {
     const assets = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     await expect(
       returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId),
@@ -616,7 +757,12 @@ describe('transferService', () => {
     await seedShippingAndReceivingLocation(refs.warehouse.id)
     const assets = await createArrivedAssets(refs, 2)
     const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
 
     const beforeFirstReturn = await getMaxHistoryId()
     await returnTransferAssetsToOrigin(transferNumber, [assets[0].id], refs.userId)
@@ -670,9 +816,11 @@ describe('transferService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await loadAssets(transferNumber, [asset.id], refs.userId)
     const sinceId = await getMaxHistoryId()
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departTransfer(transferNumber, refs.userId, null)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
     const movement = assetMovement(rows, asset.id, 'TRANSFER_DISPATCHED')
@@ -691,28 +839,31 @@ describe('transferService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await loadAssets(transferNumber, [asset.id], refs.userId)
     const sinceId = await getMaxHistoryId()
 
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departTransfer(transferNumber, refs.userId, null)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
     expect(hasAssetLocationEdit(rows, asset.id)).toBe(false)
   })
 
-  it('records a receipt at the destination shipping & receiving location', async () => {
+  it('records an unload at the destination shipping & receiving location', async () => {
     await seedShippingAndReceivingLocation(refs.warehouse2.id)
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
     const sinceId = await getMaxHistoryId()
 
-    await receiveTransfer(transferNumber, refs.userId)
+    await scanAssetUnloadedSer(transferNumber, asset.id, refs.userId)
 
     const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
-    const movement = assetMovement(rows, asset.id, 'TRANSFER_RECEIVED')
+    const movement = assetMovement(rows, asset.id, 'TRANSFER_ASSET_UNLOADED')
     expect(movement?.transfer_number).toBe(transferNumber)
     expect(movement?.before).toEqual({ warehouse: null, zone: null, bin: null })
     expect(movement?.after.warehouse).toBe(refs.warehouse2.city_code)
@@ -726,7 +877,7 @@ describe('transferService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
     const sinceId = await getMaxHistoryId()
 
     await returnTransferAssetsToOrigin(transferNumber, [asset.id], refs.userId)
@@ -736,6 +887,511 @@ describe('transferService', () => {
     expect(movement?.transfer_number).toBe(transferNumber)
     expect(movement?.after.warehouse).toBe(refs.warehouse.city_code)
     expect(movement?.after.zone).toBe('SHIPPING_AND_RECEIVING')
+  })
+
+  it('rejects departing while an asset is neither loaded nor marked missing', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId)
+
+    await expect(departTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('an asset marked missing at load never travels and rejoins the transfer at completion', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId)
+    const missingAssetOriginalLocation = (await getAssetTransitState(assets[1].id)).location_id
+    await markAssetMissingAtLoadSer(transferNumber, assets[1].id, refs.userId)
+
+    await departTransfer(transferNumber, refs.userId, null)
+
+    expect(await getAssetStatus(assets[1].id)).toBe(ASSET_STATUS.MISSING)
+    const missingState = await getAssetTransitState(assets[1].id)
+    expect(missingState.is_in_transit).toBe(false)
+    expect(missingState.location_id).toBe(missingAssetOriginalLocation)
+
+    await startUnloadingTransfer(transferNumber, refs.userId)
+    await scanAssetUnloadedSer(transferNumber, assets[0].id, refs.userId)
+    await completeTransfer(transferNumber, refs.userId)
+
+    expect(await getTransferStatus(transferNumber)).toBe('COMPLETE')
+    expect(await getTransferAssetIds(transferNumber)).toContain(assets[1].id)
+  })
+
+  it('rejects marking an asset missing at load once it has already been loaded', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, asset.id, refs.userId)
+
+    await expect(
+      markAssetMissingAtLoadSer(transferNumber, asset.id, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('rejects completing while a traveled asset is neither unloaded nor marked missing', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await departFromDraft(
+      transferNumber,
+      assets.map((a) => a.id),
+      refs.userId,
+      null,
+    )
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+    await scanAssetUnloadedSer(transferNumber, assets[0].id, refs.userId)
+
+    await expect(completeTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('an asset marked missing at unload moves to the destination shipping & receiving zone', async () => {
+    const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+
+    await markAssetMissingAtUnloadSer(transferNumber, asset.id, refs.userId)
+    await completeTransfer(transferNumber, refs.userId)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.MISSING)
+    const state = await getAssetTransitState(asset.id)
+    expect(state.is_in_transit).toBe(false)
+    expect(state.location_id).toBe(srLocationId)
+    expect(await getTransferStatus(transferNumber)).toBe('COMPLETE')
+  })
+
+  it('rejects marking an asset missing at unload before it ever traveled', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, assets[1].id, refs.userId)
+    await departTransfer(transferNumber, refs.userId, null)
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+
+    await expect(
+      markAssetMissingAtUnloadSer(transferNumber, assets[1].id, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('rejects scheduling a transfer that has already been scheduled', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleTransfer(transferNumber, refs.userId)
+
+    await expect(scheduleTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('moves a transfer from Draft to Scheduled and records the status change', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await scheduleTransfer(transferNumber, refs.userId)
+
+    expect(await getTransferStatus(transferNumber)).toBe('SCHEDULED')
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => transferStatusAfter(r) === 'SCHEDULED')).toBe(true)
+  })
+
+  it.each(['SCHEDULED', 'LOADING_IN_PROGRESS', 'IN_TRANSIT', 'UNLOADING_IN_PROGRESS', 'COMPLETE'])(
+    'rejects editing metadata and assets once the transfer is %s',
+    async (status) => {
+      if (status === 'COMPLETE' || status === 'UNLOADING_IN_PROGRESS') {
+        await seedShippingAndReceivingLocation(refs.warehouse2.id)
+      }
+      const assets = await createArrivedAssets(refs, 1)
+      const assetIds = assets.map((a) => a.id)
+      const transferNumber = await createTransfer(
+        buildCreateTransferInput(refs, assets),
+        refs.userId,
+      )
+      await advanceToStatus(transferNumber, assetIds, refs.userId, status)
+
+      await expect(
+        patchTransferMetadata(
+          transferNumber,
+          {
+            origin: refs.warehouse,
+            destination: refs.warehouse2,
+            transporter: refs.transporter,
+            comment: 'too late',
+          },
+          refs.userId,
+        ),
+      ).rejects.toBeInstanceOf(ConflictError)
+
+      const [stranger] = await createArrivedAssets(refs, 1)
+      await expect(
+        patchTransferAssets(
+          transferNumber,
+          { assetIdsToAdd: [stranger.id], assetIdsToRemove: [] },
+          refs.userId,
+        ),
+      ).rejects.toBeInstanceOf(ConflictError)
+    },
+  )
+
+  it('rejects starting to load a transfer that is not scheduled', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+
+    await expect(startLoadingTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('rejects scanning an asset loaded on a transfer that is not loading', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleTransfer(transferNumber, refs.userId)
+
+    await expect(
+      scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('rejects scanning an asset as loaded once it has already been marked missing', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, assets[0].id, refs.userId)
+
+    await expect(
+      scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('records a loaded scan on the asset', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await scanAssetLoadedSer(transferNumber, asset.id, refs.userId)
+
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(assetMovement(rows, asset.id, 'TRANSFER_ASSET_LOADED')).toMatchObject({
+      transfer_number: transferNumber,
+    })
+  })
+
+  it('marking an asset missing at load leaves it unloaded and untouched in place', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    const originalState = await getAssetTransitState(assets[0].id)
+    const sinceId = await getMaxHistoryId()
+
+    await markAssetMissingAtLoadSer(transferNumber, assets[0].id, refs.userId)
+
+    expect(await getAssetStatus(assets[0].id)).toBe(ASSET_STATUS.MISSING)
+    const state = await getAssetTransitState(assets[0].id)
+    expect(state).toEqual(originalState)
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(assetMovement(rows, assets[0].id, 'TRANSFER_ASSET_MARKED_MISSING')).toMatchObject({
+      transfer_number: transferNumber,
+    })
+  })
+
+  it('depart excludes a missing-at-load asset from cost allocation', async () => {
+    await seedWarehouseTransferCost(refs.warehouse.id, refs.userId, {
+      transfer_cost: 10,
+      processing_cost: 4,
+      tested_processing_cost: 7,
+      other_cost: 1,
+    })
+    const [traveling, missing] = await createArrivedAssets(refs, 2)
+    for (const asset of [traveling, missing]) await seedAssetCost(asset.id)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [traveling, missing]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, traveling.id, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, missing.id, refs.userId)
+
+    await departTransfer(transferNumber, refs.userId, null)
+
+    expect(await getAssetCost(traveling.id)).toEqual({
+      ...SEEDED_ASSET_COST,
+      transfer_cost: 35,
+      processing_cost: 34,
+      other_cost: 6,
+      total_cost: 210,
+    })
+    expect(await getAssetCost(missing.id)).toEqual(SEEDED_ASSET_COST)
+  })
+
+  it('rejects starting to unload a transfer that is not in transit', async () => {
+    const assets = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+
+    await expect(startUnloadingTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('rejects scanning an asset as unloaded before it ever traveled', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, assets[1].id, refs.userId)
+    await departTransfer(transferNumber, refs.userId, null)
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+
+    await expect(
+      scanAssetUnloadedSer(transferNumber, assets[1].id, refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('scanning an asset as unloaded immediately moves it to the destination shipping & receiving', async () => {
+    const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+
+    await scanAssetUnloadedSer(transferNumber, asset.id, refs.userId)
+
+    const state = await getAssetTransitState(asset.id)
+    expect(state.is_in_transit).toBe(false)
+    expect(state.location_id).toBe(srLocationId)
+    // Not yet Complete — the location update happens per-scan, ahead of the transfer closing.
+    expect(await getTransferStatus(transferNumber)).toBe('UNLOADING_IN_PROGRESS')
+  })
+
+  it.each(['SCHEDULED', 'LOADING_IN_PROGRESS', 'UNLOADING_IN_PROGRESS', 'COMPLETE'])(
+    'rejects returning assets to origin once the transfer is %s',
+    async (status) => {
+      await seedShippingAndReceivingLocation(refs.warehouse.id)
+      if (status === 'COMPLETE' || status === 'UNLOADING_IN_PROGRESS') {
+        await seedShippingAndReceivingLocation(refs.warehouse2.id)
+      }
+      const assets = await createArrivedAssets(refs, 1)
+      const assetIds = assets.map((a) => a.id)
+      const transferNumber = await createTransfer(
+        buildCreateTransferInput(refs, assets),
+        refs.userId,
+      )
+      await advanceToStatus(transferNumber, assetIds, refs.userId, status)
+
+      await expect(
+        returnTransferAssetsToOrigin(transferNumber, assetIds, refs.userId),
+      ).rejects.toBeInstanceOf(ConflictError)
+    },
+  )
+
+  it.each(['SCHEDULED', 'LOADING_IN_PROGRESS', 'IN_TRANSIT', 'UNLOADING_IN_PROGRESS'])(
+    'rejects adding an asset already on a transfer that is %s',
+    async (status) => {
+      if (status === 'UNLOADING_IN_PROGRESS') {
+        await seedShippingAndReceivingLocation(refs.warehouse2.id)
+      }
+      const assets = await createArrivedAssets(refs, 1)
+      const assetIds = assets.map((a) => a.id)
+      const holderTransferNumber = await createTransfer(
+        buildCreateTransferInput(refs, assets),
+        refs.userId,
+      )
+      await advanceToStatus(holderTransferNumber, assetIds, refs.userId, status)
+
+      await expect(
+        createTransfer(buildCreateTransferInput(refs, assets), refs.userId),
+      ).rejects.toBeInstanceOf(ConflictError)
+    },
+  )
+
+  it('allows an asset back onto a new transfer once its prior transfer is complete', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const assets = await createArrivedAssets(refs, 1)
+    const assetIds = assets.map((a) => a.id)
+    const firstTransferNumber = await createTransfer(
+      buildCreateTransferInput(refs, assets),
+      refs.userId,
+    )
+    await advanceToStatus(firstTransferNumber, assetIds, refs.userId, 'COMPLETE')
+
+    await expect(
+      createTransfer(buildCreateTransferInput(refs, assets), refs.userId),
+    ).resolves.toEqual(expect.any(String))
+  })
+
+  it('rejects adding a departed (sold) asset to a new transfer', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await setAssetStatus(asset.id, ASSET_STATUS.SOLD)
+
+    await expect(
+      createTransfer(buildCreateTransferInput(refs, [asset]), refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('allows a held asset onto a new transfer', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await setAssetStatus(asset.id, ASSET_STATUS.HELD)
+
+    await expect(
+      createTransfer(buildCreateTransferInput(refs, [asset]), refs.userId),
+    ).resolves.toEqual(expect.any(String))
+  })
+
+  it('rejects adding a departed asset when patching an existing transfer', async () => {
+    const [original] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [original]),
+      refs.userId,
+    )
+    const [departed] = await createArrivedAssets(refs, 1)
+    await setAssetStatus(departed.id, ASSET_STATUS.SOLD)
+
+    await expect(
+      patchTransferAssets(
+        transferNumber,
+        { assetIdsToAdd: [departed.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toBeInstanceOf(ConflictError)
+  })
+
+  it('halts loading and stays Scheduled if an asset is no longer on hand', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleTransfer(transferNumber, refs.userId)
+    // Simulates the asset being picked up by another process (e.g. a departure) after scheduling.
+    await setAssetStatus(assets[0].id, ASSET_STATUS.SOLD)
+
+    await expect(startLoadingTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+    expect(await getTransferStatus(transferNumber)).toBe('SCHEDULED')
+  })
+
+  it('undoes a load, putting the asset back in the pending pane', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, asset.id, refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await undoAssetLoadSer(transferNumber, asset.id, refs.userId)
+
+    // Depart is blocked again until the asset is re-resolved.
+    await expect(departTransfer(transferNumber, refs.userId, null)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(assetMovement(rows, asset.id, 'TRANSFER_ASSET_LOAD_UNDONE')).toMatchObject({
+      transfer_number: transferNumber,
+    })
+  })
+
+  it('rejects undoing a load that has not happened', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+
+    await expect(undoAssetLoadSer(transferNumber, asset.id, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('rejects undoing a load on a transfer that is not loading', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+
+    await expect(undoAssetLoadSer(transferNumber, asset.id, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('undoes an unload, restoring in-transit state and blocking completion again', async () => {
+    const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+    await scanAssetUnloadedSer(transferNumber, asset.id, refs.userId)
+    expect((await getAssetTransitState(asset.id)).location_id).toBe(srLocationId)
+    const sinceId = await getMaxHistoryId()
+
+    await undoAssetUnloadSer(transferNumber, asset.id, refs.userId)
+
+    const state = await getAssetTransitState(asset.id)
+    expect(state.is_in_transit).toBe(true)
+    expect(state.location_id).toBeNull()
+    await expect(completeTransfer(transferNumber, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(assetMovement(rows, asset.id, 'TRANSFER_ASSET_UNLOAD_UNDONE')).toMatchObject({
+      transfer_number: transferNumber,
+    })
+  })
+
+  it('rejects undoing an unload that has not happened', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+
+    await expect(undoAssetUnloadSer(transferNumber, asset.id, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
+  })
+
+  it('rejects undoing an unload on a transfer that is not unloading', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+
+    await expect(undoAssetUnloadSer(transferNumber, asset.id, refs.userId)).rejects.toBeInstanceOf(
+      ConflictError,
+    )
   })
 })
 
@@ -787,13 +1443,13 @@ describe('deleteTransfer', () => {
     )
   })
 
-  it('refuses to delete a transfer that has been dispatched', async () => {
+  it('refuses to delete a transfer that has been scheduled', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     const transferNumber = await createTransfer(
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await scheduleTransfer(transferNumber, refs.userId)
 
     await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(
       new ConflictError(`Transfer ${transferNumber} cannot be deleted after dispatch`),
@@ -807,8 +1463,8 @@ describe('deleteTransfer', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
-    await receiveTransfer(transferNumber, refs.userId)
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await completeFromInTransit(transferNumber, [asset.id], refs.userId)
 
     await expect(deleteTransfer(transferNumber, refs.userId)).rejects.toThrow(ConflictError)
   })

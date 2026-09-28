@@ -18,7 +18,17 @@ type PartAddedRecord = Extract<AssetHistoryRecord, { action_type: 'PART_ADDED' }
 type PartHarvestedRecord = Extract<AssetHistoryRecord, { action_type: 'PART_HARVESTED' }>
 type TransferMovementRecord = Extract<
   AssetHistoryRecord,
-  { action_type: 'TRANSFER_DISPATCHED' | 'TRANSFER_RECEIVED' | 'TRANSFER_RETURNED' }
+  {
+    action_type:
+      | 'TRANSFER_DISPATCHED'
+      | 'TRANSFER_RECEIVED'
+      | 'TRANSFER_RETURNED'
+      | 'TRANSFER_ASSET_LOADED'
+      | 'TRANSFER_ASSET_UNLOADED'
+      | 'TRANSFER_ASSET_MARKED_MISSING'
+      | 'TRANSFER_ASSET_LOAD_UNDONE'
+      | 'TRANSFER_ASSET_UNLOAD_UNDONE'
+  }
 >
 
 const IN_TRANSIT_LABEL = 'In transit'
@@ -92,6 +102,11 @@ const TRANSFER_MOVEMENT_VERBS = {
   TRANSFER_DISPATCHED: 'dispatched',
   TRANSFER_RECEIVED: 'received',
   TRANSFER_RETURNED: 'returned to origin',
+  TRANSFER_ASSET_LOADED: 'loaded',
+  TRANSFER_ASSET_UNLOADED: 'unloaded',
+  TRANSFER_ASSET_MARKED_MISSING: 'marked missing',
+  TRANSFER_ASSET_LOAD_UNDONE: 'load undone',
+  TRANSFER_ASSET_UNLOAD_UNDONE: 'unload undone',
 } as const satisfies Record<TransferMovementRecord['action_type'], string>
 
 function formatExchange(isExchange: boolean): string {

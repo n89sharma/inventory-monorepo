@@ -11,7 +11,7 @@ import type {
   AssetSummary,
   CollectionHistory,
   CreateTransfer,
-  DispatchTransfer,
+  DepartTransfer,
   TransferCosts,
   TransferDetail,
   TransferSummary,
@@ -24,8 +24,9 @@ import {
   AssetSummarySchema,
   CollectionHistorySchema,
   CreateTransferSchema,
-  DispatchTransferSchema,
+  DepartTransferSchema,
   ReturnAssetsToOriginSchema,
+  TransferAssetIdSchema,
   TransferDetailSchema,
   TransferSummarySchema,
   UpdateTransferMetadataSchema,
@@ -111,16 +112,76 @@ export async function patchTransferAssets(
   await api.patch(`/transfers/${transferNumber}/assets`, patchTransferAssetsBody)
 }
 
-export async function dispatchTransfer(
+export async function scheduleTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/schedule`)
+}
+
+export async function startLoadingTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/start-loading`)
+}
+
+export async function departTransfer(
   transferNumber: string,
   costs: TransferCosts | null,
 ): Promise<void> {
-  const dispatchTransferBody = DispatchTransferSchema.parse({ costs } satisfies DispatchTransfer)
-  await api.post(`/transfers/${transferNumber}/dispatch`, dispatchTransferBody)
+  const departTransferBody = DepartTransferSchema.parse({ costs } satisfies DepartTransfer)
+  await api.post(`/transfers/${transferNumber}/depart`, departTransferBody)
 }
 
-export async function receiveTransfer(transferNumber: string): Promise<void> {
-  await api.post(`/transfers/${transferNumber}/receive`)
+export async function startUnloadingTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/start-unloading`)
+}
+
+export async function completeTransfer(transferNumber: string): Promise<void> {
+  await api.post(`/transfers/${transferNumber}/complete`)
+}
+
+export async function scanTransferAssetLoaded(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const scanTransferAssetBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/scan-loaded`, scanTransferAssetBody)
+}
+
+export async function scanTransferAssetUnloaded(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const scanTransferAssetBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/scan-unloaded`, scanTransferAssetBody)
+}
+
+export async function markTransferAssetMissingAtLoad(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const markMissingBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/mark-missing-at-load`, markMissingBody)
+}
+
+export async function markTransferAssetMissingAtUnload(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const markMissingBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/mark-missing-at-unload`, markMissingBody)
+}
+
+export async function undoTransferAssetLoad(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const undoBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/undo-load`, undoBody)
+}
+
+export async function undoTransferAssetUnload(
+  transferNumber: string,
+  assetId: number,
+): Promise<void> {
+  const undoBody = TransferAssetIdSchema.parse({ assetId })
+  await api.post(`/transfers/${transferNumber}/assets/undo-unload`, undoBody)
 }
 
 export async function returnTransferAssetsToOrigin(

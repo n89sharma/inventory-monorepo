@@ -23,7 +23,26 @@ import {
   getMonthEndReports,
 } from './monthEndReportService.js'
 import { recordStoreTransaction } from './storePartService.js'
-import { createTransfer, dispatchTransfer } from './transferService.js'
+import {
+  createTransfer,
+  departTransfer,
+  scanAssetLoadedSer,
+  scheduleTransfer,
+  startLoadingTransfer,
+} from './transferService.js'
+
+async function departTransferWithAssets(
+  transferNumber: string,
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  await scheduleTransfer(transferNumber, userId)
+  await startLoadingTransfer(transferNumber, userId)
+  for (const assetId of assetIds) {
+    await scanAssetLoadedSer(transferNumber, assetId, userId)
+  }
+  await departTransfer(transferNumber, userId, null)
+}
 
 const INACTIVE_CODE = 'ZZZ'
 const INACTIVE_STREET = 'Closed Warehouse'
@@ -107,7 +126,7 @@ describe('monthEndReportService', () => {
       buildCreateTransferInput(refs, [asset]),
       refs.userId,
     )
-    await dispatchTransfer(transferNumber, refs.userId, null)
+    await departTransferWithAssets(transferNumber, [asset.id], refs.userId)
 
     const reportId = await createManualMonthEndReport(refs.userId)
     const { assets, summary } = await getMonthEndReport(reportId, ALL_FILTERS)

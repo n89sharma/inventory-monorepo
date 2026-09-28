@@ -1,17 +1,26 @@
 import express from 'express'
 import {
   TransferQuerySchema,
+  completeTransfer,
   createTransfer,
   deleteTransfer,
-  dispatchTransfer,
+  departTransfer,
   getTransferDetail,
   getTransferHistory,
   getTransfers,
+  markTransferAssetMissingAtLoad,
+  markTransferAssetMissingAtUnload,
   patchTransferAssets,
   patchTransferMetadata,
   patchTransferNotes,
-  receiveTransfer,
   returnTransferAssetsToOrigin,
+  scanTransferAssetLoaded,
+  scanTransferAssetUnloaded,
+  scheduleTransfer,
+  startLoadingTransfer,
+  startUnloadingTransfer,
+  undoTransferAssetLoad,
+  undoTransferAssetUnload,
 } from '../controllers/transferController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -47,19 +56,60 @@ router.patch(
   patchTransferNotes,
 )
 router.post(
-  '/:transferNumber/dispatch',
+  '/:transferNumber/schedule',
   requirePermission('create_update_transfer'),
-  dispatchTransfer,
+  scheduleTransfer,
 )
 router.post(
-  '/:transferNumber/receive',
+  '/:transferNumber/start-loading',
   requirePermission('create_update_transfer'),
-  receiveTransfer,
+  startLoadingTransfer,
+)
+router.post('/:transferNumber/depart', requirePermission('create_update_transfer'), departTransfer)
+router.post(
+  '/:transferNumber/start-unloading',
+  requirePermission('create_update_transfer'),
+  startUnloadingTransfer,
+)
+router.post(
+  '/:transferNumber/complete',
+  requirePermission('create_update_transfer'),
+  completeTransfer,
+)
+router.post(
+  '/:transferNumber/assets/scan-loaded',
+  requirePermission('create_update_transfer'),
+  scanTransferAssetLoaded,
+)
+router.post(
+  '/:transferNumber/assets/scan-unloaded',
+  requirePermission('create_update_transfer'),
+  scanTransferAssetUnloaded,
+)
+router.post(
+  '/:transferNumber/assets/mark-missing-at-load',
+  requirePermission('create_update_transfer'),
+  markTransferAssetMissingAtLoad,
+)
+router.post(
+  '/:transferNumber/assets/mark-missing-at-unload',
+  requirePermission('create_update_transfer'),
+  markTransferAssetMissingAtUnload,
 )
 router.post(
   '/:transferNumber/assets/return-to-origin',
   requirePermission('create_update_transfer'),
   returnTransferAssetsToOrigin,
+)
+router.post(
+  '/:transferNumber/assets/undo-load',
+  requirePermission('create_update_transfer'),
+  undoTransferAssetLoad,
+)
+router.post(
+  '/:transferNumber/assets/undo-unload',
+  requirePermission('create_update_transfer'),
+  undoTransferAssetUnload,
 )
 
 export default router

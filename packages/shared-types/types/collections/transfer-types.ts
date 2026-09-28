@@ -7,9 +7,36 @@ import { CollectionSummarySchema } from './collection-types.js'
 
 // Transfer lifecycle. DB stores the raw string (Transfer.status); this is the compile-time
 // symbol for code that names a state. Wire fields stay z.string() like AssetSummary.status.
-export const TransferStatusSchema = z.enum(['DRAFT', 'IN_TRANSIT', 'COMPLETE'])
+export const TransferStatusSchema = z.enum([
+  'DRAFT',
+  'SCHEDULED',
+  'LOADING_IN_PROGRESS',
+  'IN_TRANSIT',
+  'UNLOADING_IN_PROGRESS',
+  'COMPLETE',
+])
 export type TransferStatus = z.infer<typeof TransferStatusSchema>
 export const TRANSFER_STATUS = TransferStatusSchema.enum
+
+// Per-asset loading/unloading checklist state on a transfer. Whether a Missing asset was lost
+// at load or unload is never stored here — it's read off `loaded` plus the asset's own status.
+export const TransferAssetScanStateSchema = z.object({
+  loaded: z.boolean(),
+  unloaded: z.boolean(),
+})
+export type TransferAssetScanState = z.infer<typeof TransferAssetScanStateSchema>
+
+export const TransferAssetRowSchema = AssetSearchRowSchema.extend({
+  scan: TransferAssetScanStateSchema,
+})
+export type TransferAssetRow = z.infer<typeof TransferAssetRowSchema>
+
+// Request body shared by the four per-asset lifecycle actions: scan-loaded, scan-unloaded,
+// mark-missing-at-load, mark-missing-at-unload.
+export const TransferAssetIdSchema = z.object({
+  assetId: z.number().int(),
+})
+export type TransferAssetId = z.infer<typeof TransferAssetIdSchema>
 
 // GET /transfers?fromDate...&toDate...&origin...&destination...
 export const TransferSummarySchema = CollectionSummarySchema.extend({
@@ -33,7 +60,7 @@ export const TransferDetailSchema = z.object({
   notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
-  assets: z.array(AssetSearchRowSchema),
+  assets: z.array(TransferAssetRowSchema),
 })
 export type TransferDetail = z.infer<typeof TransferDetailSchema>
 
@@ -66,11 +93,11 @@ export const UpdateTransferMetadataSchema = z
   })
 export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema>
 
-// POST /transfers/:transferNumber/dispatch — null costs means the origin warehouse defaults.
-export const DispatchTransferSchema = z.object({
+// POST /transfers/:transferNumber/depart — null costs means the origin warehouse defaults.
+export const DepartTransferSchema = z.object({
   costs: TransferCostsSchema.nullable(),
 })
-export type DispatchTransfer = z.infer<typeof DispatchTransferSchema>
+export type DepartTransfer = z.infer<typeof DepartTransferSchema>
 
 // POST /transfers/:transferNumber/assets/return-to-origin
 export const ReturnAssetsToOriginSchema = z.object({

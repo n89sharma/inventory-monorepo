@@ -9,7 +9,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
-import { DispatchTransferModal } from '@/components/transfer/dispatch-transfer-modal'
+import { DepartTransferModal } from '@/components/transfer/depart-transfer-modal'
 import { useCan } from '@/hooks/use-can'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -18,8 +18,9 @@ import { TRANSFER_STATUS, type TransferCosts } from 'shared-types'
 type LifecycleButtonProps = {
   label: string
   title: string
-  description: string
+  description?: string
   onConfirm: () => Promise<void>
+  disabled?: boolean
 }
 
 function LifecycleButton({
@@ -27,6 +28,7 @@ function LifecycleButton({
   title,
   description,
   onConfirm,
+  disabled,
 }: LifecycleButtonProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -44,12 +46,12 @@ function LifecycleButton({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button>{label}</Button>
+        <Button disabled={disabled}>{label}</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
@@ -63,40 +65,46 @@ function LifecycleButton({
   )
 }
 
-type DispatchActionProps = {
+type DepartActionProps = {
   originId: number
   assetCount: number
   testedCount: number
-  onDispatch: (costs: TransferCosts | null) => Promise<void>
+  pendingLoadCount: number
+  onDepart: (costs: TransferCosts | null) => Promise<void>
 }
 
-// Choosing the amounts is a price edit; everyone else dispatches on the warehouse defaults.
-function DispatchAction({
+// Choosing the amounts is a price edit; everyone else departs on the warehouse defaults.
+function DepartAction({
   originId,
   assetCount,
   testedCount,
-  onDispatch,
-}: DispatchActionProps): React.JSX.Element {
+  pendingLoadCount,
+  onDepart,
+}: DepartActionProps): React.JSX.Element {
   const canEditPrices = useCan('edit_prices')
   const canViewPurchasePrice = useCan('view_purchase_price')
+  const disabled = pendingLoadCount > 0
+  const remainingLabel = disabled ? ` (${pendingLoadCount} remaining)` : ''
 
   if (canEditPrices && canViewPurchasePrice) {
     return (
-      <DispatchTransferModal
+      <DepartTransferModal
         originId={originId}
         assetCount={assetCount}
         testedCount={testedCount}
-        onDispatch={onDispatch}
+        disabled={disabled}
+        onDepart={onDepart}
       />
     )
   }
 
   return (
     <LifecycleButton
-      label="Dispatch"
-      title="Dispatch this transfer?"
-      description={`This marks ${assetCount} machine(s) as in transit and clears their location. The transfer can't be edited after dispatch.`}
-      onConfirm={() => onDispatch(null)}
+      label={`Depart${remainingLabel}`}
+      title="Depart this transfer?"
+      description="All assets in the transfer will be marked as being in transit"
+      onConfirm={() => onDepart(null)}
+      disabled={disabled}
     />
   )
 }
@@ -104,30 +112,64 @@ function DispatchAction({
 type TransferLifecycleActionsProps = {
   status: string
   originId: number
+  destinationCode: string
   assetCount: number
   testedCount: number
-  onDispatch: (costs: TransferCosts | null) => Promise<void>
-  onReceive: () => Promise<void>
+  pendingLoadCount: number
+  pendingUnloadCount: number
+  onSchedule: () => Promise<void>
+  onStartLoading: () => Promise<void>
+  onDepart: (costs: TransferCosts | null) => Promise<void>
+  onStartUnloading: () => Promise<void>
+  onComplete: () => Promise<void>
 }
 
 export function TransferLifecycleActions({
   status,
   originId,
+  destinationCode,
   assetCount,
   testedCount,
-  onDispatch,
-  onReceive,
+  pendingLoadCount,
+  pendingUnloadCount,
+  onSchedule,
+  onStartLoading,
+  onDepart,
+  onStartUnloading,
+  onComplete,
 }: TransferLifecycleActionsProps): React.JSX.Element | null {
   const canCreateEditTransfer = useCan('create_update_transfer')
   if (!canCreateEditTransfer) return null
 
   if (status === TRANSFER_STATUS.DRAFT) {
     return (
-      <DispatchAction
+      <LifecycleButton
+        label="Schedule"
+        title="Schedule this transfer?"
+        description="Lock the transfer and queues it for loading"
+        onConfirm={onSchedule}
+      />
+    )
+  }
+
+  if (status === TRANSFER_STATUS.SCHEDULED) {
+    return (
+      <LifecycleButton
+        label="Start Loading"
+        title="Start loading this transfer?"
+        onConfirm={onStartLoading}
+      />
+    )
+  }
+
+  if (status === TRANSFER_STATUS.LOADING_IN_PROGRESS) {
+    return (
+      <DepartAction
         originId={originId}
         assetCount={assetCount}
         testedCount={testedCount}
-        onDispatch={onDispatch}
+        pendingLoadCount={pendingLoadCount}
+        onDepart={onDepart}
       />
     )
   }
@@ -135,10 +177,23 @@ export function TransferLifecycleActions({
   if (status === TRANSFER_STATUS.IN_TRANSIT) {
     return (
       <LifecycleButton
-        label="Complete"
+        label="Start Unloading"
+        title="Start unloading this transfer?"
+        onConfirm={onStartUnloading}
+      />
+    )
+  }
+
+  if (status === TRANSFER_STATUS.UNLOADING_IN_PROGRESS) {
+    const disabled = pendingUnloadCount > 0
+    const remainingLabel = disabled ? ` (${pendingUnloadCount} remaining)` : ''
+    return (
+      <LifecycleButton
+        label={`Complete${remainingLabel}`}
         title="Mark this transfer as received?"
-        description={`This receives ${assetCount} machine(s) into the destination's shipping & receiving and completes the transfer.`}
-        onConfirm={onReceive}
+        description={`Receive ${assetCount} asset(s) in ${destinationCode} shipping & receiving area?`}
+        onConfirm={onComplete}
+        disabled={disabled}
       />
     )
   }

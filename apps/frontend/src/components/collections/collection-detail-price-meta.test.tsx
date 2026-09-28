@@ -46,6 +46,7 @@ const mocks = vi.hoisted(() => {
 const EMPTY_DETAIL = { data: undefined, error: undefined, isLoading: false }
 
 vi.mock('@/components/collections/collection-detail-page', () => ({
+  COLLECTION_DETAILS_TAB: 'details',
   CollectionDetailPage: (props: CapturedProps) => {
     mocks.captured.current = props
     return null

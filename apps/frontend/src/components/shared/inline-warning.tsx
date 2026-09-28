@@ -6,22 +6,28 @@ const CALLOUT_BASE = 'flex items-start justify-between gap-2 rounded-lg border p
 
 const WARNING_TONE = 'border-destructive/30 bg-destructive/10 text-destructive'
 
-const CAUTION_TONE = 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+export const CAUTION_TONE = 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400'
 
-function InlineCallout({
+export const SUCCESS_TONE = 'border-green-600/30 bg-green-500/10 text-green-800 dark:text-green-300'
+
+export function InlineCallout({
   children,
   action,
   icon,
   toneClassName,
+  align = 'start',
+  className,
 }: {
   children: ReactNode
   action?: ReactNode
   icon: ReactNode
   toneClassName: string
+  align?: 'start' | 'center'
+  className?: string
 }): React.JSX.Element {
   return (
-    <div className={cn(CALLOUT_BASE, toneClassName)}>
-      <div className="flex items-start gap-2">
+    <div className={cn(CALLOUT_BASE, toneClassName, className)}>
+      <div className={cn('flex gap-2', align === 'center' ? 'items-center' : 'items-start')}>
         {icon}
         <span>{children}</span>
       </div>
