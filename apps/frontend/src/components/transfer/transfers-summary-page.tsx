@@ -18,7 +18,7 @@ import { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { TransferSummary } from 'shared-types'
 
-const CREATED_AT_DESC_SORT = { id: 'created_at', desc: true } as const
+const TRANSFER_DATE_DESC_SORT = { id: 'transfer_date', desc: true } as const
 
 export function TransferSummaryPage(): React.JSX.Element {
   const { fromDate, toDate, setFromDate, setToDate } = useCollectionDateRange()
@@ -43,7 +43,7 @@ export function TransferSummaryPage(): React.JSX.Element {
       title="Transfers"
       columns={columns}
       data={transfers}
-      defaultSort={CREATED_AT_DESC_SORT}
+      defaultSort={TRANSFER_DATE_DESC_SORT}
       onRowMouseEnter={(transfer) => preloadTransferDetail(transfer.transfer_number)}
       getRowHref={getRowHref}
       searchBar={

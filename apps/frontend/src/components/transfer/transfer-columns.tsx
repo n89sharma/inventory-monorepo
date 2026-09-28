@@ -4,6 +4,7 @@ import {
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
+import { formatDateParam } from '@/lib/date-param'
 import { formatDate } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import { parseISO } from 'date-fns'
@@ -27,11 +28,8 @@ export function transferTableColumns(
     {
       id: 'transfer_date',
       header: 'Date',
-      cell: ({ row }) => {
-        const { transfer_date, created_at } = row.original
-        if (transfer_date !== null) return formatDate(parseISO(transfer_date))
-        return created_at ? formatDate(created_at) : '-'
-      },
+      accessorFn: (row) => row.transfer_date ?? formatDateParam(row.created_at),
+      cell: ({ getValue }) => formatDate(parseISO(getValue<string>())),
     },
     { accessorKey: 'origin_code', header: 'Origin' },
     { accessorKey: 'destination_code', header: 'Destination' },

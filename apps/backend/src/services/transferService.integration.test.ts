@@ -28,6 +28,7 @@ import {
   deleteTransfer,
   departTransfer,
   getTransfer,
+  getTransferSummaries,
   markAssetMissingAtLoadSer,
   markAssetMissingAtUnloadSer,
   patchTransferAssets,
@@ -46,6 +47,9 @@ import {
 import type { History } from '../../generated/prisma/client.js'
 
 const TEST_TRANSFER_DATE = new Date().toISOString().slice(0, 10)
+const FUTURE_TRANSFER_DATE = '2099-06-15'
+const FUTURE_RANGE_START = '2099-06-01'
+const FUTURE_RANGE_END = '2099-06-30'
 
 async function scheduleAndStartLoading(transferNumber: string, userId: number): Promise<void> {
   await scheduleTransfer(transferNumber, { transfer_date: TEST_TRANSFER_DATE }, userId)
@@ -271,6 +275,37 @@ describe('transferService', () => {
 
   afterAll(async () => {
     await cleanupTransactionalData()
+  })
+
+  it('lists transfers by transfer date, falling back to the created day when unscheduled', async () => {
+    const [scheduledAsset, draftAsset] = await createArrivedAssets(refs, 2)
+    const scheduledNumber = await createTransfer(
+      buildCreateTransferInput(refs, [scheduledAsset]),
+      refs.userId,
+    )
+    const draftNumber = await createTransfer(
+      buildCreateTransferInput(refs, [draftAsset]),
+      refs.userId,
+    )
+    await scheduleTransfer(scheduledNumber, { transfer_date: FUTURE_TRANSFER_DATE }, refs.userId)
+
+    const inFutureRange = await getTransferSummaries(
+      new Date(FUTURE_RANGE_START),
+      new Date(FUTURE_RANGE_END),
+      0,
+      0,
+    )
+    const inTodayRange = await getTransferSummaries(
+      new Date(TEST_TRANSFER_DATE),
+      new Date(TEST_TRANSFER_DATE),
+      0,
+      0,
+    )
+
+    expect(inFutureRange.map((t) => t.transfer_number)).toEqual([scheduledNumber])
+    expect(inFutureRange[0].transfer_date).toBe(FUTURE_TRANSFER_DATE)
+    expect(inTodayRange.map((t) => t.transfer_number)).toEqual([draftNumber])
+    expect(inTodayRange[0].transfer_date).toBeNull()
   })
 
   it('returns asset cost, redacted by role permissions', async () => {

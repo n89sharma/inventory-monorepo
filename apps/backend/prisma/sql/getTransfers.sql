@@ -35,8 +35,8 @@ left join lateral (
   join "AssetType" atype on atype.id = m.asset_type_id
   where at.transfer_id = t.id
 ) ac on true
-where t.created_at between $1 and $2
+where coalesce(t.transfer_date, t.created_at::date) between $1::date and $2::date
 and ($3 = 0 or wo.id = $3)
 and ($4 = 0 or wd.id = $4)
-order by t.created_at desc
+order by coalesce(t.transfer_date, t.created_at::date) desc, t.created_at desc
 limit 500
