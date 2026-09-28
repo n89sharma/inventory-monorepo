@@ -64,6 +64,7 @@ import {
   harvestAssets as harvestAssetsSer,
   returnHarvestedAssetsToStock as returnHarvestedAssetsToStockSer,
 } from '../services/assetHarvestService.js'
+import { returnMissingAssetsToStock as returnMissingAssetsToStockSer } from '../services/transferService.js'
 
 export const LocationsByWarehouseQuerySchema = z.object({
   warehouseId: z.string().transform(Number),
@@ -455,6 +456,12 @@ export const harvestAssets = asyncHandler(async (req, res) => {
 export const returnHarvestedAssetsToStock = asyncHandler(async (req, res) => {
   const { assetIds } = BulkAssetIdsSchema.parse(req.body)
   await returnHarvestedAssetsToStockSer(assetIds, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
+
+export const returnMissingAssetsToStock = asyncHandler(async (req, res) => {
+  const { assetIds } = BulkAssetIdsSchema.parse(req.body)
+  await returnMissingAssetsToStockSer(assetIds, res.locals.dbUserId)
   res.json(successResponse(null))
 })
 

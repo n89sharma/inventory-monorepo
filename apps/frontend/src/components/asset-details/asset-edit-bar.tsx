@@ -2,6 +2,7 @@ import {
   HarvestAssetsDialog,
   ReturnHarvestedToStockDialog,
 } from '@/components/asset-harvest/harvest-dialogs'
+import { ReturnMissingToStockDialog } from '@/components/asset-missing/return-missing-to-stock-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
 import { useCan } from '@/hooks/use-can'
@@ -19,7 +20,7 @@ import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { isHarvestable, isUnharvestable } from '@/lib/asset-harvest'
 import { useState } from 'react'
-import { assetDetailsToSummary, type Permission } from 'shared-types'
+import { ASSET_STATUS, assetDetailsToSummary, type Permission } from 'shared-types'
 import { toast } from 'sonner'
 import { AddToCollectionModal } from '../collections/add-to-collection-modal'
 import { ReturnToStockDialog } from '../departure/return-to-stock-dialog'
@@ -52,6 +53,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
   const [harvestOpen, setHarvestOpen] = useState(false)
   const [returnHarvestedOpen, setReturnHarvestedOpen] = useState(false)
+  const [returnMissingOpen, setReturnMissingOpen] = useState(false)
 
   const mutations = useDepartureMutations()
   const printBarcodes = useAssetStore((state) => state.printBarcodes)
@@ -87,9 +89,10 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     ])
   }
 
-  const canEditLocation = can('update_location')
-  const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p))
-  const canDelete = can('delete_asset')
+  const assetEditable = assetDetails?.status !== ASSET_STATUS.MISSING
+  const canEditLocation = can('update_location') && assetEditable
+  const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p)) && assetEditable
+  const canDelete = can('delete_asset') && assetEditable
   const showReturnToStock = can('return_to_stock') && departureNumber !== null
   const canHarvest = can('harvest_asset') && assetDetails !== null
   const showMarkHarvested =
@@ -97,6 +100,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
     isHarvestable(assetDetails.status, assetDetails.is_in_transit) &&
     departureNumber === null
   const showReturnHarvested = canHarvest && isUnharvestable(assetDetails.status, departureNumber)
+  const showReturnMissing = can('resolve_missing_asset') && !assetEditable
   const harvestTargets = assetDetails
     ? [{ id: assetDetails.id, barcode: assetDetails.barcode }]
     : []
@@ -134,14 +138,18 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
           Collection
         </Button>
       )}
-      {(showReturnToStock || showMarkHarvested || showReturnHarvested || canDelete) && (
+      {(showReturnToStock ||
+        showMarkHarvested ||
+        showReturnHarvested ||
+        showReturnMissing ||
+        canDelete) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" aria-label="More options">
               <DotsThreeVerticalIcon aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-max">
             {showMarkHarvested && (
               <DropdownMenuItem onSelect={() => setHarvestOpen(true)}>
                 <WrenchIcon />
@@ -150,6 +158,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             )}
             {showReturnHarvested && (
               <DropdownMenuItem onSelect={() => setReturnHarvestedOpen(true)}>
+                <ArrowUUpLeftIcon />
+                Return to Stock
+              </DropdownMenuItem>
+            )}
+            {showReturnMissing && (
+              <DropdownMenuItem onSelect={() => setReturnMissingOpen(true)}>
                 <ArrowUUpLeftIcon />
                 Return to Stock
               </DropdownMenuItem>
@@ -200,6 +214,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         assets={harvestTargets}
         open={returnHarvestedOpen}
         onOpenChange={setReturnHarvestedOpen}
+      />
+
+      <ReturnMissingToStockDialog
+        assets={harvestTargets}
+        open={returnMissingOpen}
+        onOpenChange={setReturnMissingOpen}
       />
 
       <DeleteEntityDialog

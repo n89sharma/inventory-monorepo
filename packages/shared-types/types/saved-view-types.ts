@@ -7,6 +7,7 @@ export const SAVED_VIEW_PAGE_KEYS = [
   'search_onhand',
   'search_departed',
   'search_harvested',
+  'search_missing',
   'model_price_history',
   'report_profitability',
 ] as const

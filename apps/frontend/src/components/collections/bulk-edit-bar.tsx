@@ -3,7 +3,7 @@ import type { InvoicePrefill } from '@/ui-types/invoice-form-types'
 import { CaretDownIcon, TrashIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { AssetSearchRow, AssetSummary } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow, type AssetSummary } from 'shared-types'
 import { BulkEditPricingModal } from './bulk-edit-pricing-modal'
 import { Button } from '../shadcn/button'
 import { Separator } from '../shadcn/separator'
@@ -136,9 +136,11 @@ export function BulkEditBar({
   const canRemoveFromCollection =
     currentCollectionType !== undefined && collectionPermissionMap[currentCollectionType]
   const showBulkRemove = onBulkRemove !== undefined && canRemoveFromCollection
-  const showBulkPricing = onPriceSaveSuccess !== undefined && canEditPrices
-  const canCreateAnyCollection =
-    canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice
+  const selectionEditable = selectedAssets.every((asset) => asset.status !== ASSET_STATUS.MISSING)
+  const showBulkPricing = onPriceSaveSuccess !== undefined && canEditPrices && selectionEditable
+  const canAddToCollection =
+    selectionEditable &&
+    (canCreateTransfer || canCreateDeparture || canCreateHold || canCreateInvoice)
 
   const newCollectionOptions = NEW_COLLECTION_OPTIONS.filter(
     (option) =>
@@ -178,7 +180,7 @@ export function BulkEditBar({
         onSelectAll={onSelectAll}
         onClear={onClear}
       >
-        {canCreateAnyCollection && (
+        {canAddToCollection && (
           <DropdownMenu>
             <Button asChild variant="default">
               <DropdownMenuTrigger>

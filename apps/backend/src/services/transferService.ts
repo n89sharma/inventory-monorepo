@@ -44,6 +44,10 @@ import { prisma } from '../prisma.js'
 
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
 const UNTESTED_READINESS = 'UNTESTED'
+const NOT_MISSING_MESSAGE = 'Only missing assets can be returned to stock:'
+const MISSING_WHILE_UNLOADING_MESSAGE =
+  'Assets missing during unloading can be returned once their transfer is complete:'
+const CONCURRENT_CHANGE_MESSAGE = 'Some assets changed while updating; refresh and try again'
 
 function toYmd(date: Date): string {
   return date.toISOString().slice(0, 10)
@@ -954,6 +958,105 @@ export async function returnTransferAssetsToOrigin(
       { status: TRANSFER_STATUS.DRAFT },
       userId,
     )
+  }
+}
+
+export async function returnMissingAssetsToStock(
+  assetIds: number[],
+  userId: number,
+): Promise<void> {
+  const inStockStatus = await prisma.status.findUniqueOrThrow({
+    where: { status: ASSET_STATUS.IN_STOCK },
+    select: { id: true },
+  })
+
+  const { priorAssets, removedAssetIdsByTransfer, revertedTransfers } = await prisma.$transaction(
+    async (tx) => {
+      const assets = await tx.asset.findMany({
+        where: { id: { in: assetIds } },
+        select: { id: true, barcode: true, status_id: true, status: { select: { status: true } } },
+      })
+      if (assets.length !== assetIds.length) throw new NotFoundError('Some assets not found')
+
+      const notMissing = assets.filter((a) => a.status.status !== ASSET_STATUS.MISSING)
+      if (notMissing.length > 0) {
+        throw new ConflictError(
+          `${NOT_MISSING_MESSAGE} ${notMissing.map((a) => a.barcode).join(', ')}`,
+        )
+      }
+
+      const openTransferRows = await tx.assetTransfer.findMany({
+        where: {
+          asset_id: { in: assetIds },
+          transfer: { status: { not: TRANSFER_STATUS.COMPLETE } },
+        },
+        select: { asset_id: true, transfer_id: true, loaded: true },
+      })
+      const barcodeById = new Map(assets.map((a) => [a.id, a.barcode]))
+      const missingWhileUnloading = openTransferRows.filter((row) => row.loaded)
+      if (missingWhileUnloading.length > 0) {
+        throw new ConflictError(
+          `${MISSING_WHILE_UNLOADING_MESSAGE} ${missingWhileUnloading
+            .map((row) => barcodeById.get(row.asset_id))
+            .join(', ')}`,
+        )
+      }
+
+      const updated = await tx.asset.updateMany({
+        where: { id: { in: assetIds }, status: { status: ASSET_STATUS.MISSING } },
+        data: { status_id: inStockStatus.id },
+      })
+      if (updated.count !== assetIds.length) throw new ConflictError(CONCURRENT_CHANGE_MESSAGE)
+
+      const affectedTransferIds = [...new Set(openTransferRows.map((row) => row.transfer_id))]
+      await tx.assetTransfer.deleteMany({
+        where: {
+          OR: openTransferRows.map((row) => ({
+            asset_id: row.asset_id,
+            transfer_id: row.transfer_id,
+          })),
+        },
+      })
+      const remainingByTransfer = await tx.assetTransfer.groupBy({
+        by: ['transfer_id'],
+        where: { transfer_id: { in: affectedTransferIds } },
+        _count: { _all: true },
+      })
+      const nonEmptyTransferIds = new Set(remainingByTransfer.map((row) => row.transfer_id))
+      const emptiedTransferIds = affectedTransferIds.filter((id) => !nonEmptyTransferIds.has(id))
+      const revertedTransfers = await tx.transfer.findMany({
+        where: { id: { in: emptiedTransferIds } },
+        select: { id: true, status: true },
+      })
+      await tx.transfer.updateMany({
+        where: { id: { in: emptiedTransferIds } },
+        data: { status: TRANSFER_STATUS.DRAFT },
+      })
+
+      const removedRowsByTransfer = Object.groupBy(openTransferRows, (row) => row.transfer_id)
+      const removedAssetIdsByTransfer = Object.entries(removedRowsByTransfer).map(
+        ([transferId, rows]) => ({
+          transferId: Number(transferId),
+          assetIds: (rows ?? []).map((row) => row.asset_id),
+        }),
+      )
+      return { priorAssets: assets, removedAssetIdsByTransfer, revertedTransfers }
+    },
+  )
+
+  await recordAssetStatusChange(priorAssets, inStockStatus.id, userId)
+  for (const { transferId, assetIds: removedAssetIds } of removedAssetIdsByTransfer) {
+    await recordAssetUpdateOnCollection('Transfer', transferId, [], removedAssetIds, userId)
+    await recordCollectionUpdateOnAssets(
+      [...removedAssetIds],
+      [],
+      'transfer_id',
+      transferId,
+      userId,
+    )
+  }
+  for (const { id, status } of revertedTransfers) {
+    await recordTransferUpdate(id, { status }, { status: TRANSFER_STATUS.DRAFT }, userId)
   }
 }
 

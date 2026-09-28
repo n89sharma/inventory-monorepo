@@ -7,6 +7,7 @@ import {
   cleanupTransactionalData,
   createArrivedAssets,
   getAssetStatus,
+  setAssetStatus,
   assetCostOf,
   ALL_PRICE_PERMISSIONS,
   NO_PERMISSIONS,
@@ -78,6 +79,31 @@ describe('invoiceService', () => {
     await expect(
       createInvoice(buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId), refs.userId),
     ).rejects.toThrow(ConflictError)
+  })
+
+  it('keeps a missing asset off a new invoice and off an existing invoice', async () => {
+    const [invoicedAsset, missingAsset] = await createArrivedAssets(refs, 2)
+    const { invoiceNumber } = await createInvoice(
+      buildCreateInvoiceInput(refs, [invoicedAsset], refs.invoiceTypeSaleId),
+      refs.userId,
+    )
+    await setAssetStatus(missingAsset.id, ASSET_STATUS.MISSING)
+
+    await expect(
+      createInvoice(
+        buildCreateInvoiceInput(refs, [missingAsset], refs.invoiceTypeSaleId),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+    await expect(
+      patchInvoiceAssets(
+        invoiceNumber,
+        { assetIdsToAdd: [missingAsset.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(missingAsset.id)).toBe(ASSET_STATUS.MISSING)
   })
 
   it('allows the same asset on both a sales and a purchase invoice', async () => {

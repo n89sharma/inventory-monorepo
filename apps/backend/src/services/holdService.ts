@@ -24,6 +24,7 @@ import {
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
+  assertAssetsNotMissing,
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { prisma } from '../prisma.js'
@@ -70,6 +71,7 @@ export async function createHold(data: CreateHold, userId: number): Promise<stri
     })
 
     await assertAssetsNotInCollection(tx, assetIds, HARVESTED_ASSET_WHERE, harvestedAssetsError)
+    await assertAssetsNotMissing(tx, assetIds)
     await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: assetIds,
       assetsToRemove: [],
@@ -234,6 +236,7 @@ export async function addRemoveCollectionFromAssetsAndRecord(
         HARVESTED_ASSET_WHERE,
         harvestedAssetsError,
       )
+      await assertAssetsNotMissing(tx, delta.assetIdsToAdd)
       await addRemoveCollectionFromAssets(tx, {
         assetsToAdd: delta.assetIdsToAdd,
         assetsToRemove: delta.assetIdsToRemove,

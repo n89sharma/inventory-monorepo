@@ -21,6 +21,7 @@ import { decimalToNumber } from '../lib/decimal.js'
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
+  assertAssetsNotMissing,
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -108,6 +109,7 @@ export async function createInvoice(
       link.inCollectionWhere,
       (barcodes) => new ConflictError(`Assets already in another invoice: ${barcodes.join(', ')}`),
     )
+    await assertAssetsNotMissing(tx, assetIds)
 
     await tx.asset.updateMany({
       where: { id: { in: assetIds } },
@@ -196,8 +198,9 @@ export async function addRemoveCollectionFromAssetsAndRecord(
 
   const link = invoiceAssetLink(invoice.invoice_type.type, invoice.id)
 
-  await prisma.$transaction((tx) =>
-    addRemoveCollectionFromAssets(tx, {
+  await prisma.$transaction(async (tx) => {
+    await assertAssetsNotMissing(tx, delta.assetIdsToAdd)
+    await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
       assetsToRemove: delta.assetIdsToRemove,
       assetInCollectionWhere: link.inCollectionWhere,
@@ -205,8 +208,8 @@ export async function addRemoveCollectionFromAssetsAndRecord(
         new ConflictError(`Assets already in another invoice: ${barcodes.join(', ')}`),
       add: link.add,
       remove: link.remove,
-    }),
-  )
+    })
+  })
 
   await recordCollectionAssetDelta(
     'Invoice',

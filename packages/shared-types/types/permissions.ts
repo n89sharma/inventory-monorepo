@@ -18,6 +18,7 @@ export const PERMISSIONS = [
   'update_settings',
   'return_to_stock',
   'harvest_asset',
+  'resolve_missing_asset',
   'view_sale_price',
   'view_purchase_price',
   'edit_any_hold',

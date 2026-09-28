@@ -45,7 +45,12 @@ import {
 import { compareDesc } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import type { AssetDetails, AssetHistory, AssetTransfer } from 'shared-types'
+import {
+  ASSET_STATUS,
+  type AssetDetails,
+  type AssetHistory,
+  type AssetTransfer,
+} from 'shared-types'
 import { AddCommentInput } from './add-comment-input'
 
 function AssetHistoryTabContent({ barcode, enabled }: { barcode: string; enabled: boolean }) {
@@ -318,8 +323,9 @@ export const AssetDetailsPage = () => {
 
   const canViewSalePrice = useCan('view_sale_price')
   const canViewPurchasePrice = useCan('view_purchase_price')
-  const canEditPrices = useCan('edit_prices')
-  const canEditTechSpecs = useCan('update_tech_specs')
+  const assetEditable = assetDetails?.status !== ASSET_STATUS.MISSING
+  const canEditPrices = useCan('edit_prices') && assetEditable
+  const canEditTechSpecs = useCan('update_tech_specs') && assetEditable
 
   if (detailLoading)
     return (

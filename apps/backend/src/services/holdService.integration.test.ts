@@ -12,6 +12,7 @@ import {
   getAssetStatus,
   getHoldArchivedAt,
   REDACTED_ASSET_COST,
+  setAssetStatus,
   seedArrivalTestData,
   seedAssetCost,
   SEEDED_ASSET_COST,
@@ -182,6 +183,25 @@ describe('holdService', () => {
     await expect(createHold(buildCreateHoldInput(refs, [asset]), refs.userId)).rejects.toThrow(
       ConflictError,
     )
+  })
+
+  it('keeps a missing asset off a new hold and off an existing hold', async () => {
+    const [heldAsset, missingAsset] = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [heldAsset]), refs.userId)
+    await setAssetStatus(missingAsset.id, ASSET_STATUS.MISSING)
+
+    await expect(
+      createHold(buildCreateHoldInput(refs, [missingAsset]), refs.userId),
+    ).rejects.toThrow(ConflictError)
+    await expect(
+      addRemoveCollectionFromAssetsAndRecord(
+        holdNumber,
+        { assetIdsToAdd: [missingAsset.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(missingAsset.id)).toBe(ASSET_STATUS.MISSING)
   })
 
   it('rejects editing the assets of an archived hold', async () => {

@@ -5,7 +5,10 @@ import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-o
 import type { Warehouse } from 'shared-types'
 import useSWR, { mutate, preload } from 'swr'
 
-export const transferDetailKey = (transferNumber: string) => `transfer:${transferNumber}`
+const TRANSFER_DETAIL_KEY_PREFIX = 'transfer:'
+
+export const transferDetailKey = (transferNumber: string) =>
+  `${TRANSFER_DETAIL_KEY_PREFIX}${transferNumber}`
 
 export function useTransferDetail(transferNumber: string) {
   return useSWR(transferDetailKey(transferNumber), () => getTransferDetail(transferNumber))
@@ -55,6 +58,14 @@ export function useTransfersList(
 ) {
   return useSWR(transferListKey(fromDate, toDate, origin, destination), () =>
     getTransfers(fromDate, toDate, origin, destination),
+  )
+}
+
+export function invalidateTransferDetails() {
+  return mutate(
+    (key) => typeof key === 'string' && key.startsWith(TRANSFER_DETAIL_KEY_PREFIX),
+    undefined,
+    { revalidate: true },
   )
 }
 

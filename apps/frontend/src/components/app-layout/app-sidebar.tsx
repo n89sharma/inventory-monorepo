@@ -108,6 +108,7 @@ const SEARCH_ASSETS_SUB_ITEMS = [
   { title: 'On-Hand', url: '/search/onhand' },
   { title: 'Departed', url: DEPARTED_PATH },
   { title: 'Harvested', url: '/search/harvested' },
+  { title: 'Missing', url: '/search/missing' },
 ]
 
 // The five collection summaries filter on a date range that defaults to a window

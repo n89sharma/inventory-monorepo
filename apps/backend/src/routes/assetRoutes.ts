@@ -25,6 +25,7 @@ import {
   patchAssetPricing,
   printAssetBarcodes,
   returnHarvestedAssetsToStock,
+  returnMissingAssetsToStock,
   updateAssetErrors,
   updateAssetLocation,
   updateAssetPricing,
@@ -51,6 +52,11 @@ router.post(
   '/bulk/return-to-stock',
   requirePermission('harvest_asset'),
   returnHarvestedAssetsToStock,
+)
+router.post(
+  '/bulk/return-missing-to-stock',
+  requirePermission('resolve_missing_asset'),
+  returnMissingAssetsToStock,
 )
 router.get(
   '/locations',

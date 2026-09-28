@@ -16,6 +16,7 @@ import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
   addRemoveCollectionFromAssets,
   assertAssetsNotInCollection,
+  assertAssetsNotMissing,
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
@@ -90,6 +91,7 @@ export async function createDeparture(departure: CreateDeparture, userId: number
         (barcodes) =>
           new ConflictError(`Assets already assigned to a departure: ${barcodes.join(', ')}`),
       )
+      await assertAssetsNotMissing(tx, assetIds)
 
       const created = await tx.departure.create({
         data: {
@@ -237,6 +239,7 @@ export async function addAssetsToDepartureAndRecord(
       where: { id: { in: delta.assetIdsToAdd } },
       select: { id: true, status_id: true, hold_id: true },
     })
+    await assertAssetsNotMissing(tx, delta.assetIdsToAdd)
     await addRemoveCollectionFromAssets(tx, {
       assetsToAdd: delta.assetIdsToAdd,
       assetsToRemove: [],

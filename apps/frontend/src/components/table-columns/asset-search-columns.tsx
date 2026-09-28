@@ -646,6 +646,8 @@ const HARVESTED_DEFAULT_COLUMN_IDS = [
   'latest_comment',
 ] as const satisfies readonly AssetColumnId[]
 
+const MISSING_DEFAULT_COLUMN_IDS = HARVESTED_DEFAULT_COLUMN_IDS
+
 export const ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS = [
   ...IDENTITY_COLUMN_IDS,
   'status',
@@ -656,6 +658,7 @@ export const DEFAULT_VISIBLE_COLUMN_IDS_BY_LIST = {
   onhand: ONHAND_DEFAULT_COLUMN_IDS,
   departed: DEPARTED_DEFAULT_COLUMN_IDS,
   harvested: HARVESTED_DEFAULT_COLUMN_IDS,
+  missing: MISSING_DEFAULT_COLUMN_IDS,
   'model-price-history': MODEL_PRICE_HISTORY_DEFAULT_COLUMN_IDS,
 } as const satisfies Record<SearchList, readonly AssetColumnId[]>
 

@@ -35,6 +35,7 @@ import {
   patchTransferDate,
   patchTransferMetadata,
   patchTransferNotes,
+  returnMissingAssetsToStock,
   returnTransferAssetsToOrigin,
   scanAssetLoadedSer,
   scanAssetUnloadedSer,
@@ -1506,6 +1507,126 @@ describe('transferService', () => {
     await expect(undoAssetUnloadSer(transferNumber, asset.id, refs.userId)).rejects.toBeInstanceOf(
       ConflictError,
     )
+  })
+})
+
+describe('returnMissingAssetsToStock', () => {
+  let refs: ArrivalTestData
+
+  beforeAll(async () => {
+    refs = await seedArrivalTestData()
+  })
+
+  afterEach(async () => {
+    await cleanupTransactionalData()
+  })
+
+  afterAll(async () => {
+    await cleanupTransactionalData()
+  })
+
+  it('returns an asset missing at load to stock in place and removes it from the open transfer', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    const originalState = await getAssetTransitState(assets[1].id)
+    await markAssetMissingAtLoadSer(transferNumber, assets[1].id, refs.userId)
+
+    await returnMissingAssetsToStock([assets[1].id], refs.userId)
+
+    expect(await getAssetStatus(assets[1].id)).toBe(ASSET_STATUS.IN_STOCK)
+    expect(await getAssetTransitState(assets[1].id)).toEqual(originalState)
+    expect(await getTransferAssetIds(transferNumber)).toEqual([assets[0].id])
+    expect(await getTransferStatus(transferNumber)).toBe('LOADING_IN_PROGRESS')
+  })
+
+  it('reverts the transfer to draft when the removal leaves it empty', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, asset.id, refs.userId)
+    const sinceId = await getMaxHistoryId()
+
+    await returnMissingAssetsToStock([asset.id], refs.userId)
+
+    expect(await getTransferAssetIds(transferNumber)).toEqual([])
+    expect(await getTransferStatus(transferNumber)).toBe('DRAFT')
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => transferStatusAfter(r) === 'DRAFT')).toBe(true)
+    expect(
+      rows.some((r) => r.entity_type === 'Transfer' && r.action_type === 'ASSETS_REMOVED'),
+    ).toBe(true)
+    expect(
+      rows.some(
+        (r) =>
+          r.entity_type === 'Asset' &&
+          r.entity_id === asset.id &&
+          (r.changes as { after?: { status?: string } }).after?.status === ASSET_STATUS.IN_STOCK,
+      ),
+    ).toBe(true)
+  })
+
+  it('rejects the whole batch while an asset missing at unload is on an open transfer', async () => {
+    await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await scanAssetLoadedSer(transferNumber, assets[0].id, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, assets[1].id, refs.userId)
+    await departTransfer(transferNumber, refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+    await markAssetMissingAtUnloadSer(transferNumber, assets[0].id, refs.userId)
+
+    await expect(
+      returnMissingAssetsToStock([assets[0].id, assets[1].id], refs.userId),
+    ).rejects.toThrow(assets[0].barcode)
+
+    expect(await getAssetStatus(assets[0].id)).toBe(ASSET_STATUS.MISSING)
+    expect(await getAssetStatus(assets[1].id)).toBe(ASSET_STATUS.MISSING)
+    expect(await getTransferAssetIds(transferNumber)).toEqual(
+      [assets[0].id, assets[1].id].sort((a, b) => a - b),
+    )
+  })
+
+  it('returns an asset missing at unload once its transfer is complete, keeping its row', async () => {
+    const srLocationId = await seedShippingAndReceivingLocation(refs.warehouse2.id)
+    const [asset] = await createArrivedAssets(refs, 1)
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [asset]),
+      refs.userId,
+    )
+    await departFromDraft(transferNumber, [asset.id], refs.userId, null)
+    await startUnloadingTransfer(transferNumber, refs.userId)
+    await markAssetMissingAtUnloadSer(transferNumber, asset.id, refs.userId)
+    await completeTransfer(transferNumber, refs.userId)
+
+    await returnMissingAssetsToStock([asset.id], refs.userId)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
+    expect((await getAssetTransitState(asset.id)).location_id).toBe(srLocationId)
+    expect(await getTransferAssetIds(transferNumber)).toEqual([asset.id])
+    expect(await getTransferStatus(transferNumber)).toBe('COMPLETE')
+  })
+
+  it('rejects the whole batch when an asset is not missing', async () => {
+    const assets = await createArrivedAssets(refs, 2)
+    const transferNumber = await createTransfer(buildCreateTransferInput(refs, assets), refs.userId)
+    await scheduleAndStartLoading(transferNumber, refs.userId)
+    await markAssetMissingAtLoadSer(transferNumber, assets[0].id, refs.userId)
+
+    await expect(
+      returnMissingAssetsToStock([assets[0].id, assets[1].id], refs.userId),
+    ).rejects.toBeInstanceOf(ConflictError)
+
+    expect(await getAssetStatus(assets[0].id)).toBe(ASSET_STATUS.MISSING)
+    expect(await getTransferAssetIds(transferNumber)).toHaveLength(2)
+  })
+
+  it('rejects an unknown asset', async () => {
+    await expect(returnMissingAssetsToStock([0], refs.userId)).rejects.toBeInstanceOf(NotFoundError)
   })
 })
 

@@ -11,6 +11,7 @@ import {
   getAssetHoldId,
   getAssetStatus,
   getHoldArchivedAt,
+  setAssetStatus,
   assetCostOf,
   ALL_PRICE_PERMISSIONS,
   NO_PERMISSIONS,
@@ -149,6 +150,35 @@ describe('departureService', () => {
     )
 
     expect(await getAssetStatus(added.id)).toBe(DEFAULT_OUTGOING_STATUS)
+  })
+
+  it('keeps a missing asset off a new departure and off an existing departure', async () => {
+    const [departingAsset, missingAsset] = await createArrivedAssets(refs, 2)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: departingAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    await setAssetStatus(missingAsset.id, ASSET_STATUS.MISSING)
+
+    await expect(
+      createDeparture(
+        buildCreateDepartureInput(refs, [
+          { id: missingAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+        ]),
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+    await expect(
+      addAssetsToDepartureAndRecord(
+        departureNumber,
+        { assetIdsToAdd: [missingAsset.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(missingAsset.id)).toBe(ASSET_STATUS.MISSING)
   })
 
   it('rejects removing assets from a departure', async () => {

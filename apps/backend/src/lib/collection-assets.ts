@@ -1,4 +1,6 @@
+import { ASSET_STATUS } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
+import { ConflictError } from './errors.js'
 import {
   recordAssetUpdateOnCollection,
   recordCollectionUpdateOnAssets,
@@ -24,6 +26,24 @@ export async function assertAssetsNotInCollection(
     select: { barcode: true },
   })
   if (inCollection.length > 0) throw assetInCollectionError(inCollection.map((a) => a.barcode))
+}
+
+const MISSING_ASSET_WHERE = {
+  status: { status: ASSET_STATUS.MISSING },
+} satisfies Prisma.AssetWhereInput
+
+const MISSING_ASSETS_MESSAGE = 'Missing assets cannot be added to a collection:'
+
+export async function assertAssetsNotMissing(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+): Promise<void> {
+  await assertAssetsNotInCollection(
+    tx,
+    assetIds,
+    MISSING_ASSET_WHERE,
+    (barcodes) => new ConflictError(`${MISSING_ASSETS_MESSAGE} ${barcodes.join(', ')}`),
+  )
 }
 
 export type AssetCollectionTransaction = {

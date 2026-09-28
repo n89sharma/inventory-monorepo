@@ -122,6 +122,11 @@ const SearchHarvestedPage = lazy(() =>
     default: m.SearchHarvestedPage,
   })),
 )
+const SearchMissingPage = lazy(() =>
+  import('./components/asset-search/search-missing-page').then((m) => ({
+    default: m.SearchMissingPage,
+  })),
+)
 const ProfitabilityReportPage = lazy(() =>
   import('./components/reports/profitability-report-page').then((m) => ({
     default: m.ProfitabilityReportPage,
@@ -511,6 +516,22 @@ function AppRoutes() {
                     />
                     <Route
                       path="/search/harvested/:assetId"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <AssetDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/missing"
+                      element={
+                        <PermissionRoute permission="view_asset">
+                          <SearchMissingPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/search/missing/:assetId"
                       element={
                         <PermissionRoute permission="view_asset">
                           <AssetDetailsPage />
