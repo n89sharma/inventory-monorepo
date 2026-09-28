@@ -27,7 +27,7 @@ import { isAfter, isBefore, startOfDay, subMonths } from 'date-fns'
 import { parseAsInteger, useQueryState, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ASSET_STATUS,
+  type AssetStatus,
   INVOICE_TYPE,
   MAX_DEPARTED_WINDOW_MONTHS,
   OUTGOING_STATUS,
@@ -592,6 +592,6 @@ export function resolveDepartedStatuses(showOther: boolean, allStatuses: Status[
   return allStatuses.filter((status) => status.status === wanted)
 }
 
-export function resolveHarvestedStatuses(allStatuses: Status[]): Status[] {
-  return allStatuses.filter((status) => status.status === ASSET_STATUS.HARVESTED)
+export function resolveStatusesByName(allStatuses: Status[], name: AssetStatus): Status[] {
+  return allStatuses.filter((status) => status.status === name)
 }

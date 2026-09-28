@@ -271,7 +271,7 @@ export async function getAssetsForDeparted(
   return z.array(AssetSearchRowSchema).parse(data)
 }
 
-export async function getAssetsForHarvested(
+export async function getAssetsByStatus(
   warehouses: Warehouse[],
   brand: Brand | null,
   assetTypes: AssetType[],
