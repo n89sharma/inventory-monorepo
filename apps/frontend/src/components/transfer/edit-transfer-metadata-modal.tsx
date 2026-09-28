@@ -9,7 +9,7 @@ import {
   type TransferMetadataForm,
 } from '@/ui-types/transfer-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { startOfDay } from 'date-fns'
+import { parseISO, startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import { TRANSFER_STATUS, type TransferDetail } from 'shared-types'
@@ -189,6 +189,6 @@ function toFormValues(t: TransferDetail): TransferMetadataForm {
       name: t.transporter.name,
     },
     comment: t.notes ?? '',
-    transfer_date: t.transfer_date,
+    transfer_date: t.transfer_date === null ? null : parseISO(t.transfer_date),
   }
 }

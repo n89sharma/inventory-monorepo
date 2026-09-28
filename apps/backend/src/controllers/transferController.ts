@@ -20,7 +20,6 @@ import {
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
-import { getTransfers as getTransfersDb } from '../../generated/prisma/sql.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { normalizeFromDate, normalizeToDate } from '../lib/date-range.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -31,6 +30,7 @@ import {
   deleteTransfer as deleteTransferSer,
   departTransfer as departTransferSer,
   getTransfer as getTransferSer,
+  getTransferSummaries as getTransferSummariesSer,
   markAssetMissingAtLoadSer,
   markAssetMissingAtUnloadSer,
   patchTransferAssets as patchTransferAssetsSer,
@@ -78,9 +78,7 @@ export const getTransfers = asyncHandler(
     const { fromDate, toDate, origin, destination } = res.locals.query as z.infer<
       typeof TransferQuerySchema
     >
-    const transfers = await prisma.$queryRawTyped(
-      getTransfersDb(fromDate, toDate, origin ?? 0, destination ?? 0),
-    )
+    const transfers = await getTransferSummariesSer(fromDate, toDate, origin ?? 0, destination ?? 0)
     res.json(successResponse(transfers))
   },
 )

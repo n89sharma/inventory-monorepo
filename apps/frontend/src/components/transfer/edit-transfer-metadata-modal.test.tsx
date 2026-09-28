@@ -28,7 +28,7 @@ vi.mock('@/hooks/use-org', () => ({
   useOrgs: () => [TRANSPORTER],
 }))
 
-function makeTransfer(status: string, transferDate: Date | null): TransferDetail {
+function makeTransfer(status: string, transferDate: string | null): TransferDetail {
   return {
     transfer_number: 'T-YYZ-0000001',
     status,
@@ -72,20 +72,20 @@ describe('EditTransferMetadataModal', () => {
   })
 
   it('SCHEDULED: date field is editable', () => {
-    renderModal(makeTransfer(TRANSFER_STATUS.SCHEDULED, new Date('2026-02-01')))
+    renderModal(makeTransfer(TRANSFER_STATUS.SCHEDULED, '2026-02-01'))
 
     expect(screen.getByRole('button', { name: /Transfer Date/ })).toBeEnabled()
   })
 
   it('IN_TRANSIT: date field is locked again', () => {
-    renderModal(makeTransfer(TRANSFER_STATUS.IN_TRANSIT, new Date('2026-02-01')))
+    renderModal(makeTransfer(TRANSFER_STATUS.IN_TRANSIT, '2026-02-01'))
 
     expect(screen.getByRole('button', { name: /Transfer Date/ })).toBeDisabled()
   })
 
   it('IN_TRANSIT: saving a changed comment calls onSaveNotes only', async () => {
     const { onSaveMetadata, onSaveNotes } = renderModal(
-      makeTransfer(TRANSFER_STATUS.IN_TRANSIT, new Date('2026-02-01')),
+      makeTransfer(TRANSFER_STATUS.IN_TRANSIT, '2026-02-01'),
     )
 
     fireEvent.change(screen.getByPlaceholderText('Transfer notes…'), {

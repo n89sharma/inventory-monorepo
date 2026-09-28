@@ -6,6 +6,7 @@ import {
 import { TransferStatusBadge } from '@/components/transfer/transfer-status-badge'
 import { formatDate } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
+import { parseISO } from 'date-fns'
 import type { TransferSummary } from 'shared-types'
 
 export function transferTableColumns(
@@ -27,8 +28,9 @@ export function transferTableColumns(
       id: 'transfer_date',
       header: 'Date',
       cell: ({ row }) => {
-        const date = row.original.transfer_date ?? row.original.created_at
-        return date ? formatDate(date) : '-'
+        const { transfer_date, created_at } = row.original
+        if (transfer_date !== null) return formatDate(parseISO(transfer_date))
+        return created_at ? formatDate(created_at) : '-'
       },
     },
     { accessorKey: 'origin_code', header: 'Origin' },

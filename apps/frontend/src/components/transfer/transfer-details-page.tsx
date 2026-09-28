@@ -26,6 +26,7 @@ import { useCan } from '@/hooks/use-can'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
+import { parseISO } from 'date-fns'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -171,7 +172,7 @@ export function TransferDetailsPage(): React.JSX.Element {
           destinationCode={transfer.destination.city_code}
           assetCount={transfer.assets.length}
           testedCount={transfer.assets.filter((a) => a.readiness !== UNTESTED_READINESS).length}
-          transferDate={transfer.transfer_date}
+          transferDate={transfer.transfer_date === null ? null : parseISO(transfer.transfer_date)}
           pendingLoadCount={pendingLoadCountOf(transfer.assets)}
           pendingUnloadCount={pendingUnloadCountOf(transfer.assets)}
           onSchedule={(transferDate) => mutations.schedule(transferNumber, transferDate)}
@@ -216,7 +217,13 @@ export function TransferDetailsPage(): React.JSX.Element {
       })}
       renderSummaryStrip={(transfer) => (
         <>
-          <SummaryValue value={formatDate(transfer.transfer_date ?? transfer.created_at)} />
+          <SummaryValue
+            value={formatDate(
+              transfer.transfer_date === null
+                ? transfer.created_at
+                : parseISO(transfer.transfer_date),
+            )}
+          />
           <SummaryRoute from={transfer.origin.city_code} to={transfer.destination.city_code} />
           <SummaryValue value={<OrgName name={transfer.transporter.name} />} />
           <AssetTotalsField assets={transfer.assets} />

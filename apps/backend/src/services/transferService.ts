@@ -9,12 +9,16 @@ import {
   TRANSFER_STATUS,
   TransferCosts,
   TransferDetail,
+  TransferSummary,
   UpdateTransferDate,
   UpdateTransferMetadata,
   UpdateTransferNotes,
 } from 'shared-types'
 import { Prisma } from '../../generated/prisma/client.js'
-import { getAssetsForTransfers } from '../../generated/prisma/sql.js'
+import {
+  getAssetsForTransfers,
+  getTransfers as getTransfersDb,
+} from '../../generated/prisma/sql.js'
 import { COST_SELECT, toAssetCost } from '../lib/asset-cost.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ZERO, totalCostDecimal } from '../lib/decimal.js'
@@ -53,6 +57,16 @@ function todayYmd(): string {
   return toYmd(new Date())
 }
 
+export async function getTransferSummaries(
+  fromDate: Date,
+  toDate: Date,
+  origin: number,
+  destination: number,
+): Promise<TransferSummary[]> {
+  const rows = await prisma.$queryRawTyped(getTransfersDb(fromDate, toDate, origin, destination))
+  return rows.map((row) => ({ ...row, transfer_date: toYmdOrNull(row.transfer_date) }))
+}
+
 export async function getTransfer(
   transferNumber: string,
   permissions: ReadonlySet<Permission>,
@@ -74,7 +88,7 @@ export async function getTransfer(
     notes: transfer.notes,
     created_at: transfer.created_at,
     created_by: transfer.created_by?.name,
-    transfer_date: transfer.transfer_date,
+    transfer_date: toYmdOrNull(transfer.transfer_date),
     assets: assets.map((r) => ({
       ...redactSearchRowCost(mapAssetSearchRow(r), permissions),
       scan: { loaded: r.loaded, unloaded: r.unloaded },

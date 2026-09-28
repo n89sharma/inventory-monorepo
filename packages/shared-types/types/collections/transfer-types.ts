@@ -56,7 +56,7 @@ export const TransferSummarySchema = CollectionSummarySchema.extend({
   destination_code: z.string(),
   destination_street: z.string(),
   transporter: z.string(),
-  transfer_date: z.coerce.date().nullable(),
+  transfer_date: z.string().nullable(),
 })
 export type TransferSummary = z.infer<typeof TransferSummarySchema>
 
@@ -70,7 +70,7 @@ export const TransferDetailSchema = z.object({
   notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
-  transfer_date: z.coerce.date().nullable(),
+  transfer_date: z.string().nullable(),
   assets: z.array(TransferAssetRowSchema),
 })
 export type TransferDetail = z.infer<typeof TransferDetailSchema>
