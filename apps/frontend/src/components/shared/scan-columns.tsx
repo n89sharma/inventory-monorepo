@@ -6,9 +6,9 @@ import {
 } from '@/components/table-columns/column-primitives'
 import { assetDetailHref } from '@/ui-types/navigation-context'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { TransferAssetRow } from 'shared-types'
+import type { AssetSearchRow } from 'shared-types'
 
-export function transferScanTableColumns(): ColumnDef<TransferAssetRow>[] {
+export function scanTableColumns(): ColumnDef<AssetSearchRow>[] {
   return [
     {
       accessorKey: 'barcode',

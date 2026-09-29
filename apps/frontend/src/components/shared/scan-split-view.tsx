@@ -9,9 +9,9 @@ import {
 } from '@/components/shadcn/dropdown-menu'
 import { ConfirmActionDialog } from '@/components/shared/confirm-action-dialog'
 import { DataTable } from '@/components/shared/data-table'
+import { scanTableColumns } from '@/components/shared/scan-columns'
 import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
 import { CAUTION_TONE, InlineCallout, SUCCESS_TONE } from '@/components/shared/inline-warning'
-import { transferScanTableColumns } from '@/components/transfer/transfer-scan-columns'
 import {
   ArrowCounterClockwiseIcon,
   CheckCircleIcon,
@@ -20,7 +20,7 @@ import {
   WarningIcon,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { ASSET_STATUS, type AssetSummary, type TransferAssetRow } from 'shared-types'
+import { ASSET_STATUS, type AssetSearchRow, type AssetSummary } from 'shared-types'
 import type { ColumnDef } from '@tanstack/react-table'
 
 const ROW_HEIGHT_CLASS = 'h-7'
@@ -33,7 +33,7 @@ const SEARCH_CLEAR_LABEL = 'Clear search'
 const SEARCHABLE_TEXT = { getColumnCanGlobalFilter: () => true } as const
 
 interface PendingActionCellProps {
-  asset: TransferAssetRow
+  asset: AssetSearchRow
   actionLabel: string
   onScan: (assetId: number) => Promise<void>
   onMarkMissing: (assetId: number) => Promise<void>
@@ -88,7 +88,7 @@ function PendingActionCell({
 }
 
 interface UndoCellProps {
-  asset: TransferAssetRow
+  asset: AssetSearchRow
   undoLabel: string
   pendingLabel: string
   onUndo: (assetId: number) => Promise<void>
@@ -123,17 +123,17 @@ function UndoCell({ asset, undoLabel, pendingLabel, onUndo }: UndoCellProps): Re
   )
 }
 
-interface TransferStatusBarProps {
+interface ScanStatusBarProps {
   pendingCount: number
   pendingStatusMessage: (remaining: number) => string
   readyStatusMessage: string
 }
 
-function TransferStatusBar({
+function ScanStatusBar({
   pendingCount,
   pendingStatusMessage,
   readyStatusMessage,
-}: TransferStatusBarProps): React.JSX.Element {
+}: ScanStatusBarProps): React.JSX.Element {
   if (pendingCount > 0) {
     return (
       <InlineCallout
@@ -158,7 +158,7 @@ function TransferStatusBar({
   )
 }
 
-function pendingRowClassName(asset: TransferAssetRow): string {
+function pendingRowClassName(asset: AssetSearchRow): string {
   const tint = asset.status === ASSET_STATUS.MISSING ? MISSING_ROW_CLASS : ''
   return `${ROW_HEIGHT_CLASS} ${tint}`.trim()
 }
@@ -167,13 +167,13 @@ function resolvedRowClassName(): string {
   return `${ROW_HEIGHT_CLASS} ${RESOLVED_ROW_CLASS}`
 }
 
-function getRowId(asset: TransferAssetRow): string {
+function getRowId(asset: AssetSearchRow): string {
   return asset.barcode
 }
 
-interface TransferScanSplitViewProps {
-  pendingAssets: TransferAssetRow[]
-  resolvedAssets: TransferAssetRow[]
+interface ScanSplitViewProps {
+  pendingAssets: AssetSearchRow[]
+  resolvedAssets: AssetSearchRow[]
   pendingLabel: string
   resolvedLabel: string
   actionLabel: string
@@ -189,7 +189,7 @@ interface TransferScanSplitViewProps {
   onUndo: (assetId: number) => Promise<void>
 }
 
-export function TransferScanSplitView({
+export function ScanSplitView({
   pendingAssets,
   resolvedAssets,
   pendingLabel,
@@ -203,7 +203,7 @@ export function TransferScanSplitView({
   onScan,
   onMarkMissing,
   onUndo,
-}: TransferScanSplitViewProps): React.JSX.Element {
+}: ScanSplitViewProps): React.JSX.Element {
   const pendingByBarcode = new Map(pendingAssets.map((asset) => [asset.barcode, asset]))
 
   function validateAsset(asset: AssetSummary): string | null {
@@ -218,8 +218,8 @@ export function TransferScanSplitView({
     await onScan(pending.id)
   }
 
-  const pendingColumns: ColumnDef<TransferAssetRow>[] = [
-    ...transferScanTableColumns(),
+  const pendingColumns: ColumnDef<AssetSearchRow>[] = [
+    ...scanTableColumns(),
     {
       id: 'action',
       header: actionLabel,
@@ -236,8 +236,8 @@ export function TransferScanSplitView({
     },
   ]
 
-  const resolvedColumns: ColumnDef<TransferAssetRow>[] = [
-    ...transferScanTableColumns(),
+  const resolvedColumns: ColumnDef<AssetSearchRow>[] = [
+    ...scanTableColumns(),
     {
       id: 'undo',
       header: undoLabel,
@@ -256,7 +256,7 @@ export function TransferScanSplitView({
 
   return (
     <div className="flex flex-col gap-2 p-2">
-      <TransferStatusBar
+      <ScanStatusBar
         pendingCount={remainingCount}
         pendingStatusMessage={pendingStatusMessage}
         readyStatusMessage={readyStatusMessage}

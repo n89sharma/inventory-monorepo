@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import type { AssetSummary, TransferAssetRow } from 'shared-types'
 import { ASSET_STATUS } from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { TransferScanSplitView } from './transfer-scan-split-view'
+import { ScanSplitView } from './scan-split-view'
 
 const mocks = vi.hoisted(() => ({ getAssetByBarcode: vi.fn() }))
 
@@ -148,7 +148,7 @@ function renderSplitView(pendingAssets: TransferAssetRow[], resolvedAssets: Tran
   const onUndo = vi.fn().mockResolvedValue(undefined)
   render(
     <MemoryRouter>
-      <TransferScanSplitView
+      <ScanSplitView
         pendingAssets={pendingAssets}
         resolvedAssets={resolvedAssets}
         pendingLabel="Pending"
@@ -174,7 +174,7 @@ function scan(barcode: string) {
   fireEvent.keyDown(input, { key: 'Enter' })
 }
 
-describe('TransferScanSplitView', () => {
+describe('ScanSplitView', () => {
   beforeEach(() => {
     mocks.getAssetByBarcode.mockReset()
   })

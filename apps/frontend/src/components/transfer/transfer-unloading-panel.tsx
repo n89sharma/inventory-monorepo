@@ -1,4 +1,4 @@
-import { TransferScanSplitView } from '@/components/transfer/transfer-scan-split-view'
+import { ScanSplitView } from '@/components/shared/scan-split-view'
 import { useTransferMutations } from '@/hooks/use-transfer-mutations'
 import { ASSET_STATUS, type TransferAssetRow } from 'shared-types'
 
@@ -35,7 +35,7 @@ export function TransferUnloadingPanel({
   ).length
 
   return (
-    <TransferScanSplitView
+    <ScanSplitView
       pendingAssets={pendingAssets}
       resolvedAssets={resolvedAssets}
       pendingLabel={PENDING_LABEL}

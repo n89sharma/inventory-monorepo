@@ -2,17 +2,9 @@ import { z } from 'zod'
 import { AssetSearchRowSchema, AssetSummarySchema } from '../asset-types.js'
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { WarehouseSchema } from '../reference-data-types.js'
+import { ScheduledDateSchema } from '../scheduled-date-types.js'
 import { TransferCostsSchema } from '../transfer-cost-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
-
-const TRANSFER_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
-
-const todayYmd = (): string => new Date().toISOString().slice(0, 10)
-
-export const TransferDateSchema = z
-  .string()
-  .regex(TRANSFER_DATE_PATTERN, 'Transfer date must be YYYY-MM-DD')
-  .refine((value) => value >= todayYmd(), 'Transfer date cannot be in the past')
 
 // Transfer lifecycle. DB stores the raw string (Transfer.status); this is the compile-time
 // symbol for code that names a state. Wire fields stay z.string() like AssetSummary.status.
@@ -106,13 +98,13 @@ export type UpdateTransferMetadata = z.infer<typeof UpdateTransferMetadataSchema
 
 // POST /transfers/:transferNumber/schedule
 export const ScheduleTransferSchema = z.object({
-  transfer_date: TransferDateSchema,
+  transfer_date: ScheduledDateSchema,
 })
 export type ScheduleTransfer = z.infer<typeof ScheduleTransferSchema>
 
 // PATCH /transfers/:transferNumber/transfer-date
 export const UpdateTransferDateSchema = z.object({
-  transfer_date: TransferDateSchema,
+  transfer_date: ScheduledDateSchema,
 })
 export type UpdateTransferDate = z.infer<typeof UpdateTransferDateSchema>
 

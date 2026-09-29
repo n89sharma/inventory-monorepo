@@ -22,8 +22,8 @@ let lastProps: {
   onUndo: (id: number) => Promise<void>
 } | null = null
 
-vi.mock('@/components/transfer/transfer-scan-split-view', () => ({
-  TransferScanSplitView: (props: typeof lastProps) => {
+vi.mock('@/components/shared/scan-split-view', () => ({
+  ScanSplitView: (props: typeof lastProps) => {
     lastProps = props
     return null
   },
