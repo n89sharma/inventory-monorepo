@@ -2,6 +2,7 @@ import { useOrgs } from '@/hooks/use-org'
 import { useActiveUsers } from '@/hooks/use-active-users'
 import { useActiveWarehouses } from '@/hooks/use-active-warehouses'
 import { useUnsavedChangesGuard } from '@/hooks/use-unsaved-changes-guard'
+import { formatDateParam } from '@/lib/date-param'
 import { flattenFieldErrors } from '@/lib/utils'
 import {
   DepartureMetadataFormSchema,
@@ -9,6 +10,7 @@ import {
 } from '@/ui-types/departure-form-types'
 import { getSelectOption, UNSELECTED } from '@/ui-types/select-option-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { parseISO, startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
 import type { DepartureDetail } from 'shared-types'
@@ -17,6 +19,7 @@ import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
 import { Field, FieldGroup, FieldLabel } from '../shadcn/field'
 import { Textarea } from '../shadcn/textarea'
+import { ControlledDatePickerField } from '../shared/date-picker'
 import { ControlledSearchSelectInput } from '../shared/search-select/controlled-search-select-input'
 import { ControlledSelectOptionSearchSelect } from '../shared/search-select/controlled-select-option-search-select'
 import { SelectOptions } from '../shared/search-select/select-options'
@@ -27,6 +30,7 @@ interface EditDepartureMetadataModalProps {
   onOpenChange: (open: boolean) => void
   departure: DepartureDetail
   onSave: (metadata: DepartureMetadataForm) => Promise<void>
+  onSaveDate: (departureDate: string) => Promise<void>
 }
 
 export function EditDepartureMetadataModal({
@@ -34,11 +38,13 @@ export function EditDepartureMetadataModal({
   onOpenChange,
   departure,
   onSave,
+  onSaveDate,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
   const activeUsers = useActiveUsers()
   const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const today = startOfDay(new Date())
 
   const values = useMemo(() => toFormValues(departure), [departure])
   const form = useForm<DepartureMetadataForm>({
@@ -51,7 +57,12 @@ export function EditDepartureMetadataModal({
   async function onValid(values: DepartureMetadataForm) {
     setIsSubmitting(true)
     try {
-      await onSave(values)
+      const { dirtyFields } = form.formState
+      const saves: Promise<void>[] = [onSave(values)]
+      if (dirtyFields.departure_date && values.departure_date) {
+        saves.push(onSaveDate(formatDateParam(values.departure_date)))
+      }
+      await Promise.all(saves)
       form.reset(values)
       onOpenChange(false)
     } catch {
@@ -117,6 +128,13 @@ export function EditDepartureMetadataModal({
               fieldLabel="Salesperson"
               fieldRequired={true}
             />
+            <ControlledDatePickerField
+              control={form.control}
+              name="departure_date"
+              label="Departure Date"
+              className="self-end pb-0.5"
+              disabled={{ before: today }}
+            />
             <Controller
               control={form.control}
               name="comment"
@@ -167,5 +185,6 @@ function toFormValues(d: DepartureDetail): DepartureMetadataForm {
     },
     salesperson: d.salesperson ? getSelectOption(d.salesperson) : UNSELECTED,
     comment: d.notes ?? '',
+    departure_date: d.departure_date === null ? null : parseISO(d.departure_date),
   }
 }

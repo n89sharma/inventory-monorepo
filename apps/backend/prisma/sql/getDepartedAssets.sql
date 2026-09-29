@@ -1,23 +1,22 @@
 -- Departure-driven variant of getAssets.sql for the Departed search page.
--- Drives FROM "Departure" over a mandatory, sargable date window (d.created_at >= $1 and <= $2)
--- so the Departure.created_at btree is used, instead of seq-scanning every Asset.
--- The bounds are timestamps (startOfDay/endOfDay applied in the service), NOT ::date casts:
--- casting the column would defeat the index. Same calendar-day semantics, sargable.
+-- Drives FROM "Departure" over a mandatory date window on the departure date (falling back to
+-- the creation day for departures that have none), so the Asset table is never seq-scanned.
+-- The bounds are cast ::date, matching the calendar-day semantics of the departure date.
 --
--- The date window is fenced in a MATERIALIZED CTE: an optimization barrier that forces the
--- planner to range-scan Departure_created_at_idx first, rather than reordering this ~22-table
--- join into a plan that builds the full status/asset_type asset set and probes Departure by PK.
+-- The date window is fenced in a MATERIALIZED CTE: an optimization barrier that stops the
+-- planner reordering this ~22-table join into a plan that builds the full status/asset_type
+-- asset set and probes Departure by PK.
 with d as materialized (
   select
     id,
     departure_number,
     created_at,
+    departure_date,
     origin_id,
     destination_id,
     sales_representative_id
   from "Departure"
-  where created_at >= $1
-    and created_at <= $2
+  where coalesce(departure_date, created_at::date) between $1::date and $2::date
     and ($15 = -1 or sales_representative_id = $15)
 )
 select
@@ -68,7 +67,7 @@ select
   do_."name" as customer,
   sp."name" as salesperson,
   d.departure_number as departure_number,
-  d.created_at as departed_at,
+  coalesce(d.departure_date, d.created_at::date) as departed_at,
   r.arrival_number as arrival_number,
   aw.city_code as arrival_warehouse_code,
   r.created_at as arrival_created_at,
@@ -138,4 +137,4 @@ where ($3 = '' or m."name" ilike '%' || $3 || '%')
   and ($13 = -1 or do_.id = $13)
   and ($14 = '' or si.invoice_reference_normalized like '%' || $14 || '%')
   and (array_length($16::int[], 1) is null or m.id = any($16::int[]))
-order by d.created_at desc
+order by coalesce(d.departure_date, d.created_at::date) desc

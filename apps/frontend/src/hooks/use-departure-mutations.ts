@@ -4,6 +4,7 @@ import {
   patchDepartureAssets,
   returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
+  updateDepartureDate,
   updateDepartureMetadata,
 } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
@@ -84,6 +85,12 @@ async function updateMetadata(departureNumber: string, metadata: DepartureMetada
   invalidateDepartureLists()
 }
 
+async function updateDate(departureNumber: string, departureDate: string) {
+  await updateDepartureDate(departureNumber, departureDate)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+}
+
 async function setOutgoingStatus(
   departureNumber: string,
   assetIds: number[],
@@ -136,6 +143,7 @@ const mutations = {
   addAsset,
   addAssetBatch,
   updateMetadata,
+  updateDate,
   updatePrice,
   setOutgoingStatus,
   returnToStock,

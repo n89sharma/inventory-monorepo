@@ -9,7 +9,7 @@ import {
   seedAssetCost,
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
-import { createDeparture } from './departureService.js'
+import { createDeparture, patchDepartureDate } from './departureService.js'
 import { getProfitabilityCube } from './profitabilityService.js'
 
 const NO_COST: typeof SEEDED_ASSET_COST = {
@@ -103,5 +103,20 @@ describe('getProfitabilityCube', () => {
     await departSoldAsset(refs, { ...NO_COST, purchase_cost: 300, total_cost: 300 })
 
     expect(await cubeTotals()).toEqual({ assets: 0, revenue: 0, baseCogs: 0, cogs: 0, margin: 0 })
+  })
+  it('counts a sale in the month of the departure date, not the month it was created', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    await seedAssetCost(asset.id, SEEDED_ASSET_COST)
+    const otherMonth = ((new Date().getUTCMonth() + 1) % 12) + 1
+    const departureDate = `${CURRENT_YEAR}-${String(otherMonth).padStart(2, '0')}-15`
+    await patchDepartureDate(departureNumber, { departure_date: departureDate }, refs.userId)
+
+    const rows = await getProfitabilityCube(CURRENT_YEAR)
+
+    expect(rows.map((r) => r.month)).toEqual([otherMonth])
   })
 })

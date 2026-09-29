@@ -42,7 +42,7 @@ import {
   formatTitleCase,
   formatWeight,
 } from '@/lib/formatters'
-import { compareDesc } from 'date-fns'
+import { compareDesc, parseISO } from 'date-fns'
 import { Fragment, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
@@ -255,16 +255,19 @@ function buildAssetLifecycle(
   }
 
   if (departure) {
+    const departureDate = departure.departure_date
+      ? parseISO(departure.departure_date)
+      : departure.created_at
     populated.push({
       key: 'departure',
-      date: departure.created_at,
+      date: departureDate,
       node: (
         <>
           <RailCardHeader
             entity="Departure"
             id={departure.departure_number}
             idHref={`/departures/${departure.departure_number}`}
-            date={departure.created_at}
+            date={departureDate}
           />
           <div className="flex flex-col gap-2">
             <RailField label="Warehouse">{departure.origin_code}</RailField>

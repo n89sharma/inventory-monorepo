@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { AssetSearchRowSchema } from '../asset-types.js'
+import { ScheduledDateSchema } from '../scheduled-date-types.js'
 import { OrgDetailSchema, OrgSummarySchema } from '../organization-types.js'
 import { OutgoingStatusSchema, WarehouseSchema } from '../reference-data-types.js'
 import { UserSchema } from '../user-types.js'
@@ -12,6 +13,7 @@ export const DepartureSummarySchema = CollectionSummarySchema.extend({
   destination: z.string(),
   transporter: z.string(),
   salesperson: z.string().nullable(),
+  departure_date: z.string().nullable(),
 })
 export type DepartureSummary = z.infer<typeof DepartureSummarySchema>
 
@@ -32,6 +34,7 @@ export const DepartureDetailSchema = z.object({
   notes: z.string().nullable(),
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
+  departure_date: z.string().nullable(),
   salesperson: UserSchema.nullable(),
   assets: z.array(AssetSearchRowSchema),
   invoices: z.array(DepartureInvoiceSchema),
@@ -77,3 +80,9 @@ export const UpdateDepartureMetadataSchema = z.object({
   comment: z.string().nullable(),
 })
 export type UpdateDepartureMetadata = z.infer<typeof UpdateDepartureMetadataSchema>
+
+// PATCH /departures/:departureNumber/departure-date
+export const UpdateDepartureDateSchema = z.object({
+  departure_date: ScheduledDateSchema,
+})
+export type UpdateDepartureDate = z.infer<typeof UpdateDepartureDateSchema>

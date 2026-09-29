@@ -1,6 +1,6 @@
 import { InlineCaution, InlineWarning } from '@/components/shared/inline-warning'
 import type { SerialNumberCheck } from '@/hooks/use-serial-number-check'
-import { formatDate } from '@/lib/formatters'
+import { formatDateOnly } from '@/lib/formatters'
 import { isBlockingSerialMatch, type SerialNumberMatch } from 'shared-types'
 import { Link } from 'react-router-dom'
 
@@ -29,7 +29,7 @@ function BlockingMatch({ match }: { match: SerialNumberMatch }) {
 function SoldMatch({ match }: { match: SerialNumberMatch }) {
   return (
     <InlineCaution>
-      This serial number was previously sold and departed on {formatDate(match.departed_at)} —{' '}
+      This serial number was previously sold and departed on {formatDateOnly(match.departed_at)} —{' '}
       <AssetLink barcode={match.barcode} />
     </InlineCaution>
   )

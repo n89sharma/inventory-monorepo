@@ -127,7 +127,7 @@ const SOLD_MATCH: SerialNumberMatch = {
   ...IN_STOCK_MATCH,
   status: 'SOLD',
   departure_number: 'D-YYZ-0000001',
-  departed_at: new Date('2026-01-15T00:00:00.000Z'),
+  departed_at: '2026-01-15',
 }
 
 // Only a sold holder leaves the serial reusable; every other status blocks the save outright.

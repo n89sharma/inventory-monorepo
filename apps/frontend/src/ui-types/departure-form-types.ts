@@ -43,6 +43,7 @@ export const DepartureMetadataFormSchema = z.object({
   transporter: OrgSummarySchema.nullable().refine((val) => !!val, 'Transporter required'),
   salesperson: UserSelectOptionSchema.refine((val) => isSelected(val), 'Salesperson required'),
   comment: z.string(),
+  departure_date: z.date().nullable(),
 })
 
 export type DepartureMetadataForm = {
@@ -51,4 +52,5 @@ export type DepartureMetadataForm = {
   transporter: OrgSummary | null
   salesperson: SelectOption<User>
   comment: string
+  departure_date: Date | null
 }

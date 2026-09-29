@@ -9,5 +9,5 @@ from "Departure" d
   join "Warehouse" wo on wo.id = d.origin_id
   join "Organization" od on od.id = d.destination_id
 where d.departure_number like $1 || '%'
-order by d.created_at desc
+order by coalesce(d.departure_date, d.created_at::date) desc, d.created_at desc
 limit 3

@@ -79,6 +79,7 @@ select
   du."name" as departure_created_by_name,
   d.notes as departure_notes,
   d.created_at as departure_created_at,
+  d.departure_date as departure_date,
   -- invoice
   pi.invoice_number as purchase_invoice_number,
   pi.invoice_reference as purchase_invoice_reference,

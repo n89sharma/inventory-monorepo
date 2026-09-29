@@ -8,7 +8,7 @@ import * as $runtime from "@prisma/client/runtime/client"
 /**
  * @param q
  */
-export const searchDepartures = $runtime.makeTypedQueryFactory("select\nd.id as id,\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nod.name as destination,\nd.created_at as created_at\nfrom \"Departure\" d\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\nwhere d.departure_number like $1 || '%'\norder by d.created_at desc\nlimit 3") as (q: string) => $runtime.TypedSql<searchDepartures.Parameters, searchDepartures.Result>
+export const searchDepartures = $runtime.makeTypedQueryFactory("select\nd.id as id,\nd.departure_number as departure_number,\nwo.city_code as origin_code,\nod.name as destination,\nd.created_at as created_at\nfrom \"Departure\" d\njoin \"Warehouse\" wo on wo.id = d.origin_id\njoin \"Organization\" od on od.id = d.destination_id\nwhere d.departure_number like $1 || '%'\norder by coalesce(d.departure_date, d.created_at::date) desc, d.created_at desc\nlimit 3") as (q: string) => $runtime.TypedSql<searchDepartures.Parameters, searchDepartures.Result>
 
 export namespace searchDepartures {
   export type Parameters = [q: string]

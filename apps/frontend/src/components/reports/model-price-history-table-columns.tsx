@@ -2,6 +2,7 @@ import { createIdColumn } from '@/components/table-columns/column-primitives'
 import { Badge } from '@/components/shadcn/badge'
 import {
   formatDate,
+  formatDateOnly,
   formatThousandsK,
   formatTitleCase,
   formatUSDWithSymbol,
@@ -42,7 +43,7 @@ export function createModelPriceHistoryColumns(
     {
       accessorKey: 'departed_at',
       header: 'Departed At',
-      cell: ({ row }) => formatDate(row.original.departed_at),
+      cell: ({ row }) => formatDateOnly(row.original.departed_at),
     },
     {
       accessorKey: 'purchase_price',

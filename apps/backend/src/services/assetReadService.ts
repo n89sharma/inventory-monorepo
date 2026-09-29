@@ -31,6 +31,7 @@ import {
 } from '../../generated/prisma/sql.js'
 import { mapAssetDetail, mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactAssetCost, redactSearchRowCost } from '../lib/cost-redaction.js'
+import { toYmdOrNull } from '../lib/date-only.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { type BarcodeContent } from './barcodePrintService.js'
@@ -140,7 +141,7 @@ export async function getSerialNumberMatches(
       warehouse_code: r.warehouse_code,
       arrival_number: r.arrival_number,
       departure_number: r.departure_number,
-      departed_at: r.departed_at,
+      departed_at: toYmdOrNull(r.departed_at),
     })),
     totalMatchCount: Number(rows[0]?.total_match_count ?? 0),
     blockingMatchCount: Number(rows[0]?.blocking_match_count ?? 0),

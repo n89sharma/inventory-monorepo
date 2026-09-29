@@ -54,6 +54,7 @@ export type DepartureMinAggregateOutputType = {
   sales_representative_id: number | null
   notes: string | null
   created_at: Date | null
+  departure_date: Date | null
 }
 
 export type DepartureMaxAggregateOutputType = {
@@ -66,6 +67,7 @@ export type DepartureMaxAggregateOutputType = {
   sales_representative_id: number | null
   notes: string | null
   created_at: Date | null
+  departure_date: Date | null
 }
 
 export type DepartureCountAggregateOutputType = {
@@ -78,6 +80,7 @@ export type DepartureCountAggregateOutputType = {
   sales_representative_id: number
   notes: number
   created_at: number
+  departure_date: number
   _all: number
 }
 
@@ -110,6 +113,7 @@ export type DepartureMinAggregateInputType = {
   sales_representative_id?: true
   notes?: true
   created_at?: true
+  departure_date?: true
 }
 
 export type DepartureMaxAggregateInputType = {
@@ -122,6 +126,7 @@ export type DepartureMaxAggregateInputType = {
   sales_representative_id?: true
   notes?: true
   created_at?: true
+  departure_date?: true
 }
 
 export type DepartureCountAggregateInputType = {
@@ -134,6 +139,7 @@ export type DepartureCountAggregateInputType = {
   sales_representative_id?: true
   notes?: true
   created_at?: true
+  departure_date?: true
   _all?: true
 }
 
@@ -233,6 +239,7 @@ export type DepartureGroupByOutputType = {
   sales_representative_id: number | null
   notes: string | null
   created_at: Date
+  departure_date: Date | null
   _count: DepartureCountAggregateOutputType | null
   _avg: DepartureAvgAggregateOutputType | null
   _sum: DepartureSumAggregateOutputType | null
@@ -268,6 +275,7 @@ export type DepartureWhereInput = {
   sales_representative_id?: Prisma.IntNullableFilter<"Departure"> | number | null
   notes?: Prisma.StringNullableFilter<"Departure"> | string | null
   created_at?: Prisma.DateTimeFilter<"Departure"> | Date | string
+  departure_date?: Prisma.DateTimeNullableFilter<"Departure"> | Date | string | null
   origin?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   destination?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   transporter?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
@@ -287,6 +295,7 @@ export type DepartureOrderByWithRelationInput = {
   sales_representative_id?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  departure_date?: Prisma.SortOrderInput | Prisma.SortOrder
   origin?: Prisma.WarehouseOrderByWithRelationInput
   destination?: Prisma.OrganizationOrderByWithRelationInput
   transporter?: Prisma.OrganizationOrderByWithRelationInput
@@ -309,6 +318,7 @@ export type DepartureWhereUniqueInput = Prisma.AtLeast<{
   sales_representative_id?: Prisma.IntNullableFilter<"Departure"> | number | null
   notes?: Prisma.StringNullableFilter<"Departure"> | string | null
   created_at?: Prisma.DateTimeFilter<"Departure"> | Date | string
+  departure_date?: Prisma.DateTimeNullableFilter<"Departure"> | Date | string | null
   origin?: Prisma.XOR<Prisma.WarehouseScalarRelationFilter, Prisma.WarehouseWhereInput>
   destination?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   transporter?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
@@ -328,6 +338,7 @@ export type DepartureOrderByWithAggregationInput = {
   sales_representative_id?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  departure_date?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DepartureCountOrderByAggregateInput
   _avg?: Prisma.DepartureAvgOrderByAggregateInput
   _max?: Prisma.DepartureMaxOrderByAggregateInput
@@ -348,12 +359,14 @@ export type DepartureScalarWhereWithAggregatesInput = {
   sales_representative_id?: Prisma.IntNullableWithAggregatesFilter<"Departure"> | number | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Departure"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Departure"> | Date | string
+  departure_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Departure"> | Date | string | null
 }
 
 export type DepartureCreateInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
@@ -373,6 +386,7 @@ export type DepartureUncheckedCreateInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -381,6 +395,7 @@ export type DepartureUpdateInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
@@ -400,6 +415,7 @@ export type DepartureUncheckedUpdateInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -414,12 +430,14 @@ export type DepartureCreateManyInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureUpdateManyMutationInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureUncheckedUpdateManyInput = {
@@ -432,6 +450,7 @@ export type DepartureUncheckedUpdateManyInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureNullableScalarRelationFilter = {
@@ -449,6 +468,7 @@ export type DepartureCountOrderByAggregateInput = {
   sales_representative_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  departure_date?: Prisma.SortOrder
 }
 
 export type DepartureAvgOrderByAggregateInput = {
@@ -470,6 +490,7 @@ export type DepartureMaxOrderByAggregateInput = {
   sales_representative_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  departure_date?: Prisma.SortOrder
 }
 
 export type DepartureMinOrderByAggregateInput = {
@@ -482,6 +503,7 @@ export type DepartureMinOrderByAggregateInput = {
   sales_representative_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  departure_date?: Prisma.SortOrder
 }
 
 export type DepartureSumOrderByAggregateInput = {
@@ -749,6 +771,7 @@ export type DepartureCreateWithoutAssetsInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
@@ -767,6 +790,7 @@ export type DepartureUncheckedCreateWithoutAssetsInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
 
@@ -790,6 +814,7 @@ export type DepartureUpdateWithoutAssetsInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
@@ -808,6 +833,7 @@ export type DepartureUncheckedUpdateWithoutAssetsInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
 
@@ -815,6 +841,7 @@ export type DepartureCreateWithoutStore_transactionsInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
@@ -833,6 +860,7 @@ export type DepartureUncheckedCreateWithoutStore_transactionsInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
 }
 
@@ -856,6 +884,7 @@ export type DepartureUpdateWithoutStore_transactionsInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
@@ -874,6 +903,7 @@ export type DepartureUncheckedUpdateWithoutStore_transactionsInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
 }
 
@@ -881,6 +911,7 @@ export type DepartureCreateWithoutOriginInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
   created_by?: Prisma.UserCreateNestedOneWithoutDeparturesInput
@@ -898,6 +929,7 @@ export type DepartureUncheckedCreateWithoutOriginInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -941,12 +973,14 @@ export type DepartureScalarWhereInput = {
   sales_representative_id?: Prisma.IntNullableFilter<"Departure"> | number | null
   notes?: Prisma.StringNullableFilter<"Departure"> | string | null
   created_at?: Prisma.DateTimeFilter<"Departure"> | Date | string
+  departure_date?: Prisma.DateTimeNullableFilter<"Departure"> | Date | string | null
 }
 
 export type DepartureCreateWithoutCreated_byInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
@@ -964,6 +998,7 @@ export type DepartureUncheckedCreateWithoutCreated_byInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -982,6 +1017,7 @@ export type DepartureCreateWithoutSales_representativeInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
@@ -999,6 +1035,7 @@ export type DepartureUncheckedCreateWithoutSales_representativeInput = {
   created_by_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -1049,6 +1086,7 @@ export type DepartureCreateWithoutDestinationInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   transporter: Prisma.OrganizationCreateNestedOneWithoutDepartures_transporterInput
   created_by?: Prisma.UserCreateNestedOneWithoutDeparturesInput
@@ -1066,6 +1104,7 @@ export type DepartureUncheckedCreateWithoutDestinationInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -1084,6 +1123,7 @@ export type DepartureCreateWithoutTransporterInput = {
   departure_number: string
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   origin: Prisma.WarehouseCreateNestedOneWithoutDeparturesInput
   destination: Prisma.OrganizationCreateNestedOneWithoutDepartures_destinationInput
   created_by?: Prisma.UserCreateNestedOneWithoutDeparturesInput
@@ -1101,6 +1141,7 @@ export type DepartureUncheckedCreateWithoutTransporterInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutDepartureInput
   store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutDepartureInput
 }
@@ -1156,12 +1197,14 @@ export type DepartureCreateManyOriginInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureUpdateWithoutOriginInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
   created_by?: Prisma.UserUpdateOneWithoutDeparturesNestedInput
@@ -1179,6 +1222,7 @@ export type DepartureUncheckedUpdateWithoutOriginInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -1192,6 +1236,7 @@ export type DepartureUncheckedUpdateManyWithoutOriginInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureCreateManyCreated_byInput = {
@@ -1203,6 +1248,7 @@ export type DepartureCreateManyCreated_byInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureCreateManySales_representativeInput = {
@@ -1214,12 +1260,14 @@ export type DepartureCreateManySales_representativeInput = {
   created_by_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureUpdateWithoutCreated_byInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
@@ -1237,6 +1285,7 @@ export type DepartureUncheckedUpdateWithoutCreated_byInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -1250,12 +1299,14 @@ export type DepartureUncheckedUpdateManyWithoutCreated_byInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureUpdateWithoutSales_representativeInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
@@ -1273,6 +1324,7 @@ export type DepartureUncheckedUpdateWithoutSales_representativeInput = {
   created_by_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -1286,6 +1338,7 @@ export type DepartureUncheckedUpdateManyWithoutSales_representativeInput = {
   created_by_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureCreateManyDestinationInput = {
@@ -1297,6 +1350,7 @@ export type DepartureCreateManyDestinationInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureCreateManyTransporterInput = {
@@ -1308,12 +1362,14 @@ export type DepartureCreateManyTransporterInput = {
   sales_representative_id?: number | null
   notes?: string | null
   created_at: Date | string
+  departure_date?: Date | string | null
 }
 
 export type DepartureUpdateWithoutDestinationInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   transporter?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_transporterNestedInput
   created_by?: Prisma.UserUpdateOneWithoutDeparturesNestedInput
@@ -1331,6 +1387,7 @@ export type DepartureUncheckedUpdateWithoutDestinationInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -1344,12 +1401,14 @@ export type DepartureUncheckedUpdateManyWithoutDestinationInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DepartureUpdateWithoutTransporterInput = {
   departure_number?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   origin?: Prisma.WarehouseUpdateOneRequiredWithoutDeparturesNestedInput
   destination?: Prisma.OrganizationUpdateOneRequiredWithoutDepartures_destinationNestedInput
   created_by?: Prisma.UserUpdateOneWithoutDeparturesNestedInput
@@ -1367,6 +1426,7 @@ export type DepartureUncheckedUpdateWithoutTransporterInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   assets?: Prisma.AssetUncheckedUpdateManyWithoutDepartureNestedInput
   store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutDepartureNestedInput
 }
@@ -1380,6 +1440,7 @@ export type DepartureUncheckedUpdateManyWithoutTransporterInput = {
   sales_representative_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departure_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1432,6 +1493,7 @@ export type DepartureSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   sales_representative_id?: boolean
   notes?: boolean
   created_at?: boolean
+  departure_date?: boolean
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1452,6 +1514,7 @@ export type DepartureSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   sales_representative_id?: boolean
   notes?: boolean
   created_at?: boolean
+  departure_date?: boolean
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1469,6 +1532,7 @@ export type DepartureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   sales_representative_id?: boolean
   notes?: boolean
   created_at?: boolean
+  departure_date?: boolean
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   transporter?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1486,9 +1550,10 @@ export type DepartureSelectScalar = {
   sales_representative_id?: boolean
   notes?: boolean
   created_at?: boolean
+  departure_date?: boolean
 }
 
-export type DepartureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "departure_number" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "sales_representative_id" | "notes" | "created_at", ExtArgs["result"]["departure"]>
+export type DepartureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "departure_number" | "origin_id" | "destination_id" | "transporter_id" | "created_by_id" | "sales_representative_id" | "notes" | "created_at" | "departure_date", ExtArgs["result"]["departure"]>
 export type DepartureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   origin?: boolean | Prisma.WarehouseDefaultArgs<ExtArgs>
   destination?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -1535,6 +1600,7 @@ export type $DeparturePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     sales_representative_id: number | null
     notes: string | null
     created_at: Date
+    departure_date: Date | null
   }, ExtArgs["result"]["departure"]>
   composites: {}
 }
@@ -1974,6 +2040,7 @@ export interface DepartureFieldRefs {
   readonly sales_representative_id: Prisma.FieldRef<"Departure", 'Int'>
   readonly notes: Prisma.FieldRef<"Departure", 'String'>
   readonly created_at: Prisma.FieldRef<"Departure", 'DateTime'>
+  readonly departure_date: Prisma.FieldRef<"Departure", 'DateTime'>
 }
     
 

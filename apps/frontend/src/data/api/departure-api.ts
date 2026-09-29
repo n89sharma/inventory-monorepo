@@ -13,6 +13,7 @@ import type {
   DepartureDetail,
   OrgSummary,
   OutgoingStatus,
+  UpdateDepartureDate,
   UpdateDepartureMetadata,
   Warehouse,
 } from 'shared-types'
@@ -25,6 +26,7 @@ import {
   DepartureSummarySchema,
   ReturnAssetsToStockSchema,
   SetDepartureOutgoingStatusSchema,
+  UpdateDepartureDateSchema,
   UpdateDepartureMetadataSchema,
 } from 'shared-types'
 import { z } from 'zod'
@@ -121,4 +123,14 @@ export async function updateDepartureMetadata(
     comment: metadata.comment === '' ? null : metadata.comment,
   } satisfies UpdateDepartureMetadata)
   await api.patch(`/departures/${departureNumber}/metadata`, updateDepartureMetadataBody)
+}
+
+export async function updateDepartureDate(
+  departureNumber: string,
+  departureDate: string,
+): Promise<void> {
+  const updateDepartureDateBody = UpdateDepartureDateSchema.parse({
+    departure_date: departureDate,
+  } satisfies UpdateDepartureDate)
+  await api.patch(`/departures/${departureNumber}/departure-date`, updateDepartureDateBody)
 }

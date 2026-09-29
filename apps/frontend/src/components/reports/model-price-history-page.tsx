@@ -25,7 +25,7 @@ import {
   type PriceHistoryRange,
 } from '@/lib/filters/hooks'
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
-import { formatDate, formatMonthYear, formatUSD } from '@/lib/formatters'
+import { formatDateOnly, formatMonthYear, formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-price-history-summary'
 import { searchListAssetDetailHref } from '@/ui-types/navigation-context'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
@@ -46,7 +46,7 @@ const SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as 
 const DEPARTED_AT_DESC_SORT = { id: 'departed_at', desc: true }
 
 function formatSaleSummary(sale: ModelPriceHistoryRow): string {
-  return `for $${formatUSD(sale.sale_price)} on ${formatDate(sale.departed_at)}`
+  return `for $${formatUSD(sale.sale_price)} on ${formatDateOnly(sale.departed_at)}`
 }
 
 function formatSalesCount(count: number): string {

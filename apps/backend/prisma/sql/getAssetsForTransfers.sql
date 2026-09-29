@@ -48,7 +48,7 @@ select
   do_."name" as customer,
   sp."name" as salesperson,
   d.departure_number as departure_number,
-  d.created_at as departed_at,
+  coalesce(d.departure_date, d.created_at::date) as departed_at,
   r.arrival_number as arrival_number,
   aw.city_code as arrival_warehouse_code,
   r.created_at as arrival_created_at,

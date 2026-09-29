@@ -9,7 +9,7 @@ import {
 } from '../../test/factories.js'
 import { NotFoundError } from '../lib/errors.js'
 import { patchAssetPricing } from './assetPricingService.js'
-import { createDeparture } from './departureService.js'
+import { createDeparture, patchDepartureDate } from './departureService.js'
 import { getModelPriceHistory } from './modelPriceHistoryService.js'
 
 const MISSING_ID = 999999
@@ -55,5 +55,19 @@ describe('modelPriceHistoryService', () => {
 
   it('throws NotFoundError for an unknown model', async () => {
     await expect(getModelPriceHistory(MISSING_ID)).rejects.toThrow(NotFoundError)
+  })
+  it('reports the departure date as the sale date', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await patchAssetPricing(asset.barcode, { purchase_cost: 100, sale_price: 500 }, refs.userId)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    const departureDate = new Date().toISOString().slice(0, 10)
+    await patchDepartureDate(departureNumber, { departure_date: departureDate }, refs.userId)
+
+    const result = await getModelPriceHistory(refs.model.id)
+
+    expect(result.sales[0].departed_at).toBe(departureDate)
   })
 })

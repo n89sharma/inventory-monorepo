@@ -129,7 +129,7 @@ function makeRow(overrides: Partial<AssetSearchRow> = {}): AssetSearchRow {
     departure_number: 'D-260710-001',
     arrival_number: 'A-260705-001',
     arrival_warehouse_code: 'TOR',
-    departed_at: new Date(2026, 6, 10),
+    departed_at: '2026-07-10',
     arrival_created_at: new Date(2026, 6, 5),
     purchase_invoice_invoice_number: 'PI-100',
     purchase_invoice_invoice_reference: 'VENDOR-REF-4',
@@ -374,7 +374,7 @@ describe('asset search column sorting', () => {
   })
 
   it('orders every other date column chronologically too', () => {
-    const dateColumns = ['departed_at', 'arrival_created_at', 'hold_created_at'] as const
+    const dateColumns = ['arrival_created_at', 'hold_created_at'] as const
     for (const columnId of dateColumns) {
       const rows = [
         makeRow({ barcode: 'JULY', [columnId]: new Date(2026, 6, 15) }),
@@ -383,6 +383,15 @@ describe('asset search column sorting', () => {
       ]
       expect(sortedBarcodes(rows, columnId)).toEqual(['MARCH', 'APRIL', 'JULY'])
     }
+  })
+
+  it('orders the departed date chronologically', () => {
+    const rows = [
+      makeRow({ barcode: 'JULY', departed_at: '2026-07-15' }),
+      makeRow({ barcode: 'MARCH', departed_at: '2026-03-05' }),
+      makeRow({ barcode: 'APRIL', departed_at: '2026-04-10' }),
+    ]
+    expect(sortedBarcodes(rows, 'departed_at')).toEqual(['MARCH', 'APRIL', 'JULY'])
   })
 
   it('keeps assets with no hold last in both directions of days held', () => {

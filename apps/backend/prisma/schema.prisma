@@ -388,6 +388,7 @@ model Departure {
   sales_representative_id Int?
   notes                   String?
   created_at              DateTime
+  departure_date          DateTime? @db.Date
 
   origin               Warehouse          @relation(fields: [origin_id], references: [id])
   destination          Organization       @relation(fields: [destination_id], references: [id])

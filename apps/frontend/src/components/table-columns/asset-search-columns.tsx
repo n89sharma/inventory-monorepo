@@ -8,6 +8,7 @@ import { COST_FIELD_LABELS } from '@/lib/cost-fields'
 import {
   formatDamaged,
   formatDate,
+  formatDateOnly,
   formatLocation,
   formatMarginPercent,
   formatThousands,
@@ -423,7 +424,7 @@ const ASSET_SEARCH_COLUMN_LITERALS = [
     id: 'departed_at',
     label: 'Departed At',
     section: 'departure',
-    text: (a) => formatDate(a.departed_at),
+    text: (a) => formatDateOnly(a.departed_at),
   },
   {
     id: 'cost_purchase_cost',

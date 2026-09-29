@@ -7,11 +7,11 @@ import {
   DepartureDetail,
   ReturnAssetsToStockSchema,
   SetDepartureOutgoingStatusSchema,
+  UpdateDepartureDateSchema,
   UpdateDepartureMetadataSchema,
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
-import { getDepartures as getDeparturesDb } from '../../generated/prisma/sql.js'
 import { DepartureListQuerySchema } from '../middleware/validation.js'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
@@ -19,9 +19,11 @@ import { prisma } from '../prisma.js'
 import {
   createDeparture as createDepartureSer,
   getDeparture as getDepartureSer,
+  getDepartureSummaries as getDepartureSummariesSer,
   addAssetsToDepartureAndRecord as patchDepartureAssetsSer,
   setDepartureOutgoingStatus as setDepartureOutgoingStatusSer,
   returnDepartureAssetsToStock as returnDepartureAssetsToStockSer,
+  patchDepartureDate as patchDepartureDateSer,
   patchDepartureMetadata as patchDepartureMetadataSer,
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
@@ -30,9 +32,7 @@ export const getDepartures = asyncHandler(async (req, res) => {
   const { fromDate, toDate, warehouse, customer } = res.locals.query as z.infer<
     typeof DepartureListQuerySchema
   >
-  const departures = await prisma.$queryRawTyped(
-    getDeparturesDb(fromDate, toDate, warehouse ?? 0, customer ?? 0),
-  )
+  const departures = await getDepartureSummariesSer(fromDate, toDate, warehouse ?? 0, customer ?? 0)
   res.json(successResponse(departures))
 })
 
@@ -76,6 +76,12 @@ export const returnDepartureAssetsToStock = asyncHandler(async (req, res) => {
 export const patchDepartureMetadata = asyncHandler(async (req, res) => {
   const metadata = UpdateDepartureMetadataSchema.parse(req.body)
   await patchDepartureMetadataSer(req.params.departureNumber, metadata, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const patchDepartureDate = asyncHandler(async (req, res) => {
+  const update = UpdateDepartureDateSchema.parse(req.body)
+  await patchDepartureDateSer(req.params.departureNumber, update, res.locals.dbUserId)
   res.status(204).send()
 })
 

@@ -10,7 +10,7 @@ select
   w.city_code as warehouse_code,
   r.arrival_number as arrival_number,
   d.departure_number as departure_number,
-  d.created_at as departed_at,
+  coalesce(d.departure_date, d.created_at::date) as departed_at,
   count(*) over () as total_match_count,
   count(*) filter (where s.status <> $3) over () as blocking_match_count
 from "Asset" a

@@ -17,6 +17,7 @@ import {
 } from '../../generated/prisma/sql.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
+import { toYmd, toYmdOrNull } from '../lib/date-only.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import {
   addRemoveCollectionFromAssets,
@@ -38,14 +39,6 @@ import {
 
 const INVOICE_NUMBER_PREFIX = 'I-'
 const INVOICE_NUMBER_PAD = 7
-
-function toYmd(date: Date): string {
-  return date.toISOString().slice(0, 10)
-}
-
-function toYmdOrNull(date: Date | null): string | null {
-  return date === null ? null : toYmd(date)
-}
 
 async function getNewInvoiceNumber(): Promise<string> {
   const sequence = await getNextSequence('invoice')

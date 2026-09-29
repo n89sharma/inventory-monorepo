@@ -4,6 +4,7 @@ import {
   getModelLastSale as getModelLastSaleQuery,
   getModelPriceHistory as getModelPriceHistoryQuery,
 } from '../../generated/prisma/sql.js'
+import { toYmd } from '../lib/date-only.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 
@@ -13,7 +14,7 @@ function mapModelPriceHistoryRow(row: getModelPriceHistoryQuery.Result): ModelPr
   return {
     barcode: row.barcode,
     arrived_at: row.arrived_at,
-    departed_at: row.departed_at,
+    departed_at: toYmd(row.departed_at!),
     purchase_price: row.purchase_cost ?? null,
     sale_price: row.sale_price ?? 0,
     meter: row.meter,

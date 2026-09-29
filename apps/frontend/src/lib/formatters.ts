@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import type { AssetLocationDetails } from 'shared-types'
 
 const BIN_ZONE = 'BIN'
@@ -83,6 +83,11 @@ export function formatDateWithTime(rawDate: Date | null): string {
 export function formatDate(rawDate: Date | null): string {
   if (rawDate === null) return ''
   return format(rawDate, DATE_FORMAT)
+}
+
+export function formatDateOnly(ymd: string | null): string {
+  if (ymd === null) return ''
+  return formatDate(parseISO(ymd))
 }
 
 export function formatMonthYear(rawDate: Date): string {

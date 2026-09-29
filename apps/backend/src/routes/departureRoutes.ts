@@ -5,6 +5,7 @@ import {
   getDepartureHistory,
   getDepartures,
   patchDepartureAssets,
+  patchDepartureDate,
   patchDepartureMetadata,
   returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
@@ -45,6 +46,11 @@ router.patch(
   '/:departureNumber/metadata',
   requirePermission('create_update_departure'),
   patchDepartureMetadata,
+)
+router.patch(
+  '/:departureNumber/departure-date',
+  requirePermission('create_update_departure'),
+  patchDepartureDate,
 )
 
 export default router

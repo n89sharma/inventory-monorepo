@@ -5,12 +5,18 @@ import {
   CreateDeparture,
   DEFAULT_OUTGOING_STATUS,
   DepartureDetail,
+  DepartureSummary,
   OutgoingStatus,
   OutgoingStatusSchema,
+  UpdateDepartureDate,
   UpdateDepartureMetadata,
 } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
-import { getAssetsForDepartures, getInvoicesForDeparture } from '../../generated/prisma/sql.js'
+import {
+  getAssetsForDepartures,
+  getDepartures as getDeparturesDb,
+  getInvoicesForDeparture,
+} from '../../generated/prisma/sql.js'
 import { mapAssetSearchRow } from '../lib/asset-mappers.js'
 import { redactSearchRowCost } from '../lib/cost-redaction.js'
 import {
@@ -20,6 +26,7 @@ import {
   recordCollectionAssetDelta,
 } from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
+import { toYmdOrNull } from '../lib/date-only.js'
 import { decimalToNumber } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
@@ -31,6 +38,16 @@ import {
   recordDepartureUpdate,
 } from './historyService.js'
 import { archiveHoldsEmptiedByReleasedAssets, recordHoldRelease } from './holdService.js'
+
+export async function getDepartureSummaries(
+  fromDate: Date,
+  toDate: Date,
+  warehouse: number,
+  customer: number,
+): Promise<DepartureSummary[]> {
+  const rows = await prisma.$queryRawTyped(getDeparturesDb(fromDate, toDate, warehouse, customer))
+  return rows.map((row) => ({ ...row, departure_date: toYmdOrNull(row.departure_date) }))
+}
 
 export async function getDeparture(
   departureNumber: string,
@@ -59,6 +76,7 @@ export async function getDeparture(
     notes: departure.notes,
     created_at: departure.created_at,
     created_by: departure.created_by?.name,
+    departure_date: toYmdOrNull(departure.departure_date),
     salesperson: departure.sales_representative && mapUser(departure.sales_representative),
     assets: assets.map((r) => redactSearchRowCost(mapAssetSearchRow(r), permissions)),
     invoices,
@@ -209,6 +227,32 @@ export async function patchDepartureMetadata(
       transporter_id: metadata.transporter.id,
       sales_representative_id: metadata.salesperson.id,
     },
+    userId,
+  )
+}
+
+export async function patchDepartureDate(
+  departureNumber: string,
+  update: UpdateDepartureDate,
+  userId: number,
+): Promise<void> {
+  const { departureId, previousDate } = await prisma.$transaction(async (tx) => {
+    const departure = await tx.departure.findUnique({
+      where: { departure_number: departureNumber },
+      select: { id: true, departure_date: true },
+    })
+    if (!departure) throw new NotFoundError(`Departure ${departureNumber} not found`)
+    await tx.departure.update({
+      where: { id: departure.id },
+      data: { departure_date: new Date(update.departure_date) },
+    })
+    return { departureId: departure.id, previousDate: toYmdOrNull(departure.departure_date) }
+  })
+
+  await recordDepartureUpdate(
+    departureId,
+    { departure_date: previousDate },
+    { departure_date: update.departure_date },
     userId,
   )
 }

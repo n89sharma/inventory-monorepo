@@ -29,6 +29,7 @@ function departureWith(assets: AssetSearchRow[], invoices: DepartureInvoice[]): 
     notes: null,
     created_at: new Date('2026-01-01T00:00:00Z'),
     created_by: 'Alice',
+    departure_date: null,
     salesperson: null,
     assets,
     invoices,

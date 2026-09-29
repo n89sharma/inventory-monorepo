@@ -1,6 +1,7 @@
 import { AssetDetails, AssetLocationDetails, AssetSearchRow, AssetSummary } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generated/prisma/sql.js'
+import { toYmdOrNull } from './date-only.js'
 import { decimalToNumber } from './decimal.js'
 
 type LocationRow = {
@@ -168,7 +169,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     customer: r.customer,
     salesperson: r.salesperson,
     departure_number: r.departure_number,
-    departed_at: r.departed_at,
+    departed_at: toYmdOrNull(r.departed_at),
     arrival_number: r.arrival_number,
     arrival_warehouse_code: r.arrival_warehouse_code,
     arrival_created_at: r.arrival_created_at,
@@ -283,6 +284,7 @@ function mapDeparture(r: AssetDetailRow) {
     created_by: r.departure_created_by_name ?? '',
     notes: r.departure_notes,
     created_at: r.departure_created_at!,
+    departure_date: toYmdOrNull(r.departure_date),
   }
 }
 

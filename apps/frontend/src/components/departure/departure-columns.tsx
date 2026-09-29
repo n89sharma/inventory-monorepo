@@ -1,9 +1,10 @@
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
   assetCountColumnDef,
-  createdAtColumnDef,
   createdByColumnDef,
 } from '@/components/table-columns/collection-summary-columns'
+import { formatDateParam } from '@/lib/date-param'
+import { formatDateOnly } from '@/lib/formatters'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { DepartureSummary } from 'shared-types'
 
@@ -17,7 +18,12 @@ export function departureTableColumns(
       href: getHref,
       value: (row) => row.departure_number,
     }),
-    createdAtColumnDef as ColumnDef<DepartureSummary>,
+    {
+      id: 'departure_date',
+      header: 'Date',
+      accessorFn: (row) => row.departure_date ?? formatDateParam(row.created_at),
+      cell: ({ getValue }) => formatDateOnly(getValue<string>()),
+    },
     createdByColumnDef as ColumnDef<DepartureSummary>,
     { accessorKey: 'salesperson', header: 'Salesperson' },
     { accessorKey: 'origin_code', header: 'Warehouse' },

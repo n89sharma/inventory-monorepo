@@ -6,6 +6,7 @@ select
 	od."name" as destination,
 	t."name" as transporter,
 	d.created_at as created_at,
+	d.departure_date as departure_date,
 	u."name"  as created_by,
 	sp."name" as salesperson,
   ac.asset_count as asset_count,
@@ -33,8 +34,8 @@ left join lateral (
   join "AssetType" atype on atype.id = m.asset_type_id
   where ast.departure_id = d.id
 ) ac on true
-where d.created_at between $1 and $2
+where coalesce(d.departure_date, d.created_at::date) between $1::date and $2::date
 and ($3 = 0 or wo.id = $3)
 and ($4 = 0 or od.id = $4)
-order by d.created_at desc
+order by coalesce(d.departure_date, d.created_at::date) desc, d.created_at desc
 limit 500

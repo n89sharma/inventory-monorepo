@@ -46,7 +46,7 @@ select
   do_."name" as customer,
   sp."name" as salesperson,
   d.departure_number as departure_number,
-  d.created_at as departed_at,
+  coalesce(d.departure_date, d.created_at::date) as departed_at,
   r.arrival_number as arrival_number,
   aw.city_code as arrival_warehouse_code,
   r.created_at as arrival_created_at,
@@ -113,8 +113,8 @@ where ($1 = '' or m."name" ilike '%' || $1 || '%')
   and ($8 = -1 or cmp.id = $8)
   and (array_length($9::int[], 1) is null or b.id = any($9::int[]))
   and (array_length($10::int[], 1) is null or at.id = any($10::int[]))
-  and ($11::date < date '1900-01-01' or d.created_at::date >= $11::date)
-  and ($12::date > date '5000-01-01' or d.created_at::date <= $12::date)
+  and ($11::date < date '1900-01-01' or coalesce(d.departure_date, d.created_at::date) >= $11::date)
+  and ($12::date > date '5000-01-01' or coalesce(d.departure_date, d.created_at::date) <= $12::date)
   and ($13 = -1 or do_.id = $13)
   and ($14 = -1 or hu.id = $14)
   and ($15 = -1 or hu2.id = $15)

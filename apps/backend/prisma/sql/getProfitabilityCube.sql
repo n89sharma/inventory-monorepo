@@ -10,7 +10,7 @@ select
   arr.origin_id                                             as vendor_id,
   dep.destination_id                                        as customer_id,
   m.brand_id                                                as brand_id,
-  extract(month from dep.created_at)::int                   as month,
+  extract(month from coalesce(dep.departure_date, dep.created_at::date))::int                   as month,
   count(*)::int                                             as asset_count,
 
   coalesce(sum(coalesce(c.purchase_cost, 0)), 0)::float8           as base_cogs,
@@ -27,7 +27,7 @@ left join "Arrival" arr on arr.id = a.arrival_id
 -- present or non-zero: an asset sold against no recorded cost is a real 100% margin, and
 -- excluding it understated revenue. A null cost is read as zero inside the sums so revenue
 -- and margin stay reconcilable rather than the row being dropped from one and not the other.
-where extract(year from dep.created_at)::int = $1
+where extract(year from coalesce(dep.departure_date, dep.created_at::date))::int = $1
   and c.sale_price is not null and c.sale_price > 0
 group by
   dep.origin_id,
@@ -35,5 +35,5 @@ group by
   arr.origin_id,
   dep.destination_id,
   m.brand_id,
-  extract(month from dep.created_at)
+  extract(month from coalesce(dep.departure_date, dep.created_at::date))
 order by month

@@ -3,7 +3,7 @@
 -- @param {Int} $3:soldStatusId
 select
   a.barcode as barcode,
-  d.created_at as departed_at,
+  coalesce(d.departure_date, d.created_at::date) as departed_at,
   c.purchase_cost::float8 as purchase_cost,
   c.sale_price::float8 as sale_price,
   ts.meter_total as meter,
@@ -32,5 +32,5 @@ from "Asset" a
 where a.model_id = $1
   and a.status_id = $3
   and c.sale_price is not null
-  and d.created_at >= $2
-order by d.created_at desc
+  and coalesce(d.departure_date, d.created_at::date) >= $2::date
+order by coalesce(d.departure_date, d.created_at::date) desc

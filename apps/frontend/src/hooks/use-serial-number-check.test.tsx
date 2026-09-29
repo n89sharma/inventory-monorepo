@@ -41,7 +41,7 @@ const BLOCKING_RESULT: SerialNumberCheckResult = {
 }
 
 const SOLD_RESULT: SerialNumberCheckResult = {
-  matches: [{ ...MATCH, status: 'SOLD', departure_number: 'D-1', departed_at: new Date() }],
+  matches: [{ ...MATCH, status: 'SOLD', departure_number: 'D-1', departed_at: '2026-07-10' }],
   totalMatchCount: 1,
   blockingMatchCount: 0,
 }

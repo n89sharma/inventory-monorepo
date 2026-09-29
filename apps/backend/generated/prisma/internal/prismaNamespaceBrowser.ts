@@ -406,7 +406,8 @@ export const DepartureScalarFieldEnum = {
   created_by_id: 'created_by_id',
   sales_representative_id: 'sales_representative_id',
   notes: 'notes',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  departure_date: 'departure_date'
 } as const
 
 export type DepartureScalarFieldEnum = (typeof DepartureScalarFieldEnum)[keyof typeof DepartureScalarFieldEnum]

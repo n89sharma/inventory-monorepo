@@ -21,6 +21,7 @@ import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useCan } from '@/hooks/use-can'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
+import { parseISO } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -122,7 +123,11 @@ export function DepartureDetailsPage(): React.JSX.Element {
       })}
       renderSummaryStrip={(departure) => (
         <>
-          <SummaryValue value={formatDate(departure.created_at)} />
+          <SummaryValue
+            value={formatDate(
+              departure.departure_date ? parseISO(departure.departure_date) : departure.created_at,
+            )}
+          />
           <SummaryRoute
             from={departure.origin.city_code}
             to={<OrgName name={departure.customer.name} />}
@@ -140,6 +145,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
           onOpenChange={control.onOpenChange}
           departure={departure}
           onSave={(metadata) => mutations.updateMetadata(departureNumber, metadata)}
+          onSaveDate={(departureDate) => mutations.updateDate(departureNumber, departureDate)}
         />
       )}
       renderAddAssetBar={(departure) =>

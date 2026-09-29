@@ -1,5 +1,5 @@
 import type { PriceHistoryRange } from '@/lib/filters/hooks'
-import { isAfter, subMonths } from 'date-fns'
+import { isAfter, parseISO, subMonths } from 'date-fns'
 import type { ModelPriceHistoryRow } from 'shared-types'
 
 export const METER_BANDS = [
@@ -27,7 +27,7 @@ export function filterByMonths(
   now: Date = new Date(),
 ): ModelPriceHistoryRow[] {
   const cutoff = subMonths(now, months)
-  return sales.filter((sale) => isAfter(sale.departed_at, cutoff))
+  return sales.filter((sale) => isAfter(parseISO(sale.departed_at), cutoff))
 }
 
 function median(values: number[]): number | null {

@@ -121,7 +121,7 @@ export const AssetSearchRowSchema = z.object({
   customer: z.string().nullable(),
   salesperson: z.string().nullable(),
   departure_number: z.string().nullable(),
-  departed_at: z.coerce.date().nullable(),
+  departed_at: z.string().nullable(),
   arrival_number: z.string().nullable(),
   arrival_warehouse_code: z.string().nullable(),
   arrival_created_at: z.coerce.date().nullable(),
@@ -225,6 +225,7 @@ export const AssetDetailsSchema = z.object({
       created_by: z.string(),
       notes: z.string().nullable(),
       created_at: z.coerce.date(),
+      departure_date: z.string().nullable(),
     })
     .nullable(),
   purchase_invoice: z
@@ -371,7 +372,7 @@ export const SerialNumberMatchSchema = z.object({
   warehouse_code: z.string().nullable(),
   arrival_number: z.string().nullable(),
   departure_number: z.string().nullable(),
-  departed_at: z.coerce.date().nullable(),
+  departed_at: z.string().nullable(),
 })
 
 export type SerialNumberMatch = z.infer<typeof SerialNumberMatchSchema>

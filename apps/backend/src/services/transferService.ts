@@ -40,6 +40,7 @@ import {
   getWarehouseTransferCostDecimals,
   type TransferCostDecimals,
 } from './transferCostService.js'
+import { todayYmd, toYmdOrNull } from '../lib/date-only.js'
 import { prisma } from '../prisma.js'
 
 const SHIPPING_AND_RECEIVING_ZONE = 'SHIPPING_AND_RECEIVING'
@@ -48,18 +49,6 @@ const NOT_MISSING_MESSAGE = 'Only missing assets can be returned to stock:'
 const MISSING_WHILE_UNLOADING_MESSAGE =
   'Assets missing during unloading can be returned once their transfer is complete:'
 const CONCURRENT_CHANGE_MESSAGE = 'Some assets changed while updating; refresh and try again'
-
-function toYmd(date: Date): string {
-  return date.toISOString().slice(0, 10)
-}
-
-function toYmdOrNull(date: Date | null): string | null {
-  return date === null ? null : toYmd(date)
-}
-
-function todayYmd(): string {
-  return toYmd(new Date())
-}
 
 export async function getTransferSummaries(
   fromDate: Date,

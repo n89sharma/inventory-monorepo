@@ -22,23 +22,38 @@ import {
   SEEDED_ASSET_COST,
   TEST_INVOICE_REFERENCE,
 } from '../../test/factories.js'
-import { ConflictError } from '../lib/errors.js'
+import type { History } from '../../generated/prisma/client.js'
+import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
   addAssetsToDepartureAndRecord,
   createDeparture,
   getDeparture,
+  getDepartureSummaries,
+  patchDepartureDate,
   returnDepartureAssetsToStock,
   setDepartureOutgoingStatus,
 } from './departureService.js'
 import { createHold } from './holdService.js'
 import { createInvoice } from './invoiceService.js'
 
+const TODAY = new Date().toISOString().slice(0, 10)
+const FUTURE_DEPARTURE_DATE = '2099-06-15'
+const FUTURE_RANGE_START = '2099-06-01'
+const FUTURE_RANGE_END = '2099-06-30'
+
 async function getAssetCollectionLinks(assetId: number) {
   return prisma.asset.findUniqueOrThrow({
     where: { id: assetId },
     select: { departure_id: true, sales_invoice_id: true },
   })
+}
+
+function departureDateAfter(row: History): string | null | undefined {
+  if (row.entity_type !== 'Departure') return undefined
+  const changes = row.changes as { after?: Record<string, unknown> }
+  if (!changes.after || !('departure_date' in changes.after)) return undefined
+  return changes.after.departure_date as string | null
 }
 
 async function getMaxHistoryId(): Promise<number> {
@@ -428,5 +443,74 @@ describe('departureService', () => {
     expect(priceChange?.before?.sale_price).toBe(SEEDED_ASSET_COST.sale_price)
     expect(priceChange?.after?.sale_price).toBeNull()
     expect(changesFor('Asset').some((c) => c.after?.status === ASSET_STATUS.IN_STOCK)).toBe(true)
+  })
+  it('has no departure date until one is set and dates its assets by the creation day', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    const departure = await getDeparture(departureNumber, ALL_PRICE_PERMISSIONS)
+
+    expect(departure.departure_date).toBeNull()
+    expect(departure.assets[0].departed_at).toBe(TODAY)
+  })
+
+  it('stores the departure date, shows it on the assets and records the change', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const departureNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+    const sinceId = await getMaxHistoryId()
+
+    await patchDepartureDate(
+      departureNumber,
+      { departure_date: FUTURE_DEPARTURE_DATE },
+      refs.userId,
+    )
+
+    const departure = await getDeparture(departureNumber, ALL_PRICE_PERMISSIONS)
+    expect(departure.departure_date).toBe(FUTURE_DEPARTURE_DATE)
+    expect(departure.assets[0].departed_at).toBe(FUTURE_DEPARTURE_DATE)
+    const rows = await prisma.history.findMany({ where: { id: { gt: sinceId } } })
+    expect(rows.some((r) => departureDateAfter(r) === FUTURE_DEPARTURE_DATE)).toBe(true)
+  })
+
+  it('rejects a date change on an unknown departure', async () => {
+    await expect(
+      patchDepartureDate('D-XXX-0000000', { departure_date: FUTURE_DEPARTURE_DATE }, refs.userId),
+    ).rejects.toThrow(NotFoundError)
+  })
+
+  it('lists departures by departure date, falling back to the creation day', async () => {
+    const [datedAsset, undatedAsset] = await createArrivedAssets(refs, 2)
+    const datedNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: datedAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    const undatedNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: undatedAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    await patchDepartureDate(datedNumber, { departure_date: FUTURE_DEPARTURE_DATE }, refs.userId)
+
+    const inFutureRange = await getDepartureSummaries(
+      new Date(FUTURE_RANGE_START),
+      new Date(FUTURE_RANGE_END),
+      0,
+      0,
+    )
+    const inTodayRange = await getDepartureSummaries(new Date(TODAY), new Date(TODAY), 0, 0)
+
+    expect(inFutureRange.map((d) => d.departure_number)).toEqual([datedNumber])
+    expect(inFutureRange[0].departure_date).toBe(FUTURE_DEPARTURE_DATE)
+    expect(inTodayRange.map((d) => d.departure_number)).toEqual([undatedNumber])
+    expect(inTodayRange[0].departure_date).toBeNull()
   })
 })
