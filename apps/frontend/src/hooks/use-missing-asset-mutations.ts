@@ -1,6 +1,7 @@
 import { returnMissingAssetsToStock } from '@/data/api/asset-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import type { AssetStatusTarget } from '@/hooks/use-asset-harvest-mutations'
+import { invalidateDepartureDetails, invalidateDepartureLists } from '@/hooks/use-departure'
 import { invalidateSearchMissing } from '@/hooks/use-search-missing'
 import { invalidateSearchOnHand } from '@/hooks/use-search-onhand'
 import { invalidateTransferDetails, invalidateTransferLists } from '@/hooks/use-transfer'
@@ -12,6 +13,8 @@ async function returnToStock(assets: AssetStatusTarget[]) {
   invalidateSearchOnHand()
   invalidateTransferDetails()
   invalidateTransferLists()
+  invalidateDepartureDetails()
+  invalidateDepartureLists()
 }
 
 const mutations = { returnToStock } as const

@@ -9,11 +9,18 @@ import { EditDepartureMetadataModal } from '@/components/departure/edit-departur
 import { createCollectionDetailColumns } from '@/components/table-columns/collection-detail-columns'
 import { AddAssetBar } from '@/components/collections/add-asset-bar'
 import { AddFromHoldModal } from '@/components/collections/add-from-hold-modal'
-import { CollectionDetailPage } from '@/components/collections/collection-detail-page'
+import {
+  COLLECTION_DETAILS_TAB,
+  CollectionDetailPage,
+  type CollectionExtraTab,
+} from '@/components/collections/collection-detail-page'
 import type { BulkExtraAction, BulkExtraActionGroup } from '@/components/collections/bulk-edit-bar'
 import { AssetTotalsField } from '@/components/shared/cards/asset-totals-field'
 import { SummaryRoute } from '@/components/shared/cards/summary-route'
 import { SummaryValue } from '@/components/shared/cards/summary-value'
+import { DepartureLifecycleActions } from '@/components/departure/departure-lifecycle-actions'
+import { DepartureLoadingPanel } from '@/components/departure/departure-loading-panel'
+import { DepartureStatusBadge } from '@/components/departure/departure-status-badge'
 import { ReturnToStockDialog } from '@/components/departure/return-to-stock-dialog'
 import { getDepartureHistory } from '@/data/api/departure-api'
 import { departureDetailKey, useDepartureDetail } from '@/hooks/use-departure'
@@ -22,14 +29,17 @@ import { useCan } from '@/hooks/use-can'
 import { usePriceCellEditing } from '@/hooks/use-price-cell-editing'
 import { formatDate } from '@/lib/formatters'
 import { parseISO } from 'date-fns'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
+  ASSET_STATUS,
+  DEPARTURE_STATUS,
   INVOICE_TYPE,
   OrgSummarySchema,
   OUTGOING_STATUS_LABELS,
   OutgoingStatusSchema,
   type AssetSearchRow,
+  type DepartureAssetRow,
   type OutgoingStatus,
   type PatchAssetPricing,
 } from 'shared-types'
@@ -46,6 +56,17 @@ function buildOutgoingStatusActions(onApply: (status: OutgoingStatus) => void): 
 }
 
 const ADD_FROM_HOLD_LABEL = 'Add Assets from Hold'
+const LOADING_TAB = 'loading'
+
+function pendingLoadCountOf(assets: DepartureAssetRow[]): number {
+  return assets.filter((asset) => !asset.scan.loaded && asset.status !== ASSET_STATUS.MISSING)
+    .length
+}
+
+function tabForStatus(status: string): string {
+  if (status === DEPARTURE_STATUS.LOADING_IN_PROGRESS) return LOADING_TAB
+  return COLLECTION_DETAILS_TAB
+}
 
 export function DepartureDetailsPage(): React.JSX.Element {
   const { collectionId: departureNumber } = useParams<{ collectionId: string }>()
@@ -61,6 +82,32 @@ export function DepartureDetailsPage(): React.JSX.Element {
   const canReturnToStock = useCan('return_to_stock')
   const can = useCan()
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
+  const isDraft = detail.data?.status === DEPARTURE_STATUS.DRAFT
+  const canEditAssets = canCreateEditDeparture && isDraft
+  const loadedAssetIds = useMemo(
+    () => new Set((detail.data?.assets ?? []).filter((a) => a.scan.loaded).map((a) => a.id)),
+    [detail.data?.assets],
+  )
+
+  const [activeTab, setActiveTab] = useState<string>(COLLECTION_DETAILS_TAB)
+  const prevStatusRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    const currStatus = detail.data?.status
+    if (currStatus === undefined) return
+    const prevStatus = prevStatusRef.current
+    prevStatusRef.current = currStatus
+    if (prevStatus !== currStatus) setActiveTab(tabForStatus(currStatus))
+  }, [detail.data?.status])
+
+  // Bumped every time the active tab changes, so the Loading scan input remounts and reliably
+  // grabs focus each time its tab is entered. Adjusting state during render (not in an effect)
+  // per https://react.dev/learn/you-might-not-need-an-effect.
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab)
+  const [focusNonce, setFocusNonce] = useState(0)
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab)
+    setFocusNonce((n) => n + 1)
+  }
 
   const savePrice = useCallback(
     (barcode: string, patch: PatchAssetPricing) =>
@@ -81,6 +128,11 @@ export function DepartureDetailsPage(): React.JSX.Element {
     [can, priceEditorRegistry],
   )
 
+  const departureTabs: CollectionExtraTab[] = []
+  if (detail.data?.status === DEPARTURE_STATUS.LOADING_IN_PROGRESS) {
+    departureTabs.push({ value: LOADING_TAB, label: 'Loading' })
+  }
+
   return (
     <CollectionDetailPage
       section="departures"
@@ -92,7 +144,35 @@ export function DepartureDetailsPage(): React.JSX.Element {
       refreshKey={departureDetailKey(departureNumber)}
       historyCacheKey={`departure-history:${departureNumber}`}
       historyFetcher={() => getDepartureHistory(departureNumber)}
+      tabs={departureTabs}
+      activeTab={activeTab}
+      onActiveTabChange={setActiveTab}
+      renderTabContent={(tabValue, departure) => {
+        if (tabValue !== LOADING_TAB) return null
+        return (
+          <DepartureLoadingPanel
+            departureNumber={departureNumber}
+            assets={departure.assets}
+            focusKey={focusNonce}
+          />
+        )
+      }}
+      onBulkRemove={
+        canEditAssets ? (assets) => mutations.bulkRemoveAssets(departureNumber, assets) : undefined
+      }
       onFlushPending={mutations.flushPending}
+      renderHeaderActions={(departure) => (
+        <DepartureLifecycleActions
+          status={departure.status}
+          assetCount={departure.assets.length}
+          pendingLoadCount={pendingLoadCountOf(departure.assets)}
+          onSchedule={(departureDate) => mutations.schedule(departureNumber, departureDate)}
+          onStartLoading={() => mutations.startLoading(departureNumber)}
+          onFinishLoading={() => mutations.finishLoading(departureNumber)}
+          onComplete={() => mutations.complete(departureNumber)}
+        />
+      )}
+      renderTitleBadge={(departure) => <DepartureStatusBadge status={departure.status} />}
       buildColumns={buildColumns}
       counterpartyWarning={counterpartyWarning}
       tableMeta={tableMeta}
@@ -102,7 +182,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
       })}
       getNote={(departure) => departure.notes}
       renderMenuActions={(departure) => ({
-        actions: canCreateEditDeparture
+        actions: canEditAssets
           ? [
               {
                 label: ADD_FROM_HOLD_LABEL,
@@ -145,11 +225,12 @@ export function DepartureDetailsPage(): React.JSX.Element {
           onOpenChange={control.onOpenChange}
           departure={departure}
           onSave={(metadata) => mutations.updateMetadata(departureNumber, metadata)}
+          onSaveNotes={(comment) => mutations.updateNotes(departureNumber, comment)}
           onSaveDate={(departureDate) => mutations.updateDate(departureNumber, departureDate)}
         />
       )}
       renderAddAssetBar={(departure) =>
-        canCreateEditDeparture && (
+        canEditAssets && (
           <AddAssetBar
             existingAssets={departure.assets}
             entityName="departure"
@@ -159,7 +240,8 @@ export function DepartureDetailsPage(): React.JSX.Element {
       }
       renderBulkExtraActions={({ selectedAssets, clearSelection }) => {
         const groups: BulkExtraActionGroup[] = []
-        if (canCreateEditDeparture) {
+        const returnable = canReturnToStock && selectedAssets.every((a) => loadedAssetIds.has(a.id))
+        if (canEditAssets) {
           groups.push({
             heading: OUTGOING_STATUS_HEADING,
             actions: buildOutgoingStatusActions((status) => {
@@ -172,14 +254,14 @@ export function DepartureDetailsPage(): React.JSX.Element {
             }),
           })
         }
-        if (canReturnToStock) {
+        if (returnable) {
           groups.push({
             actions: [{ label: RETURN_TO_STOCK_LABEL, onSelect: () => setReturnToStockOpen(true) }],
           })
         }
         return {
           groups,
-          dialogs: canReturnToStock && (
+          dialogs: returnable && (
             <ReturnToStockDialog
               assetCount={selectedAssets.length}
               open={returnToStockOpen}

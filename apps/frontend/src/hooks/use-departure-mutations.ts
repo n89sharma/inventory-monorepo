@@ -1,22 +1,40 @@
 import {
+  completeDeparture,
   createDeparture,
+  finishLoadingDeparture,
   getDepartureDetail,
+  markDepartureAssetMissingAtLoad,
   patchDepartureAssets,
   returnDepartureAssetsToStock,
+  scanDepartureAssetLoaded,
+  scheduleDeparture,
   setDepartureOutgoingStatus,
+  startLoadingDeparture,
+  undoDepartureAssetLoad,
   updateDepartureDate,
   updateDepartureMetadata,
+  updateDepartureNotes,
 } from '@/data/api/departure-api'
 import { invalidateAssetDetails } from '@/hooks/use-asset-detail'
 import { departureDetailKey, invalidateDepartureLists } from '@/hooks/use-departure'
+import { invalidateHoldLists } from '@/hooks/use-hold'
 import { invalidateInvoiceLists } from '@/hooks/use-invoice'
+import { invalidateSearchMissing } from '@/hooks/use-search-missing'
+import { invalidateSearchOnHand } from '@/hooks/use-search-onhand'
 import {
   flushPendingPriceInvalidation,
   saveAssetPrice,
   type PriceSaveSpec,
 } from '@/lib/asset-price-save'
+import { flushPendingRemovals, scheduleBulkAssetRemoval } from '@/lib/asset-removal-undo'
 import type { DepartureForm, DepartureMetadataForm } from '@/ui-types/departure-form-types'
-import type { AssetSearchRow, AssetSummary, OutgoingStatus, PatchAssetPricing } from 'shared-types'
+import type {
+  AssetIdentity,
+  AssetSearchRow,
+  AssetSummary,
+  OutgoingStatus,
+  PatchAssetPricing,
+} from 'shared-types'
 import { mutate } from 'swr'
 
 async function create(data: DepartureForm) {
@@ -91,6 +109,72 @@ async function updateDate(departureNumber: string, departureDate: string) {
   invalidateDepartureLists()
 }
 
+async function updateNotes(departureNumber: string, comment: string) {
+  await updateDepartureNotes(departureNumber, comment)
+  mutate(departureDetailKey(departureNumber))
+}
+
+async function schedule(departureNumber: string, departureDate: string) {
+  await scheduleDeparture(departureNumber, departureDate)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+}
+
+async function startLoading(departureNumber: string) {
+  await startLoadingDeparture(departureNumber)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+}
+
+async function finishLoading(departureNumber: string) {
+  await finishLoadingDeparture(departureNumber)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+}
+
+async function complete(departureNumber: string) {
+  await completeDeparture(departureNumber)
+  mutate(departureDetailKey(departureNumber))
+  invalidateDepartureLists()
+}
+
+// Loading changes an asset's status and can release its hold, so the stock and hold views refresh too.
+function refreshAfterLoadChange(departureNumber: string, barcode: string) {
+  mutate(departureDetailKey(departureNumber))
+  invalidateAssetDetails([barcode])
+  invalidateDepartureLists()
+  invalidateSearchOnHand()
+  invalidateHoldLists()
+}
+
+async function scanLoaded(departureNumber: string, assetId: number, barcode: string) {
+  await scanDepartureAssetLoaded(departureNumber, assetId)
+  refreshAfterLoadChange(departureNumber, barcode)
+}
+
+async function markMissingAtLoad(departureNumber: string, assetId: number, barcode: string) {
+  await markDepartureAssetMissingAtLoad(departureNumber, assetId)
+  refreshAfterLoadChange(departureNumber, barcode)
+  invalidateSearchMissing()
+}
+
+async function undoLoad(departureNumber: string, assetId: number, barcode: string) {
+  await undoDepartureAssetLoad(departureNumber, assetId)
+  refreshAfterLoadChange(departureNumber, barcode)
+}
+
+function bulkRemoveAssets(departureNumber: string, assets: AssetIdentity[]) {
+  scheduleBulkAssetRemoval(
+    {
+      collectionId: departureNumber,
+      detailCacheKey: departureDetailKey(departureNumber),
+      patchAssets: (delta) => patchDepartureAssets(departureNumber, delta),
+      invalidateLists: invalidateDepartureLists,
+    },
+    assets,
+  )
+}
+
 async function setOutgoingStatus(
   departureNumber: string,
   assetIds: number[],
@@ -129,10 +213,11 @@ function updatePrice(
   return saveAssetPrice(priceSaveSpec(departureNumber), barcode, patch)
 }
 
-// Returning assets to stock commits immediately, so the only deferred work is the price list
-// invalidation. Module-level so the identity stays stable: CollectionDetailPage's unmount effect depends on
-// this callback and would otherwise flush on every render.
+// Draft removals are deferred behind an undo window, and price edits defer their list
+// invalidation. Module-level so the identity stays stable: CollectionDetailPage's unmount effect
+// depends on this callback and would otherwise flush on every render.
 function flushPending(departureNumber: string) {
+  flushPendingRemovals(departureNumber)
   flushPendingPriceInvalidation(priceSaveSpec(departureNumber))
 }
 
@@ -144,6 +229,15 @@ const mutations = {
   addAssetBatch,
   updateMetadata,
   updateDate,
+  updateNotes,
+  schedule,
+  startLoading,
+  finishLoading,
+  complete,
+  scanLoaded,
+  markMissingAtLoad,
+  undoLoad,
+  bulkRemoveAssets,
   updatePrice,
   setOutgoingStatus,
   returnToStock,

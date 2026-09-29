@@ -1,70 +1,8 @@
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/shadcn/alert-dialog'
-import { Button } from '@/components/shadcn/button'
 import { DepartTransferModal } from '@/components/transfer/depart-transfer-modal'
 import { ScheduleTransferModal } from '@/components/transfer/schedule-transfer-modal'
+import { LifecycleButton } from '@/components/shared/lifecycle-button'
 import { useCan } from '@/hooks/use-can'
-import { SpinnerGapIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
 import { TRANSFER_STATUS, type TransferCosts } from 'shared-types'
-
-type LifecycleButtonProps = {
-  label: string
-  title: string
-  description?: string
-  onConfirm: () => Promise<void>
-  disabled?: boolean
-}
-
-function LifecycleButton({
-  label,
-  title,
-  description,
-  onConfirm,
-  disabled,
-}: LifecycleButtonProps): React.JSX.Element {
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  async function handleConfirm() {
-    setLoading(true)
-    try {
-      await onConfirm()
-      setOpen(false)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button disabled={disabled}>{label}</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
-          <Button onClick={handleConfirm} disabled={loading}>
-            {loading ? <SpinnerGapIcon className="animate-spin" /> : null}
-            {label}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
 
 type DepartActionProps = {
   originId: number

@@ -45,7 +45,9 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
 }
 
 function harvestBlockedReason(assets: AssetSearchRow[]): string | undefined {
-  const blockedCount = assets.filter((a) => !isHarvestable(a.status, a.is_in_transit)).length
+  const blockedCount = assets.filter(
+    (a) => !isHarvestable(a.status, a.is_in_transit, a.departure_number),
+  ).length
   if (blockedCount === 0) return undefined
   if (blockedCount === 1) return '1 selected asset is held or in transit'
   return `${blockedCount} selected assets are held or in transit`

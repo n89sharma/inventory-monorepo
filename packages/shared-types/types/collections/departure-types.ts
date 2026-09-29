@@ -6,8 +6,21 @@ import { OutgoingStatusSchema, WarehouseSchema } from '../reference-data-types.j
 import { UserSchema } from '../user-types.js'
 import { CollectionSummarySchema } from './collection-types.js'
 
+// Departure lifecycle. DB stores the raw string (Departure.status); this is the compile-time
+// symbol for code that names a state. Wire fields stay z.string() like TransferSummary.status.
+export const DepartureStatusSchema = z.enum([
+  'DRAFT',
+  'SCHEDULED',
+  'LOADING_IN_PROGRESS',
+  'LOADED',
+  'COMPLETE',
+])
+export type DepartureStatus = z.infer<typeof DepartureStatusSchema>
+export const DEPARTURE_STATUS = DepartureStatusSchema.enum
+
 export const DepartureSummarySchema = CollectionSummarySchema.extend({
   departure_number: z.string(),
+  status: z.string(),
   origin_code: z.string(),
   origin_street: z.string(),
   destination: z.string(),
@@ -25,9 +38,21 @@ export const DepartureInvoiceSchema = z.object({
 })
 export type DepartureInvoice = z.infer<typeof DepartureInvoiceSchema>
 
+// Per-asset loading checklist state on a departure. A Missing asset was lost at load:
+// it is Missing with loaded still false.
+export const DepartureAssetScanStateSchema = z.object({ loaded: z.boolean() })
+export type DepartureAssetScanState = z.infer<typeof DepartureAssetScanStateSchema>
+
+export const DepartureAssetRowSchema = AssetSearchRowSchema.extend({
+  scan: DepartureAssetScanStateSchema,
+  outgoing_status: OutgoingStatusSchema,
+})
+export type DepartureAssetRow = z.infer<typeof DepartureAssetRowSchema>
+
 // GET /departures/:departureNumber
 export const DepartureDetailSchema = z.object({
   departure_number: z.string(),
+  status: z.string(),
   origin: WarehouseSchema,
   customer: OrgDetailSchema,
   transporter: OrgDetailSchema,
@@ -36,7 +61,7 @@ export const DepartureDetailSchema = z.object({
   created_by: z.string().optional(),
   departure_date: z.string().nullable(),
   salesperson: UserSchema.nullable(),
-  assets: z.array(AssetSearchRowSchema),
+  assets: z.array(DepartureAssetRowSchema),
   invoices: z.array(DepartureInvoiceSchema),
 })
 export type DepartureDetail = z.infer<typeof DepartureDetailSchema>
@@ -80,6 +105,20 @@ export const UpdateDepartureMetadataSchema = z.object({
   comment: z.string().nullable(),
 })
 export type UpdateDepartureMetadata = z.infer<typeof UpdateDepartureMetadataSchema>
+
+// POST /departures/:departureNumber/schedule
+export const ScheduleDepartureSchema = z.object({
+  departure_date: ScheduledDateSchema,
+})
+export type ScheduleDeparture = z.infer<typeof ScheduleDepartureSchema>
+
+// POST /departures/:departureNumber/assets/{scan-loaded,mark-missing-at-load,undo-load}
+export const DepartureAssetIdSchema = z.object({ assetId: z.number().int() })
+export type DepartureAssetId = z.infer<typeof DepartureAssetIdSchema>
+
+// PATCH /departures/:departureNumber/notes
+export const UpdateDepartureNotesSchema = z.object({ comment: z.string() })
+export type UpdateDepartureNotes = z.infer<typeof UpdateDepartureNotesSchema>
 
 // PATCH /departures/:departureNumber/departure-date
 export const UpdateDepartureDateSchema = z.object({

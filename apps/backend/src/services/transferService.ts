@@ -1,6 +1,5 @@
 import {
   ASSET_STATUS,
-  ON_HAND_STATUS_VALUES,
   Permission,
   AssetCost,
   AssetDelta,
@@ -20,6 +19,11 @@ import {
   getTransfers as getTransfersDb,
 } from '../../generated/prisma/sql.js'
 import { COST_SELECT, toAssetCost } from '../lib/asset-cost.js'
+import {
+  assertAssetsNotOnDeparture,
+  assertAssetsNotOnOpenTransfer,
+  assertAssetsOnHand,
+} from '../lib/collection-assets.js'
 import { getNextSequence } from '../lib/db-utils.js'
 import { ZERO, totalCostDecimal } from '../lib/decimal.js'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
@@ -36,6 +40,7 @@ import {
   recordTransferCreate,
   recordTransferUpdate,
 } from './historyService.js'
+import { recordDepartureRelease, releaseMissingAssetsFromDepartures } from './departureService.js'
 import {
   getWarehouseTransferCostDecimals,
   type TransferCostDecimals,
@@ -48,6 +53,7 @@ const UNTESTED_READINESS = 'UNTESTED'
 const NOT_MISSING_MESSAGE = 'Only missing assets can be returned to stock:'
 const MISSING_WHILE_UNLOADING_MESSAGE =
   'Assets missing during unloading can be returned once their transfer is complete:'
+const NOT_ON_HAND_MESSAGE = 'Not in stock or held, cannot be on a transfer:'
 const CONCURRENT_CHANGE_MESSAGE = 'Some assets changed while updating; refresh and try again'
 
 export async function getTransferSummaries(
@@ -94,6 +100,10 @@ const TRANSFER_ROUTE_SELECT = {
   destination: { select: { city_code: true } },
 } as const
 
+function onHandError(detail: string): ConflictError {
+  return new ConflictError(`${NOT_ON_HAND_MESSAGE} ${detail}`)
+}
+
 function transferRoute(
   transferNumber: string,
   transfer: { origin: { city_code: string }; destination: { city_code: string } },
@@ -113,7 +123,8 @@ export async function createTransfer(transfer: CreateTransfer, userId: number): 
 
   const newTransferId = await prisma.$transaction(async (tx) => {
     await assertAssetsNotOnOpenTransfer(tx, assetIds)
-    await assertAssetsOnHand(tx, assetIds)
+    await assertAssetsNotOnDeparture(tx, assetIds)
+    await assertAssetsOnHand(tx, assetIds, onHandError)
     const created = await tx.transfer.create({
       data: {
         transfer_number: transferNumber,
@@ -227,7 +238,8 @@ export async function patchTransferAssets(
       throw new ConflictError(`Transfer ${transferNumber} cannot be edited after dispatch`)
     }
     await assertAssetsNotOnOpenTransfer(tx, delta.assetIdsToAdd, transfer.id)
-    await assertAssetsOnHand(tx, delta.assetIdsToAdd)
+    await assertAssetsNotOnDeparture(tx, delta.assetIdsToAdd)
+    await assertAssetsOnHand(tx, delta.assetIdsToAdd, onHandError)
     await applyTransferAssetDelta(tx, transfer.id, delta.assetIdsToAdd, delta.assetIdsToRemove)
     return transfer.id
   })
@@ -324,6 +336,7 @@ export async function startLoadingTransfer(transferNumber: string, userId: numbe
     await assertAssetsOnHand(
       tx,
       transfer.asset_transfers.map((at) => at.asset_id),
+      onHandError,
     )
     await tx.transfer.update({
       where: { id: transfer.id },
@@ -959,8 +972,8 @@ export async function returnMissingAssetsToStock(
     select: { id: true },
   })
 
-  const { priorAssets, removedAssetIdsByTransfer, revertedTransfers } = await prisma.$transaction(
-    async (tx) => {
+  const { priorAssets, removedAssetIdsByTransfer, revertedTransfers, departureRelease } =
+    await prisma.$transaction(async (tx) => {
       const assets = await tx.asset.findMany({
         where: { id: { in: assetIds } },
         select: { id: true, barcode: true, status_id: true, status: { select: { status: true } } },
@@ -1029,9 +1042,9 @@ export async function returnMissingAssetsToStock(
           assetIds: (rows ?? []).map((row) => row.asset_id),
         }),
       )
-      return { priorAssets: assets, removedAssetIdsByTransfer, revertedTransfers }
-    },
-  )
+      const departureRelease = await releaseMissingAssetsFromDepartures(tx, assetIds)
+      return { priorAssets: assets, removedAssetIdsByTransfer, revertedTransfers, departureRelease }
+    })
 
   await recordAssetStatusChange(priorAssets, inStockStatus.id, userId)
   for (const { transferId, assetIds: removedAssetIds } of removedAssetIdsByTransfer) {
@@ -1047,6 +1060,7 @@ export async function returnMissingAssetsToStock(
   for (const { id, status } of revertedTransfers) {
     await recordTransferUpdate(id, { status }, { status: TRANSFER_STATUS.DRAFT }, userId)
   }
+  await recordDepartureRelease(departureRelease, userId)
 }
 
 async function resolveShippingAndReceivingLocationId(
@@ -1070,48 +1084,6 @@ async function resolveShippingAndReceivingLocationId(
     )
   }
   return location.id
-}
-
-async function assertAssetsNotOnOpenTransfer(
-  tx: Prisma.TransactionClient,
-  assetIds: number[],
-  excludeTransferId?: number,
-): Promise<void> {
-  if (assetIds.length === 0) return
-  const conflicts = await tx.assetTransfer.findMany({
-    where: {
-      asset_id: { in: assetIds },
-      transfer: {
-        status: { not: TRANSFER_STATUS.COMPLETE },
-        ...(excludeTransferId !== undefined ? { id: { not: excludeTransferId } } : {}),
-      },
-    },
-    select: {
-      asset: { select: { barcode: true } },
-      transfer: { select: { transfer_number: true } },
-    },
-  })
-  if (conflicts.length > 0) {
-    const detail = conflicts
-      .map((c) => `${c.asset.barcode} (on ${c.transfer.transfer_number})`)
-      .join(', ')
-    throw new ConflictError(`Already on an open transfer: ${detail}`)
-  }
-}
-
-const ON_HAND_STATUSES: readonly string[] = ON_HAND_STATUS_VALUES
-
-async function assertAssetsOnHand(tx: Prisma.TransactionClient, assetIds: number[]): Promise<void> {
-  if (assetIds.length === 0) return
-  const assets = await tx.asset.findMany({
-    where: { id: { in: assetIds } },
-    select: { barcode: true, status: { select: { status: true } } },
-  })
-  const notOnHand = assets.filter((asset) => !ON_HAND_STATUSES.includes(asset.status.status))
-  if (notOnHand.length > 0) {
-    const detail = notOnHand.map((asset) => `${asset.barcode} (${asset.status.status})`).join(', ')
-    throw new ConflictError(`Not in stock or held, cannot be on a transfer: ${detail}`)
-  }
 }
 
 async function applyTransferAssetDelta(

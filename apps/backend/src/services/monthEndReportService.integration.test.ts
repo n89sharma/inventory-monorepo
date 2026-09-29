@@ -2,18 +2,17 @@ import { OUTGOING_STATUS, type RecordStoreTransaction } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
-  buildCreateDepartureInput,
   buildCreateHoldInput,
   buildCreateTransferInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  createLoadedDeparture,
   seedArrivalTestData,
   seedAssetCost,
   seedBrand,
   seedModel,
 } from '../../test/factories.js'
 import { prisma } from '../prisma.js'
-import { createDeparture } from './departureService.js'
 import { createHold } from './holdService.js'
 import {
   createManualMonthEndReport,
@@ -109,10 +108,7 @@ describe('monthEndReportService', () => {
 
   it('leaves out departed assets and assets in inactive warehouses', async () => {
     const [kept, sold, parked] = await createArrivedAssets(refs, 3)
-    await createDeparture(
-      buildCreateDepartureInput(refs, [{ id: sold.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-      refs.userId,
-    )
+    await createLoadedDeparture(refs, [{ id: sold.id, outgoing_status: OUTGOING_STATUS.SOLD }])
     await moveToInactiveWarehouse(parked.id)
 
     const reportId = await createManualMonthEndReport(refs.userId)

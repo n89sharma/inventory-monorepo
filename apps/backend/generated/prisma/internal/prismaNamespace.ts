@@ -409,6 +409,7 @@ export const ModelName = {
   AssetTransfer: 'AssetTransfer',
   Arrival: 'Arrival',
   Departure: 'Departure',
+  AssetDeparture: 'AssetDeparture',
   Hold: 'Hold',
   Invoice: 'Invoice',
   Location: 'Location',
@@ -445,7 +446,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "assetDeparture" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2296,6 +2297,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DepartureCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DepartureCountAggregateOutputType> | number
+        }
+      }
+    }
+    AssetDeparture: {
+      payload: Prisma.$AssetDeparturePayload<ExtArgs>
+      fields: Prisma.AssetDepartureFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AssetDepartureFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AssetDepartureFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        findFirst: {
+          args: Prisma.AssetDepartureFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AssetDepartureFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        findMany: {
+          args: Prisma.AssetDepartureFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>[]
+        }
+        create: {
+          args: Prisma.AssetDepartureCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        createMany: {
+          args: Prisma.AssetDepartureCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AssetDepartureCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>[]
+        }
+        delete: {
+          args: Prisma.AssetDepartureDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        update: {
+          args: Prisma.AssetDepartureUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        deleteMany: {
+          args: Prisma.AssetDepartureDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AssetDepartureUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AssetDepartureUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>[]
+        }
+        upsert: {
+          args: Prisma.AssetDepartureUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssetDeparturePayload>
+        }
+        aggregate: {
+          args: Prisma.AssetDepartureAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAssetDeparture>
+        }
+        groupBy: {
+          args: Prisma.AssetDepartureGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AssetDepartureGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AssetDepartureCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AssetDepartureCountAggregateOutputType> | number
         }
       }
     }
@@ -4181,6 +4256,7 @@ export type ArrivalScalarFieldEnum = (typeof ArrivalScalarFieldEnum)[keyof typeo
 export const DepartureScalarFieldEnum = {
   id: 'id',
   departure_number: 'departure_number',
+  status: 'status',
   origin_id: 'origin_id',
   destination_id: 'destination_id',
   transporter_id: 'transporter_id',
@@ -4192,6 +4268,16 @@ export const DepartureScalarFieldEnum = {
 } as const
 
 export type DepartureScalarFieldEnum = (typeof DepartureScalarFieldEnum)[keyof typeof DepartureScalarFieldEnum]
+
+
+export const AssetDepartureScalarFieldEnum = {
+  asset_id: 'asset_id',
+  departure_id: 'departure_id',
+  outgoing_status_id: 'outgoing_status_id',
+  loaded: 'loaded'
+} as const
+
+export type AssetDepartureScalarFieldEnum = (typeof AssetDepartureScalarFieldEnum)[keyof typeof AssetDepartureScalarFieldEnum]
 
 
 export const HoldScalarFieldEnum = {
@@ -4766,6 +4852,7 @@ export type GlobalOmitConfig = {
   assetTransfer?: Prisma.AssetTransferOmit
   arrival?: Prisma.ArrivalOmit
   departure?: Prisma.DepartureOmit
+  assetDeparture?: Prisma.AssetDepartureOmit
   hold?: Prisma.HoldOmit
   invoice?: Prisma.InvoiceOmit
   location?: Prisma.LocationOmit

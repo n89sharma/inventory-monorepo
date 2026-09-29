@@ -149,6 +149,7 @@ function renderSplitView(pendingAssets: TransferAssetRow[], resolvedAssets: Tran
   render(
     <MemoryRouter>
       <ScanSplitView
+        entityName="transfer"
         pendingAssets={pendingAssets}
         resolvedAssets={resolvedAssets}
         pendingLabel="Pending"

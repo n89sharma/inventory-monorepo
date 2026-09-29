@@ -36,6 +36,10 @@ export const OutgoingStatusSchema = z.enum(OUTGOING_STATUS_VALUES)
 export type OutgoingStatus = z.infer<typeof OutgoingStatusSchema>
 export const OUTGOING_STATUS = OutgoingStatusSchema.enum
 
+export function isOutgoingStatus(status: string): status is OutgoingStatus {
+  return OutgoingStatusSchema.safeParse(status).success
+}
+
 export const AssetStatusSchema = z.enum([...IN_HOUSE_STATUS_VALUES, ...OUTGOING_STATUS_VALUES])
 export type AssetStatus = z.infer<typeof AssetStatusSchema>
 export const ASSET_STATUS = AssetStatusSchema.enum

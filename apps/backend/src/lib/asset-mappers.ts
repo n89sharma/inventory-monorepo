@@ -1,4 +1,10 @@
-import { AssetDetails, AssetLocationDetails, AssetSearchRow, AssetSummary } from 'shared-types'
+import {
+  AssetDetails,
+  AssetLocationDetails,
+  AssetSearchRow,
+  AssetSummary,
+  isOutgoingStatus,
+} from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { getAssetDetailsBatch as getAssetDetailsBatchQuery } from '../../generated/prisma/sql.js'
 import { toYmdOrNull } from './date-only.js'
@@ -169,7 +175,7 @@ export function mapAssetSearchRow(r: AssetSearchRowDb): AssetSearchRow {
     customer: r.customer,
     salesperson: r.salesperson,
     departure_number: r.departure_number,
-    departed_at: toYmdOrNull(r.departed_at),
+    departed_at: isOutgoingStatus(r.status) ? toYmdOrNull(r.departed_at) : null,
     arrival_number: r.arrival_number,
     arrival_warehouse_code: r.arrival_warehouse_code,
     arrival_created_at: r.arrival_created_at,

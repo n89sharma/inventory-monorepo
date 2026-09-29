@@ -27,13 +27,17 @@ const ROW_HEIGHT_CLASS = 'h-7'
 const COMPACT_CELL_CLASS = 'py-0'
 const RESOLVED_ROW_CLASS = 'data-row-success'
 const MISSING_ROW_CLASS = 'data-row-warning'
-const NOT_ON_TRANSFER_ERROR = 'not in the scheduled transfer list'
 const SEARCH_PLACEHOLDER = 'Search barcode, serial, model'
 const SEARCH_CLEAR_LABEL = 'Clear search'
 const SEARCHABLE_TEXT = { getColumnCanGlobalFilter: () => true } as const
 
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1)
+}
+
 interface PendingActionCellProps {
   asset: AssetSearchRow
+  entityName: string
   actionLabel: string
   onScan: (assetId: number) => Promise<void>
   onMarkMissing: (assetId: number) => Promise<void>
@@ -41,6 +45,7 @@ interface PendingActionCellProps {
 
 function PendingActionCell({
   asset,
+  entityName,
   actionLabel,
   onScan,
   onMarkMissing,
@@ -80,7 +85,8 @@ function PendingActionCell({
         }}
       >
         <AlertDialogDescription>
-          Asset {asset.barcode} will be marked as Missing. Transfer can continue without the asset.
+          Asset {asset.barcode} will be marked as Missing. {capitalize(entityName)} can continue
+          without the asset.
         </AlertDialogDescription>
       </ConfirmActionDialog>
     </div>
@@ -172,6 +178,7 @@ function getRowId(asset: AssetSearchRow): string {
 }
 
 interface ScanSplitViewProps {
+  entityName: string
   pendingAssets: AssetSearchRow[]
   resolvedAssets: AssetSearchRow[]
   pendingLabel: string
@@ -190,6 +197,7 @@ interface ScanSplitViewProps {
 }
 
 export function ScanSplitView({
+  entityName,
   pendingAssets,
   resolvedAssets,
   pendingLabel,
@@ -208,7 +216,7 @@ export function ScanSplitView({
 
   function validateAsset(asset: AssetSummary): string | null {
     const pending = pendingByBarcode.get(asset.barcode)
-    if (!pending) return `Asset ${asset.barcode} is ${NOT_ON_TRANSFER_ERROR}.`
+    if (!pending) return `Asset ${asset.barcode} is not in the scheduled ${entityName} list.`
     return null
   }
 
@@ -228,6 +236,7 @@ export function ScanSplitView({
       cell: ({ row }) => (
         <PendingActionCell
           asset={row.original}
+          entityName={entityName}
           actionLabel={actionLabel}
           onScan={onScan}
           onMarkMissing={onMarkMissing}
@@ -265,7 +274,7 @@ export function ScanSplitView({
         <AddAssetsByBarcodeOrSerial
           getAssets={() => resolvedAssets}
           onAddAsset={() => {}}
-          entityName="transfer"
+          entityName={entityName}
           validateAsset={validateAsset}
           onCommit={handleScan}
           showLeadingIcon

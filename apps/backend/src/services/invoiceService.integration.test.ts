@@ -2,10 +2,11 @@ import { ASSET_STATUS, INVOICE_TYPE, OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
-  buildCreateDepartureInput,
   buildCreateInvoiceInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  buildCreateDepartureInput,
+  createLoadedDeparture,
   getAssetStatus,
   setAssetStatus,
   assetCostOf,
@@ -364,7 +365,7 @@ async function setArrivalDate(assetId: number, ymd: string): Promise<void> {
 async function setDepartureDate(departureNumber: string, ymd: string): Promise<void> {
   await prisma.departure.update({
     where: { departure_number: departureNumber },
-    data: { created_at: atUtcNoon(ymd) },
+    data: { departure_date: new Date(ymd) },
   })
 }
 
@@ -454,10 +455,9 @@ describe('invoiceService.getInvoices date window', () => {
 
   it('matches a sales invoice on its departure date and keeps it out of the purchase list', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    const departureNumber = await createDeparture(
-      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-      refs.userId,
-    )
+    const departureNumber = await createLoadedDeparture(refs, [
+      { id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+    ])
     const { invoiceNumber } = await createInvoice(
       buildCreateInvoiceInput(refs, [asset], refs.invoiceTypeSaleId),
       refs.userId,

@@ -193,12 +193,14 @@ export type StatusWhereInput = {
   id?: Prisma.IntFilter<"Status"> | number
   status?: Prisma.StringFilter<"Status"> | string
   assets?: Prisma.AssetListRelationFilter
+  asset_departures?: Prisma.AssetDepartureListRelationFilter
 }
 
 export type StatusOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   status?: Prisma.SortOrder
   assets?: Prisma.AssetOrderByRelationAggregateInput
+  asset_departures?: Prisma.AssetDepartureOrderByRelationAggregateInput
 }
 
 export type StatusWhereUniqueInput = Prisma.AtLeast<{
@@ -208,6 +210,7 @@ export type StatusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.StatusWhereInput[]
   NOT?: Prisma.StatusWhereInput | Prisma.StatusWhereInput[]
   assets?: Prisma.AssetListRelationFilter
+  asset_departures?: Prisma.AssetDepartureListRelationFilter
 }, "id" | "status">
 
 export type StatusOrderByWithAggregationInput = {
@@ -231,23 +234,27 @@ export type StatusScalarWhereWithAggregatesInput = {
 export type StatusCreateInput = {
   status: string
   assets?: Prisma.AssetCreateNestedManyWithoutStatusInput
+  asset_departures?: Prisma.AssetDepartureCreateNestedManyWithoutOutgoing_statusInput
 }
 
 export type StatusUncheckedCreateInput = {
   id?: number
   status: string
   assets?: Prisma.AssetUncheckedCreateNestedManyWithoutStatusInput
+  asset_departures?: Prisma.AssetDepartureUncheckedCreateNestedManyWithoutOutgoing_statusInput
 }
 
 export type StatusUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   assets?: Prisma.AssetUpdateManyWithoutStatusNestedInput
+  asset_departures?: Prisma.AssetDepartureUpdateManyWithoutOutgoing_statusNestedInput
 }
 
 export type StatusUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   assets?: Prisma.AssetUncheckedUpdateManyWithoutStatusNestedInput
+  asset_departures?: Prisma.AssetDepartureUncheckedUpdateManyWithoutOutgoing_statusNestedInput
 }
 
 export type StatusCreateManyInput = {
@@ -306,13 +313,29 @@ export type StatusUpdateOneRequiredWithoutAssetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StatusUpdateToOneWithWhereWithoutAssetsInput, Prisma.StatusUpdateWithoutAssetsInput>, Prisma.StatusUncheckedUpdateWithoutAssetsInput>
 }
 
+export type StatusCreateNestedOneWithoutAsset_departuresInput = {
+  create?: Prisma.XOR<Prisma.StatusCreateWithoutAsset_departuresInput, Prisma.StatusUncheckedCreateWithoutAsset_departuresInput>
+  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAsset_departuresInput
+  connect?: Prisma.StatusWhereUniqueInput
+}
+
+export type StatusUpdateOneRequiredWithoutAsset_departuresNestedInput = {
+  create?: Prisma.XOR<Prisma.StatusCreateWithoutAsset_departuresInput, Prisma.StatusUncheckedCreateWithoutAsset_departuresInput>
+  connectOrCreate?: Prisma.StatusCreateOrConnectWithoutAsset_departuresInput
+  upsert?: Prisma.StatusUpsertWithoutAsset_departuresInput
+  connect?: Prisma.StatusWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StatusUpdateToOneWithWhereWithoutAsset_departuresInput, Prisma.StatusUpdateWithoutAsset_departuresInput>, Prisma.StatusUncheckedUpdateWithoutAsset_departuresInput>
+}
+
 export type StatusCreateWithoutAssetsInput = {
   status: string
+  asset_departures?: Prisma.AssetDepartureCreateNestedManyWithoutOutgoing_statusInput
 }
 
 export type StatusUncheckedCreateWithoutAssetsInput = {
   id?: number
   status: string
+  asset_departures?: Prisma.AssetDepartureUncheckedCreateNestedManyWithoutOutgoing_statusInput
 }
 
 export type StatusCreateOrConnectWithoutAssetsInput = {
@@ -333,11 +356,51 @@ export type StatusUpdateToOneWithWhereWithoutAssetsInput = {
 
 export type StatusUpdateWithoutAssetsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  asset_departures?: Prisma.AssetDepartureUpdateManyWithoutOutgoing_statusNestedInput
 }
 
 export type StatusUncheckedUpdateWithoutAssetsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  asset_departures?: Prisma.AssetDepartureUncheckedUpdateManyWithoutOutgoing_statusNestedInput
+}
+
+export type StatusCreateWithoutAsset_departuresInput = {
+  status: string
+  assets?: Prisma.AssetCreateNestedManyWithoutStatusInput
+}
+
+export type StatusUncheckedCreateWithoutAsset_departuresInput = {
+  id?: number
+  status: string
+  assets?: Prisma.AssetUncheckedCreateNestedManyWithoutStatusInput
+}
+
+export type StatusCreateOrConnectWithoutAsset_departuresInput = {
+  where: Prisma.StatusWhereUniqueInput
+  create: Prisma.XOR<Prisma.StatusCreateWithoutAsset_departuresInput, Prisma.StatusUncheckedCreateWithoutAsset_departuresInput>
+}
+
+export type StatusUpsertWithoutAsset_departuresInput = {
+  update: Prisma.XOR<Prisma.StatusUpdateWithoutAsset_departuresInput, Prisma.StatusUncheckedUpdateWithoutAsset_departuresInput>
+  create: Prisma.XOR<Prisma.StatusCreateWithoutAsset_departuresInput, Prisma.StatusUncheckedCreateWithoutAsset_departuresInput>
+  where?: Prisma.StatusWhereInput
+}
+
+export type StatusUpdateToOneWithWhereWithoutAsset_departuresInput = {
+  where?: Prisma.StatusWhereInput
+  data: Prisma.XOR<Prisma.StatusUpdateWithoutAsset_departuresInput, Prisma.StatusUncheckedUpdateWithoutAsset_departuresInput>
+}
+
+export type StatusUpdateWithoutAsset_departuresInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  assets?: Prisma.AssetUpdateManyWithoutStatusNestedInput
+}
+
+export type StatusUncheckedUpdateWithoutAsset_departuresInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  assets?: Prisma.AssetUncheckedUpdateManyWithoutStatusNestedInput
 }
 
 
@@ -347,10 +410,12 @@ export type StatusUncheckedUpdateWithoutAssetsInput = {
 
 export type StatusCountOutputType = {
   assets: number
+  asset_departures: number
 }
 
 export type StatusCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assets?: boolean | StatusCountOutputTypeCountAssetsArgs
+  asset_departures?: boolean | StatusCountOutputTypeCountAsset_departuresArgs
 }
 
 /**
@@ -370,11 +435,19 @@ export type StatusCountOutputTypeCountAssetsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.AssetWhereInput
 }
 
+/**
+ * StatusCountOutputType without action
+ */
+export type StatusCountOutputTypeCountAsset_departuresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssetDepartureWhereInput
+}
+
 
 export type StatusSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   status?: boolean
   assets?: boolean | Prisma.Status$assetsArgs<ExtArgs>
+  asset_departures?: boolean | Prisma.Status$asset_departuresArgs<ExtArgs>
   _count?: boolean | Prisma.StatusCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["status"]>
 
@@ -396,6 +469,7 @@ export type StatusSelectScalar = {
 export type StatusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status", ExtArgs["result"]["status"]>
 export type StatusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assets?: boolean | Prisma.Status$assetsArgs<ExtArgs>
+  asset_departures?: boolean | Prisma.Status$asset_departuresArgs<ExtArgs>
   _count?: boolean | Prisma.StatusCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StatusIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -405,6 +479,7 @@ export type $StatusPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Status"
   objects: {
     assets: Prisma.$AssetPayload<ExtArgs>[]
+    asset_departures: Prisma.$AssetDeparturePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -804,6 +879,7 @@ readonly fields: StatusFieldRefs;
 export interface Prisma__StatusClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   assets<T extends Prisma.Status$assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Status$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  asset_departures<T extends Prisma.Status$asset_departuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Status$asset_departuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssetDeparturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1249,6 +1325,30 @@ export type Status$assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.AssetScalarFieldEnum | Prisma.AssetScalarFieldEnum[]
+}
+
+/**
+ * Status.asset_departures
+ */
+export type Status$asset_departuresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssetDeparture
+   */
+  select?: Prisma.AssetDepartureSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssetDeparture
+   */
+  omit?: Prisma.AssetDepartureOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssetDepartureInclude<ExtArgs> | null
+  where?: Prisma.AssetDepartureWhereInput
+  orderBy?: Prisma.AssetDepartureOrderByWithRelationInput | Prisma.AssetDepartureOrderByWithRelationInput[]
+  cursor?: Prisma.AssetDepartureWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssetDepartureScalarFieldEnum | Prisma.AssetDepartureScalarFieldEnum[]
 }
 
 /**

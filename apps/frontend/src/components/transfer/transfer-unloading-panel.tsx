@@ -36,6 +36,7 @@ export function TransferUnloadingPanel({
 
   return (
     <ScanSplitView
+      entityName="transfer"
       pendingAssets={pendingAssets}
       resolvedAssets={resolvedAssets}
       pendingLabel={PENDING_LABEL}

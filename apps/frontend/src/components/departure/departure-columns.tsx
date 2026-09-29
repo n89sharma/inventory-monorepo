@@ -1,3 +1,4 @@
+import { DepartureStatusBadge } from '@/components/departure/departure-status-badge'
 import { createIdColumn } from '@/components/table-columns/column-primitives'
 import {
   assetCountColumnDef,
@@ -18,6 +19,11 @@ export function departureTableColumns(
       href: getHref,
       value: (row) => row.departure_number,
     }),
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => <DepartureStatusBadge status={row.original.status} />,
+    },
     {
       id: 'departure_date',
       header: 'Date',

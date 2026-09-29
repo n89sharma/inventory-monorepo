@@ -116,6 +116,7 @@ type DepartureUpdateFields = Partial<{
   transporter_id: number
   sales_representative_id: number | null
   departure_date: string | null
+  status: string
 }>
 
 type HoldUpdateFields = Partial<{
@@ -523,6 +524,7 @@ const DEPARTURE_UPDATE_SPEC: FieldSpec[] = [
   { field: 'destination_id', out: 'destination_name', resolve: 'organization', bothRequired: true },
   { field: 'transporter_id', out: 'transporter_name', resolve: 'organization', bothRequired: true },
   { field: 'sales_representative_id', out: 'salesperson_name', resolve: 'user' },
+  { field: 'status' },
   { field: 'departure_date' },
 ]
 

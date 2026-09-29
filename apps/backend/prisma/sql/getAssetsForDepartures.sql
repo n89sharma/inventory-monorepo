@@ -47,6 +47,8 @@ select
   sp."name" as salesperson,
   d.departure_number as departure_number,
   coalesce(d.departure_date, d.created_at::date) as departed_at,
+  coalesce(ad.loaded, false) as loaded,
+  coalesce(os.status, s.status) as outgoing_status,
   r.arrival_number as arrival_number,
   aw.city_code as arrival_warehouse_code,
   r.created_at as arrival_created_at,
@@ -59,6 +61,8 @@ select
   lcu."name" as latest_comment_by
 from "Departure" d
   join "Asset" a on d.id = a.departure_id
+  left join "AssetDeparture" ad on ad.asset_id = a.id
+  left join "Status" os on os.id = ad.outgoing_status_id
   join "TechnicalSpecification" t on t.asset_id = a.id
   left join "Component" cmp on cmp.id = t.component_id
   left join lateral (

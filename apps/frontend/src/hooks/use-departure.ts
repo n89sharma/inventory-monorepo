@@ -5,7 +5,10 @@ import { getIdOrNullFromSelection, getSelectedOrNull } from '@/ui-types/select-o
 import type { OrgSummary, Warehouse } from 'shared-types'
 import useSWR, { mutate, preload } from 'swr'
 
-export const departureDetailKey = (departureNumber: string) => `departure:${departureNumber}`
+const DEPARTURE_DETAIL_KEY_PREFIX = 'departure:'
+
+export const departureDetailKey = (departureNumber: string) =>
+  `${DEPARTURE_DETAIL_KEY_PREFIX}${departureNumber}`
 
 export function useDepartureDetail(departureNumber: string) {
   return useSWR(departureDetailKey(departureNumber), () => getDepartureDetail(departureNumber))
@@ -58,4 +61,12 @@ export function invalidateDepartureLists() {
   return mutate((key) => Array.isArray(key) && key[0] === DEPARTURE_LIST_KEY_PREFIX, undefined, {
     revalidate: true,
   })
+}
+
+export function invalidateDepartureDetails() {
+  return mutate(
+    (key) => typeof key === 'string' && key.startsWith(DEPARTURE_DETAIL_KEY_PREFIX),
+    undefined,
+    { revalidate: true },
+  )
 }

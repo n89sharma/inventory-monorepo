@@ -1,5 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import type { DepartureDetail, OrgDetail, User, Warehouse } from 'shared-types'
+import {
+  DEPARTURE_STATUS,
+  type DepartureDetail,
+  type OrgDetail,
+  type User,
+  type Warehouse,
+} from 'shared-types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { EditDepartureMetadataModal } from './edit-departure-metadata-modal'
 
@@ -39,9 +45,10 @@ vi.mock('@/hooks/use-org', () => ({
   useOrgs: () => [CUSTOMER],
 }))
 
-function makeDeparture(departureDate: string | null): DepartureDetail {
+function makeDeparture(status: string, departureDate: string | null): DepartureDetail {
   return {
     departure_number: 'D-YYZ-0000001',
+    status,
     origin: ORIGIN,
     customer: CUSTOMER,
     transporter: CUSTOMER,
@@ -57,6 +64,7 @@ function makeDeparture(departureDate: string | null): DepartureDetail {
 
 function renderModal(departure: DepartureDetail) {
   const onSave = vi.fn().mockResolvedValue(undefined)
+  const onSaveNotes = vi.fn().mockResolvedValue(undefined)
   const onSaveDate = vi.fn().mockResolvedValue(undefined)
   render(
     <EditDepartureMetadataModal
@@ -64,10 +72,11 @@ function renderModal(departure: DepartureDetail) {
       onOpenChange={() => {}}
       departure={departure}
       onSave={onSave}
+      onSaveNotes={onSaveNotes}
       onSaveDate={onSaveDate}
     />,
   )
-  return { onSave, onSaveDate }
+  return { onSave, onSaveNotes, onSaveDate }
 }
 
 describe('EditDepartureMetadataModal', () => {
@@ -75,14 +84,28 @@ describe('EditDepartureMetadataModal', () => {
     vi.clearAllMocks()
   })
 
-  it('shows the departure date field', () => {
-    renderModal(makeDeparture('2026-02-01'))
+  it('DRAFT: date field is locked (not yet scheduled)', () => {
+    renderModal(makeDeparture(DEPARTURE_STATUS.DRAFT, null))
+
+    expect(screen.getByRole('button', { name: /Departure Date/ })).toBeDisabled()
+  })
+
+  it('SCHEDULED: date field is editable', () => {
+    renderModal(makeDeparture(DEPARTURE_STATUS.SCHEDULED, '2026-02-01'))
 
     expect(screen.getByRole('button', { name: /Departure Date/ })).toBeEnabled()
   })
 
-  it('saving an unchanged date does not call onSaveDate', async () => {
-    const { onSave, onSaveDate } = renderModal(makeDeparture('2026-02-01'))
+  it('LOADING_IN_PROGRESS: date field is locked again', () => {
+    renderModal(makeDeparture(DEPARTURE_STATUS.LOADING_IN_PROGRESS, '2026-02-01'))
+
+    expect(screen.getByRole('button', { name: /Departure Date/ })).toBeDisabled()
+  })
+
+  it('DRAFT: saving a changed comment saves the metadata, not just the notes', async () => {
+    const { onSave, onSaveNotes, onSaveDate } = renderModal(
+      makeDeparture(DEPARTURE_STATUS.DRAFT, null),
+    )
 
     fireEvent.change(screen.getByPlaceholderText('Departure notes…'), {
       target: { value: 'Updated note' },
@@ -90,6 +113,22 @@ describe('EditDepartureMetadataModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }))
 
     await vi.waitFor(() => expect(onSave).toHaveBeenCalled())
+    expect(onSaveNotes).not.toHaveBeenCalled()
+    expect(onSaveDate).not.toHaveBeenCalled()
+  })
+
+  it('SCHEDULED: saving a changed comment calls onSaveNotes only', async () => {
+    const { onSave, onSaveNotes, onSaveDate } = renderModal(
+      makeDeparture(DEPARTURE_STATUS.SCHEDULED, '2026-02-01'),
+    )
+
+    fireEvent.change(screen.getByPlaceholderText('Departure notes…'), {
+      target: { value: 'Updated note' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }))
+
+    await vi.waitFor(() => expect(onSaveNotes).toHaveBeenCalledWith('Updated note'))
+    expect(onSave).not.toHaveBeenCalled()
     expect(onSaveDate).not.toHaveBeenCalled()
   })
 })

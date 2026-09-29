@@ -1,4 +1,4 @@
-import { ASSET_STATUS, AssetUpdateDiffSchema } from 'shared-types'
+import { ASSET_STATUS, AssetUpdateDiffSchema, OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
@@ -6,6 +6,7 @@ import {
   ALL_PRICE_PERMISSIONS,
   NO_PERMISSIONS,
   SALE_PRICE_ONLY,
+  buildCreateDepartureInput,
   buildCreateHoldInput,
   cleanupTransactionalData,
   createArrivedAssets,
@@ -19,6 +20,7 @@ import {
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import { createDeparture } from './departureService.js'
 import {
   addRemoveCollectionFromAssetsAndRecord,
   archiveHold,
@@ -202,6 +204,30 @@ describe('holdService', () => {
     ).rejects.toThrow(ConflictError)
 
     expect(await getAssetStatus(missingAsset.id)).toBe(ASSET_STATUS.MISSING)
+  })
+
+  it('keeps an asset on a departure off a new hold and off an existing hold', async () => {
+    const [heldAsset, departingAsset] = await createArrivedAssets(refs, 2)
+    const holdNumber = await createHold(buildCreateHoldInput(refs, [heldAsset]), refs.userId)
+    await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: departingAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+
+    await expect(
+      createHold(buildCreateHoldInput(refs, [departingAsset]), refs.userId),
+    ).rejects.toThrow(ConflictError)
+    await expect(
+      addRemoveCollectionFromAssetsAndRecord(
+        holdNumber,
+        { assetIdsToAdd: [departingAsset.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(departingAsset.id)).toBe(ASSET_STATUS.IN_STOCK)
   })
 
   it('rejects editing the assets of an archived hold', async () => {

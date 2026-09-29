@@ -22,7 +22,14 @@ import {
   Warehouse,
 } from 'shared-types'
 import { prisma } from '../src/prisma.js'
+import { todayYmd } from '../src/lib/date-only.js'
 import { createArrival, getArrival } from '../src/services/arrivalService.js'
+import {
+  createDeparture,
+  scanAssetLoaded,
+  scheduleDeparture,
+  startLoadingDeparture,
+} from '../src/services/departureService.js'
 
 // Zone the arrival flow places assets in. Must match arrivalService.ts `arrivalZone`.
 const ARRIVAL_ZONE = 'ARRIVAL'
@@ -549,6 +556,23 @@ export function buildUpdateAssetSpecs(
 }
 
 // Read the current status string for an asset by id (assertion helper).
+// Creates a departure and drives it to Loading In Progress with every asset scanned as loaded.
+export async function createLoadedDeparture(
+  refs: ArrivalTestData,
+  assets: DepartureAssetInput[],
+): Promise<string> {
+  const departureNumber = await createDeparture(
+    buildCreateDepartureInput(refs, assets),
+    refs.userId,
+  )
+  await scheduleDeparture(departureNumber, { departure_date: todayYmd() }, refs.userId)
+  await startLoadingDeparture(departureNumber, refs.userId)
+  for (const asset of assets) {
+    await scanAssetLoaded(departureNumber, asset.id, refs.userId)
+  }
+  return departureNumber
+}
+
 export async function getAssetStatus(assetId: number): Promise<string> {
   const asset = await prisma.asset.findUniqueOrThrow({
     where: { id: assetId },
@@ -609,6 +633,7 @@ export async function cleanupTransactionalData(): Promise<void> {
   await prisma.storeTransaction.deleteMany()
   await prisma.assetSalvagedPart.deleteMany()
   await prisma.assetTransfer.deleteMany()
+  await prisma.assetDeparture.deleteMany()
   await prisma.assetError.deleteMany()
   await prisma.assetAccessory.deleteMany()
   await prisma.comment.deleteMany()

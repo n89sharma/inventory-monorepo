@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
+  buildCreateDepartureInput,
   buildCreateTransferInput,
   cleanupTransactionalData,
   createArrivedAssets,
@@ -19,9 +20,18 @@ import {
   SEEDED_ASSET_COST,
   seedShippingAndReceivingLocation,
 } from '../../test/factories.js'
-import { ASSET_STATUS, type LocationParts, type TransferCosts } from 'shared-types'
+import { ASSET_STATUS, OUTGOING_STATUS, type LocationParts, type TransferCosts } from 'shared-types'
 import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
+import {
+  completeDeparture,
+  createDeparture,
+  finishLoadingDeparture,
+  markAssetMissingAtLoad,
+  scanAssetLoaded,
+  scheduleDeparture,
+  startLoadingDeparture,
+} from './departureService.js'
 import {
   completeTransfer,
   createTransfer,
@@ -48,6 +58,14 @@ import {
 import type { History } from '../../generated/prisma/client.js'
 
 const TEST_TRANSFER_DATE = new Date().toISOString().slice(0, 10)
+async function getDepartureStatus(departureNumber: string): Promise<string> {
+  const departure = await prisma.departure.findUniqueOrThrow({
+    where: { departure_number: departureNumber },
+    select: { status: true },
+  })
+  return departure.status
+}
+
 const FUTURE_TRANSFER_DATE = '2099-06-15'
 const FUTURE_RANGE_START = '2099-06-01'
 const FUTURE_RANGE_END = '2099-06-30'
@@ -307,6 +325,31 @@ describe('transferService', () => {
     expect(inFutureRange[0].transfer_date).toBe(FUTURE_TRANSFER_DATE)
     expect(inTodayRange.map((t) => t.transfer_number)).toEqual([draftNumber])
     expect(inTodayRange[0].transfer_date).toBeNull()
+  })
+
+  it('rejects an asset on a departure on create and add', async () => {
+    const [onDeparture, onTransfer] = await createArrivedAssets(refs, 2)
+    await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: onDeparture.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    const transferNumber = await createTransfer(
+      buildCreateTransferInput(refs, [onTransfer]),
+      refs.userId,
+    )
+
+    await expect(
+      createTransfer(buildCreateTransferInput(refs, [onDeparture]), refs.userId),
+    ).rejects.toThrow(ConflictError)
+    await expect(
+      patchTransferAssets(
+        transferNumber,
+        { assetIdsToAdd: [onDeparture.id], assetIdsToRemove: [] },
+        refs.userId,
+      ),
+    ).rejects.toThrow(ConflictError)
   })
 
   it('returns asset cost, redacted by role permissions', async () => {
@@ -1627,6 +1670,45 @@ describe('returnMissingAssetsToStock', () => {
 
   it('rejects an unknown asset', async () => {
     await expect(returnMissingAssetsToStock([0], refs.userId)).rejects.toBeInstanceOf(NotFoundError)
+  })
+
+  it('detaches an asset missing on a departure, at any departure status, and reverts an emptied Loading departure', async () => {
+    const [missingOnLoading, missingOnCompleted, loadedAsset] = await createArrivedAssets(refs, 3)
+    const loadingNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: missingOnLoading.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    await scheduleDeparture(loadingNumber, { departure_date: TEST_TRANSFER_DATE }, refs.userId)
+    await startLoadingDeparture(loadingNumber, refs.userId)
+    await markAssetMissingAtLoad(loadingNumber, missingOnLoading.id, refs.userId)
+
+    const completedNumber = await createDeparture(
+      buildCreateDepartureInput(refs, [
+        { id: missingOnCompleted.id, outgoing_status: OUTGOING_STATUS.SOLD },
+        { id: loadedAsset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+      ]),
+      refs.userId,
+    )
+    await scheduleDeparture(completedNumber, { departure_date: TEST_TRANSFER_DATE }, refs.userId)
+    await startLoadingDeparture(completedNumber, refs.userId)
+    await scanAssetLoaded(completedNumber, loadedAsset.id, refs.userId)
+    await markAssetMissingAtLoad(completedNumber, missingOnCompleted.id, refs.userId)
+    await finishLoadingDeparture(completedNumber, refs.userId)
+    await completeDeparture(completedNumber, refs.userId)
+
+    await returnMissingAssetsToStock([missingOnLoading.id, missingOnCompleted.id], refs.userId)
+
+    expect(await getAssetStatus(missingOnLoading.id)).toBe(ASSET_STATUS.IN_STOCK)
+    expect(await getAssetStatus(missingOnCompleted.id)).toBe(ASSET_STATUS.IN_STOCK)
+    const links = await prisma.asset.findMany({
+      where: { id: { in: [missingOnLoading.id, missingOnCompleted.id] } },
+      select: { departure_id: true },
+    })
+    expect(links.every((l) => l.departure_id === null)).toBe(true)
+    expect(await getDepartureStatus(loadingNumber)).toBe('DRAFT')
+    expect(await getDepartureStatus(completedNumber)).toBe('COMPLETE')
   })
 })
 

@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { parseISO, startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Controller, useForm, type FieldErrors } from 'react-hook-form'
-import type { DepartureDetail } from 'shared-types'
+import { DEPARTURE_STATUS, type DepartureDetail } from 'shared-types'
 import { toast } from 'sonner'
 import { Button } from '../shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../shadcn/dialog'
@@ -30,6 +30,7 @@ interface EditDepartureMetadataModalProps {
   onOpenChange: (open: boolean) => void
   departure: DepartureDetail
   onSave: (metadata: DepartureMetadataForm) => Promise<void>
+  onSaveNotes: (comment: string) => Promise<void>
   onSaveDate: (departureDate: string) => Promise<void>
 }
 
@@ -38,6 +39,7 @@ export function EditDepartureMetadataModal({
   onOpenChange,
   departure,
   onSave,
+  onSaveNotes,
   onSaveDate,
 }: EditDepartureMetadataModalProps): React.JSX.Element {
   const activeWarehouses = useActiveWarehouses()
@@ -45,6 +47,8 @@ export function EditDepartureMetadataModal({
   const orgs = useOrgs()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const today = startOfDay(new Date())
+  const canEditMetadata = departure.status === DEPARTURE_STATUS.DRAFT
+  const canEditDate = departure.status === DEPARTURE_STATUS.SCHEDULED
 
   const values = useMemo(() => toFormValues(departure), [departure])
   const form = useForm<DepartureMetadataForm>({
@@ -58,8 +62,13 @@ export function EditDepartureMetadataModal({
     setIsSubmitting(true)
     try {
       const { dirtyFields } = form.formState
-      const saves: Promise<void>[] = [onSave(values)]
-      if (dirtyFields.departure_date && values.departure_date) {
+      const saves: Promise<void>[] = []
+      if (canEditMetadata) {
+        saves.push(onSave(values))
+      } else if (dirtyFields.comment) {
+        saves.push(onSaveNotes(values.comment))
+      }
+      if (canEditDate && dirtyFields.departure_date && values.departure_date) {
         saves.push(onSaveDate(formatDateParam(values.departure_date)))
       }
       await Promise.all(saves)
@@ -88,52 +97,55 @@ export function EditDepartureMetadataModal({
         </DialogHeader>
         <form onSubmit={(e) => e.preventDefault()}>
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-3">
-            <Controller
-              control={form.control}
-              name="origin"
-              render={({ field: { onChange, value }, fieldState }) => (
-                <SelectOptions
-                  selection={value}
-                  onSelectionChange={onChange}
-                  options={activeWarehouses}
-                  getLabel={(w) => w.city_code}
-                  fieldLabel="Origin"
-                  anyAllowed={false}
-                  fieldRequired={true}
-                  error={fieldState.invalid}
-                />
-              )}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="customer"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Customer"
-              fieldRequired={true}
-            />
-            <ControlledSearchSelectInput
-              control={form.control}
-              name="transporter"
-              options={orgs}
-              getLabel={(o) => o.name}
-              fieldLabel="Transporter"
-              fieldRequired={true}
-            />
-            <ControlledSelectOptionSearchSelect
-              control={form.control}
-              name="salesperson"
-              options={activeUsers}
-              getLabel={(u) => u.name}
-              fieldLabel="Salesperson"
-              fieldRequired={true}
-            />
+            <fieldset disabled={!canEditMetadata} className="contents">
+              <Controller
+                control={form.control}
+                name="origin"
+                render={({ field: { onChange, value }, fieldState }) => (
+                  <SelectOptions
+                    selection={value}
+                    onSelectionChange={onChange}
+                    options={activeWarehouses}
+                    getLabel={(w) => w.city_code}
+                    fieldLabel="Origin"
+                    anyAllowed={false}
+                    fieldRequired={true}
+                    error={fieldState.invalid}
+                  />
+                )}
+              />
+              <ControlledSearchSelectInput
+                control={form.control}
+                name="customer"
+                options={orgs}
+                getLabel={(o) => o.name}
+                fieldLabel="Customer"
+                fieldRequired={true}
+              />
+              <ControlledSearchSelectInput
+                control={form.control}
+                name="transporter"
+                options={orgs}
+                getLabel={(o) => o.name}
+                fieldLabel="Transporter"
+                fieldRequired={true}
+              />
+              <ControlledSelectOptionSearchSelect
+                control={form.control}
+                name="salesperson"
+                options={activeUsers}
+                getLabel={(u) => u.name}
+                fieldLabel="Salesperson"
+                fieldRequired={true}
+              />
+            </fieldset>
             <ControlledDatePickerField
               control={form.control}
               name="departure_date"
               label="Departure Date"
               className="self-end pb-0.5"
               disabled={{ before: today }}
+              fieldDisabled={!canEditDate}
             />
             <Controller
               control={form.control}

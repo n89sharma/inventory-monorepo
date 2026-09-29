@@ -2,14 +2,14 @@ import { OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
-  buildCreateDepartureInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  createLoadedDeparture,
   seedArrivalTestData,
 } from '../../test/factories.js'
 import { NotFoundError } from '../lib/errors.js'
+import { prisma } from '../prisma.js'
 import { patchAssetPricing } from './assetPricingService.js'
-import { createDeparture, patchDepartureDate } from './departureService.js'
 import { getModelPriceHistory } from './modelPriceHistoryService.js'
 
 const MISSING_ID = 999999
@@ -39,10 +39,7 @@ describe('modelPriceHistoryService', () => {
   it('includes a sold asset with a sale price in the sales list', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await patchAssetPricing(asset.barcode, { purchase_cost: 100, sale_price: 500 }, refs.userId)
-    await createDeparture(
-      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-      refs.userId,
-    )
+    await createLoadedDeparture(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }])
 
     const result = await getModelPriceHistory(refs.model.id)
     expect(result.sales).toHaveLength(1)
@@ -59,12 +56,14 @@ describe('modelPriceHistoryService', () => {
   it('reports the departure date as the sale date', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await patchAssetPricing(asset.barcode, { purchase_cost: 100, sale_price: 500 }, refs.userId)
-    const departureNumber = await createDeparture(
-      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-      refs.userId,
-    )
+    const departureNumber = await createLoadedDeparture(refs, [
+      { id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+    ])
     const departureDate = new Date().toISOString().slice(0, 10)
-    await patchDepartureDate(departureNumber, { departure_date: departureDate }, refs.userId)
+    await prisma.departure.update({
+      where: { departure_number: departureNumber },
+      data: { departure_date: new Date(departureDate) },
+    })
 
     const result = await getModelPriceHistory(refs.model.id)
 

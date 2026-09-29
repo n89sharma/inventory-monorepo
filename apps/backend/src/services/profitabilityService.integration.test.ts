@@ -2,14 +2,14 @@ import { OUTGOING_STATUS } from 'shared-types'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
-  buildCreateDepartureInput,
   cleanupTransactionalData,
   createArrivedAssets,
+  createLoadedDeparture,
   seedArrivalTestData,
   seedAssetCost,
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
-import { createDeparture, patchDepartureDate } from './departureService.js'
+import { prisma } from '../prisma.js'
 import { getProfitabilityCube } from './profitabilityService.js'
 
 const NO_COST: typeof SEEDED_ASSET_COST = {
@@ -30,10 +30,7 @@ async function departSoldAsset(
   cost: typeof SEEDED_ASSET_COST,
 ): Promise<void> {
   const [asset] = await createArrivedAssets(refs, 1)
-  await createDeparture(
-    buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-    refs.userId,
-  )
+  await createLoadedDeparture(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }])
   await seedAssetCost(asset.id, cost)
 }
 
@@ -106,14 +103,16 @@ describe('getProfitabilityCube', () => {
   })
   it('counts a sale in the month of the departure date, not the month it was created', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
-    const departureNumber = await createDeparture(
-      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
-      refs.userId,
-    )
+    const departureNumber = await createLoadedDeparture(refs, [
+      { id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD },
+    ])
     await seedAssetCost(asset.id, SEEDED_ASSET_COST)
     const otherMonth = ((new Date().getUTCMonth() + 1) % 12) + 1
     const departureDate = `${CURRENT_YEAR}-${String(otherMonth).padStart(2, '0')}-15`
-    await patchDepartureDate(departureNumber, { departure_date: departureDate }, refs.userId)
+    await prisma.departure.update({
+      where: { departure_number: departureNumber },
+      data: { departure_date: new Date(departureDate) },
+    })
 
     const rows = await getProfitabilityCube(CURRENT_YEAR)
 

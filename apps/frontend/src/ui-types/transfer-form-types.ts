@@ -65,8 +65,3 @@ export type TransferMetadataForm = {
   comment: string
   transfer_date: Date | null
 }
-
-export const TransferScheduleFormSchema = z.object({
-  transfer_date: z.date({ message: 'Transfer date is required' }),
-})
-export type TransferScheduleForm = z.infer<typeof TransferScheduleFormSchema>

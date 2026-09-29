@@ -5,6 +5,7 @@ import { AssetEditBar } from './asset-edit-bar'
 
 const mocks = vi.hoisted(() => ({
   status: 'IN_STOCK',
+  departureNumber: null as string | null,
   granted: new Set<string>(),
 }))
 
@@ -16,7 +17,8 @@ vi.mock('@/hooks/use-asset-detail', () => ({
         barcode: 'YYZ-0000001',
         status: mocks.status,
         is_in_transit: false,
-        departure: null,
+        departure:
+          mocks.departureNumber === null ? null : { departure_number: mocks.departureNumber },
       },
       accessories: [],
     },
@@ -58,11 +60,13 @@ const PERMISSIONS = [
   'delete_asset',
   'harvest_asset',
   'resolve_missing_asset',
+  'return_to_stock',
 ]
 
 describe('AssetEditBar', () => {
   beforeEach(() => {
     mocks.granted = new Set(PERMISSIONS)
+    mocks.departureNumber = null
   })
 
   it('an in-stock asset offers location, collection, harvest and delete', () => {
@@ -93,5 +97,22 @@ describe('AssetEditBar', () => {
     render(<AssetEditBar barcode="YYZ-0000001" />)
 
     expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()
+  })
+
+  it('an in-stock asset on a departure that has not loaded it offers neither Return to Stock nor Mark Harvested', () => {
+    mocks.status = ASSET_STATUS.IN_STOCK
+    mocks.departureNumber = 'D-YYZ-0000001'
+    render(<AssetEditBar barcode="YYZ-0000001" />)
+
+    expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mark Harvested')).not.toBeInTheDocument()
+  })
+
+  it('a sold asset on a departure offers Return to Stock', () => {
+    mocks.status = ASSET_STATUS.SOLD
+    mocks.departureNumber = 'D-YYZ-0000001'
+    render(<AssetEditBar barcode="YYZ-0000001" />)
+
+    expect(screen.getByText('Return to Stock')).toBeInTheDocument()
   })
 })

@@ -1,4 +1,4 @@
-import { ASSET_STATUS } from 'shared-types'
+import { ASSET_STATUS, ON_HAND_STATUS_VALUES, TRANSFER_STATUS } from 'shared-types'
 import type { Prisma } from '../../generated/prisma/client.js'
 import { ConflictError } from './errors.js'
 import {
@@ -44,6 +44,68 @@ export async function assertAssetsNotMissing(
     MISSING_ASSET_WHERE,
     (barcodes) => new ConflictError(`${MISSING_ASSETS_MESSAGE} ${barcodes.join(', ')}`),
   )
+}
+
+const ON_DEPARTURE_WHERE = { departure_id: { not: null } } satisfies Prisma.AssetWhereInput
+
+const ON_DEPARTURE_MESSAGE = 'Assets already assigned to a departure:'
+
+export async function assertAssetsNotOnDeparture(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+): Promise<void> {
+  await assertAssetsNotInCollection(
+    tx,
+    assetIds,
+    ON_DEPARTURE_WHERE,
+    (barcodes) => new ConflictError(`${ON_DEPARTURE_MESSAGE} ${barcodes.join(', ')}`),
+  )
+}
+
+export async function assertAssetsNotOnOpenTransfer(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+  excludeTransferId?: number,
+): Promise<void> {
+  if (assetIds.length === 0) return
+  const conflicts = await tx.assetTransfer.findMany({
+    where: {
+      asset_id: { in: assetIds },
+      transfer: {
+        status: { not: TRANSFER_STATUS.COMPLETE },
+        ...(excludeTransferId !== undefined ? { id: { not: excludeTransferId } } : {}),
+      },
+    },
+    select: {
+      asset: { select: { barcode: true } },
+      transfer: { select: { transfer_number: true } },
+    },
+  })
+  if (conflicts.length > 0) {
+    const detail = conflicts
+      .map((c) => `${c.asset.barcode} (on ${c.transfer.transfer_number})`)
+      .join(', ')
+    throw new ConflictError(`Already on an open transfer: ${detail}`)
+  }
+}
+
+const ON_HAND_STATUSES: readonly string[] = ON_HAND_STATUS_VALUES
+
+export async function assertAssetsOnHand(
+  tx: Prisma.TransactionClient,
+  assetIds: number[],
+  notOnHandError: (detail: string) => Error,
+): Promise<void> {
+  if (assetIds.length === 0) return
+  const assets = await tx.asset.findMany({
+    where: { id: { in: assetIds } },
+    select: { barcode: true, status: { select: { status: true } } },
+  })
+  const notOnHand = assets.filter((asset) => !ON_HAND_STATUSES.includes(asset.status.status))
+  if (notOnHand.length > 0) {
+    const detail = notOnHand.map((asset) => `${asset.barcode} (${asset.status.status})`).join(', ')
+    throw notOnHandError(detail)
+  }
 }
 
 export type AssetCollectionTransaction = {

@@ -20,7 +20,12 @@ import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
 import { isHarvestable, isUnharvestable } from '@/lib/asset-harvest'
 import { useState } from 'react'
-import { ASSET_STATUS, assetDetailsToSummary, type Permission } from 'shared-types'
+import {
+  ASSET_STATUS,
+  assetDetailsToSummary,
+  isOutgoingStatus,
+  type Permission,
+} from 'shared-types'
 import { toast } from 'sonner'
 import { AddToCollectionModal } from '../collections/add-to-collection-modal'
 import { ReturnToStockDialog } from '../departure/return-to-stock-dialog'
@@ -93,12 +98,11 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canEditLocation = can('update_location') && assetEditable
   const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p)) && assetEditable
   const canDelete = can('delete_asset') && assetEditable
-  const showReturnToStock = can('return_to_stock') && departureNumber !== null
+  const isDeparted = assetDetails !== null && isOutgoingStatus(assetDetails.status)
+  const showReturnToStock = can('return_to_stock') && departureNumber !== null && isDeparted
   const canHarvest = can('harvest_asset') && assetDetails !== null
   const showMarkHarvested =
-    canHarvest &&
-    isHarvestable(assetDetails.status, assetDetails.is_in_transit) &&
-    departureNumber === null
+    canHarvest && isHarvestable(assetDetails.status, assetDetails.is_in_transit, departureNumber)
   const showReturnHarvested = canHarvest && isUnharvestable(assetDetails.status, departureNumber)
   const showReturnMissing = can('resolve_missing_asset') && !assetEditable
   const harvestTargets = assetDetails

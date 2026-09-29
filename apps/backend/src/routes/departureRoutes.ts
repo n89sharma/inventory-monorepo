@@ -1,14 +1,22 @@
 import express from 'express'
 import {
+  completeDeparture,
   createDeparture,
+  finishLoadingDeparture,
   getDepartureDetail,
   getDepartureHistory,
   getDepartures,
+  markDepartureAssetMissingAtLoad,
   patchDepartureAssets,
   patchDepartureDate,
   patchDepartureMetadata,
+  patchDepartureNotes,
   returnDepartureAssetsToStock,
+  scanDepartureAssetLoaded,
+  scheduleDeparture,
   setDepartureOutgoingStatus,
+  startLoadingDeparture,
+  undoDepartureAssetLoad,
 } from '../controllers/departureController.js'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requirePermission } from '../middleware/requirePermission.js'
@@ -51,6 +59,46 @@ router.patch(
   '/:departureNumber/departure-date',
   requirePermission('create_update_departure'),
   patchDepartureDate,
+)
+router.patch(
+  '/:departureNumber/notes',
+  requirePermission('create_update_departure'),
+  patchDepartureNotes,
+)
+router.post(
+  '/:departureNumber/schedule',
+  requirePermission('create_update_departure'),
+  scheduleDeparture,
+)
+router.post(
+  '/:departureNumber/start-loading',
+  requirePermission('create_update_departure'),
+  startLoadingDeparture,
+)
+router.post(
+  '/:departureNumber/finish-loading',
+  requirePermission('create_update_departure'),
+  finishLoadingDeparture,
+)
+router.post(
+  '/:departureNumber/complete',
+  requirePermission('create_update_departure'),
+  completeDeparture,
+)
+router.post(
+  '/:departureNumber/assets/scan-loaded',
+  requirePermission('create_update_departure'),
+  scanDepartureAssetLoaded,
+)
+router.post(
+  '/:departureNumber/assets/mark-missing-at-load',
+  requirePermission('create_update_departure'),
+  markDepartureAssetMissingAtLoad,
+)
+router.post(
+  '/:departureNumber/assets/undo-load',
+  requirePermission('create_update_departure'),
+  undoDepartureAssetLoad,
 )
 
 export default router

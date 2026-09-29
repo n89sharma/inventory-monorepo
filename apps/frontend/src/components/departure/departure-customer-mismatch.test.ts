@@ -1,6 +1,12 @@
 import { makeAssetSearchRow } from '@/test/asset-factories'
 import { makeOrgDetail } from '@/test/org-factories'
-import type { AssetSearchRow, DepartureDetail, DepartureInvoice } from 'shared-types'
+import {
+  DEPARTURE_STATUS,
+  OUTGOING_STATUS,
+  type AssetSearchRow,
+  type DepartureDetail,
+  type DepartureInvoice,
+} from 'shared-types'
 import { describe, expect, it } from 'vitest'
 import { departureCustomerWarning } from './departure-customer-mismatch'
 
@@ -23,6 +29,7 @@ const IMAGENET_INVOICE: DepartureInvoice = {
 function departureWith(assets: AssetSearchRow[], invoices: DepartureInvoice[]): DepartureDetail {
   return {
     departure_number: 'D-YYZ-0000001',
+    status: DEPARTURE_STATUS.DRAFT,
     origin: { id: 1, city_code: 'YYZ', street: '1 Main St', is_active: true },
     customer: ABM,
     transporter: makeOrgDetail(9, 'FAST FREIGHT'),
@@ -31,7 +38,11 @@ function departureWith(assets: AssetSearchRow[], invoices: DepartureInvoice[]): 
     created_by: 'Alice',
     departure_date: null,
     salesperson: null,
-    assets,
+    assets: assets.map((asset) => ({
+      ...asset,
+      scan: { loaded: false },
+      outgoing_status: OUTGOING_STATUS.SOLD,
+    })),
     invoices,
   }
 }

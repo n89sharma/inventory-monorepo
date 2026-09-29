@@ -3,9 +3,9 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ArrivalTestData,
   buildCreateArrivalInput,
-  buildCreateDepartureInput,
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
+  createLoadedDeparture,
   seedArrivalTestData,
   ALL_PRICE_PERMISSIONS,
 } from '../../test/factories.js'
@@ -21,7 +21,6 @@ import {
 import { harvestAssets } from './assetHarvestService.js'
 import { getSerialNumberMatches } from './assetReadService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
-import { createDeparture } from './departureService.js'
 
 const EXISTING_SERIAL = 'DUP-SERIAL-001'
 const OTHER_SERIAL = 'DUP-SERIAL-002'
@@ -80,12 +79,9 @@ async function createSoldAssetWithSerial(
 ): Promise<{ arrivalNumber: string; assetId: number; barcode: string }> {
   // Acknowledged, so a run that sells the same serial repeatedly builds a chain of sold holders.
   const created = await createArrivalWithSerial(refs, serialNumber, true)
-  await createDeparture(
-    buildCreateDepartureInput(refs, [
-      { id: created.assetId, outgoing_status: OUTGOING_STATUS.SOLD },
-    ]),
-    refs.userId,
-  )
+  await createLoadedDeparture(refs, [
+    { id: created.assetId, outgoing_status: OUTGOING_STATUS.SOLD },
+  ])
   return created
 }
 
@@ -240,10 +236,7 @@ describe('duplicate serial numbers', () => {
 
     it('rejects an unacknowledged serial belonging to a sold asset', async () => {
       const { assetId } = await createArrivalWithSerial(refs, EXISTING_SERIAL)
-      await createDeparture(
-        buildCreateDepartureInput(refs, [{ id: assetId, outgoing_status: OUTGOING_STATUS.SOLD }]),
-        refs.userId,
-      )
+      await createLoadedDeparture(refs, [{ id: assetId, outgoing_status: OUTGOING_STATUS.SOLD }])
       const { arrivalNumber } = await createArrivalWithSerial(refs, OTHER_SERIAL)
       const [asset] = arrivalWithSerials(refs, [{ serialNumber: EXISTING_SERIAL }]).assets
 

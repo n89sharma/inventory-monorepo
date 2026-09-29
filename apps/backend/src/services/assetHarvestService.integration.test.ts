@@ -87,7 +87,7 @@ describe('assetHarvestService', () => {
 
     await expect(harvestAssets([asset.id], refs.userId)).rejects.toThrow(ConflictError)
 
-    expect(await getAssetStatus(asset.id)).toBe(OUTGOING_STATUS.SOLD)
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
   })
 
   it('returns harvested assets to stock', async () => {

@@ -21,6 +21,7 @@ select
 from "Asset" a
 join "Cost" c on c.asset_id = a.id
 join "Departure" dep on dep.id = a.departure_id
+join "Status" s on s.id = a.status_id
 join "Model" m on m.id = a.model_id
 left join "Arrival" arr on arr.id = a.arrival_id
 -- A sale price is the only thing an asset needs to count. Costs are not required to be
@@ -29,6 +30,7 @@ left join "Arrival" arr on arr.id = a.arrival_id
 -- and margin stay reconcilable rather than the row being dropped from one and not the other.
 where extract(year from coalesce(dep.departure_date, dep.created_at::date))::int = $1
   and c.sale_price is not null and c.sale_price > 0
+  and s.status in ('SOLD', 'SCRAPPED', 'RETURNED')
 group by
   dep.origin_id,
   dep.sales_representative_id,

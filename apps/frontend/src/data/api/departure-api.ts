@@ -12,9 +12,12 @@ import type {
   CreateDeparture,
   DepartureDetail,
   OrgSummary,
+  DepartureAssetId,
   OutgoingStatus,
+  ScheduleDeparture,
   UpdateDepartureDate,
   UpdateDepartureMetadata,
+  UpdateDepartureNotes,
   Warehouse,
 } from 'shared-types'
 import {
@@ -22,12 +25,15 @@ import {
   AssetDeltaSchema,
   CollectionHistorySchema,
   CreateDepartureSchema,
+  DepartureAssetIdSchema,
   DepartureDetailSchema,
   DepartureSummarySchema,
   ReturnAssetsToStockSchema,
+  ScheduleDepartureSchema,
   SetDepartureOutgoingStatusSchema,
   UpdateDepartureDateSchema,
   UpdateDepartureMetadataSchema,
+  UpdateDepartureNotesSchema,
 } from 'shared-types'
 import { z } from 'zod'
 
@@ -133,4 +139,69 @@ export async function updateDepartureDate(
     departure_date: departureDate,
   } satisfies UpdateDepartureDate)
   await api.patch(`/departures/${departureNumber}/departure-date`, updateDepartureDateBody)
+}
+
+export async function updateDepartureNotes(
+  departureNumber: string,
+  comment: string,
+): Promise<void> {
+  const updateDepartureNotesBody = UpdateDepartureNotesSchema.parse({
+    comment,
+  } satisfies UpdateDepartureNotes)
+  await api.patch(`/departures/${departureNumber}/notes`, updateDepartureNotesBody)
+}
+
+export async function scheduleDeparture(
+  departureNumber: string,
+  departureDate: string,
+): Promise<void> {
+  const scheduleDepartureBody = ScheduleDepartureSchema.parse({
+    departure_date: departureDate,
+  } satisfies ScheduleDeparture)
+  await api.post(`/departures/${departureNumber}/schedule`, scheduleDepartureBody)
+}
+
+export async function startLoadingDeparture(departureNumber: string): Promise<void> {
+  await api.post(`/departures/${departureNumber}/start-loading`)
+}
+
+export async function finishLoadingDeparture(departureNumber: string): Promise<void> {
+  await api.post(`/departures/${departureNumber}/finish-loading`)
+}
+
+export async function completeDeparture(departureNumber: string): Promise<void> {
+  await api.post(`/departures/${departureNumber}/complete`)
+}
+
+export async function scanDepartureAssetLoaded(
+  departureNumber: string,
+  assetId: number,
+): Promise<void> {
+  const scanDepartureAssetLoadedBody = DepartureAssetIdSchema.parse({
+    assetId,
+  } satisfies DepartureAssetId)
+  await api.post(`/departures/${departureNumber}/assets/scan-loaded`, scanDepartureAssetLoadedBody)
+}
+
+export async function markDepartureAssetMissingAtLoad(
+  departureNumber: string,
+  assetId: number,
+): Promise<void> {
+  const markDepartureAssetMissingBody = DepartureAssetIdSchema.parse({
+    assetId,
+  } satisfies DepartureAssetId)
+  await api.post(
+    `/departures/${departureNumber}/assets/mark-missing-at-load`,
+    markDepartureAssetMissingBody,
+  )
+}
+
+export async function undoDepartureAssetLoad(
+  departureNumber: string,
+  assetId: number,
+): Promise<void> {
+  const undoDepartureAssetLoadBody = DepartureAssetIdSchema.parse({
+    assetId,
+  } satisfies DepartureAssetId)
+  await api.post(`/departures/${departureNumber}/assets/undo-load`, undoDepartureAssetLoadBody)
 }

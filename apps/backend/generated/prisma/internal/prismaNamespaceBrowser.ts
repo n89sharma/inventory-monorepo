@@ -76,6 +76,7 @@ export const ModelName = {
   AssetTransfer: 'AssetTransfer',
   Arrival: 'Arrival',
   Departure: 'Departure',
+  AssetDeparture: 'AssetDeparture',
   Hold: 'Hold',
   Invoice: 'Invoice',
   Location: 'Location',
@@ -400,6 +401,7 @@ export type ArrivalScalarFieldEnum = (typeof ArrivalScalarFieldEnum)[keyof typeo
 export const DepartureScalarFieldEnum = {
   id: 'id',
   departure_number: 'departure_number',
+  status: 'status',
   origin_id: 'origin_id',
   destination_id: 'destination_id',
   transporter_id: 'transporter_id',
@@ -411,6 +413,16 @@ export const DepartureScalarFieldEnum = {
 } as const
 
 export type DepartureScalarFieldEnum = (typeof DepartureScalarFieldEnum)[keyof typeof DepartureScalarFieldEnum]
+
+
+export const AssetDepartureScalarFieldEnum = {
+  asset_id: 'asset_id',
+  departure_id: 'departure_id',
+  outgoing_status_id: 'outgoing_status_id',
+  loaded: 'loaded'
+} as const
+
+export type AssetDepartureScalarFieldEnum = (typeof AssetDepartureScalarFieldEnum)[keyof typeof AssetDepartureScalarFieldEnum]
 
 
 export const HoldScalarFieldEnum = {

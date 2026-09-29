@@ -3,10 +3,10 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ALL_PRICE_PERMISSIONS,
   ArrivalTestData,
-  buildCreateDepartureInput,
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
   createArrivedAssets,
+  createLoadedDeparture,
   NO_PERMISSIONS,
   REDACTED_ASSET_COST,
   seedArrivalTestData,
@@ -14,7 +14,6 @@ import {
   SEEDED_ASSET_COST,
 } from '../../test/factories.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
-import { createDeparture } from './departureService.js'
 import { getInStockSummaryReport } from './inStockSummaryService.js'
 
 describe('inStockSummaryService', () => {
@@ -34,12 +33,7 @@ describe('inStockSummaryService', () => {
 
   it('counts only IN_STOCK assets, excluding departed ones', async () => {
     const assets = await createArrivedAssets(refs, 3)
-    await createDeparture(
-      buildCreateDepartureInput(refs, [
-        { id: assets[0].id, outgoing_status: OUTGOING_STATUS.SOLD },
-      ]),
-      refs.userId,
-    )
+    await createLoadedDeparture(refs, [{ id: assets[0].id, outgoing_status: OUTGOING_STATUS.SOLD }])
 
     const report = await getInStockSummaryReport(ALL_PRICE_PERMISSIONS)
     const total = report.reduce((sum, row) => sum + (row.asset_count ?? 0), 0)

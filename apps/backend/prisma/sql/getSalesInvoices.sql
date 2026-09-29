@@ -2,7 +2,9 @@ with matched_invoice as (
   select distinct a.sales_invoice_id as id
   from "Departure" d
   join "Asset" a on a.departure_id = d.id
+  join "Status" s on s.id = a.status_id
   where coalesce(d.departure_date, d.created_at::date) between $1::date and $2::date
+    and s.status in ('SOLD', 'SCRAPPED', 'RETURNED')
     and a.sales_invoice_id is not null
   union
   select i.id
@@ -79,7 +81,9 @@ from "Invoice" i
       max(coalesce(d.departure_date, d.created_at::date)) as departure_end_date
     from "Asset" a
     join "Departure" d on d.id = a.departure_id
+    join "Status" s on s.id = a.status_id
     where a.sales_invoice_id = i.id
+      and s.status in ('SOLD', 'SCRAPPED', 'RETURNED')
   ) mv on true
   left join lateral (
     select

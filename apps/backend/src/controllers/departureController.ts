@@ -4,11 +4,14 @@ import {
   AssetDeltaSchema,
   CollectionHistory,
   CreateDepartureSchema,
+  DepartureAssetIdSchema,
   DepartureDetail,
   ReturnAssetsToStockSchema,
+  ScheduleDepartureSchema,
   SetDepartureOutgoingStatusSchema,
   UpdateDepartureDateSchema,
   UpdateDepartureMetadataSchema,
+  UpdateDepartureNotesSchema,
   successResponse,
 } from 'shared-types'
 import { z } from 'zod'
@@ -17,14 +20,22 @@ import { asyncHandler } from '../lib/asyncHandler.js'
 import { NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import {
+  completeDeparture as completeDepartureSer,
   createDeparture as createDepartureSer,
+  finishLoadingDeparture as finishLoadingDepartureSer,
   getDeparture as getDepartureSer,
   getDepartureSummaries as getDepartureSummariesSer,
   addAssetsToDepartureAndRecord as patchDepartureAssetsSer,
   setDepartureOutgoingStatus as setDepartureOutgoingStatusSer,
   returnDepartureAssetsToStock as returnDepartureAssetsToStockSer,
+  scanAssetLoaded as scanAssetLoadedSer,
+  scheduleDeparture as scheduleDepartureSer,
+  startLoadingDeparture as startLoadingDepartureSer,
+  undoAssetLoad as undoAssetLoadSer,
   patchDepartureDate as patchDepartureDateSer,
+  markAssetMissingAtLoad as markAssetMissingAtLoadSer,
   patchDepartureMetadata as patchDepartureMetadataSer,
+  patchDepartureNotes as patchDepartureNotesSer,
 } from '../services/departureService.js'
 import { getCollectionHistory as getCollectionHistorySer } from '../services/historyService.js'
 
@@ -58,12 +69,7 @@ export const patchDepartureAssets = asyncHandler(async (req, res) => {
 
 export const setDepartureOutgoingStatus = asyncHandler(async (req, res) => {
   const { assetIds, outgoing_status } = SetDepartureOutgoingStatusSchema.parse(req.body)
-  await setDepartureOutgoingStatusSer(
-    req.params.departureNumber,
-    assetIds,
-    outgoing_status,
-    res.locals.dbUserId,
-  )
+  await setDepartureOutgoingStatusSer(req.params.departureNumber, assetIds, outgoing_status)
   res.status(204).send()
 })
 
@@ -82,6 +88,51 @@ export const patchDepartureMetadata = asyncHandler(async (req, res) => {
 export const patchDepartureDate = asyncHandler(async (req, res) => {
   const update = UpdateDepartureDateSchema.parse(req.body)
   await patchDepartureDateSer(req.params.departureNumber, update, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const patchDepartureNotes = asyncHandler(async (req, res) => {
+  const { comment } = UpdateDepartureNotesSchema.parse(req.body)
+  await patchDepartureNotesSer(req.params.departureNumber, comment)
+  res.status(204).send()
+})
+
+export const scheduleDeparture = asyncHandler(async (req, res) => {
+  const schedule = ScheduleDepartureSchema.parse(req.body)
+  await scheduleDepartureSer(req.params.departureNumber, schedule, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const startLoadingDeparture = asyncHandler(async (req, res) => {
+  await startLoadingDepartureSer(req.params.departureNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const finishLoadingDeparture = asyncHandler(async (req, res) => {
+  await finishLoadingDepartureSer(req.params.departureNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const completeDeparture = asyncHandler(async (req, res) => {
+  await completeDepartureSer(req.params.departureNumber, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const scanDepartureAssetLoaded = asyncHandler(async (req, res) => {
+  const { assetId } = DepartureAssetIdSchema.parse(req.body)
+  await scanAssetLoadedSer(req.params.departureNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const markDepartureAssetMissingAtLoad = asyncHandler(async (req, res) => {
+  const { assetId } = DepartureAssetIdSchema.parse(req.body)
+  await markAssetMissingAtLoadSer(req.params.departureNumber, assetId, res.locals.dbUserId)
+  res.status(204).send()
+})
+
+export const undoDepartureAssetLoad = asyncHandler(async (req, res) => {
+  const { assetId } = DepartureAssetIdSchema.parse(req.body)
+  await undoAssetLoadSer(req.params.departureNumber, assetId, res.locals.dbUserId)
   res.status(204).send()
 })
 

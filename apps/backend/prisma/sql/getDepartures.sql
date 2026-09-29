@@ -5,6 +5,7 @@ select
 	wo.street as origin_street,
 	od."name" as destination,
 	t."name" as transporter,
+	d.status as status,
 	d.created_at as created_at,
 	d.departure_date as departure_date,
 	u."name"  as created_by,

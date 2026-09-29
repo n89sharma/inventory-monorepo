@@ -143,6 +143,11 @@ export type Arrival = Prisma.ArrivalModel
  */
 export type Departure = Prisma.DepartureModel
 /**
+ * Model AssetDeparture
+ * 
+ */
+export type AssetDeparture = Prisma.AssetDepartureModel
+/**
  * Model Hold
  * 
  */
