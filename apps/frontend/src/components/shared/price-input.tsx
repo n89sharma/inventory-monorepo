@@ -9,6 +9,7 @@ const SPINNER_CLASS =
   'text-muted-foreground pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2 animate-spin'
 
 interface PriceInputProps {
+  id?: string
   value: string
   onChange: (value: string) => void
   onBlur?: () => void
@@ -22,6 +23,7 @@ interface PriceInputProps {
 }
 
 export function PriceInput({
+  id,
   value,
   onChange,
   onBlur,
@@ -37,6 +39,7 @@ export function PriceInput({
     <div className={`relative ${className ?? ''}`}>
       <span className={PREFIX_CLASS}>$</span>
       <Input
+        id={id}
         value={value}
         onChange={(event) => onChange(sanitizeDecimalInput(event.target.value))}
         onBlur={onBlur}

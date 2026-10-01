@@ -1,5 +1,11 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { BID_OUTCOME, BID_STATUS, type BidMetadata } from 'shared-types'
+import {
+  BID_OUTCOME,
+  BID_STATUS,
+  DEFAULT_BID_MARGIN_PERCENT,
+  DEFAULT_BID_TRANSPORT_COST,
+  type BidMetadata,
+} from 'shared-types'
 import {
   ArrivalTestData,
   cleanupTransactionalData,
@@ -37,6 +43,8 @@ function buildCreateBidInput(overrides: Partial<BidMetadata> = {}): BidMetadata 
     vendor: seed.vendor,
     received_date: RECEIVED_DATE,
     due_date: DUE_DATE,
+    margin_percent: DEFAULT_BID_MARGIN_PERCENT,
+    transport_cost: DEFAULT_BID_TRANSPORT_COST,
     comment: 'Lot of three',
     ...overrides,
   }
@@ -154,6 +162,65 @@ describe('bidService', () => {
     })
   })
 
+  it('prices rows at the bid margin unless a row overrides it', async () => {
+    const { bidNumber, rowIds } = await createBidWithRows()
+    const [firstRowId, secondRowId] = rowIds
+    if (secondRowId === undefined) throw new Error('Expected a second row')
+    await updateBidRows(bidNumber, { row_ids: rowIds, selling_price: 1000, transport_cost: 100 })
+
+    const detail = await updateBidRows(bidNumber, { row_ids: [secondRowId], margin_percent: 10 })
+
+    expect(detail.margin_percent).toBe(25)
+    expect(detail.rows.find((row) => row.id === firstRowId)).toMatchObject({
+      margin_percent: 25,
+      margin_overridden: false,
+      bid_price: 650,
+      priced: true,
+    })
+    expect(detail.rows.find((row) => row.id === secondRowId)).toMatchObject({
+      margin_percent: 10,
+      margin_overridden: true,
+      bid_price: 800,
+    })
+  })
+
+  it('reprices rows on the bid margin when it changes, leaving overrides alone', async () => {
+    const { bidNumber, rowIds } = await createBidWithRows()
+    const [firstRowId, secondRowId] = rowIds
+    if (secondRowId === undefined) throw new Error('Expected a second row')
+    await updateBidRows(bidNumber, { row_ids: rowIds, selling_price: 1000, transport_cost: 100 })
+    await updateBidRows(bidNumber, { row_ids: [secondRowId], margin_percent: 10 })
+
+    await updateBidMetadata(bidNumber, buildCreateBidInput({ margin_percent: 30 }))
+
+    const detail = await getBid(bidNumber)
+    expect(detail.rows.find((row) => row.id === firstRowId)?.bid_price).toBe(600)
+    expect(detail.rows.find((row) => row.id === secondRowId)?.bid_price).toBe(800)
+  })
+
+  it('prices rows at the bid freight until a row overrides it, and reprices when it changes', async () => {
+    const { bidNumber, rowIds } = await createBidWithRows()
+    const [firstRowId, secondRowId] = rowIds
+    if (secondRowId === undefined) throw new Error('Expected a second row')
+    await updateBidRows(bidNumber, { row_ids: rowIds, selling_price: 1000 })
+    await updateBidRows(bidNumber, { row_ids: [secondRowId], transport_cost: 100 })
+
+    const before = await getBid(bidNumber)
+    expect(before.rows.find((row) => row.id === firstRowId)).toMatchObject({
+      transport_cost: 30,
+      transport_cost_overridden: false,
+      bid_price: 720,
+      total_cost: 750,
+      priced: true,
+    })
+
+    await updateBidMetadata(bidNumber, buildCreateBidInput({ transport_cost: 50 }))
+
+    const after = await getBid(bidNumber)
+    expect(after.rows.find((row) => row.id === firstRowId)?.bid_price).toBe(700)
+    expect(after.rows.find((row) => row.id === secondRowId)?.bid_price).toBe(650)
+  })
+
   it('prices a zero-priced row at nothing', async () => {
     const { bidNumber, rowIds } = await createBidWithRows()
     const [firstRowId] = rowIds
@@ -163,8 +230,11 @@ describe('bidService', () => {
     expect(detail.rows.find((row) => row.id === firstRowId)).toMatchObject({
       zero_priced: true,
       priced: true,
-      bid_price: 0,
-      total_cost: 0,
+      selling_price: null,
+      transport_cost: null,
+      margin_percent: null,
+      bid_price: null,
+      total_cost: null,
     })
   })
 

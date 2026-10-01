@@ -8,6 +8,11 @@ export const BID_UPLOAD_LIMITS = {
   cellLength: 1000,
 } as const
 
+export const DEFAULT_BID_MARGIN_PERCENT = 25
+export const DEFAULT_BID_TRANSPORT_COST = 30
+
+export const BidMarginPercentSchema = z.number().min(0).lt(100)
+
 export const BidStatusSchema = z.enum(['DRAFT', 'REVIEW', 'SUBMITTED', 'CONCLUDED'])
 export type BidStatus = z.infer<typeof BidStatusSchema>
 export const BID_STATUS = BidStatusSchema.enum
@@ -34,7 +39,9 @@ export const BidRowSchema = z.object({
   cells: z.array(z.string()),
   selling_price: z.number().nullable(),
   transport_cost: z.number().nullable(),
+  transport_cost_overridden: z.boolean(),
   margin_percent: z.number().nullable(),
+  margin_overridden: z.boolean(),
   zero_priced: z.boolean(),
   priced: z.boolean(),
   bid_price: z.number().nullable(),
@@ -53,6 +60,8 @@ export type BidTotals = z.infer<typeof BidTotalsSchema>
 export const BidDetailSchema = BidSummarySchema.extend({
   created_at: z.coerce.date(),
   created_by: z.string().optional(),
+  margin_percent: z.number(),
+  transport_cost: z.number(),
   headers: z.array(z.string()),
   rows: z.array(BidRowSchema),
   totals: BidTotalsSchema,
@@ -63,6 +72,8 @@ export const BidMetadataSchema = z.object({
   vendor: OrgSummarySchema,
   received_date: z.iso.date(),
   due_date: z.iso.date(),
+  margin_percent: BidMarginPercentSchema,
+  transport_cost: z.number().nonnegative(),
   comment: z.string().nullable(),
 })
 export type BidMetadata = z.infer<typeof BidMetadataSchema>
@@ -83,8 +94,6 @@ export const UploadBidRowsSchema = z
     path: ['rows'],
   })
 export type UploadBidRows = z.infer<typeof UploadBidRowsSchema>
-
-export const BidMarginPercentSchema = z.number().min(0).lt(100)
 
 export const UpdateBidRowsSchema = z
   .object({

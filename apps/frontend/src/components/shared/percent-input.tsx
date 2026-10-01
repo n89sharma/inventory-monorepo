@@ -6,6 +6,7 @@ const SUFFIX_CLASS =
   'text-muted-foreground pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm'
 
 interface PercentInputProps {
+  id?: string
   value: string
   onChange: (value: string) => void
   invalid?: boolean
@@ -15,6 +16,7 @@ interface PercentInputProps {
 }
 
 export function PercentInput({
+  id,
   value,
   onChange,
   invalid,
@@ -25,6 +27,7 @@ export function PercentInput({
   return (
     <div className={`relative ${className ?? ''}`}>
       <Input
+        id={id}
         value={value}
         onChange={(event) => onChange(sanitizeDecimalInput(event.target.value))}
         inputMode="decimal"

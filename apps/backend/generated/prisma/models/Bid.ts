@@ -29,12 +29,16 @@ export type AggregateBid = {
 export type BidAvgAggregateOutputType = {
   id: number | null
   vendor_id: number | null
+  margin_percent: runtime.Decimal | null
+  transport_cost: runtime.Decimal | null
   created_by_id: number | null
 }
 
 export type BidSumAggregateOutputType = {
   id: number | null
   vendor_id: number | null
+  margin_percent: runtime.Decimal | null
+  transport_cost: runtime.Decimal | null
   created_by_id: number | null
 }
 
@@ -48,6 +52,8 @@ export type BidMinAggregateOutputType = {
   due_date: Date | null
   submitted_date: Date | null
   notes: string | null
+  margin_percent: runtime.Decimal | null
+  transport_cost: runtime.Decimal | null
   created_by_id: number | null
   created_at: Date | null
 }
@@ -62,6 +68,8 @@ export type BidMaxAggregateOutputType = {
   due_date: Date | null
   submitted_date: Date | null
   notes: string | null
+  margin_percent: runtime.Decimal | null
+  transport_cost: runtime.Decimal | null
   created_by_id: number | null
   created_at: Date | null
 }
@@ -76,6 +84,8 @@ export type BidCountAggregateOutputType = {
   due_date: number
   submitted_date: number
   notes: number
+  margin_percent: number
+  transport_cost: number
   headers: number
   created_by_id: number
   created_at: number
@@ -86,12 +96,16 @@ export type BidCountAggregateOutputType = {
 export type BidAvgAggregateInputType = {
   id?: true
   vendor_id?: true
+  margin_percent?: true
+  transport_cost?: true
   created_by_id?: true
 }
 
 export type BidSumAggregateInputType = {
   id?: true
   vendor_id?: true
+  margin_percent?: true
+  transport_cost?: true
   created_by_id?: true
 }
 
@@ -105,6 +119,8 @@ export type BidMinAggregateInputType = {
   due_date?: true
   submitted_date?: true
   notes?: true
+  margin_percent?: true
+  transport_cost?: true
   created_by_id?: true
   created_at?: true
 }
@@ -119,6 +135,8 @@ export type BidMaxAggregateInputType = {
   due_date?: true
   submitted_date?: true
   notes?: true
+  margin_percent?: true
+  transport_cost?: true
   created_by_id?: true
   created_at?: true
 }
@@ -133,6 +151,8 @@ export type BidCountAggregateInputType = {
   due_date?: true
   submitted_date?: true
   notes?: true
+  margin_percent?: true
+  transport_cost?: true
   headers?: true
   created_by_id?: true
   created_at?: true
@@ -235,6 +255,8 @@ export type BidGroupByOutputType = {
   due_date: Date
   submitted_date: Date | null
   notes: string | null
+  margin_percent: runtime.Decimal
+  transport_cost: runtime.Decimal
   headers: string[]
   created_by_id: number
   created_at: Date
@@ -273,6 +295,8 @@ export type BidWhereInput = {
   due_date?: Prisma.DateTimeFilter<"Bid"> | Date | string
   submitted_date?: Prisma.DateTimeNullableFilter<"Bid"> | Date | string | null
   notes?: Prisma.StringNullableFilter<"Bid"> | string | null
+  margin_percent?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.StringNullableListFilter<"Bid">
   created_by_id?: Prisma.IntFilter<"Bid"> | number
   created_at?: Prisma.DateTimeFilter<"Bid"> | Date | string
@@ -291,6 +315,8 @@ export type BidOrderByWithRelationInput = {
   due_date?: Prisma.SortOrder
   submitted_date?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   headers?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -312,6 +338,8 @@ export type BidWhereUniqueInput = Prisma.AtLeast<{
   due_date?: Prisma.DateTimeFilter<"Bid"> | Date | string
   submitted_date?: Prisma.DateTimeNullableFilter<"Bid"> | Date | string | null
   notes?: Prisma.StringNullableFilter<"Bid"> | string | null
+  margin_percent?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.StringNullableListFilter<"Bid">
   created_by_id?: Prisma.IntFilter<"Bid"> | number
   created_at?: Prisma.DateTimeFilter<"Bid"> | Date | string
@@ -330,6 +358,8 @@ export type BidOrderByWithAggregationInput = {
   due_date?: Prisma.SortOrder
   submitted_date?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   headers?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -353,6 +383,8 @@ export type BidScalarWhereWithAggregatesInput = {
   due_date?: Prisma.DateTimeWithAggregatesFilter<"Bid"> | Date | string
   submitted_date?: Prisma.DateTimeNullableWithAggregatesFilter<"Bid"> | Date | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Bid"> | string | null
+  margin_percent?: Prisma.DecimalWithAggregatesFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalWithAggregatesFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.StringNullableListFilter<"Bid">
   created_by_id?: Prisma.IntWithAggregatesFilter<"Bid"> | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Bid"> | Date | string
@@ -366,6 +398,8 @@ export type BidCreateInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
@@ -383,6 +417,8 @@ export type BidUncheckedCreateInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
@@ -397,6 +433,8 @@ export type BidUpdateInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
@@ -414,6 +452,8 @@ export type BidUncheckedUpdateInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -430,6 +470,8 @@ export type BidCreateManyInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
@@ -443,6 +485,8 @@ export type BidUpdateManyMutationInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -457,6 +501,8 @@ export type BidUncheckedUpdateManyInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -480,6 +526,8 @@ export type BidCountOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   submitted_date?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   headers?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -488,6 +536,8 @@ export type BidCountOrderByAggregateInput = {
 export type BidAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   vendor_id?: Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
 }
 
@@ -501,6 +551,8 @@ export type BidMaxOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   submitted_date?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -515,6 +567,8 @@ export type BidMinOrderByAggregateInput = {
   due_date?: Prisma.SortOrder
   submitted_date?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
@@ -522,6 +576,8 @@ export type BidMinOrderByAggregateInput = {
 export type BidSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   vendor_id?: Prisma.SortOrder
+  margin_percent?: Prisma.SortOrder
+  transport_cost?: Prisma.SortOrder
   created_by_id?: Prisma.SortOrder
 }
 
@@ -655,6 +711,8 @@ export type BidCreateWithoutRowsInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
@@ -671,6 +729,8 @@ export type BidUncheckedCreateWithoutRowsInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
@@ -700,6 +760,8 @@ export type BidUpdateWithoutRowsInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
@@ -716,6 +778,8 @@ export type BidUncheckedUpdateWithoutRowsInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -729,6 +793,8 @@ export type BidCreateWithoutCreated_byInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   vendor: Prisma.OrganizationCreateNestedOneWithoutBidsInput
@@ -745,6 +811,8 @@ export type BidUncheckedCreateWithoutCreated_byInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   rows?: Prisma.BidRowUncheckedCreateNestedManyWithoutBidInput
@@ -789,6 +857,8 @@ export type BidScalarWhereInput = {
   due_date?: Prisma.DateTimeFilter<"Bid"> | Date | string
   submitted_date?: Prisma.DateTimeNullableFilter<"Bid"> | Date | string | null
   notes?: Prisma.StringNullableFilter<"Bid"> | string | null
+  margin_percent?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFilter<"Bid"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.StringNullableListFilter<"Bid">
   created_by_id?: Prisma.IntFilter<"Bid"> | number
   created_at?: Prisma.DateTimeFilter<"Bid"> | Date | string
@@ -802,6 +872,8 @@ export type BidCreateWithoutVendorInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
   created_by: Prisma.UserCreateNestedOneWithoutBids_createdInput
@@ -817,6 +889,8 @@ export type BidUncheckedCreateWithoutVendorInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
@@ -859,6 +933,8 @@ export type BidCreateManyCreated_byInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_at: Date | string
 }
@@ -871,6 +947,8 @@ export type BidUpdateWithoutCreated_byInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   vendor?: Prisma.OrganizationUpdateOneRequiredWithoutBidsNestedInput
@@ -887,6 +965,8 @@ export type BidUncheckedUpdateWithoutCreated_byInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.BidRowUncheckedUpdateManyWithoutBidNestedInput
@@ -902,6 +982,8 @@ export type BidUncheckedUpdateManyWithoutCreated_byInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -915,6 +997,8 @@ export type BidCreateManyVendorInput = {
   due_date: Date | string
   submitted_date?: Date | string | null
   notes?: string | null
+  margin_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidCreateheadersInput | string[]
   created_by_id: number
   created_at: Date | string
@@ -928,6 +1012,8 @@ export type BidUpdateWithoutVendorInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_by?: Prisma.UserUpdateOneRequiredWithoutBids_createdNestedInput
@@ -943,6 +1029,8 @@ export type BidUncheckedUpdateWithoutVendorInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -958,6 +1046,8 @@ export type BidUncheckedUpdateManyWithoutVendorInput = {
   due_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submitted_date?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  margin_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  transport_cost?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   headers?: Prisma.BidUpdateheadersInput | string[]
   created_by_id?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1004,6 +1094,8 @@ export type BidSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   due_date?: boolean
   submitted_date?: boolean
   notes?: boolean
+  margin_percent?: boolean
+  transport_cost?: boolean
   headers?: boolean
   created_by_id?: boolean
   created_at?: boolean
@@ -1023,6 +1115,8 @@ export type BidSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
   due_date?: boolean
   submitted_date?: boolean
   notes?: boolean
+  margin_percent?: boolean
+  transport_cost?: boolean
   headers?: boolean
   created_by_id?: boolean
   created_at?: boolean
@@ -1040,6 +1134,8 @@ export type BidSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
   due_date?: boolean
   submitted_date?: boolean
   notes?: boolean
+  margin_percent?: boolean
+  transport_cost?: boolean
   headers?: boolean
   created_by_id?: boolean
   created_at?: boolean
@@ -1057,12 +1153,14 @@ export type BidSelectScalar = {
   due_date?: boolean
   submitted_date?: boolean
   notes?: boolean
+  margin_percent?: boolean
+  transport_cost?: boolean
   headers?: boolean
   created_by_id?: boolean
   created_at?: boolean
 }
 
-export type BidOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bid_number" | "status" | "outcome" | "vendor_id" | "received_date" | "due_date" | "submitted_date" | "notes" | "headers" | "created_by_id" | "created_at", ExtArgs["result"]["bid"]>
+export type BidOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bid_number" | "status" | "outcome" | "vendor_id" | "received_date" | "due_date" | "submitted_date" | "notes" | "margin_percent" | "transport_cost" | "headers" | "created_by_id" | "created_at", ExtArgs["result"]["bid"]>
 export type BidInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendor?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   created_by?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1095,6 +1193,8 @@ export type $BidPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     due_date: Date
     submitted_date: Date | null
     notes: string | null
+    margin_percent: runtime.Decimal
+    transport_cost: runtime.Decimal
     headers: string[]
     created_by_id: number
     created_at: Date
@@ -1533,6 +1633,8 @@ export interface BidFieldRefs {
   readonly due_date: Prisma.FieldRef<"Bid", 'DateTime'>
   readonly submitted_date: Prisma.FieldRef<"Bid", 'DateTime'>
   readonly notes: Prisma.FieldRef<"Bid", 'String'>
+  readonly margin_percent: Prisma.FieldRef<"Bid", 'Decimal'>
+  readonly transport_cost: Prisma.FieldRef<"Bid", 'Decimal'>
   readonly headers: Prisma.FieldRef<"Bid", 'String[]'>
   readonly created_by_id: Prisma.FieldRef<"Bid", 'Int'>
   readonly created_at: Prisma.FieldRef<"Bid", 'DateTime'>

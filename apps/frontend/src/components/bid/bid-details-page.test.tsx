@@ -27,6 +27,7 @@ vi.mock('@/hooks/use-bid-mutations', () => ({
     updateMetadata: vi.fn(),
     upload: vi.fn(),
     updateRows: vi.fn(),
+    setNoBid: vi.fn(),
     review: vi.fn(),
     returnToDraft: vi.fn(),
     submit: vi.fn(),
@@ -53,6 +54,8 @@ function makeBid(status: string): BidDetail {
     total_cost: 800,
     created_at: new Date('2026-03-10T12:00:00Z'),
     created_by: 'Admin',
+    margin_percent: 25,
+    transport_cost: 30,
     headers: ['Serial', 'Location'],
     rows: [
       {
@@ -60,7 +63,9 @@ function makeBid(status: string): BidDetail {
         cells: ['S1', 'Dock 4'],
         selling_price: 1000,
         transport_cost: 100,
+        transport_cost_overridden: true,
         margin_percent: 20,
+        margin_overridden: true,
         zero_priced: false,
         priced: true,
         bid_price: 700,
@@ -93,7 +98,7 @@ describe('BidDetailsPage', () => {
     renderPage(BID_STATUS.DRAFT)
     expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Selling Price for row 1' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Price row 11 at $0' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'No Bid for row 1' })).toBeInTheDocument()
   })
 
   it('locks the rows once the bid is in review', () => {
@@ -103,6 +108,14 @@ describe('BidDetailsPage', () => {
       screen.queryByRole('button', { name: 'Selling Price for row 1' }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('cell', { name: '$1,000.00' })).toBeInTheDocument()
+  })
+
+  it('puts the pricing columns after every pasted column', () => {
+    renderPage(BID_STATUS.DRAFT)
+    const headers = screen.getAllByRole('columnheader').map((header) => header.textContent ?? '')
+    expect(headers.findIndex((text) => text.includes('Location'))).toBeLessThan(
+      headers.findIndex((text) => text.includes('Selling Price')),
+    )
   })
 
   it('colours recognised headers green and unrecognised ones grey', () => {

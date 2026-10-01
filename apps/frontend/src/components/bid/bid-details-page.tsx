@@ -1,5 +1,8 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import {
+  BID_COLUMN_SECTIONS,
+  bidPickerColumns,
+  bidRowClassName,
   buildBidGridColumns,
   isPastedColumnId,
   type BidPriceField,
@@ -29,14 +32,16 @@ import { SummaryField } from '@/components/shared/cards/summary-field'
 import { DataGridWithoutResultCount } from '@/components/shared/data-table'
 import { DeleteEntityDialog } from '@/components/shared/delete-entity-dialog'
 import { TableTextFilter } from '@/components/shared/filters/table-text-filter'
+import { ColumnPickerPopover } from '@/components/shared/column-picker-button'
+import { TableToolbarEnd } from '@/components/shared/table-toolbar'
 import { useBidDetail } from '@/hooks/use-bid'
 import { useBidMutations } from '@/hooks/use-bid-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
-import { formatDateOnly } from '@/lib/formatters'
+import { formatDateOnly, formatUSDWithSymbol } from '@/lib/formatters'
 import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { queryStringFrom } from '@/ui-types/navigation-context'
 import { DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
-import type { RowSelectionState, TableOptions } from '@tanstack/react-table'
+import type { RowSelectionState, TableOptions, VisibilityState } from '@tanstack/react-table'
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -75,6 +80,8 @@ function BidSubtitle({ bid }: { bid: BidDetail }): React.JSX.Element {
       <SummaryField label="Vendor" value={bid.vendor.name} />
       <SummaryField label="Received" value={formatDateOnly(bid.received_date)} />
       <SummaryField label="Due" value={formatDateOnly(bid.due_date)} />
+      <SummaryField label="Margin" value={`${bid.margin_percent}%`} />
+      <SummaryField label="Freight" value={formatUSDWithSymbol(bid.transport_cost)} />
       <SummaryField label="Submitted" value={formatDateOnly(bid.submitted_date)} />
       <SummaryField label="Created By" value={bid.created_by} />
       <SummaryField label="Notes" value={bid.notes} />
@@ -118,6 +125,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [metadataOpen, setMetadataOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [hiddenColumnIds, setHiddenColumnIds] = useState<ReadonlySet<string>>(new Set())
   const [bulkDialog, setBulkDialog] = useState<BulkDialog | null>(null)
   const editorRegistry = useMemo(() => createPriceCellEditorRegistry<BidPriceField>(), [])
   const isDraft = bid.status === BID_STATUS.DRAFT
@@ -129,15 +137,29 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
     [mutations, bidNumber],
   )
   const toggleZeroPrice = useCallback(
-    (row: BidRow) =>
-      mutations.updateRows(bidNumber, { row_ids: [row.id], zero_priced: !row.zero_priced }),
-    [mutations, bidNumber],
+    (row: BidRow) => mutations.setNoBid(bid, row.id, !row.zero_priced),
+    [mutations, bid],
   )
   const editing = useMemo<BidRowEditing | undefined>(
     () => (isDraft ? { editorRegistry, saveField, toggleZeroPrice } : undefined),
     [isDraft, editorRegistry, saveField, toggleZeroPrice],
   )
   const columns = useMemo(() => buildBidGridColumns(bid.headers, editing), [bid.headers, editing])
+  const pickerColumns = useMemo(() => bidPickerColumns(bid.headers), [bid.headers])
+  const visibleColumnIds = new Set(
+    pickerColumns.filter((column) => !hiddenColumnIds.has(column.id)).map((column) => column.id),
+  )
+  const columnVisibility: VisibilityState = Object.fromEntries(
+    [...hiddenColumnIds].map((id) => [id, false]),
+  )
+
+  function showColumns(newVisibleIds: Set<string>) {
+    setHiddenColumnIds(
+      new Set(
+        pickerColumns.filter((column) => !newVisibleIds.has(column.id)).map((column) => column.id),
+      ),
+    )
+  }
 
   const selectedRowIds = bid.rows.filter((row) => rowSelection[getBidRowId(row)]).map((r) => r.id)
   const [firstSelectedId, ...otherSelectedIds] = selectedRowIds
@@ -233,16 +255,27 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
         columns={columns}
         data={bid.rows}
         getRowId={getBidRowId}
+        getRowClassName={bidRowClassName}
         textSearch={BID_ROW_TEXT_SEARCH}
         rowSelection={isDraft ? rowSelection : undefined}
         onRowSelectionChange={isDraft ? setRowSelection : undefined}
+        columnVisibility={columnVisibility}
         renderToolbar={(table) => (
-          <TableTextFilter
-            table={table}
-            placeholder="Search rows"
-            clearLabel="Clear row search"
-            className="w-64"
-          />
+          <TableToolbarEnd>
+            <TableTextFilter
+              table={table}
+              placeholder="Search rows"
+              clearLabel="Clear row search"
+              className="w-64"
+            />
+            <ColumnPickerPopover
+              visible={visibleColumnIds}
+              onVisibleChange={showColumns}
+              onReset={() => setHiddenColumnIds(new Set())}
+              columns={pickerColumns}
+              sections={BID_COLUMN_SECTIONS}
+            />
+          </TableToolbarEnd>
         )}
         renderAboveTable={(table) => {
           if (!isDraft) return null
@@ -258,14 +291,14 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
               onClear={clearSelection}
               itemNoun={ROW_NOUN}
             >
-              <Button variant="ghost" onClick={() => setBulkDialog('margin')}>
+              <Button variant="secondary" onClick={() => setBulkDialog('margin')}>
                 Set margin
               </Button>
-              <Button variant="ghost" onClick={() => setBulkDialog('freight')}>
+              <Button variant="secondary" onClick={() => setBulkDialog('freight')}>
                 Set freight
               </Button>
-              <Button variant="ghost" onClick={() => applyToSelection({ zero_priced: true })}>
-                Set $0
+              <Button variant="secondary" onClick={() => applyToSelection({ zero_priced: true })}>
+                Mark No Bid
               </Button>
             </BulkActionBar>
           )

@@ -144,6 +144,12 @@
     --row-bg: var(--row-success);
     --row-bg-hover: var(--row-success-hover);
   }
+
+  .data-row-muted {
+    --row-bg: var(--color-muted);
+    --row-bg-hover: var(--color-accent);
+    color: var(--color-muted-foreground);
+  }
 }
 
 @layer base {

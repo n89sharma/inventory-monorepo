@@ -396,6 +396,8 @@ export const BidScalarFieldEnum = {
   due_date: 'due_date',
   submitted_date: 'submitted_date',
   notes: 'notes',
+  margin_percent: 'margin_percent',
+  transport_cost: 'transport_cost',
   headers: 'headers',
   created_by_id: 'created_by_id',
   created_at: 'created_at'

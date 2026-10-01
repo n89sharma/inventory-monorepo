@@ -8,9 +8,17 @@ import { flattenFieldErrors } from '@/lib/utils'
 import { BidFormSchema, type BidForm } from '@/ui-types/bid-form-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, type FieldErrors } from 'react-hook-form'
+import { DEFAULT_BID_MARGIN_PERCENT, DEFAULT_BID_TRANSPORT_COST } from 'shared-types'
 import { toast } from 'sonner'
 
-const EMPTY_BID_FORM: BidForm = { vendor: null, received_date: null, due_date: null, notes: '' }
+const EMPTY_BID_FORM: BidForm = {
+  vendor: null,
+  received_date: null,
+  due_date: null,
+  margin_percent: String(DEFAULT_BID_MARGIN_PERCENT),
+  transport_cost: String(DEFAULT_BID_TRANSPORT_COST),
+  notes: '',
+}
 
 interface BidFormPageProps {
   pageConfig: {

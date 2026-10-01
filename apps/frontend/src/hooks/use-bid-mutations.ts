@@ -49,6 +49,40 @@ async function updateRows(bidNumber: string, update: UpdateBidRows) {
   adoptDetail(bidNumber, await updateBidRows(bidNumber, update))
 }
 
+function withNoBid(bid: BidDetail, rowId: number, noBid: boolean): BidDetail {
+  return {
+    ...bid,
+    rows: bid.rows.map((row) => {
+      if (row.id !== rowId) return row
+      if (!noBid) return { ...row, zero_priced: false }
+      return {
+        ...row,
+        zero_priced: true,
+        priced: true,
+        selling_price: null,
+        transport_cost: null,
+        margin_percent: null,
+        bid_price: null,
+        total_cost: null,
+      }
+    }),
+  }
+}
+
+async function setNoBid(bid: BidDetail, rowId: number, noBid: boolean) {
+  await mutate(
+    bidDetailKey(bid.bid_number),
+    updateBidRows(bid.bid_number, { row_ids: [rowId], zero_priced: noBid }),
+    {
+      optimisticData: withNoBid(bid, rowId, noBid),
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: false,
+    },
+  )
+  invalidateBidLists()
+}
+
 async function review(bidNumber: string) {
   await reviewBid(bidNumber)
   refresh(bidNumber)
@@ -75,6 +109,7 @@ const mutations = {
   updateMetadata,
   upload,
   updateRows,
+  setNoBid,
   review,
   returnToDraft,
   submit,

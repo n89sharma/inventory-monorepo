@@ -2,10 +2,6 @@ import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
 import { Label } from '@/components/shadcn/label'
 import { Switch } from '@/components/shadcn/switch'
-import {
-  COLUMN_SECTIONS,
-  type AssetSearchColumn,
-} from '@/components/table-columns/asset-search-columns'
 import { cn } from '@/lib/utils'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useId, useMemo, useState } from 'react'
@@ -19,14 +15,26 @@ const ALL_TOGGLE_LABEL = 'All'
 const SCROLL_AREA_MAX_HEIGHT =
   'max-h-[min(640px,calc(var(--radix-popover-content-available-height)-6rem))]'
 
+export type PickerColumn = {
+  readonly id: string
+  readonly label: string
+  readonly section: string
+}
+
+export type PickerSection = {
+  readonly id: string
+  readonly label: string
+}
+
 type ColumnPickerProps = {
   visibleColSet: Set<string>
   onVisibleChange: (next: Set<string>) => void
   onReset: () => void
-  columns: readonly AssetSearchColumn[]
+  columns: readonly PickerColumn[]
+  sections: readonly PickerSection[]
 }
 
-function matchesQuery(column: AssetSearchColumn, query: string): boolean {
+function matchesQuery(column: PickerColumn, query: string): boolean {
   if (query.length === 0) return true
   return column.label.toLowerCase().includes(query.toLowerCase())
 }
@@ -82,7 +90,7 @@ function ColumnRow({
   isOn,
   onToggle,
 }: {
-  column: AssetSearchColumn
+  column: PickerColumn
   isOn: boolean
   onToggle: (checked: boolean) => void
 }): React.JSX.Element {
@@ -122,17 +130,22 @@ export function ColumnPicker({
   onVisibleChange,
   onReset,
   columns: allColumns,
+  sections,
 }: ColumnPickerProps): React.JSX.Element {
   const [query, setQuery] = useState('')
 
   const groupedSections = useMemo(
     () =>
-      COLUMN_SECTIONS.map((section) => {
-        const columns = allColumns.filter((c) => c.section === section.id && matchesQuery(c, query))
-        const visibleColumns = columns.filter((c) => visibleColSet.has(c.id))
-        return { section, columns, visibleColumns }
-      }).filter((g) => g.columns.length > 0),
-    [query, visibleColSet, allColumns],
+      sections
+        .map((section) => {
+          const columns = allColumns.filter(
+            (c) => c.section === section.id && matchesQuery(c, query),
+          )
+          const visibleColumns = columns.filter((c) => visibleColSet.has(c.id))
+          return { section, columns, visibleColumns }
+        })
+        .filter((g) => g.columns.length > 0),
+    [query, visibleColSet, allColumns, sections],
   )
 
   const hasAnyMatch = groupedSections.length > 0
@@ -160,7 +173,7 @@ export function ColumnPicker({
 
       <div className={cn(SCROLL_AREA_MAX_HEIGHT, 'overflow-y-auto -mx-0.5 px-0.5')}>
         {/* A row-major grid rather than a newspaper flow: sections read left to right in
-            COLUMN_SECTIONS order, so the most-wanted ones stay at the top of the popover.
+            section order, so the most-wanted ones stay at the top of the popover.
             Paired sections are independent, so each starts at the top of its own row. */}
         <div className="grid grid-cols-2 items-start gap-x-4 gap-y-4">
           {hasAnyMatch ? (

@@ -1,6 +1,6 @@
 import { Button } from '@/components/shadcn/button'
 import { Calendar } from '@/components/shadcn/calendar'
-import { Field, FieldError } from '@/components/shadcn/field'
+import { Field, FieldError, FieldLabel } from '@/components/shadcn/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/popover'
 import {
   getSelectedOrNull,
@@ -28,8 +28,13 @@ interface DatePickerFieldProps {
   endMonth?: Date
 }
 
-function DatePickerFieldInline({
-  label,
+interface DatePickerPopoverProps extends Omit<DatePickerFieldProps, 'label'> {
+  triggerText: string
+  invalid?: boolean
+}
+
+function DatePickerPopover({
+  triggerText,
   date,
   setDate,
   id,
@@ -38,9 +43,9 @@ function DatePickerFieldInline({
   fieldDisabled,
   startMonth,
   endMonth,
-}: DatePickerFieldProps): React.JSX.Element {
+  invalid,
+}: DatePickerPopoverProps): React.JSX.Element {
   const [open, setOpen] = useState(false)
-  const triggerLabel = isSelected(date) ? `${label}: ${formatDate(date.selected)}` : label
   return (
     <Popover open={open && !fieldDisabled} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -48,9 +53,10 @@ function DatePickerFieldInline({
           variant="outline"
           id={id}
           disabled={fieldDisabled}
+          aria-invalid={invalid || undefined}
           className={`justify-start font-normal gap-2 ${className ?? ''}`}
         >
-          {triggerLabel}
+          {triggerText}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-1" align="start">
@@ -70,6 +76,16 @@ function DatePickerFieldInline({
       </PopoverContent>
     </Popover>
   )
+}
+
+function DatePickerFieldInline({
+  label,
+  ...props
+}: DatePickerFieldProps): React.JSX.Element {
+  const triggerText = isSelected(props.date)
+    ? `${label}: ${formatDate(props.date.selected)}`
+    : label
+  return <DatePickerPopover {...props} triggerText={triggerText} />
 }
 
 interface ControlledDatePickerFieldProps<TForm extends FieldValues> {
@@ -107,6 +123,41 @@ export function ControlledDatePickerField<TForm extends FieldValues>({
         fieldDisabled={fieldDisabled}
         startMonth={startMonth}
         endMonth={endMonth}
+      />
+      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+    </Field>
+  )
+}
+
+interface ControlledLabelledDatePickerFieldProps<TForm extends FieldValues> {
+  control: Control<TForm>
+  name: Path<TForm>
+  label: string
+  fieldRequired: boolean
+  className?: string
+}
+
+export function ControlledLabelledDatePickerField<TForm extends FieldValues>({
+  control,
+  name,
+  label,
+  fieldRequired,
+  className,
+}: ControlledLabelledDatePickerFieldProps<TForm>): React.JSX.Element {
+  const { field, fieldState } = useController({ control, name })
+  const value = field.value as Date | null
+  return (
+    <Field data-invalid={fieldState.invalid} className={className}>
+      <FieldLabel htmlFor={name}>
+        {label}
+        {fieldRequired && <span className="text-destructive">*</span>}
+      </FieldLabel>
+      <DatePickerPopover
+        id={name}
+        triggerText={value ? formatDate(value) : ''}
+        date={value ? getSelectOption(value) : UNSELECTED}
+        setDate={(d) => field.onChange(getSelectedOrNull(d))}
+        invalid={fieldState.invalid}
       />
       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
     </Field>

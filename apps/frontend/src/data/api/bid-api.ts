@@ -34,6 +34,8 @@ function toBidMetadata(form: BidForm): BidMetadata {
     vendor: form.vendor!,
     received_date: formatDateParam(form.received_date!),
     due_date: formatDateParam(form.due_date!),
+    margin_percent: parseFloat(form.margin_percent),
+    transport_cost: parseFloat(form.transport_cost),
     comment: form.notes.trim() === '' ? null : form.notes,
   }
 }

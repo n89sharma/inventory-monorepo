@@ -61,6 +61,43 @@ describe('use-bid-mutations', () => {
     expect(mocks.invalidateBidLists).toHaveBeenCalledOnce()
   })
 
+  it('shows a row as No Bid at once and lets the server reply replace it', async () => {
+    const row = {
+      id: 7,
+      cells: ['S1'],
+      selling_price: 1000,
+      transport_cost: 30,
+      transport_cost_overridden: false,
+      margin_percent: 25,
+      margin_overridden: false,
+      zero_priced: false,
+      priced: true,
+      bid_price: 720,
+      total_cost: 750,
+    }
+    const bid = { ...DETAIL, rows: [row] } as BidDetail
+    mocks.updateBidRows.mockResolvedValue(DETAIL)
+    const mutations = await loadMutations()
+    await mutations.setNoBid(bid, 7, true)
+
+    expect(mocks.updateBidRows).toHaveBeenCalledWith(BID_NUMBER, {
+      row_ids: [7],
+      zero_priced: true,
+    })
+    const [key, , options] = mocks.mutate.mock.calls[0] ?? []
+    expect(key).toBe(`bid:${BID_NUMBER}`)
+    expect(options).toMatchObject({ rollbackOnError: true, populateCache: true, revalidate: false })
+    expect(options.optimisticData.rows[0]).toMatchObject({
+      zero_priced: true,
+      selling_price: null,
+      transport_cost: null,
+      margin_percent: null,
+      bid_price: null,
+      total_cost: null,
+    })
+    expect(mocks.invalidateBidLists).toHaveBeenCalledOnce()
+  })
+
   it('puts the returned detail into the cache after an upload', async () => {
     mocks.uploadBidRows.mockResolvedValue(DETAIL)
     const mutations = await loadMutations()

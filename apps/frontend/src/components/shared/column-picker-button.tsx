@@ -3,37 +3,40 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/shadcn/pop
 import { useCan } from '@/hooks/use-can'
 import {
   ASSET_SEARCH_COLUMNS,
+  COLUMN_SECTIONS,
   canViewColumn,
   type AssetSearchColumn,
 } from '@/components/table-columns/asset-search-columns'
 import { SlidersIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
-import { ColumnPicker } from './column-picker'
+import { ColumnPicker, type PickerColumn, type PickerSection } from './column-picker'
 
-type ColumnPickerButtonProps = {
+type ColumnPickerVisibilityProps = {
   visible: Set<string>
   onVisibleChange: (next: Set<string>) => void
   onReset: () => void
 }
 
-export function ColumnPickerButton({
+type ColumnPickerPopoverProps = ColumnPickerVisibilityProps & {
+  columns: readonly PickerColumn[]
+  sections: readonly PickerSection[]
+}
+
+export function ColumnPickerPopover({
   visible,
   onVisibleChange,
   onReset,
-}: ColumnPickerButtonProps): React.JSX.Element {
-  const can = useCan()
-  const permittedColumns = useMemo<readonly AssetSearchColumn[]>(
-    () => ASSET_SEARCH_COLUMNS.filter((column) => canViewColumn(column, can)),
-    [can],
-  )
-  const visibleCount = permittedColumns.filter((c) => visible.has(c.id)).length
+  columns,
+  sections,
+}: ColumnPickerPopoverProps): React.JSX.Element {
+  const visibleCount = columns.filter((c) => visible.has(c.id)).length
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           size="icon-sm"
-          aria-label={`Columns (${visibleCount} of ${permittedColumns.length} shown)`}
+          aria-label={`Columns (${visibleCount} of ${columns.length} shown)`}
         >
           <SlidersIcon />
         </Button>
@@ -43,9 +46,31 @@ export function ColumnPickerButton({
           visibleColSet={visible}
           onVisibleChange={onVisibleChange}
           onReset={onReset}
-          columns={permittedColumns}
+          columns={columns}
+          sections={sections}
         />
       </PopoverContent>
     </Popover>
+  )
+}
+
+export function ColumnPickerButton({
+  visible,
+  onVisibleChange,
+  onReset,
+}: ColumnPickerVisibilityProps): React.JSX.Element {
+  const can = useCan()
+  const permittedColumns = useMemo<readonly AssetSearchColumn[]>(
+    () => ASSET_SEARCH_COLUMNS.filter((column) => canViewColumn(column, can)),
+    [can],
+  )
+  return (
+    <ColumnPickerPopover
+      visible={visible}
+      onVisibleChange={onVisibleChange}
+      onReset={onReset}
+      columns={permittedColumns}
+      sections={COLUMN_SECTIONS}
+    />
   )
 }

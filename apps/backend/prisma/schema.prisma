@@ -367,6 +367,8 @@ model Bid {
   due_date       DateTime  @db.Date
   submitted_date DateTime? @db.Date
   notes          String?   @db.Text
+  margin_percent Decimal   @default(25) @db.Decimal(5, 2)
+  transport_cost Decimal   @default(30) @db.Decimal(12, 2)
   headers        String[]  @default([])
   created_by_id  Int
   created_at     DateTime

@@ -94,6 +94,8 @@ function toFormValues(bid: BidDetail): BidForm {
     vendor: bid.vendor,
     received_date: parseISO(bid.received_date),
     due_date: parseISO(bid.due_date),
+    margin_percent: String(bid.margin_percent),
+    transport_cost: String(bid.transport_cost),
     notes: bid.notes ?? '',
   }
 }

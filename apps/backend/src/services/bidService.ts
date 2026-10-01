@@ -76,6 +76,33 @@ function lockDraftBid(tx: Tx, bidNumber: string): Promise<number> {
   )
 }
 
+const PRICING_INPUT_SELECT = {
+  id: true,
+  selling_price: true,
+  transport_cost: true,
+  margin_percent: true,
+  zero_priced: true,
+} as const
+
+type BidDefaults = {
+  margin_percent: Prisma.Decimal
+  transport_cost: Prisma.Decimal
+}
+
+const BID_DEFAULTS_SELECT = { margin_percent: true, transport_cost: true } as const
+
+function withBidDefaults<T extends BidRowPricingInput>(row: T, defaults: BidDefaults): T {
+  return {
+    ...row,
+    margin_percent: row.margin_percent ?? defaults.margin_percent,
+    transport_cost: row.transport_cost ?? defaults.transport_cost,
+  }
+}
+
+function getBidDefaults(tx: Tx, bidId: number): Promise<BidDefaults> {
+  return tx.bid.findUniqueOrThrow({ where: { id: bidId }, select: BID_DEFAULTS_SELECT })
+}
+
 type StoredBidRow = BidRowPricingInput & {
   id: number
   cells: string[]
@@ -83,17 +110,24 @@ type StoredBidRow = BidRowPricingInput & {
   total_cost: Prisma.Decimal | null
 }
 
-function toBidRowDto(row: StoredBidRow): BidRowDto {
+function noBidAware(row: BidRowPricingInput, value: Prisma.Decimal | null): number | null {
+  return row.zero_priced ? null : decimalToNumber(value)
+}
+
+function toBidRowDto(row: StoredBidRow, defaults: BidDefaults): BidRowDto {
+  const resolved = withBidDefaults(row, defaults)
   return {
     id: row.id,
     cells: row.cells,
-    selling_price: decimalToNumber(row.selling_price),
-    transport_cost: decimalToNumber(row.transport_cost),
-    margin_percent: decimalToNumber(row.margin_percent),
+    selling_price: noBidAware(row, row.selling_price),
+    transport_cost: noBidAware(row, row.transport_cost ?? defaults.transport_cost),
+    transport_cost_overridden: row.transport_cost !== null,
+    margin_percent: noBidAware(row, row.margin_percent ?? defaults.margin_percent),
+    margin_overridden: row.margin_percent !== null,
     zero_priced: row.zero_priced,
-    priced: isBidRowPriced(row),
-    bid_price: decimalToNumber(row.bid_price),
-    total_cost: decimalToNumber(row.total_cost),
+    priced: isBidRowPriced(resolved),
+    bid_price: noBidAware(row, row.bid_price),
+    total_cost: noBidAware(row, row.total_cost),
   }
 }
 
@@ -130,7 +164,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
     },
   })
   if (!bid) throw notFound(bidNumber)
-  const totals = summariseBidRows(bid.rows)
+  const totals = summariseBidRows(bid.rows.map((row) => withBidDefaults(row, bid)))
   return {
     bid_number: bid.bid_number,
     status: bid.status,
@@ -143,8 +177,10 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
     total_cost: totals.total_cost,
     created_at: bid.created_at,
     created_by: bid.created_by.name,
+    margin_percent: bid.margin_percent.toNumber(),
+    transport_cost: bid.transport_cost.toNumber(),
     headers: bid.headers,
-    rows: bid.rows.map(toBidRowDto),
+    rows: bid.rows.map((row) => toBidRowDto(row, bid)),
     totals,
   }
 }
@@ -158,6 +194,8 @@ export async function createBid(bid: BidMetadata, userId: number): Promise<strin
       vendor_id: bid.vendor.id,
       received_date: new Date(bid.received_date),
       due_date: new Date(bid.due_date),
+      margin_percent: new Prisma.Decimal(bid.margin_percent),
+      transport_cost: new Prisma.Decimal(bid.transport_cost),
       notes: bid.comment,
       created_by_id: userId,
       created_at: new Date(),
@@ -169,15 +207,32 @@ export async function createBid(bid: BidMetadata, userId: number): Promise<strin
 export async function updateBidMetadata(bidNumber: string, metadata: BidMetadata): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const bidId = await lockDraftBid(tx, bidNumber)
+    const defaults: BidDefaults = {
+      margin_percent: new Prisma.Decimal(metadata.margin_percent),
+      transport_cost: new Prisma.Decimal(metadata.transport_cost),
+    }
     await tx.bid.update({
       where: { id: bidId },
       data: {
         vendor_id: metadata.vendor.id,
         received_date: new Date(metadata.received_date),
         due_date: new Date(metadata.due_date),
+        ...defaults,
         notes: metadata.comment,
       },
     })
+    const rows = await tx.bidRow.findMany({
+      where: { bid_id: bidId, OR: [{ margin_percent: null }, { transport_cost: null }] },
+      select: PRICING_INPUT_SELECT,
+    })
+    await Promise.all(
+      rows.map((row) =>
+        tx.bidRow.update({
+          where: { id: row.id },
+          data: calculateBidRowPrice(withBidDefaults(row, defaults)),
+        }),
+      ),
+    )
   })
 }
 
@@ -222,15 +277,10 @@ function mergePricingInput(row: BidRowPricingInput, update: UpdateBidRows): BidR
 export async function updateBidRows(bidNumber: string, update: UpdateBidRows): Promise<BidDetail> {
   await prisma.$transaction(async (tx) => {
     const bidId = await lockDraftBid(tx, bidNumber)
+    const defaults = await getBidDefaults(tx, bidId)
     const rows = await tx.bidRow.findMany({
       where: { bid_id: bidId, id: { in: update.row_ids } },
-      select: {
-        id: true,
-        selling_price: true,
-        transport_cost: true,
-        margin_percent: true,
-        zero_priced: true,
-      },
+      select: PRICING_INPUT_SELECT,
     })
     if (rows.length !== new Set(update.row_ids).size) {
       throw new ValidationError(ROW_NOT_ON_BID_MESSAGE)
@@ -240,7 +290,7 @@ export async function updateBidRows(bidNumber: string, update: UpdateBidRows): P
         const pricing = mergePricingInput(row, update)
         return tx.bidRow.update({
           where: { id: row.id },
-          data: { ...pricing, ...calculateBidRowPrice(pricing) },
+          data: { ...pricing, ...calculateBidRowPrice(withBidDefaults(pricing, defaults)) },
         })
       }),
     )
@@ -257,17 +307,15 @@ export async function reviewBid(bidNumber: string): Promise<void> {
       { status: BID_STATUS.REVIEW },
       NOT_DRAFT_MESSAGE,
     )
+    const defaults = await getBidDefaults(tx, bidId)
     const rows = await tx.bidRow.findMany({
       where: { bid_id: bidId },
-      select: {
-        selling_price: true,
-        transport_cost: true,
-        margin_percent: true,
-        zero_priced: true,
-      },
+      select: PRICING_INPUT_SELECT,
     })
     if (rows.length === 0) throw new ConflictError(NO_ROWS_MESSAGE)
-    const unpricedCount = rows.filter((row) => !isBidRowPriced(row)).length
+    const unpricedCount = rows.filter(
+      (row) => !isBidRowPriced(withBidDefaults(row, defaults)),
+    ).length
     if (unpricedCount > 0) {
       throw new ConflictError(`Price every row first: ${pluralize(unpricedCount, 'row')} unpriced`)
     }
