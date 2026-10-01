@@ -10,7 +10,7 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param date
  * @param int4
  */
-export const getBids = $runtime.makeTypedQueryFactory("select\nb.bid_number as bid_number,\nb.status as status,\nb.outcome as outcome,\nb.received_date as received_date,\nb.due_date as due_date,\nb.submitted_date as submitted_date,\nb.notes as notes,\no.id as vendor_id,\no.account_number as vendor_account_number,\no.\"name\" as vendor_name,\ncoalesce(rt.total_cost, 0)::float8 as total_cost\nfrom \"Bid\" b\njoin \"Organization\" o on o.id = b.vendor_id\nleft join lateral (\nselect sum(r.total_cost) as total_cost\nfrom \"BidRow\" r\nwhere r.bid_id = b.id\n) rt on true\nwhere b.received_date between $1::date and $2::date\nand ($3 = 0 or o.id = $3)\norder by b.received_date desc, b.id desc\nlimit 500") as (date: Date, date: Date, int4: number) => $runtime.TypedSql<getBids.Parameters, getBids.Result>
+export const getBids = $runtime.makeTypedQueryFactory("select\nb.bid_number as bid_number,\nb.status as status,\nb.outcome as outcome,\nb.received_date as received_date,\nb.due_date as due_date,\nb.submitted_date as submitted_date,\nb.notes as notes,\no.id as vendor_id,\no.account_number as vendor_account_number,\no.\"name\" as vendor_name,\ncoalesce(rt.total_cost, 0)::float8 as total_cost,\nrt.row_count as row_count\nfrom \"Bid\" b\njoin \"Organization\" o on o.id = b.vendor_id\nleft join lateral (\nselect sum(r.total_cost) as total_cost, count(*)::int as row_count\nfrom \"BidRow\" r\nwhere r.bid_id = b.id\n) rt on true\nwhere b.received_date between $1::date and $2::date\nand ($3 = 0 or o.id = $3)\norder by b.received_date desc, b.id desc\nlimit 500") as (date: Date, date: Date, int4: number) => $runtime.TypedSql<getBids.Parameters, getBids.Result>
 
 export namespace getBids {
   export type Parameters = [date: Date, date: Date, int4: number]
@@ -26,5 +26,6 @@ export namespace getBids {
     vendor_account_number: string | null
     vendor_name: string
     total_cost: number | null
+    row_count: number | null
   }
 }

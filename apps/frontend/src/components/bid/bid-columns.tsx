@@ -14,6 +14,7 @@ export function bidTableColumns(getHref: (row: BidSummary) => string): ColumnDef
       href: getHref,
       value: (row) => row.bid_number,
     }),
+    { id: 'vendor', header: 'Vendor', accessorFn: (row) => row.vendor.name },
     {
       accessorKey: 'status',
       header: 'Status',
@@ -35,10 +36,10 @@ export function bidTableColumns(getHref: (row: BidSummary) => string): ColumnDef
       sortUndefined: 'last',
       cell: ({ row }) => formatDateOnly(row.original.submitted_date),
     },
-    { id: 'vendor', header: 'Vendor', accessorFn: (row) => row.vendor.name },
+    { accessorKey: 'row_count', header: 'Assets' },
     {
       accessorKey: 'total_cost',
-      header: 'Total Cost',
+      header: 'Bid Amount',
       cell: ({ row }) => formatUSDWithSymbol(row.original.total_cost),
     },
     {

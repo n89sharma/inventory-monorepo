@@ -52,6 +52,7 @@ function makeBid(status: string): BidDetail {
     vendor: { id: 1, account_number: null, name: 'Acme Leasing' },
     notes: null,
     total_cost: 800,
+    row_count: 1,
     created_at: new Date('2026-03-10T12:00:00Z'),
     created_by: 'Admin',
     margin_percent: 25,

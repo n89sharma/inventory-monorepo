@@ -121,8 +121,14 @@ describe('bidService', () => {
     expect(summaries.map((bid) => bid.bid_number).sort()).toEqual(
       [bidNumber, emptyBidNumber].sort(),
     )
-    expect(summaries.find((bid) => bid.bid_number === bidNumber)?.total_cost).toBe(2400)
-    expect(summaries.find((bid) => bid.bid_number === emptyBidNumber)?.total_cost).toBe(0)
+    expect(summaries.find((bid) => bid.bid_number === bidNumber)).toMatchObject({
+      total_cost: 2400,
+      row_count: 3,
+    })
+    expect(summaries.find((bid) => bid.bid_number === emptyBidNumber)).toMatchObject({
+      total_cost: 0,
+      row_count: 0,
+    })
   })
 
   it('replaces earlier rows on upload and keeps the pasted order', async () => {

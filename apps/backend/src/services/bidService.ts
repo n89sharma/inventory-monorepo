@@ -153,6 +153,7 @@ export async function getBidSummaries(
     },
     notes: row.notes,
     total_cost: row.total_cost ?? 0,
+    row_count: row.row_count ?? 0,
   }))
 }
 
@@ -177,6 +178,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
     vendor: bid.vendor,
     notes: bid.notes,
     total_cost: totals.total_cost,
+    row_count: bid.rows.length,
     created_at: bid.created_at,
     created_by: bid.created_by.name,
     margin_percent: bid.margin_percent.toNumber(),

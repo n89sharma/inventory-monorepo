@@ -9,11 +9,12 @@ select
   o.id as vendor_id,
   o.account_number as vendor_account_number,
   o."name" as vendor_name,
-  coalesce(rt.total_cost, 0)::float8 as total_cost
+  coalesce(rt.total_cost, 0)::float8 as total_cost,
+  rt.row_count as row_count
 from "Bid" b
 join "Organization" o on o.id = b.vendor_id
 left join lateral (
-  select sum(r.total_cost) as total_cost
+  select sum(r.total_cost) as total_cost, count(*)::int as row_count
   from "BidRow" r
   where r.bid_id = b.id
 ) rt on true

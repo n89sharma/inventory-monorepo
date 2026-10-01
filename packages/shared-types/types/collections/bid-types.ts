@@ -31,6 +31,7 @@ export const BidSummarySchema = z.object({
   vendor: OrgSummarySchema,
   notes: z.string().nullable(),
   total_cost: z.number(),
+  row_count: z.number().int(),
 })
 export type BidSummary = z.infer<typeof BidSummarySchema>
 

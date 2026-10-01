@@ -48,6 +48,10 @@ import type { RowSelectionState, TableOptions, VisibilityState } from '@tanstack
 import { useOptimisticSearchParams } from 'nuqs/adapters/react-router/v7'
 import { useCallback, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { bidCsvColumns, bidCsvFilename } from '@/lib/bid-csv'
+import { toCsv } from '@/lib/csv'
+import { downloadFile } from '@/lib/download-file'
+import { ExportCsvButton } from '@/components/shared/export-csv-button'
 import { BID_STATUS, type BidDetail, type BidRow } from 'shared-types'
 
 const TABLE_LABEL = 'Bid rows'
@@ -59,6 +63,17 @@ const BID_ROW_TEXT_SEARCH = {
 } as const satisfies Pick<TableOptions<BidRow>, 'getColumnCanGlobalFilter'>
 
 const getBidRowId = (row: BidRow) => String(row.id)
+
+const CSV_MIME_TYPE = 'text/csv'
+const SENT_STATUSES: string[] = [BID_STATUS.SUBMITTED, BID_STATUS.CONCLUDED]
+
+function BidDownloadButton({ bid }: { bid: BidDetail }): React.JSX.Element {
+  function download() {
+    const csv = toCsv(bidCsvColumns(bid), bid.rows)
+    downloadFile(bidCsvFilename(bid), new Blob([csv], { type: CSV_MIME_TYPE }))
+  }
+  return <ExportCsvButton loading={false} disabled={bid.rows.length === 0} onClick={download} />
+}
 
 type BulkDialog = 'margin' | 'freight'
 
@@ -132,6 +147,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   const [bulkDialog, setBulkDialog] = useState<BulkDialog | null>(null)
   const editorRegistry = useMemo(() => createPriceCellEditorRegistry<BidPriceField>(), [])
   const isDraft = bid.status === BID_STATUS.DRAFT
+  const isSent = SENT_STATUSES.includes(bid.status)
   const handleDelete = useEntityDelete(ENTITY_LABEL, bidNumber, bidNumber, mutations.remove)
 
   const saveField = useCallback(
@@ -200,6 +216,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
                 onUpload={(upload) => mutations.upload(bidNumber, upload)}
               />
             )}
+            {isSent && <BidDownloadButton bid={bid} />}
             <BidLifecycleActions
               status={bid.status}
               rowCount={bid.rows.length}
