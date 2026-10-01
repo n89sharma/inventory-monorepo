@@ -266,3 +266,16 @@ describe('DataTable', () => {
     expect(screen.queryByText(`${ROW_COUNT} results`)).not.toBeInTheDocument()
   })
 })
+
+describe('column header class', () => {
+  const HEADER_CLASS = 'bg-emerald-100'
+  const STYLED_COLUMNS: ColumnDef<Widget, unknown>[] = [
+    { id: 'name', accessorKey: 'name', header: 'Name', meta: { headerClassName: HEADER_CLASS } },
+  ]
+
+  it('applies the header class to the header cell only', () => {
+    renderInRouter(<DataTable label={TABLE_LABEL} columns={STYLED_COLUMNS} data={WIDGETS} />)
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveClass(HEADER_CLASS)
+    expect(screen.getByRole('cell', { name: 'Widget 0' })).not.toHaveClass(HEADER_CLASS)
+  })
+})

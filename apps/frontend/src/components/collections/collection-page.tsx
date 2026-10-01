@@ -2,7 +2,7 @@ import { GridPageContent, PageSection } from '@/components/app-layout/page-conte
 import { DataGrid } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { useTableSortParam } from '@/hooks/use-table-sort-param'
-import type { ColumnDef, Table } from '@tanstack/react-table'
+import type { ColumnDef, Table, TableOptions } from '@tanstack/react-table'
 
 const TABLE_LABEL = 'Collections'
 
@@ -18,6 +18,7 @@ interface CollectionPageProps<TData, TValue> {
   defaultSort: { id: string; desc: boolean }
   pinLeft?: string[]
   renderToolbar?: (table: Table<TData>) => React.ReactNode
+  textSearch?: Pick<TableOptions<TData>, 'getColumnCanGlobalFilter'>
 }
 
 export function CollectionPage<TData, TValue>({
@@ -32,6 +33,7 @@ export function CollectionPage<TData, TValue>({
   defaultSort,
   pinLeft,
   renderToolbar,
+  textSearch,
 }: CollectionPageProps<TData, TValue>) {
   const [sorting, onSortingChange] = useTableSortParam(defaultSort)
   return (
@@ -55,6 +57,7 @@ export function CollectionPage<TData, TValue>({
         sorting={sorting}
         onSortingChange={onSortingChange}
         renderToolbar={renderToolbar}
+        textSearch={textSearch}
       />
     </GridPageContent>
   )

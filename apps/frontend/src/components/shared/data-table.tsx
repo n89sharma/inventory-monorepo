@@ -316,7 +316,8 @@ function headerCellStyle<TData>(header: Header<TData, unknown>, frozen: boolean)
 }
 
 function headerCellClassName<TData>(header: Header<TData, unknown>): string {
-  return `${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${header.column.columnDef.meta?.cellClassName ?? ''}`
+  const meta = header.column.columnDef.meta
+  return `${TABLE_HEAD_CLASS} ${pinEdgeClass(header.column)} ${meta?.cellClassName ?? ''} ${meta?.headerClassName ?? ''}`
 }
 
 // Nothing marks a column as sortable at rest: every column is, so a hint on each one would

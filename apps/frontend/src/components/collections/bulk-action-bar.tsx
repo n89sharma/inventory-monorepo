@@ -5,6 +5,7 @@ import { Button } from '../shadcn/button'
 import { useSidebar } from '../shadcn/sidebar'
 
 const CLEAR_SELECTION_LABEL = 'Clear selection'
+const DEFAULT_ITEM_NOUN = 'asset'
 
 type BulkActionBarProps = {
   selectedCount: number
@@ -12,6 +13,7 @@ type BulkActionBarProps = {
   hiddenCount?: number
   onSelectAll?: () => void
   onClear: () => void
+  itemNoun?: string
   children?: React.ReactNode
 }
 
@@ -21,6 +23,7 @@ export function BulkActionBar({
   hiddenCount,
   onSelectAll,
   onClear,
+  itemNoun = DEFAULT_ITEM_NOUN,
   children,
 }: BulkActionBarProps): React.ReactNode {
   const { state: sidebarState, isMobile } = useSidebar()
@@ -34,10 +37,12 @@ export function BulkActionBar({
 
   function getCountLabel() {
     if (totalCount === undefined) {
-      return `${selectedCount} asset${selectedCount !== 1 ? 's' : ''} selected`
+      return `${selectedCount} ${itemNoun}${selectedCount !== 1 ? 's' : ''} selected`
     }
     if (selectedCount === totalCount) {
-      return hasHidden ? `All ${totalCount} shown selected` : `All ${totalCount} assets selected`
+      return hasHidden
+        ? `All ${totalCount} shown selected`
+        : `All ${totalCount} ${itemNoun}s selected`
     }
     return `${selectedCount} of ${totalCount} selected`
   }

@@ -1,6 +1,6 @@
 import type { AssetColumnId } from '@/components/table-columns/asset-search-columns'
 import {
-  DEFAULT_COLLECTION_RANGE_DAYS,
+  getDefaultCollectionFromDate,
   DEFAULT_DEPARTED_RANGE_DAYS,
   getDefaultFromDate,
   getToday,
@@ -167,9 +167,12 @@ export function buildProfitabilityReportPath(): string {
 // The date filters default to a window ending today, so a link that omits them
 // means "the last N days" to whoever opens it rather than the range the sender
 // saw. Stamping the dates at build time keeps a copied link exact.
-export function buildCollectionSummaryPath(path: string): string {
+export function buildCollectionSummaryPath(
+  path: string,
+  getDefaultFrom: () => Date = getDefaultCollectionFromDate,
+): string {
   return serializeDateRange(path, {
-    from: getDefaultFromDate(DEFAULT_COLLECTION_RANGE_DAYS),
+    from: getDefaultFrom(),
     to: getToday(),
   })
 }

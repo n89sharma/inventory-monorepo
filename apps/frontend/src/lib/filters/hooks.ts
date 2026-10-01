@@ -10,7 +10,7 @@ import {
 } from '@/hooks/use-reference-data'
 import { useUsers } from '@/hooks/use-user'
 import {
-  DEFAULT_COLLECTION_RANGE_DAYS,
+  getDefaultCollectionFromDate,
   DEFAULT_DEPARTED_RANGE_DAYS,
   getDefaultFromDate,
   getToday,
@@ -464,7 +464,7 @@ export function useDepartedRangeParam(): {
   return { from, to, setRange }
 }
 
-export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_RANGE_DAYS): {
+export function useCollectionDateRange(getDefaultFrom: () => Date = getDefaultCollectionFromDate): {
   fromDate: SelectOption<Date>
   toDate: SelectOption<Date>
   setFromDate: (next: SelectOption<Date>) => void
@@ -472,7 +472,7 @@ export function useCollectionDateRange(defaultDays: number = DEFAULT_COLLECTION_
 } {
   const [fromRaw, setFrom] = useQueryState('from', FILTER_PARSERS.from)
   const [toRaw, setTo] = useQueryState('to', FILTER_PARSERS.to)
-  const from = useMemo(() => fromRaw ?? getDefaultFromDate(defaultDays), [fromRaw, defaultDays])
+  const from = useMemo(() => fromRaw ?? getDefaultFrom(), [fromRaw, getDefaultFrom])
   const to = useMemo(() => toRaw ?? getToday(), [toRaw])
   const setFromDate = useCallback(
     (next: SelectOption<Date>) => void setFrom(getSelectedOrNull(next)),

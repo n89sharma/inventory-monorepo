@@ -28,23 +28,23 @@ export function editablePriceFieldForColumn(columnId: string): EditablePriceFiel
   return FIELD_BY_COLUMN_ID.get(columnId)
 }
 
-export interface PriceCellPosition {
+export interface PriceCellPosition<F extends string = EditablePriceField> {
   rowId: string
-  field: EditablePriceField
+  field: F
 }
 
-export interface PriceGridLayout {
+export interface PriceGridLayout<F extends string = EditablePriceField> {
   rowIds: readonly string[]
-  fields: readonly EditablePriceField[]
+  fields: readonly F[]
 }
 
 export type PriceCellDirection = 'nextField' | 'previousField' | 'nextRow'
 
-export function resolveAdjacentPriceCell(
-  layout: PriceGridLayout,
-  origin: PriceCellPosition,
+export function resolveAdjacentPriceCell<F extends string>(
+  layout: PriceGridLayout<F>,
+  origin: PriceCellPosition<F>,
   direction: PriceCellDirection,
-): PriceCellPosition | null {
+): PriceCellPosition<F> | null {
   const rowIndex = layout.rowIds.indexOf(origin.rowId)
   const fieldIndex = layout.fields.indexOf(origin.field)
   if (rowIndex === -1 || fieldIndex === -1) return null
@@ -72,14 +72,16 @@ export function resolveAdjacentPriceCell(
   return { rowId: previousRowId, field: lastField }
 }
 
-export interface PriceCellEditorRegistry {
-  register(position: PriceCellPosition, beginEditing: () => void): () => void
-  beginEditing(position: PriceCellPosition): void
+export interface PriceCellEditorRegistry<F extends string = EditablePriceField> {
+  register(position: PriceCellPosition<F>, beginEditing: () => void): () => void
+  beginEditing(position: PriceCellPosition<F>): void
 }
 
-export function createPriceCellEditorRegistry(): PriceCellEditorRegistry {
+export function createPriceCellEditorRegistry<
+  F extends string = EditablePriceField,
+>(): PriceCellEditorRegistry<F> {
   const editors = new Map<string, () => void>()
-  const keyOf = (position: PriceCellPosition) => `${position.rowId}:${position.field}`
+  const keyOf = (position: PriceCellPosition<F>) => `${position.rowId}:${position.field}`
   return {
     register(position, beginEditing) {
       const key = keyOf(position)
