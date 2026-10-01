@@ -407,6 +407,8 @@ export const ModelName = {
   AssetSalvagedPart: 'AssetSalvagedPart',
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
+  Bid: 'Bid',
+  BidRow: 'BidRow',
   Arrival: 'Arrival',
   Departure: 'Departure',
   AssetDeparture: 'AssetDeparture',
@@ -446,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "arrival" | "departure" | "assetDeparture" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
+    modelProps: "accessory" | "assetType" | "status" | "readiness" | "fileType" | "invoiceType" | "role" | "permission" | "rolePermission" | "country" | "asset" | "technicalSpecification" | "cost" | "assetAccessory" | "error" | "assetError" | "storePart" | "storeTransactionType" | "storeTransaction" | "assetStorePart" | "assetSalvagedPart" | "transfer" | "assetTransfer" | "bid" | "bidRow" | "arrival" | "departure" | "assetDeparture" | "hold" | "invoice" | "location" | "zone" | "warehouse" | "warehouseTransferCost" | "brand" | "model" | "component" | "file" | "comment" | "user" | "release" | "releaseNote" | "savedView" | "organization" | "monthEndSchedule" | "monthEndReport" | "monthEndReportAsset" | "monthEndReportPart" | "history"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2149,6 +2151,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AssetTransferCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AssetTransferCountAggregateOutputType> | number
+        }
+      }
+    }
+    Bid: {
+      payload: Prisma.$BidPayload<ExtArgs>
+      fields: Prisma.BidFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BidFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BidFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        findFirst: {
+          args: Prisma.BidFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BidFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        findMany: {
+          args: Prisma.BidFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>[]
+        }
+        create: {
+          args: Prisma.BidCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        createMany: {
+          args: Prisma.BidCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BidCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>[]
+        }
+        delete: {
+          args: Prisma.BidDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        update: {
+          args: Prisma.BidUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        deleteMany: {
+          args: Prisma.BidDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BidUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BidUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>[]
+        }
+        upsert: {
+          args: Prisma.BidUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidPayload>
+        }
+        aggregate: {
+          args: Prisma.BidAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBid>
+        }
+        groupBy: {
+          args: Prisma.BidGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BidCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidCountAggregateOutputType> | number
+        }
+      }
+    }
+    BidRow: {
+      payload: Prisma.$BidRowPayload<ExtArgs>
+      fields: Prisma.BidRowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BidRowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BidRowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        findFirst: {
+          args: Prisma.BidRowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BidRowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        findMany: {
+          args: Prisma.BidRowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>[]
+        }
+        create: {
+          args: Prisma.BidRowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        createMany: {
+          args: Prisma.BidRowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BidRowCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>[]
+        }
+        delete: {
+          args: Prisma.BidRowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        update: {
+          args: Prisma.BidRowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        deleteMany: {
+          args: Prisma.BidRowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BidRowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BidRowUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>[]
+        }
+        upsert: {
+          args: Prisma.BidRowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BidRowPayload>
+        }
+        aggregate: {
+          args: Prisma.BidRowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBidRow>
+        }
+        groupBy: {
+          args: Prisma.BidRowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidRowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BidRowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BidRowCountAggregateOutputType> | number
         }
       }
     }
@@ -4239,6 +4389,40 @@ export const AssetTransferScalarFieldEnum = {
 export type AssetTransferScalarFieldEnum = (typeof AssetTransferScalarFieldEnum)[keyof typeof AssetTransferScalarFieldEnum]
 
 
+export const BidScalarFieldEnum = {
+  id: 'id',
+  bid_number: 'bid_number',
+  status: 'status',
+  outcome: 'outcome',
+  vendor_id: 'vendor_id',
+  received_date: 'received_date',
+  due_date: 'due_date',
+  submitted_date: 'submitted_date',
+  notes: 'notes',
+  headers: 'headers',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type BidScalarFieldEnum = (typeof BidScalarFieldEnum)[keyof typeof BidScalarFieldEnum]
+
+
+export const BidRowScalarFieldEnum = {
+  id: 'id',
+  bid_id: 'bid_id',
+  position: 'position',
+  cells: 'cells',
+  selling_price: 'selling_price',
+  transport_cost: 'transport_cost',
+  margin_percent: 'margin_percent',
+  zero_priced: 'zero_priced',
+  bid_price: 'bid_price',
+  total_cost: 'total_cost'
+} as const
+
+export type BidRowScalarFieldEnum = (typeof BidRowScalarFieldEnum)[keyof typeof BidRowScalarFieldEnum]
+
+
 export const ArrivalScalarFieldEnum = {
   id: 'id',
   arrival_number: 'arrival_number',
@@ -4850,6 +5034,8 @@ export type GlobalOmitConfig = {
   assetSalvagedPart?: Prisma.AssetSalvagedPartOmit
   transfer?: Prisma.TransferOmit
   assetTransfer?: Prisma.AssetTransferOmit
+  bid?: Prisma.BidOmit
+  bidRow?: Prisma.BidRowOmit
   arrival?: Prisma.ArrivalOmit
   departure?: Prisma.DepartureOmit
   assetDeparture?: Prisma.AssetDepartureOmit

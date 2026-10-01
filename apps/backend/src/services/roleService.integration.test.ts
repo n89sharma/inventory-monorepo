@@ -64,6 +64,14 @@ describe('roleService', () => {
     expect(granted.sort()).toEqual(ROLES_WITH_UPDATE_ASSET_STATUS)
   })
 
+  it('grants create_update_purchase_bids to admin only', async () => {
+    const roles = await listRoles()
+    const granted = roles
+      .filter((r) => r.permissions.includes('create_update_purchase_bids'))
+      .map((r) => r.code)
+    expect(granted).toEqual(['admin'])
+  })
+
   it('resolves a role code to its granted permissions', async () => {
     const permissions = await getPermissionsForRole('sales')
     expect(permissions.has('view_sale_price')).toBe(true)

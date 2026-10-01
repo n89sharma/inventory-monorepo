@@ -8,6 +8,7 @@ const SEQ_NAMES: Record<string, string> = {
   hold: 'seq_hold',
   invoice: 'seq_invoice',
   store_transaction: 'seq_store_transaction',
+  bid: 'seq_bid',
 }
 
 export async function getNextSequence(entityType: string): Promise<number> {

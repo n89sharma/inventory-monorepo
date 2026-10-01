@@ -157,6 +157,16 @@ export type Transfer = Prisma.TransferModel
  */
 export type AssetTransfer = Prisma.AssetTransferModel
 /**
+ * Model Bid
+ * 
+ */
+export type Bid = Prisma.BidModel
+/**
+ * Model BidRow
+ * 
+ */
+export type BidRow = Prisma.BidRowModel
+/**
  * Model Arrival
  * 
  */

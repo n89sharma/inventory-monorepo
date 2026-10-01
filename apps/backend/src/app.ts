@@ -9,6 +9,7 @@ import { requestId } from './middleware/requestId.js'
 import adminRoutes from './routes/adminRoutes.js'
 import arrivalRoutes from './routes/arrivalRoutes.js'
 import assetRoutes from './routes/assetRoutes.js'
+import bidRoutes from './routes/bidRoutes.js'
 import brandRoutes from './routes/brandRoutes.js'
 import componentRoutes from './routes/componentRoutes.js'
 import departureRoutes from './routes/departureRoutes.js'
@@ -135,6 +136,7 @@ app.use('/reference', constantRoutes)
 app.use('/brands', brandRoutes)
 app.use('/assets', assetRoutes)
 app.use('/arrivals', arrivalRoutes)
+app.use('/bids', bidRoutes)
 app.use('/departures', departureRoutes)
 app.use('/transfers', transferRoutes)
 app.use('/transfer-costs', transferCostRoutes)

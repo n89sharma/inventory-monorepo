@@ -271,6 +271,7 @@ export type UserWhereInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostListRelationFilter
   month_end_reports?: Prisma.MonthEndReportListRelationFilter
   month_end_schedules?: Prisma.MonthEndScheduleListRelationFilter
+  bids_created?: Prisma.BidListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -305,6 +306,7 @@ export type UserOrderByWithRelationInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostOrderByRelationAggregateInput
   month_end_reports?: Prisma.MonthEndReportOrderByRelationAggregateInput
   month_end_schedules?: Prisma.MonthEndScheduleOrderByRelationAggregateInput
+  bids_created?: Prisma.BidOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -342,6 +344,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   transfer_costs_set?: Prisma.WarehouseTransferCostListRelationFilter
   month_end_reports?: Prisma.MonthEndReportListRelationFilter
   month_end_schedules?: Prisma.MonthEndScheduleListRelationFilter
+  bids_created?: Prisma.BidListRelationFilter
 }, "id" | "name" | "email" | "clerk_id">
 
 export type UserOrderByWithAggregationInput = {
@@ -402,6 +405,7 @@ export type UserCreateInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -433,6 +437,7 @@ export type UserUncheckedCreateInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUpdateInput = {
@@ -463,6 +468,7 @@ export type UserUpdateInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -494,6 +500,7 @@ export type UserUncheckedUpdateInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -718,6 +725,20 @@ export type UserUpdateOneRequiredWithoutTransfersNestedInput = {
   upsert?: Prisma.UserUpsertWithoutTransfersInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTransfersInput, Prisma.UserUpdateWithoutTransfersInput>, Prisma.UserUncheckedUpdateWithoutTransfersInput>
+}
+
+export type UserCreateNestedOneWithoutBids_createdInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBids_createdInput, Prisma.UserUncheckedCreateWithoutBids_createdInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBids_createdInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBids_createdNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBids_createdInput, Prisma.UserUncheckedCreateWithoutBids_createdInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBids_createdInput
+  upsert?: Prisma.UserUpsertWithoutBids_createdInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBids_createdInput, Prisma.UserUpdateWithoutBids_createdInput>, Prisma.UserUncheckedUpdateWithoutBids_createdInput>
 }
 
 export type UserCreateNestedOneWithoutArrivalsInput = {
@@ -1035,6 +1056,7 @@ export type UserCreateWithoutAssigned_roleInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutAssigned_roleInput = {
@@ -1065,6 +1087,7 @@ export type UserUncheckedCreateWithoutAssigned_roleInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutAssigned_roleInput = {
@@ -1134,6 +1157,7 @@ export type UserCreateWithoutAsset_errors_addedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
@@ -1164,6 +1188,7 @@ export type UserUncheckedCreateWithoutAsset_errors_addedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutAsset_errors_addedInput = {
@@ -1198,6 +1223,7 @@ export type UserCreateWithoutAsset_errors_fixedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
@@ -1228,6 +1254,7 @@ export type UserUncheckedCreateWithoutAsset_errors_fixedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutAsset_errors_fixedInput = {
@@ -1273,6 +1300,7 @@ export type UserUpdateWithoutAsset_errors_addedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
@@ -1303,6 +1331,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_addedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUpsertWithoutAsset_errors_fixedInput = {
@@ -1343,6 +1372,7 @@ export type UserUpdateWithoutAsset_errors_fixedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
@@ -1373,6 +1403,7 @@ export type UserUncheckedUpdateWithoutAsset_errors_fixedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutStore_transactionsInput = {
@@ -1402,6 +1433,7 @@ export type UserCreateWithoutStore_transactionsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutStore_transactionsInput = {
@@ -1432,6 +1464,7 @@ export type UserUncheckedCreateWithoutStore_transactionsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutStore_transactionsInput = {
@@ -1477,6 +1510,7 @@ export type UserUpdateWithoutStore_transactionsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStore_transactionsInput = {
@@ -1507,6 +1541,7 @@ export type UserUncheckedUpdateWithoutStore_transactionsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutStore_asset_partsInput = {
@@ -1536,6 +1571,7 @@ export type UserCreateWithoutStore_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutStore_asset_partsInput = {
@@ -1566,6 +1602,7 @@ export type UserUncheckedCreateWithoutStore_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutStore_asset_partsInput = {
@@ -1611,6 +1648,7 @@ export type UserUpdateWithoutStore_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStore_asset_partsInput = {
@@ -1641,6 +1679,7 @@ export type UserUncheckedUpdateWithoutStore_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutSalvaged_asset_partsInput = {
@@ -1670,6 +1709,7 @@ export type UserCreateWithoutSalvaged_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutSalvaged_asset_partsInput = {
@@ -1700,6 +1740,7 @@ export type UserUncheckedCreateWithoutSalvaged_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutSalvaged_asset_partsInput = {
@@ -1745,6 +1786,7 @@ export type UserUpdateWithoutSalvaged_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSalvaged_asset_partsInput = {
@@ -1775,6 +1817,7 @@ export type UserUncheckedUpdateWithoutSalvaged_asset_partsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutTransfersInput = {
@@ -1804,6 +1847,7 @@ export type UserCreateWithoutTransfersInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutTransfersInput = {
@@ -1834,6 +1878,7 @@ export type UserUncheckedCreateWithoutTransfersInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutTransfersInput = {
@@ -1879,6 +1924,7 @@ export type UserUpdateWithoutTransfersInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransfersInput = {
@@ -1893,6 +1939,145 @@ export type UserUncheckedUpdateWithoutTransfersInput = {
   releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
   asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
   asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUncheckedUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUncheckedUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUncheckedUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUncheckedUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUncheckedUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUncheckedUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
+  month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
+  month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
+}
+
+export type UserCreateWithoutBids_createdInput = {
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  assigned_role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+  default_warehouse?: Prisma.WarehouseCreateNestedOneWithoutUsersInput
+  last_seen_release?: Prisma.ReleaseCreateNestedOneWithoutSeen_byInput
+  releases_created?: Prisma.ReleaseCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
+  month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
+  month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserUncheckedCreateWithoutBids_createdInput = {
+  id?: number
+  name: string
+  email?: string | null
+  clerk_id?: string | null
+  is_active?: boolean
+  default_warehouse_id?: number | null
+  role?: string | null
+  last_seen_release_id?: number | null
+  releases_created?: Prisma.ReleaseUncheckedCreateNestedManyWithoutCreated_byInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutAddedByInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedCreateNestedManyWithoutFixedByInput
+  transfers?: Prisma.TransferUncheckedCreateNestedManyWithoutCreated_byInput
+  departures?: Prisma.DepartureUncheckedCreateNestedManyWithoutCreated_byInput
+  departure_sales_reps?: Prisma.DepartureUncheckedCreateNestedManyWithoutSales_representativeInput
+  arrivals?: Prisma.ArrivalUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_created?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_byInput
+  holds_for?: Prisma.HoldUncheckedCreateNestedManyWithoutCreated_forInput
+  invoices_updated?: Prisma.InvoiceUncheckedCreateNestedManyWithoutUpdated_byInput
+  files?: Prisma.FileUncheckedCreateNestedManyWithoutUploaded_byInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutCreated_byInput
+  history?: Prisma.HistoryUncheckedCreateNestedManyWithoutUserInput
+  store_transactions?: Prisma.StoreTransactionUncheckedCreateNestedManyWithoutCreated_byInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUncheckedCreateNestedManyWithoutFixedByInput
+  store_asset_parts?: Prisma.AssetStorePartUncheckedCreateNestedManyWithoutCreated_byInput
+  savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
+  month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
+  month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+}
+
+export type UserCreateOrConnectWithoutBids_createdInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBids_createdInput, Prisma.UserUncheckedCreateWithoutBids_createdInput>
+}
+
+export type UserUpsertWithoutBids_createdInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBids_createdInput, Prisma.UserUncheckedUpdateWithoutBids_createdInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBids_createdInput, Prisma.UserUncheckedCreateWithoutBids_createdInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBids_createdInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBids_createdInput, Prisma.UserUncheckedUpdateWithoutBids_createdInput>
+}
+
+export type UserUpdateWithoutBids_createdInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assigned_role?: Prisma.RoleUpdateOneWithoutUsersNestedInput
+  default_warehouse?: Prisma.WarehouseUpdateOneWithoutUsersNestedInput
+  last_seen_release?: Prisma.ReleaseUpdateOneWithoutSeen_byNestedInput
+  releases_created?: Prisma.ReleaseUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUpdateManyWithoutCreated_byNestedInput
+  departures?: Prisma.DepartureUpdateManyWithoutCreated_byNestedInput
+  departure_sales_reps?: Prisma.DepartureUpdateManyWithoutSales_representativeNestedInput
+  arrivals?: Prisma.ArrivalUpdateManyWithoutCreated_byNestedInput
+  holds_created?: Prisma.HoldUpdateManyWithoutCreated_byNestedInput
+  holds_for?: Prisma.HoldUpdateManyWithoutCreated_forNestedInput
+  invoices_updated?: Prisma.InvoiceUpdateManyWithoutUpdated_byNestedInput
+  files?: Prisma.FileUpdateManyWithoutUploaded_byNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutCreated_byNestedInput
+  history?: Prisma.HistoryUpdateManyWithoutUserNestedInput
+  store_transactions?: Prisma.StoreTransactionUpdateManyWithoutCreated_byNestedInput
+  salvaged_asset_parts?: Prisma.AssetSalvagedPartUpdateManyWithoutFixedByNestedInput
+  store_asset_parts?: Prisma.AssetStorePartUpdateManyWithoutCreated_byNestedInput
+  savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
+  transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
+  month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
+  month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBids_createdInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clerk_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  default_warehouse_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last_seen_release_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releases_created?: Prisma.ReleaseUncheckedUpdateManyWithoutCreated_byNestedInput
+  asset_errors_added?: Prisma.AssetErrorUncheckedUpdateManyWithoutAddedByNestedInput
+  asset_errors_fixed?: Prisma.AssetErrorUncheckedUpdateManyWithoutFixedByNestedInput
+  transfers?: Prisma.TransferUncheckedUpdateManyWithoutCreated_byNestedInput
   departures?: Prisma.DepartureUncheckedUpdateManyWithoutCreated_byNestedInput
   departure_sales_reps?: Prisma.DepartureUncheckedUpdateManyWithoutSales_representativeNestedInput
   arrivals?: Prisma.ArrivalUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -1938,6 +2123,7 @@ export type UserCreateWithoutArrivalsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutArrivalsInput = {
@@ -1968,6 +2154,7 @@ export type UserUncheckedCreateWithoutArrivalsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutArrivalsInput = {
@@ -2013,6 +2200,7 @@ export type UserUpdateWithoutArrivalsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArrivalsInput = {
@@ -2043,6 +2231,7 @@ export type UserUncheckedUpdateWithoutArrivalsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutDeparturesInput = {
@@ -2072,6 +2261,7 @@ export type UserCreateWithoutDeparturesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutDeparturesInput = {
@@ -2102,6 +2292,7 @@ export type UserUncheckedCreateWithoutDeparturesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutDeparturesInput = {
@@ -2136,6 +2327,7 @@ export type UserCreateWithoutDeparture_sales_repsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
@@ -2166,6 +2358,7 @@ export type UserUncheckedCreateWithoutDeparture_sales_repsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutDeparture_sales_repsInput = {
@@ -2211,6 +2404,7 @@ export type UserUpdateWithoutDeparturesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparturesInput = {
@@ -2241,6 +2435,7 @@ export type UserUncheckedUpdateWithoutDeparturesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUpsertWithoutDeparture_sales_repsInput = {
@@ -2281,6 +2476,7 @@ export type UserUpdateWithoutDeparture_sales_repsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
@@ -2311,6 +2507,7 @@ export type UserUncheckedUpdateWithoutDeparture_sales_repsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutHolds_createdInput = {
@@ -2340,6 +2537,7 @@ export type UserCreateWithoutHolds_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutHolds_createdInput = {
@@ -2370,6 +2568,7 @@ export type UserUncheckedCreateWithoutHolds_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutHolds_createdInput = {
@@ -2404,6 +2603,7 @@ export type UserCreateWithoutHolds_forInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutHolds_forInput = {
@@ -2434,6 +2634,7 @@ export type UserUncheckedCreateWithoutHolds_forInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutHolds_forInput = {
@@ -2479,6 +2680,7 @@ export type UserUpdateWithoutHolds_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_createdInput = {
@@ -2509,6 +2711,7 @@ export type UserUncheckedUpdateWithoutHolds_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUpsertWithoutHolds_forInput = {
@@ -2549,6 +2752,7 @@ export type UserUpdateWithoutHolds_forInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHolds_forInput = {
@@ -2579,6 +2783,7 @@ export type UserUncheckedUpdateWithoutHolds_forInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutInvoices_updatedInput = {
@@ -2608,6 +2813,7 @@ export type UserCreateWithoutInvoices_updatedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutInvoices_updatedInput = {
@@ -2638,6 +2844,7 @@ export type UserUncheckedCreateWithoutInvoices_updatedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutInvoices_updatedInput = {
@@ -2683,6 +2890,7 @@ export type UserUpdateWithoutInvoices_updatedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
@@ -2713,6 +2921,7 @@ export type UserUncheckedUpdateWithoutInvoices_updatedInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutDefault_warehouseInput = {
@@ -2742,6 +2951,7 @@ export type UserCreateWithoutDefault_warehouseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutDefault_warehouseInput = {
@@ -2772,6 +2982,7 @@ export type UserUncheckedCreateWithoutDefault_warehouseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutDefault_warehouseInput = {
@@ -2827,6 +3038,7 @@ export type UserCreateWithoutTransfer_costs_setInput = {
   savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutTransfer_costs_setInput = {
@@ -2857,6 +3069,7 @@ export type UserUncheckedCreateWithoutTransfer_costs_setInput = {
   savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutTransfer_costs_setInput = {
@@ -2902,6 +3115,7 @@ export type UserUpdateWithoutTransfer_costs_setInput = {
   savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransfer_costs_setInput = {
@@ -2932,6 +3146,7 @@ export type UserUncheckedUpdateWithoutTransfer_costs_setInput = {
   savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutFilesInput = {
@@ -2961,6 +3176,7 @@ export type UserCreateWithoutFilesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutFilesInput = {
@@ -2991,6 +3207,7 @@ export type UserUncheckedCreateWithoutFilesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutFilesInput = {
@@ -3036,6 +3253,7 @@ export type UserUpdateWithoutFilesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFilesInput = {
@@ -3066,6 +3284,7 @@ export type UserUncheckedUpdateWithoutFilesInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3095,6 +3314,7 @@ export type UserCreateWithoutCommentsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3125,6 +3345,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -3170,6 +3391,7 @@ export type UserUpdateWithoutCommentsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -3200,6 +3422,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutReleases_createdInput = {
@@ -3229,6 +3452,7 @@ export type UserCreateWithoutReleases_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutReleases_createdInput = {
@@ -3259,6 +3483,7 @@ export type UserUncheckedCreateWithoutReleases_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutReleases_createdInput = {
@@ -3293,6 +3518,7 @@ export type UserCreateWithoutLast_seen_releaseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutLast_seen_releaseInput = {
@@ -3323,6 +3549,7 @@ export type UserUncheckedCreateWithoutLast_seen_releaseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutLast_seen_releaseInput = {
@@ -3373,6 +3600,7 @@ export type UserUpdateWithoutReleases_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReleases_createdInput = {
@@ -3403,6 +3631,7 @@ export type UserUncheckedUpdateWithoutReleases_createdInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutLast_seen_releaseInput = {
@@ -3448,6 +3677,7 @@ export type UserCreateWithoutSavedViewsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutSavedViewsInput = {
@@ -3478,6 +3708,7 @@ export type UserUncheckedCreateWithoutSavedViewsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutSavedViewsInput = {
@@ -3523,6 +3754,7 @@ export type UserUpdateWithoutSavedViewsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedViewsInput = {
@@ -3553,6 +3785,7 @@ export type UserUncheckedUpdateWithoutSavedViewsInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutMonth_end_schedulesInput = {
@@ -3582,6 +3815,7 @@ export type UserCreateWithoutMonth_end_schedulesInput = {
   savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutMonth_end_schedulesInput = {
@@ -3612,6 +3846,7 @@ export type UserUncheckedCreateWithoutMonth_end_schedulesInput = {
   savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutMonth_end_schedulesInput = {
@@ -3657,6 +3892,7 @@ export type UserUpdateWithoutMonth_end_schedulesInput = {
   savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMonth_end_schedulesInput = {
@@ -3687,6 +3923,7 @@ export type UserUncheckedUpdateWithoutMonth_end_schedulesInput = {
   savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutMonth_end_reportsInput = {
@@ -3716,6 +3953,7 @@ export type UserCreateWithoutMonth_end_reportsInput = {
   savedViews?: Prisma.SavedViewCreateNestedManyWithoutCreated_byInput
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutMonth_end_reportsInput = {
@@ -3746,6 +3984,7 @@ export type UserUncheckedCreateWithoutMonth_end_reportsInput = {
   savedViews?: Prisma.SavedViewUncheckedCreateNestedManyWithoutCreated_byInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutMonth_end_reportsInput = {
@@ -3791,6 +4030,7 @@ export type UserUpdateWithoutMonth_end_reportsInput = {
   savedViews?: Prisma.SavedViewUpdateManyWithoutCreated_byNestedInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMonth_end_reportsInput = {
@@ -3821,6 +4061,7 @@ export type UserUncheckedUpdateWithoutMonth_end_reportsInput = {
   savedViews?: Prisma.SavedViewUncheckedUpdateManyWithoutCreated_byNestedInput
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateWithoutHistoryInput = {
@@ -3850,6 +4091,7 @@ export type UserCreateWithoutHistoryInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserUncheckedCreateWithoutHistoryInput = {
@@ -3880,6 +4122,7 @@ export type UserUncheckedCreateWithoutHistoryInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedCreateNestedManyWithoutUpdated_byInput
   month_end_reports?: Prisma.MonthEndReportUncheckedCreateNestedManyWithoutCreated_byInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedCreateNestedManyWithoutUpdated_byInput
+  bids_created?: Prisma.BidUncheckedCreateNestedManyWithoutCreated_byInput
 }
 
 export type UserCreateOrConnectWithoutHistoryInput = {
@@ -3925,6 +4168,7 @@ export type UserUpdateWithoutHistoryInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHistoryInput = {
@@ -3955,6 +4199,7 @@ export type UserUncheckedUpdateWithoutHistoryInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserCreateManyAssigned_roleInput = {
@@ -3994,6 +4239,7 @@ export type UserUpdateWithoutAssigned_roleInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssigned_roleInput = {
@@ -4024,6 +4270,7 @@ export type UserUncheckedUpdateWithoutAssigned_roleInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutAssigned_roleInput = {
@@ -4073,6 +4320,7 @@ export type UserUpdateWithoutDefault_warehouseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDefault_warehouseInput = {
@@ -4103,6 +4351,7 @@ export type UserUncheckedUpdateWithoutDefault_warehouseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDefault_warehouseInput = {
@@ -4152,6 +4401,7 @@ export type UserUpdateWithoutLast_seen_releaseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLast_seen_releaseInput = {
@@ -4182,6 +4432,7 @@ export type UserUncheckedUpdateWithoutLast_seen_releaseInput = {
   transfer_costs_set?: Prisma.WarehouseTransferCostUncheckedUpdateManyWithoutUpdated_byNestedInput
   month_end_reports?: Prisma.MonthEndReportUncheckedUpdateManyWithoutCreated_byNestedInput
   month_end_schedules?: Prisma.MonthEndScheduleUncheckedUpdateManyWithoutUpdated_byNestedInput
+  bids_created?: Prisma.BidUncheckedUpdateManyWithoutCreated_byNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutLast_seen_releaseInput = {
@@ -4220,6 +4471,7 @@ export type UserCountOutputType = {
   transfer_costs_set: number
   month_end_reports: number
   month_end_schedules: number
+  bids_created: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4243,6 +4495,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   transfer_costs_set?: boolean | UserCountOutputTypeCountTransfer_costs_setArgs
   month_end_reports?: boolean | UserCountOutputTypeCountMonth_end_reportsArgs
   month_end_schedules?: boolean | UserCountOutputTypeCountMonth_end_schedulesArgs
+  bids_created?: boolean | UserCountOutputTypeCountBids_createdArgs
 }
 
 /**
@@ -4395,6 +4648,13 @@ export type UserCountOutputTypeCountMonth_end_schedulesArgs<ExtArgs extends runt
   where?: Prisma.MonthEndScheduleWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBids_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BidWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4428,6 +4688,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   transfer_costs_set?: boolean | Prisma.User$transfer_costs_setArgs<ExtArgs>
   month_end_reports?: boolean | Prisma.User$month_end_reportsArgs<ExtArgs>
   month_end_schedules?: boolean | Prisma.User$month_end_schedulesArgs<ExtArgs>
+  bids_created?: boolean | Prisma.User$bids_createdArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -4495,6 +4756,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   transfer_costs_set?: boolean | Prisma.User$transfer_costs_setArgs<ExtArgs>
   month_end_reports?: boolean | Prisma.User$month_end_reportsArgs<ExtArgs>
   month_end_schedules?: boolean | Prisma.User$month_end_schedulesArgs<ExtArgs>
+  bids_created?: boolean | Prisma.User$bids_createdArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4534,6 +4796,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     transfer_costs_set: Prisma.$WarehouseTransferCostPayload<ExtArgs>[]
     month_end_reports: Prisma.$MonthEndReportPayload<ExtArgs>[]
     month_end_schedules: Prisma.$MonthEndSchedulePayload<ExtArgs>[]
+    bids_created: Prisma.$BidPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -4961,6 +5224,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   transfer_costs_set<T extends Prisma.User$transfer_costs_setArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transfer_costs_setArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WarehouseTransferCostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   month_end_reports<T extends Prisma.User$month_end_reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$month_end_reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthEndReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   month_end_schedules<T extends Prisma.User$month_end_schedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$month_end_schedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthEndSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bids_created<T extends Prisma.User$bids_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bids_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BidPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5933,6 +6197,30 @@ export type User$month_end_schedulesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.MonthEndScheduleScalarFieldEnum | Prisma.MonthEndScheduleScalarFieldEnum[]
+}
+
+/**
+ * User.bids_created
+ */
+export type User$bids_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Bid
+   */
+  select?: Prisma.BidSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Bid
+   */
+  omit?: Prisma.BidOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BidInclude<ExtArgs> | null
+  where?: Prisma.BidWhereInput
+  orderBy?: Prisma.BidOrderByWithRelationInput | Prisma.BidOrderByWithRelationInput[]
+  cursor?: Prisma.BidWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BidScalarFieldEnum | Prisma.BidScalarFieldEnum[]
 }
 
 /**

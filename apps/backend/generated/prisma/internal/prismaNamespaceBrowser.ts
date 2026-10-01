@@ -74,6 +74,8 @@ export const ModelName = {
   AssetSalvagedPart: 'AssetSalvagedPart',
   Transfer: 'Transfer',
   AssetTransfer: 'AssetTransfer',
+  Bid: 'Bid',
+  BidRow: 'BidRow',
   Arrival: 'Arrival',
   Departure: 'Departure',
   AssetDeparture: 'AssetDeparture',
@@ -382,6 +384,40 @@ export const AssetTransferScalarFieldEnum = {
 } as const
 
 export type AssetTransferScalarFieldEnum = (typeof AssetTransferScalarFieldEnum)[keyof typeof AssetTransferScalarFieldEnum]
+
+
+export const BidScalarFieldEnum = {
+  id: 'id',
+  bid_number: 'bid_number',
+  status: 'status',
+  outcome: 'outcome',
+  vendor_id: 'vendor_id',
+  received_date: 'received_date',
+  due_date: 'due_date',
+  submitted_date: 'submitted_date',
+  notes: 'notes',
+  headers: 'headers',
+  created_by_id: 'created_by_id',
+  created_at: 'created_at'
+} as const
+
+export type BidScalarFieldEnum = (typeof BidScalarFieldEnum)[keyof typeof BidScalarFieldEnum]
+
+
+export const BidRowScalarFieldEnum = {
+  id: 'id',
+  bid_id: 'bid_id',
+  position: 'position',
+  cells: 'cells',
+  selling_price: 'selling_price',
+  transport_cost: 'transport_cost',
+  margin_percent: 'margin_percent',
+  zero_priced: 'zero_priced',
+  bid_price: 'bid_price',
+  total_cost: 'total_cost'
+} as const
+
+export type BidRowScalarFieldEnum = (typeof BidRowScalarFieldEnum)[keyof typeof BidRowScalarFieldEnum]
 
 
 export const ArrivalScalarFieldEnum = {

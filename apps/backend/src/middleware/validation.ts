@@ -21,6 +21,21 @@ export const ArrivalListQuerySchema = z
     message: 'fromDate must be before toDate',
   })
 
+export const BidListQuerySchema = z
+  .object({
+    fromDate: z.iso.date(),
+    toDate: z.iso.date().optional(),
+    vendor: z.coerce.number().int().optional(),
+  })
+  .transform((data) => ({
+    fromDate: normalizeFromDate(data.fromDate),
+    toDate: normalizeToDate(data.toDate),
+    vendor: data.vendor,
+  }))
+  .refine((data) => !isAfter(data.fromDate, data.toDate), {
+    message: 'fromDate must be before toDate',
+  })
+
 export const DepartureListQuerySchema = z
   .object({
     fromDate: z.iso.date(),

@@ -41,6 +41,8 @@ export * from "./sql/getAssetStoreParts.js"
 
 export * from "./sql/getAssetTransfers.js"
 
+export * from "./sql/getBids.js"
+
 export * from "./sql/getComponentReferenceCounts.js"
 
 export * from "./sql/getComponents.js"

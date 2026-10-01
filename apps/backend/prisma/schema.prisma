@@ -357,6 +357,45 @@ model AssetTransfer {
   @@id([asset_id, transfer_id])
 }
 
+model Bid {
+  id             Int       @id @default(autoincrement())
+  bid_number     String    @unique @db.VarChar(50)
+  status         String    @default("DRAFT") @db.VarChar(30)
+  outcome        String?   @db.VarChar(10)
+  vendor_id      Int
+  received_date  DateTime  @db.Date
+  due_date       DateTime  @db.Date
+  submitted_date DateTime? @db.Date
+  notes          String?   @db.Text
+  headers        String[]  @default([])
+  created_by_id  Int
+  created_at     DateTime
+
+  vendor     Organization @relation(fields: [vendor_id], references: [id])
+  created_by User         @relation("BidCreatedBy", fields: [created_by_id], references: [id])
+  rows       BidRow[]
+
+  @@index([received_date(sort: Desc)])
+  @@index([vendor_id])
+}
+
+model BidRow {
+  id             Int      @id @default(autoincrement())
+  bid_id         Int
+  position       Int
+  cells          String[] @default([])
+  selling_price  Decimal? @db.Decimal(12, 2)
+  transport_cost Decimal? @db.Decimal(12, 2)
+  margin_percent Decimal? @db.Decimal(5, 2)
+  zero_priced    Boolean  @default(false)
+  bid_price      Decimal? @db.Decimal(12, 2)
+  total_cost     Decimal? @db.Decimal(12, 2)
+
+  bid Bid @relation(fields: [bid_id], references: [id])
+
+  @@index([bid_id, position])
+}
+
 model Arrival {
   id             Int      @id @default(autoincrement())
   arrival_number String   @unique @db.VarChar(50)
@@ -640,6 +679,7 @@ model User {
   transfer_costs_set   WarehouseTransferCost[]
   month_end_reports    MonthEndReport[]    @relation("MonthEndReportCreatedBy")
   month_end_schedules  MonthEndSchedule[]  @relation("MonthEndScheduleUpdatedBy")
+  bids_created         Bid[]               @relation("BidCreatedBy")
 }
 
 model Release {
@@ -711,6 +751,7 @@ model Organization {
   departures_transporter Departure[] @relation("DepartureTransporter")
   holds                  Hold[]
   transfers              Transfer[]
+  bids                   Bid[]
 
   name_normalized String? @default(dbgenerated()) @map("name_normalized")
 

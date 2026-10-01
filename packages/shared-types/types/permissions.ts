@@ -13,6 +13,7 @@ export const PERMISSIONS = [
   'create_update_departure',
   'create_update_invoice',
   'create_update_store',
+  'create_update_purchase_bids',
   'update_tech_specs',
   'update_location',
   'update_settings',
