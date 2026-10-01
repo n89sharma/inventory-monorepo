@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Prisma } from '../../generated/prisma/client.js'
 import {
+  calculateBidRowMargin,
   calculateBidRowPrice,
   isBidRowPriced,
   summariseBidRows,
@@ -53,6 +54,17 @@ describe('calculateBidRowPrice', () => {
   it('prices a zero-priced row at nothing whatever else it holds', () => {
     expect(amounts(pricing(1000, 100, 20, true))).toEqual({ bid: 0, total: 0 })
     expect(amounts(pricing(null, null, null, true))).toEqual({ bid: 0, total: 0 })
+  })
+})
+
+describe('calculateBidRowMargin', () => {
+  it('keeps the selling price less the bid price and freight', () => {
+    expect(calculateBidRowMargin(priced(pricing(1000, 100, 20)))?.toNumber()).toBe(200)
+  })
+
+  it('has no margin while unpriced or when the row is No Bid', () => {
+    expect(calculateBidRowMargin(priced(pricing(1000, null, 20)))).toBeNull()
+    expect(calculateBidRowMargin(priced(pricing(1000, 100, 20, true)))).toBeNull()
   })
 })
 

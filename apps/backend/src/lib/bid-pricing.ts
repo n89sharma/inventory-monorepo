@@ -37,6 +37,11 @@ export function calculateBidRowPrice(row: BidRowPricingInput): BidRowPrice {
   return { bid_price: bidPrice, total_cost: bidPrice.add(transport_cost) }
 }
 
+export function calculateBidRowMargin(row: PricedBidRow): Prisma.Decimal | null {
+  if (row.zero_priced || row.selling_price === null || row.total_cost === null) return null
+  return row.selling_price.sub(row.total_cost)
+}
+
 export function summariseBidRows(rows: PricedBidRow[]): BidTotals {
   let totalCost = ZERO
   let expectedSale = ZERO

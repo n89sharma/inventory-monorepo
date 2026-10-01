@@ -1,7 +1,10 @@
 import { Input } from '@/components/shadcn/input'
 import { sanitizeDecimalInput } from '@/lib/input-sanitizers'
+import { CircleNotchIcon } from '@phosphor-icons/react'
 
 const PLACEHOLDER = '0'
+const SPINNER_CLASS =
+  'text-muted-foreground pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2 animate-spin'
 const SUFFIX_CLASS =
   'text-muted-foreground pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm'
 
@@ -9,7 +12,11 @@ interface PercentInputProps {
   id?: string
   value: string
   onChange: (value: string) => void
+  onBlur?: () => void
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
   invalid?: boolean
+  saving?: boolean
   label?: string
   className?: string
   autoFocus?: boolean
@@ -19,7 +26,11 @@ export function PercentInput({
   id,
   value,
   onChange,
+  onBlur,
+  onFocus,
+  onKeyDown,
   invalid,
+  saving,
   label,
   className,
   autoFocus,
@@ -30,6 +41,9 @@ export function PercentInput({
         id={id}
         value={value}
         onChange={(event) => onChange(sanitizeDecimalInput(event.target.value))}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
         inputMode="decimal"
         autoFocus={autoFocus}
         placeholder={PLACEHOLDER}
@@ -37,7 +51,8 @@ export function PercentInput({
         aria-invalid={invalid}
         className="h-7 pr-6 tabular-nums"
       />
-      <span className={SUFFIX_CLASS}>%</span>
+      {saving && <CircleNotchIcon className={SPINNER_CLASS} aria-hidden="true" />}
+      {!saving && <span className={SUFFIX_CLASS}>%</span>}
     </div>
   )
 }

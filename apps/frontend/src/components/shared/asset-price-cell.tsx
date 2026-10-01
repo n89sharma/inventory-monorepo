@@ -1,4 +1,6 @@
 import { EditableAmountCell } from '@/components/shared/editable-amount-cell'
+import { PriceInput } from '@/components/shared/price-input'
+import { formatUSDWithSymbol } from '@/lib/formatters'
 import {
   editablePriceFieldForColumn,
   EDITABLE_PRICE_COLUMNS,
@@ -46,6 +48,8 @@ export function AssetPriceCell({
       label={`${label} for ${asset.barcode}`}
       editorRegistry={editorRegistry}
       fieldForColumn={editablePriceFieldForColumn}
+      format={formatUSDWithSymbol}
+      AmountInput={PriceInput}
       onSave={savePrice}
     />
   )

@@ -12,6 +12,7 @@ import {
 import { Prisma } from '../../generated/prisma/client.js'
 import { getBids as getBidsDb } from '../../generated/prisma/sql/getBids.js'
 import {
+  calculateBidRowMargin,
   calculateBidRowPrice,
   isBidRowPriced,
   summariseBidRows,
@@ -128,6 +129,7 @@ function toBidRowDto(row: StoredBidRow, defaults: BidDefaults): BidRowDto {
     priced: isBidRowPriced(resolved),
     bid_price: noBidAware(row, row.bid_price),
     total_cost: noBidAware(row, row.total_cost),
+    margin_amount: decimalToNumber(calculateBidRowMargin(row)),
   }
 }
 

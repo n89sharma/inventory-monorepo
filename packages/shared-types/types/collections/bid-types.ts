@@ -46,6 +46,7 @@ export const BidRowSchema = z.object({
   priced: z.boolean(),
   bid_price: z.number().nullable(),
   total_cost: z.number().nullable(),
+  margin_amount: z.number().nullable(),
 })
 export type BidRow = z.infer<typeof BidRowSchema>
 

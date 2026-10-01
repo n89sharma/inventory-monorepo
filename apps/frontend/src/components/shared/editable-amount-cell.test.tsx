@@ -2,7 +2,9 @@ import { createPriceCellEditorRegistry } from '@/lib/price-cell-navigation'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { Row, Table } from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'
+import { formatUSDWithSymbol } from '@/lib/formatters'
 import { EditableAmountCell } from './editable-amount-cell'
+import { PriceInput } from './price-input'
 
 type Line = { id: string }
 
@@ -33,6 +35,8 @@ function renderCell(
       label={LABEL}
       editorRegistry={createPriceCellEditorRegistry<typeof FIELD>()}
       fieldForColumn={fieldForColumn}
+      format={formatUSDWithSymbol}
+      AmountInput={PriceInput}
       onSave={onSave}
     />,
   )

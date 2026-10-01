@@ -175,6 +175,7 @@ describe('bidService', () => {
       margin_percent: 25,
       margin_overridden: false,
       bid_price: 650,
+      margin_amount: 250,
       priced: true,
     })
     expect(detail.rows.find((row) => row.id === secondRowId)).toMatchObject({

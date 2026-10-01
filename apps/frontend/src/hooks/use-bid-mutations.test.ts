@@ -74,6 +74,7 @@ describe('use-bid-mutations', () => {
       priced: true,
       bid_price: 720,
       total_cost: 750,
+      margin_amount: 250,
     }
     const bid = { ...DETAIL, rows: [row] } as BidDetail
     mocks.updateBidRows.mockResolvedValue(DETAIL)

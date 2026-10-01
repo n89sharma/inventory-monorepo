@@ -64,6 +64,7 @@ function withNoBid(bid: BidDetail, rowId: number, noBid: boolean): BidDetail {
         margin_percent: null,
         bid_price: null,
         total_cost: null,
+        margin_amount: null,
       }
     }),
   }

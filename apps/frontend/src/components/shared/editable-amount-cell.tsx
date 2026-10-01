@@ -1,5 +1,3 @@
-import { PriceInput } from '@/components/shared/price-input'
-import { formatUSDWithSymbol } from '@/lib/formatters'
 import {
   resolveAdjacentPriceCell,
   type PriceCellDirection,
@@ -65,8 +63,20 @@ function isKeyboardEntryCell<TData, F extends string>(
   return visibleEditableFields(table, fieldForColumn)[0] === field
 }
 
+export interface AmountInputProps {
+  autoFocus: boolean
+  value: string
+  onChange: (value: string) => void
+  onBlur: () => void
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  onFocus: (event: React.FocusEvent<HTMLInputElement>) => void
+  saving: boolean
+  invalid: boolean
+  label: string
+}
+
 interface AmountButtonProps {
-  amount: number | null
+  text: string
   label: string
   invalid: boolean
   tabIndex: typeof ENTRY_TAB_INDEX | typeof ROVING_TAB_INDEX
@@ -76,7 +86,7 @@ interface AmountButtonProps {
 }
 
 function AmountButton({
-  amount,
+  text,
   label,
   invalid,
   tabIndex,
@@ -95,7 +105,7 @@ function AmountButton({
       onClick={onClick}
       onKeyDown={onKeyDown}
     >
-      {formatUSDWithSymbol(amount)}
+      {text}
     </button>
   )
 }
@@ -109,6 +119,8 @@ interface EditableAmountCellProps<TData, F extends string> {
   label: string
   editorRegistry: PriceCellEditorRegistry<F>
   fieldForColumn: (columnId: string) => F | undefined
+  format: (amount: number | null) => string
+  AmountInput: React.ComponentType<AmountInputProps>
   onSave: (value: number | null) => Promise<void>
 }
 
@@ -121,6 +133,8 @@ export function EditableAmountCell<TData, F extends string>({
   label,
   editorRegistry,
   fieldForColumn,
+  format,
+  AmountInput,
   onSave,
 }: EditableAmountCellProps<TData, F>): React.JSX.Element {
   const [prevSavedValue, setPrevSavedValue] = useState(currSavedValue)
@@ -213,7 +227,7 @@ export function EditableAmountCell<TData, F extends string>({
   if (!isEditing) {
     return (
       <AmountButton
-        amount={toAmount(value, blankValue)}
+        text={format(toAmount(value, blankValue))}
         label={label}
         invalid={status === 'error'}
         tabIndex={
@@ -229,7 +243,7 @@ export function EditableAmountCell<TData, F extends string>({
   }
 
   return (
-    <PriceInput
+    <AmountInput
       autoFocus
       value={value}
       onChange={setValue}

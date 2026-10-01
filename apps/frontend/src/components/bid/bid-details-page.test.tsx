@@ -70,6 +70,7 @@ function makeBid(status: string): BidDetail {
         priced: true,
         bid_price: 700,
         total_cost: 800,
+        margin_amount: 200,
       },
     ],
     totals: { total_cost: 800, expected_sale: 1000, expected_margin: 200, unpriced_count: 0 },
@@ -99,6 +100,7 @@ describe('BidDetailsPage', () => {
     expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Selling Price for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'No Bid for row 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Margin % for row 1' })).toHaveTextContent('20%')
   })
 
   it('locks the rows once the bid is in review', () => {
@@ -108,6 +110,28 @@ describe('BidDetailsPage', () => {
       screen.queryByRole('button', { name: 'Selling Price for row 1' }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('cell', { name: '$1,000.00' })).toBeInTheDocument()
+  })
+
+  it('shows the row margin in dollars', () => {
+    renderPage(BID_STATUS.REVIEW)
+    expect(screen.getByRole('columnheader', { name: /^Margin$/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('cell', { name: '$200.00' })).toHaveLength(1)
+  })
+
+  it('orders the pricing columns Selling Price, Freight, Margin %, Margin, Bid Price, No Bid', () => {
+    renderPage(BID_STATUS.DRAFT)
+    const labels = screen
+      .getAllByRole('columnheader')
+      .slice(-6)
+      .map((header) => header.textContent ?? '')
+    expect(labels.map((label) => label.split('(')[0]?.trim())).toEqual([
+      'Selling Price',
+      'Freight',
+      'Margin %',
+      'Margin',
+      'Bid Price',
+      'No Bid',
+    ])
   })
 
   it('puts the pricing columns after every pasted column', () => {
@@ -126,7 +150,6 @@ describe('BidDetailsPage', () => {
 
   it('shows the totals from the server', () => {
     renderPage(BID_STATUS.DRAFT)
-    expect(screen.getByText('Expected Margin')).toBeInTheDocument()
-    expect(screen.getByText('$200.00')).toBeInTheDocument()
+    expect(screen.getByText('Expected Margin').parentElement).toHaveTextContent('$200.00')
   })
 })
