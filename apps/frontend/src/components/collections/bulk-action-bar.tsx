@@ -5,6 +5,7 @@ import { Button } from '../shadcn/button'
 import { useSidebar } from '../shadcn/sidebar'
 
 const CLEAR_SELECTION_LABEL = 'Clear selection'
+export const BULK_ACTION_BAR_CLEARANCE_CLASS = 'pb-[66px]'
 const DEFAULT_ITEM_NOUN = 'asset'
 
 type BulkActionBarProps = {
@@ -60,7 +61,7 @@ export function BulkActionBar({
 
   return createPortal(
     <div
-      className="fixed bottom-6 z-50 -translate-x-1/2 animate-in slide-in-from-bottom-4 fade-in-0 duration-50 ease-in-out transition-[left] motion-safe:duration-200"
+      className="fixed bottom-2 z-50 -translate-x-1/2 animate-in slide-in-from-bottom-4 fade-in-0 duration-50 ease-in-out transition-[left] motion-safe:duration-200"
       style={{ left: barLeft }}
       role="region"
       aria-label="Bulk edit actions"

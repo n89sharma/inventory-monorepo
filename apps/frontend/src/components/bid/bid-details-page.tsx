@@ -17,7 +17,10 @@ import {
   SetBidRowsMarginDialog,
 } from '@/components/bid/set-bid-rows-value-dialog'
 import { UploadBidRowsDialog } from '@/components/bid/upload-bid-rows-dialog'
-import { BulkActionBar } from '@/components/collections/bulk-action-bar'
+import {
+  BulkActionBar,
+  BULK_ACTION_BAR_CLEARANCE_CLASS,
+} from '@/components/collections/bulk-action-bar'
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
 import { AlertDialogDescription } from '@/components/shadcn/alert-dialog'
 import { Button } from '@/components/shadcn/button'
@@ -178,7 +181,7 @@ function BidDetailsContent({ bid }: { bid: BidDetail }): React.JSX.Element {
   }
 
   return (
-    <GridPageContent className={selectedRowIds.length > 0 ? 'pb-24' : ''}>
+    <GridPageContent className={selectedRowIds.length > 0 ? BULK_ACTION_BAR_CLEARANCE_CLASS : ''}>
       <GridDetailsPageHeader
         breadcrumbSegments={[{ label: 'Purchases', href: `/bids${queryStringFrom(searchParams)}` }]}
         title={`Bid ${bidNumber}`}

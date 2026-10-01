@@ -1,3 +1,4 @@
+import { BULK_ACTION_BAR_CLEARANCE_CLASS } from '@/components/collections/bulk-action-bar'
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { ASSETS_BY_SERIAL_NUMBER_DEFAULT_COLUMN_IDS } from '@/components/table-columns/asset-search-columns'
 import { Button } from '@/components/shadcn/button'
@@ -119,7 +120,7 @@ export function ExportAssetsPage(): React.JSX.Element {
   }, [mutate])
 
   return (
-    <GridPageContent className={selection.hasSelection ? 'pb-24' : ''}>
+    <GridPageContent className={selection.hasSelection ? BULK_ACTION_BAR_CLEARANCE_CLASS : ''}>
       <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">

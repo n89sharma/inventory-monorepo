@@ -1,3 +1,4 @@
+import { BULK_ACTION_BAR_CLEARANCE_CLASS } from '@/components/collections/bulk-action-bar'
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import type { RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
@@ -68,7 +69,7 @@ export function AssetSearchPage({
   )
 
   return (
-    <GridPageContent className={selection.hasSelection ? 'pb-24' : ''}>
+    <GridPageContent className={selection.hasSelection ? BULK_ACTION_BAR_CLEARANCE_CLASS : ''}>
       <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">

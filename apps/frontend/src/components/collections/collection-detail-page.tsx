@@ -1,3 +1,4 @@
+import { BULK_ACTION_BAR_CLEARANCE_CLASS } from '@/components/collections/bulk-action-bar'
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { CostSummaryStrip } from '@/components/shared/cards/cost-summary-strip'
 import { GridDetailsPageHeader } from '@/components/collections/sticky-details-page-header'
@@ -272,7 +273,7 @@ export function CollectionDetailPage<TEntity extends { assets: AssetSearchRow[] 
   )
 
   return (
-    <GridPageContent className={selectedAssets.length > 0 ? 'pb-24' : ''}>
+    <GridPageContent className={selectedAssets.length > 0 ? BULK_ACTION_BAR_CLEARANCE_CLASS : ''}>
       <GridDetailsPageHeader
         breadcrumbSegments={getBreadcrumbForAssetSummary(section, queryStringFrom(searchParams))}
         title={header.title}
