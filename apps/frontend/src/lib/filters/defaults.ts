@@ -13,6 +13,10 @@ export function getDefaultFromDate(days: number): Date {
   return startOfDay(subDays(new Date(), days))
 }
 
+export function getStartOfYear(): Date {
+  return startOfYear(new Date())
+}
+
 export function getDefaultCollectionFromDate(): Date {
   return getDefaultFromDate(DEFAULT_COLLECTION_RANGE_DAYS)
 }

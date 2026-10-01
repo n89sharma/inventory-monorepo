@@ -7,6 +7,7 @@ const ASSET_SECTION = 'assets'
 const SEARCH_SECTION_LABEL = 'Search Assets'
 
 const SECTION_LABEL: Record<string, string> = {
+  bids: 'Purchases',
   arrivals: 'Arrivals',
   transfers: 'Transfers',
   departures: 'Departures',
@@ -18,6 +19,7 @@ const SECTION_LABEL: Record<string, string> = {
 }
 
 const ENTITY_LABEL: Record<string, string> = {
+  bids: 'Bid',
   arrivals: 'Arrival',
   transfers: 'Transfer',
   departures: 'Departure',

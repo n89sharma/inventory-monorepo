@@ -15,6 +15,21 @@ const LoginPage = lazy(() =>
   import('./components/app-layout/login-page').then((m) => ({ default: m.LoginPage })),
 )
 
+const BidsSummaryPage = lazy(() =>
+  import('./components/bid/bids-summary-page').then((m) => ({
+    default: m.BidsSummaryPage,
+  })),
+)
+const CreateBidPage = lazy(() =>
+  import('./components/bid/create-bid-page').then((m) => ({
+    default: m.CreateBidPage,
+  })),
+)
+const BidDetailsPage = lazy(() =>
+  import('./components/bid/bid-details-page').then((m) => ({
+    default: m.BidDetailsPage,
+  })),
+)
 const ArrivalsSummaryPage = lazy(() =>
   import('./components/arrivals/arrivals-summary-page').then((m) => ({
     default: m.ArrivalsSummaryPage,
@@ -225,6 +240,31 @@ function AppRoutes() {
                 <Suspense fallback={null}>
                   <Routes>
                     <Route path="/" element={<PostLoginLanding />} />
+
+                    <Route
+                      path="/bids"
+                      element={
+                        <PermissionRoute permission="create_update_purchase_bids">
+                          <BidsSummaryPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/bids/new"
+                      element={
+                        <PermissionRoute permission="create_update_purchase_bids">
+                          <CreateBidPage />
+                        </PermissionRoute>
+                      }
+                    />
+                    <Route
+                      path="/bids/:collectionId"
+                      element={
+                        <PermissionRoute permission="create_update_purchase_bids">
+                          <BidDetailsPage />
+                        </PermissionRoute>
+                      }
+                    />
 
                     <Route
                       path="/arrivals"

@@ -32,6 +32,7 @@ import {
   buildProfitabilityReportPath,
   buildStoreListPath,
 } from '@/lib/filters/serializers'
+import { getStartOfYear } from '@/lib/filters/defaults'
 import {
   CaretDownIcon,
   ChartLineUpIcon,
@@ -41,6 +42,7 @@ import {
   LockOpenIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
+  ShoppingCartIcon,
   ToolboxIcon,
   TruckTrailerIcon,
   WarehouseIcon,
@@ -52,10 +54,17 @@ const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
 const STOCK_SALES_PATH = '/reports/stock-sales'
 const MONTH_END_PATH = '/reports/month-end'
+const BIDS_PATH = '/bids'
 
-type SidebarPermission = 'view_collections' | 'view_store'
+type SidebarPermission = 'create_update_purchase_bids' | 'view_collections' | 'view_store'
 
 const sidebarItems = [
+  {
+    title: 'Purchases',
+    url: BIDS_PATH,
+    icon: <ShoppingCartIcon aria-hidden="true" />,
+    permission: 'create_update_purchase_bids',
+  },
   {
     title: 'Arrivals',
     url: '/arrivals',
@@ -176,6 +185,7 @@ export function AppSidebar(): React.JSX.Element {
 
   function sidebarItemPath(url: string): string {
     if (url === STORE_PATH) return buildStoreListPath(defaultWarehouse)
+    if (url === BIDS_PATH) return buildCollectionSummaryPath(url, getStartOfYear)
     if (DATE_RANGE_ITEM_URLS.includes(url)) return buildCollectionSummaryPath(url)
     return url
   }
@@ -201,8 +211,10 @@ export function AppSidebar(): React.JSX.Element {
   const canPutAway = useCan('update_location')
   const canViewCollections = useCan('view_collections')
   const canViewStore = useCan('view_store')
+  const canManageBids = useCan('create_update_purchase_bids')
 
   const sidebarItemVisible: Record<SidebarPermission, boolean> = {
+    create_update_purchase_bids: canManageBids,
     view_collections: canViewCollections,
     view_store: canViewStore,
   }
