@@ -73,6 +73,7 @@ export interface AmountInputProps {
   saving: boolean
   invalid: boolean
   label: string
+  size: 'sm'
 }
 
 interface AmountButtonProps {
@@ -256,6 +257,7 @@ export function EditableAmountCell<TData, F extends string>({
       saving={status === 'saving'}
       invalid={status === 'error'}
       label={label}
+      size="sm"
     />
   )
 }

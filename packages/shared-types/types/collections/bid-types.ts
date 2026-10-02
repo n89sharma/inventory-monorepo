@@ -97,6 +97,11 @@ export const UploadBidRowsSchema = z
   })
 export type UploadBidRows = z.infer<typeof UploadBidRowsSchema>
 
+export const CreateBidSchema = BidMetadataSchema.extend({
+  sheet: UploadBidRowsSchema.nullable(),
+})
+export type CreateBid = z.infer<typeof CreateBidSchema>
+
 export const UpdateBidRowsSchema = z
   .object({
     row_ids: z.array(z.number().int()).nonempty().max(BID_UPLOAD_LIMITS.rows),

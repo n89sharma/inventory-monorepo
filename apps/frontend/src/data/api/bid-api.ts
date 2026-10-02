@@ -12,6 +12,7 @@ import type {
   BidOutcome,
   BidSummary,
   ConcludeBid,
+  CreateBid,
   OrgDetail,
   UpdateBidRows,
   UploadBidRows,
@@ -21,6 +22,7 @@ import {
   BidMetadataSchema,
   BidSummarySchema,
   ConcludeBidSchema,
+  CreateBidSchema,
   UpdateBidRowsSchema,
   UploadBidRowsSchema,
 } from 'shared-types'
@@ -60,8 +62,11 @@ export async function getBidDetail(bidNumber: string): Promise<BidDetail> {
   return BidDetailSchema.parse(data)
 }
 
-export async function createBid(form: BidForm): Promise<CreateBidResponse> {
-  const createBidBody = BidMetadataSchema.parse(toBidMetadata(form) satisfies BidMetadata)
+export async function createBid(
+  form: BidForm,
+  sheet: UploadBidRows | null,
+): Promise<CreateBidResponse> {
+  const createBidBody = CreateBidSchema.parse({ ...toBidMetadata(form), sheet } satisfies CreateBid)
   const { data } = await api.post<CreateBidResponse>('/bids', createBidBody)
   return CreateBidResponseSchema.parse(data)
 }

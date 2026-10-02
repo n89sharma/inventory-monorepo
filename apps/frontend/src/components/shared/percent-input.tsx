@@ -2,6 +2,8 @@ import { Input } from '@/components/shadcn/input'
 import { sanitizeDecimalInput } from '@/lib/input-sanitizers'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 
+const INPUT_HEIGHT_CLASS = { default: 'h-8', sm: 'h-7' } as const
+
 const PLACEHOLDER = '0'
 const SPINNER_CLASS =
   'text-muted-foreground pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2 animate-spin'
@@ -20,6 +22,7 @@ interface PercentInputProps {
   label?: string
   className?: string
   autoFocus?: boolean
+  size?: keyof typeof INPUT_HEIGHT_CLASS
 }
 
 export function PercentInput({
@@ -34,6 +37,7 @@ export function PercentInput({
   label,
   className,
   autoFocus,
+  size = 'default',
 }: PercentInputProps): React.JSX.Element {
   return (
     <div className={`relative ${className ?? ''}`}>
@@ -49,7 +53,7 @@ export function PercentInput({
         placeholder={PLACEHOLDER}
         aria-label={label}
         aria-invalid={invalid}
-        className="h-7 pr-6 tabular-nums"
+        className={`${INPUT_HEIGHT_CLASS[size]} pr-6 tabular-nums`}
       />
       {saving && <CircleNotchIcon className={SPINNER_CLASS} aria-hidden="true" />}
       {!saving && <span className={SUFFIX_CLASS}>%</span>}

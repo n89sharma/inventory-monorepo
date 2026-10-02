@@ -1,6 +1,7 @@
 import {
   BID_STATUS,
   type BidMetadata,
+  type CreateBid,
   type BidDetail,
   type BidOutcome,
   type BidRow as BidRowDto,
@@ -189,7 +190,7 @@ export async function getBid(bidNumber: string): Promise<BidDetail> {
   }
 }
 
-export async function createBid(bid: BidMetadata, userId: number): Promise<string> {
+export async function createBid(bid: CreateBid, userId: number): Promise<string> {
   const bidNumber = await getNewBidNumber()
   await prisma.bid.create({
     data: {
@@ -201,6 +202,12 @@ export async function createBid(bid: BidMetadata, userId: number): Promise<strin
       margin_percent: new Prisma.Decimal(bid.margin_percent),
       transport_cost: new Prisma.Decimal(bid.transport_cost),
       notes: bid.comment,
+      headers: bid.sheet?.headers ?? [],
+      rows: {
+        createMany: {
+          data: (bid.sheet?.rows ?? []).map((cells, position) => ({ position, cells })),
+        },
+      },
       created_by_id: userId,
       created_at: new Date(),
     },

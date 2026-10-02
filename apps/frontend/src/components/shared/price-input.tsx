@@ -2,6 +2,8 @@ import { Input } from '@/components/shadcn/input'
 import { sanitizeDecimalInput } from '@/lib/input-sanitizers'
 import { CircleNotchIcon } from '@phosphor-icons/react'
 
+const INPUT_HEIGHT_CLASS = { default: 'h-8', sm: 'h-7' } as const
+
 const PLACEHOLDER = '0.00'
 const PREFIX_CLASS =
   'text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm'
@@ -20,6 +22,7 @@ interface PriceInputProps {
   label?: string
   className?: string
   autoFocus?: boolean
+  size?: keyof typeof INPUT_HEIGHT_CLASS
 }
 
 export function PriceInput({
@@ -34,6 +37,7 @@ export function PriceInput({
   label,
   className,
   autoFocus,
+  size = 'default',
 }: PriceInputProps): React.JSX.Element {
   return (
     <div className={`relative ${className ?? ''}`}>
@@ -50,7 +54,7 @@ export function PriceInput({
         placeholder={PLACEHOLDER}
         aria-label={label}
         aria-invalid={invalid}
-        className="h-7 pl-6 tabular-nums"
+        className={`${INPUT_HEIGHT_CLASS[size]} pl-6 tabular-nums`}
       />
       {saving && <CircleNotchIcon className={SPINNER_CLASS} aria-hidden="true" />}
     </div>

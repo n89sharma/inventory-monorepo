@@ -24,8 +24,8 @@ function adoptDetail(bidNumber: string, detail: BidDetail) {
   invalidateBidLists()
 }
 
-async function create(data: BidForm) {
-  const result = await createBid(data)
+async function create(data: BidForm, sheet: UploadBidRows | null) {
+  const result = await createBid(data, sheet)
   invalidateBidLists()
   return result
 }

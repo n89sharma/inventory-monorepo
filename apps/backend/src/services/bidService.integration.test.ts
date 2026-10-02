@@ -4,7 +4,7 @@ import {
   BID_STATUS,
   DEFAULT_BID_MARGIN_PERCENT,
   DEFAULT_BID_TRANSPORT_COST,
-  type BidMetadata,
+  type CreateBid,
 } from 'shared-types'
 import {
   ArrivalTestData,
@@ -38,7 +38,7 @@ const THREE_ROWS: [string[], ...string[][]] = [
 
 let seed: ArrivalTestData
 
-function buildCreateBidInput(overrides: Partial<BidMetadata> = {}): BidMetadata {
+function buildCreateBidInput(overrides: Partial<CreateBid> = {}): CreateBid {
   return {
     vendor: seed.vendor,
     received_date: RECEIVED_DATE,
@@ -46,6 +46,7 @@ function buildCreateBidInput(overrides: Partial<BidMetadata> = {}): BidMetadata 
     margin_percent: DEFAULT_BID_MARGIN_PERCENT,
     transport_cost: DEFAULT_BID_TRANSPORT_COST,
     comment: 'Lot of three',
+    sheet: null,
     ...overrides,
   }
 }
@@ -103,6 +104,16 @@ describe('bidService', () => {
       headers: [],
       rows: [],
     })
+  })
+
+  it('creates a bid with its pasted sheet in pasted order', async () => {
+    const bidNumber = await createBid(
+      buildCreateBidInput({ sheet: { headers: HEADERS, rows: THREE_ROWS } }),
+      seed.userId,
+    )
+    const bid = await getBid(bidNumber)
+    expect(bid.headers).toEqual(HEADERS)
+    expect(bid.rows.map((row) => row.cells)).toEqual(THREE_ROWS)
   })
 
   it('lists bids received inside the range, filtered by vendor, with their summed total cost', async () => {

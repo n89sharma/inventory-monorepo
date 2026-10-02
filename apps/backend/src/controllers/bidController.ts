@@ -4,6 +4,7 @@ import {
   BidDetail,
   BidSummary,
   BidMetadataSchema,
+  CreateBidSchema,
   ConcludeBidSchema,
   UpdateBidRowsSchema,
   UploadBidRowsSchema,
@@ -42,7 +43,7 @@ export const getBidDetail = asyncHandler(
 )
 
 export const createBid = asyncHandler(async (req, res) => {
-  const validated = BidMetadataSchema.parse(req.body)
+  const validated = CreateBidSchema.parse(req.body)
   const bidNumber = await createBidSer(validated, res.locals.dbUserId)
   res.status(201).json({ bidNumber })
 })

@@ -59,7 +59,7 @@ export function EditBidMetadataModal({
 
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : guard.onOpenChange}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Bid</DialogTitle>
         </DialogHeader>
