@@ -28,7 +28,7 @@ interface DatePickerFieldProps {
   endMonth?: Date
 }
 
-export function DatePickerFieldInline({
+function DatePickerFieldInline({
   label,
   date,
   setDate,

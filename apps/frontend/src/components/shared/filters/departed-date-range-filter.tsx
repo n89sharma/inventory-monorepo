@@ -1,7 +1,6 @@
-import { DatePickerFieldInline } from '@/components/shared/date-picker'
+import { DateRangeFilter } from '@/components/shared/filters/date-range-filter'
 import { getToday } from '@/lib/filters/defaults'
 import { getDepartedFloor, isValidDepartedDateRange } from '@/lib/filters/hooks'
-import { getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 import { MAX_DEPARTED_WINDOW_MONTHS } from 'shared-types'
 
 const INVALID_RANGE_MESSAGE = `Only data from the last ${MAX_DEPARTED_WINDOW_MONTHS} months can be shown`
@@ -21,32 +20,15 @@ export function DepartedDateRangeFilter({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex flex-row gap-2">
-        <DatePickerFieldInline
-          label="From"
-          id="departed-from"
-          date={getSelectOption(from)}
-          setDate={(d) => {
-            const next = getSelectedOrNull(d)
-            if (next) onChange(next, to)
-          }}
-          disabled={[{ before: floor }, { after: to }]}
-          startMonth={floor}
-          endMonth={today}
-        />
-        <DatePickerFieldInline
-          label="To"
-          id="departed-to"
-          date={getSelectOption(to)}
-          setDate={(d) => {
-            const next = getSelectedOrNull(d)
-            if (next) onChange(from, next)
-          }}
-          disabled={[{ before: from }, { after: today }]}
-          startMonth={floor}
-          endMonth={today}
-        />
-      </div>
+      <DateRangeFilter
+        id="departed-range"
+        from={from}
+        to={to}
+        onChange={onChange}
+        disabled={[{ before: floor }, { after: today }]}
+        startMonth={floor}
+        endMonth={today}
+      />
       {valid ? null : <p className="text-destructive text-xs">{INVALID_RANGE_MESSAGE}</p>}
     </div>
   )

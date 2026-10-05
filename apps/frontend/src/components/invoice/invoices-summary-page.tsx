@@ -106,8 +106,7 @@ export function InvoicesSummaryPage(): React.JSX.Element {
         <SearchBar
           searchOptions={{ fromDate, toDate }}
           setSearchOptions={{ setFromDate, setToDate }}
-          fromLabel={INVOICE_DATE_FILTER_LABEL[invoiceType].from}
-          toLabel={INVOICE_DATE_FILTER_LABEL[invoiceType].to}
+          rangeLabel={INVOICE_DATE_FILTER_LABEL[invoiceType]}
           leadingFilter={<InvoiceTypeToggle value={invoiceType} onChange={setInvoiceType} />}
         />
       }
@@ -153,9 +152,9 @@ const INVOICE_PAGE_TITLE = {
 } as const satisfies Record<InvoiceTypeFilter, string>
 
 const INVOICE_DATE_FILTER_LABEL = {
-  [INVOICE_TYPE.purchase]: { from: 'Arrival From', to: 'Arrival To' },
-  [INVOICE_TYPE.sales]: { from: 'Departure From', to: 'Departure To' },
-} as const satisfies Record<InvoiceTypeFilter, { from: string; to: string }>
+  [INVOICE_TYPE.purchase]: 'Arrival',
+  [INVOICE_TYPE.sales]: 'Departure',
+} as const satisfies Record<InvoiceTypeFilter, string>
 
 const INVOICE_TYPE_TOGGLE_LABEL = {
   [INVOICE_TYPE.purchase]: 'Show Sales',

@@ -1,8 +1,13 @@
-import { getDefaultFromDate, getToday } from '@/lib/filters/defaults'
+import {
+  getCollectionRangeEndMonth,
+  getCollectionRangeStartMonth,
+  getDefaultFromDate,
+  getToday,
+} from '@/lib/filters/defaults'
 import type { SearchOptions, SetSearchOptions } from '@/ui-types/search-option-types'
-import { ANY_OPTION, getSelectOption } from '@/ui-types/select-option-types'
+import { ANY_OPTION, getSelectedOrNull, getSelectOption } from '@/ui-types/select-option-types'
 import React from 'react'
-import { DatePickerFieldInline } from './date-picker'
+import { DateRangeFilter } from './filters/date-range-filter'
 import { FilterRow } from './filter-row'
 import { QuickSearchButtons } from './quick-search-buttons'
 
@@ -10,21 +15,16 @@ interface SearchBarProps {
   searchOptions: SearchOptions
   setSearchOptions: SetSearchOptions
   onSearch?: (searchOptions: SearchOptions) => Promise<void>
-  fromLabel?: string
-  toLabel?: string
+  rangeLabel?: string
   leadingFilter?: React.ReactNode
   children?: React.ReactNode
 }
-
-const DEFAULT_FROM_LABEL = 'From'
-const DEFAULT_TO_LABEL = 'To'
 
 export function SearchBar({
   searchOptions,
   setSearchOptions,
   onSearch,
-  fromLabel = DEFAULT_FROM_LABEL,
-  toLabel = DEFAULT_TO_LABEL,
+  rangeLabel,
   leadingFilter,
   children,
 }: SearchBarProps): React.JSX.Element {
@@ -39,6 +39,11 @@ export function SearchBar({
     setCustomer,
     setVendor,
   } = setSearchOptions
+
+  function handleRangeChange(from: Date, to: Date) {
+    setFromDate(getSelectOption(from))
+    setToDate(getSelectOption(to))
+  }
 
   async function handleQuickSearch(days: number) {
     const from = getSelectOption(getDefaultFromDate(days))
@@ -72,14 +77,15 @@ export function SearchBar({
 
       {leadingFilter}
 
-      <DatePickerFieldInline
-        label={fromLabel}
-        id="from-date"
-        date={fromDate}
-        setDate={setFromDate}
+      <DateRangeFilter
+        id="date-range"
+        label={rangeLabel}
+        from={getSelectedOrNull(fromDate)}
+        to={getSelectedOrNull(toDate)}
+        onChange={handleRangeChange}
+        startMonth={getCollectionRangeStartMonth()}
+        endMonth={getCollectionRangeEndMonth()}
       />
-
-      <DatePickerFieldInline label={toLabel} id="to-date" date={toDate} setDate={setToDate} />
 
       {children}
     </FilterRow>
