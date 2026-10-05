@@ -34,6 +34,10 @@ export const ModelPriceHistoryQuerySchema = z.object({
   modelId: z.coerce.number().int().positive(),
 })
 
+export const InStockSummaryQuerySchema = z.object({
+  salesFrom: z.iso.date(),
+})
+
 export const MonthEndReportQuerySchema = z.object({
   brandGroup: BrandGroupSchema.optional(),
   assetGroup: AssetGroupSchema.optional(),
@@ -96,6 +100,7 @@ export const getHeldReport = asyncHandler(async (req, res) => {
 })
 
 export const getInStockSummaryReport = asyncHandler(async (req, res) => {
-  const data = await getInStockSummaryReportSer(res.locals.permissions)
+  const { salesFrom } = res.locals.query as z.infer<typeof InStockSummaryQuerySchema>
+  const data = await getInStockSummaryReportSer(salesFrom, res.locals.permissions)
   res.json(successResponse(data))
 })

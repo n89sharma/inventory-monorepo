@@ -1,5 +1,6 @@
 import type { PriceHistoryRange } from '@/lib/filters/hooks'
-import { isAfter, parseISO, subMonths } from 'date-fns'
+import { formatDateParam } from '@/lib/date-param'
+import { isBefore, parseISO, startOfDay, subMonths } from 'date-fns'
 import type { ModelPriceHistoryRow } from 'shared-types'
 
 export const METER_BANDS = [
@@ -13,6 +14,9 @@ export const METER_BANDS = [
   max: number | null
 }[]
 
+const UNKNOWN_BAND = { name: 'Unknown', label: 'No reading' }
+const ALL_BANDS = { name: 'All', label: '' }
+
 export type BandSummary = {
   name: string
   label: string
@@ -21,16 +25,20 @@ export type BandSummary = {
   saleMedian: number | null
 }
 
+export function salesWindowStart(months: PriceHistoryRange, now: Date = new Date()): string {
+  return formatDateParam(startOfDay(subMonths(now, months)))
+}
+
 export function filterByMonths(
   sales: ModelPriceHistoryRow[],
   months: PriceHistoryRange,
   now: Date = new Date(),
 ): ModelPriceHistoryRow[] {
-  const cutoff = subMonths(now, months)
-  return sales.filter((sale) => isAfter(parseISO(sale.departed_at), cutoff))
+  const windowStart = parseISO(salesWindowStart(months, now))
+  return sales.filter((sale) => !isBefore(parseISO(sale.departed_at), windowStart))
 }
 
-function median(values: number[]): number | null {
+export function median(values: number[]): number | null {
   if (values.length === 0) return null
   const sorted = [...values].sort((a, b) => a - b)
   const mid = Math.floor(sorted.length / 2)
@@ -44,18 +52,35 @@ function isInBand(meter: number, band: { min: number | null; max: number | null 
   return true
 }
 
+function summarize(
+  band: { name: string; label: string },
+  sales: ModelPriceHistoryRow[],
+): BandSummary {
+  const purchasePrices = sales
+    .map((sale) => sale.purchase_price)
+    .filter((price): price is number => price !== null)
+  return {
+    name: band.name,
+    label: band.label,
+    count: sales.length,
+    purchaseMedian: median(purchasePrices),
+    saleMedian: median(sales.map((sale) => sale.sale_price)),
+  }
+}
+
 export function summarizeBands(sales: ModelPriceHistoryRow[]): BandSummary[] {
-  return METER_BANDS.map((band) => {
-    const inBand = sales.filter((sale) => sale.meter !== null && isInBand(sale.meter, band))
-    const purchasePrices = inBand
-      .map((sale) => sale.purchase_price)
-      .filter((price): price is number => price !== null)
-    return {
-      name: band.name,
-      label: band.label,
-      count: inBand.length,
-      purchaseMedian: median(purchasePrices),
-      saleMedian: median(inBand.map((sale) => sale.sale_price)),
-    }
-  })
+  const meteredBands = METER_BANDS.map((band) =>
+    summarize(
+      band,
+      sales.filter((sale) => sale.meter !== null && isInBand(sale.meter, band)),
+    ),
+  )
+  return [
+    ...meteredBands,
+    summarize(
+      UNKNOWN_BAND,
+      sales.filter((sale) => sale.meter === null),
+    ),
+    summarize(ALL_BANDS, sales),
+  ]
 }

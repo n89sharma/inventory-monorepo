@@ -390,6 +390,7 @@ export const ALL_PRICE_PERMISSIONS: ReadonlySet<Permission> = new Set([
   'view_sale_price',
 ])
 export const SALE_PRICE_ONLY: ReadonlySet<Permission> = new Set(['view_sale_price'])
+export const PURCHASE_PRICE_ONLY: ReadonlySet<Permission> = new Set(['view_purchase_price'])
 export const NO_PERMISSIONS: ReadonlySet<Permission> = new Set()
 
 export const SEEDED_ASSET_COST: AssetCost = {

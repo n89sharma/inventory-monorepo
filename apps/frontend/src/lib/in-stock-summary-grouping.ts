@@ -1,4 +1,5 @@
-import type { InStockSummaryRow } from 'shared-types'
+import { median } from '@/lib/model-price-history-summary'
+import type { InStockSalePriceGroup, InStockSummaryRow, MeterBand } from 'shared-types'
 
 type CostTotals = {
   purchase_cost_sum: number | null
@@ -14,10 +15,18 @@ export type InStockSummaryModelRow = Pick<
   asset_count: number
   avg_purchase_cost: number | null
   avg_total_cost: number | null
+  median_sale_price: number | null
+  margin_percent: number | null
+  sales_count: number
 }
 
-type ModelAccumulator = Omit<InStockSummaryModelRow, 'avg_purchase_cost' | 'avg_total_cost'> &
+type ModelAccumulator = Omit<
+  InStockSummaryModelRow,
+  'avg_purchase_cost' | 'avg_total_cost' | 'median_sale_price' | 'margin_percent' | 'sales_count'
+> &
   CostTotals
+
+const NO_SALE_PRICES: number[] = []
 
 function addNullable(total: number | null, value: number | null): number | null {
   if (value === null) return total
@@ -29,7 +38,34 @@ function average(sum: number | null, count: number): number | null {
   return sum / count
 }
 
-export function buildInStockSummaryGroups(rows: InStockSummaryRow[]): InStockSummaryModelRow[] {
+function marginPercent(salePrice: number | null, cost: number | null): number | null {
+  if (salePrice === null || cost === null || salePrice === 0) return null
+  return ((salePrice - cost) / salePrice) * 100
+}
+
+function collectSalePrices(
+  salePriceGroups: InStockSalePriceGroup[],
+  band: MeterBand | null,
+): Map<number, number[]> {
+  const pricesByModel = new Map<number, number[]>()
+  for (const group of salePriceGroups) {
+    if (band !== null && group.meter_band !== band) continue
+    const prices = pricesByModel.get(group.model_id)
+    if (prices) {
+      prices.push(...group.sale_prices)
+    } else {
+      pricesByModel.set(group.model_id, [...group.sale_prices])
+    }
+  }
+  return pricesByModel
+}
+
+export function buildInStockSummaryGroups(
+  rows: InStockSummaryRow[],
+  salePriceGroups: InStockSalePriceGroup[],
+  band: MeterBand | null,
+): InStockSummaryModelRow[] {
+  const salePricesByModel = collectSalePrices(salePriceGroups, band)
   const groups = new Map<number, ModelAccumulator>()
   for (const row of rows) {
     const existing = groups.get(row.model_id)
@@ -56,15 +92,23 @@ export function buildInStockSummaryGroups(rows: InStockSummaryRow[]): InStockSum
     }
   }
 
-  return Array.from(groups.values(), (group) => ({
-    brand_id: group.brand_id,
-    brand_name: group.brand_name,
-    asset_type_id: group.asset_type_id,
-    asset_type: group.asset_type,
-    model_id: group.model_id,
-    model_name: group.model_name,
-    asset_count: group.asset_count,
-    avg_purchase_cost: average(group.purchase_cost_sum, group.purchase_cost_count),
-    avg_total_cost: average(group.total_cost_sum, group.total_cost_count),
-  }))
+  return Array.from(groups.values(), (group) => {
+    const salePrices = salePricesByModel.get(group.model_id) ?? NO_SALE_PRICES
+    const avgTotalCost = average(group.total_cost_sum, group.total_cost_count)
+    const medianSalePrice = median(salePrices)
+    return {
+      brand_id: group.brand_id,
+      brand_name: group.brand_name,
+      asset_type_id: group.asset_type_id,
+      asset_type: group.asset_type,
+      model_id: group.model_id,
+      model_name: group.model_name,
+      asset_count: group.asset_count,
+      avg_purchase_cost: average(group.purchase_cost_sum, group.purchase_cost_count),
+      avg_total_cost: avgTotalCost,
+      median_sale_price: medianSalePrice,
+      margin_percent: marginPercent(medianSalePrice, avgTotalCost),
+      sales_count: salePrices.length,
+    }
+  })
 }

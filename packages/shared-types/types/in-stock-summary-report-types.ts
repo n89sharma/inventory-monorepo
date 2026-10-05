@@ -20,5 +20,15 @@ export const InStockSummaryRowSchema = z.object({
 })
 export type InStockSummaryRow = z.infer<typeof InStockSummaryRowSchema>
 
-export const InStockSummaryReportSchema = z.array(InStockSummaryRowSchema)
+export const InStockSalePriceGroupSchema = z.object({
+  model_id: z.number().int(),
+  meter_band: z.enum(METER_BAND),
+  sale_prices: z.array(z.number()),
+})
+export type InStockSalePriceGroup = z.infer<typeof InStockSalePriceGroupSchema>
+
+export const InStockSummaryReportSchema = z.object({
+  stock: z.array(InStockSummaryRowSchema),
+  sale_prices: z.array(InStockSalePriceGroupSchema).nullable(),
+})
 export type InStockSummaryReport = z.infer<typeof InStockSummaryReportSchema>

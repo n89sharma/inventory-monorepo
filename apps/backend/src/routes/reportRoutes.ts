@@ -1,6 +1,7 @@
 import express from 'express'
 import { getAssetsBySerialNumber } from '../controllers/assetController.js'
 import {
+  InStockSummaryQuerySchema,
   ModelPriceHistoryQuerySchema,
   MonthEndReportQuerySchema,
   ProfitabilityReportQuerySchema,
@@ -34,7 +35,12 @@ router.get(
 
 router.get('/held', requirePermission('view_reports'), getHeldReport)
 
-router.get('/in-stock-summary', requirePermission('view_reports'), getInStockSummaryReport)
+router.get(
+  '/in-stock-summary',
+  requirePermission('view_reports'),
+  validateQuery(InStockSummaryQuerySchema),
+  getInStockSummaryReport,
+)
 
 router.get('/month-end', requirePermission('view_month_end_report'), getMonthEndReports)
 

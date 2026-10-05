@@ -55,6 +55,8 @@ export * from "./sql/getHeldReport.js"
 
 export * from "./sql/getHolds.js"
 
+export * from "./sql/getInStockSalePrices.js"
+
 export * from "./sql/getInStockSummary.js"
 
 export * from "./sql/getInvoicesForArrival.js"

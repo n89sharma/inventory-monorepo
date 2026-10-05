@@ -30,6 +30,7 @@ import { useCallback, useMemo } from 'react'
 import type {
   AssetType,
   Brand,
+  InStockSalePriceGroup,
   InStockSummaryReport,
   MeterBand,
   ModelSummary,
@@ -38,7 +39,8 @@ import type {
 
 const TABLE_LABEL = 'In-stock summary'
 
-const EMPTY_ROWS: InStockSummaryReport = []
+const EMPTY_REPORT: InStockSummaryReport = { stock: [], sale_prices: null }
+const NO_SALE_PRICE_GROUPS: InStockSalePriceGroup[] = []
 const DEFAULT_SORT = { id: 'asset_count', desc: true }
 
 type InStockSummaryFilters = {
@@ -50,13 +52,13 @@ type InStockSummaryFilters = {
 }
 
 function buildFilteredGroups(
-  rows: InStockSummaryReport,
+  report: InStockSummaryReport,
   filters: InStockSummaryFilters,
 ): InStockSummaryModelRow[] {
   const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
   const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
   const modelIds = new Set(filters.models.map((m) => m.id))
-  const filtered = rows.filter(
+  const filtered = report.stock.filter(
     (row) =>
       (warehouseIds.size === 0 || warehouseIds.has(row.warehouse_id)) &&
       (filters.band === null || row.meter_band === filters.band) &&
@@ -64,7 +66,11 @@ function buildFilteredGroups(
       (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
       (modelIds.size === 0 || modelIds.has(row.model_id)),
   )
-  return buildInStockSummaryGroups(filtered)
+  return buildInStockSummaryGroups(
+    filtered,
+    report.sale_prices ?? NO_SALE_PRICE_GROUPS,
+    filters.band,
+  )
 }
 
 function InStockSummaryBody({
@@ -106,10 +112,10 @@ export function InStockSummaryReportPage(): React.JSX.Element {
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
-  const { data: rows = EMPTY_ROWS, isLoading } = useInStockSummaryReport()
+  const { data: report = EMPTY_REPORT, isLoading } = useInStockSummaryReport()
   const visibleRows = useMemo(
-    () => buildFilteredGroups(rows, { warehouses, band, brand, assetTypes, models }),
-    [rows, warehouses, band, brand, assetTypes, models],
+    () => buildFilteredGroups(report, { warehouses, band, brand, assetTypes, models }),
+    [report, warehouses, band, brand, assetTypes, models],
   )
   const getRowHref = useCallback(
     (row: InStockSummaryModelRow) => inStockDrilldownHref({ row, warehouses, band }),
@@ -117,9 +123,16 @@ export function InStockSummaryReportPage(): React.JSX.Element {
   )
 
   const canViewPurchase = useCan('view_purchase_price')
+  const canViewSale = useCan('view_sale_price')
   const columnVisibility = useMemo<VisibilityState>(
-    () => ({ avg_purchase_cost: canViewPurchase, avg_total_cost: canViewPurchase }),
-    [canViewPurchase],
+    () => ({
+      avg_purchase_cost: canViewPurchase,
+      avg_total_cost: canViewPurchase,
+      median_sale_price: canViewSale,
+      margin_percent: canViewPurchase && canViewSale,
+      sales_count: canViewSale,
+    }),
+    [canViewPurchase, canViewSale],
   )
 
   return (

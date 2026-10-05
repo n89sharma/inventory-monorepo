@@ -116,6 +116,9 @@ const IRADX_ROW: InStockSummaryModelRow = {
   asset_count: 3,
   avg_purchase_cost: null,
   avg_total_cost: null,
+  median_sale_price: null,
+  margin_percent: null,
+  sales_count: 0,
 }
 
 describe('inStockDrilldownHref', () => {

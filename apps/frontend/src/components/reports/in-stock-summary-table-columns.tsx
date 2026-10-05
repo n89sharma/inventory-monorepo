@@ -1,5 +1,5 @@
 import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
-import { formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
+import { formatMarginPercent, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { modelPriceHistoryHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon } from '@phosphor-icons/react'
 import type { ColumnDef, Row, SortingFn } from '@tanstack/react-table'
@@ -19,6 +19,10 @@ const sortByPurchaseCost = rowSorter(
   (a, b) => nullsLow(a.avg_purchase_cost) - nullsLow(b.avg_purchase_cost),
 )
 const sortByTotalCost = rowSorter((a, b) => nullsLow(a.avg_total_cost) - nullsLow(b.avg_total_cost))
+const sortBySalePrice = rowSorter(
+  (a, b) => nullsLow(a.median_sale_price) - nullsLow(b.median_sale_price),
+)
+const sortByMargin = rowSorter((a, b) => nullsLow(a.margin_percent) - nullsLow(b.margin_percent))
 
 function PriceHistoryCell({ row }: { row: Row<InStockSummaryModelRow> }): React.JSX.Element {
   const { model_id, model_name } = row.original
@@ -62,6 +66,25 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
     header: 'Avg Total Cost',
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_total_cost),
     sortingFn: sortByTotalCost,
+    meta: { cellClassName: 'text-center tabular-nums' },
+  },
+  {
+    accessorKey: 'median_sale_price',
+    header: 'Median Sale Price',
+    cell: ({ row }) => formatUSDWithSymbol(row.original.median_sale_price),
+    sortingFn: sortBySalePrice,
+    meta: { cellClassName: 'text-center tabular-nums' },
+  },
+  {
+    accessorKey: 'margin_percent',
+    header: 'Margin %',
+    cell: ({ row }) => formatMarginPercent(row.original.margin_percent ?? undefined),
+    sortingFn: sortByMargin,
+    meta: { cellClassName: 'text-center tabular-nums' },
+  },
+  {
+    accessorKey: 'sales_count',
+    header: 'Sales',
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {

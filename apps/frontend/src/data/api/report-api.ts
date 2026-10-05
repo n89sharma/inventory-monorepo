@@ -83,7 +83,7 @@ export async function getHeldReport(): Promise<HeldReport> {
   return HeldReportSchema.parse(data)
 }
 
-export async function getInStockSummaryReport(): Promise<InStockSummaryReport> {
-  const { data } = await api.get(`/reports/in-stock-summary`)
+export async function getInStockSummaryReport(salesFrom: string): Promise<InStockSummaryReport> {
+  const { data } = await api.get(`/reports/in-stock-summary`, { params: { salesFrom } })
   return InStockSummaryReportSchema.parse(data)
 }

@@ -72,8 +72,8 @@ function MeterBandsTable({ bands }: { bands: BandSummary[] }): React.JSX.Element
           <TableRow>
             <TableHead className={TABLE_HEAD_CLASS} />
             <TableHead className={TABLE_HEAD_CLASS} />
-            <TableHead className={TABLE_HEAD_CLASS}>Purchase price</TableHead>
-            <TableHead className={TABLE_HEAD_CLASS}>Sale price</TableHead>
+            <TableHead className={TABLE_HEAD_CLASS}>Median purchase price</TableHead>
+            <TableHead className={TABLE_HEAD_CLASS}>Median sale price</TableHead>
             <TableHead className={TABLE_HEAD_CLASS}>Sales</TableHead>
           </TableRow>
         </TableHeader>
