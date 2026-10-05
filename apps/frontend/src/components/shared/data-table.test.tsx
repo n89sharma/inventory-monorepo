@@ -7,10 +7,9 @@ import { describe, expect, it } from 'vitest'
 
 const TABLE_LABEL = 'Widgets'
 const SCROLL_REGION = '[data-slot="table-scroll"]'
-// Well above both a page and any window, so the two frames disagree about how many rows
-// land in the DOM: the grid keeps a screenful, the in-flow table its first page.
+// Well above any window, so the two frames disagree about how many rows land in the DOM:
+// the grid keeps a screenful, the in-flow table every row.
 const ROW_COUNT = 250
-const IN_FLOW_PAGE_ROWS = 75
 
 type Widget = { id: number; name: string }
 
@@ -54,7 +53,7 @@ describe('DataGrid', () => {
     expect(bodyRowCount()).toBeLessThan(ROW_COUNT)
   })
 
-  it('replaces the pager rather than rendering one', () => {
+  it('renders no pager', () => {
     renderInRouter(<DataGrid label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)
     expect(screen.queryByRole('button', { name: 'First page' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument()
@@ -251,13 +250,18 @@ describe('column resizing', () => {
 })
 
 describe('DataTable', () => {
-  it('keeps the pager for a table that sits in flow', () => {
+  it('renders every row', () => {
     renderInRouter(<DataTable label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)
-    expect(screen.getByRole('button', { name: 'First page' })).toBeInTheDocument()
-    expect(bodyRowCount()).toBe(IN_FLOW_PAGE_ROWS)
+    expect(bodyRowCount()).toBe(ROW_COUNT)
   })
 
-  it('leaves the result count to the pager', () => {
+  it('renders no pager', () => {
+    renderInRouter(<DataTable label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)
+    expect(screen.queryByRole('button', { name: 'First page' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument()
+  })
+
+  it('shows no result count', () => {
     renderInRouter(<DataTable label={TABLE_LABEL} columns={COLUMNS} data={WIDGETS} />)
     expect(screen.queryByText(`${ROW_COUNT} results`)).not.toBeInTheDocument()
   })

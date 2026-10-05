@@ -23,7 +23,6 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -70,18 +69,9 @@ import {
   TableRow,
 } from '@/components/shadcn/table'
 
-import { Button } from '@/components/shadcn/button'
 import { TableResultCount, TableToolbar, TableToolbarEnd } from '@/components/shared/table-toolbar'
 import { useGridScrollRestoration } from '@/hooks/use-grid-scroll-restoration'
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CaretDoubleLeftIcon,
-  CaretDoubleRightIcon,
-  CaretLeftIcon,
-  CaretRightIcon,
-  DotsSixVerticalIcon,
-} from '@phosphor-icons/react'
+import { ArrowDownIcon, ArrowUpIcon, DotsSixVerticalIcon } from '@phosphor-icons/react'
 
 interface DataTableProps<TData, TValue> {
   // The entity the rows describe, as a plural noun ('Assets', 'Users'). Names the scroll
@@ -121,8 +111,6 @@ interface DataTableProps<TData, TValue> {
 
 type DataTableBaseProps<TData, TValue> = DataTableProps<TData, TValue> & { frame: TableFrame }
 
-const DEFAULT_PAGE_SIZE = 75
-
 export const TABLE_HEAD_CLASS =
   'h-7 whitespace-nowrap bg-muted text-center text-xs font-medium text-muted-foreground [&_button]:text-xs'
 
@@ -134,23 +122,20 @@ type TableFrame = {
   root: string
   border: string
   scrollRegion: string
-  // Present when the frame keeps only the rows near the viewport in the DOM, which is what
-  // replaces a pager. Absent means a fixed page with pager controls.
+  // Present when the frame keeps only the rows near the viewport in the DOM. Absent means
+  // every row is rendered.
   //
   // rowHeight must match what a row actually measures: rows are placed by arithmetic, not
   // by measurement, so a wrong value drifts further out of true the deeper you scroll.
   // Every cell is whitespace-nowrap and single-line, which is what keeps that true.
   virtualRows?: { rowHeight: number; overscan: number }
-  // A grid has no pager to carry the total, so it leads the toolbar with a result count unless
-  // the page carries the count itself.
+  // A grid leads the toolbar with a result count unless the page carries the count itself.
   countsResults: boolean
 }
 
 // Rows are 29px: p-1 either side of a 13px line-height, plus a 1px bottom border.
 const GRID_ROW_HEIGHT = 29
 const GRID_OVERSCAN = 12
-// A virtualised grid never paginates; the row model has to hand over every row.
-const ALL_ROWS_PAGE_SIZE = Number.MAX_SAFE_INTEGER
 
 // Claims what its flex column has left and scrolls on both axes, so both scrollbars sit on
 // the viewport edges. No side border or radius: the grid runs edge to edge.
@@ -577,7 +562,6 @@ function DataTableBase<TData, TValue>({
     columnResizeMode: 'onChange',
     onColumnSizingChange: setColumnSizing,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange,
@@ -594,7 +578,6 @@ function DataTableBase<TData, TValue>({
     getSubRows,
     getExpandedRowModel: getExpandedRowModel(),
     onExpandedChange: setExpanded,
-    paginateExpandedRows: false,
     state: {
       sorting,
       rowSelection,
@@ -606,26 +589,14 @@ function DataTableBase<TData, TValue>({
       columnSizing,
       expanded,
     },
-    initialState: {
-      pagination: {
-        pageSize: frame.virtualRows ? ALL_ROWS_PAGE_SIZE : DEFAULT_PAGE_SIZE,
-        pageIndex: 0,
-      },
-    },
   })
 
-  const { pageIndex, pageSize } = table.getState().pagination
-  const filteredRows = table.getFilteredRowModel().rows
-  const totalRows = filteredRows.length
   const hasFooter = table
     .getVisibleLeafColumns()
     .some((column) => column.columnDef.footer !== undefined)
 
-  const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1
-  const end = Math.min((pageIndex + 1) * pageSize, totalRows)
-
-  // A grid has no pager: it holds only the rows near the viewport, so sorting or toggling a
-  // column re-renders a screenful rather than every row the reader has scrolled past.
+  // A grid holds only the rows near the viewport, so sorting or toggling a column re-renders
+  // a screenful rather than every row the reader has scrolled past.
   const virtualRows = frame.virtualRows
   const rows = table.getRowModel().rows
   // Names this region on this path, so returning to the list by any route puts the reader back
@@ -856,57 +827,6 @@ function DataTableBase<TData, TValue>({
           {draggedColumnLabel.length > 0 && <ColumnDragChip label={draggedColumnLabel} />}
         </DragOverlay>
       </DndContext>
-
-      {!virtualRows && (
-        <div className="flex shrink-0 flex-col items-center gap-2 p-2">
-          <div className="text-sm text-semibold">
-            <strong>
-              {start}-{end}
-            </strong>{' '}
-            of <strong>{totalRows}</strong>
-          </div>
-          {table.getPageCount() > 1 && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.firstPage()}
-                disabled={!table.getCanPreviousPage()}
-                aria-label="First page"
-              >
-                <CaretDoubleLeftIcon aria-hidden="true" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <CaretLeftIcon aria-hidden="true" />
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Next
-                <CaretRightIcon aria-hidden="true" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.lastPage()}
-                disabled={!table.getCanNextPage()}
-                aria-label="Last page"
-              >
-                <CaretDoubleRightIcon aria-hidden="true" />
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }
@@ -930,7 +850,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 
 function DataRowImpl<TData>({
   row,
-  // Sorting and pagination reorder the same Row instances, so without the visual position in
+  // Sorting reorders the same Row instances, so without the visual position in
   // the props this memo never busts on a reorder — which strands anything a cell derives from
   // its position, such as an editable grid's single keyboard entry point.
   rowPosition,
