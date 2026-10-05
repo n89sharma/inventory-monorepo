@@ -1,7 +1,7 @@
 -- $1 = on-hand status names, $2 = warehouse ids. An in-transit asset has no location, so it
--- belongs to the origin of its open transfer.
+-- belongs to the destination of its open transfer.
 select
-  coalesce(l.warehouse_id, tr.origin_id) as warehouse_id,
+  coalesce(l.warehouse_id, tr.destination_id) as warehouse_id,
   w.city_code as city_code,
   a.is_in_transit as is_in_transit,
   a.barcode as barcode,
@@ -38,14 +38,14 @@ from "Asset" a
   left join "Cost" c on c.asset_id = a.id
   left join "Location" l on l.id = a.location_id
   left join lateral (
-    select tf.transfer_number, tf.origin_id
+    select tf.transfer_number, tf.destination_id
     from "AssetTransfer" atf
       join "Transfer" tf on tf.id = atf.transfer_id
     where atf.asset_id = a.id
       and tf.status = 'IN_TRANSIT'
     limit 1
   ) tr on true
-  join "Warehouse" w on w.id = coalesce(l.warehouse_id, tr.origin_id)
+  join "Warehouse" w on w.id = coalesce(l.warehouse_id, tr.destination_id)
   left join lateral (
     select coalesce(array_agg(ac.accessory order by ac.accessory), '{}') as accessories
     from "AssetAccessory" aa

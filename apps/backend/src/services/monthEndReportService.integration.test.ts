@@ -117,7 +117,7 @@ describe('monthEndReportService', () => {
     expect(assets.map((line) => line.barcode)).toEqual([kept.barcode])
   })
 
-  it('files a dispatched asset under its transfer origin as in transit', async () => {
+  it('files a dispatched asset under its transfer destination as in transit', async () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await seedAssetCost(asset.id)
     const transferNumber = await createTransfer(
@@ -131,7 +131,7 @@ describe('monthEndReportService', () => {
 
     expect(assets).toHaveLength(1)
     expect(assets[0]).toMatchObject({
-      warehouse_id: refs.warehouse.id,
+      warehouse_id: refs.warehouse2.id,
       is_in_transit: true,
       transfer_number: transferNumber,
     })
