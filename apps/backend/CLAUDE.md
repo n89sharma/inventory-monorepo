@@ -72,7 +72,8 @@ array form when conditional logic is involved.
   the opposite: hand-written typed `.sql` files, see above.) List the DB changes and wait — I run
   the migrations myself.
 - **Never run a destructive or `UPDATE` statement until I've confirmed the `WHERE` clause.** Show
-  me the matching row count from a `SELECT` with the same predicate first, then wait.
+  me the matching row count from a `SELECT` with the same predicate first, then wait. Production
+  data has its own rules in the root `CLAUDE.md` (**Production data**).
 
 ## Conventions
 

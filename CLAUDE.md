@@ -119,6 +119,22 @@ Don't add meta/attribution trailers to commit messages (e.g. "Generated with Cla
 Write the message to a temp file and use `git commit -F <file>`. Multi-line messages passed
 inline through the PowerShell tool leak literal `@` characters.
 
+## Production data
+
+The production connection string is `PRD_URL` in `.notes/database.env`. Never print it, never
+commit it.
+
+- **Reads are fine.** Run `SELECT`s freely; set the session read-only first
+  (`SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY`).
+- **Never run an `INSERT`, `UPDATE` or `DELETE` until I've confirmed the `WHERE` clause.** First
+  run a `SELECT` with the same predicate, show me the matching row count (and, for a delete, the
+  rows that reference it), then wait for my go-ahead. A go-ahead for one statement does not cover
+  another.
+- **Writes run in one transaction** (`psql -1`) with a check that raises and rolls back when the
+  counts differ from the preview.
+- **Schema changes are mine.** I apply migrations; you list the DDL and wait.
+- After a write, re-read the affected rows read-only and report the result.
+
 ## Commands
 
 Run from the **repo root** after every code change. `npm run verify` sequences its own stages;
