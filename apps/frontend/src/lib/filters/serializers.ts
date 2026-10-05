@@ -106,13 +106,11 @@ export function buildStockSalesPath(brand: Brand | null, assetType: AssetType | 
 
 export function onHandDrilldownHref(params: {
   row: StockSalesModelRow
-  warehouses: Warehouse[]
   band: MeterBand | null
 }): string {
-  const { row, warehouses, band } = params
+  const { row, band } = params
   const bounds = band === null || band === 'UNKNOWN' ? null : BAND_BOUNDS[band]
   return serializeDrilldown(ONHAND_PATH, {
-    wh: warehouses.length > 0 ? warehouses.map((warehouse) => warehouse.id) : null,
     brand: row.brand_id,
     type: [row.asset_type_id],
     models: [row.model_id],

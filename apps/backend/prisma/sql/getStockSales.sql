@@ -1,7 +1,6 @@
 -- $1 = IN_STOCK status ids, $2 = HELD status ids. Meter-band thresholds mirror METER_BANDS
 -- (apps/frontend/src/lib/model-price-history-summary.ts): max is exclusive.
 select
-  w.id                          as warehouse_id,
   b.id                          as brand_id,
   b."name"                      as brand_name,
   t.id                          as asset_type_id,
@@ -29,5 +28,5 @@ join "Location" l  on l.id = a.location_id
 join "Warehouse" w on w.id = l.warehouse_id and w.is_active is true
 left join "Cost" c                   on c.asset_id = a.id
 left join "TechnicalSpecification" h on h.asset_id = a.id
-group by w.id, b.id, b."name", t.id, t.asset_type, m.id, m."name", meter_band
-order by count(*) desc, w.id, b."name", t.asset_type, m."name"
+group by b.id, b."name", t.id, t.asset_type, m.id, m."name", meter_band
+order by count(*) desc, b."name", t.asset_type, m."name"

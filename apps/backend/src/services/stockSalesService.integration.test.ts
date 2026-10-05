@@ -120,17 +120,28 @@ describe('stockSalesService', () => {
     expect(row).toMatchObject({ purchase_cost_sum: null, total_cost_sum: null })
   })
 
-  it('returns a separate row per warehouse for the same model', async () => {
+  it('returns one stock row per model and meter band across all active warehouses', async () => {
     await createArrivedAssets(refs, 2)
     await createArrivedAssets({ ...refs, warehouse: refs.warehouse2 }, 1)
 
     const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
-    const counts = Object.fromEntries(
-      report.stock
-        .filter((r) => r.model_id === refs.model.id)
-        .map((r) => [r.warehouse_id, r.in_stock_count]),
-    )
-    expect(counts).toEqual({ [refs.warehouse.id]: 2, [refs.warehouse2.id]: 1 })
+    const rows = report.stock.filter((r) => r.model_id === refs.model.id)
+    expect(rows).toHaveLength(1)
+    expect(rows[0].in_stock_count).toBe(3)
+  })
+
+  it('returns sale-price groups carrying brand, type and model names', async () => {
+    await sell(500, SALES_FROM, 10000)
+
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const group = report.sale_prices?.find((g) => g.model_id === refs.model.id)
+    expect(group).toMatchObject({
+      brand_id: refs.model.brand_id,
+      brand_name: refs.model.brand_name,
+      asset_type_id: refs.model.asset_type_id,
+      asset_type: refs.model.asset_type,
+      model_name: refs.model.model_name,
+    })
   })
 
   it('groups sale prices of sold assets by model and meter band', async () => {

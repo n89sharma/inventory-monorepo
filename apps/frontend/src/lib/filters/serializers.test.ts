@@ -123,33 +123,20 @@ const IRADX_ROW: StockSalesModelRow = {
 }
 
 describe('onHandDrilldownHref', () => {
-  it('carries the selected warehouse', () => {
-    const params = parse(
-      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [warehouse(3)], band: null }),
-    ).searchParams
-    expect(params.get('wh')).toBe('3')
-  })
-
-  it('omits the warehouse param when all warehouses are selected', () => {
-    const params = parse(
-      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band: null }),
-    ).searchParams
+  it('carries no warehouse', () => {
+    const params = parse(onHandDrilldownHref({ row: IRADX_ROW, band: null })).searchParams
     expect(params.has('wh')).toBe(false)
   })
 
   it("carries the selected band's meter range", () => {
-    const params = parse(
-      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band: 'MEDIUM' }),
-    ).searchParams
+    const params = parse(onHandDrilldownHref({ row: IRADX_ROW, band: 'MEDIUM' })).searchParams
     expect(params.get('meter_min')).toBe(String(METER_BANDS[1].min))
     expect(params.get('meter_max')).toBe(String(METER_BANDS[1].max))
   })
 
   it('carries no meter range for all bands or the unknown band', () => {
     for (const band of [null, 'UNKNOWN'] as const) {
-      const params = parse(
-        onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band }),
-      ).searchParams
+      const params = parse(onHandDrilldownHref({ row: IRADX_ROW, band })).searchParams
       expect(params.has('meter_min')).toBe(false)
       expect(params.has('meter_max')).toBe(false)
     }
@@ -157,7 +144,7 @@ describe('onHandDrilldownHref', () => {
 })
 
 describe('buildStockSalesPath', () => {
-  it('opens the report on all warehouses', () => {
+  it('opens the report with the default brand and no warehouse', () => {
     const params = parse(buildStockSalesPath(CANON, null)).searchParams
     expect(params.has('wh')).toBe(false)
     expect(params.get('brand')).toBe('7')

@@ -15,7 +15,12 @@ import {
   getDefaultFromDate,
   getToday,
 } from '@/lib/filters/defaults'
-import { FILTER_PARSERS, parseAsIdList, type MonthEndReportView } from '@/lib/filters/parsers'
+import {
+  FILTER_PARSERS,
+  parseAsIdList,
+  type MonthEndReportView,
+  type StockSalesMode,
+} from '@/lib/filters/parsers'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
 import {
   ANY_OPTION,
@@ -524,6 +529,18 @@ export function useMonthEndReportViewParam(): [
     [setRaw],
   )
   return [view, setView]
+}
+
+const DEFAULT_STOCK_SALES_MODE: StockSalesMode = 'stock'
+
+export function useStockSalesModeParam(): [StockSalesMode, (next: StockSalesMode) => void] {
+  const [raw, setRaw] = useQueryState('mode', FILTER_PARSERS.mode)
+  const mode = raw ?? DEFAULT_STOCK_SALES_MODE
+  const setMode = useCallback(
+    (next: StockSalesMode) => void setRaw(next === DEFAULT_STOCK_SALES_MODE ? null : next),
+    [setRaw],
+  )
+  return [mode, setMode]
 }
 
 export function useStoreWarehousesParam(): [Warehouse[], (next: Warehouse[]) => void] {

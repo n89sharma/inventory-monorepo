@@ -21,6 +21,8 @@ export const COLS_PARAM_KEY = 'cols'
 
 const MONTH_END_REPORT_VIEWS = ['summary', 'assets'] as const
 export type MonthEndReportView = (typeof MONTH_END_REPORT_VIEWS)[number]
+const STOCK_SALES_MODES = ['stock', 'sold'] as const
+export type StockSalesMode = (typeof STOCK_SALES_MODES)[number]
 
 // Non-negative integer; anything negative or unparseable clears the param.
 const parseAsNonNegativeInt = createParser<number>({
@@ -106,4 +108,5 @@ export const FILTER_PARSERS = {
   brandgroup: parseAsStringLiteral(BrandGroupSchema.options),
   assetgroup: parseAsStringLiteral(AssetGroupSchema.options),
   view: parseAsStringLiteral(MONTH_END_REPORT_VIEWS),
+  mode: parseAsStringLiteral(STOCK_SALES_MODES),
 }

@@ -9,12 +9,17 @@ import * as $runtime from "@prisma/client/runtime/client"
  * @param soldStatusId
  * @param salesFrom
  */
-export const getStockSalesSalePrices = $runtime.makeTypedQueryFactory("select\na.model_id                       as model_id,\ncase\nwhen h.meter_total is null   then 'UNKNOWN'\nwhen h.meter_total < 70000   then 'LOW'\nwhen h.meter_total < 210000  then 'MEDIUM'\nelse 'HIGH'\nend                              as meter_band,\narray_agg(c.sale_price::float8)  as sale_prices\nfrom \"Asset\" a\njoin \"Departure\" d on d.id = a.departure_id\njoin \"Cost\" c      on c.asset_id = a.id\nleft join \"TechnicalSpecification\" h on h.asset_id = a.id\nwhere a.status_id = $1\nand c.sale_price is not null\nand coalesce(d.departure_date, d.created_at::date) >= $2::date\ngroup by a.model_id, meter_band") as (soldStatusId: number, salesFrom: string) => $runtime.TypedSql<getStockSalesSalePrices.Parameters, getStockSalesSalePrices.Result>
+export const getStockSalesSalePrices = $runtime.makeTypedQueryFactory("select\nb.id                             as brand_id,\nb.\"name\"                         as brand_name,\nt.id                             as asset_type_id,\nt.asset_type                     as asset_type,\nm.id                             as model_id,\nm.\"name\"                         as model_name,\ncase\nwhen h.meter_total is null   then 'UNKNOWN'\nwhen h.meter_total < 70000   then 'LOW'\nwhen h.meter_total < 210000  then 'MEDIUM'\nelse 'HIGH'\nend                              as meter_band,\narray_agg(c.sale_price::float8)  as sale_prices\nfrom \"Asset\" a\njoin \"Departure\" d on d.id = a.departure_id\njoin \"Cost\" c      on c.asset_id = a.id\njoin \"Model\" m     on m.id = a.model_id\njoin \"AssetType\" t on t.id = m.asset_type_id\njoin \"Brand\" b     on b.id = m.brand_id\nleft join \"TechnicalSpecification\" h on h.asset_id = a.id\nwhere a.status_id = $1\nand c.sale_price is not null\nand coalesce(d.departure_date, d.created_at::date) >= $2::date\ngroup by b.id, b.\"name\", t.id, t.asset_type, m.id, m.\"name\", meter_band") as (soldStatusId: number, salesFrom: string) => $runtime.TypedSql<getStockSalesSalePrices.Parameters, getStockSalesSalePrices.Result>
 
 export namespace getStockSalesSalePrices {
   export type Parameters = [soldStatusId: number, salesFrom: string]
   export type Result = {
+    brand_id: number
+    brand_name: string
+    asset_type_id: number
+    asset_type: string
     model_id: number
+    model_name: string
     meter_band: string | null
     sale_prices: number[] | null
   }

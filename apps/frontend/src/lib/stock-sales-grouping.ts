@@ -1,5 +1,14 @@
+import type { StockSalesMode } from '@/lib/filters/parsers'
 import { median } from '@/lib/model-price-history-summary'
-import type { StockSalesSalePriceGroup, StockSalesRow, MeterBand } from 'shared-types'
+import type {
+  AssetType,
+  Brand,
+  MeterBand,
+  ModelSummary,
+  StockSalesReport,
+  StockSalesRow,
+  StockSalesSalePriceGroup,
+} from 'shared-types'
 
 type CostTotals = {
   purchase_cost_sum: number | null
@@ -8,10 +17,12 @@ type CostTotals = {
   total_cost_count: number
 }
 
-export type StockSalesModelRow = Pick<
+type ModelIdentity = Pick<
   StockSalesRow,
   'brand_id' | 'brand_name' | 'asset_type_id' | 'asset_type' | 'model_id' | 'model_name'
-> & {
+>
+
+export type StockSalesModelRow = ModelIdentity & {
   in_stock_count: number
   held_count: number
   avg_purchase_cost: number | null
@@ -21,13 +32,31 @@ export type StockSalesModelRow = Pick<
   sales_count: number
 }
 
-type ModelAccumulator = Omit<
-  StockSalesModelRow,
-  'avg_purchase_cost' | 'avg_total_cost' | 'median_sale_price' | 'margin_percent' | 'sales_count'
-> &
-  CostTotals
+export type StockSalesFilters = {
+  band: MeterBand | null
+  brand: Brand | null
+  assetTypes: AssetType[]
+  models: ModelSummary[]
+}
+
+type StockAccumulator = ModelIdentity &
+  CostTotals & {
+    in_stock_count: number
+    held_count: number
+  }
+
+type SalesAccumulator = ModelIdentity & { sale_prices: number[] }
 
 const NO_SALE_PRICES: number[] = []
+const NO_SALE_PRICE_GROUPS: StockSalesSalePriceGroup[] = []
+const NOTHING_ON_HAND: Omit<StockAccumulator, keyof ModelIdentity> = {
+  in_stock_count: 0,
+  held_count: 0,
+  purchase_cost_sum: null,
+  purchase_cost_count: 0,
+  total_cost_sum: null,
+  total_cost_count: 0,
+}
 
 function addNullable(total: number | null, value: number | null): number | null {
   if (value === null) return total
@@ -44,32 +73,33 @@ function marginPercent(salePrice: number | null, cost: number | null): number | 
   return ((salePrice - cost) / salePrice) * 100
 }
 
-function collectSalePrices(
-  salePriceGroups: StockSalesSalePriceGroup[],
-  band: MeterBand | null,
-): Map<number, number[]> {
-  const pricesByModel = new Map<number, number[]>()
-  for (const group of salePriceGroups) {
-    if (band !== null && group.meter_band !== band) continue
-    const prices = pricesByModel.get(group.model_id)
-    if (prices) {
-      prices.push(...group.sale_prices)
-    } else {
-      pricesByModel.set(group.model_id, [...group.sale_prices])
-    }
+function identityOf(item: ModelIdentity): ModelIdentity {
+  return {
+    brand_id: item.brand_id,
+    brand_name: item.brand_name,
+    asset_type_id: item.asset_type_id,
+    asset_type: item.asset_type,
+    model_id: item.model_id,
+    model_name: item.model_name,
   }
-  return pricesByModel
 }
 
-export function buildStockSalesGroups(
-  rows: StockSalesRow[],
-  salePriceGroups: StockSalesSalePriceGroup[],
-  band: MeterBand | null,
-): StockSalesModelRow[] {
-  const salePricesByModel = collectSalePrices(salePriceGroups, band)
-  const groups = new Map<number, ModelAccumulator>()
+function buildMatcher(
+  filters: StockSalesFilters,
+): (item: ModelIdentity & { meter_band: MeterBand }) => boolean {
+  const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
+  const modelIds = new Set(filters.models.map((m) => m.id))
+  return (item) =>
+    (filters.band === null || item.meter_band === filters.band) &&
+    (filters.brand === null || item.brand_id === filters.brand.id) &&
+    (assetTypeIds.size === 0 || assetTypeIds.has(item.asset_type_id)) &&
+    (modelIds.size === 0 || modelIds.has(item.model_id))
+}
+
+function accumulateStock(rows: StockSalesRow[]): Map<number, StockAccumulator> {
+  const stockByModel = new Map<number, StockAccumulator>()
   for (const row of rows) {
-    const existing = groups.get(row.model_id)
+    const existing = stockByModel.get(row.model_id)
     if (existing) {
       existing.in_stock_count += row.in_stock_count
       existing.held_count += row.held_count
@@ -78,13 +108,8 @@ export function buildStockSalesGroups(
       existing.total_cost_sum = addNullable(existing.total_cost_sum, row.total_cost_sum)
       existing.total_cost_count += row.total_cost_count
     } else {
-      groups.set(row.model_id, {
-        brand_id: row.brand_id,
-        brand_name: row.brand_name,
-        asset_type_id: row.asset_type_id,
-        asset_type: row.asset_type,
-        model_id: row.model_id,
-        model_name: row.model_name,
+      stockByModel.set(row.model_id, {
+        ...identityOf(row),
         in_stock_count: row.in_stock_count,
         held_count: row.held_count,
         purchase_cost_sum: row.purchase_cost_sum,
@@ -94,25 +119,58 @@ export function buildStockSalesGroups(
       })
     }
   }
+  return stockByModel
+}
 
-  return Array.from(groups.values(), (group) => {
-    const salePrices = salePricesByModel.get(group.model_id) ?? NO_SALE_PRICES
-    const avgTotalCost = average(group.total_cost_sum, group.total_cost_count)
-    const medianSalePrice = median(salePrices)
-    return {
-      brand_id: group.brand_id,
-      brand_name: group.brand_name,
-      asset_type_id: group.asset_type_id,
-      asset_type: group.asset_type,
-      model_id: group.model_id,
-      model_name: group.model_name,
-      in_stock_count: group.in_stock_count,
-      held_count: group.held_count,
-      avg_purchase_cost: average(group.purchase_cost_sum, group.purchase_cost_count),
-      avg_total_cost: avgTotalCost,
-      median_sale_price: medianSalePrice,
-      margin_percent: marginPercent(medianSalePrice, avgTotalCost),
-      sales_count: salePrices.length,
+function accumulateSales(groups: StockSalesSalePriceGroup[]): Map<number, SalesAccumulator> {
+  const salesByModel = new Map<number, SalesAccumulator>()
+  for (const group of groups) {
+    const existing = salesByModel.get(group.model_id)
+    if (existing) {
+      existing.sale_prices.push(...group.sale_prices)
+    } else {
+      salesByModel.set(group.model_id, {
+        ...identityOf(group),
+        sale_prices: [...group.sale_prices],
+      })
     }
-  })
+  }
+  return salesByModel
+}
+
+function toModelRow(stock: StockAccumulator, salePrices: number[]): StockSalesModelRow {
+  const avgTotalCost = average(stock.total_cost_sum, stock.total_cost_count)
+  const medianSalePrice = median(salePrices)
+  return {
+    ...identityOf(stock),
+    in_stock_count: stock.in_stock_count,
+    held_count: stock.held_count,
+    avg_purchase_cost: average(stock.purchase_cost_sum, stock.purchase_cost_count),
+    avg_total_cost: avgTotalCost,
+    median_sale_price: medianSalePrice,
+    margin_percent: marginPercent(medianSalePrice, avgTotalCost),
+    sales_count: salePrices.length,
+  }
+}
+
+export function buildStockSalesGroups(
+  report: StockSalesReport,
+  filters: StockSalesFilters,
+  mode: StockSalesMode,
+): StockSalesModelRow[] {
+  const matches = buildMatcher(filters)
+  const stockByModel = accumulateStock(report.stock.filter(matches))
+  const salesByModel = accumulateSales((report.sale_prices ?? NO_SALE_PRICE_GROUPS).filter(matches))
+
+  if (mode === 'stock') {
+    return Array.from(stockByModel.values(), (stock) =>
+      toModelRow(stock, salesByModel.get(stock.model_id)?.sale_prices ?? NO_SALE_PRICES),
+    )
+  }
+  return Array.from(salesByModel.values(), (sales) =>
+    toModelRow(
+      stockByModel.get(sales.model_id) ?? { ...identityOf(sales), ...NOTHING_ON_HAND },
+      sales.sale_prices,
+    ),
+  )
 }

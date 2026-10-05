@@ -4,7 +4,6 @@ export const METER_BAND = ['UNKNOWN', 'LOW', 'MEDIUM', 'HIGH'] as const
 export type MeterBand = (typeof METER_BAND)[number]
 
 export const StockSalesRowSchema = z.object({
-  warehouse_id: z.number().int(),
   brand_id: z.number().int(),
   brand_name: z.string(),
   asset_type_id: z.number().int(),
@@ -22,7 +21,12 @@ export const StockSalesRowSchema = z.object({
 export type StockSalesRow = z.infer<typeof StockSalesRowSchema>
 
 export const StockSalesSalePriceGroupSchema = z.object({
+  brand_id: z.number().int(),
+  brand_name: z.string(),
+  asset_type_id: z.number().int(),
+  asset_type: z.string(),
   model_id: z.number().int(),
+  model_name: z.string(),
   meter_band: z.enum(METER_BAND),
   sale_prices: z.array(z.number()),
 })

@@ -3,8 +3,8 @@ import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
 import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { MeterBandFilter } from '@/components/shared/filters/meter-band-filter'
 import { ModelsFilter } from '@/components/shared/filters/models-filter'
-import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { FilterRow } from '@/components/shared/filter-row'
+import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { STOCK_SALES_COLUMNS } from './stock-sales-table-columns'
 import { DataGrid } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
@@ -16,62 +16,63 @@ import {
   useBrandParam,
   useMeterBandParam,
   useModelsParam,
-  useWarehousesParam,
+  useStockSalesModeParam,
 } from '@/lib/filters/hooks'
+import type { StockSalesMode } from '@/lib/filters/parsers'
 import { onHandDrilldownHref } from '@/lib/filters/serializers'
 import { buildStockSalesGroups, type StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
 import { useCallback, useMemo } from 'react'
-import type {
-  AssetType,
-  Brand,
-  StockSalesSalePriceGroup,
-  StockSalesReport,
-  MeterBand,
-  ModelSummary,
-  Warehouse,
-} from 'shared-types'
+import type { StockSalesReport } from 'shared-types'
 
 const TABLE_LABEL = 'Stock & sales'
 
 const EMPTY_REPORT: StockSalesReport = { stock: [], sale_prices: null }
-const NO_SALE_PRICE_GROUPS: StockSalesSalePriceGroup[] = []
-const DEFAULT_SORT = { id: 'in_stock_count', desc: true }
+const STOCK_MODE: StockSalesMode = 'stock'
+const SOLD_MODE: StockSalesMode = 'sold'
+const DEFAULT_SORTS = {
+  stock: { id: 'in_stock_count', desc: true },
+  sold: { id: 'sales_count', desc: true },
+} as const satisfies Record<StockSalesMode, { id: string; desc: boolean }>
+const EMPTY_MESSAGES = {
+  stock: 'No on-hand assets match these filters.',
+  sold: 'No sales in the last 6 months match these filters.',
+} as const satisfies Record<StockSalesMode, string>
 
-type StockSalesFilters = {
-  warehouses: Warehouse[]
-  band: MeterBand | null
-  brand: Brand | null
-  assetTypes: AssetType[]
-  models: ModelSummary[]
-}
-
-function buildFilteredGroups(
-  report: StockSalesReport,
-  filters: StockSalesFilters,
-): StockSalesModelRow[] {
-  const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
-  const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
-  const modelIds = new Set(filters.models.map((m) => m.id))
-  const filtered = report.stock.filter(
-    (row) =>
-      (warehouseIds.size === 0 || warehouseIds.has(row.warehouse_id)) &&
-      (filters.band === null || row.meter_band === filters.band) &&
-      (filters.brand === null || row.brand_id === filters.brand.id) &&
-      (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
-      (modelIds.size === 0 || modelIds.has(row.model_id)),
+function StockSalesModeToggle({
+  mode,
+  onModeChange,
+}: {
+  mode: StockSalesMode
+  onModeChange: (next: StockSalesMode) => void
+}): React.JSX.Element {
+  return (
+    <ToggleGroup
+      type="single"
+      variant="outline"
+      value={mode}
+      onValueChange={(value) => {
+        if (value === '') return
+        onModeChange(value === SOLD_MODE ? SOLD_MODE : STOCK_MODE)
+      }}
+      aria-label="Report mode"
+    >
+      <ToggleGroupItem value={STOCK_MODE}>Stock</ToggleGroupItem>
+      <ToggleGroupItem value={SOLD_MODE}>Sold</ToggleGroupItem>
+    </ToggleGroup>
   )
-  return buildStockSalesGroups(filtered, report.sale_prices ?? NO_SALE_PRICE_GROUPS, filters.band)
 }
 
 function StockSalesBody({
+  mode,
   rows,
   isLoading,
   columnVisibility,
   getRowHref,
 }: {
+  mode: StockSalesMode
   rows: StockSalesModelRow[]
   isLoading: boolean
   columnVisibility: VisibilityState
@@ -79,19 +80,16 @@ function StockSalesBody({
 }): React.JSX.Element | null {
   if (rows.length === 0) {
     if (isLoading) return null
-    return (
-      <p className="py-16 text-center text-sm text-muted-foreground">
-        No in-stock assets match these filters.
-      </p>
-    )
+    return <p className="py-16 text-center text-sm text-muted-foreground">{EMPTY_MESSAGES[mode]}</p>
   }
 
   return (
     <DataGrid
+      key={mode}
       label={TABLE_LABEL}
       columns={STOCK_SALES_COLUMNS}
       data={rows}
-      defaultSort={DEFAULT_SORT}
+      defaultSort={DEFAULT_SORTS[mode]}
       getRowHref={getRowHref}
       columnVisibility={columnVisibility}
     />
@@ -99,24 +97,26 @@ function StockSalesBody({
 }
 
 export function StockSalesReportPage(): React.JSX.Element {
-  const [warehouses, setWarehouses] = useWarehousesParam()
+  const [requestedMode, setMode] = useStockSalesModeParam()
   const [band, setBand] = useMeterBandParam()
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
-  const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport()
-  const visibleRows = useMemo(
-    () => buildFilteredGroups(report, { warehouses, band, brand, assetTypes, models }),
-    [report, warehouses, band, brand, assetTypes, models],
-  )
-  const getRowHref = useCallback(
-    (row: StockSalesModelRow) => onHandDrilldownHref({ row, warehouses, band }),
-    [warehouses, band],
-  )
-
   const canViewPurchase = useCan('view_purchase_price')
   const canViewSale = useCan('view_sale_price')
+  const mode = canViewSale ? requestedMode : STOCK_MODE
+
+  const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport()
+  const visibleRows = useMemo(
+    () => buildStockSalesGroups(report, { band, brand, assetTypes, models }, mode),
+    [report, band, brand, assetTypes, models, mode],
+  )
+  const getRowHref = useCallback(
+    (row: StockSalesModelRow) => onHandDrilldownHref({ row, band }),
+    [band],
+  )
+
   const columnVisibility = useMemo<VisibilityState>(
     () => ({
       avg_purchase_cost: canViewPurchase,
@@ -146,7 +146,7 @@ export function StockSalesReportPage(): React.JSX.Element {
         </div>
         <form onSubmit={(e) => e.preventDefault()}>
           <FilterRow>
-            <WarehouseFilter selection={warehouses} onSelectionChange={setWarehouses} />
+            {canViewSale && <StockSalesModeToggle mode={mode} onModeChange={setMode} />}
             <MeterBandFilter selection={band} onSelectionChange={setBand} />
             <BrandFilter
               selection={brand}
@@ -168,6 +168,7 @@ export function StockSalesReportPage(): React.JSX.Element {
         className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
         <StockSalesBody
+          mode={mode}
           rows={visibleRows}
           isLoading={isLoading}
           columnVisibility={columnVisibility}
