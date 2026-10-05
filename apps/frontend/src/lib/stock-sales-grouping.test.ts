@@ -1,13 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import type {
-  AssetType,
-  Brand,
-  MeterBand,
-  ModelSummary,
-  StockSalesRow,
-  StockSalesSalePriceGroup,
-} from 'shared-types'
-import { buildStockSalesGroups, type StockSalesFilters } from './stock-sales-grouping'
+import type { MeterBand, ModelSummary, StockSalesRow, StockSalesSalePriceGroup } from 'shared-types'
+import {
+  buildStockSalesGroups,
+  summarizeStockSales,
+  type StockSalesFilters,
+} from './stock-sales-grouping'
 
 const CANON = 10
 const RICOH = 11
@@ -17,9 +14,7 @@ const IRADX = 100
 const IMAGERUNNER = 101
 const MPC = 102
 const NO_SALES: StockSalesSalePriceGroup[] = []
-const NO_FILTERS: StockSalesFilters = { band: null, brand: null, assetTypes: [], models: [] }
-const RICOH_BRAND: Brand = { id: RICOH, name: 'RICOH' }
-const PRINTER_TYPE: AssetType = { id: PRINTER, asset_type: 'PRINTER' }
+const NO_FILTERS: StockSalesFilters = { band: null, models: [] }
 const MPC_MODEL: ModelSummary = {
   id: MPC,
   brand_id: RICOH,
@@ -31,11 +26,7 @@ const MPC_MODEL: ModelSummary = {
   size: 0,
   is_colour: false,
 }
-const FILTERS_MATCHING_ONLY_MPC: StockSalesFilters[] = [
-  { ...NO_FILTERS, brand: RICOH_BRAND },
-  { ...NO_FILTERS, assetTypes: [PRINTER_TYPE] },
-  { ...NO_FILTERS, models: [MPC_MODEL] },
-]
+const ONLY_MPC: StockSalesFilters = { ...NO_FILTERS, models: [MPC_MODEL] }
 
 type Identity = { model: number; brand?: number; type?: number }
 
@@ -141,7 +132,7 @@ describe('buildStockSalesGroups stock mode', () => {
     expect(groups.map((group) => group.model_id)).toEqual([IRADX])
   })
 
-  it('applies the band, brand, type and model filters to stock', () => {
+  it('applies the band and model filters to stock', () => {
     const stock = [
       stocked({ model: IRADX, band: 'LOW', assets: 1, purchaseCosts: [] }),
       stocked({ model: IRADX, band: 'HIGH', assets: 2, purchaseCosts: [] }),
@@ -157,9 +148,7 @@ describe('buildStockSalesGroups stock mode', () => {
     const [highOnly] = stockMode(stock, NO_SALES, { ...NO_FILTERS, band: 'HIGH' })
     expect(highOnly).toMatchObject({ model_id: IRADX, in_stock_count: 2 })
 
-    for (const filters of FILTERS_MATCHING_ONLY_MPC) {
-      expect(stockMode(stock, NO_SALES, filters).map((group) => group.model_id)).toEqual([MPC])
-    }
+    expect(stockMode(stock, NO_SALES, ONLY_MPC).map((group) => group.model_id)).toEqual([MPC])
   })
 })
 
@@ -249,19 +238,34 @@ describe('buildStockSalesGroups sold mode', () => {
     expect(groups.map((group) => group.model_id)).toEqual([IRADX])
   })
 
-  it('applies the brand, type and model filters', () => {
+  it('applies the model filter', () => {
     const sales = [
       sold({ model: IRADX }, 'LOW', [400]),
       sold({ model: MPC, brand: RICOH, type: PRINTER }, 'LOW', [500]),
     ]
-    for (const filters of FILTERS_MATCHING_ONLY_MPC) {
-      expect(soldMode([], sales, filters).map((group) => group.model_id)).toEqual([MPC])
-    }
+    expect(soldMode([], sales, ONLY_MPC).map((group) => group.model_id)).toEqual([MPC])
   })
 
   it('shows the same figures for a model in both modes', () => {
     const stock = [stocked({ model: IRADX, band: 'LOW', assets: 2, held: 1, purchaseCosts: [300] })]
     const sales = [sold({ model: IRADX }, 'LOW', [1000, 800])]
     expect(soldMode(stock, sales)).toEqual(stockMode(stock, sales))
+  })
+})
+
+describe('summarizeStockSales', () => {
+  it('sums in-stock, held and sales counts over the given rows', () => {
+    const rows = stockMode(
+      [
+        stocked({ model: IRADX, band: 'LOW', assets: 2, held: 1, purchaseCosts: [] }),
+        stocked({ model: MPC, band: 'LOW', assets: 3, held: 4, purchaseCosts: [] }),
+      ],
+      [sold({ model: IRADX }, 'LOW', [500, 600]), sold({ model: MPC }, 'HIGH', [700])],
+    )
+    expect(summarizeStockSales(rows)).toEqual({ in_stock_count: 5, held_count: 5, sales_count: 3 })
+  })
+
+  it('is zero for no rows', () => {
+    expect(summarizeStockSales([])).toEqual({ in_stock_count: 0, held_count: 0, sales_count: 0 })
   })
 })

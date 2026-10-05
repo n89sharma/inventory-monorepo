@@ -21,7 +21,6 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/shadcn/sidebar'
-import { useBrands } from '@/hooks/use-reference-data'
 import { useCan } from '@/hooks/use-can'
 import { useDefaultAssetType } from '@/hooks/use-default-asset-type'
 import { useProfileDefaultWarehouse } from '@/hooks/use-profile-default-warehouse'
@@ -30,7 +29,6 @@ import {
   buildAssetSearchPath,
   buildCollectionSummaryPath,
   buildDepartedSearchPath,
-  buildStockSalesPath,
   buildProfitabilityReportPath,
   buildStoreListPath,
 } from '@/lib/filters/serializers'
@@ -47,14 +45,13 @@ import {
   TruckTrailerIcon,
   WarehouseIcon,
 } from '@phosphor-icons/react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
 const STOCK_SALES_PATH = '/reports/stock-sales'
 const MONTH_END_PATH = '/reports/month-end'
-const DEFAULT_BRAND_NAME = 'Canon'
 
 type SidebarPermission = 'view_collections' | 'view_store'
 
@@ -175,11 +172,6 @@ export function AppSidebar(): React.JSX.Element {
   const location = useLocation()
   const defaultWarehouse = useProfileDefaultWarehouse()
 
-  const brands = useBrands()
-  const defaultBrand = useMemo(
-    () => brands.find((b) => b.name === DEFAULT_BRAND_NAME) ?? null,
-    [brands],
-  )
   const defaultAssetType = useDefaultAssetType()
 
   function sidebarItemPath(url: string): string {
@@ -195,9 +187,6 @@ export function AppSidebar(): React.JSX.Element {
 
   function reportItemPath(url: string): string {
     if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath()
-    if (url === STOCK_SALES_PATH) {
-      return buildStockSalesPath(defaultBrand, defaultAssetType)
-    }
     return url
   }
 

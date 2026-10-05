@@ -1,8 +1,6 @@
 import type { StockSalesMode } from '@/lib/filters/parsers'
 import { median } from '@/lib/model-price-history-summary'
 import type {
-  AssetType,
-  Brand,
   MeterBand,
   ModelSummary,
   StockSalesReport,
@@ -34,8 +32,6 @@ export type StockSalesModelRow = ModelIdentity & {
 
 export type StockSalesFilters = {
   band: MeterBand | null
-  brand: Brand | null
-  assetTypes: AssetType[]
   models: ModelSummary[]
 }
 
@@ -87,12 +83,9 @@ function identityOf(item: ModelIdentity): ModelIdentity {
 function buildMatcher(
   filters: StockSalesFilters,
 ): (item: ModelIdentity & { meter_band: MeterBand }) => boolean {
-  const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
   const modelIds = new Set(filters.models.map((m) => m.id))
   return (item) =>
     (filters.band === null || item.meter_band === filters.band) &&
-    (filters.brand === null || item.brand_id === filters.brand.id) &&
-    (assetTypeIds.size === 0 || assetTypeIds.has(item.asset_type_id)) &&
     (modelIds.size === 0 || modelIds.has(item.model_id))
 }
 
@@ -172,5 +165,22 @@ export function buildStockSalesGroups(
       stockByModel.get(sales.model_id) ?? { ...identityOf(sales), ...NOTHING_ON_HAND },
       sales.sale_prices,
     ),
+  )
+}
+
+export type StockSalesTotals = {
+  in_stock_count: number
+  held_count: number
+  sales_count: number
+}
+
+export function summarizeStockSales(rows: StockSalesModelRow[]): StockSalesTotals {
+  return rows.reduce(
+    (totals, row) => ({
+      in_stock_count: totals.in_stock_count + row.in_stock_count,
+      held_count: totals.held_count + row.held_count,
+      sales_count: totals.sales_count + row.sales_count,
+    }),
+    { in_stock_count: 0, held_count: 0, sales_count: 0 },
   )
 }

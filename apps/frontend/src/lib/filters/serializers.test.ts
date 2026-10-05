@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Brand, OrgDetail, User, Warehouse } from 'shared-types'
 import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
-import { buildStockSalesPath, departedDrilldownHref, onHandDrilldownHref } from './serializers'
+import { departedDrilldownHref, modelPriceHistoryHref, onHandDrilldownHref } from './serializers'
 
 const ORIGIN = 'https://loon.test'
 
@@ -143,10 +143,17 @@ describe('onHandDrilldownHref', () => {
   })
 })
 
-describe('buildStockSalesPath', () => {
-  it('opens the report with the default brand and no warehouse', () => {
-    const params = parse(buildStockSalesPath(CANON, null)).searchParams
-    expect(params.has('wh')).toBe(false)
-    expect(params.get('brand')).toBe('7')
+describe('modelPriceHistoryHref', () => {
+  it('carries a 1- or 12-month window', () => {
+    for (const months of [1, 12] as const) {
+      const params = parse(modelPriceHistoryHref(90, months)).searchParams
+      expect(params.get('model')).toBe('90')
+      expect(params.get('range')).toBe(String(months))
+    }
+  })
+
+  it('leaves out the default 6-month window', () => {
+    const params = parse(modelPriceHistoryHref(90, 6)).searchParams
+    expect(params.has('range')).toBe(false)
   })
 })

@@ -6,7 +6,11 @@ import {
   getToday,
   getDefaultYear,
 } from '@/lib/filters/defaults'
-import { FILTER_PARSERS } from '@/lib/filters/parsers'
+import {
+  DEFAULT_SALES_WINDOW_MONTHS,
+  FILTER_PARSERS,
+  type SalesWindowMonths,
+} from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
 import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
@@ -25,7 +29,6 @@ const HELD_DRILLDOWN_COLUMN_IDS = [
 const HELD_DRILLDOWN_SORT = { id: 'days_held', desc: true } as const
 
 const STORE_LIST_PATH = '/store'
-const STOCK_SALES_PATH = '/reports/stock-sales'
 const ONHAND_PATH = '/search/onhand'
 const DEPARTED_PATH = '/search/departed'
 export const MODEL_PRICE_HISTORY_PATH = '/reports/model-price-history'
@@ -42,10 +45,6 @@ const BAND_BOUNDS = {
 
 const serializeWarehouse = createSerializer({ warehouse: FILTER_PARSERS.warehouse })
 const serializeAssetSearch = createSerializer({ wh: FILTER_PARSERS.wh, type: FILTER_PARSERS.type })
-const serializeStockSales = createSerializer({
-  brand: FILTER_PARSERS.brand,
-  type: FILTER_PARSERS.type,
-})
 const serializeDrilldown = createSerializer({
   wh: FILTER_PARSERS.wh,
   brand: FILTER_PARSERS.brand,
@@ -72,7 +71,10 @@ const serializeDateRange = createSerializer({ from: FILTER_PARSERS.from, to: FIL
 const serializeProfitability = createSerializer({
   year: FILTER_PARSERS.year,
 })
-const serializeModel = createSerializer({ model: FILTER_PARSERS.model })
+const serializePriceHistory = createSerializer({
+  model: FILTER_PARSERS.model,
+  range: FILTER_PARSERS.range,
+})
 const serializeModels = createSerializer({ models: FILTER_PARSERS.models })
 const serializeHeld = createSerializer({
   heldfor: FILTER_PARSERS.heldfor,
@@ -95,13 +97,6 @@ export function buildStorePartPath(partId: number, warehouseId: number | null): 
   const path = `${STORE_LIST_PATH}/${partId}`
   if (warehouseId === null) return path
   return serializeWarehouse(path, { warehouse: [warehouseId] })
-}
-
-export function buildStockSalesPath(brand: Brand | null, assetType: AssetType | null): string {
-  return serializeStockSales(STOCK_SALES_PATH, {
-    brand: brand?.id ?? null,
-    type: assetType ? [assetType.id] : null,
-  })
 }
 
 export function onHandDrilldownHref(params: {
@@ -140,8 +135,11 @@ export function departedDrilldownHref(params: {
   })
 }
 
-export function modelPriceHistoryHref(modelId: number): string {
-  return serializeModel(MODEL_PRICE_HISTORY_PATH, { model: modelId })
+export function modelPriceHistoryHref(modelId: number, months: SalesWindowMonths): string {
+  return serializePriceHistory(MODEL_PRICE_HISTORY_PATH, {
+    model: modelId,
+    range: months === DEFAULT_SALES_WINDOW_MONTHS ? null : months,
+  })
 }
 
 export function buildOnHandModelPath(modelId: number): string {

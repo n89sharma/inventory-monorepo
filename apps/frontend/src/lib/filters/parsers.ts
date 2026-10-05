@@ -21,6 +21,9 @@ export const COLS_PARAM_KEY = 'cols'
 
 const MONTH_END_REPORT_VIEWS = ['summary', 'assets'] as const
 export type MonthEndReportView = (typeof MONTH_END_REPORT_VIEWS)[number]
+export const SALES_WINDOW_OPTIONS = [1, 6, 12] as const
+export type SalesWindowMonths = (typeof SALES_WINDOW_OPTIONS)[number]
+export const DEFAULT_SALES_WINDOW_MONTHS: SalesWindowMonths = 6
 const STOCK_SALES_MODES = ['stock', 'sold'] as const
 export type StockSalesMode = (typeof STOCK_SALES_MODES)[number]
 

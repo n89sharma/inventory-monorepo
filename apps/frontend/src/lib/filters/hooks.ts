@@ -16,9 +16,12 @@ import {
   getToday,
 } from '@/lib/filters/defaults'
 import {
+  DEFAULT_SALES_WINDOW_MONTHS,
   FILTER_PARSERS,
   parseAsIdList,
+  SALES_WINDOW_OPTIONS,
   type MonthEndReportView,
+  type SalesWindowMonths,
   type StockSalesMode,
 } from '@/lib/filters/parsers'
 import type { InvoiceTypeFilter } from '@/ui-types/invoice-form-types'
@@ -53,9 +56,6 @@ const MIN_MODEL_INPUT_QUERY_LENGTH = 3
 const toCommittedQuery = (text: string): string =>
   text.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? text : ''
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
-
-export type SalesWindowMonths = 6 | 12
-const DEFAULT_SALES_WINDOW_MONTHS: SalesWindowMonths = 6
 
 const ID_LIST_DEFAULT: number[] = []
 const NO_MODELS: ModelSummary[] = []
@@ -430,9 +430,9 @@ export function useSpecsVisibleParam(): [boolean, (next: boolean) => void] {
 
 export function useSalesWindowParam(): [SalesWindowMonths, (next: SalesWindowMonths) => void] {
   const [raw, setRaw] = useQueryState('range', FILTER_PARSERS.range)
-  const range: SalesWindowMonths = raw === 12 ? 12 : DEFAULT_SALES_WINDOW_MONTHS
+  const range = SALES_WINDOW_OPTIONS.find((option) => option === raw) ?? DEFAULT_SALES_WINDOW_MONTHS
   const setRange = useCallback(
-    (next: SalesWindowMonths) => void setRaw(next === 12 ? 12 : null),
+    (next: SalesWindowMonths) => void setRaw(next === DEFAULT_SALES_WINDOW_MONTHS ? null : next),
     [setRaw],
   )
   return [range, setRange]

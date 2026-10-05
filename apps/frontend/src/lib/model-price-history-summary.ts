@@ -1,4 +1,4 @@
-import type { SalesWindowMonths } from '@/lib/filters/hooks'
+import type { SalesWindowMonths } from '@/lib/filters/parsers'
 import { formatDateParam } from '@/lib/date-param'
 import { isBefore, parseISO, startOfDay, subMonths } from 'date-fns'
 import type { ModelPriceHistoryRow } from 'shared-types'

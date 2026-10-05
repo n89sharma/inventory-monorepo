@@ -1,26 +1,29 @@
 import { GridPageContent } from '@/components/app-layout/page-content'
-import { AssetTypeFilter } from '@/components/shared/filters/asset-type-filter'
-import { BrandFilter } from '@/components/shared/filters/brand-filter'
 import { MeterBandFilter } from '@/components/shared/filters/meter-band-filter'
 import { ModelsFilter } from '@/components/shared/filters/models-filter'
+import { SalesWindowToggle } from '@/components/shared/filters/sales-window-toggle'
+import { SummaryField } from '@/components/shared/cards/summary-field'
 import { FilterRow } from '@/components/shared/filter-row'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
-import { STOCK_SALES_COLUMNS } from './stock-sales-table-columns'
+import { createStockSalesColumns } from './stock-sales-table-columns'
 import { DataGrid } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
 import { useStockSalesReport } from '@/hooks/use-stock-sales-report'
 import {
-  useAssetTypesParam,
-  useBrandParam,
   useMeterBandParam,
   useModelsParam,
+  useSalesWindowParam,
   useStockSalesModeParam,
 } from '@/lib/filters/hooks'
-import type { StockSalesMode } from '@/lib/filters/parsers'
+import type { SalesWindowMonths, StockSalesMode } from '@/lib/filters/parsers'
 import { onHandDrilldownHref } from '@/lib/filters/serializers'
-import { buildStockSalesGroups, type StockSalesModelRow } from '@/lib/stock-sales-grouping'
+import {
+  buildStockSalesGroups,
+  summarizeStockSales,
+  type StockSalesModelRow,
+} from '@/lib/stock-sales-grouping'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
@@ -36,10 +39,29 @@ const DEFAULT_SORTS = {
   stock: { id: 'in_stock_count', desc: true },
   sold: { id: 'sales_count', desc: true },
 } as const satisfies Record<StockSalesMode, { id: string; desc: boolean }>
-const EMPTY_MESSAGES = {
-  stock: 'No on-hand assets match these filters.',
-  sold: 'No sales in the last 6 months match these filters.',
-} as const satisfies Record<StockSalesMode, string>
+const NO_STOCK_MESSAGE = 'No on-hand assets match these filters.'
+
+function emptyMessage(mode: StockSalesMode, months: SalesWindowMonths): string {
+  if (mode === STOCK_MODE) return NO_STOCK_MESSAGE
+  return `No sales in the last ${months} mo match these filters.`
+}
+
+function StockSalesSummaryStrip({
+  rows,
+  canViewSale,
+}: {
+  rows: StockSalesModelRow[]
+  canViewSale: boolean
+}): React.JSX.Element {
+  const totals = summarizeStockSales(rows)
+  return (
+    <div className="flex w-full shrink-0 flex-wrap items-baseline gap-x-6 gap-y-1 px-2 py-1">
+      <SummaryField label="Total In Stock" value={String(totals.in_stock_count)} />
+      <SummaryField label="Total Held" value={String(totals.held_count)} />
+      {canViewSale && <SummaryField label="Total Sales" value={String(totals.sales_count)} />}
+    </div>
+  )
+}
 
 function StockSalesModeToggle({
   mode,
@@ -67,27 +89,34 @@ function StockSalesModeToggle({
 
 function StockSalesBody({
   mode,
+  months,
   rows,
   isLoading,
   columnVisibility,
   getRowHref,
 }: {
   mode: StockSalesMode
+  months: SalesWindowMonths
   rows: StockSalesModelRow[]
   isLoading: boolean
   columnVisibility: VisibilityState
   getRowHref: (row: StockSalesModelRow) => string
 }): React.JSX.Element | null {
+  const columns = useMemo(() => createStockSalesColumns(months), [months])
   if (rows.length === 0) {
     if (isLoading) return null
-    return <p className="py-16 text-center text-sm text-muted-foreground">{EMPTY_MESSAGES[mode]}</p>
+    return (
+      <p className="py-16 text-center text-sm text-muted-foreground">
+        {emptyMessage(mode, months)}
+      </p>
+    )
   }
 
   return (
     <DataGrid
       key={mode}
       label={TABLE_LABEL}
-      columns={STOCK_SALES_COLUMNS}
+      columns={columns}
       data={rows}
       defaultSort={DEFAULT_SORTS[mode]}
       getRowHref={getRowHref}
@@ -98,19 +127,18 @@ function StockSalesBody({
 
 export function StockSalesReportPage(): React.JSX.Element {
   const [requestedMode, setMode] = useStockSalesModeParam()
+  const [months, setMonths] = useSalesWindowParam()
   const [band, setBand] = useMeterBandParam()
-  const [brand, setBrand] = useBrandParam()
-  const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
   const canViewPurchase = useCan('view_purchase_price')
   const canViewSale = useCan('view_sale_price')
   const mode = canViewSale ? requestedMode : STOCK_MODE
 
-  const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport()
+  const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport(months)
   const visibleRows = useMemo(
-    () => buildStockSalesGroups(report, { band, brand, assetTypes, models }, mode),
-    [report, band, brand, assetTypes, models, mode],
+    () => buildStockSalesGroups(report, { band, models }, mode),
+    [report, band, models, mode],
   )
   const getRowHref = useCallback(
     (row: StockSalesModelRow) => onHandDrilldownHref({ row, band }),
@@ -147,13 +175,13 @@ export function StockSalesReportPage(): React.JSX.Element {
         <form onSubmit={(e) => e.preventDefault()}>
           <FilterRow>
             {canViewSale && <StockSalesModeToggle mode={mode} onModeChange={setMode} />}
-            <MeterBandFilter selection={band} onSelectionChange={setBand} />
-            <BrandFilter
-              selection={brand}
-              onSelectionChange={setBrand}
-              onClear={() => setBrand(null)}
-            />
-            <AssetTypeFilter selection={assetTypes} onSelectionChange={setAssetTypes} />
+            {canViewSale && (
+              <SalesWindowToggle
+                months={months}
+                onMonthsChange={setMonths}
+                getLabel={(option) => `${option} mo`}
+              />
+            )}
             <ModelsFilter
               selection={models}
               query={modelQuery}
@@ -161,14 +189,17 @@ export function StockSalesReportPage(): React.JSX.Element {
               onQueryChange={setModelQuery}
               onClear={clearModels}
             />
+            <MeterBandFilter selection={band} onSelectionChange={setBand} />
           </FilterRow>
         </form>
       </GridPageHeader>
       <div
         className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
+        <StockSalesSummaryStrip rows={visibleRows} canViewSale={canViewSale} />
         <StockSalesBody
           mode={mode}
+          months={months}
           rows={visibleRows}
           isLoading={isLoading}
           columnVisibility={columnVisibility}

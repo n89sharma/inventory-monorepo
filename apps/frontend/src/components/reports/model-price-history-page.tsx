@@ -1,5 +1,6 @@
 import { GridPageContent, PageSection } from '@/components/app-layout/page-content'
 import { ModelFilter } from '@/components/shared/filters/model-filter'
+import { SalesWindowToggle } from '@/components/shared/filters/sales-window-toggle'
 import { FilterRow } from '@/components/shared/filter-row'
 import { createModelPriceHistoryColumns } from './model-price-history-table-columns'
 import { Button } from '@/components/shadcn/button'
@@ -13,17 +14,12 @@ import {
   TableRow,
 } from '@/components/shadcn/table'
 import { Toggle } from '@/components/shadcn/toggle'
-import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { SavedViewsButton } from '@/components/shared/saved-views-button'
 import { ShareButton } from '@/components/shared/share-button'
 import { useModelPriceHistory } from '@/hooks/use-model-price-history'
-import {
-  useModelParam,
-  useSalesWindowParam,
-  useSpecsVisibleParam,
-  type SalesWindowMonths,
-} from '@/lib/filters/hooks'
+import { useModelParam, useSalesWindowParam, useSpecsVisibleParam } from '@/lib/filters/hooks'
+import type { SalesWindowMonths } from '@/lib/filters/parsers'
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
 import { formatDateOnly, formatMonthYear, formatUSD } from '@/lib/formatters'
 import { filterByMonths, summarizeBands, type BandSummary } from '@/lib/model-price-history-summary'
@@ -39,7 +35,6 @@ import type { ModelPriceHistoryResult, ModelPriceHistoryRow, ModelSummary } from
 const TABLE_LABEL = 'Model price history'
 
 const EMPTY_SALES: ModelPriceHistoryRow[] = []
-const RANGE_OPTIONS = [6, 12] as const satisfies readonly SalesWindowMonths[]
 const NO_MEDIAN = '—'
 
 const SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
@@ -207,8 +202,13 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
 
   const sales12 = data?.sales ?? EMPTY_SALES
   const sales6 = useMemo(() => filterByMonths(sales12, 6), [sales12])
-  const rangeCounts = { 6: sales6.length, 12: sales12.length }
-  const visibleSales = range === 6 ? sales6 : sales12
+  const sales1 = useMemo(() => filterByMonths(sales12, 1), [sales12])
+  const salesByWindow: Record<SalesWindowMonths, ModelPriceHistoryRow[]> = {
+    1: sales1,
+    6: sales6,
+    12: sales12,
+  }
+  const visibleSales = salesByWindow[range]
   const bands = useMemo(() => summarizeBands(visibleSales), [visibleSales])
 
   const inStockHref = model ? buildOnHandModelPath(model.id) : ''
@@ -260,22 +260,11 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
               placeholder="Model *"
             />
 
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              value={String(range)}
-              onValueChange={(value) => {
-                if (value === '') return
-                setRange(value === '12' ? 12 : 6)
-              }}
-              aria-label="Price history range"
-            >
-              {RANGE_OPTIONS.map((option) => (
-                <ToggleGroupItem key={option} value={String(option)}>
-                  {option} mo ({rangeCounts[option]})
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+            <SalesWindowToggle
+              months={range}
+              onMonthsChange={setRange}
+              getLabel={(option) => `${option} mo (${salesByWindow[option].length})`}
+            />
 
             <Toggle
               variant="outline"

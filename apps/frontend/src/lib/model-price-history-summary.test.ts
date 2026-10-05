@@ -29,7 +29,16 @@ function bandByName(sales: ModelPriceHistoryRow[], name: string) {
   return summarizeBands(sales).find((band) => band.name === name)
 }
 
+const ONE_MONTH_WINDOW_START = '2026-09-05'
+const DAY_BEFORE_ONE_MONTH_WINDOW_START = '2026-09-04'
+
 describe('filterByMonths', () => {
+  it('includes a sale on a 1-month window start date and excludes one the day before', () => {
+    const onStart = sale(500, LOW_METER, ONE_MONTH_WINDOW_START)
+    const dayBefore = sale(700, LOW_METER, DAY_BEFORE_ONE_MONTH_WINDOW_START)
+    expect(filterByMonths([onStart, dayBefore], 1, NOW)).toEqual([onStart])
+  })
+
   it('includes a sale on the window start date and excludes one the day before', () => {
     const onStart = sale(500, LOW_METER, WINDOW_START)
     const dayBefore = sale(700, LOW_METER, DAY_BEFORE_WINDOW_START)
