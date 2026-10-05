@@ -1,12 +1,14 @@
 import { GridPageContent } from '@/components/app-layout/page-content'
 import { MeterBandFilter } from '@/components/shared/filters/meter-band-filter'
 import { ModelsFilter } from '@/components/shared/filters/models-filter'
+import { AssetTypeFilterGroup } from '@/components/shared/filters/asset-type-filter-group'
+import { TableToolbarEnd } from '@/components/shared/table-toolbar'
 import { SalesWindowToggle } from '@/components/shared/filters/sales-window-toggle'
 import { SummaryField } from '@/components/shared/cards/summary-field'
 import { FilterRow } from '@/components/shared/filter-row'
 import { ToggleGroup, ToggleGroupItem } from '@/components/shadcn/toggle-group'
 import { createStockSalesColumns } from './stock-sales-table-columns'
-import { DataGrid } from '@/components/shared/data-table'
+import { DataGridWithoutResultCount } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
@@ -17,7 +19,14 @@ import {
   useSalesWindowParam,
   useStockSalesModeParam,
 } from '@/lib/filters/hooks'
-import type { SalesWindowMonths, StockSalesMode } from '@/lib/filters/parsers'
+import {
+  countAssetTypes,
+  filterAssetsByType,
+  resolveAssetTypeFilter,
+  type AssetTypeCounts,
+  type AssetTypeFilter,
+} from '@/lib/asset-type-filter'
+import { FILTER_PARSERS, type SalesWindowMonths, type StockSalesMode } from '@/lib/filters/parsers'
 import { onHandDrilldownHref } from '@/lib/filters/serializers'
 import {
   buildStockSalesGroups,
@@ -27,10 +36,12 @@ import {
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
+import { useQueryState } from 'nuqs'
 import { useCallback, useMemo } from 'react'
 import type { StockSalesReport } from 'shared-types'
 
 const TABLE_LABEL = 'Stock & sales'
+const ASSET_TYPE_PARAM_KEY = 'asset_type'
 
 const EMPTY_REPORT: StockSalesReport = { stock: [], sale_prices: null }
 const STOCK_MODE: StockSalesMode = 'stock'
@@ -91,6 +102,10 @@ function StockSalesBody({
   mode,
   months,
   rows,
+  hasRowsOfAnyType,
+  assetTypeFilter,
+  assetTypeCounts,
+  onAssetTypeFilterChange,
   isLoading,
   columnVisibility,
   getRowHref,
@@ -98,12 +113,16 @@ function StockSalesBody({
   mode: StockSalesMode
   months: SalesWindowMonths
   rows: StockSalesModelRow[]
+  hasRowsOfAnyType: boolean
+  assetTypeFilter: AssetTypeFilter
+  assetTypeCounts: AssetTypeCounts
+  onAssetTypeFilterChange: (next: AssetTypeFilter) => void
   isLoading: boolean
   columnVisibility: VisibilityState
   getRowHref: (row: StockSalesModelRow) => string
 }): React.JSX.Element | null {
   const columns = useMemo(() => createStockSalesColumns(months), [months])
-  if (rows.length === 0) {
+  if (!hasRowsOfAnyType) {
     if (isLoading) return null
     return (
       <p className="py-16 text-center text-sm text-muted-foreground">
@@ -113,7 +132,7 @@ function StockSalesBody({
   }
 
   return (
-    <DataGrid
+    <DataGridWithoutResultCount
       key={mode}
       label={TABLE_LABEL}
       columns={columns}
@@ -121,6 +140,15 @@ function StockSalesBody({
       defaultSort={DEFAULT_SORTS[mode]}
       getRowHref={getRowHref}
       columnVisibility={columnVisibility}
+      renderToolbar={() => (
+        <TableToolbarEnd>
+          <AssetTypeFilterGroup
+            value={assetTypeFilter}
+            counts={assetTypeCounts}
+            onValueChange={onAssetTypeFilterChange}
+          />
+        </TableToolbarEnd>
+      )}
     />
   )
 }
@@ -136,10 +164,23 @@ export function StockSalesReportPage(): React.JSX.Element {
   const mode = canViewSale ? requestedMode : STOCK_MODE
 
   const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport(months)
-  const visibleRows = useMemo(
+  const [assetTypeParam, setAssetTypeParam] = useQueryState(
+    ASSET_TYPE_PARAM_KEY,
+    FILTER_PARSERS.asset_type,
+  )
+  const rowsOfAnyType = useMemo(
     () => buildStockSalesGroups(report, { band, models }, mode),
     [report, band, models, mode],
   )
+  const assetTypeCounts = useMemo(() => countAssetTypes(rowsOfAnyType), [rowsOfAnyType])
+  const defaultAssetTypeFilter = resolveAssetTypeFilter(null, assetTypeCounts)
+  const assetTypeFilter = resolveAssetTypeFilter(assetTypeParam, assetTypeCounts)
+  const visibleRows = useMemo(
+    () => filterAssetsByType(rowsOfAnyType, assetTypeFilter),
+    [rowsOfAnyType, assetTypeFilter],
+  )
+  const handleAssetTypeFilterChange = (newFilter: AssetTypeFilter) =>
+    void setAssetTypeParam(newFilter === defaultAssetTypeFilter ? null : newFilter)
   const getRowHref = useCallback(
     (row: StockSalesModelRow) => onHandDrilldownHref({ row, band }),
     [band],
@@ -201,6 +242,10 @@ export function StockSalesReportPage(): React.JSX.Element {
           mode={mode}
           months={months}
           rows={visibleRows}
+          hasRowsOfAnyType={rowsOfAnyType.length > 0}
+          assetTypeFilter={assetTypeFilter}
+          assetTypeCounts={assetTypeCounts}
+          onAssetTypeFilterChange={handleAssetTypeFilterChange}
           isLoading={isLoading}
           columnVisibility={columnVisibility}
           getRowHref={getRowHref}
