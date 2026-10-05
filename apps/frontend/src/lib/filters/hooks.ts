@@ -54,8 +54,8 @@ const toCommittedQuery = (text: string): string =>
   text.length >= MIN_MODEL_INPUT_QUERY_LENGTH ? text : ''
 const DEFAULT_FILTER_DEBOUNCE_MS = 600
 
-export type PriceHistoryRange = 6 | 12
-const DEFAULT_PRICE_HISTORY_RANGE: PriceHistoryRange = 6
+export type SalesWindowMonths = 6 | 12
+const DEFAULT_SALES_WINDOW_MONTHS: SalesWindowMonths = 6
 
 const ID_LIST_DEFAULT: number[] = []
 const NO_MODELS: ModelSummary[] = []
@@ -428,14 +428,11 @@ export function useSpecsVisibleParam(): [boolean, (next: boolean) => void] {
   return [on, setValue]
 }
 
-export function usePriceHistoryRangeParam(): [
-  PriceHistoryRange,
-  (next: PriceHistoryRange) => void,
-] {
+export function useSalesWindowParam(): [SalesWindowMonths, (next: SalesWindowMonths) => void] {
   const [raw, setRaw] = useQueryState('range', FILTER_PARSERS.range)
-  const range: PriceHistoryRange = raw === 12 ? 12 : DEFAULT_PRICE_HISTORY_RANGE
+  const range: SalesWindowMonths = raw === 12 ? 12 : DEFAULT_SALES_WINDOW_MONTHS
   const setRange = useCallback(
-    (next: PriceHistoryRange) => void setRaw(next === 12 ? 12 : null),
+    (next: SalesWindowMonths) => void setRaw(next === 12 ? 12 : null),
     [setRaw],
   )
   return [range, setRange]

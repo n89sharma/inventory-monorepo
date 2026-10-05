@@ -20,9 +20,9 @@ import { ShareButton } from '@/components/shared/share-button'
 import { useModelPriceHistory } from '@/hooks/use-model-price-history'
 import {
   useModelParam,
-  usePriceHistoryRangeParam,
+  useSalesWindowParam,
   useSpecsVisibleParam,
-  type PriceHistoryRange,
+  type SalesWindowMonths,
 } from '@/lib/filters/hooks'
 import { buildOnHandModelPath } from '@/lib/filters/serializers'
 import { formatDateOnly, formatMonthYear, formatUSD } from '@/lib/formatters'
@@ -39,7 +39,7 @@ import type { ModelPriceHistoryResult, ModelPriceHistoryRow, ModelSummary } from
 const TABLE_LABEL = 'Model price history'
 
 const EMPTY_SALES: ModelPriceHistoryRow[] = []
-const RANGE_OPTIONS = [6, 12] as const satisfies readonly PriceHistoryRange[]
+const RANGE_OPTIONS = [6, 12] as const satisfies readonly SalesWindowMonths[]
 const NO_MEDIAN = '—'
 
 const SPEC_COLUMN_IDS = ['cassettes', 'internal_finisher', 'core_functions'] as const
@@ -102,7 +102,7 @@ function RangeSentence({
   range,
 }: {
   count: number
-  range: PriceHistoryRange
+  range: SalesWindowMonths
 }): React.JSX.Element {
   const now = new Date()
   const from = formatMonthYear(subMonths(now, range))
@@ -129,7 +129,7 @@ function EmptyWindowState({
   range,
   lastSale,
 }: {
-  range: PriceHistoryRange
+  range: SalesWindowMonths
   lastSale: ModelPriceHistoryRow | null
 }): React.JSX.Element {
   return (
@@ -152,7 +152,7 @@ function ModelPriceHistoryResults({
 }: {
   data: ModelPriceHistoryResult | undefined
   model: ModelSummary | null
-  range: PriceHistoryRange
+  range: SalesWindowMonths
   visibleSales: ModelPriceHistoryRow[]
   bands: BandSummary[]
   inStockHref: string
@@ -200,7 +200,7 @@ export function ModelPriceHistoryPage(): React.JSX.Element {
   const [modelQuery, setModelQuery] = useState('')
 
   const [model, setModel] = useModelParam()
-  const [range, setRange] = usePriceHistoryRangeParam()
+  const [range, setRange] = useSalesWindowParam()
   const [specsVisible, setSpecsVisible] = useSpecsVisibleParam()
 
   const { data, isLoading } = useModelPriceHistory(model?.id ?? null)

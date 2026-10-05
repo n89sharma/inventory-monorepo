@@ -1,4 +1,4 @@
-import type { PriceHistoryRange } from '@/lib/filters/hooks'
+import type { SalesWindowMonths } from '@/lib/filters/hooks'
 import { formatDateParam } from '@/lib/date-param'
 import { isBefore, parseISO, startOfDay, subMonths } from 'date-fns'
 import type { ModelPriceHistoryRow } from 'shared-types'
@@ -25,13 +25,13 @@ export type BandSummary = {
   saleMedian: number | null
 }
 
-export function salesWindowStart(months: PriceHistoryRange, now: Date = new Date()): string {
+export function salesWindowStart(months: SalesWindowMonths, now: Date = new Date()): string {
   return formatDateParam(startOfDay(subMonths(now, months)))
 }
 
 export function filterByMonths(
   sales: ModelPriceHistoryRow[],
-  months: PriceHistoryRange,
+  months: SalesWindowMonths,
   now: Date = new Date(),
 ): ModelPriceHistoryRow[] {
   const windowStart = parseISO(salesWindowStart(months, now))
