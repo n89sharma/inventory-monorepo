@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const METER_BAND = ['UNKNOWN', 'LOW', 'MEDIUM', 'HIGH'] as const
 export type MeterBand = (typeof METER_BAND)[number]
 
-export const InStockSummaryRowSchema = z.object({
+export const StockSalesRowSchema = z.object({
   warehouse_id: z.number().int(),
   brand_id: z.number().int(),
   brand_name: z.string(),
@@ -19,17 +19,17 @@ export const InStockSummaryRowSchema = z.object({
   in_stock_count: z.number().int(),
   held_count: z.number().int(),
 })
-export type InStockSummaryRow = z.infer<typeof InStockSummaryRowSchema>
+export type StockSalesRow = z.infer<typeof StockSalesRowSchema>
 
-export const InStockSalePriceGroupSchema = z.object({
+export const StockSalesSalePriceGroupSchema = z.object({
   model_id: z.number().int(),
   meter_band: z.enum(METER_BAND),
   sale_prices: z.array(z.number()),
 })
-export type InStockSalePriceGroup = z.infer<typeof InStockSalePriceGroupSchema>
+export type StockSalesSalePriceGroup = z.infer<typeof StockSalesSalePriceGroupSchema>
 
-export const InStockSummaryReportSchema = z.object({
-  stock: z.array(InStockSummaryRowSchema),
-  sale_prices: z.array(InStockSalePriceGroupSchema).nullable(),
+export const StockSalesReportSchema = z.object({
+  stock: z.array(StockSalesRowSchema),
+  sale_prices: z.array(StockSalesSalePriceGroupSchema).nullable(),
 })
-export type InStockSummaryReport = z.infer<typeof InStockSummaryReportSchema>
+export type StockSalesReport = z.infer<typeof StockSalesReportSchema>

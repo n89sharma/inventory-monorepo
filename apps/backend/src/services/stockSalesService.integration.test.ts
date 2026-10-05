@@ -19,12 +19,12 @@ import { prisma } from '../prisma.js'
 import { patchAssetPricing } from './assetPricingService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
 import { createHold } from './holdService.js'
-import { getInStockSummaryReport } from './inStockSummaryService.js'
+import { getStockSalesReport } from './stockSalesService.js'
 
 const SALES_FROM = '2026-04-05'
 const DAY_BEFORE_SALES_FROM = '2026-04-04'
 
-describe('inStockSummaryService', () => {
+describe('stockSalesService', () => {
   let refs: ArrivalTestData
 
   async function sell(salePrice: number, departureDate: string, meterBlack: number | null) {
@@ -52,7 +52,7 @@ describe('inStockSummaryService', () => {
   }
 
   async function salePricesByBand() {
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     return Object.fromEntries(
       (report.sale_prices ?? [])
         .filter((group) => group.model_id === refs.model.id)
@@ -76,7 +76,7 @@ describe('inStockSummaryService', () => {
     const assets = await createArrivedAssets(refs, 3)
     await createLoadedDeparture(refs, [{ id: assets[0].id, outgoing_status: OUTGOING_STATUS.SOLD }])
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const total = report.stock.reduce((sum, row) => sum + (row.in_stock_count ?? 0), 0)
     expect(total).toBe(2)
   })
@@ -89,7 +89,7 @@ describe('inStockSummaryService', () => {
       refs.userId,
     )
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id && r.meter_band === 'HIGH')
     expect(row?.in_stock_count).toBe(1)
   })
@@ -100,7 +100,7 @@ describe('inStockSummaryService', () => {
     await seedAssetCost(second.id)
     await seedAssetCost(uncosted.id, REDACTED_ASSET_COST)
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({
       in_stock_count: 3,
@@ -115,7 +115,7 @@ describe('inStockSummaryService', () => {
     const [asset] = await createArrivedAssets(refs, 1)
     await seedAssetCost(asset.id)
 
-    const report = await getInStockSummaryReport(SALES_FROM, NO_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, NO_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({ purchase_cost_sum: null, total_cost_sum: null })
   })
@@ -124,7 +124,7 @@ describe('inStockSummaryService', () => {
     await createArrivedAssets(refs, 2)
     await createArrivedAssets({ ...refs, warehouse: refs.warehouse2 }, 1)
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const counts = Object.fromEntries(
       report.stock
         .filter((r) => r.model_id === refs.model.id)
@@ -172,7 +172,7 @@ describe('inStockSummaryService', () => {
     await createArrivedAssets(refs, 1)
     await sell(500, SALES_FROM, 10000)
 
-    const report = await getInStockSummaryReport(SALES_FROM, PURCHASE_PRICE_ONLY)
+    const report = await getStockSalesReport(SALES_FROM, PURCHASE_PRICE_ONLY)
     expect(report.sale_prices).toBeNull()
     expect(report.stock.find((r) => r.model_id === refs.model.id)?.in_stock_count).toBe(1)
   })
@@ -181,7 +181,7 @@ describe('inStockSummaryService', () => {
     const [held, ...inStock] = await createArrivedAssets(refs, 3)
     await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({ in_stock_count: inStock.length, held_count: 1 })
   })
@@ -190,7 +190,7 @@ describe('inStockSummaryService', () => {
     const [held] = await createArrivedAssets(refs, 1)
     await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({ in_stock_count: 0, held_count: 1 })
   })
@@ -201,7 +201,7 @@ describe('inStockSummaryService', () => {
     await seedAssetCost(inStock.id)
     await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
 
-    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const report = await getStockSalesReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({
       purchase_cost_sum: (SEEDED_ASSET_COST.purchase_cost ?? 0) * 2,

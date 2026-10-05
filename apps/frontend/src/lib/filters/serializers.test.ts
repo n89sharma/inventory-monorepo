@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { Brand, OrgDetail, User, Warehouse } from 'shared-types'
-import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
+import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
-import { buildInStockSummaryPath, departedDrilldownHref, inStockDrilldownHref } from './serializers'
+import { buildStockSalesPath, departedDrilldownHref, onHandDrilldownHref } from './serializers'
 
 const ORIGIN = 'https://loon.test'
 
@@ -106,7 +106,7 @@ describe('departedDrilldownHref', () => {
   })
 })
 
-const IRADX_ROW: InStockSummaryModelRow = {
+const IRADX_ROW: StockSalesModelRow = {
   brand_id: 7,
   brand_name: 'Canon',
   asset_type_id: 4,
@@ -122,24 +122,24 @@ const IRADX_ROW: InStockSummaryModelRow = {
   sales_count: 0,
 }
 
-describe('inStockDrilldownHref', () => {
+describe('onHandDrilldownHref', () => {
   it('carries the selected warehouse', () => {
     const params = parse(
-      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [warehouse(3)], band: null }),
+      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [warehouse(3)], band: null }),
     ).searchParams
     expect(params.get('wh')).toBe('3')
   })
 
   it('omits the warehouse param when all warehouses are selected', () => {
     const params = parse(
-      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band: null }),
+      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band: null }),
     ).searchParams
     expect(params.has('wh')).toBe(false)
   })
 
   it("carries the selected band's meter range", () => {
     const params = parse(
-      inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band: 'MEDIUM' }),
+      onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band: 'MEDIUM' }),
     ).searchParams
     expect(params.get('meter_min')).toBe(String(METER_BANDS[1].min))
     expect(params.get('meter_max')).toBe(String(METER_BANDS[1].max))
@@ -148,7 +148,7 @@ describe('inStockDrilldownHref', () => {
   it('carries no meter range for all bands or the unknown band', () => {
     for (const band of [null, 'UNKNOWN'] as const) {
       const params = parse(
-        inStockDrilldownHref({ row: IRADX_ROW, warehouses: [], band }),
+        onHandDrilldownHref({ row: IRADX_ROW, warehouses: [], band }),
       ).searchParams
       expect(params.has('meter_min')).toBe(false)
       expect(params.has('meter_max')).toBe(false)
@@ -156,9 +156,9 @@ describe('inStockDrilldownHref', () => {
   })
 })
 
-describe('buildInStockSummaryPath', () => {
+describe('buildStockSalesPath', () => {
   it('opens the report on all warehouses', () => {
-    const params = parse(buildInStockSummaryPath(CANON, null)).searchParams
+    const params = parse(buildStockSalesPath(CANON, null)).searchParams
     expect(params.has('wh')).toBe(false)
     expect(params.get('brand')).toBe('7')
   })

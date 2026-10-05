@@ -5,12 +5,12 @@ import { MeterBandFilter } from '@/components/shared/filters/meter-band-filter'
 import { ModelsFilter } from '@/components/shared/filters/models-filter'
 import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { FilterRow } from '@/components/shared/filter-row'
-import { IN_STOCK_SUMMARY_COLUMNS } from './in-stock-summary-table-columns'
+import { STOCK_SALES_COLUMNS } from './stock-sales-table-columns'
 import { DataGrid } from '@/components/shared/data-table'
 import { GridPageHeader } from '@/components/app-layout/sticky-page-header'
 import { ShareButton } from '@/components/shared/share-button'
 import { useCan } from '@/hooks/use-can'
-import { useInStockSummaryReport } from '@/hooks/use-in-stock-summary-report'
+import { useStockSalesReport } from '@/hooks/use-stock-sales-report'
 import {
   useAssetTypesParam,
   useBrandParam,
@@ -18,11 +18,8 @@ import {
   useModelsParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
-import { inStockDrilldownHref } from '@/lib/filters/serializers'
-import {
-  buildInStockSummaryGroups,
-  type InStockSummaryModelRow,
-} from '@/lib/in-stock-summary-grouping'
+import { onHandDrilldownHref } from '@/lib/filters/serializers'
+import { buildStockSalesGroups, type StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { cn } from '@/lib/utils'
 import { SpinnerGapIcon } from '@phosphor-icons/react'
 import type { VisibilityState } from '@tanstack/react-table'
@@ -30,20 +27,20 @@ import { useCallback, useMemo } from 'react'
 import type {
   AssetType,
   Brand,
-  InStockSalePriceGroup,
-  InStockSummaryReport,
+  StockSalesSalePriceGroup,
+  StockSalesReport,
   MeterBand,
   ModelSummary,
   Warehouse,
 } from 'shared-types'
 
-const TABLE_LABEL = 'In-stock summary'
+const TABLE_LABEL = 'Stock & sales'
 
-const EMPTY_REPORT: InStockSummaryReport = { stock: [], sale_prices: null }
-const NO_SALE_PRICE_GROUPS: InStockSalePriceGroup[] = []
+const EMPTY_REPORT: StockSalesReport = { stock: [], sale_prices: null }
+const NO_SALE_PRICE_GROUPS: StockSalesSalePriceGroup[] = []
 const DEFAULT_SORT = { id: 'in_stock_count', desc: true }
 
-type InStockSummaryFilters = {
+type StockSalesFilters = {
   warehouses: Warehouse[]
   band: MeterBand | null
   brand: Brand | null
@@ -52,9 +49,9 @@ type InStockSummaryFilters = {
 }
 
 function buildFilteredGroups(
-  report: InStockSummaryReport,
-  filters: InStockSummaryFilters,
-): InStockSummaryModelRow[] {
+  report: StockSalesReport,
+  filters: StockSalesFilters,
+): StockSalesModelRow[] {
   const warehouseIds = new Set(filters.warehouses.map((w) => w.id))
   const assetTypeIds = new Set(filters.assetTypes.map((t) => t.id))
   const modelIds = new Set(filters.models.map((m) => m.id))
@@ -66,23 +63,19 @@ function buildFilteredGroups(
       (assetTypeIds.size === 0 || assetTypeIds.has(row.asset_type_id)) &&
       (modelIds.size === 0 || modelIds.has(row.model_id)),
   )
-  return buildInStockSummaryGroups(
-    filtered,
-    report.sale_prices ?? NO_SALE_PRICE_GROUPS,
-    filters.band,
-  )
+  return buildStockSalesGroups(filtered, report.sale_prices ?? NO_SALE_PRICE_GROUPS, filters.band)
 }
 
-function InStockSummaryBody({
+function StockSalesBody({
   rows,
   isLoading,
   columnVisibility,
   getRowHref,
 }: {
-  rows: InStockSummaryModelRow[]
+  rows: StockSalesModelRow[]
   isLoading: boolean
   columnVisibility: VisibilityState
-  getRowHref: (row: InStockSummaryModelRow) => string
+  getRowHref: (row: StockSalesModelRow) => string
 }): React.JSX.Element | null {
   if (rows.length === 0) {
     if (isLoading) return null
@@ -96,7 +89,7 @@ function InStockSummaryBody({
   return (
     <DataGrid
       label={TABLE_LABEL}
-      columns={IN_STOCK_SUMMARY_COLUMNS}
+      columns={STOCK_SALES_COLUMNS}
       data={rows}
       defaultSort={DEFAULT_SORT}
       getRowHref={getRowHref}
@@ -105,20 +98,20 @@ function InStockSummaryBody({
   )
 }
 
-export function InStockSummaryReportPage(): React.JSX.Element {
+export function StockSalesReportPage(): React.JSX.Element {
   const [warehouses, setWarehouses] = useWarehousesParam()
   const [band, setBand] = useMeterBandParam()
   const [brand, setBrand] = useBrandParam()
   const [assetTypes, setAssetTypes] = useAssetTypesParam()
   const { models, modelQuery, setModels, setModelQuery, clear: clearModels } = useModelsParam()
 
-  const { data: report = EMPTY_REPORT, isLoading } = useInStockSummaryReport()
+  const { data: report = EMPTY_REPORT, isLoading } = useStockSalesReport()
   const visibleRows = useMemo(
     () => buildFilteredGroups(report, { warehouses, band, brand, assetTypes, models }),
     [report, warehouses, band, brand, assetTypes, models],
   )
   const getRowHref = useCallback(
-    (row: InStockSummaryModelRow) => inStockDrilldownHref({ row, warehouses, band }),
+    (row: StockSalesModelRow) => onHandDrilldownHref({ row, warehouses, band }),
     [warehouses, band],
   )
 
@@ -140,7 +133,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
       <GridPageHeader>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">In Stock Report</h1>
+            <h1 className="text-2xl font-semibold">Stock &amp; Sales Report</h1>
             {isLoading ? (
               <SpinnerGapIcon
                 className="animate-spin text-muted-foreground"
@@ -174,7 +167,7 @@ export function InStockSummaryReportPage(): React.JSX.Element {
       <div
         className={cn('flex min-h-0 flex-1 flex-col transition-opacity', isLoading && 'opacity-50')}
       >
-        <InStockSummaryBody
+        <StockSalesBody
           rows={visibleRows}
           isLoading={isLoading}
           columnVisibility={columnVisibility}

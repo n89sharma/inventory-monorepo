@@ -1,4 +1,4 @@
-import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
+import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import { formatMarginPercent, formatTitleCase, formatUSDWithSymbol } from '@/lib/formatters'
 import { modelPriceHistoryHref } from '@/lib/filters/serializers'
 import { ArrowSquareOutIcon } from '@phosphor-icons/react'
@@ -10,8 +10,8 @@ function nullsLow(value: number | null): number {
 }
 
 function rowSorter(
-  compare: (a: InStockSummaryModelRow, b: InStockSummaryModelRow) => number,
-): SortingFn<InStockSummaryModelRow> {
+  compare: (a: StockSalesModelRow, b: StockSalesModelRow) => number,
+): SortingFn<StockSalesModelRow> {
   return (a, b) => compare(a.original, b.original)
 }
 
@@ -24,7 +24,7 @@ const sortBySalePrice = rowSorter(
 )
 const sortByMargin = rowSorter((a, b) => nullsLow(a.margin_percent) - nullsLow(b.margin_percent))
 
-function PriceHistoryCell({ row }: { row: Row<InStockSummaryModelRow> }): React.JSX.Element {
+function PriceHistoryCell({ row }: { row: Row<StockSalesModelRow> }): React.JSX.Element {
   const { model_id, model_name } = row.original
   return (
     <Link
@@ -37,7 +37,7 @@ function PriceHistoryCell({ row }: { row: Row<InStockSummaryModelRow> }): React.
   )
 }
 
-export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
+export const STOCK_SALES_COLUMNS: ColumnDef<StockSalesModelRow>[] = [
   {
     accessorKey: 'brand_name',
     header: 'Brand',

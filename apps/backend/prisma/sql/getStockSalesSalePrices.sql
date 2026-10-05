@@ -1,6 +1,6 @@
 -- @param {Int} $1:soldStatusId
 -- @param {String} $2:salesFrom
--- Filters mirror getModelPriceHistory.sql; meter-band thresholds mirror getInStockSummary.sql.
+-- Filters mirror getModelPriceHistory.sql; meter-band thresholds mirror getStockSales.sql.
 select
   a.model_id                       as model_id,
   case

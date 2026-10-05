@@ -3,7 +3,7 @@ import {
   CreateMonthEndReportResultSchema,
   DeleteMonthEndReportsSchema,
   HeldReportSchema,
-  InStockSummaryReportSchema,
+  StockSalesReportSchema,
   MonthEndReportDetailSchema,
   MonthEndReportListSchema,
   MonthEndScheduleSchema,
@@ -13,7 +13,7 @@ import {
   type BrandGroup,
   type DeleteMonthEndReports,
   type HeldReport,
-  type InStockSummaryReport,
+  type StockSalesReport,
   type MonthEndReportDetail,
   type MonthEndReportListItem,
   type MonthEndSchedule,
@@ -83,7 +83,7 @@ export async function getHeldReport(): Promise<HeldReport> {
   return HeldReportSchema.parse(data)
 }
 
-export async function getInStockSummaryReport(salesFrom: string): Promise<InStockSummaryReport> {
-  const { data } = await api.get(`/reports/in-stock-summary`, { params: { salesFrom } })
-  return InStockSummaryReportSchema.parse(data)
+export async function getStockSalesReport(salesFrom: string): Promise<StockSalesReport> {
+  const { data } = await api.get(`/reports/stock-sales`, { params: { salesFrom } })
+  return StockSalesReportSchema.parse(data)
 }

@@ -9,7 +9,7 @@ import {
 import type { ReleaseLinkArea } from 'shared-types'
 
 const ON_HAND_PATH = '/search/onhand'
-const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
+const STOCK_SALES_PATH = '/reports/stock-sales'
 const SETTINGS_PATH = '/settings/models'
 
 export const RELEASE_AREA_LABELS = {
@@ -40,7 +40,7 @@ export function useReleaseAreaHrefs(): Record<ReleaseLinkArea, string> {
     store: buildStoreListPath(defaultWarehouse),
     onhand_assets: buildAssetSearchPath(ON_HAND_PATH, defaultWarehouse, defaultAssetType),
     departed_assets: buildDepartedSearchPath(defaultWarehouse, defaultAssetType),
-    reports: IN_STOCK_SUMMARY_PATH,
+    reports: STOCK_SALES_PATH,
     settings: SETTINGS_PATH,
   }
 }

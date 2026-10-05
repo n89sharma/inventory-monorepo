@@ -30,7 +30,7 @@ import {
   buildAssetSearchPath,
   buildCollectionSummaryPath,
   buildDepartedSearchPath,
-  buildInStockSummaryPath,
+  buildStockSalesPath,
   buildProfitabilityReportPath,
   buildStoreListPath,
 } from '@/lib/filters/serializers'
@@ -52,7 +52,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 const STORE_PATH = '/store'
 const PROFITABILITY_PATH = '/reports/profitability'
-const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
+const STOCK_SALES_PATH = '/reports/stock-sales'
 const MONTH_END_PATH = '/reports/month-end'
 const DEFAULT_BRAND_NAME = 'Canon'
 
@@ -135,7 +135,7 @@ type ReportPermission =
   | 'view_month_end_report'
 
 const REPORTS_SUB_ITEMS = [
-  { title: 'In Stock', url: IN_STOCK_SUMMARY_PATH, permission: 'view_reports' },
+  { title: 'Stock & Sales', url: STOCK_SALES_PATH, permission: 'view_reports' },
   { title: 'Held', url: HELD_REPORT_PATH, permission: 'view_reports' },
   { title: 'Price History', url: MODEL_PRICE_HISTORY_PATH, permission: 'view_sale_price' },
   { title: 'Profitability', url: PROFITABILITY_PATH, permission: 'view_profitability_report' },
@@ -195,8 +195,8 @@ export function AppSidebar(): React.JSX.Element {
 
   function reportItemPath(url: string): string {
     if (url === PROFITABILITY_PATH) return buildProfitabilityReportPath()
-    if (url === IN_STOCK_SUMMARY_PATH) {
-      return buildInStockSummaryPath(defaultBrand, defaultAssetType)
+    if (url === STOCK_SALES_PATH) {
+      return buildStockSalesPath(defaultBrand, defaultAssetType)
     }
     return url
   }

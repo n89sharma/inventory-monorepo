@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { toNumberArray } from '../lib/query-params.js'
 import { getHeldReport as getHeldReportSer } from '../services/heldReportService.js'
-import { getInStockSummaryReport as getInStockSummaryReportSer } from '../services/inStockSummaryService.js'
+import { getStockSalesReport as getStockSalesReportSer } from '../services/stockSalesService.js'
 import { getModelPriceHistory as getModelPriceHistorySer } from '../services/modelPriceHistoryService.js'
 import {
   createManualMonthEndReport as createManualMonthEndReportSer,
@@ -34,7 +34,7 @@ export const ModelPriceHistoryQuerySchema = z.object({
   modelId: z.coerce.number().int().positive(),
 })
 
-export const InStockSummaryQuerySchema = z.object({
+export const StockSalesQuerySchema = z.object({
   salesFrom: z.iso.date(),
 })
 
@@ -99,8 +99,8 @@ export const getHeldReport = asyncHandler(async (req, res) => {
   res.json(successResponse(data))
 })
 
-export const getInStockSummaryReport = asyncHandler(async (req, res) => {
-  const { salesFrom } = res.locals.query as z.infer<typeof InStockSummaryQuerySchema>
-  const data = await getInStockSummaryReportSer(salesFrom, res.locals.permissions)
+export const getStockSalesReport = asyncHandler(async (req, res) => {
+  const { salesFrom } = res.locals.query as z.infer<typeof StockSalesQuerySchema>
+  const data = await getStockSalesReportSer(salesFrom, res.locals.permissions)
   res.json(successResponse(data))
 })

@@ -55,10 +55,6 @@ export * from "./sql/getHeldReport.js"
 
 export * from "./sql/getHolds.js"
 
-export * from "./sql/getInStockSalePrices.js"
-
-export * from "./sql/getInStockSummary.js"
-
 export * from "./sql/getInvoicesForArrival.js"
 
 export * from "./sql/getInvoicesForDeparture.js"
@@ -88,6 +84,10 @@ export * from "./sql/getProfitabilityCube.js"
 export * from "./sql/getPurchaseInvoices.js"
 
 export * from "./sql/getSalesInvoices.js"
+
+export * from "./sql/getStockSales.js"
+
+export * from "./sql/getStockSalesSalePrices.js"
 
 export * from "./sql/getStorePartLedger.js"
 

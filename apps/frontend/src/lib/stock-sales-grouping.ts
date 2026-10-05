@@ -1,5 +1,5 @@
 import { median } from '@/lib/model-price-history-summary'
-import type { InStockSalePriceGroup, InStockSummaryRow, MeterBand } from 'shared-types'
+import type { StockSalesSalePriceGroup, StockSalesRow, MeterBand } from 'shared-types'
 
 type CostTotals = {
   purchase_cost_sum: number | null
@@ -8,8 +8,8 @@ type CostTotals = {
   total_cost_count: number
 }
 
-export type InStockSummaryModelRow = Pick<
-  InStockSummaryRow,
+export type StockSalesModelRow = Pick<
+  StockSalesRow,
   'brand_id' | 'brand_name' | 'asset_type_id' | 'asset_type' | 'model_id' | 'model_name'
 > & {
   in_stock_count: number
@@ -22,7 +22,7 @@ export type InStockSummaryModelRow = Pick<
 }
 
 type ModelAccumulator = Omit<
-  InStockSummaryModelRow,
+  StockSalesModelRow,
   'avg_purchase_cost' | 'avg_total_cost' | 'median_sale_price' | 'margin_percent' | 'sales_count'
 > &
   CostTotals
@@ -45,7 +45,7 @@ function marginPercent(salePrice: number | null, cost: number | null): number | 
 }
 
 function collectSalePrices(
-  salePriceGroups: InStockSalePriceGroup[],
+  salePriceGroups: StockSalesSalePriceGroup[],
   band: MeterBand | null,
 ): Map<number, number[]> {
   const pricesByModel = new Map<number, number[]>()
@@ -61,11 +61,11 @@ function collectSalePrices(
   return pricesByModel
 }
 
-export function buildInStockSummaryGroups(
-  rows: InStockSummaryRow[],
-  salePriceGroups: InStockSalePriceGroup[],
+export function buildStockSalesGroups(
+  rows: StockSalesRow[],
+  salePriceGroups: StockSalesSalePriceGroup[],
   band: MeterBand | null,
-): InStockSummaryModelRow[] {
+): StockSalesModelRow[] {
   const salePricesByModel = collectSalePrices(salePriceGroups, band)
   const groups = new Map<number, ModelAccumulator>()
   for (const row of rows) {

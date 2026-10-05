@@ -137,9 +137,9 @@ const HeldReportPage = lazy(() =>
     default: m.HeldReportPage,
   })),
 )
-const InStockSummaryReportPage = lazy(() =>
-  import('./components/reports/in-stock-summary-report-page').then((m) => ({
-    default: m.InStockSummaryReportPage,
+const StockSalesReportPage = lazy(() =>
+  import('./components/reports/stock-sales-report-page').then((m) => ({
+    default: m.StockSalesReportPage,
   })),
 )
 const MonthEndReportsPage = lazy(() =>
@@ -227,6 +227,11 @@ const WhatsNewPage = lazy(() =>
     default: m.WhatsNewPage,
   })),
 )
+
+function LegacyStockSalesRedirect(): React.JSX.Element {
+  const { search } = useLocation()
+  return <Navigate to={{ pathname: '/reports/stock-sales', search }} replace />
+}
 
 function AppRoutes() {
   const location = useLocation()
@@ -397,7 +402,11 @@ function AppRoutes() {
 
                     <Route
                       path="/reports"
-                      element={<Navigate to="/reports/in-stock-summary" replace />}
+                      element={<Navigate to="/reports/stock-sales" replace />}
+                    />
+                    <Route
+                      path="/reports/in-stock-summary"
+                      element={<LegacyStockSalesRedirect />}
                     />
                     <Route
                       path="/reports/profitability"
@@ -432,10 +441,10 @@ function AppRoutes() {
                       }
                     />
                     <Route
-                      path="/reports/in-stock-summary"
+                      path="/reports/stock-sales"
                       element={
                         <PermissionRoute permission="view_reports">
-                          <InStockSummaryReportPage />
+                          <StockSalesReportPage />
                         </PermissionRoute>
                       }
                     />

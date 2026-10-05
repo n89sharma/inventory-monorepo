@@ -9,7 +9,7 @@ import {
 import { FILTER_PARSERS } from '@/lib/filters/parsers'
 import { METER_BANDS } from '@/lib/model-price-history-summary'
 import { createSerializer } from 'nuqs'
-import type { InStockSummaryModelRow } from '@/lib/in-stock-summary-grouping'
+import type { StockSalesModelRow } from '@/lib/stock-sales-grouping'
 import type { AssetType, Brand, MeterBand, OrgDetail, User, Warehouse } from 'shared-types'
 
 const HELD_DRILLDOWN_COLUMN_IDS = [
@@ -25,7 +25,7 @@ const HELD_DRILLDOWN_COLUMN_IDS = [
 const HELD_DRILLDOWN_SORT = { id: 'days_held', desc: true } as const
 
 const STORE_LIST_PATH = '/store'
-const IN_STOCK_SUMMARY_PATH = '/reports/in-stock-summary'
+const STOCK_SALES_PATH = '/reports/stock-sales'
 const ONHAND_PATH = '/search/onhand'
 const DEPARTED_PATH = '/search/departed'
 export const MODEL_PRICE_HISTORY_PATH = '/reports/model-price-history'
@@ -42,7 +42,7 @@ const BAND_BOUNDS = {
 
 const serializeWarehouse = createSerializer({ warehouse: FILTER_PARSERS.warehouse })
 const serializeAssetSearch = createSerializer({ wh: FILTER_PARSERS.wh, type: FILTER_PARSERS.type })
-const serializeInStockSummary = createSerializer({
+const serializeStockSales = createSerializer({
   brand: FILTER_PARSERS.brand,
   type: FILTER_PARSERS.type,
 })
@@ -97,15 +97,15 @@ export function buildStorePartPath(partId: number, warehouseId: number | null): 
   return serializeWarehouse(path, { warehouse: [warehouseId] })
 }
 
-export function buildInStockSummaryPath(brand: Brand | null, assetType: AssetType | null): string {
-  return serializeInStockSummary(IN_STOCK_SUMMARY_PATH, {
+export function buildStockSalesPath(brand: Brand | null, assetType: AssetType | null): string {
+  return serializeStockSales(STOCK_SALES_PATH, {
     brand: brand?.id ?? null,
     type: assetType ? [assetType.id] : null,
   })
 }
 
-export function inStockDrilldownHref(params: {
-  row: InStockSummaryModelRow
+export function onHandDrilldownHref(params: {
+  row: StockSalesModelRow
   warehouses: Warehouse[]
   band: MeterBand | null
 }): string {
