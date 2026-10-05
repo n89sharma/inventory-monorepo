@@ -5,7 +5,7 @@ import { WarehouseFilter } from '@/components/shared/filters/warehouse-filter'
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { useCan } from '@/hooks/use-can'
 import { useSearchHarvested } from '@/hooks/use-search-harvested'
-import { isUnharvestable } from '@/lib/asset-harvest'
+import { isUnharvestable } from '@/lib/asset-status'
 import { useAssetFilters, useWarehousesParam } from '@/lib/filters/hooks'
 import { useCallback, useMemo, useState } from 'react'
 import type { AssetSearchRow } from 'shared-types'
@@ -38,7 +38,7 @@ export function SearchHarvestedPage(): React.JSX.Element {
     mutate()
   }, [mutate])
 
-  const canHarvest = useCan('harvest_asset')
+  const canHarvest = useCan('update_asset_status')
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
 
   const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(

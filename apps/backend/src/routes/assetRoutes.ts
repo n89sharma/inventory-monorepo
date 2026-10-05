@@ -47,15 +47,15 @@ router.get(
   getDepartedAssets,
 )
 router.post('/barcodes/print', requirePermission('view_asset'), printAssetBarcodes)
-router.post('/bulk/harvest', requirePermission('harvest_asset'), harvestAssets)
+router.post('/bulk/harvest', requirePermission('update_asset_status'), harvestAssets)
 router.post(
   '/bulk/return-to-stock',
-  requirePermission('harvest_asset'),
+  requirePermission('update_asset_status'),
   returnHarvestedAssetsToStock,
 )
 router.post(
   '/bulk/return-missing-to-stock',
-  requirePermission('resolve_missing_asset'),
+  requirePermission('update_asset_status'),
   returnMissingAssetsToStock,
 )
 router.get(

@@ -54,14 +54,7 @@ vi.mock('@/components/asset-missing/return-missing-to-stock-dialog', () => ({
   ReturnMissingToStockDialog: () => null,
 }))
 
-const PERMISSIONS = [
-  'update_location',
-  'create_update_hold',
-  'delete_asset',
-  'harvest_asset',
-  'resolve_missing_asset',
-  'return_to_stock',
-]
+const PERMISSIONS = ['update_location', 'create_update_hold', 'delete_asset', 'update_asset_status']
 
 describe('AssetEditBar', () => {
   beforeEach(() => {
@@ -93,7 +86,7 @@ describe('AssetEditBar', () => {
 
   it('a missing asset offers no Return to Stock without the permission', () => {
     mocks.status = ASSET_STATUS.MISSING
-    mocks.granted = new Set(PERMISSIONS.filter((p) => p !== 'resolve_missing_asset'))
+    mocks.granted = new Set(PERMISSIONS.filter((p) => p !== 'update_asset_status'))
     render(<AssetEditBar barcode="YYZ-0000001" />)
 
     expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()

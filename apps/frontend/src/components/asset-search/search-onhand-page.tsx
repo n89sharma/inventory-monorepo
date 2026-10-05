@@ -22,7 +22,7 @@ import {
   useStatusesParam,
   useWarehousesParam,
 } from '@/lib/filters/hooks'
-import { isHarvestable } from '@/lib/asset-harvest'
+import { isAvailable } from '@/lib/asset-status'
 import { formatTitleCase } from '@/lib/formatters'
 import { useCallback, useMemo, useState } from 'react'
 import { ON_HAND_STATUS_VALUES, type AssetSearchRow, type Status } from 'shared-types'
@@ -44,9 +44,9 @@ function heldRowClassName(asset: AssetSearchRow): string | undefined {
   return days !== undefined && days > DAYS_HELD_WARNING_THRESHOLD ? ROW_WARNING_CLASS : undefined
 }
 
-function harvestBlockedReason(assets: AssetSearchRow[]): string | undefined {
+function unavailableReason(assets: AssetSearchRow[]): string | undefined {
   const blockedCount = assets.filter(
-    (a) => !isHarvestable(a.status, a.is_in_transit, a.departure_number),
+    (a) => !isAvailable(a.status, a.is_in_transit, a.departure_number),
   ).length
   if (blockedCount === 0) return undefined
   if (blockedCount === 1) return '1 selected asset is held or in transit'
@@ -91,7 +91,7 @@ export function SearchOnHandPage(): React.JSX.Element {
   )
 
   const canViewPurchasePrice = useCan('view_purchase_price')
-  const canHarvest = useCan('harvest_asset')
+  const canHarvest = useCan('update_asset_status')
   const [harvestOpen, setHarvestOpen] = useState(false)
 
   const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(
@@ -104,7 +104,7 @@ export function SearchOnHandPage(): React.JSX.Element {
               {
                 label: MARK_HARVESTED_LABEL,
                 onSelect: () => setHarvestOpen(true),
-                blockedReason: harvestBlockedReason(selectedAssets),
+                blockedReason: unavailableReason(selectedAssets),
               },
             ],
           },

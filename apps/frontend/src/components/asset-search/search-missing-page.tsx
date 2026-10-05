@@ -28,7 +28,7 @@ export function SearchMissingPage(): React.JSX.Element {
     mutate()
   }, [mutate])
 
-  const canResolveMissing = useCan('resolve_missing_asset')
+  const canResolveMissing = useCan('update_asset_status')
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
 
   const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(

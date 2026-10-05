@@ -63,7 +63,7 @@ import { deleteAsset as deleteAssetSer } from '../services/assetDeleteService.js
 import {
   harvestAssets as harvestAssetsSer,
   returnHarvestedAssetsToStock as returnHarvestedAssetsToStockSer,
-} from '../services/assetHarvestService.js'
+} from '../services/assetStatusService.js'
 import { returnMissingAssetsToStock as returnMissingAssetsToStockSer } from '../services/transferService.js'
 
 export const LocationsByWarehouseQuerySchema = z.object({

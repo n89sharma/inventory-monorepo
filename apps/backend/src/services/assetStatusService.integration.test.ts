@@ -11,7 +11,7 @@ import {
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { harvestAssets, returnHarvestedAssetsToStock } from './assetHarvestService.js'
+import { harvestAssets, returnHarvestedAssetsToStock } from './assetStatusService.js'
 import { createDeparture } from './departureService.js'
 import { addRemoveCollectionFromAssetsAndRecord, createHold } from './holdService.js'
 
@@ -29,7 +29,7 @@ async function getStatusChanges(assetId: number, sinceId: number): Promise<unkno
     .filter((status) => status !== undefined)
 }
 
-describe('assetHarvestService', () => {
+describe('assetStatusService', () => {
   let refs: ArrivalTestData
 
   beforeAll(async () => {

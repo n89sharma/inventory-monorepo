@@ -4,7 +4,7 @@ import { ConflictError, NotFoundError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
 import { recordAssetStatusChange } from './historyService.js'
 
-const HARVESTABLE_ASSET_WHERE = {
+const AVAILABLE_ASSET_WHERE = {
   status: { status: ASSET_STATUS.IN_STOCK },
   hold_id: null,
   departure_id: null,
@@ -69,7 +69,7 @@ export async function harvestAssets(assetIds: number[], userId: number): Promise
   await changeEligibleAssetStatus(
     {
       assetIds,
-      eligibleWhere: HARVESTABLE_ASSET_WHERE,
+      eligibleWhere: AVAILABLE_ASSET_WHERE,
       newStatus: ASSET_STATUS.HARVESTED,
       ineligibleError: (barcodes) =>
         new ConflictError(`${NOT_HARVESTABLE_MESSAGE} ${barcodes.join(', ')}`),

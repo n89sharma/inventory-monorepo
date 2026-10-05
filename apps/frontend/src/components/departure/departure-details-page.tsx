@@ -79,7 +79,7 @@ export function DepartureDetailsPage(): React.JSX.Element {
     [detail.data],
   )
   const canCreateEditDeparture = useCan('create_update_departure')
-  const canReturnToStock = useCan('return_to_stock')
+  const canReturnToStock = useCan('update_asset_status')
   const can = useCan()
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
   const isDraft = detail.data?.status === DEPARTURE_STATUS.DRAFT

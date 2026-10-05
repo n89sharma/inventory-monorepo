@@ -47,7 +47,7 @@ router.patch(
 )
 router.post(
   '/:departureNumber/assets/return-to-stock',
-  requirePermission('return_to_stock'),
+  requirePermission('update_asset_status'),
   returnDepartureAssetsToStock,
 )
 router.patch(

@@ -29,9 +29,7 @@ const SEEDED_ROLE_CODES = [
   'tech',
 ]
 
-const ROLES_WITH_RETURN_TO_STOCK = ['admin', 'general_manager', 'inventory_manager', 'leadership']
-
-const ROLES_WITH_RESOLVE_MISSING_ASSET = [
+const ROLES_WITH_UPDATE_ASSET_STATUS = [
   'admin',
   'branch_manager',
   'general_manager',
@@ -58,20 +56,12 @@ describe('roleService', () => {
     expect(await getDefaultRoleCode()).toBe('member')
   })
 
-  it('grants return_to_stock to exactly the four intended roles', async () => {
+  it('grants update_asset_status to every role that held a manual status permission', async () => {
     const roles = await listRoles()
     const granted = roles
-      .filter((r) => r.permissions.includes('return_to_stock'))
+      .filter((r) => r.permissions.includes('update_asset_status'))
       .map((r) => r.code)
-    expect(granted.sort()).toEqual(ROLES_WITH_RETURN_TO_STOCK)
-  })
-
-  it('grants resolve_missing_asset to the harvest roles present in this database', async () => {
-    const roles = await listRoles()
-    const granted = roles
-      .filter((r) => r.permissions.includes('resolve_missing_asset'))
-      .map((r) => r.code)
-    expect(granted.sort()).toEqual(ROLES_WITH_RESOLVE_MISSING_ASSET)
+    expect(granted.sort()).toEqual(ROLES_WITH_UPDATE_ASSET_STATUS)
   })
 
   it('resolves a role code to its granted permissions', async () => {

@@ -18,7 +18,7 @@ import {
 } from '@phosphor-icons/react'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
 import { useEntityDelete } from '@/hooks/use-entity-delete'
-import { isHarvestable, isUnharvestable } from '@/lib/asset-harvest'
+import { isAvailable, isUnharvestable } from '@/lib/asset-status'
 import { useState } from 'react'
 import {
   ASSET_STATUS,
@@ -99,12 +99,14 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canCreateSomeCollections = COLLECTION_PERMISSIONS.some((p) => can(p)) && assetEditable
   const canDelete = can('delete_asset') && assetEditable
   const isDeparted = assetDetails !== null && isOutgoingStatus(assetDetails.status)
-  const showReturnToStock = can('return_to_stock') && departureNumber !== null && isDeparted
-  const canHarvest = can('harvest_asset') && assetDetails !== null
+  const canUpdateStatus = can('update_asset_status')
+  const showReturnToStock = canUpdateStatus && departureNumber !== null && isDeparted
+  const canChangeStatus = canUpdateStatus && assetDetails !== null
   const showMarkHarvested =
-    canHarvest && isHarvestable(assetDetails.status, assetDetails.is_in_transit, departureNumber)
-  const showReturnHarvested = canHarvest && isUnharvestable(assetDetails.status, departureNumber)
-  const showReturnMissing = can('resolve_missing_asset') && !assetEditable
+    canChangeStatus && isAvailable(assetDetails.status, assetDetails.is_in_transit, departureNumber)
+  const showReturnHarvested =
+    canChangeStatus && isUnharvestable(assetDetails.status, departureNumber)
+  const showReturnMissing = canUpdateStatus && !assetEditable
   const harvestTargets = assetDetails
     ? [{ id: assetDetails.id, barcode: assetDetails.barcode }]
     : []

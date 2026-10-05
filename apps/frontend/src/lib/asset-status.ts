@@ -1,6 +1,6 @@
 import { ASSET_STATUS } from 'shared-types'
 
-export function isHarvestable(
+export function isAvailable(
   status: string,
   isInTransit: boolean,
   departureNumber: string | null,

@@ -18,7 +18,7 @@ import {
   getArrivalAssetForUpdate,
   updateArrivalAsset,
 } from './arrivalService.js'
-import { harvestAssets } from './assetHarvestService.js'
+import { harvestAssets } from './assetStatusService.js'
 import { getSerialNumberMatches } from './assetReadService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
 
