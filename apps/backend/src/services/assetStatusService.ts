@@ -18,6 +18,8 @@ const UNHARVESTABLE_ASSET_WHERE = {
 
 const NOT_HARVESTABLE_MESSAGE =
   'Only in-stock assets not on hold, a departure or in transit can be harvested:'
+const NOT_MARKABLE_MISSING_MESSAGE =
+  'Only in-stock assets not on hold, a departure or in transit can be marked missing:'
 const NOT_UNHARVESTABLE_MESSAGE =
   'Only harvested assets not on a departure can be returned to stock:'
 const CONCURRENT_CHANGE_MESSAGE = 'Some assets changed while updating; refresh and try again'
@@ -89,6 +91,19 @@ export async function returnHarvestedAssetsToStock(
       newStatus: ASSET_STATUS.IN_STOCK,
       ineligibleError: (barcodes) =>
         new ConflictError(`${NOT_UNHARVESTABLE_MESSAGE} ${barcodes.join(', ')}`),
+    },
+    userId,
+  )
+}
+
+export async function markAssetsMissing(assetIds: number[], userId: number): Promise<void> {
+  await changeEligibleAssetStatus(
+    {
+      assetIds,
+      eligibleWhere: AVAILABLE_ASSET_WHERE,
+      newStatus: ASSET_STATUS.MISSING,
+      ineligibleError: (barcodes) =>
+        new ConflictError(`${NOT_MARKABLE_MISSING_MESSAGE} ${barcodes.join(', ')}`),
     },
     userId,
   )

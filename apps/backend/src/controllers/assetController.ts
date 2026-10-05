@@ -62,6 +62,7 @@ import { createAssetSalvagedPart as createAssetSalvagedPartSer } from '../servic
 import { deleteAsset as deleteAssetSer } from '../services/assetDeleteService.js'
 import {
   harvestAssets as harvestAssetsSer,
+  markAssetsMissing as markAssetsMissingSer,
   returnHarvestedAssetsToStock as returnHarvestedAssetsToStockSer,
 } from '../services/assetStatusService.js'
 import { returnMissingAssetsToStock as returnMissingAssetsToStockSer } from '../services/transferService.js'
@@ -456,6 +457,12 @@ export const harvestAssets = asyncHandler(async (req, res) => {
 export const returnHarvestedAssetsToStock = asyncHandler(async (req, res) => {
   const { assetIds } = BulkAssetIdsSchema.parse(req.body)
   await returnHarvestedAssetsToStockSer(assetIds, res.locals.dbUserId)
+  res.json(successResponse(null))
+})
+
+export const markAssetsMissing = asyncHandler(async (req, res) => {
+  const { assetIds } = BulkAssetIdsSchema.parse(req.body)
+  await markAssetsMissingSer(assetIds, res.locals.dbUserId)
   res.json(successResponse(null))
 })
 

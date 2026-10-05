@@ -170,6 +170,11 @@ export async function returnHarvestedAssetsToStock(assetIds: number[]): Promise<
   await api.post('/assets/bulk/return-to-stock', returnHarvestedAssetsToStockBody)
 }
 
+export async function markAssetsMissing(assetIds: number[]): Promise<void> {
+  const markAssetsMissingBody = BulkAssetIdsSchema.parse({ assetIds } satisfies BulkAssetIds)
+  await api.post('/assets/bulk/mark-missing', markAssetsMissingBody)
+}
+
 export async function returnMissingAssetsToStock(assetIds: number[]): Promise<void> {
   const returnMissingAssetsToStockBody = BulkAssetIdsSchema.parse({
     assetIds,

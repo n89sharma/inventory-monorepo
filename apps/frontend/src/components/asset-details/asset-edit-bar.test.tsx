@@ -50,6 +50,9 @@ vi.mock('@/components/asset-harvest/harvest-dialogs', () => ({
   HarvestAssetsDialog: () => null,
   ReturnHarvestedToStockDialog: () => null,
 }))
+vi.mock('@/components/asset-missing/mark-assets-missing-dialog', () => ({
+  MarkAssetsMissingDialog: () => null,
+}))
 vi.mock('@/components/asset-missing/return-missing-to-stock-dialog', () => ({
   ReturnMissingToStockDialog: () => null,
 }))
@@ -62,13 +65,14 @@ describe('AssetEditBar', () => {
     mocks.departureNumber = null
   })
 
-  it('an in-stock asset offers location, collection, harvest and delete', () => {
+  it('an in-stock asset offers location, collection, harvest, missing and delete', () => {
     mocks.status = ASSET_STATUS.IN_STOCK
     render(<AssetEditBar barcode="YYZ-0000001" />)
 
     expect(screen.getByRole('button', { name: 'Edit location' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Collection/ })).toBeInTheDocument()
     expect(screen.getByText('Mark Harvested')).toBeInTheDocument()
+    expect(screen.getByText('Mark Missing')).toBeInTheDocument()
     expect(screen.getByText('Delete')).toBeInTheDocument()
     expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()
   })
@@ -92,13 +96,23 @@ describe('AssetEditBar', () => {
     expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()
   })
 
-  it('an in-stock asset on a departure that has not loaded it offers neither Return to Stock nor Mark Harvested', () => {
+  it('an in-stock asset on a departure that has not loaded it offers neither Return to Stock nor a status mark', () => {
     mocks.status = ASSET_STATUS.IN_STOCK
     mocks.departureNumber = 'D-YYZ-0000001'
     render(<AssetEditBar barcode="YYZ-0000001" />)
 
     expect(screen.queryByText('Return to Stock')).not.toBeInTheDocument()
     expect(screen.queryByText('Mark Harvested')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mark Missing')).not.toBeInTheDocument()
+  })
+
+  it('an in-stock asset offers no status mark without the permission', () => {
+    mocks.status = ASSET_STATUS.IN_STOCK
+    mocks.granted = new Set(PERMISSIONS.filter((p) => p !== 'update_asset_status'))
+    render(<AssetEditBar barcode="YYZ-0000001" />)
+
+    expect(screen.queryByText('Mark Harvested')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mark Missing')).not.toBeInTheDocument()
   })
 
   it('a sold asset on a departure offers Return to Stock', () => {

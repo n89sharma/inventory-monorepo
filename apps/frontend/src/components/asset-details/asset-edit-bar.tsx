@@ -2,6 +2,7 @@ import {
   HarvestAssetsDialog,
   ReturnHarvestedToStockDialog,
 } from '@/components/asset-harvest/harvest-dialogs'
+import { MarkAssetsMissingDialog } from '@/components/asset-missing/mark-assets-missing-dialog'
 import { ReturnMissingToStockDialog } from '@/components/asset-missing/return-missing-to-stock-dialog'
 import { useAssetStore } from '@/data/store/asset-store'
 import { useAssetDetail } from '@/hooks/use-asset-detail'
@@ -14,6 +15,7 @@ import {
   PlusIcon,
   PrinterIcon,
   TrashIcon,
+  WarningIcon,
   WrenchIcon,
 } from '@phosphor-icons/react'
 import { useDepartureMutations } from '@/hooks/use-departure-mutations'
@@ -58,6 +60,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const [returnToStockOpen, setReturnToStockOpen] = useState(false)
   const [harvestOpen, setHarvestOpen] = useState(false)
   const [returnHarvestedOpen, setReturnHarvestedOpen] = useState(false)
+  const [markMissingOpen, setMarkMissingOpen] = useState(false)
   const [returnMissingOpen, setReturnMissingOpen] = useState(false)
 
   const mutations = useDepartureMutations()
@@ -102,14 +105,12 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
   const canUpdateStatus = can('update_asset_status')
   const showReturnToStock = canUpdateStatus && departureNumber !== null && isDeparted
   const canChangeStatus = canUpdateStatus && assetDetails !== null
-  const showMarkHarvested =
+  const showMarkActions =
     canChangeStatus && isAvailable(assetDetails.status, assetDetails.is_in_transit, departureNumber)
   const showReturnHarvested =
     canChangeStatus && isUnharvestable(assetDetails.status, departureNumber)
   const showReturnMissing = canUpdateStatus && !assetEditable
-  const harvestTargets = assetDetails
-    ? [{ id: assetDetails.id, barcode: assetDetails.barcode }]
-    : []
+  const statusTargets = assetDetails ? [{ id: assetDetails.id, barcode: assetDetails.barcode }] : []
 
   return (
     <div className="flex gap-2 print:hidden">
@@ -145,7 +146,7 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
         </Button>
       )}
       {(showReturnToStock ||
-        showMarkHarvested ||
+        showMarkActions ||
         showReturnHarvested ||
         showReturnMissing ||
         canDelete) && (
@@ -156,10 +157,16 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-max">
-            {showMarkHarvested && (
+            {showMarkActions && (
               <DropdownMenuItem onSelect={() => setHarvestOpen(true)}>
                 <WrenchIcon />
                 Mark Harvested
+              </DropdownMenuItem>
+            )}
+            {showMarkActions && (
+              <DropdownMenuItem onSelect={() => setMarkMissingOpen(true)}>
+                <WarningIcon />
+                Mark Missing
               </DropdownMenuItem>
             )}
             {showReturnHarvested && (
@@ -211,19 +218,25 @@ export function AssetEditBar({ barcode }: { barcode: string }): React.JSX.Elemen
       />
 
       <HarvestAssetsDialog
-        assets={harvestTargets}
+        assets={statusTargets}
         open={harvestOpen}
         onOpenChange={setHarvestOpen}
       />
 
       <ReturnHarvestedToStockDialog
-        assets={harvestTargets}
+        assets={statusTargets}
         open={returnHarvestedOpen}
         onOpenChange={setReturnHarvestedOpen}
       />
 
+      <MarkAssetsMissingDialog
+        assets={statusTargets}
+        open={markMissingOpen}
+        onOpenChange={setMarkMissingOpen}
+      />
+
       <ReturnMissingToStockDialog
-        assets={harvestTargets}
+        assets={statusTargets}
         open={returnMissingOpen}
         onOpenChange={setReturnMissingOpen}
       />

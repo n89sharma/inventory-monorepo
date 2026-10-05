@@ -11,9 +11,14 @@ import {
 } from '../../test/factories.js'
 import { ConflictError } from '../lib/errors.js'
 import { prisma } from '../prisma.js'
-import { harvestAssets, returnHarvestedAssetsToStock } from './assetStatusService.js'
+import {
+  harvestAssets,
+  markAssetsMissing,
+  returnHarvestedAssetsToStock,
+} from './assetStatusService.js'
 import { createDeparture } from './departureService.js'
 import { addRemoveCollectionFromAssetsAndRecord, createHold } from './holdService.js'
+import { returnMissingAssetsToStock } from './transferService.js'
 
 async function getMaxHistoryId(): Promise<number> {
   const { _max } = await prisma.history.aggregate({ _max: { id: true } })
@@ -149,5 +154,64 @@ describe('assetStatusService', () => {
     ).rejects.toThrow(ConflictError)
 
     expect(await getAssetStatus(harvestedAsset.id)).toBe(ASSET_STATUS.HARVESTED)
+  })
+
+  it('marks in-stock assets missing in place and records the status change', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    const sinceId = await getMaxHistoryId()
+
+    await markAssetsMissing([asset.id], refs.userId)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.MISSING)
+    expect(await getStatusChanges(asset.id, sinceId)).toEqual([ASSET_STATUS.MISSING])
+  })
+
+  it('rejects the whole missing batch when one asset is held', async () => {
+    const [free, held] = await createArrivedAssets(refs, 2)
+    await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
+
+    await expect(markAssetsMissing([free.id, held.id], refs.userId)).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(free.id)).toBe(ASSET_STATUS.IN_STOCK)
+    expect(await getAssetStatus(held.id)).toBe(ASSET_STATUS.HELD)
+  })
+
+  it('refuses to mark an asset in transit missing', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await prisma.asset.update({ where: { id: asset.id }, data: { is_in_transit: true } })
+
+    await expect(markAssetsMissing([asset.id], refs.userId)).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
+  })
+
+  it('refuses to mark an asset on a departure missing', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await createDeparture(
+      buildCreateDepartureInput(refs, [{ id: asset.id, outgoing_status: OUTGOING_STATUS.SOLD }]),
+      refs.userId,
+    )
+
+    await expect(markAssetsMissing([asset.id], refs.userId)).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
+  })
+
+  it('refuses to mark a harvested asset missing', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await harvestAssets([asset.id], refs.userId)
+
+    await expect(markAssetsMissing([asset.id], refs.userId)).rejects.toThrow(ConflictError)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.HARVESTED)
+  })
+
+  it('returns a manually missing asset to stock', async () => {
+    const [asset] = await createArrivedAssets(refs, 1)
+    await markAssetsMissing([asset.id], refs.userId)
+
+    await returnMissingAssetsToStock([asset.id], refs.userId)
+
+    expect(await getAssetStatus(asset.id)).toBe(ASSET_STATUS.IN_STOCK)
   })
 })

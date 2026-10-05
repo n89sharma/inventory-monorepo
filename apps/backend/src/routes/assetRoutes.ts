@@ -22,6 +22,7 @@ import {
   getDepartedAssets,
   getSerialNumberMatches,
   harvestAssets,
+  markAssetsMissing,
   patchAssetPricing,
   printAssetBarcodes,
   returnHarvestedAssetsToStock,
@@ -53,6 +54,7 @@ router.post(
   requirePermission('update_asset_status'),
   returnHarvestedAssetsToStock,
 )
+router.post('/bulk/mark-missing', requirePermission('update_asset_status'), markAssetsMissing)
 router.post(
   '/bulk/return-missing-to-stock',
   requirePermission('update_asset_status'),

@@ -1,6 +1,7 @@
 import { AssetFilterBar } from '@/components/asset-search/asset-filter-bar'
 import { AssetSearchPage } from '@/components/asset-search/asset-search-page'
 import { HarvestAssetsDialog } from '@/components/asset-harvest/harvest-dialogs'
+import { MarkAssetsMissingDialog } from '@/components/asset-missing/mark-assets-missing-dialog'
 import type { RenderBulkExtraActions } from '@/components/collections/bulk-edit-bar'
 import { Toggle } from '@/components/shadcn/toggle'
 import { OrganizationFilter } from '@/components/shared/filters/organization-filter'
@@ -36,6 +37,7 @@ const ROW_WARNING_CLASS = 'data-row-warning'
 const ALL_STATUSES_LABEL = 'All'
 const STATUS_GROUP_LABEL = 'Filter by status'
 const MARK_HARVESTED_LABEL = 'Mark harvested'
+const MARK_MISSING_LABEL = 'Mark missing'
 
 const statusLabel = (status: Status) => formatTitleCase(status.status)
 
@@ -91,12 +93,14 @@ export function SearchOnHandPage(): React.JSX.Element {
   )
 
   const canViewPurchasePrice = useCan('view_purchase_price')
-  const canHarvest = useCan('update_asset_status')
+  const canUpdateStatus = useCan('update_asset_status')
   const [harvestOpen, setHarvestOpen] = useState(false)
+  const [markMissingOpen, setMarkMissingOpen] = useState(false)
 
   const renderBulkExtraActions = useCallback<RenderBulkExtraActions>(
     ({ selectedAssets, clearSelection }) => {
-      if (!canHarvest) return null
+      if (!canUpdateStatus) return null
+      const blockedReason = unavailableReason(selectedAssets)
       return {
         groups: [
           {
@@ -104,22 +108,35 @@ export function SearchOnHandPage(): React.JSX.Element {
               {
                 label: MARK_HARVESTED_LABEL,
                 onSelect: () => setHarvestOpen(true),
-                blockedReason: unavailableReason(selectedAssets),
+                blockedReason,
+              },
+              {
+                label: MARK_MISSING_LABEL,
+                onSelect: () => setMarkMissingOpen(true),
+                blockedReason,
               },
             ],
           },
         ],
         dialogs: (
-          <HarvestAssetsDialog
-            assets={selectedAssets}
-            open={harvestOpen}
-            onOpenChange={setHarvestOpen}
-            onSuccess={clearSelection}
-          />
+          <>
+            <HarvestAssetsDialog
+              assets={selectedAssets}
+              open={harvestOpen}
+              onOpenChange={setHarvestOpen}
+              onSuccess={clearSelection}
+            />
+            <MarkAssetsMissingDialog
+              assets={selectedAssets}
+              open={markMissingOpen}
+              onOpenChange={setMarkMissingOpen}
+              onSuccess={clearSelection}
+            />
+          </>
         ),
       }
     },
-    [canHarvest, harvestOpen],
+    [canUpdateStatus, harvestOpen, markMissingOpen],
   )
 
   const { data: assets = EMPTY_ASSETS, isLoading, mutate } = useSearchOnHand(filters)
