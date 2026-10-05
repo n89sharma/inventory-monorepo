@@ -66,7 +66,7 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
   },
   {
     accessorKey: 'asset_count',
-    header: 'Count',
+    header: 'In Stock',
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
