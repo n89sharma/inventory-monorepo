@@ -4,7 +4,7 @@ import { TableToolbarEnd } from '@/components/shared/table-toolbar'
 import type { AssetTypeCounts, AssetTypeFilter } from '@/lib/asset-type-filter'
 import type { Table } from '@tanstack/react-table'
 import type { AssetSearchRow } from 'shared-types'
-import { AssetTypeFilterGroup } from './asset-type-filter-group'
+import { AssetTypeFilterGroup } from '@/components/shared/filters/asset-type-filter-group'
 
 const SEARCH_PLACEHOLDER = 'Search barcode, serial, model'
 const SEARCH_CLEAR_LABEL = 'Clear search'
