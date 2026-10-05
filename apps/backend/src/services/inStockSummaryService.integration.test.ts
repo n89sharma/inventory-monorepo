@@ -3,6 +3,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import {
   ALL_PRICE_PERMISSIONS,
   ArrivalTestData,
+  buildCreateHoldInput,
   buildUpdateAssetSpecs,
   cleanupTransactionalData,
   createArrivedAssets,
@@ -17,6 +18,7 @@ import {
 import { prisma } from '../prisma.js'
 import { patchAssetPricing } from './assetPricingService.js'
 import { updateAssetSpecs } from './assetSpecsService.js'
+import { createHold } from './holdService.js'
 import { getInStockSummaryReport } from './inStockSummaryService.js'
 
 const SALES_FROM = '2026-04-05'
@@ -173,5 +175,37 @@ describe('inStockSummaryService', () => {
     const report = await getInStockSummaryReport(SALES_FROM, PURCHASE_PRICE_ONLY)
     expect(report.sale_prices).toBeNull()
     expect(report.stock.find((r) => r.model_id === refs.model.id)?.in_stock_count).toBe(1)
+  })
+
+  it('counts held assets separately from in-stock ones', async () => {
+    const [held, ...inStock] = await createArrivedAssets(refs, 3)
+    await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
+
+    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const row = report.stock.find((r) => r.model_id === refs.model.id)
+    expect(row).toMatchObject({ in_stock_count: inStock.length, held_count: 1 })
+  })
+
+  it('returns a row for a model whose only assets are held', async () => {
+    const [held] = await createArrivedAssets(refs, 1)
+    await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
+
+    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const row = report.stock.find((r) => r.model_id === refs.model.id)
+    expect(row).toMatchObject({ in_stock_count: 0, held_count: 1 })
+  })
+
+  it('includes held assets in the cost sums', async () => {
+    const [held, inStock] = await createArrivedAssets(refs, 2)
+    await seedAssetCost(held.id)
+    await seedAssetCost(inStock.id)
+    await createHold(buildCreateHoldInput(refs, [held]), refs.userId)
+
+    const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
+    const row = report.stock.find((r) => r.model_id === refs.model.id)
+    expect(row).toMatchObject({
+      purchase_cost_sum: (SEEDED_ASSET_COST.purchase_cost ?? 0) * 2,
+      purchase_cost_count: 2,
+    })
   })
 })

@@ -114,6 +114,7 @@ const IRADX_ROW: InStockSummaryModelRow = {
   model_id: 90,
   model_name: 'IRADX4745i',
   in_stock_count: 3,
+  held_count: 0,
   avg_purchase_cost: null,
   avg_total_cost: null,
   median_sale_price: null,

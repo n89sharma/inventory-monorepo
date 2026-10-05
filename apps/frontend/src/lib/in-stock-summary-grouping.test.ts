@@ -16,6 +16,7 @@ type Stock = {
   model: number
   band: MeterBand
   assets: number
+  held?: number
   purchaseCosts: (number | null)[]
 }
 
@@ -23,7 +24,14 @@ function sold(model: number, band: MeterBand, salePrices: number[]): InStockSale
   return { model_id: model, meter_band: band, sale_prices: salePrices }
 }
 
-function stocked({ warehouse, model, band, assets, purchaseCosts }: Stock): InStockSummaryRow {
+function stocked({
+  warehouse,
+  model,
+  band,
+  assets,
+  held = 0,
+  purchaseCosts,
+}: Stock): InStockSummaryRow {
   const recorded = purchaseCosts.filter((cost): cost is number => cost !== null)
   const sum = recorded.length === 0 ? null : recorded.reduce((total, cost) => total + cost, 0)
   return {
@@ -40,6 +48,7 @@ function stocked({ warehouse, model, band, assets, purchaseCosts }: Stock): InSt
     total_cost_sum: sum,
     total_cost_count: recorded.length,
     in_stock_count: assets,
+    held_count: held,
   }
 }
 
@@ -65,6 +74,32 @@ describe('buildInStockSummaryGroups', () => {
       [IRADX, 4],
       [IMAGERUNNER, 5],
     ])
+  })
+
+  it('adds up held units across warehouses and meter bands', () => {
+    const [group] = buildInStockSummaryGroups(
+      [
+        stocked({
+          warehouse: YYZ,
+          model: IRADX,
+          band: 'LOW',
+          assets: 2,
+          held: 1,
+          purchaseCosts: [],
+        }),
+        stocked({
+          warehouse: DFW,
+          model: IRADX,
+          band: 'HIGH',
+          assets: 0,
+          held: 3,
+          purchaseCosts: [],
+        }),
+      ],
+      NO_SALES,
+      ALL_BANDS,
+    )
+    expect(group).toMatchObject({ in_stock_count: 2, held_count: 4 })
   })
 
   it('averages over the assets that have a cost, not over every asset', () => {

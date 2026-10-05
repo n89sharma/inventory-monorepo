@@ -13,6 +13,7 @@ export type InStockSummaryModelRow = Pick<
   'brand_id' | 'brand_name' | 'asset_type_id' | 'asset_type' | 'model_id' | 'model_name'
 > & {
   in_stock_count: number
+  held_count: number
   avg_purchase_cost: number | null
   avg_total_cost: number | null
   median_sale_price: number | null
@@ -71,6 +72,7 @@ export function buildInStockSummaryGroups(
     const existing = groups.get(row.model_id)
     if (existing) {
       existing.in_stock_count += row.in_stock_count
+      existing.held_count += row.held_count
       existing.purchase_cost_sum = addNullable(existing.purchase_cost_sum, row.purchase_cost_sum)
       existing.purchase_cost_count += row.purchase_cost_count
       existing.total_cost_sum = addNullable(existing.total_cost_sum, row.total_cost_sum)
@@ -84,6 +86,7 @@ export function buildInStockSummaryGroups(
         model_id: row.model_id,
         model_name: row.model_name,
         in_stock_count: row.in_stock_count,
+        held_count: row.held_count,
         purchase_cost_sum: row.purchase_cost_sum,
         purchase_cost_count: row.purchase_cost_count,
         total_cost_sum: row.total_cost_sum,
@@ -104,6 +107,7 @@ export function buildInStockSummaryGroups(
       model_id: group.model_id,
       model_name: group.model_name,
       in_stock_count: group.in_stock_count,
+      held_count: group.held_count,
       avg_purchase_cost: average(group.purchase_cost_sum, group.purchase_cost_count),
       avg_total_cost: avgTotalCost,
       median_sale_price: medianSalePrice,

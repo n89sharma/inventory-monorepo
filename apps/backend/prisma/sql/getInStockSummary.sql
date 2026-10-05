@@ -1,4 +1,4 @@
--- $1 = IN_STOCK status ids. Meter-band thresholds mirror METER_BANDS
+-- $1 = IN_STOCK status ids, $2 = HELD status ids. Meter-band thresholds mirror METER_BANDS
 -- (apps/frontend/src/lib/model-price-history-summary.ts): max is exclusive.
 select
   w.id                          as warehouse_id,
@@ -18,9 +18,10 @@ select
   count(c.purchase_cost)::int   as purchase_cost_count,
   sum(c.total_cost)::float8     as total_cost_sum,
   count(c.total_cost)::int      as total_cost_count,
-  count(*)::int                 as in_stock_count
+  count(*) filter (where s.id = any($1::int[]))::int as in_stock_count,
+  count(*) filter (where s.id = any($2::int[]))::int as held_count
 from "Asset" a
-join "Status" s    on s.id = a.status_id and s.id = any($1::int[])
+join "Status" s    on s.id = a.status_id and (s.id = any($1::int[]) or s.id = any($2::int[]))
 join "Model" m     on m.id = a.model_id
 join "AssetType" t on t.id = m.asset_type_id
 join "Brand" b     on b.id = m.brand_id

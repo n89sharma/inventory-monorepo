@@ -17,6 +17,7 @@ export const InStockSummaryRowSchema = z.object({
   total_cost_sum: z.number().nullable(),
   total_cost_count: z.number().int(),
   in_stock_count: z.number().int(),
+  held_count: z.number().int(),
 })
 export type InStockSummaryRow = z.infer<typeof InStockSummaryRowSchema>
 

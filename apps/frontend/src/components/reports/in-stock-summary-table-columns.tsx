@@ -55,6 +55,16 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
     ),
   },
   {
+    accessorKey: 'in_stock_count',
+    header: 'In Stock',
+    meta: { cellClassName: 'text-center tabular-nums' },
+  },
+  {
+    accessorKey: 'held_count',
+    header: 'Held',
+    meta: { cellClassName: 'text-center tabular-nums' },
+  },
+  {
     accessorKey: 'avg_purchase_cost',
     header: 'Avg Purchase Cost',
     cell: ({ row }) => formatUSDWithSymbol(row.original.avg_purchase_cost),
@@ -85,11 +95,6 @@ export const IN_STOCK_SUMMARY_COLUMNS: ColumnDef<InStockSummaryModelRow>[] = [
   {
     accessorKey: 'sales_count',
     header: 'Sales',
-    meta: { cellClassName: 'text-center tabular-nums' },
-  },
-  {
-    accessorKey: 'in_stock_count',
-    header: 'In Stock',
     meta: { cellClassName: 'text-center tabular-nums' },
   },
   {
