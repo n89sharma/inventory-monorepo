@@ -113,7 +113,7 @@ const IRADX_ROW: InStockSummaryModelRow = {
   asset_type: 'COPIER',
   model_id: 90,
   model_name: 'IRADX4745i',
-  asset_count: 3,
+  in_stock_count: 3,
   avg_purchase_cost: null,
   avg_total_cost: null,
   median_sale_price: null,

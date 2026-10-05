@@ -75,7 +75,7 @@ describe('inStockSummaryService', () => {
     await createLoadedDeparture(refs, [{ id: assets[0].id, outgoing_status: OUTGOING_STATUS.SOLD }])
 
     const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
-    const total = report.stock.reduce((sum, row) => sum + (row.asset_count ?? 0), 0)
+    const total = report.stock.reduce((sum, row) => sum + (row.in_stock_count ?? 0), 0)
     expect(total).toBe(2)
   })
 
@@ -89,7 +89,7 @@ describe('inStockSummaryService', () => {
 
     const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id && r.meter_band === 'HIGH')
-    expect(row?.asset_count).toBe(1)
+    expect(row?.in_stock_count).toBe(1)
   })
 
   it('returns cost sums and costed counts, leaving an uncosted asset out of the costed count', async () => {
@@ -101,7 +101,7 @@ describe('inStockSummaryService', () => {
     const report = await getInStockSummaryReport(SALES_FROM, ALL_PRICE_PERMISSIONS)
     const row = report.stock.find((r) => r.model_id === refs.model.id)
     expect(row).toMatchObject({
-      asset_count: 3,
+      in_stock_count: 3,
       purchase_cost_sum: (SEEDED_ASSET_COST.purchase_cost ?? 0) * 2,
       purchase_cost_count: 2,
       total_cost_sum: (SEEDED_ASSET_COST.total_cost ?? 0) * 2,
@@ -126,7 +126,7 @@ describe('inStockSummaryService', () => {
     const counts = Object.fromEntries(
       report.stock
         .filter((r) => r.model_id === refs.model.id)
-        .map((r) => [r.warehouse_id, r.asset_count]),
+        .map((r) => [r.warehouse_id, r.in_stock_count]),
     )
     expect(counts).toEqual({ [refs.warehouse.id]: 2, [refs.warehouse2.id]: 1 })
   })
@@ -172,6 +172,6 @@ describe('inStockSummaryService', () => {
 
     const report = await getInStockSummaryReport(SALES_FROM, PURCHASE_PRICE_ONLY)
     expect(report.sale_prices).toBeNull()
-    expect(report.stock.find((r) => r.model_id === refs.model.id)?.asset_count).toBe(1)
+    expect(report.stock.find((r) => r.model_id === refs.model.id)?.in_stock_count).toBe(1)
   })
 })

@@ -41,7 +41,7 @@ const TABLE_LABEL = 'In-stock summary'
 
 const EMPTY_REPORT: InStockSummaryReport = { stock: [], sale_prices: null }
 const NO_SALE_PRICE_GROUPS: InStockSalePriceGroup[] = []
-const DEFAULT_SORT = { id: 'asset_count', desc: true }
+const DEFAULT_SORT = { id: 'in_stock_count', desc: true }
 
 type InStockSummaryFilters = {
   warehouses: Warehouse[]

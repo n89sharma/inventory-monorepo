@@ -18,7 +18,7 @@ select
   count(c.purchase_cost)::int   as purchase_cost_count,
   sum(c.total_cost)::float8     as total_cost_sum,
   count(c.total_cost)::int      as total_cost_count,
-  count(*)::int                 as asset_count
+  count(*)::int                 as in_stock_count
 from "Asset" a
 join "Status" s    on s.id = a.status_id and s.id = any($1::int[])
 join "Model" m     on m.id = a.model_id

@@ -39,7 +39,7 @@ function stocked({ warehouse, model, band, assets, purchaseCosts }: Stock): InSt
     purchase_cost_count: recorded.length,
     total_cost_sum: sum,
     total_cost_count: recorded.length,
-    asset_count: assets,
+    in_stock_count: assets,
   }
 }
 
@@ -61,7 +61,7 @@ describe('buildInStockSummaryGroups', () => {
       NO_SALES,
       ALL_BANDS,
     )
-    expect(groups.map((group) => [group.model_id, group.asset_count])).toEqual([
+    expect(groups.map((group) => [group.model_id, group.in_stock_count])).toEqual([
       [IRADX, 4],
       [IMAGERUNNER, 5],
     ])
@@ -82,7 +82,7 @@ describe('buildInStockSummaryGroups', () => {
       NO_SALES,
       ALL_BANDS,
     )
-    expect(group.asset_count).toBe(3)
+    expect(group.in_stock_count).toBe(3)
     expect(group.avg_purchase_cost).toBe(250)
     expect(group.avg_total_cost).toBe(250)
   })
